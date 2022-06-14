@@ -45,12 +45,11 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
-import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -60,12 +59,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.quartz.CronExpression;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,13 +99,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    private Scheduler scheduler;
+    private SchedulerApi schedulerApi;
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private QuartzExecutor quartzExecutor;
 
     /**
      * save schedule
@@ -143,7 +138,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -243,7 +238,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -286,7 +281,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -441,7 +436,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -460,8 +455,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     public void setSchedule(int projectId, Schedule schedule) {
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
-
-        quartzExecutor.addJob(ProcessScheduleJob.class, projectId, schedule);
+        schedulerApi.insertOrUpdateScheduleTask(projectId, schedule);
     }
 
     /**
@@ -474,20 +468,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     public void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
-
-        String jobName = quartzExecutor.buildJobName(scheduleId);
-        String jobGroupName = quartzExecutor.buildJobGroupName(projectId);
-
-        JobKey jobKey = new JobKey(jobName, jobGroupName);
-        try {
-            if (scheduler.checkExists(jobKey)) {
-                logger.info("Try to delete job: {}, group name: {},", jobName, jobGroupName);
-                scheduler.deleteJob(jobKey);
-            }
-        } catch (SchedulerException e) {
-            logger.error("Failed to delete job: {}", jobKey);
-            throw new ServiceException("Failed to delete job: " + jobKey);
-        }
+        schedulerApi.deleteScheduleTask(projectId, scheduleId);
     }
 
     /**
@@ -521,7 +502,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
@@ -617,7 +598,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                      long environmentCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

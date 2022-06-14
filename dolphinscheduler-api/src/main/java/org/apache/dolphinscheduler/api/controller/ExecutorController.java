@@ -58,7 +58,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class ExecutorController extends BaseController {
      * @param loginUser login user
      * @param projectCode project code
      * @param processDefinitionCode process definition code
-     * @param scheduleTime schedule time
+     * @param scheduleTime schedule time when CommandType is COMPLEMENT_DATA  there are two ways to transfer parameters 1.date range, for example:{"complementStartDate":"2022-01-01 12:12:12","complementEndDate":"2022-01-6 12:12:12"} 2.manual input,  for example:{"complementScheduleDateList":"2022-01-01 00:00:00,2022-01-02 12:12:12,2022-01-03 12:12:12"}
      * @param failureStrategy failure strategy
      * @param startNodeList start nodes list
      * @param taskDependType task depend type

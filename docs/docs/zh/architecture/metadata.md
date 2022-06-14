@@ -31,14 +31,14 @@
 
 <a name="VNVGr"></a>
 ### 用户	队列	数据源
-![image.png](/img/metadata-erd/user-queue-datasource.png)
+![image.png](../../../img/metadata-erd/user-queue-datasource.png)
 
 - 一个租户下可以有多个用户<br />
 - t_ds_user中的queue字段存储的是队列表中的queue_name信息，t_ds_tenant下存的是queue_id，在流程定义执行过程中，用户队列优先级最高，用户队列为空则采用租户队列<br />
 - t_ds_datasource表中的user_id字段表示创建该数据源的用户，t_ds_relation_datasource_user中的user_id表示，对数据源有权限的用户<br />
 <a name="HHyGV"></a>
 ### 项目	资源	告警
-![image.png](/img/metadata-erd/project-resource-alert.png)
+![image.png](../../../img/metadata-erd/project-resource-alert.png)
 
 - 一个用户可以有多个项目，用户项目授权通过t_ds_relation_project_user表完成project_id和user_id的关系绑定<br />
 - t_ds_projcet表中的user_id表示创建该项目的用户，t_ds_relation_project_user表中的user_id表示对项目有权限的用户<br />
@@ -46,7 +46,7 @@
 - t_ds_udfs表中的user_id表示创建该UDF的用户，t_ds_relation_udfs_user表中的user_id表示对UDF有权限的用户<br />
 <a name="Bg2Sn"></a>
 ### 命令	流程	任务
-![image.png](/img/metadata-erd/command.png)<br />![image.png](/img/metadata-erd/process-task.png)
+![image.png](../../../img/metadata-erd/command.png)<br />![image.png](../../../img/metadata-erd/process-task.png)
 
 - 一个项目有多个流程定义，一个流程定义可以生成多个流程实例，一个流程实例可以生成多个任务实例<br />
 - t_ds_schedulers表存放流程定义的定时调度信息<br />

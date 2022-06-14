@@ -40,7 +40,8 @@ import {
   NSelect,
   NSwitch,
   NCheckbox,
-  NDatePicker
+  NDatePicker,
+  NRadioButton
 } from 'naive-ui'
 import {
   ArrowDownOutlined,
@@ -228,7 +229,7 @@ export default defineComponent({
         onConfirm={this.handleStart}
         confirmLoading={this.saving}
       >
-        <NForm ref='startFormRef'>
+        <NForm ref='startFormRef' model={this.startForm} rules={this.rules}>
           <NFormItem
             label={t('project.workflow.workflow_name')}
             path='workflow_name'
@@ -316,7 +317,7 @@ export default defineComponent({
           </NFormItem>
           {this.startForm.execType &&
             this.startForm.execType !== 'START_PROCESS' && (
-              <NSpace>
+              <NSpace vertical class={styles['width-100']}>
                 <NFormItem
                   label={t('project.workflow.mode_of_dependent')}
                   path='dependentMode'
@@ -366,14 +367,41 @@ export default defineComponent({
                 )}
                 <NFormItem
                   label={t('project.workflow.schedule_date')}
-                  path='startEndTime'
+                  path={
+                    this.startForm.dataDateType === 1
+                      ? 'startEndTime'
+                      : 'scheduleTime'
+                  }
                 >
-                  <NDatePicker
-                    type='datetimerange'
-                    clearable
-                    v-model:value={this.startForm.startEndTime}
-                    placement='top'
-                  />
+                  <NSpace vertical class={styles['width-100']}>
+                    <NRadioGroup
+                      name='data-date'
+                      v-model:value={this.startForm.dataDateType}
+                    >
+                      {[
+                        { label: t('project.workflow.select_date'), value: 1 },
+                        { label: t('project.workflow.enter_date'), value: 2 }
+                      ].map((item) => (
+                        <NRadioButton {...item} key={item.value} />
+                      ))}
+                    </NRadioGroup>
+
+                    {this.startForm.dataDateType === 1 ? (
+                      <NDatePicker
+                        type='datetimerange'
+                        clearable
+                        v-model:value={this.startForm.startEndTime}
+                        placement='top'
+                      />
+                    ) : (
+                      <NInput
+                        clearable
+                        type='textarea'
+                        v-model:value={this.startForm.scheduleTime}
+                        placeholder={t('project.workflow.schedule_date_tips')}
+                      />
+                    )}
+                  </NSpace>
                 </NFormItem>
               </NSpace>
             )}

@@ -51,7 +51,8 @@ export function useSql({
     sqlType: '0',
     preStatements: [],
     postStatements: [],
-    udfs: []
+    udfs: [],
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []

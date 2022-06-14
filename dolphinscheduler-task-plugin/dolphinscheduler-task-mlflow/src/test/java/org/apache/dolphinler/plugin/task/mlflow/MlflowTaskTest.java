@@ -78,28 +78,92 @@ public class MlflowTaskTest {
     }
 
     @Test
-    public void testInitBasicAlgorithmTask() throws Exception {
+    public void testInitBasicAlgorithmTask() {
         MlflowTask mlflowTask = initTask(createBasicAlgorithmParameters());
-        String command = mlflowTask.buildCommand();
-
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "data_path=/data/iris.csv\n" +
+                        "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-BasicAlgorithm\n" +
+                        "mlflow run $repo " +
+                        "-P algorithm=xgboost " +
+                        "-P data_path=$data_path " +
+                        "-P params=\"n_estimators=100\" " +
+                        "-P search_params=\"\" " +
+                        "-P model_name=\"BasicAlgorithm\" " +
+                        "--experiment-name=\"BasicAlgorithm\" " +
+                        "--version=main ");
     }
 
     @Test
-    public void testInitAutoMLTask() throws Exception {
+    public void testInitAutoMLTask() {
         MlflowTask mlflowTask = initTask(createAutoMLParameters());
-        String command = mlflowTask.buildCommand();
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "data_path=/data/iris.csv\n" +
+                        "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-AutoML\n" +
+                        "mlflow run $repo " +
+                        "-P tool=autosklearn " +
+                        "-P data_path=$data_path " +
+                        "-P params=\"time_left_for_this_task=30\" " +
+                        "-P model_name=\"AutoML\" " +
+                        "--experiment-name=\"AutoML\" " +
+                        "--version=main ");
     }
 
     @Test
-    public void testModelsDeployMlflow() throws Exception {
+    public void testInitCustomProjectTask() {
+        MlflowTask mlflowTask = initTask(createCustomProjectParameters());
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "repo=https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native\n" +
+                        "mlflow run $repo " +
+                        "-P learning_rate=0.2 " +
+                        "-P colsample_bytree=0.8 " +
+                        "-P subsample=0.9 " +
+                        "--experiment-name=\"custom_project\" " +
+                        "--version=\"master\" ");
+    }
+
+    @Test
+    public void testModelsDeployMlflow() {
         MlflowTask mlflowTask = initTask(createModelDeplyMlflowParameters());
-        String command = mlflowTask.buildCommand();
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "mlflow models serve -m runs:/a272ec279fc34a8995121ae04281585f/model " +
+                        "--port 7000 " +
+                        "-h 0.0.0.0");
     }
 
     @Test
-    public void testModelsDeployDocker() throws Exception {
+    public void testModelsDeployDocker() {
         MlflowTask mlflowTask = initTask(createModelDeplyDockerParameters());
-        String command = mlflowTask.buildCommand();
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "mlflow models build-docker -m runs:/a272ec279fc34a8995121ae04281585f/model " +
+                        "-n mlflow/a272ec279fc34a8995121ae04281585f:model " +
+                        "--enable-mlserver\n" +
+                        "docker rm -f ds-mlflow-a272ec279fc34a8995121ae04281585f-model\n" +
+                        "docker run --name=ds-mlflow-a272ec279fc34a8995121ae04281585f-model " +
+                        "-p=7000:8080 mlflow/a272ec279fc34a8995121ae04281585f:model");
+    }
+
+    @Test
+    public void testModelsDeployDockerCompose() throws Exception{
+        MlflowTask mlflowTask = initTask(createModelDeplyDockerComposeParameters());
+        Assert.assertEquals(mlflowTask.buildCommand(),
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
+                        "cp " + mlflowTask.getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE) +
+                        " /tmp/dolphinscheduler_test\n" +
+                        "mlflow models build-docker -m models:/22222/1 -n mlflow/22222:1 --enable-mlserver\n" +
+                        "export DS_TASK_MLFLOW_IMAGE_NAME=mlflow/22222:1\n" +
+                        "export DS_TASK_MLFLOW_CONTAINER_NAME=ds-mlflow-22222-1\n" +
+                        "export DS_TASK_MLFLOW_DEPLOY_PORT=7000\n" +
+                        "export DS_TASK_MLFLOW_CPU_LIMIT=0.5\n" +
+                        "export DS_TASK_MLFLOW_MEMORY_LIMIT=200m\n" +
+                        "docker-compose up -d\n" +
+                        "for i in $(seq 1 300); do " +
+                        "[ $(docker inspect --format \"{{json .State.Health.Status }}\" ds-mlflow-22222-1) = '\"healthy\"' ] && exit 0  && break;sleep 1; " +
+                        "done; docker-compose down; exit 1");
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {
@@ -116,8 +180,10 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS);
         mlflowParameters.setMlflowJobType(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM);
         mlflowParameters.setAlgorithm("xgboost");
-        mlflowParameters.setDataPaths("xxxxxxxxxx");
-        mlflowParameters.setExperimentNames("asbbb");
+        mlflowParameters.setDataPaths("/data/iris.csv");
+        mlflowParameters.setParams("n_estimators=100");
+        mlflowParameters.setExperimentNames("BasicAlgorithm");
+        mlflowParameters.setModelNames("BasicAlgorithm");
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
         return mlflowParameters;
     }
@@ -128,10 +194,22 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowJobType(MlflowConstants.JOB_TYPE_AUTOML);
         mlflowParameters.setAutomlTool("autosklearn");
         mlflowParameters.setParams("time_left_for_this_task=30");
-        mlflowParameters.setDataPaths("xxxxxxxxxxx");
-        mlflowParameters.setExperimentNames("asbbb");
-        mlflowParameters.setModelNames("asbbb");
+        mlflowParameters.setDataPaths("/data/iris.csv");
+        mlflowParameters.setExperimentNames("AutoML");
+        mlflowParameters.setModelNames("AutoML");
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        return mlflowParameters;
+    }
+
+    private MlflowParameters createCustomProjectParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS);
+        mlflowParameters.setMlflowJobType(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT);
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        mlflowParameters.setExperimentNames("custom_project");
+        mlflowParameters.setParams("-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9");
+        mlflowParameters.setMlflowProjectRepository("https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native");
+
         return mlflowParameters;
     }
 
@@ -152,6 +230,18 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
         mlflowParameters.setDeployModelKey("runs:/a272ec279fc34a8995121ae04281585f/model");
         mlflowParameters.setDeployPort("7000");
+        return mlflowParameters;
+    }
+
+    private MlflowParameters createModelDeplyDockerComposeParameters() {
+        MlflowParameters mlflowParameters = new MlflowParameters();
+        mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
+        mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
+        mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
+        mlflowParameters.setDeployModelKey("models:/22222/1");
+        mlflowParameters.setDeployPort("7000");
+        mlflowParameters.setCpuLimit("0.5");
+        mlflowParameters.setMemoryLimit("200m");
         return mlflowParameters;
     }
 }

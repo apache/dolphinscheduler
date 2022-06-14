@@ -43,13 +43,18 @@ export function useMlflow({
     workerGroup: 'default',
     algorithm: 'svm',
     mlflowTrackingUri: 'http://127.0.0.1:5000',
-    mlflowTaskType: 'MLflow Models',
+    mlflowTaskType: 'MLflow Projects',
     deployType: 'MLFLOW',
     deployPort: '7000',
-    mlflowJobType: 'AutoML',
+    mlflowJobType: 'CustomProject',
+    mlflowProjectVersion: 'master',
     automlTool: 'flaml',
+    cpuLimit: '0.5',
+    memoryLimit: '500M',
+    mlflowCustomProjectParameters: [],
     delayTime: 0,
-    timeout: 30
+    timeout: 30,
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
   let extra: IJsonItem[] = []

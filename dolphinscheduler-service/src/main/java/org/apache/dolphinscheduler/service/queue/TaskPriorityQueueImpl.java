@@ -29,15 +29,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
-    /**
-     * queue size
-     */
-    private static final Integer QUEUE_MAX_SIZE = 3000;
 
     /**
-     * queue
+     * Task queue, this queue is unbounded, this means it will cause OutOfMemoryError.
+     * The master will stop to generate the task if memory is too high.
      */
-    private PriorityBlockingQueue<TaskPriority> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE);
+    private final PriorityBlockingQueue<TaskPriority> queue = new PriorityBlockingQueue<>(3000);
 
     /**
      * put task takePriorityInfo
