@@ -145,7 +145,7 @@ public class TaskDefinitionServiceImplTest {
     public void queryTaskDefinitionByName() {
         String taskName = "task";
         long projectCode = 1L;
-
+        long processCode = 1L;
         Project project = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
@@ -157,11 +157,11 @@ public class TaskDefinitionServiceImplTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
-        Mockito.when(taskDefinitionMapper.queryByName(project.getCode(), taskName))
+        Mockito.when(taskDefinitionMapper.queryByName(project.getCode(), processCode, taskName))
             .thenReturn(new TaskDefinition());
 
         Map<String, Object> relation = taskDefinitionService
-            .queryTaskDefinitionByName(loginUser, projectCode, taskName);
+            .queryTaskDefinitionByName(loginUser, projectCode, processCode, taskName);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
