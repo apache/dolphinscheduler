@@ -145,7 +145,7 @@ public class RequestClient {
 
         Headers headersBuilder = Headers.of(headers);
 
-        LOGGER.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        LOGGER.info("DELETE request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
                 .url(requestUrl)
@@ -164,7 +164,7 @@ public class RequestClient {
 
         HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
 
-        LOGGER.info("POST response: {}", httpResponse);
+        LOGGER.info("DELETE response: {}", httpResponse);
 
         return httpResponse;
     }
