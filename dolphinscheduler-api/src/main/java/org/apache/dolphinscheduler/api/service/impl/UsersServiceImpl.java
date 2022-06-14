@@ -414,7 +414,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(userPassword)) {
             if (!CheckUtils.checkPassword(userPassword)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userPassword);
+                putMsg(result, Status.USER_PASSWORD_NOT_VALID_OR_TOO_LONG_ERROR, userPassword);
                 return result;
             }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
