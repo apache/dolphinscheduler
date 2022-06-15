@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
-import org.apache.dolphinscheduler.api.security.AuthenticationType;
 import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 
@@ -67,7 +66,7 @@ public class LdapService {
     @Value("${security.authentication.ldap.user.email.attribute:null}")
     private String ldapEmailAttribute;
 
-    @Value("${security.authentication.ldap.user.not.exist.action:CREATION}")
+    @Value("${security.authentication.ldap.user.not.exist.action:CREATE}")
     private String ldapUserNotExistAction;
 
     /***
@@ -140,8 +139,8 @@ public class LdapService {
 
     public LdapUserNotExistActionType getLdapUserNotExistAction(){
         if (StringUtils.isBlank(ldapUserNotExistAction)) {
-            logger.info("security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATION'");
-            return LdapUserNotExistActionType.CREATION;
+            logger.info("security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
+            return LdapUserNotExistActionType.CREATE;
         }
 
         return LdapUserNotExistActionType.valueOf(ldapUserNotExistAction);

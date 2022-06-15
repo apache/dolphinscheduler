@@ -46,6 +46,6 @@ public class SecurityConfigLDAPTest extends AbstractControllerTest {
     @Test
     public void testLdapUserNotExistAction() {
         LdapUserNotExistActionType authenticator = ldapService.getLdapUserNotExistAction();
-        Assert.assertEquals(authenticator, LdapUserNotExistActionType.CREATION);
+        Assert.assertEquals(LdapUserNotExistActionType.CREATE, authenticator);
     }
 }

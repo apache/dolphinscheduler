@@ -101,8 +101,8 @@ security:
       password: password
       user.identity.attribute: uid
       user.email.attribute: mail
-      # action when ldap user is not exist (supported types: CREATION,DENY)
-      user.not.exist.action: CREATION
+      # action when ldap user is not exist (supported types: CREATE,DENY)
+      user.not.exist.action: CREATE
 
 master:
   listen-port: 5678

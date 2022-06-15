@@ -58,7 +58,7 @@ import org.springframework.test.context.TestPropertySource;
                 "security.authentication.ldap.password=password",
                 "security.authentication.ldap.user.identity.attribute=uid",
                 "security.authentication.ldap.user.email.attribute=mail",
-                "security.authentication.ldap.user.not.exist.action=CREATION",
+                "security.authentication.ldap.user.not.exist.action=CREATE",
         })
 public class LdapAuthenticatorTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
@@ -114,7 +114,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
         Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
 
         // test username pwd correct and user not exist, config user not exist action creation, so login success
-        when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATION);
+        when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATE);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());

@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum LdapUserNotExistActionType {
 
-    CREATION(0, "automatically create user when user not exist"),
+    CREATE(0, "automatically create user when user not exist"),
     DENY(1, "deny log-in when user not exist"),
     ;
 
