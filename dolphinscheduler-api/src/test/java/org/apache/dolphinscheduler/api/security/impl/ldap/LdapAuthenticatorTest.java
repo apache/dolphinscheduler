@@ -113,13 +113,13 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
         Result<Map<String, String>> result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
 
-        // test username pwd correct and user not exist, config user not exist action creation, so login success
+        // test username pwd correct and user not exist, config user not exist action create, so login success
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATE);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
-        // test username pwd correct and user not exist, config action creation but can't create session, so login failed
+        // test username pwd correct and user not exist, config action create but can't create session, so login failed
         when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(null);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
