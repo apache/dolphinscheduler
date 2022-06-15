@@ -98,6 +98,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
           - name: Environment
             class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
+          - name: Cluster
+            class: org.apache.dolphinscheduler.e2e.cases.ClusterE2ETest
           - name: Token
             class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
           - name: Workflow

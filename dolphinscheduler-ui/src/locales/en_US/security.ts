@@ -98,6 +98,26 @@ export default {
     environment_description_tips: 'Please enter your environment description',
     worker_group_tips: 'Please select worker group'
   },
+  cluster: {
+    create_cluster: 'Create Cluster',
+    edit_cluster: 'Edit Cluster',
+    search_tips: 'Please enter keywords',
+    edit: 'Edit',
+    delete: 'Delete',
+    cluster_name: 'Cluster Name',
+    cluster_components: 'Cluster Components',
+    cluster_config: 'Cluster Config',
+    kubernetes_config: 'Kubernetes Config',
+    yarn_config: 'Yarn Config',
+    cluster_desc: 'Cluster Desc',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    cluster_name_tips: 'Please enter your cluster name',
+    cluster_config_tips: 'Please enter your cluster config',
+    cluster_description_tips: 'Please enter your cluster description'
+  },
   token: {
     create_token: 'Create Token',
     edit_token: 'Edit Token',
