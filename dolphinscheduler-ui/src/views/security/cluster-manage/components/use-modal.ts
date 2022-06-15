@@ -69,8 +69,7 @@ export function useModal(
 
     try {
       statusRef === 0 ? await submitClusterModal() : await updateClusterModal()
-      variables.saving = false
-    } catch (err) {
+    } finally {
       variables.saving = false
     }
   }

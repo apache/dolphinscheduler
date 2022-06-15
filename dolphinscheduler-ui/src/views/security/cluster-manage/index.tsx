@@ -22,7 +22,8 @@ import {
   NDataTable,
   NIcon,
   NInput,
-  NPagination
+  NPagination,
+  NSpace
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
@@ -105,17 +106,15 @@ const clusterManage = defineComponent({
       <div>
         <NCard>
           <div class={styles['search-card']}>
-            <div>
-              <NButton
-                size='small'
-                type='primary'
-                onClick={handleModalChange}
-                class='btn-create-cluster'
-              >
-                {t('security.cluster.create_cluster')}
-              </NButton>
-            </div>
-            <div class={styles.box}>
+            <NButton
+              size='small'
+              type='primary'
+              onClick={handleModalChange}
+              class='btn-create-cluster'
+            >
+              {t('security.cluster.create_cluster')}
+            </NButton>
+            <NSpace>
               <NInput
                 size='small'
                 clearable
@@ -131,7 +130,7 @@ const clusterManage = defineComponent({
                   )
                 }}
               </NButton>
-            </div>
+            </NSpace>
           </div>
         </NCard>
         <Card class={styles['table-card']}>

@@ -314,7 +314,6 @@ export default {
     failed_retry_interval: 'Failed retry interval',
     minute: 'Minute',
     delay_execution_time: 'Delay execution time',
-    cluster_manage: 'Cluster Manage',
     namespace_cluster: 'Namespace(Cluster)',
     min_cpu: 'Min cpu',
     min_memory: 'Min memory',

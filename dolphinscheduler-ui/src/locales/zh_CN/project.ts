@@ -314,7 +314,6 @@ export default {
     failed_retry_interval: '失败重试间隔',
     minute: '分',
     delay_execution_time: '延时执行时间',
-    cluster_manage: '集群管理',
     namespace_cluster: '命名空间(集群)',
     min_cpu: '最小cpu',
     min_memory: '最小内存',
