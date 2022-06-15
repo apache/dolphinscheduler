@@ -98,6 +98,26 @@ export default {
     environment_description_tips: '请输入环境描述',
     worker_group_tips: '请选择Worker分组'
   },
+  cluster: {
+    create_cluster: '创建集群',
+    edit_cluster: '编辑集群',
+    search_tips: '请输入关键词',
+    edit: '编辑',
+    delete: '删除',
+    cluster_name: '集群名称',
+    cluster_components: '集群模块',
+    cluster_config: '集群配置',
+    kubernetes_config: 'Kubernetes配置',
+    yarn_config: 'Yarn配置',
+    cluster_desc: '集群描述',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    delete_confirm: '确定删除吗?',
+    cluster_name_tips: '请输入集群名',
+    cluster_config_tips: '请输入集群配置',
+    cluster_description_tips: '请输入集群描述'
+  },
   token: {
     create_token: '创建令牌',
     edit_token: '编辑令牌',

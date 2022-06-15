@@ -1963,3 +1963,26 @@ CREATE TABLE t_ds_alert_send_status
     UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
 );
 
+
+--
+-- Table structure for table t_ds_cluster
+--
+DROP TABLE IF EXISTS t_ds_cluster CASCADE;
+CREATE TABLE t_ds_cluster
+(
+    id          int       NOT NULL AUTO_INCREMENT,
+    code        bigint(20) NOT NULL,
+    name        varchar(100)       DEFAULT NULL,
+    config      text               DEFAULT NULL,
+    description text,
+    operator    int                DEFAULT NULL,
+    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY cluster_name_unique (name),
+    UNIQUE KEY cluster_code_unique (code)
+);
+
+INSERT INTO `t_ds_cluster`
+(`id`,`code`,`name`,`config`,`description`,`operator`,`create_time`,`update_time`)
+VALUES (100, 100, 'ds_null_k8s', '{"k8s":"ds_null_k8s"}', 'test', 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');

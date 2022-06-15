@@ -1938,3 +1938,22 @@ CREATE TABLE t_ds_alert_send_status (
   PRIMARY KEY (`id`),
   UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for t_ds_cluster
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_cluster`;
+CREATE TABLE `t_ds_cluster` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'cluster name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cluster_name_unique` (`name`),
+  UNIQUE KEY `cluster_code_unique` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

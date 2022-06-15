@@ -48,6 +48,7 @@ export default {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',
+  cluster_manage: 'Cluster Manage',
   k8s_namespace_manage: 'K8S Namespace Manage',
   token_manage: 'Token Manage',
   task_group_manage: 'Task Group Manage',

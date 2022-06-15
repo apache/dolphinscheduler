@@ -52,9 +52,12 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     private WebElement menuEnvironmentManage;
 
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(8) > .n-menu-item-content")
-    private WebElement menuNamespaceManage;
+    private WebElement menuClusterManage;
 
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(9) > .n-menu-item-content")
+    private WebElement menuNamespaceManage;
+
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(10) > .n-menu-item-content")
     private WebElement menuTokenManage;
 
     public SecurityPage(RemoteWebDriver driver) {
@@ -95,6 +98,13 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
             new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(menuEnvironmentManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuEnvironmentManage());
             return tab.cast(new EnvironmentPage(driver));
+        }
+
+        if (tab == ClusterPage.class) {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/security"));
+            new WebDriverWait(driver, 60).until(ExpectedConditions.elementToBeClickable(menuClusterManage));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuClusterManage());
+            return tab.cast(new ClusterPage(driver));
         }
 
         if (tab == TokenPage.class) {

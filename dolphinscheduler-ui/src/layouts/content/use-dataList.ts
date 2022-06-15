@@ -46,7 +46,8 @@ import {
   ContainerOutlined,
   ApartmentOutlined,
   BarsOutlined,
-  CloudServerOutlined
+  CloudServerOutlined,
+  ClusterOutlined
 } from '@vicons/antd'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
@@ -289,6 +290,11 @@ export function useDataList() {
                   label: t('menu.environment_manage'),
                   key: '/security/environment-manage',
                   icon: renderIcon(EnvironmentOutlined)
+                },
+                {
+                  label: t('menu.cluster_manage'),
+                  key: '/security/cluster-manage',
+                  icon: renderIcon(ClusterOutlined)
                 },
                 {
                   label: t('menu.k8s_namespace_manage'),
