@@ -45,22 +45,22 @@ public class LdapService {
     @Value("${security.authentication.ldap.user.admin:null}")
     private String adminUserId;
 
-    @Value("${ldap.urls:null}")
+    @Value("${security.authentication.ldap.urls:null}")
     private String ldapUrls;
 
-    @Value("${ldap.base.dn:null}")
+    @Value("${security.authentication.ldap.base.dn:null}")
     private String ldapBaseDn;
 
-    @Value("${ldap.username:null}")
+    @Value("${security.authentication.ldap.username:null}")
     private String ldapSecurityPrincipal;
 
-    @Value("${ldap.password:null}")
+    @Value("${security.authentication.ldap.password:null}")
     private String ldapPrincipalPassword;
 
-    @Value("${ldap.user.identity.attribute:null}")
+    @Value("${security.authentication.ldap.user.identity.attribute:null}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${ldap.user.email.attribute:null}")
+    @Value("${security.authentication.ldap.user.email.attribute:null}")
     private String ldapEmailAttribute;
 
     /***
