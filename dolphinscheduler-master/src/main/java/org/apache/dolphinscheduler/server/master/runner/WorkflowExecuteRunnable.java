@@ -681,14 +681,13 @@ public class WorkflowExecuteRunnable implements Runnable {
 
             if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
                 // serial wait execution type needs to wake up the waiting process
-                if (processDefinition.getExecutionType().typeIsSerialWait()){
+                if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()){
                     endProcess();
                     return true;
                 }
                 this.updateProcessInstanceState(stateEvent);
                 return true;
             }
-
             if (processComplementData()) {
                 return true;
             }
@@ -829,7 +828,7 @@ public class WorkflowExecuteRunnable implements Runnable {
      */
     public void endProcess() {
         this.stateEvents.clear();
-        if (processDefinition.getExecutionType().typeIsSerialWait()) {
+        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()) {
             checkSerialProcess(processDefinition);
         }
         if (processInstance.getState().typeIsWaitingThread()) {
@@ -850,6 +849,10 @@ public class WorkflowExecuteRunnable implements Runnable {
         if (nextInstanceId == 0) {
             ProcessInstance nextProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.SERIAL_WAIT.getCode(), processInstance.getId());
             if (nextProcessInstance == null) {
+                return;
+            }
+            ProcessInstance nextReadyStopProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.READY_STOP.getCode(), processInstance.getId());
+            if (processDefinition.getExecutionType().typeIsSerialPriority() && nextReadyStopProcessInstance != null) {
                 return;
             }
             nextInstanceId = nextProcessInstance.getId();
