@@ -103,9 +103,9 @@ const clusterManage = defineComponent({
     } = this
 
     return (
-      <div>
+      <NSpace vertical>
         <NCard>
-          <div class={styles['search-card']}>
+          <NSpace justify='space-between'>
             <NButton
               size='small'
               type='primary'
@@ -131,28 +131,30 @@ const clusterManage = defineComponent({
                 }}
               </NButton>
             </NSpace>
-          </div>
+          </NSpace>
         </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            row-class-name='items'
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestData}
-              onUpdatePageSize={onUpdatePageSize}
+        <Card>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              row-class-name='items'
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <ClusterModal
           showModalRef={this.showModalRef}
@@ -161,7 +163,7 @@ const clusterManage = defineComponent({
           onCancelModal={onCancelModal}
           onConfirmModal={onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })
