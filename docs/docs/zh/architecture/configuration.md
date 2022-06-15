@@ -210,6 +210,13 @@ spring.messages.encoding|UTF-8|请求编码
 spring.jackson.time-zone|GMT+8|设置时区
 spring.messages.basename|i18n/messages|i18n配置
 security.authentication.type|PASSWORD|权限校验类型
+security.authentication.ldap.user.admin|read-only-admin|LDAP登陆时，系统管理员账号
+security.authentication.ldap.urls|ldap://ldap.forumsys.com:389/|LDAP urls
+security.authentication.ldap.base.dn|dc=example,dc=com|LDAP base dn
+security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP账号
+security.authentication.ldap.password|password|LDAP密码
+security.authentication.ldap.user.identity.attribute|uid|LDAP用户身份标识字段名
+security.authentication.ldap.user.email.attribute|mail|LDAP邮箱字段名
 
 
 ## 6.master.properties [Master服务配置]
@@ -383,7 +390,7 @@ singleYarnIp="yarnIp1"
 resourceUploadPath="/dolphinscheduler"
 
 
-# HDFS/S3  操作用户
+# HDFS/S3  操作用户 
 hdfsRootUser="hdfs"
 
 # 以下为 kerberos 配置

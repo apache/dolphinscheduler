@@ -128,6 +128,22 @@ python-gateway:
   # (0 = infinite), and socket server would never close even though no requests accept
   read-timeout: 0
 
+security:
+  authentication:
+    # Authentication types (supported types: PASSWORD,LDAP)
+    type: PASSWORD
+    # IF you set type `LDAP`, below config will be effective
+    ldap:
+      # admin userId
+      user.admin: read-only-admin
+      # ldap server config
+      urls: ldap://ldap.forumsys.com:389/
+      base.dn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user.identity.attribute: uid
+      user.email.attribute: mail
+
 # Override by profile
 
 ---
