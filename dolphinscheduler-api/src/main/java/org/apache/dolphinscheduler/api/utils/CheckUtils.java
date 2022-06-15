@@ -31,6 +31,9 @@ import java.util.regex.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
+import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
+import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MIN_LENGTH;
+
 /**
  * check utils
  */
@@ -105,7 +108,16 @@ public class CheckUtils {
      * @return true if password regex valid, otherwise return false
      */
     public static boolean checkPassword(String password) {
-        return !StringUtils.isEmpty(password) && password.length() >= 2 && password.length() <= 20;
+        return !StringUtils.isEmpty(password) && checkPasswordLength(password);
+    }
+
+    /**
+     *  check password length
+     * @param password password
+     * @return true if password length valid, otherwise return false
+     */
+    public static boolean checkPasswordLength(String password) {
+        return password.length() >= USER_PASSWORD_MIN_LENGTH && password.length() <= USER_PASSWORD_MAX_LENGTH;
     }
 
     /**
