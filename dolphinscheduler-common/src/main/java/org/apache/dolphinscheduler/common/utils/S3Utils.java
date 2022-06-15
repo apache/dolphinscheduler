@@ -28,7 +28,6 @@ import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -236,7 +235,7 @@ public class S3Utils implements Closeable, StorageOperate {
             s3Client.putObject(BUCKET_NAME, dstPath, new File(srcFile));
             return true;
         } catch (AmazonServiceException e) {
-            logger.error("upload failed,the bucketName is {},the dstPath is {}", BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + dstPath);
+            logger.error("upload failed,the bucketName is {},the filePath is {}", BUCKET_NAME, dstPath);
             return false;
         }
     }
@@ -310,7 +309,7 @@ public class S3Utils implements Closeable, StorageOperate {
      * upload local directory to S3
      *
      * @param tenantCode
-     * @param keyPrefix  the name of directory
+     * @param keyPrefix the name of directory
      * @param strPath
      */
     private void uploadDirectory(String tenantCode, String keyPrefix, String strPath) {
@@ -323,7 +322,7 @@ public class S3Utils implements Closeable, StorageOperate {
      * download S3 Directory to local
      *
      * @param tenantCode
-     * @param keyPrefix  the name of directory
+     * @param keyPrefix the name of directory
      * @param srcPath
      */
     private void downloadDirectory(String tenantCode, String keyPrefix, String srcPath) {
@@ -341,7 +340,6 @@ public class S3Utils implements Closeable, StorageOperate {
 
     public void checkBucketNameExists(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
-            Stopper.stop();
             throw new IllegalArgumentException("resource.aws.s3.bucket.name is blank");
         }
 
@@ -352,7 +350,6 @@ public class S3Utils implements Closeable, StorageOperate {
             )
             .findFirst()
             .orElseThrow(() -> {
-                Stopper.stop();
                 return new IllegalArgumentException("bucketName: " + bucketName + " is not exists, you need to create them by yourself");
             });
 

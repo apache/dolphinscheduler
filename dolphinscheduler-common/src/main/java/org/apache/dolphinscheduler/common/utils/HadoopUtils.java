@@ -157,7 +157,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
                 logger.warn("resource.hdfs.root.user is not set value!");
                 fs = FileSystem.get(configuration);
             }
-//
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

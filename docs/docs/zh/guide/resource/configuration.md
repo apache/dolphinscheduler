@@ -56,7 +56,7 @@ resource.aws.secret.access.key=minioadmin
 # The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.region=cn-north-1
 # The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
-resource.aws.s3.bucket.name=dolphinscheduler-test
+resource.aws.s3.bucket.name=dolphinscheduler
 # You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
 resource.aws.s3.endpoint=http://localhost:9000
 
