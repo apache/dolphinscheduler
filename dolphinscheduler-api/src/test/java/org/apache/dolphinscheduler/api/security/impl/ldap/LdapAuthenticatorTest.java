@@ -38,6 +38,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +50,12 @@ import org.springframework.test.context.TestPropertySource;
         properties = {
                 "security.authentication.type=LDAP",
                 "security.authentication.ldap.user.admin=read-only-admin",
-                "ldap.urls=ldap://ldap.forumsys.com:389/",
-                "ldap.base.dn=dc=example,dc=com",
-                "ldap.username=cn=read-only-admin,dc=example,dc=com",
-                "ldap.password=password",
-                "ldap.user.identity.attribute=uid",
-                "ldap.user.email.attribute=mail",
+                "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
+                "security.authentication.ldap.base.dn=dc=example,dc=com",
+                "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
+                "security.authentication.ldap.password=password",
+                "security.authentication.ldap.user.identity.attribute=uid",
+                "security.authentication.ldap.user.email.attribute=mail",
         })
 public class LdapAuthenticatorTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
@@ -64,7 +65,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     private LdapService ldapService;
     @MockBean(name = "sessionServiceImpl")
     private SessionService sessionService;
-    @MockBean(name = "usersServiceImpl")
+    @Spy
     private UsersService usersService;
 
     private LdapAuthenticator ldapAuthenticator;
@@ -102,22 +103,19 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     @Test
     public void testAuthenticate() {
-        when(usersService.createUser(userType, ldapUid, ldapEmail)).thenReturn(mockUser);
-        when(usersService.getUserByUserName(ldapUid)).thenReturn(mockUser);
-        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
-
+        when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(mockSession.getId());
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
 
         Result result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
-        when(sessionService.createSession(mockUser, ip)).thenReturn(null);
+        when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(null);
+
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
-        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
-        when(usersService.getUserByUserName(ldapUid)).thenReturn(null);
+        when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(null);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
     }

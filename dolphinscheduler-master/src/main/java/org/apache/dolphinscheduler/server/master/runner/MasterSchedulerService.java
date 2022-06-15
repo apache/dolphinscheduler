@@ -49,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * master scheduler thread
+ * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
 @Service
 public class MasterSchedulerService extends Thread {
@@ -163,11 +163,8 @@ public class MasterSchedulerService extends Thread {
         MasterServerMetrics.incMasterConsumeCommand(commands.size());
 
         for (ProcessInstance processInstance : processInstances) {
-            if (processInstance == null) {
-                continue;
-            }
 
-            WorkflowExecuteRunnable workflowExecuteThread = new WorkflowExecuteRunnable(
+            WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
                     processInstance
                     , processService
                     , nettyExecutorManager
@@ -175,11 +172,11 @@ public class MasterSchedulerService extends Thread {
                     , masterConfig
                     , stateWheelExecuteThread);
 
-            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
+            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
             if (processInstance.getTimeout() > 0) {
                 stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
-            workflowExecuteThreadPool.startWorkflow(workflowExecuteThread);
+            workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
         }
     }
 
@@ -203,7 +200,7 @@ public class MasterSchedulerService extends Thread {
                         logger.info("handle command {} end, create process instance {}", command.getId(), processInstance.getId());
                     }
                 } catch (Exception e) {
-                    logger.error("handle command error ", e);
+                    logger.error("handle command {} error ", command.getId(), e);
                     processService.moveToErrorCommand(command, e.toString());
                 } finally {
                     latch.countDown();
