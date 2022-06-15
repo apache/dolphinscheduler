@@ -66,35 +66,35 @@ public class K8sClientService {
 
         //创建资源
         ResourceQuota queryExist = client.resourceQuotas()
-                .inNamespace(k8sNamespace.getNamespace())
-                .withName(k8sNamespace.getNamespace())
-                .get();
+            .inNamespace(k8sNamespace.getNamespace())
+            .withName(k8sNamespace.getNamespace())
+            .get();
 
         ResourceQuota body = yaml.loadAs(yamlStr, ResourceQuota.class);
 
         if (queryExist != null) {
             if (k8sNamespace.getLimitsCpu() == null && k8sNamespace.getLimitsMemory() == null) {
                 client.resourceQuotas().inNamespace(k8sNamespace.getNamespace())
-                        .withName(k8sNamespace.getNamespace())
-                        .delete();
+                    .withName(k8sNamespace.getNamespace())
+                    .delete();
                 return null;
             }
         }
 
         return client.resourceQuotas().inNamespace(k8sNamespace.getNamespace())
-                .withName(k8sNamespace.getNamespace())
-                .createOrReplace(body);
+            .withName(k8sNamespace.getNamespace())
+            .createOrReplace(body);
     }
 
     private Optional<Namespace> getNamespaceFromK8s(String name, String k8s) {
         NamespaceList listNamespace =
-                k8sManager.getK8sClient(k8s).namespaces().list();
+            k8sManager.getK8sClient(k8s).namespaces().list();
 
         Optional<Namespace> list =
-                listNamespace.getItems().stream()
-                        .filter((Namespace namespace) ->
-                                namespace.getMetadata().getName().equals(name))
-                        .findFirst();
+            listNamespace.getItems().stream()
+                .filter((Namespace namespace) ->
+                    namespace.getMetadata().getName().equals(name))
+                .findFirst();
 
         return list;
     }
