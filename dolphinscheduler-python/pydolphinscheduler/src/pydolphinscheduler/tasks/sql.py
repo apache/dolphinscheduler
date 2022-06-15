@@ -31,7 +31,7 @@ log = logging.getLogger(__file__)
 class SqlType:
     """SQL type, for now it just contain `SELECT` and `NO_SELECT`."""
 
-    SELECT = "00"
+    SELECT = "0"
     NOT_SELECT = "1"
 
 
