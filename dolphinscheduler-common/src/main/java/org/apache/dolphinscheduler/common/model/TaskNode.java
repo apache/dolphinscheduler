@@ -178,6 +178,16 @@ public class TaskNode {
      */
     private int delayTime;
 
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
+
     public String getId() {
         return id;
     }
@@ -262,7 +272,7 @@ public class TaskNode {
         this.runFlag = runFlag;
     }
 
-    public Boolean isForbidden() {
+    public boolean isForbidden() {
         return (!StringUtils.isEmpty(this.runFlag)
                 && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
@@ -496,5 +506,21 @@ public class TaskNode {
 
     public void setTaskGroupPriority(int taskGroupPriority) {
         this.taskGroupPriority = taskGroupPriority;
+    }
+
+    public Integer getCpuQuota() {
+        return cpuQuota == null ? -1 : cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax == null ? -1 : memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
     }
 }
