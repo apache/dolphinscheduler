@@ -33,11 +33,10 @@ export function useEdit(state: any) {
       skipLineNum: 0,
       limit: 3000
     }
-    const { state } = useAsyncState(viewResource(params, id), {
+    return useAsyncState(viewResource(params, id), {
       alias: '',
       content: ''
     })
-    return state
   }
 
   const handleUpdateContent = (id: number) => {
