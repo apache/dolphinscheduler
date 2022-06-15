@@ -176,56 +176,6 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void dateToString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        String time = "2022-02-22 13:38:24";
-        Date date = DateUtils.stringToDate(time);
-        String json = JSONUtils.toJsonString(date);
-        Assert.assertEquals(json, "\"" + time + "\"");
-
-        String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
-        Assert.assertNull(DateUtils.stringToDate(errorFormatTime));
-    }
-
-    @Test
-    public void stringToDate() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        String json = "\"2022-02-22 13:38:24\"";
-        Date date = JSONUtils.parseObject(json, Date.class);
-        Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
-    }
-
-
-    @Test
-    public void calendarToString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        String time = "2022-02-22 13:38:24";
-        Date date = DateUtils.stringToDate(time);
-        Calendar instance = Calendar.getInstance();
-        instance.setTime(date);
-        String json = JSONUtils.toJsonString(instance);
-        Assert.assertEquals("\"" + time + "\"", json);
-    }
-
-
-    @Test
-    public void sqlTimeToString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        Time time = Time.valueOf("13:38:24");
-        String json = JSONUtils.toJsonString(time);
-        Assert.assertEquals("\"" + time + "\"", json);
-    }
-
-    @Test
-    public void sqlTimestampToString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        String time = "2022-02-22 13:38:24";
-        Timestamp timestamp = Timestamp.valueOf(time);
-        String json = JSONUtils.toJsonString(timestamp);
-        Assert.assertEquals("\"" + time + "\"", json);
-    }
-
-    @Test
     public void localDateTimeToString() {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         String time = "2022-02-22 13:38:24";
