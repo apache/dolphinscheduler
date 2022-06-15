@@ -64,7 +64,7 @@ class Sql(Task):
         name: str,
         datasource_name: str,
         sql: str,
-        sql_type: Optional[int] = None,
+        sql_type: Optional[str] = None,
         pre_statements: Optional[str] = None,
         post_statements: Optional[str] = None,
         display_rows: Optional[int] = 10,
