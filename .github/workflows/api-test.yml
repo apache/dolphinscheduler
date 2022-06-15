@@ -1,0 +1,139 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+name: API-Test
+
+concurrency:
+  group: api-test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  paths-filter:
+    name: API-Test-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
+  build:
+    name: API-Test-Build
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Build Image
+        run: |
+          ./mvnw -B clean install \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Pdocker,release -Ddocker.tag=ci \
+          -pl dolphinscheduler-standalone-server -am
+      - name: Export Docker Images
+        run: |
+          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
+          && du -sh /tmp/standalone-image.tar
+      - uses: actions/upload-artifact@v2
+        name: Upload Docker Images
+        with:
+          name: standalone-image
+          path: /tmp/standalone-image.tar
+          retention-days: 1
+  api-test:
+    name: ${{ matrix.case.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        case:
+          - name: Tenant
+            class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
+    env:
+      RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - uses: actions/download-artifact@v2
+        name: Download Docker Images
+        with:
+          name: standalone-image
+          path: /tmp
+      - name: Load Docker Images
+        run: |
+            docker load -i /tmp/standalone-image.tar
+      - name: Run Test
+        run: |
+          ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
+            -DfailIfNoTests=false \
+            -Dtest=${{ matrix.case.class }} test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        name: Upload Recording
+        with:
+          name: recording-${{ matrix.case.name }}
+          path: ${{ env.RECORDING_PATH }}
+          retention-days: 1
+  result:
+    name: API-Test-Result
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ api-test, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip API Test!"
+            exit 0
+          fi
+          if [[ ${{ needs.api-test.result }} != 'success' ]]; then
+            echo "API test Failed!"
+            exit -1
+          fi

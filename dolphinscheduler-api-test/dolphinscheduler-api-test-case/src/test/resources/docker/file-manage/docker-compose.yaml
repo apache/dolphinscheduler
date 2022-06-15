@@ -1,0 +1,78 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: "3.8"
+
+services:
+  dolphinscheduler:
+    image: apache/dolphinscheduler-standalone-server:ci
+    environment:
+      MASTER_MAX_CPU_LOAD_AVG: 100
+      WORKER_TENANT_AUTO_CREATE: 'true'
+    ports:
+      - "12345:12345"
+    networks:
+      - api-test
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+    volumes:
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
+    depends_on:
+      s3:
+        condition: service_healthy
+      mc:
+        condition: service_completed_successfully
+  s3:
+    image: minio/minio:RELEASE.2022-01-25T19-56-04Z
+    hostname: s3
+    tty: true
+    stdin_open: true
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
+    networks:
+      - e2e
+    environment:
+      MINIO_ROOT_USER: accessKey123
+      MINIO_ROOT_PASSWORD: secretKey123
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 120s
+      retries: 120
+  mc:
+    image: minio/mc:RELEASE.2022-01-07T06-01-38Z
+    entrypoint: bash
+    networks:
+      - e2e
+    command:
+      - -c
+      - mc alias set s3 http://s3:9000 accessKey123 secretKey123 && mc mb s3/dolphinscheduler
+    depends_on:
+      s3:
+        condition: service_healthy
+
+networks:
+  api-test:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.1.0.0/24
+          gateway: 10.1.0.1
