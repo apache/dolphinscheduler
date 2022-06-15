@@ -51,7 +51,7 @@ public class LdapService {
     @Value("${security.authentication.ldap.urls:null}")
     private String ldapUrls;
 
-    @Value("${security.authentication.ldap.base.dn:null}")
+    @Value("${security.authentication.ldap.base-dn:null}")
     private String ldapBaseDn;
 
     @Value("${security.authentication.ldap.username:null}")
@@ -60,13 +60,13 @@ public class LdapService {
     @Value("${security.authentication.ldap.password:null}")
     private String ldapPrincipalPassword;
 
-    @Value("${security.authentication.ldap.user.identity.attribute:null}")
+    @Value("${security.authentication.ldap.user.identity-attribute:null}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${security.authentication.ldap.user.email.attribute:null}")
+    @Value("${security.authentication.ldap.user.email-attribute:null}")
     private String ldapEmailAttribute;
 
-    @Value("${security.authentication.ldap.user.not.exist.action:CREATE}")
+    @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
     private String ldapUserNotExistAction;
 
     /***
