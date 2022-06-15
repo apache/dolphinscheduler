@@ -80,7 +80,7 @@ class Sql(Task):
         self.display_rows = display_rows
 
     @property
-    def sql_type(self) -> int:
+    def sql_type(self) -> str:
         """Judgement sql type, it will return the SQL type for type `SELECT` or `NOT_SELECT`.
 
         If `param_sql_type` dot not specific, will use regexp to check
