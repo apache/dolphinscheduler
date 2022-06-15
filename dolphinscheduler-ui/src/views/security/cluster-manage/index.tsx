@@ -30,7 +30,6 @@ import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
 import ClusterModal from './components/cluster-modal'
-import styles from './index.module.scss'
 
 const clusterManage = defineComponent({
   name: 'cluster-manage',
