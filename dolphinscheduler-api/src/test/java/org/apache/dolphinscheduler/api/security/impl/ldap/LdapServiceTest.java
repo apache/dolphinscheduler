@@ -47,6 +47,7 @@ import org.springframework.test.context.junit4.SpringRunner;
                 "security.authentication.ldap.password=password",
                 "security.authentication.ldap.user.identity.attribute=uid",
                 "security.authentication.ldap.user.email.attribute=mail",
+                "security.authentication.ldap.user.not.exist.action=CREATION",
         })
 public class LdapServiceTest {
     @Autowired

@@ -226,6 +226,7 @@ security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP 
 security.authentication.ldap.password|password|LDAP password
 security.authentication.ldap.user.identity.attribute|uid|LDAP user identity attribute 
 security.authentication.ldap.user.email.attribute|mail|LDAP user email attribute
+security.authentication.ldap.user.not.exist.action|CREATION|action when LDAP user is not exist
 
 ### master.properties [master-service log config]
 

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -37,7 +38,10 @@ public class LdapAuthenticator extends AbstractAuthenticator {
             //check if user exist
             user = usersService.getUserByUserName(userId);
             if (user == null) {
-                user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+                LdapUserNotExistActionType type = ldapService.getLdapUserNotExistAction();
+                if(type == LdapUserNotExistActionType.CREATION){
+                    user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+                }
             }
         }
         return user;
