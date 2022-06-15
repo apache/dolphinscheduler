@@ -351,7 +351,7 @@ public class ProcessServiceImpl implements ProcessService {
                 return;
             }
             for (ProcessInstance info : runningProcessInstances) {
-                if (info.getState().equals(ExecutionStatus.READY_STOP) || info.getState().typeIsFinished()) {
+                if (Objects.nonNull(info.getState()) && (ExecutionStatus.READY_STOP.equals(info.getState()) || info.getState().typeIsFinished())) {
                     continue;
                 }
                 info.setCommandType(CommandType.STOP);
