@@ -413,17 +413,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             user.setUserName(userName);
         }
 
-
-        if (StringUtils.isEmpty(userPassword)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userPassword);
-            return result;
+        if (StringUtils.isNotEmpty(userPassword)) {
+            if (!CheckUtils.checkPasswordLength(userPassword)) {
+                putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
+                return result;
+            }
+            user.setUserPassword(EncryptionUtils.getMd5(userPassword));
         }
-        if (!CheckUtils.checkPasswordLength(userPassword)) {
-            putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
-            return result;
-        }
-        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
-
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
