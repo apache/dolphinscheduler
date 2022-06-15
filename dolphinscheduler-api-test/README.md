@@ -29,7 +29,7 @@ where `userName`, `userPassword` are the main elements on UI that we are interes
 
 ## Test Environment Setup
 
-DolphinScheduler End-to-End test uses [testcontainers](https://www.testcontainers.org) to set up the testing
+DolphinScheduler API test uses [testcontainers](https://www.testcontainers.org) to set up the testing
 environment, with docker compose.
 
 Typically, every test case needs one or more `docker-compose.yaml` files to set up all needed components, and expose the

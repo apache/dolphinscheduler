@@ -78,14 +78,14 @@ public class RequestClient {
     }
 
     public static String getParams(Map<String, Object> params) {
-        StringBuilder sb = new StringBuilder("?");
+        StringBuilder sb = new StringBuilder(Constants.QUESTION_MARK);
         if (params.size() > 0) {
             for (Map.Entry<String, Object> item : params.entrySet()) {
                 Object value = item.getValue();
                 if (Objects.nonNull(value)) {
-                    sb.append("&");
+                    sb.append(Constants.AND_MARK);
                     sb.append(item.getKey());
-                    sb.append("=");
+                    sb.append(Constants.EQUAL_MARK);
                     sb.append(value);
                 }
             }

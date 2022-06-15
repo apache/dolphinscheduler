@@ -44,4 +44,15 @@ public final class Constants {
      * simple date format
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+
+    /**
+     * docker compose default healthy timeout
+     */
+    public static final Integer DOCKER_COMPOSE_DEFAULT_TIMEOUT = 180;
+
+    public static final String QUESTION_MARK = "?";
+
+    public static final String EQUAL_MARK = "=";
+
+    public static final String AND_MARK = "&";
 }

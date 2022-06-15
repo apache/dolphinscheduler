@@ -72,6 +72,16 @@ public class TenantAPITest {
     }
 
     @Test
+    @Order(2)
+    public void testDuplicateCreateTenant() {
+        TenantPage tenantPage = new TenantPage();
+
+        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
+
+        Assertions.assertFalse(createTenantHttpResponse.body().success());
+    }
+
+    @Test
     @Order(5)
     public void testGetTenantListPaging() {
         TenantPage tenantPage = new TenantPage();
