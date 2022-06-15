@@ -228,6 +228,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setCreateTime(now);
         user.setUpdateTime(now);
         user.setQueue("");
+        user.setState(Flag.YES.getCode());
 
         // save user
         userMapper.insert(user);
