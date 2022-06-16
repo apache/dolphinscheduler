@@ -32,13 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
@@ -375,9 +369,13 @@ public class DagHelper {
         } else {
             conditionTaskList.add(nodeCode);
         }
+        // the skipNodeList maybe null if no next task
+        skipNodeList = Optional.ofNullable(skipNodeList).orElse(new ArrayList<>());
         for (String failedNode : skipNodeList) {
             setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
         }
+        // the conditionTaskList maybe null if no next task
+        conditionTaskList = Optional.ofNullable(conditionTaskList).orElse(new ArrayList<>());
         return conditionTaskList;
     }
 
