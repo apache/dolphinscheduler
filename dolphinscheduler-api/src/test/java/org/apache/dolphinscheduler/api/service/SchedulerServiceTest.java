@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.impl.QuartzExecutorImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
@@ -52,7 +50,6 @@ import java.util.Map;
  * scheduler service test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(QuartzExecutorImpl.class)
 public class SchedulerServiceTest {
 
     @InjectMocks
@@ -78,9 +75,6 @@ public class SchedulerServiceTest {
 
     @Mock
     private ProjectServiceImpl projectService;
-
-    @InjectMocks
-    private QuartzExecutorImpl quartzExecutors;
 
     @Before
     public void setUp() {
