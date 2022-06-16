@@ -32,7 +32,14 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Optional;
 
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
