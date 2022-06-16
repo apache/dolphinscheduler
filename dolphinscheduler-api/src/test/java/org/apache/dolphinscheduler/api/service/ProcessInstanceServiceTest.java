@@ -17,9 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
@@ -57,15 +63,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,8 +70,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * process instance service test
@@ -163,7 +163,7 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         Result proejctAuthFailRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 46, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", "test_user", ExecutionStatus.SUBMITTED_SUCCESS,
-            "192.168.xx.xx", 1, 10);
+            "192.168.xx.xx", "",1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) proejctAuthFailRes.getCode());
 
         Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
@@ -185,7 +185,7 @@ public class ProcessInstanceServiceTest {
 
         Result dataParameterRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "20200101 00:00:00",
             "20200102 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
-            "192.168.xx.xx", 1, 10);
+            "192.168.xx.xx", "",1, 10);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) dataParameterRes.getCode());
 
         //project auth success
@@ -201,7 +201,7 @@ public class ProcessInstanceServiceTest {
 
         Result successRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
-            "192.168.xx.xx", 1, 10);
+            "192.168.xx.xx", "",1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
 
         // data parameter empty
@@ -209,7 +209,7 @@ public class ProcessInstanceServiceTest {
             eq("192.168.xx.xx"), eq(null), eq(null))).thenReturn(pageReturn);
         successRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "",
             "", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
-            "192.168.xx.xx", 1, 10);
+            "192.168.xx.xx", "",1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
 
         //executor null
@@ -217,7 +217,7 @@ public class ProcessInstanceServiceTest {
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
         Result executorExistRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", "admin", ExecutionStatus.SUBMITTED_SUCCESS,
-            "192.168.xx.xx", 1, 10);
+            "192.168.xx.xx", "",1, 10);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), (int)executorExistRes.getCode());
 
@@ -226,7 +226,7 @@ public class ProcessInstanceServiceTest {
             eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         Result executorEmptyRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", "", ExecutionStatus.SUBMITTED_SUCCESS,
-            "192.168.xx.xx", 1, 10);
+            "192.168.xx.xx", "",1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int)executorEmptyRes.getCode());
 
     }
