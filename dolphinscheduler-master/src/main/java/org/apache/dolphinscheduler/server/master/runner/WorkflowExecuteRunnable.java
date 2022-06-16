@@ -17,10 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -69,8 +78,10 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,18 +99,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 /**
  * Workflow execute task, used to execute a workflow instance.
@@ -1001,7 +1004,7 @@ public class WorkflowExecuteRunnable implements Runnable {
      * @param taskInstance task instance
      * @return TaskInstance
      */
-    private TaskInstance submitTaskExec(TaskInstance taskInstance) {
+    private Optional<TaskInstance> submitTaskExec(TaskInstance taskInstance) {
         try {
             // package task instance before submit
             processService.packageTaskInstance(taskInstance, processInstance);
@@ -1019,7 +1022,7 @@ public class WorkflowExecuteRunnable implements Runnable {
                 logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
                         processInstance.getId(), processInstance.getName(),
                         taskInstance.getId(), taskInstance.getName());
-                return null;
+                return Optional.empty();
             }
 
             // in a dag, only one taskInstance is valid per taskCode, so need to set the old taskInstance invalid
@@ -1058,10 +1061,10 @@ public class WorkflowExecuteRunnable implements Runnable {
                 taskStateChangeEvent.setType(StateEventType.TASK_STATE_CHANGE);
                 this.stateEvents.add(taskStateChangeEvent);
             }
-            return taskInstance;
+            return Optional.of(taskInstance);
         } catch (Exception e) {
             logger.error("submit standby task error", e);
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -1360,6 +1363,7 @@ public class WorkflowExecuteRunnable implements Runnable {
         for (TaskInstance task : taskInstances) {
 
             if (readyToSubmitTaskQueue.contains(task)) {
+                logger.warn("Task is already at submit queue, taskInstanceId: {}", task.getId());
                 continue;
             }
 
@@ -1764,9 +1768,6 @@ public class WorkflowExecuteRunnable implements Runnable {
      * @param taskInstance task instance
      */
     private void removeTaskFromStandbyList(TaskInstance taskInstance) {
-        logger.info("remove task from stand by list, id: {} name:{}",
-                taskInstance.getId(),
-                taskInstance.getName());
         try {
             readyToSubmitTaskQueue.remove(taskInstance);
         } catch (Exception e) {
@@ -1859,14 +1860,14 @@ public class WorkflowExecuteRunnable implements Runnable {
                 }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
-                    TaskInstance taskInstance = submitTaskExec(task);
-                    if (taskInstance == null) {
+                    Optional<TaskInstance> taskInstanceOptional = submitTaskExec(task);
+                    if (!taskInstanceOptional.isPresent()) {
                         this.taskFailedSubmit = true;
                         // Remove and add to complete map and error map
                         removeTaskFromStandbyList(task);
                         completeTaskMap.put(task.getTaskCode(), task.getId());
                         errorTaskMap.put(task.getTaskCode(), task.getId());
-                        logger.error("process {}, task {}, code:{} submit task failed.", task.getProcessInstanceId(), task.getName(), task.getTaskCode());
+                        logger.error("Task submitted failed, processInstanceId: {}, taskInstanceId: {}", task.getProcessInstanceId(), task.getId());
                     } else {
                         removeTaskFromStandbyList(task);
                     }
@@ -1874,11 +1875,11 @@ public class WorkflowExecuteRunnable implements Runnable {
                     // if the dependency fails, the current node is not submitted and the state changes to failure.
                     dependFailedTaskMap.put(task.getTaskCode(), task.getId());
                     removeTaskFromStandbyList(task);
-                    logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
+                    logger.info("Task dependent result is failed, taskInstanceId:{} depend result : {}", task.getId(), dependResult);
                 } else if (DependResult.NON_EXEC == dependResult) {
                     // for some reasons(depend task pause/stop) this task would not be submit
                     removeTaskFromStandbyList(task);
-                    logger.info("remove task {},id:{} , because depend result : {}", task.getName(), task.getId(), dependResult);
+                    logger.info("Remove task due to depend result not executed, taskInstanceId:{} depend result : {}", task.getId(), dependResult);
                 }
             }
         } catch (Exception e) {
@@ -2067,6 +2068,11 @@ public class WorkflowExecuteRunnable implements Runnable {
     }
 
     private void measureTaskState(StateEvent taskStateEvent) {
+        if (taskStateEvent == null || taskStateEvent.getExecutionStatus() == null) {
+            // the event is broken
+            logger.warn("The task event is broken..., taskEvent: {}", taskStateEvent);
+            return;
+        }
         if (taskStateEvent.getExecutionStatus().typeIsFinished()) {
             TaskMetrics.incTaskFinish();
         }
