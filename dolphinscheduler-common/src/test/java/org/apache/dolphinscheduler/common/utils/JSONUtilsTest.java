@@ -17,27 +17,25 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class JSONUtilsTest {
 
@@ -262,7 +260,6 @@ public class JSONUtilsTest {
 
     @Test
     public void dateToString() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
@@ -274,7 +271,6 @@ public class JSONUtilsTest {
 
     @Test
     public void stringToDate() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
         Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
