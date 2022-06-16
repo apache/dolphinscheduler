@@ -46,14 +46,11 @@ public class PeerTaskInstancePriorityQueueTest {
         Assert.assertTrue(queue.size() < peekBeforeLength);
     }
 
-    @Test
+
+    @Test(expected = TaskPriorityQueueException.class)
     public void poll() throws Exception {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
-        try {
-            queue.poll(1000, TimeUnit.MILLISECONDS);
-        } catch (TaskPriorityQueueException e) {
-            e.printStackTrace();
-        }
+        queue.poll(1000, TimeUnit.MILLISECONDS);
     }
 
     @Test

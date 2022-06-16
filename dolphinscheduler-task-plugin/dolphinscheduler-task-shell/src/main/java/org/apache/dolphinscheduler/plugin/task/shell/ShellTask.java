@@ -34,6 +34,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -147,7 +148,11 @@ public class ShellTask extends AbstractTaskExecutor {
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            Files.createFile(path, attr);
+            try {
+                Files.createFile(path, attr);
+            } catch (FileAlreadyExistsException ex) {
+                // this is expected
+            }
         }
 
         Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);

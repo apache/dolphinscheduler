@@ -163,6 +163,8 @@ public class TaskCallbackService {
                     }
                 }
             });
+        } else {
+            logger.warn("Remote channel of taskInstanceId is null: {}, cannot send command: {}", taskInstanceId, command);
         }
     }
 
