@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -41,8 +40,6 @@ import com.google.common.base.Strings;
  */
 @TableName("t_ds_process_instance")
 public class ProcessInstance {
-
-    private static final AtomicInteger incrememt = new AtomicInteger();
 
     /**
      * id
@@ -268,15 +265,14 @@ public class ProcessInstance {
      */
     public ProcessInstance(ProcessDefinition processDefinition) {
         this.processDefinition = processDefinition;
+        // todo: the name is not unique
         this.name = processDefinition.getName()
                 + "-"
                 +
                 processDefinition.getVersion()
                 + "-"
                 +
-                DateUtils.getCurrentTimeStamp()
-                + "-"
-                + incrememt.getAndIncrement();
+            DateUtils.getCurrentTimeStamp();
     }
 
     public String getVarPool() {

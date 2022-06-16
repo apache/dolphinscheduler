@@ -247,7 +247,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 if (e instanceof NoSuchFileException) {
                     // this is expected
                 } else {
-                    logger.error("delete exec dir failed : {}", e.getMessage(), e);
+                    logger.error("Delete exec dir failed.", e);
                 }
             }
         }
