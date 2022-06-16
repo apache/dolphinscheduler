@@ -110,7 +110,8 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
-        @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String")
+        @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
+        @ApiImplicitParam(name = "otherParamsJson", value = "OTHER_PARAMS_JSON", required = false, type = "String")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -229,7 +230,8 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
-        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState")
+        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState"),
+        @ApiImplicitParam(name = "otherParamsJson", value = "OTHER_PARAMS_JSON", required = false, type = "String")
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -477,7 +479,8 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
         @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
+        @ApiImplicitParam(name = "otherParamsJson", value = "OTHER_PARAMS_JSON", required = false, type = "String")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -809,7 +812,8 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
-        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState")
+        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState"),
+        @ApiImplicitParam(name = "otherParamsJson", value = "OTHER_PARAMS_JSON", required = false, type = "String")
     })
     @PutMapping(value = "/{code}/basic-info")
     @ResponseStatus(HttpStatus.OK)
