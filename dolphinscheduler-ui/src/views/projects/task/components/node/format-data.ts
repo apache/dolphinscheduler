@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { find, omit, cloneDeep } from 'lodash'
+import { omit, cloneDeep } from 'lodash'
 import type {
   INodeData,
   ITaskData,
