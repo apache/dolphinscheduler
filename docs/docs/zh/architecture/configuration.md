@@ -194,6 +194,7 @@ yarn.resourcemanager.ha.rm.ids||yarn resourcemanager 地址, 如果resourcemanag
 yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname
 dolphinscheduler.env.path|env/dolphinscheduler_env.sh|运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
 development.state|false|是否处于开发模式
+task.resource.limit.state|false|是否启用资源限制模式
 
 
 ## 5.application-api.properties [API服务配置]
@@ -209,6 +210,13 @@ spring.messages.encoding|UTF-8|请求编码
 spring.jackson.time-zone|GMT+8|设置时区
 spring.messages.basename|i18n/messages|i18n配置
 security.authentication.type|PASSWORD|权限校验类型
+security.authentication.ldap.user.admin|read-only-admin|LDAP登陆时，系统管理员账号
+security.authentication.ldap.urls|ldap://ldap.forumsys.com:389/|LDAP urls
+security.authentication.ldap.base.dn|dc=example,dc=com|LDAP base dn
+security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP账号
+security.authentication.ldap.password|password|LDAP密码
+security.authentication.ldap.user.identity.attribute|uid|LDAP用户身份标识字段名
+security.authentication.ldap.user.email.attribute|mail|LDAP邮箱字段名
 
 
 ## 6.master.properties [Master服务配置]
@@ -382,7 +390,7 @@ singleYarnIp="yarnIp1"
 resourceUploadPath="/dolphinscheduler"
 
 
-# HDFS/S3  操作用户
+# HDFS/S3  操作用户 
 hdfsRootUser="hdfs"
 
 # 以下为 kerberos 配置

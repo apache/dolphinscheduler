@@ -36,6 +36,15 @@ EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN 
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alert ADD COLUMN IF NOT EXISTS sign varchar(40) NOT NULL DEFAULT ''''  ';
 EXECUTE 'comment on column ' || quote_ident(v_schema) ||'.t_ds_alert.sign is ''sign=sha1(content)''';
 
+-- Add resource limit column
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition ADD COLUMN IF NOT EXISTS cpu_quota int NOT NULL DEFAULT ''-1''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition ADD COLUMN IF NOT EXISTS memory_max int NOT NULL DEFAULT ''-1''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition_log ADD COLUMN IF NOT EXISTS cpu_quota int NOT NULL DEFAULT ''-1''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition_log ADD COLUMN IF NOT EXISTS memory_max int NOT NULL DEFAULT ''-1''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS cpu_quota int NOT NULL DEFAULT ''-1''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS memory_max int NOT NULL DEFAULT ''-1''  ';
+
+
 return 'Success!';
 exception when others then
         ---Raise EXCEPTION '(%)',SQLERRM;
@@ -238,6 +247,20 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_relation
     update_time       timestamp DEFAULT NULL ,
     PRIMARY KEY (id) ,
     CONSTRAINT namespace_user_unique UNIQUE (user_id,namespace_id)
+)';
+
+EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_cluster" (
+    id serial NOT NULL,
+    code bigint NOT NULL,
+    name varchar(100) DEFAULT NULL,
+    config text DEFAULT NULL,
+    description text,
+    operator int DEFAULT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT cluster_name_unique UNIQUE (name),
+    CONSTRAINT cluster_code_unique UNIQUE (code)
 )';
 
 return 'Success!';

@@ -336,6 +336,8 @@ interface ITaskParams {
   deployType?: string
   deployPort?: string
   deployModelKey?: string
+  cpuLimit?: string
+  memoryLimit?: string
   zk?: string
   zkPath?: string
   executeMode?: string
@@ -365,6 +367,8 @@ interface INodeData
   environmentCode?: number | null
   failRetryInterval?: number
   failRetryTimes?: number
+  cpuQuota?: number
+  memoryMax?: number
   flag?: 'YES' | 'NO'
   taskGroupId?: number
   taskGroupPriority?: number

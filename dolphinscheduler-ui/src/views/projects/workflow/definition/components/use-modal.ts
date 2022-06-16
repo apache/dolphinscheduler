@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import _, { cloneDeep } from 'lodash'
+import _, { cloneDeep, omit } from 'lodash'
 import { reactive, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -37,7 +37,7 @@ import {
 } from '@/service/modules/schedules'
 import { parseTime } from '@/common/common'
 import { EnvironmentItem } from '@/service/modules/environment/types'
-import { ITimingState } from './types'
+import { ITimingState, ProcessInstanceReq } from './types'
 
 export function useModal(
   state: any,
@@ -92,7 +92,12 @@ export function useModal(
     state.saving = true
     try {
       state.startForm.processDefinitionCode = code
-      if (state.startForm.startEndTime) {
+      const params = omit(state.startForm, [
+        'startEndTime',
+        'scheduleTime',
+        'dataDateType'
+      ]) as ProcessInstanceReq
+      if (state.startForm.dataDateType === 1) {
         const start = format(
           new Date(state.startForm.startEndTime[0]),
           'yyyy-MM-dd HH:mm:ss'
@@ -101,7 +106,14 @@ export function useModal(
           new Date(state.startForm.startEndTime[1]),
           'yyyy-MM-dd HH:mm:ss'
         )
-        state.startForm.scheduleTime = `${start},${end}`
+        params.scheduleTime = JSON.stringify({
+          complementStartDate: start,
+          complementEndDate: end
+        })
+      } else {
+        params.scheduleTime = JSON.stringify({
+          complementScheduleDateList: state.startForm.scheduleTime
+        })
       }
 
       const startParams = {} as any
@@ -110,11 +122,11 @@ export function useModal(
           startParams[item.prop] = item.value
         }
       }
-      state.startForm.startParams = !_.isEmpty(startParams)
+      params.startParams = !_.isEmpty(startParams)
         ? JSON.stringify(startParams)
         : ''
 
-      await startProcessInstance(state.startForm, variables.projectCode)
+      await startProcessInstance(params, variables.projectCode)
       window.$message.success(t('project.workflow.success'))
       state.saving = false
       ctx.emit('updateList')

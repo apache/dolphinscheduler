@@ -48,5 +48,6 @@
     <modules>
         <module>dolphinscheduler-registry-api</module>
         <module>dolphinscheduler-registry-plugins</module>
+        <module>dolphinscheduler-registry-all</module>
     </modules>
 </project>

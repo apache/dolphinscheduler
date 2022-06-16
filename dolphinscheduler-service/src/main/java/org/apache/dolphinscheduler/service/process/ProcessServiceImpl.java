@@ -162,6 +162,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import io.micrometer.core.annotation.Counted;
+
 /**
  * process relative dao that some mappers in this.
  */
@@ -406,6 +408,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return create result
      */
     @Override
+    @Counted("dolphinscheduler_create_command_count")
     public int createCommand(Command command) {
         int result = 0;
         if (command != null) {
@@ -1264,8 +1267,9 @@ public class ProcessServiceImpl implements ProcessService {
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
                 logger.error("task commit to db failed", e);
+            } finally {
+                retryTimes += 1;
             }
-            retryTimes += 1;
         }
         return task;
     }
@@ -2767,6 +2771,8 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
                 taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
                 taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
+                taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
+                taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
                 taskNodeList.add(taskNode);
             }
         }

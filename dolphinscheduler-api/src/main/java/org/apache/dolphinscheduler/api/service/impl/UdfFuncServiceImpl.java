@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
@@ -31,23 +34,17 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * udf func service impl
@@ -137,7 +134,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         udfFuncMapper.insert(udf);
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(resource.getId()), logger);
+        permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(udf.getId()), logger);
         return result;
     }
 
@@ -190,17 +187,17 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      */
     @Override
     public Result<Object> updateUdfFunc(User loginUser,
-                                             int udfFuncId,
-                                             String funcName,
-                                             String className,
-                                             String argTypes,
-                                             String database,
-                                             String desc,
-                                             UdfType type,
-                                             int resourceId) {
+                                        int udfFuncId,
+                                        String funcName,
+                                        String className,
+                                        String argTypes,
+                                        String database,
+                                        String desc,
+                                        UdfType type,
+                                        int resourceId) {
         Result<Object> result = new Result<>();
 
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{udfFuncId}, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;

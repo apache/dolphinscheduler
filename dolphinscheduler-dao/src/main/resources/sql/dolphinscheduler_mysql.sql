@@ -487,6 +487,8 @@ CREATE TABLE `t_ds_task_definition` (
   `resource_ids` text COMMENT 'resource id, separated by comma',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `task_group_priority` tinyint(4) DEFAULT '0' COMMENT 'task group priority',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
@@ -521,6 +523,8 @@ CREATE TABLE `t_ds_task_definition_log` (
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `task_group_priority` tinyint(4) DEFAULT 0 COMMENT 'task group priority',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
@@ -853,6 +857,8 @@ CREATE TABLE `t_ds_task_instance` (
   `var_pool` longtext COMMENT 'var_pool',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
@@ -1931,4 +1937,23 @@ CREATE TABLE t_ds_alert_send_status (
   `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for t_ds_cluster
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_cluster`;
+CREATE TABLE `t_ds_cluster` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'cluster name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cluster_name_unique` (`name`),
+  UNIQUE KEY `cluster_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
