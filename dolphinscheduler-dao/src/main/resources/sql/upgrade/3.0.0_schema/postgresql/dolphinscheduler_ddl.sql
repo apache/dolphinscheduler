@@ -89,6 +89,12 @@ EXECUTE 'CREATE INDEX IF NOT EXISTS process_task_relation_log_idx_project_code_p
 EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_code_version"';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_code_version ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("code","version")';
 
+EXECUTE 'DROP INDEX IF EXISTS "idx_relation_process_instance_parent_process_task"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_relation_process_instance_parent_process_task ON ' || quote_ident(v_schema) ||'.t_ds_relation_process_instance USING Btree("parent_process_instance_id","parent_task_instance_id")';
+
+EXECUTE 'DROP INDEX IF EXISTS "idx_relation_process_instance_process_instance_id"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_relation_process_instance_process_instance_id ON ' || quote_ident(v_schema) ||'.t_ds_relation_process_instance USING Btree("process_instance_id")';
+
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_user ADD COLUMN IF NOT EXISTS "time_zone" varchar(32) DEFAULT NULL';
 
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alert ADD COLUMN IF NOT EXISTS "warning_type" int DEFAULT 2';
