@@ -842,4 +842,9 @@ public final class Constants {
     public static final String FUNCTION_START_WITH = "$";
 
     public static final Integer DEFAULT_QUEUE_ID = 1;
+
+    /**
+     * Security authentication types (supported types: PASSWORD,LDAP)
+     */
+    public static final String SECURITY_CONFIG_TYPE= "securityConfigType";
 }
