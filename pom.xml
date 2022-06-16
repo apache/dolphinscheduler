@@ -390,7 +390,16 @@
                 <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-scheduler-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-datasource-all</artifactId>
@@ -1246,5 +1255,6 @@
         <module>dolphinscheduler-log-server</module>
         <module>dolphinscheduler-tools</module>
         <module>dolphinscheduler-ui-next</module>
+        <module>dolphinscheduler-scheduler-plugin</module>
     </modules>
 </project>

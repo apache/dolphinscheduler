@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz.cron;
-
-import org.apache.dolphinscheduler.common.enums.CycleEnum;
+package org.apache.dolphinscheduler.service.corn;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.field.CronField;
@@ -28,6 +26,7 @@ import com.cronutils.model.field.expression.Between;
 import com.cronutils.model.field.expression.Every;
 import com.cronutils.model.field.expression.FieldExpression;
 import com.cronutils.model.field.expression.On;
+import org.apache.dolphinscheduler.common.enums.CycleEnum;
 
 /**
  * Cycle

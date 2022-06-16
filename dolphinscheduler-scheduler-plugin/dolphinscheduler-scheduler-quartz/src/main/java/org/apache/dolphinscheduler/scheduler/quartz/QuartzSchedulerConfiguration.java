@@ -15,33 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz;
+package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
+@Configuration
+public class QuartzSchedulerConfiguration {
 
-import org.quartz.Job;
-
-public interface QuartzExecutor {
-
-    /**
-     * build job name
-     */
-    String buildJobName(int scheduleId);
-
-    /**
-     * build job group name
-     */
-    String buildJobGroupName(int projectId);
-
-    /**
-     * build data map of job detail
-     */
-    Map<String, Object> buildDataMap(int projectId, Schedule schedule);
-
-    /**
-     * add job to quartz
-     */
-    void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule);
+    @Bean
+    public SchedulerApi schedulerApi() {
+        return new QuartzScheduler();
+    }
 }

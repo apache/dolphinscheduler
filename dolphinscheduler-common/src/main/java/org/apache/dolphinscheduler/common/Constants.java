@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.regex.Pattern;
 
@@ -502,26 +501,6 @@ public final class Constants {
      * underline  "_"
      */
     public static final String UNDERLINE = "_";
-    /**
-     * quartz job prifix
-     */
-    public static final String QUARTZ_JOB_PREFIX = "job";
-    /**
-     * quartz job group prifix
-     */
-    public static final String QUARTZ_JOB_GROUP_PREFIX = "jobgroup";
-    /**
-     * projectId
-     */
-    public static final String PROJECT_ID = "projectId";
-    /**
-     * processId
-     */
-    public static final String SCHEDULE_ID = "scheduleId";
-    /**
-     * schedule
-     */
-    public static final String SCHEDULE = "schedule";
     /**
      * application regex
      */

@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.service.quartz.cron;
+
+package org.apache.dolphinscheduler.service.cron;
 
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.model.Cron;
@@ -22,9 +23,15 @@ import com.cronutils.model.CronType;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.field.CronField;
 import com.cronutils.model.field.CronFieldName;
-import com.cronutils.model.field.expression.*;
+import com.cronutils.model.field.expression.Always;
+import com.cronutils.model.field.expression.And;
+import com.cronutils.model.field.expression.Between;
+import com.cronutils.model.field.expression.Every;
+import com.cronutils.model.field.expression.On;
+import com.cronutils.model.field.expression.QuestionMark;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,7 +40,10 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.cronutils.model.field.expression.FieldExpressionFactory.*;
+import static com.cronutils.model.field.expression.FieldExpressionFactory.always;
+import static com.cronutils.model.field.expression.FieldExpressionFactory.every;
+import static com.cronutils.model.field.expression.FieldExpressionFactory.on;
+import static com.cronutils.model.field.expression.FieldExpressionFactory.questionMark;
 
 /**
  * CronUtilsTest
@@ -66,6 +76,7 @@ public class CronUtilsTest {
 
     /**
      * cron parse test
+     *
      * @throws ParseException if error throws ParseException
      */
     @Test
@@ -83,6 +94,7 @@ public class CronUtilsTest {
 
     /**
      * schedule type test
+     *
      * @throws ParseException if error throws ParseException
      */
     @Test
@@ -95,18 +107,18 @@ public class CronUtilsTest {
 
         CycleEnum cycleEnum3 = CronUtils.getMiniCycle(CronUtils.parse2Cron("0 * * * * ? *"));
         Assert.assertEquals("MINUTE", cycleEnum3.name());
-    
+
         CycleEnum cycleEnum4 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1 ? *"));
         Assert.assertEquals("YEAR", cycleEnum4.name());
         cycleEnum4 = CronUtils.getMiniCycle(CronUtils.parse2Cron("0 0 7 * 1 ? *"));
         Assert.assertEquals("DAY", cycleEnum4.name());
-    
+
         CycleEnum cycleEnum5 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1/1 ? *"));
         Assert.assertEquals("MONTH", cycleEnum5.name());
-    
+
         CycleEnum cycleEnum6 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1-2 ? *"));
         Assert.assertEquals("YEAR", cycleEnum6.name());
-    
+
         CycleEnum cycleEnum7 = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 0 7 * 1,2 ? *"));
         Assert.assertEquals("YEAR", cycleEnum7.name());
     }
@@ -115,7 +127,7 @@ public class CronUtilsTest {
      * test
      */
     @Test
-    public void test2(){
+    public void test2() {
         Cron cron1 = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
                 .withYear(always())
                 .withDoW(questionMark())
@@ -126,62 +138,62 @@ public class CronUtilsTest {
                 .withSecond(on(0))
                 .instance();
         // minute cycle
-        String[] cronArayy = new String[]{"* * * * * ? *","* 0 * * * ? *",
-                "* 5 * * 3/5 ? *","0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *" , "0 0 7 * 1,2 ? *"};
-        for(String minCrontab:cronArayy){
+        String[] cronArayy = new String[]{"* * * * * ? *", "* 0 * * * ? *",
+                "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *", "0 0 7 * 1,2 ? *"};
+        for (String minCrontab : cronArayy) {
             if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
-                throw new RuntimeException(minCrontab+" verify failure, cron expression not valid");
+                throw new RuntimeException(minCrontab + " verify failure, cron expression not valid");
             }
             Cron cron = CronUtils.parse2Cron(minCrontab);
             CronField minField = cron.retrieve(CronFieldName.MINUTE);
-            logger.info("minField instanceof Between:"+(minField.getExpression() instanceof Between));
-            logger.info("minField instanceof Every:"+(minField.getExpression() instanceof Every));
+            logger.info("minField instanceof Between:" + (minField.getExpression() instanceof Between));
+            logger.info("minField instanceof Every:" + (minField.getExpression() instanceof Every));
             logger.info("minField instanceof Always:" + (minField.getExpression() instanceof Always));
-            logger.info("minField instanceof On:"+(minField.getExpression() instanceof On));
-            logger.info("minField instanceof And:"+(minField.getExpression() instanceof And));
+            logger.info("minField instanceof On:" + (minField.getExpression() instanceof On));
+            logger.info("minField instanceof And:" + (minField.getExpression() instanceof And));
             CronField hourField = cron.retrieve(CronFieldName.HOUR);
-            logger.info("hourField instanceof Between:"+(hourField.getExpression() instanceof Between));
-            logger.info("hourField instanceof Always:"+(hourField.getExpression() instanceof Always));
-            logger.info("hourField instanceof Every:"+(hourField.getExpression() instanceof Every));
-            logger.info("hourField instanceof On:"+(hourField.getExpression() instanceof On));
-            logger.info("hourField instanceof And:"+(hourField.getExpression() instanceof And));
+            logger.info("hourField instanceof Between:" + (hourField.getExpression() instanceof Between));
+            logger.info("hourField instanceof Always:" + (hourField.getExpression() instanceof Always));
+            logger.info("hourField instanceof Every:" + (hourField.getExpression() instanceof Every));
+            logger.info("hourField instanceof On:" + (hourField.getExpression() instanceof On));
+            logger.info("hourField instanceof And:" + (hourField.getExpression() instanceof And));
 
             CronField dayOfMonthField = cron.retrieve(CronFieldName.DAY_OF_MONTH);
-            logger.info("dayOfMonthField instanceof Between:"+(dayOfMonthField.getExpression() instanceof Between));
-            logger.info("dayOfMonthField instanceof Always:"+(dayOfMonthField.getExpression() instanceof Always));
-            logger.info("dayOfMonthField instanceof Every:"+(dayOfMonthField.getExpression() instanceof Every));
-            logger.info("dayOfMonthField instanceof On:"+(dayOfMonthField.getExpression() instanceof On));
-            logger.info("dayOfMonthField instanceof And:"+(dayOfMonthField.getExpression() instanceof And));
-            logger.info("dayOfMonthField instanceof QuestionMark:"+(dayOfMonthField.getExpression() instanceof QuestionMark));
+            logger.info("dayOfMonthField instanceof Between:" + (dayOfMonthField.getExpression() instanceof Between));
+            logger.info("dayOfMonthField instanceof Always:" + (dayOfMonthField.getExpression() instanceof Always));
+            logger.info("dayOfMonthField instanceof Every:" + (dayOfMonthField.getExpression() instanceof Every));
+            logger.info("dayOfMonthField instanceof On:" + (dayOfMonthField.getExpression() instanceof On));
+            logger.info("dayOfMonthField instanceof And:" + (dayOfMonthField.getExpression() instanceof And));
+            logger.info("dayOfMonthField instanceof QuestionMark:" + (dayOfMonthField.getExpression() instanceof QuestionMark));
 
             CronField monthField = cron.retrieve(CronFieldName.MONTH);
-            logger.info("monthField instanceof Between:"+(monthField.getExpression() instanceof Between));
-            logger.info("monthField instanceof Always:"+(monthField.getExpression() instanceof Always));
-            logger.info("monthField instanceof Every:"+(monthField.getExpression() instanceof Every));
-            logger.info("monthField instanceof On:"+(monthField.getExpression() instanceof On));
-            logger.info("monthField instanceof And:"+(monthField.getExpression() instanceof And));
-            logger.info("monthField instanceof QuestionMark:"+(monthField.getExpression() instanceof QuestionMark));
+            logger.info("monthField instanceof Between:" + (monthField.getExpression() instanceof Between));
+            logger.info("monthField instanceof Always:" + (monthField.getExpression() instanceof Always));
+            logger.info("monthField instanceof Every:" + (monthField.getExpression() instanceof Every));
+            logger.info("monthField instanceof On:" + (monthField.getExpression() instanceof On));
+            logger.info("monthField instanceof And:" + (monthField.getExpression() instanceof And));
+            logger.info("monthField instanceof QuestionMark:" + (monthField.getExpression() instanceof QuestionMark));
 
             CronField dayOfWeekField = cron.retrieve(CronFieldName.DAY_OF_WEEK);
-            logger.info("dayOfWeekField instanceof Between:"+(dayOfWeekField.getExpression() instanceof Between));
-            logger.info("dayOfWeekField instanceof Always:"+(dayOfWeekField.getExpression() instanceof Always));
-            logger.info("dayOfWeekField instanceof Every:"+(dayOfWeekField.getExpression() instanceof Every));
-            logger.info("dayOfWeekField instanceof On:"+(dayOfWeekField.getExpression() instanceof On));
-            logger.info("dayOfWeekField instanceof And:"+(dayOfWeekField.getExpression() instanceof And));
-            logger.info("dayOfWeekField instanceof QuestionMark:"+(dayOfWeekField.getExpression() instanceof QuestionMark));
-    
+            logger.info("dayOfWeekField instanceof Between:" + (dayOfWeekField.getExpression() instanceof Between));
+            logger.info("dayOfWeekField instanceof Always:" + (dayOfWeekField.getExpression() instanceof Always));
+            logger.info("dayOfWeekField instanceof Every:" + (dayOfWeekField.getExpression() instanceof Every));
+            logger.info("dayOfWeekField instanceof On:" + (dayOfWeekField.getExpression() instanceof On));
+            logger.info("dayOfWeekField instanceof And:" + (dayOfWeekField.getExpression() instanceof And));
+            logger.info("dayOfWeekField instanceof QuestionMark:" + (dayOfWeekField.getExpression() instanceof QuestionMark));
+
             CronField yearField = cron.retrieve(CronFieldName.YEAR);
-            logger.info("yearField instanceof Between:"+(yearField.getExpression() instanceof Between));
-            logger.info("yearField instanceof Always:"+(yearField.getExpression() instanceof Always));
-            logger.info("yearField instanceof Every:"+(yearField.getExpression() instanceof Every));
-            logger.info("yearField instanceof On:"+(yearField.getExpression() instanceof On));
-            logger.info("yearField instanceof And:"+(yearField.getExpression() instanceof And));
-            logger.info("yearField instanceof QuestionMark:"+(yearField.getExpression() instanceof QuestionMark));
+            logger.info("yearField instanceof Between:" + (yearField.getExpression() instanceof Between));
+            logger.info("yearField instanceof Always:" + (yearField.getExpression() instanceof Always));
+            logger.info("yearField instanceof Every:" + (yearField.getExpression() instanceof Every));
+            logger.info("yearField instanceof On:" + (yearField.getExpression() instanceof On));
+            logger.info("yearField instanceof And:" + (yearField.getExpression() instanceof And));
+            logger.info("yearField instanceof QuestionMark:" + (yearField.getExpression() instanceof QuestionMark));
 
             CycleEnum cycleEnum = CronUtils.getMaxCycle(minCrontab);
-            if(cycleEnum !=null){
+            if (cycleEnum != null) {
                 logger.info(cycleEnum.name());
-            }else{
+            } else {
                 logger.info("can't get scheduleType");
             }
         }
@@ -213,7 +225,7 @@ public class CronUtilsTest {
     }
 
     @Test
-    public void getExpirationTime(){
+    public void getExpirationTime() {
         Date startTime = DateUtils.stringToDate("2020-02-07 18:30:00");
         Date expirationTime = CronUtils.getExpirationTime(startTime, CycleEnum.HOUR);
         Assert.assertEquals("2020-02-07 19:30:00", DateUtils.dateToString(expirationTime));

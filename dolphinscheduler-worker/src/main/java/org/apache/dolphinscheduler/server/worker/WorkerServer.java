@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -39,14 +40,6 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.Collection;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,14 +49,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.Set;
+
 @SpringBootApplication
 @EnableTransactionManagement
 @ComponentScan(basePackages = "org.apache.dolphinscheduler",
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
                         "org.apache.dolphinscheduler.service.process.*",
-                        // todo: split the quartz into a single module
-                        "org.apache.dolphinscheduler.service.quartz.*",
                         "org.apache.dolphinscheduler.service.queue.*",
                 })
         }

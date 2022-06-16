@@ -48,14 +48,10 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.service.quartz.QuartzExecutor;
-import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,13 +95,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    private Scheduler scheduler;
+    private SchedulerApi schedulerApi;
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private QuartzExecutor quartzExecutor;
 
     /**
      * save schedule
@@ -173,7 +167,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
-        if (!CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+        if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
             logger.error("{} verify failure", scheduleParam.getCrontab());
 
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
@@ -391,7 +385,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     public Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
-                                             Integer pageNo, Integer pageSize) {
+                                Integer pageNo, Integer pageSize) {
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
@@ -410,7 +404,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Page<Schedule> page = new Page<>(pageNo, pageSize);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode,
-            searchVal);
+                searchVal);
 
         List<ScheduleVo> scheduleList = new ArrayList<>();
         for (Schedule schedule : scheduleIPage.getRecords()) {
@@ -457,8 +451,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     public void setSchedule(int projectId, Schedule schedule) {
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
-
-        quartzExecutor.addJob(ProcessScheduleJob.class, projectId, schedule);
+        schedulerApi.insertOrUpdateScheduleTask(projectId, schedule);
     }
 
     /**
@@ -471,20 +464,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     public void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
-
-        String jobName = quartzExecutor.buildJobName(scheduleId);
-        String jobGroupName = quartzExecutor.buildJobGroupName(projectId);
-
-        JobKey jobKey = new JobKey(jobName, jobGroupName);
-        try {
-            if (scheduler.checkExists(jobKey)) {
-                logger.info("Try to delete job: {}, group name: {},", jobName, jobGroupName);
-                scheduler.deleteJob(jobKey);
-            }
-        } catch (SchedulerException e) {
-            logger.error("Failed to delete job: {}", jobKey);
-            throw new ServiceException("Failed to delete job: " + jobKey);
-        }
+        schedulerApi.deleteScheduleTask(projectId, scheduleId);
     }
 
     /**
@@ -671,7 +651,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
-            if (!CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+            if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
                 putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
                 return;
             }

@@ -15,16 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.quartz.cron;
-
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.day;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.hour;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.min;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.month;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.week;
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.year;
-
-import static com.cronutils.model.CronType.QUARTZ;
+package org.apache.dolphinscheduler.service.corn;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
@@ -49,11 +40,19 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
+import static com.cronutils.model.CronType.QUARTZ;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
 
 
 /**
+ * // todo: this utils is heavy, it rely on quartz and corn-utils.
  * cron utils
  */
 public class CronUtils {

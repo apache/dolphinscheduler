@@ -20,17 +20,7 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
-import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
@@ -38,10 +28,6 @@ import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import javax.annotation.PostConstruct;
-
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +37,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
@@ -72,7 +60,7 @@ public class MasterServer implements IStoppable {
     private MasterSchedulerService masterSchedulerService;
 
     @Autowired
-    private Scheduler scheduler;
+    private SchedulerApi schedulerApi;
 
     @Autowired
     private EventExecuteService eventExecuteService;
@@ -110,7 +98,7 @@ public class MasterServer implements IStoppable {
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
 
-        this.scheduler.start();
+        this.schedulerApi.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
@@ -145,6 +133,7 @@ public class MasterServer implements IStoppable {
                 logger.warn("thread sleep exception ", e);
             }
             // close
+            this.schedulerApi.close();
             this.masterSchedulerService.close();
             this.masterRPCServer.close();
             this.masterRegistryClient.closeRegistry();
