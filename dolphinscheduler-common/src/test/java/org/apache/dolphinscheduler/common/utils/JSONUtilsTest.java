@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -260,10 +261,7 @@ public class JSONUtilsTest {
 
     @Test
     public void dateToString() {
-<<<<<<< HEAD
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-=======
->>>>>>> f3c647d45 ([Improvement][Api] Interface and entity optimization to improve code scalability (#10466). (#10468))
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
@@ -275,10 +273,7 @@ public class JSONUtilsTest {
 
     @Test
     public void stringToDate() {
-<<<<<<< HEAD
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-=======
->>>>>>> f3c647d45 ([Improvement][Api] Interface and entity optimization to improve code scalability (#10466). (#10468))
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
         Assert.assertEquals(date, DateUtils.stringToDate("2022-02-22 13:38:24"));
