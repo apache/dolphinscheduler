@@ -127,7 +127,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
         return this.contains(taskInstance.getId());
     }
 
-    public boolean contains(long taskInstanceId) {
+    public boolean contains(int taskInstanceId) {
         return taskInstanceIdSet.contains(taskInstanceId);
     }
 
