@@ -825,4 +825,9 @@ public final class Constants {
     public static final int USER_PASSWORD_MAX_LENGTH = 20;
 
     public static final int USER_PASSWORD_MIN_LENGTH = 2;
+
+    /**
+     * Security authentication types (supported types: PASSWORD,LDAP)
+     */
+    public static final String SECURITY_CONFIG_TYPE= "securityConfigType";
 }
