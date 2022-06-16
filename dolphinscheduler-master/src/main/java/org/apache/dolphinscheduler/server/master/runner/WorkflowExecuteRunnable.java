@@ -2050,6 +2050,11 @@ public class WorkflowExecuteRunnable implements Runnable {
     }
 
     private void measureTaskState(StateEvent taskStateEvent) {
+        if (taskStateEvent == null || taskStateEvent.getExecutionStatus() == null) {
+            // the event is broken
+            logger.warn("The task event is broken..., taskEvent: {}", taskStateEvent);
+            return;
+        }
         if (taskStateEvent.getExecutionStatus().typeIsFinished()) {
             TaskMetrics.incTaskFinish();
         }

@@ -125,7 +125,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
-            logger.info("master submit success, task : {}", taskInstance.getName());
+            logger.info("Master submit task to priority queue success, taskInstanceId : {}", taskInstance.getId());
             return true;
         } catch (Exception e) {
             logger.error("submit task error", e);
