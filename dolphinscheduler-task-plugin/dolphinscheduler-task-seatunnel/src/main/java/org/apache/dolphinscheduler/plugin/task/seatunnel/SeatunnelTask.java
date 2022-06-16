@@ -128,6 +128,7 @@ public class SeatunnelTask extends AbstractTaskExecutor {
         } else {
             seatunnelParameters.getResourceList().forEach(resourceInfo -> {
                 args.add(CONFIG_OPTIONS);
+                // TODO Currently resourceName is `/xxx.sh`, it has more `/` and needs to be optimized
                 args.add(resourceInfo.getResourceName().substring(1));
             });
         }
