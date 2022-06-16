@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -48,14 +55,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR;
@@ -93,6 +92,7 @@ public class ProcessInstanceController extends BaseController {
      * @param host host
      * @param startTime start time
      * @param endTime end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
     @ApiOperation(value = "queryProcessInstanceListPaging", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
@@ -120,6 +120,7 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "host", required = false) String host,
                                            @RequestParam(value = "startDate", required = false) String startTime,
                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
 
@@ -129,7 +130,7 @@ public class ProcessInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
-                searchVal, executorName, stateType, host, pageNo, pageSize);
+                searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
         return result;
     }
 

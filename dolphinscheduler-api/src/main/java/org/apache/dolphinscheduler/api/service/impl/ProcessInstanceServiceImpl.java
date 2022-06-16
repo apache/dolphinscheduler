@@ -19,6 +19,21 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
@@ -69,22 +84,6 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
@@ -240,11 +239,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param host host
      * @param startDate start time
      * @param endDate end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
     @Override
     public Result queryProcessInstanceList(User loginUser, long projectCode, long processDefineCode, String startDate, String endDate, String searchVal, String executorName,
-                                           ExecutionStatus stateType, String host, Integer pageNo, Integer pageSize) {
+                                           ExecutionStatus stateType, String host, String otherParamsJson, Integer pageNo, Integer pageSize) {
 
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);

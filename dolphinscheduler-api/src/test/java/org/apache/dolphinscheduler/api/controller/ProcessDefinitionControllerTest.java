@@ -17,6 +17,14 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -38,14 +46,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * process definition controller test
  */
@@ -93,10 +93,10 @@ public class ProcessDefinitionControllerTest {
         result.put(Constants.DATA_LIST, 1);
 
         Mockito.when(processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson, ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
+                locations, timeout, tenantCode, relationJson, taskDefinitionJson,"", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
 
         Result response = processDefinitionController.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson,ProcessExecutionTypeEnum.PARALLEL);
+                locations, timeout, tenantCode, relationJson, taskDefinitionJson,"", ProcessExecutionTypeEnum.PARALLEL);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -156,10 +156,10 @@ public class ProcessDefinitionControllerTest {
         result.put("processDefinitionId", 1);
 
         Mockito.when(processDefinitionService.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson,ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
+                locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
 
         Result response = processDefinitionController.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson, ProcessExecutionTypeEnum.PARALLEL, ReleaseState.OFFLINE);
+                locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -357,8 +357,8 @@ public class ProcessDefinitionControllerTest {
         putMsg(result, Status.SUCCESS);
         result.setData(new PageInfo<Resource>(1, 10));
 
-        Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, searchVal, userId, pageNo, pageSize)).thenReturn(result);
-        Result response = processDefinitionController.queryProcessDefinitionListPaging(user, projectCode, searchVal, userId, pageNo, pageSize);
+        Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize)).thenReturn(result);
+        Result response = processDefinitionController.queryProcessDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }
