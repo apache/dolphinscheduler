@@ -201,7 +201,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         } catch (RuntimeException e) {
             logger.error("Master dispatch task to worker error: ", e);
         } catch (ExecuteException e) {
-            logger.error("Master dispatch task to worker error: {}", e.getMessage());
+            logger.error("Master dispatch task to worker error: {}", e);
         }
         return result;
     }
