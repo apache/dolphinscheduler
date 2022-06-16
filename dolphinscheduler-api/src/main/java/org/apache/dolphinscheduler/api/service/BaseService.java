@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * base service
@@ -114,4 +116,21 @@ public interface BaseService {
      * @return map<status,startDate,endDate>
      */
     Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
+
+    /**
+     * delete other relation
+     * @param project
+     * @param result
+     * @param processDefinition
+     */
+    void deleteOtherRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition);
+
+    /**
+     * save other relation
+     * @param loginUser
+     * @param processDefinition
+     * @param result
+     * @param otherParamsJson
+     */
+    void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson);
 }

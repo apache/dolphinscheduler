@@ -17,6 +17,20 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -28,17 +42,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +58,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_COPY_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_MOVE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINITION_VERSION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
 
 /**
  * process definition controller
@@ -91,6 +103,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @return create result code
      */
     @ApiOperation(value = "createProcessDefinition", notes = "CREATE_PROCESS_DEFINITION_NOTES")
@@ -113,9 +126,10 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                          @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectCode, name, description, globalParams,
-            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
+            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         return returnDataList(result);
     }
 
@@ -126,6 +140,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @param codes process definition codes
      * @param targetProjectCode target project code
+     * @param otherParamsJson otherParamsJson handle other params
      * @return copy result code
      */
     @ApiOperation(value = "batchCopyByCodes", notes = "COPY_PROCESS_DEFINITION_NOTES")
@@ -140,8 +155,9 @@ public class ProcessDefinitionController extends BaseController {
     public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
+                                        @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        return returnDataList(processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, codes, targetProjectCode));
+        return returnDataList(processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, codes, targetProjectCode, otherParamsJson));
     }
 
     /**
@@ -151,6 +167,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @param codes process definition codes
      * @param targetProjectCode target project code
+     * @param otherParamsJson otherParamsJson handle other params
      * @return move result code
      */
     @ApiOperation(value = "batchMoveByCodes", notes = "MOVE_PROCESS_DEFINITION_NOTES")
@@ -165,8 +182,9 @@ public class ProcessDefinitionController extends BaseController {
     public Result moveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
+                                        @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        return returnDataList(processDefinitionService.batchMoveProcessDefinition(loginUser, projectCode, codes, targetProjectCode));
+        return returnDataList(processDefinitionService.batchMoveProcessDefinition(loginUser, projectCode, codes, targetProjectCode, otherParamsJson));
     }
 
     /**
@@ -206,6 +224,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @return update result code
      */
     @ApiOperation(value = "update", notes = "UPDATE_PROCESS_DEFINITION_NOTES")
@@ -231,11 +250,12 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                          @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
                                           @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name, code, description, globalParams,
-            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
+            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,otherParamsJson, executionType);
         //  If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -450,6 +470,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param loginUser login user
      * @param projectCode project code
      * @param searchVal search value
+     * @param otherParamsJson otherParamsJson handle other params
      * @param pageNo page number
      * @param pageSize page size
      * @param userId user id
@@ -469,6 +490,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result queryProcessDefinitionListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                   @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                    @RequestParam("pageNo") Integer pageNo,
                                                    @RequestParam("pageSize") Integer pageSize) {
@@ -478,7 +500,7 @@ public class ProcessDefinitionController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
 
-        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal, userId, pageNo, pageSize);
+        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize);
     }
 
     /**
@@ -712,6 +734,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param loginUser login user
      * @param projectCode project code
      * @param file resource file
+     * @param otherParamsJson otherParamsJson handle other params
      * @return import result code
      */
     @ApiOperation(value = "importProcessDefinition", notes = "IMPORT_PROCESS_DEFINITION_NOTES")
@@ -723,12 +746,13 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "file"})
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                           @RequestParam("file") MultipartFile file) {
         Map<String, Object> result;
         if ("application/zip".equals(file.getContentType())) {
-            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file);
+            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file, otherParamsJson);
         } else {
-            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
+            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file, otherParamsJson);
         }
         return returnDataList(result);
     }
@@ -783,6 +807,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param scheduleJson scheduleJson
      * @param executionType executionType
      * @param releaseState releaseState
+     * @param otherParamsJson otherParamsJson handle other params
      * @return update result code
      */
     @ApiOperation(value = "updateBasicInfo", notes = "UPDATE_PROCESS_DEFINITION_BASIC_INFO_NOTES")
@@ -805,10 +830,11 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                                    @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                                    @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
+                                                   @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                                    @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
                                                    @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
         Map<String, Object> result = processDefinitionService.updateProcessDefinitionBasicInfo(loginUser, projectCode, name, code, description, globalParams,
-            timeout, tenantCode, scheduleJson, executionType);
+            timeout, tenantCode, scheduleJson, otherParamsJson, executionType);
         //  If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
