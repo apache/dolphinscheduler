@@ -140,7 +140,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @param codes process definition codes
      * @param targetProjectCode target project code
-     * @param otherParamsJson otherParamsJson handle other params
      * @return copy result code
      */
     @ApiOperation(value = "batchCopyByCodes", notes = "COPY_PROCESS_DEFINITION_NOTES")
@@ -155,9 +154,8 @@ public class ProcessDefinitionController extends BaseController {
     public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
-                                        @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        return returnDataList(processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, codes, targetProjectCode, otherParamsJson));
+        return returnDataList(processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, codes, targetProjectCode));
     }
 
     /**
@@ -167,7 +165,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @param codes process definition codes
      * @param targetProjectCode target project code
-     * @param otherParamsJson otherParamsJson handle other params
      * @return move result code
      */
     @ApiOperation(value = "batchMoveByCodes", notes = "MOVE_PROCESS_DEFINITION_NOTES")
@@ -182,9 +179,8 @@ public class ProcessDefinitionController extends BaseController {
     public Result moveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
-                                        @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        return returnDataList(processDefinitionService.batchMoveProcessDefinition(loginUser, projectCode, codes, targetProjectCode, otherParamsJson));
+        return returnDataList(processDefinitionService.batchMoveProcessDefinition(loginUser, projectCode, codes, targetProjectCode));
     }
 
     /**
@@ -734,7 +730,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param loginUser login user
      * @param projectCode project code
      * @param file resource file
-     * @param otherParamsJson otherParamsJson handle other params
      * @return import result code
      */
     @ApiOperation(value = "importProcessDefinition", notes = "IMPORT_PROCESS_DEFINITION_NOTES")
@@ -746,13 +741,12 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "file"})
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                          @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                           @RequestParam("file") MultipartFile file) {
         Map<String, Object> result;
         if ("application/zip".equals(file.getContentType())) {
-            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file, otherParamsJson);
+            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file);
         } else {
-            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file, otherParamsJson);
+            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
         }
         return returnDataList(result);
     }

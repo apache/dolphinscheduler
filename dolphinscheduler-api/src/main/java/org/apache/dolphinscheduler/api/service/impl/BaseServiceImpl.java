@@ -214,28 +214,4 @@ public class BaseServiceImpl implements BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
-    /**
-     * save other relation
-     * @param loginUser
-     * @param processDefinition
-     * @param result
-     * @param otherParamsJson
-     */
-    @Override
-    public void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson) {
-
-    }
-
-    /**
-     * delete other relation
-     * @param project
-     * @param result
-     * @param processDefinition
-     */
-    @Override
-    public void deleteOtherRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition) {
-
-    }
-
 }

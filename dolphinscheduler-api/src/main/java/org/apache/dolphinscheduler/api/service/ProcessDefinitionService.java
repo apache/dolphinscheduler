@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -136,12 +138,11 @@ public interface ProcessDefinitionService {
      * @param projectCode projectCode
      * @param codes processDefinitionCodes
      * @param targetProjectCode targetProjectCode
-     * @param otherParamsJson otherParamsJson handle other params
      */
     Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                    long projectCode,
                                                    String codes,
-                                                   long targetProjectCode, String otherParamsJson);
+                                                   long targetProjectCode);
 
     /**
      * batch move process definition
@@ -150,12 +151,11 @@ public interface ProcessDefinitionService {
      * @param projectCode projectCode
      * @param codes processDefinitionCodes
      * @param targetProjectCode targetProjectCode
-     * @param otherParamsJson otherParamsJson handle other params
      */
     Map<String, Object> batchMoveProcessDefinition(User loginUser,
                                                    long projectCode,
                                                    String codes,
-                                                   long targetProjectCode, String otherParamsJson);
+                                                   long targetProjectCode);
 
     /**
      * update  process definition
@@ -245,12 +245,11 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param file process metadata json file
-     * @param otherParamsJson otherParamsJson handle other params
      * @return import process
      */
     Map<String, Object> importProcessDefinition(User loginUser,
                                                 long projectCode,
-                                                MultipartFile file, String otherParamsJson);
+                                                MultipartFile file);
 
     /**
      * import sql process definition
@@ -258,12 +257,11 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param file sql file, zip
-     * @param otherParamsJson otherParamsJson handle other params
      * @return import process
      */
     Map<String, Object> importSqlProcessDefinition(User loginUser,
                                                    long projectCode,
-                                                   MultipartFile file, String otherParamsJson);
+                                                   MultipartFile file);
 
     /**
      * check the process task relation json
@@ -440,5 +438,30 @@ public interface ProcessDefinitionService {
                                                    long projectCode,
                                                    long code,
                                                    ReleaseState releaseState);
+
+    /**
+     * delete other relation
+     * @param project
+     * @param result
+     * @param processDefinition
+     */
+    void deleteOtherRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition);
+
+    /**
+     * save other relation
+     * @param loginUser
+     * @param processDefinition
+     * @param result
+     * @param otherParamsJson
+     */
+    void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson);
+
+    /**
+     * get Json String
+     * @param loginUser
+     * @param processDefinition
+     * @return Json String
+     */
+    String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
 }
 

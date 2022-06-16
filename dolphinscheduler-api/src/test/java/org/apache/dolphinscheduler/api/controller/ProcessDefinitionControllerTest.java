@@ -210,8 +210,8 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user, projectCode, code, targetProjectCode,"")).thenReturn(result);
-        Result response = processDefinitionController.copyProcessDefinition(user, projectCode, code, "", targetProjectCode);
+        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user, projectCode, code, targetProjectCode)).thenReturn(result);
+        Result response = processDefinitionController.copyProcessDefinition(user, projectCode, code, targetProjectCode);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }
@@ -225,8 +225,8 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.batchMoveProcessDefinition(user, projectCode, id, targetProjectCode, "")).thenReturn(result);
-        Result response = processDefinitionController.moveProcessDefinition(user, projectCode, id, "", targetProjectCode);
+        Mockito.when(processDefinitionService.batchMoveProcessDefinition(user, projectCode, id, targetProjectCode)).thenReturn(result);
+        Result response = processDefinitionController.moveProcessDefinition(user, projectCode, id, targetProjectCode);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }

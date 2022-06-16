@@ -139,6 +139,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
@@ -753,18 +754,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
         }
-        deleteRelation(project, result, processDefinition);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * delete relation
-     * @param project
-     * @param result
-     * @param processDefinition
-     */
-    private void deleteRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition) {
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
@@ -775,6 +764,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.warn("The process definition has not relation, it will be delete successfully");
         }
         deleteOtherRelation(project, result, processDefinition);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -924,12 +915,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param loginUser login user
      * @param projectCode project code
      * @param file process metadata json file
-     * @param otherParamsJson otherParamsJson handle other params
      * @return import process
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> importProcessDefinition(User loginUser, long projectCode, MultipartFile file, String otherParamsJson) {
+    public Map<String, Object> importProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         String dagDataScheduleJson = FileUtils.file2String(file);
         List<DagDataSchedule> dagDataScheduleList = JSONUtils.toList(dagDataScheduleJson, DagDataSchedule.class);
@@ -944,7 +934,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         for (DagDataSchedule dagDataSchedule : dagDataScheduleList) {
-            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule, otherParamsJson)) {
+            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule, EMPTY_STRING)) {
                 return result;
             }
         }
@@ -953,7 +943,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file, String otherParamsJson) {
+    public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
          result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_IMPORT);
@@ -1096,7 +1086,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        return createDagDefine(loginUser, processTaskRelationList, processDefinition, taskDefinitionList, otherParamsJson);
+        return createDagDefine(loginUser, processTaskRelationList, processDefinition, taskDefinitionList, EMPTY_STRING);
     }
 
     private ProcessTaskRelationLog buildNormalTaskRelation(long preTaskCode, long postTaskCode) {
@@ -1674,13 +1664,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     public Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                           long projectCode,
                                                           String codes,
-                                                          long targetProjectCode,String otherParamsJson) {
+                                                          long targetProjectCode) {
         Map<String, Object> result = checkParams(loginUser, projectCode, codes, targetProjectCode,WORKFLOW_BATCH_COPY);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         List<String> failedProcessList = new ArrayList<>();
-        doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, true, otherParamsJson);
+        doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, true);
         if (result.get(Constants.STATUS) == Status.NOT_SUPPORT_COPY_TASK_TYPE) {
             return result;
         }
@@ -1695,14 +1685,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param projectCode projectCode
      * @param codes processDefinitionCodes
      * @param targetProjectCode targetProjectCode
-     * @param otherParamsJson otherParamsJson handle other params
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> batchMoveProcessDefinition(User loginUser,
                                                           long projectCode,
                                                           String codes,
-                                                          long targetProjectCode, String otherParamsJson) {
+                                                          long targetProjectCode) {
         Map<String, Object> result = checkParams(loginUser, projectCode, codes, targetProjectCode,TASK_DEFINITION_MOVE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
@@ -1712,7 +1701,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         List<String> failedProcessList = new ArrayList<>();
-        doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, false, otherParamsJson);
+        doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, false);
         checkBatchOperateResult(projectCode, targetProjectCode, result, failedProcessList, false);
         return result;
     }
@@ -1749,7 +1738,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                  List<String> failedProcessList,
                                                  String processDefinitionCodes,
                                                  Map<String, Object> result,
-                                                 boolean isCopy, String otherParamsJson) {
+                                                 boolean isCopy) {
         Set<Long> definitionCodes = Arrays.stream(processDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
         Set<Long> queryCodes = processDefinitionList.stream().map(ProcessDefinition::getCode).collect(Collectors.toSet());
@@ -1761,6 +1750,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
             List<ProcessTaskRelationLog> taskRelationList = processTaskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
             processDefinition.setProjectCode(targetProjectCode);
+            String otherParamsJson = doOtherOperateProcess(loginUser, processDefinition);
             if (isCopy) {
                 List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
@@ -1955,6 +1945,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             }
+            deleteOtherRelation(project, result, processDefinition);
             putMsg(result, Status.SUCCESS);
         }
         return result;
@@ -2275,4 +2266,39 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    /**
+     * save other relation
+     * @param loginUser
+     * @param processDefinition
+     * @param result
+     * @param otherParamsJson
+     */
+    @Override
+    public void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson) {
+
+    }
+
+    /**
+     * get Json String
+     * @param loginUser
+     * @param processDefinition
+     * @return Json String
+     */
+    @Override
+    public String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition) {
+        return null;
+    }
+
+    /**
+     * delete other relation
+     * @param project
+     * @param result
+     * @param processDefinition
+     */
+    @Override
+    public void deleteOtherRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition) {
+
+    }
+
 }
