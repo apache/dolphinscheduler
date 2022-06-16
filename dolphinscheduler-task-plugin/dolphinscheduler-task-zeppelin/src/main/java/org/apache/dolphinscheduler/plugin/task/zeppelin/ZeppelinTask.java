@@ -100,6 +100,8 @@ public class ZeppelinTask extends AbstractTaskExecutor {
                                     paragraphResult.getParagraphId(),
                                     paragraphResult.getResultInText()));
                     status = paragraphResult.getStatus();
+                    // we treat note execution as failure if any paragraph in the note fails
+                    // status will be further processed in method mapStatusToExitCode below
                     if (status != Status.FINISHED) {
                         break;
                     }
