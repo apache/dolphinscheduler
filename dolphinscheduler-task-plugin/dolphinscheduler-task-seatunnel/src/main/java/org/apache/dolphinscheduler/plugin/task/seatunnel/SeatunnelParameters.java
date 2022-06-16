@@ -17,23 +17,25 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.flink.SeatunnelFlinkParameters;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.spark.SeatunnelSparkParameters;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "engine")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SeatunnelFlinkParameters.class, name = "FLINK"),
-        @JsonSubTypes.Type(value = SeatunnelSparkParameters.class, name = "SPARK")
+    @JsonSubTypes.Type(value = SeatunnelFlinkParameters.class, name = "FLINK"),
+    @JsonSubTypes.Type(value = SeatunnelSparkParameters.class, name = "SPARK")
 })
 public class SeatunnelParameters extends AbstractParameters {
 
@@ -82,7 +84,9 @@ public class SeatunnelParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return Objects.nonNull(engine) && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript)) || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList) && resourceList.size() == 1));
+        return Objects.nonNull(engine)
+                && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
+                || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList) && resourceList.size() == 1));
     }
 
     @Override

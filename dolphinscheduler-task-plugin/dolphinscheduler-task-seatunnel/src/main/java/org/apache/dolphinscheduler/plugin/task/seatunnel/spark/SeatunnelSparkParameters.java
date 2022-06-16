@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.spark;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
