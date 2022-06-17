@@ -1088,7 +1088,7 @@ public class WorkflowExecuteRunnable implements Runnable {
     }
 
     /**
-     * encapsulation task
+     * encapsulation task, this method will only create a new task instance, the return task instance will not contain id.
      *
      * @param processInstance process instance
      * @param taskNode        taskNode
