@@ -71,7 +71,7 @@ jobs:
           key: ${{ runner.os }}-maven
 
       - name: Run Unit tests
-        run: ./mvnw clean verify -B -Dmaven.test.skip=false
+        run: ./mvnw clean verify -B -Dmaven.test.skip=false -Dcheckstyle.skip=true
       - name: Upload coverage report to codecov
         run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
 
