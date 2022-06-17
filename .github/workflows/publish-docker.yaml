@@ -56,7 +56,7 @@ jobs:
           ./mvnw -B clean deploy \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dmaven.checkstyle.skip \
+          -Dcheckstyle.skip=true \
           -Dmaven.deploy.skip \
           -Ddocker.tag=${{ github.sha }} \
           -Ddocker.hub=${{ env.HUB }} \

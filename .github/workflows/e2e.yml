@@ -65,7 +65,7 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dmaven.checkstyle.skip \
+          -Dcheckstyle.skip=true \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Export Docker Images
