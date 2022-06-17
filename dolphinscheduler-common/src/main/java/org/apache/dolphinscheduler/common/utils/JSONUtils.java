@@ -84,7 +84,6 @@ public class JSONUtils {
 
     public static synchronized void setTimeZone(TimeZone timeZone) {
         objectMapper.setTimeZone(timeZone);
-        logger.info("set timezone: {}", timeZone);
     }
 
     public static ArrayNode createArrayNode() {
