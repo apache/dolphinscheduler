@@ -23,7 +23,8 @@ Note：**Due to the large number of services, it is recommended that the single-
 
 ## Q: Which mailboxes does the system support?
 
-A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supported. Support TLS and SSL protocols, optionally configured in alert.properties
+A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supported. Support TLS and SSL protocols, these can be configured in the ui of dolphinscheduler:
+[How to setup email alarm](../en/guide/alert/email.md).
 
 ---
 
