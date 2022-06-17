@@ -250,11 +250,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         IPage<DataSource> dataSourceList = null;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_LIST)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
         } else {

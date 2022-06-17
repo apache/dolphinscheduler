@@ -41,8 +41,11 @@
         </include>
         from t_ds_task_group
         <where>
-            <if test="userId != 0">
-                and user_id = #{userId}
+            <if test="ids != null and ids.size() > 0">
+                and id in
+                <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                    #{i}
+                </foreach>
             </if>
             <if test="status != null">
                 and status = #{status}
@@ -101,6 +104,16 @@
         from t_ds_task_group
         where
         id = #{id} and status = #{status}
+    </select>
+
+    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group
+        where 1=1
+        <if test="user_id != 0">
+            and user_id = #{userId}
+        </if>
     </select>
 
 </mapper>

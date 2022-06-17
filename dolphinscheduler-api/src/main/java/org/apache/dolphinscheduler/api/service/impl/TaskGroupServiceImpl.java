@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * task Group Service
@@ -267,13 +268,14 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, Integer status) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
-
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_VIEW);
-        if (!canOperatorPermissions){
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+        PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TASK_GROUP, userId, logger);
+        if (ids.isEmpty()) {
+            result.put(Constants.DATA_LIST, pageInfo);
+            putMsg(result, Status.SUCCESS);
             return result;
         }
-        IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPaging(page, userId, name, status);
+        IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPaging(page, new ArrayList<>(ids), name, status);
 
         return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
     }
