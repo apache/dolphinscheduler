@@ -149,6 +149,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2449,13 +2450,21 @@ public class ProcessServiceImpl implements ProcessService {
     public String getResourceIds(TaskDefinition taskDefinition) {
         Set<Integer> resourceIds = null;
         AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
-
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceIds = params.getResourceFilesList().
-                stream()
-                .filter(t -> t.getId() != 0)
-                .map(ResourceInfo::getId)
-                .collect(toSet());
+            params.getResourceFilesList().forEach(resourceFile -> {
+                if (resourceFile.getId() <= 0 && StringUtils.isNotEmpty(resourceFile.getResourceName())) {
+                    List<Resource> resources = resourceMapper.queryResource(resourceFile.getResourceName(), resourceFile.getType().getCode());
+                    if (CollectionUtils.isNotEmpty(resources)) {
+                        resourceFile.setId(resources.get(0).getId());
+                    }
+                }
+            });
+            taskDefinition.setTaskParams(JSONUtils.toJsonString(params));
+            resourceIds = params.getResourceFilesList()
+                    .stream()
+                    .map(ResourceInfo::getId)
+                    .filter(id -> id != 0)
+                    .collect(toSet());
         }
         if (CollectionUtils.isEmpty(resourceIds)) {
             return "";
