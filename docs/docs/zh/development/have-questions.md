@@ -2,7 +2,7 @@
 
 ## StackOverflow
 
-如果在使用上有疑问，建议你使用StackOverflow标签 [apache-dolphinscheduler](https://stackoverflow.com/questions/tagged/apache-dolphinscheduler)，这是一个DolphinScheduler用户问答的活跃论坛。
+如果在使用上有疑问，建议你使用StackOverflow标签 [apache-dolphinscheduler](https://stackoverflow.com/questions/tagged/apache-dolphinscheduler )，这是一个DolphinScheduler用户问答的活跃论坛。
 
 使用StackOverflow时的快速提示：
 
