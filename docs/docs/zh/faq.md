@@ -24,7 +24,8 @@ A：DolphinScheduler 由 5 个服务组成，MasterServer、WorkerServer、ApiSe
 
 ## Q：系统支持哪些邮箱？
 
-A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在 alert.properties 中选择性配置
+A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在dolphinscheduler的ui中进行配置：
+[如何配置邮箱告警](../zh/guide/alert/email.md)。
 
 ---
 
