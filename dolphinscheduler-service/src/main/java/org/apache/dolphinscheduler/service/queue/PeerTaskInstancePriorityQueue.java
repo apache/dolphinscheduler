@@ -21,11 +21,13 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Task instances priority queue implementation
@@ -40,12 +42,8 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     /**
      * queue
      */
-    private PriorityQueue<TaskInstance> queue = new PriorityQueue<>(QUEUE_MAX_SIZE, new TaskInfoComparator());
-
-    /**
-     * Lock used for all public operations
-     */
-    private final ReentrantLock lock = new ReentrantLock(true);
+    private final PriorityQueue<TaskInstance> queue = new PriorityQueue<>(QUEUE_MAX_SIZE, new TaskInfoComparator());
+    private final Set<Integer> taskInstanceIdSet = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * put task instance to priority queue
@@ -56,6 +54,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     @Override
     public void put(TaskInstance taskInstance) throws TaskPriorityQueueException {
         queue.add(taskInstance);
+        taskInstanceIdSet.add(taskInstance.getId());
     }
 
     /**
@@ -66,7 +65,11 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      */
     @Override
     public TaskInstance take() throws TaskPriorityQueueException {
-        return queue.poll();
+        TaskInstance taskInstance = queue.poll();
+        if (taskInstance != null) {
+            taskInstanceIdSet.remove(taskInstance.getId());
+        }
+        return taskInstance;
     }
 
     /**
@@ -111,6 +114,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      */
     public void clear() {
         queue.clear();
+        taskInstanceIdSet.clear();
     }
 
     /**
@@ -120,20 +124,11 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * @return true is contains
      */
     public boolean contains(TaskInstance taskInstance) {
-        return this.contains(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
+        return this.contains(taskInstance.getId());
     }
 
-    public boolean contains(long taskCode, int taskVersion) {
-        Iterator<TaskInstance> iterator = this.queue.iterator();
-        while (iterator.hasNext()) {
-            TaskInstance taskInstance = iterator.next();
-            if (taskCode == taskInstance.getTaskCode()
-                    && taskVersion == taskInstance.getTaskDefinitionVersion()) {
-                return true;
-            }
-        }
-        return false;
-
+    public boolean contains(int taskInstanceId) {
+        return taskInstanceIdSet.contains(taskInstanceId);
     }
 
     /**

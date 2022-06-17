@@ -190,16 +190,18 @@ public class TaskPriorityQueueConsumer extends Thread {
                     return true;
                 }
             }
-
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
+                logger.info("Master success dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
                 addDispatchEvent(context, executionContext);
+            } else {
+                logger.info("Master failed to dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
             }
         } catch (RuntimeException e) {
-            logger.error("dispatch error: ", e);
+            logger.error("Master dispatch task to worker error: ", e);
         } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage());
+            logger.error("Master dispatch task to worker error: {}", e);
         }
         return result;
     }

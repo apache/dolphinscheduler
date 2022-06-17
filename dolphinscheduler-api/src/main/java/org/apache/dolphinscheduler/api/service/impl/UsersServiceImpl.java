@@ -80,6 +80,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
 
 /**
  * users service impl
@@ -414,8 +415,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
-            if (!CheckUtils.checkPassword(userPassword)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userPassword);
+            if (!CheckUtils.checkPasswordLength(userPassword)) {
+                putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
                 return result;
             }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
