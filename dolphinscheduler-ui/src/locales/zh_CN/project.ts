@@ -108,6 +108,10 @@ export default {
     all_send: '成功或失败都发',
     whether_complement_data: '是否是补数',
     schedule_date: '调度日期',
+    select_date: '日期选择',
+    enter_date: '手动输入',
+    schedule_date_tips: '格式为yyyy-MM-dd HH:mm:ss，多个逗号分割',
+    schedule_date_limit: '输入日期不满足<=100条',
     mode_of_execution: '执行方式',
     serial_execution: '串行执行',
     parallel_execution: '并行执行',
@@ -191,7 +195,7 @@ export default {
     project_tips: '请选择项目',
     workflow_relation_no_data_result_title: '工作流关系不存在',
     workflow_relation_no_data_result_desc:
-      '目前没有任何工作流，请先创建工作流，再访问该页面'
+        '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
     cancel_full_screen: '取消全屏',
@@ -389,7 +393,7 @@ export default {
     parallelism_tips: '请输入并行度',
     parallelism_number_tips: '并行度必须为正整数',
     parallelism_complement_tips:
-      '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
+        '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
     task_manager_number: 'TaskManager数量',
     task_manager_number_tips: '请输入TaskManager数量',
     http_url: '请求地址',
@@ -424,7 +428,7 @@ export default {
     procedure_method: 'SQL语句',
     procedure_method_tips: '请输入存储脚本',
     procedure_method_snippet:
-      '--请输入存储脚本 \n\n--调用存储过程: call <procedure-name>[(<arg1>,<arg2>, ...)] \n\n--调用存储函数：?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
+        '--请输入存储脚本 \n\n--调用存储过程: call <procedure-name>[(<arg1>,<arg2>, ...)] \n\n--调用存储函数：?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: '运行',
     edit: '编辑',
     copy: '复制节点',
@@ -630,7 +634,7 @@ export default {
     mlflow_isSearchParams: '是否搜索参数',
     mlflow_dataPath: '数据路径',
     mlflow_dataPath_tips:
-      ' 文件/文件夹的绝对路径, 若文件需以.csv结尾, 文件夹需包含train.csv和test.csv ',
+        ' 文件/文件夹的绝对路径, 若文件需以.csv结尾, 文件夹需包含train.csv和test.csv ',
     mlflow_dataPath_error_tips: ' 数据路径不能为空 ',
     mlflow_experimentName: '实验名称',
     mlflow_experimentName_tips: 'experiment_001',

@@ -23,12 +23,24 @@
         worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, create_time, update_time, task_group_id,task_group_priority, cpu_quota, memory_max
     </sql>
+    <sql id="baseSqlV2">
+        ${alias}.id, ${alias}.code, ${alias}.name, ${alias}.version, ${alias}.description, ${alias}.project_code, ${alias}.user_id,
+        ${alias}.task_type, ${alias}.task_params, ${alias}.flag, ${alias}.task_priority, ${alias}.worker_group, ${alias}.environment_code,
+        ${alias}.fail_retry_times, ${alias}.fail_retry_interval, ${alias}.timeout_flag, ${alias}.timeout_notify_strategy, ${alias}.timeout,
+        ${alias}.delay_time, ${alias}.resource_ids, ${alias}.create_time, ${alias}.update_time, ${alias}.task_group_id,
+        ${alias}.task_group_priority, ${alias}.cpu_quota, ${alias}.memory_max
+    </sql>
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
-        <include refid="baseSql"/>
-        from t_ds_task_definition
-        WHERE project_code = #{projectCode}
-        and name = #{name}
+        <include refid="baseSqlV2">
+            <property name="alias" value="td"/>
+        </include>
+        from t_ds_task_definition td
+        join t_ds_process_task_relation ptr on ptr.project_code = td.project_code
+        where td.project_code = #{projectCode}
+        and td.name = #{name}
+        and ptr.process_definition_code = #{processCode}
+        and td.code = ptr.post_task_code
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select

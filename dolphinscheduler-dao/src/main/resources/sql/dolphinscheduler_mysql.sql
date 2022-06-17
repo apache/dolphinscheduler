@@ -694,7 +694,9 @@ CREATE TABLE `t_ds_relation_process_instance` (
   `parent_process_instance_id` int(11) DEFAULT NULL COMMENT 'parent process instance id',
   `parent_task_instance_id` int(11) DEFAULT NULL COMMENT 'parent process instance id',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'child process instance id',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_parent_process_task` (`parent_process_instance_id`,`parent_task_instance_id`) ,
+  KEY `idx_process_instance_id` (`process_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -1937,4 +1939,23 @@ CREATE TABLE t_ds_alert_send_status (
   `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for t_ds_cluster
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_cluster`;
+CREATE TABLE `t_ds_cluster` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'cluster name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cluster_name_unique` (`name`),
+  UNIQUE KEY `cluster_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
