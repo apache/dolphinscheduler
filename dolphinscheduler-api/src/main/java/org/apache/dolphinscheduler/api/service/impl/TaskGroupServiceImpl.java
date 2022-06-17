@@ -17,32 +17,34 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * task Group Service
@@ -59,6 +61,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private ExecutorService executorService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupServiceImpl.class);
 
     /**
@@ -73,7 +78,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CREATE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         if (name == null) {
@@ -90,7 +98,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = new TaskGroup(name, projectCode, description,
-            groupSize, loginUser.getId(), Flag.YES.getCode());
+                groupSize, loginUser.getId(), Flag.YES.getCode());
 
         taskGroup.setCreateTime(new Date());
         taskGroup.setUpdateTime(new Date());
@@ -116,7 +124,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_EDIT);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         if (name == null) {
@@ -127,7 +137,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
             return result;
         }
-        Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda().eq(TaskGroup::getName, name).ne(TaskGroup::getId, id));
+        Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda()
+                .eq(TaskGroup::getName, name)
+                .eq(TaskGroup::getUserId, loginUser.getId())
+                .ne(TaskGroup::getId, id));
+
         if (exists > 0) {
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
@@ -170,7 +184,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), name, status);
+        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), name, status);
     }
 
     /**
@@ -200,6 +214,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
 
         return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
@@ -247,6 +267,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, Integer status) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_VIEW);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPaging(page, userId, name, status);
 
         return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
@@ -262,7 +288,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> closeTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
@@ -286,7 +315,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> startTaskGroup(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
@@ -311,18 +343,21 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     public Map<String, Object> forceStartTask(User loginUser, int queueId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        taskGroupQueueService.forceStartTask(queueId, Flag.YES.getCode());
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return executorService.forceStartTaskInstance(loginUser, queueId);
     }
 
     @Override
     public Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY);
+        if (!canOperatorPermissions){
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         taskGroupQueueService.modifyPriority(queueId, priority);

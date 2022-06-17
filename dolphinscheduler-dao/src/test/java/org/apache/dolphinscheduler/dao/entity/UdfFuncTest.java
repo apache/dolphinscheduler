@@ -18,9 +18,10 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
-import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class UdfFuncTest {
 
@@ -35,9 +36,9 @@ public class UdfFuncTest {
     udfFunc.setResourceId(2);
     udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
 
-    Assert.assertEquals("{\"id\":0,\"userId\":0,\"funcName\":null,\"className\":\"org.apache.dolphinscheduler.test.mrUpdate\",\"argTypes\":null,\"database\":null,"
-            + "\"description\":null,\"resourceId\":2,\"resourceName\":\"dolphin_resource_update\",\"type\":null,\"createTime\":null,\"updateTime\":null}"
-        , udfFunc.toString());
+    Assert.assertEquals("{\"id\":0,\"userId\":0,\"resourceType\":\"UDF\",\"funcName\":null,\"className\":\"org.apache.dolphinscheduler.test.mrUpdate\",\"argTypes\":null,\"database\":null,"
+                    + "\"description\":null,\"resourceId\":2,\"resourceName\":\"dolphin_resource_update\",\"type\":null,\"createTime\":null,\"updateTime\":null,\"userName\":null}"
+            , udfFunc.toString());
   }
 
   /**

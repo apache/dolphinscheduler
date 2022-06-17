@@ -8,7 +8,7 @@
 - 队列是在执行 spark、mapreduce 等程序，需要用到“队列”参数时使用的。
 - 管理员进入安全中心 -> 队列管理页面，点击“创建队列”按钮，创建队列。
 
-![create-queue](/img/new_ui/dev/security/create-queue.png)
+![create-queue](../../../img/new_ui/dev/security/create-queue.png)
 
 ## 添加租户
 
@@ -16,7 +16,7 @@
 - 租户编码：**租户编码是 Linux上 的用户，唯一，不能重复**
 - 管理员进入安全中心->租户管理页面，点击“创建租户”按钮，创建租户。
 
-![create-tenant](/img/new_ui/dev/security/create-tenant.png)
+![create-tenant](../../../img/new_ui/dev/security/create-tenant.png)
 
 ## 创建普通用户
 
@@ -28,7 +28,7 @@
 
 - 进入安全中心->用户管理页面，点击“创建用户”按钮，创建用户。        
 
-![create-user](/img/new_ui/dev/security/create-user.png)
+![create-user](../../../img/new_ui/dev/security/create-user.png)
   
 ### 编辑用户信息
 
@@ -46,14 +46,14 @@
 * 告警组是在启动时设置的参数，在流程结束以后会将流程的状态和其他信息以邮件形式发送给告警组。
 * 管理员进入安全中心->告警组管理页面，点击“创建告警组”按钮，创建告警组。
 
-![create-alarmInstance](/img/new_ui/dev/security/create-alarmInstance.png)
+![create-alarmInstance](../../../img/new_ui/dev/security/create-alarmInstance.png)
 
 ## 令牌管理
 
 > 由于后端接口有登录检查，令牌管理提供了一种可以通过调用接口的方式对系统进行各种操作。
 - 管理员进入安全中心->令牌管理页面，点击“创建令牌”按钮，选择失效时间与用户，点击"生成令牌"按钮，点击"提交"按钮，则选择用户的token创建成功。
 
-![create-token](/img/new_ui/dev/security/create-token.png)
+![create-token](../../../img/new_ui/dev/security/create-token.png)
   
 - 普通用户登录后，点击用户名下拉框中的用户信息，进入令牌管理页面，选择失效时间，点击"生成令牌"按钮，点击"提交"按钮，则该用户创建 token 成功。
     
@@ -96,17 +96,17 @@
 
 ## 授予权限
 
-* 授予权限包括项目权限，资源权限，数据源权限，UD F函数权限。
-* 管理员可以对普通用户进行非其创建的项目、资源、数据源和 UDF 函数进行授权。因为项目、资源、数据源和 UDF 函数授权方式都是一样的，所以以项目授权为例介绍。
+* 授予权限包括项目权限，资源权限，数据源权限，UDF函数权限，k8s命名空间。
+* 管理员可以对普通用户进行非其创建的项目、资源、数据源、UDF函数、k8s命名空间。因为项目、资源、数据源、UDF函数、k8s命名空间授权方式都是一样的，所以以项目授权为例介绍。
 * 注意：对于用户自己创建的项目，该用户拥有所有的权限。则项目列表和已选项目列表中不会显示。
  
 - 管理员进入安全中心->用户管理页面，点击需授权用户的“授权”按钮，如下图所示：
 
-![user-authorize](/img/new_ui/dev/security/user-authorize.png)
+![user-authorize](../../../img/new_ui/dev/security/user-authorize.png)
 
 - 选择项目，进行项目授权。
 
-![project-authorize](/img/new_ui/dev/security/project-authorize.png)
+![project-authorize](../../../img/new_ui/dev/security/project-authorize.png)
   
 - 资源、数据源、UDF 函数授权同项目授权。
 
@@ -141,10 +141,34 @@ worker.groups=default,test
 
 - 环境配置等价于dolphinscheduler_env.sh文件内配置
 
-![create-environment](/img/new_ui/dev/security/create-environment.png)
+![create-environment](../../../img/new_ui/dev/security/create-environment.png)
 
 > 使用环境
 
 - 在工作流定义中创建任务节点选择 worker 分组和 worker 分组对应的环境，任务执行时 worker 会先执行环境在执行任务.
 
-![use-environment](/img/new_ui/dev/security/use-environment.png)
+![use-environment](../../../img/new_ui/dev/security/use-environment.png)
+
+## 集群管理
+
+> 创建/更新 集群
+
+- 每个工作流可以绑定零到若干个集群用来支持多集群，目前先用于k8s。
+
+> 使用集群
+
+- 创建和授权后，k8s命名空间和工作流会增加关联集群的功能。每一个集群会有独立的工作流和任务实例独立运行。
+
+![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
+
+## 命名空间管理
+
+> 创建/更新 k8s集群
+
+- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`，后续会通过页面配置.
+
+> 创建/更新 namespace
+
+- 创建和授权后，在相关k8s任务选择命名空间时下拉可选，如果k8s集群名字是`ds_null_k8s`是测试模式，不会真正操作集群.
+
+![create-environment](../../../img/new_ui/dev/security/create-namespace.png)

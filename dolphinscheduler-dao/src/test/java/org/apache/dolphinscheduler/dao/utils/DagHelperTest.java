@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -48,6 +49,57 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * dag helper test
  */
 public class DagHelperTest {
+
+    @Test
+    public void testHaveSubAfterNode(){
+        String parentNodeCode = "5293789969856";
+        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
+        TaskNodeRelation relation = new TaskNodeRelation();
+        relation.setStartNode("5293789969856");
+        relation.setEndNode("5293789969857");
+        taskNodeRelations.add(relation);
+
+        TaskNodeRelation relationNext = new TaskNodeRelation();
+        relationNext.setStartNode("5293789969856");
+        relationNext.setEndNode("5293789969858");
+        taskNodeRelations.add(relationNext);
+
+        List<TaskNode> taskNodes = new ArrayList<>();
+        TaskNode node = new TaskNode();
+        node.setCode(5293789969856L);
+        node.setType("SHELL");
+
+        TaskNode subNode = new TaskNode();
+        subNode.setCode(5293789969857L);
+        subNode.setType("BLOCKING");
+        subNode.setPreTasks("[5293789969856]");
+
+        TaskNode subNextNode = new TaskNode();
+        subNextNode.setCode(5293789969858L);
+        subNextNode.setType("CONDITIONS");
+        subNextNode.setPreTasks("[5293789969856]");
+
+        taskNodes.add(node);
+        taskNodes.add(subNode);
+        taskNodes.add(subNextNode);
+
+        ProcessDag processDag = new ProcessDag();
+        processDag.setEdges(taskNodeRelations);
+        processDag.setNodes(taskNodes);
+        DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
+        Assert.assertTrue(canSubmit);
+
+        boolean haveBlocking = DagHelper.haveBlockingAfterNode(parentNodeCode, dag);
+        Assert.assertTrue(haveBlocking);
+
+        boolean haveConditions = DagHelper.haveConditionsAfterNode(parentNodeCode, dag);
+        Assert.assertTrue(haveConditions);
+
+        boolean dependent = DagHelper.haveSubAfterNode(parentNodeCode, dag, TaskConstants.TASK_TYPE_DEPENDENT);
+        Assert.assertFalse(dependent);
+    }
+
     /**
      * test task node can submit
      *
@@ -280,9 +332,16 @@ public class DagHelperTest {
     }
 
     /**
+     * process:
      * 1->2->3->5->7
      * 4->3->6
-     * 2->8->5->7
+     * 1->2->8->5->7
+     * DAG graph:
+     *      4 ->   -> 6
+     *          \ /
+     * 1 -> 2 -> 3 -> 5 -> 7
+     *       \       /
+     *        -> 8 ->
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
@@ -377,9 +436,12 @@ public class DagHelperTest {
     }
 
     /**
-     * 1->2->3->5->7
-     * 4->3->6
-     * 2->8->5->7
+     * DAG graph:
+     *    2
+     *    ↑
+     * 0->1(switch)
+     *    ↓
+     *    4
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException

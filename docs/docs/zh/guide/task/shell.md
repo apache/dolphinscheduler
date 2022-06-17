@@ -2,28 +2,29 @@
 
 ## 综述
 
-Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 Shell 脚本。worker 执行该任务的时候，会生成一个临时shell脚本，
-并使用与租户同名的 linux 用户执行这个脚本。
+Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 Shell 脚本。worker 执行该任务的时候，会生成一个临时 shell 脚本，并使用与租户同名的 linux 用户执行这个脚本。
 
 ## 创建任务
 
-- 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入DAG编辑页面。
-- 工具栏中拖动 <img src="/img/tasks/icons/shell.png" width="15"/> 到画板中，即可完成创建。
+- 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入 DAG 编辑页面。
+- 工具栏中拖动 <img src="../../../../img/tasks/icons/shell.png" width="15"/> 到画板中，即可完成创建。
 
 ## 任务参数
 
 - 任务名称：设置任务的名称。一个工作流定义中的节点名称是唯一的。
 - 运行标志：标识这个节点是否能正常调度,如果不需要执行，可以打开禁止执行开关。
 - 描述：描述该节点的功能。
-- 任务优先级：worker线程数不足时，根据优先级从高到低依次执行，优先级一样时根据先进先出原则执行。
-- Worker分组：任务分配给worker组的机器机执行，选择Default，会随机选择一台worker机执行。
+- 任务优先级：worker 线程数不足时，根据优先级从高到低依次执行，优先级一样时根据先进先出原则执行。
+- Worker 分组：任务分配给 worker 组的机器机执行，选择 Default，会随机选择一台 worker 机执行。
 - 环境名称：配置运行脚本的环境。
 - 失败重试次数：任务失败重新提交的次数，支持下拉和手填。
 - 失败重试间隔：任务失败重新提交任务的时间间隔，支持下拉和手填。
+- Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
+- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
 - 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.
-- 脚本：用户开发的SHELL程序。
+- 脚本：用户开发的 SHELL 程序。
 - 资源：是指脚本中需要调用的资源文件列表，资源中心-文件管理上传或创建的文件。
-- 自定义参数：是SHELL局部的用户自定义参数，会替换脚本中以${变量}的内容。
+- 自定义参数：是 SHELL 局部的用户自定义参数，会替换脚本中以 `${变量}` 的内容。
 - 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 
 ## 任务样例
@@ -33,7 +34,7 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 该样例模拟了常见的简单任务，这些任务只需要简单的一两行命令就能运行起来。我们以打印一行日志为例，该任务仅会在日志文件中打印一行
 "This is a demo of shell task"
 
-![demo-shell-simple](/img/tasks/demo/shell.jpg)
+![demo-shell-simple](../../../../img/tasks/demo/shell.jpg)
 
 ### 使用自定义参数
 
@@ -41,8 +42,10 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 中定义了参数 "param_key"，并将他的值设置为 "param_val"。接着在"脚本"中声明了 echo 命令，将参数 "param_key" 打印了出来。当我们保存
 并运行任务后，在日志中会看到将参数 "param_key" 对应的值 "param_val" 打印出来。
 
-![demo-shell-custom-param](/img/tasks/demo/shell_custom_param.jpg)
+![demo-shell-custom-param](../../../../img/tasks/demo/shell_custom_param.jpg)
 
 ## 注意事项
 
-无
+Shell 任务类型通过解析任务日志是否包含 ```application_xxx_xxx``` 的内容来判断是否 Yarn 任务，如果是则会将相应的 ```application_id``` 的状态作为当前 Shell 节点的运行状态判断，此时如果操作停止工作流则会 Kill 相应的 ```application_id```
+
+如果 Shell 任务中需要使用到用户自定义的脚本，可通过资源中心来上传对应的文件然后在 Shell 任务中引用他们，可参考：[文件管理](../resource/file-manage.md)。

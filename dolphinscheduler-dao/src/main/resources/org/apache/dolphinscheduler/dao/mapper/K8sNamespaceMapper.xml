@@ -20,8 +20,13 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper">
 
     <sql id="baseSql">
-        id, namespace, k8s, owner, tag, limits_memory, limits_cpu, online_job_num, pod_replicas, pod_request_cpu, pod_request_memory, create_time, update_time
+        id, namespace, k8s, user_id, limits_memory, limits_cpu, online_job_num, pod_replicas, pod_request_cpu, pod_request_memory, create_time, update_time
     </sql>
+
+    <sql id="baseSqlV2">
+        ${alias}.id, ${alias}.namespace, ${alias}.k8s, ${alias}.user_id, ${alias}.limits_memory, ${alias}.limits_cpu, ${alias}.online_job_num, ${alias}.pod_replicas, ${alias}.pod_request_cpu, ${alias}.pod_request_memory, ${alias}.create_time, ${alias}.update_time
+    </sql>
+
     <select id="queryK8sNamespacePaging" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
         select
         <include refid="baseSql"/>
@@ -45,4 +50,30 @@
         </if>
     </select>
 
+    <select id="queryNamespaceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSql"/>
+        from t_ds_k8s_namespace
+        where user_id <![CDATA[ <> ]]> #{userId}
+    </select>
+
+    <select id="queryAuthedNamespaceListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        from t_ds_k8s_namespace p,t_ds_relation_namespace_user rel
+        where p.id = rel.namespace_id and rel.user_id= #{userId}
+    </select>
+
+    <select id="queryNamespaceAvailable" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="b"/>
+        </include>
+        from ( select namespace_id  from t_ds_relation_namespace_user where user_id= #{userId} ) a
+        left join  t_ds_k8s_namespace b
+        on b.id = a.namespace_id
+        where b.id is not null
+    </select>
 </mapper>

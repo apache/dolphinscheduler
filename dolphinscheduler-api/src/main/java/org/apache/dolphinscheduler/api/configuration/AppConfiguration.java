@@ -101,7 +101,7 @@ public class AppConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/v2/**",
+                        "/swagger-resources/**", "/webjars/**", "/api-docs/**",
                         "/doc.html", "/swagger-ui.html", "*.html", "/ui/**", "/error");
     }
 

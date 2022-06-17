@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -31,6 +33,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +73,11 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     public Map<String, Object> queryTasksByGroupId(User loginUser, String taskName
         , String processName, Integer status, int groupId, int pageNo, int pageSize) {
         Map<String, Object> result = new HashMap<>();
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_QUEUE);
+        if (!canOperatorPermissions){
+            result.put(Constants.STATUS, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         Map<String, Object> objectMap = this.projectService.queryAuthorizedProject(loginUser, loginUser.getId());
         List<Project> projects = (List<Project>)objectMap.get(Constants.DATA_LIST);
@@ -115,9 +123,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize,
                                        int groupId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
+
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueuePaging(page, groupId);
 

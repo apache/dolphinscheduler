@@ -40,5 +40,8 @@ jobs:
       - name: "Comment in issue"
         uses: ./.github/actions/comment-on-issue
         with:
-          message: "Hi:\n* Thank you for your feedback, we have received your issue, Please wait patiently for a reply.\n* In order for us to understand your request as soon as possible, please provide detailed information、version or pictures.\n* If you haven't received a reply for a long time, you can subscribe to the developer's email，Mail subscription steps reference https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html ,Then write the issue URL in the email content and send question to dev@dolphinscheduler.apache.org."
+          message: |
+            Thank you for your feedback, we have received your issue, Please wait patiently for a reply.
+            * In order for us to understand your request as soon as possible, please provide detailed information、version or pictures.
+            * If you haven't received a reply for a long time, you can [join our slack](https://s.apache.org/dolphinscheduler-slack) and send your question to channel `#troubleshooting`
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

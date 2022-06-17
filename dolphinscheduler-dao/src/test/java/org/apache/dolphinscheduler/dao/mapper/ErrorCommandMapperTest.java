@@ -77,6 +77,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         errorCommandMapper.updateById(errorCommand);
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
+                0,
                 null,
                 null,
                 new Long[0]
@@ -86,6 +87,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         projectCodeArray[0] = processDefinition.getProjectCode();
         projectCodeArray[1] = 200L;
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
+                0,
                 null,
                 null,
                 projectCodeArray

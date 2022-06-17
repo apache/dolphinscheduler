@@ -44,9 +44,6 @@ Create default docker images' fullname.
 {{- define "dolphinscheduler.image.fullname.tools" -}}
 {{- .Values.image.registry }}/dolphinscheduler-tools:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
-{{- define "dolphinscheduler.image.fullname.python-gateway" -}}
-{{- .Values.image.registry }}/dolphinscheduler-python-gateway:{{ .Values.image.tag | default .Chart.AppVersion -}}
-{{- end -}}
 
 {{/*
 Create a default common labels.
@@ -115,7 +112,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Create a default fully qualified zookkeeper quorum.
 */}}
 {{- define "dolphinscheduler.zookeeper.quorum" -}}
-{{- $port := default "2181" (.Values.zookeeper.service.port | toString) -}}
+{{- $port := default "2181" .Values.zookeeper.service.port | toString -}}
 {{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port -}}
 {{- end -}}
 

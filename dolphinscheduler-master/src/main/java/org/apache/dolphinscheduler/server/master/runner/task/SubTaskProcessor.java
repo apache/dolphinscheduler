@@ -19,8 +19,9 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.auto.service.AutoService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -88,6 +89,11 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         } finally {
             this.runLock.unlock();
         }
+        return true;
+    }
+
+    @Override
+    protected boolean resubmitTask() {
         return true;
     }
 
@@ -181,7 +187,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
-
+        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);

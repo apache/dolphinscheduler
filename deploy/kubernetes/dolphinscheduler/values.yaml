@@ -23,7 +23,7 @@ timezone: "Asia/Shanghai"
 
 image:
   registry: "dolphinscheduler.docker.scarf.sh/apache"
-  tag: "2.0.4-SNAPSHOT"
+  tag: "dev-SNAPSHOT"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
 
@@ -52,6 +52,8 @@ externalDatabase:
 ## If not exists external registry, the zookeeper registry will be used by default.
 zookeeper:
   enabled: true
+  service:
+    port: 2181 
   fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
   persistence:
     enabled: false
@@ -403,6 +405,7 @@ ingress:
   enabled: false
   host: "dolphinscheduler.org"
   path: "/dolphinscheduler"
+  annotations: {}
   tls:
     enabled: false
     secretName: "dolphinscheduler-tls"

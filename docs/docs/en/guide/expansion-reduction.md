@@ -31,9 +31,9 @@ This article describes how to add a new master service or worker service to an e
 mkdir -p /opt
 cd /opt
 # decompress
-tar -zxvf apache-dolphinscheduler-1.3.8-bin.tar.gz -C /opt 
+tar -zxvf apache-dolphinscheduler-<version>-bin.tar.gz -C /opt 
 cd /opt
-mv apache-dolphinscheduler-1.3.8-bin  dolphinscheduler
+mv apache-dolphinscheduler-<version>-bin  dolphinscheduler
 ```
 
 ```markdown
@@ -73,10 +73,10 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
     datasource.properties: database connection information 
     zookeeper.properties: information for connecting zk 
     common.properties: Configuration information about the resource store (if hadoop is set up, please check if the core-site.xml and hdfs-site.xml configuration files exist).
-    env/dolphinscheduler_env.sh: environment Variables
+    dolphinscheduler_env.sh: environment Variables
     ````
 
-- Modify the `dolphinscheduler_env.sh` environment variable in the `conf/env` directory according to the machine configuration (the following is the example that all the used software install under `/opt/soft`)
+- Modify the `dolphinscheduler_env.sh` environment variable in the `bin/env/dolphinscheduler_env.sh` directory according to the machine configuration (the following is the example that all the used software install under `/opt/soft`)
 
     ```shell
         export HADOOP_HOME=/opt/soft/hadoop

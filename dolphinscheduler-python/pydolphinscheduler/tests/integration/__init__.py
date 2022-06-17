@@ -15,4 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Test integration between Python API and PythonGatewayServer."""
+"""Test integration between Python API and PythonGatewayService."""

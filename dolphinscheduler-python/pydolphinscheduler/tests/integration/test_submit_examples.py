@@ -15,9 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Test whether success submit examples DAG to PythonGatewayServer."""
+"""Test whether success submit examples DAG to PythonGatewayService."""
 
 from pathlib import Path
+from subprocess import Popen
 
 import pytest
 
@@ -34,8 +35,10 @@ from tests.testing.path import path_example
     ],
 )
 def test_exec_white_list_example(example_path: Path):
-    """Test execute examples and submit DAG to PythonGatewayServer."""
+    """Test execute examples and submit DAG to PythonGatewayService."""
     try:
-        exec(example_path.read_text())
+        # Because our task decorator used module ``inspect`` to get the source, and it will
+        # raise IOError when call it by built-in function ``exec``, so we change to ``subprocess.Popen``
+        Popen(["python", str(example_path)])
     except Exception:
         raise Exception("Run example %s failed.", example_path.stem)

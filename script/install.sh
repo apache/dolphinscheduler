@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -24,13 +24,19 @@ source ${workDir}/env/dolphinscheduler_env.sh
 
 echo "1.create directory"
 
+# If install Path equal to "/" or related path is "/" or is empty, will cause directory "/bin" be overwrite or file adding,
+# so we should check its value. Here use command `realpath` to get the related path, and it will skip if your shell env
+# without command `realpath`.
 if [ ! -d $installPath ];then
   sudo mkdir -p $installPath
   sudo chown -R $deployUser:$deployUser $installPath
+elif [[ -z "${installPath// }" || "${installPath// }" == "/" || ( $(command -v realpath) && $(realpath -s "${installPath}") == "/" ) ]]; then
+  echo "Parameter installPath can not be empty, use in root path or related path of root path, currently use ${installPath}"
+  exit 1
 fi
 
 echo "2.scp resources"
-sh ${workDir}/scp-hosts.sh
+bash ${workDir}/scp-hosts.sh
 if [ $? -eq 0 ];then
 	echo 'scp copy completed'
 else
@@ -39,10 +45,10 @@ else
 fi
 
 echo "3.stop server"
-sh ${workDir}/stop-all.sh
+bash ${workDir}/stop-all.sh
 
 echo "4.delete zk node"
-sh ${workDir}/remove-zk-node.sh $zkRoot
+bash ${workDir}/remove-zk-node.sh $zkRoot
 
 echo "5.startup"
-sh ${workDir}/start-all.sh
+bash ${workDir}/start-all.sh

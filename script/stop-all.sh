@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -21,43 +21,33 @@ workDir=`cd ${workDir};pwd`
 
 source ${workDir}/env/install_env.sh
 
-declare -A workersGroupMap=()
-
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
   echo $workerGroup;
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupName)
+  workerNames+=($worker)
 done
 
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
   echo "$master master server is stopping"
-	ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop master-server;"
+	ssh -o StrictHostKeyChecking=no -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop master-server;"
 
 done
 
-for worker in ${!workersGroupMap[*]}
+for worker in ${workerNames[@]}
 do
   echo "$worker worker server is stopping"
-  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop worker-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop worker-server;"
 done
 
-ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop alert-server;"
+ssh -o StrictHostKeyChecking=no -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop alert-server;"
 
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
   echo "$apiServer api server is stopping"
-  ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
-done
-
-pythonGatewayHost=(${pythonGatewayServers//,/ })
-for pythonGatewayServer in "${pythonGatewayHost[@]}"
-do
-  echo "$pythonGatewayServer python gateway server is stopping"
-  ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop python-gateway-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh stop api-server;"
 done

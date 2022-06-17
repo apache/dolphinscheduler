@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.alert;
 
 import junit.framework.TestCase;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
+import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.junit.Assert;
@@ -27,8 +29,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,19 +48,26 @@ public class AlertServerTest extends TestCase {
     
     @Mock
     private AlertConfig alertConfig;
+
+    @Mock
+    private AlertSenderService alertSenderService;
     
     @Test
     public void testStart() {
+
         Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
-        
-        Mockito.when(alertConfig.getPort()).thenReturn(50053);
-        
-        alertServer.start(null);
+
+        Mockito.when(alertConfig.getPort()).thenReturn(50052);
+
+        Mockito.doNothing().when(alertSenderService).start();
+
+        alertServer.run(null);
     
-        NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "server");
+        NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "nettyRemotingServer");
     
         NettyServerConfig nettyServerConfig = Whitebox.getInternalState(nettyRemotingServer, "serverConfig");
         
-        Assert.assertEquals(50053, nettyServerConfig.getListenPort());
+        Assert.assertEquals(50052, nettyServerConfig.getListenPort());
+
     }
 }

@@ -218,7 +218,7 @@ A:   1, in **the process definition list**, click the **Start** button.
 
 ## Q : Python task setting Python version
 
-A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in conf/env/.dolphinscheduler_env.sh
+A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in `bin/env/dolphinscheduler_env.sh`
 
 ```
 export PYTHON_HOME=/bin/python
@@ -306,11 +306,10 @@ A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluste
 
 ​		3, Copy the deployment directory from worker server that has already deployed
 
-​		4, Go to bin dir, then start worker server and logger server
+​		4, Go to bin dir, then start worker server
 
         ```
         ./dolphinscheduler-daemon.sh start worker-server
-        ./dolphinscheduler-daemon.sh start logger-server
         ```
 
 ---
@@ -544,17 +543,6 @@ A: 1, edit nginx config file /etc/nginx/conf.d/escheduler.conf
 
 ---
 
-## Q : Welcome to subscribe the DolphinScheduler development mailing list
-A: In the process of using DolphinScheduler, if you have any questions or ideas, suggestions, you can participate in the DolphinScheduler community building through the Apache mailing list. Sending a subscription email is also very simple, the steps are as follows: 
-
-1, Send an email to dev-subscribe@dolphinscheduler.apache.org with your own email address, subject and content.
-
-2, Receive confirmation email and reply. After completing step 1, you will receive a confirmation email from dev-help@dolphinscheduler.apache.org (if not received, please confirm whether the email is automatically classified as spam, promotion email, subscription email, etc.) . Then reply directly to the email, or click on the link in the email to reply quickly, the subject and content are arbitrary.
-
-3, Receive a welcome email. After completing the above steps, you will receive a welcome email with the subject WELCOME to dev@dolphinscheduler.apache.org, and you have successfully subscribed to the Apache DolphinScheduler mailing list.
-
----
-
 ## Q : Workflow Dependency
 A: 1, It is currently judged according to natural days, at the end of last month: the judgment time is the workflow A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'. Last month: It is judged that there is an A instance completed every day from the 1st to the end of the month. Last week: There are completed A instances 7 days last week. The first two days: Judging yesterday and the day before yesterday, there must be a completed A instance for two days.
 
@@ -570,7 +558,7 @@ When the master service and worker service are registered with zookeeper, releva
 If the ip address is obtained incorrectly, please check the network information. For example, in the Linux system, use the `ifconfig` command to view the network information. The following figure is an example:
 
 <p align="center">
-  <img src="/img/network/network_config.png" width="60%" />
+  <img src="../../img/network/network_config.png" width="60%" />
 </p>
 
 You can use the three strategies provided by dolphinscheduler to get the available ip:
@@ -613,7 +601,7 @@ A：By deploying different worker in different yarn clusters，the steps are as 
    
    2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
    
-   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` and `bin/dolphinscheduler-daemon.sh start logger-server` to start worker-server and logger-server
+   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` to start worker-server
 
 ---
 
@@ -714,4 +702,12 @@ update t_ds_version set version='2.0.1';
 
 ---
 
-## We will collect more FAQ later
+## Q：Can not find python-gateway-server in distribute package
+
+A：After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
+start API server. If you want disabled when Python gateway service you could change API server configuration in path
+`api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
+
+---
+
+We will collect more FAQ later

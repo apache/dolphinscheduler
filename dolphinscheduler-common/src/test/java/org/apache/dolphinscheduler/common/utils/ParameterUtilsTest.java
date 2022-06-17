@@ -100,22 +100,22 @@ public class ParameterUtilsTest {
         Date scheduleTime = DateUtils.stringToDate("2019-12-20 00:00:00");
 
         //test globalParamList is null
-        String result = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        String result = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assert.assertNull(result);
-        Assert.assertNull(ParameterUtils.curingGlobalParams(null, null, CommandType.START_CURRENT_TASK_PROCESS, null));
-        Assert.assertNull(ParameterUtils.curingGlobalParams(globalParamMap, null, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime));
+        Assert.assertNull(ParameterUtils.curingGlobalParams(null, null, CommandType.START_CURRENT_TASK_PROCESS, null, null));
+        Assert.assertNull(ParameterUtils.curingGlobalParams(globalParamMap, null, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
 
         //test globalParamList is not null
         Property property = new Property("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
         globalParamList.add(property);
 
-        String result2 = ParameterUtils.curingGlobalParams(null, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        String result2 = ParameterUtils.curingGlobalParams(null, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assert.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
 
-        String result3 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, null);
+        String result3 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, null, null);
         Assert.assertEquals(result3, JSONUtils.toJsonString(globalParamList));
 
-        String result4 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        String result4 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assert.assertEquals(result4, JSONUtils.toJsonString(globalParamList));
 
         //test var $ startsWith
@@ -130,7 +130,7 @@ public class ParameterUtilsTest {
         globalParamList.add(property3);
         globalParamList.add(property4);
 
-        String result5 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        String result5 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assert.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
 
         Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
@@ -150,7 +150,7 @@ public class ParameterUtilsTest {
             }
         }
 
-        String result6 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        String result6 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assert.assertTrue(result6.contains("20191220"));
     }
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -21,48 +21,38 @@ workDir=`cd ${workDir};pwd`
 
 source ${workDir}/env/install_env.sh
 
-workersGroupMap=()
-
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
   echo $workerGroup;
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupName)
+  workerNames+=($worker)
 done
 
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
   echo "$master master server is starting"
-	ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start master-server;"
+	ssh -o StrictHostKeyChecking=no -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start master-server;"
 
 done
 
-for worker in ${!workersGroupMap[*]}
+for worker in ${workerNames[@]}
 do
   echo "$worker worker server is starting"
 
-  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start worker-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start worker-server;"
 done
 
-ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start alert-server;"
+ssh -o StrictHostKeyChecking=no -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start alert-server;"
 
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
   echo "$apiServer api server is starting"
-  ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
-done
-
-pythonGatewayHost=(${pythonGatewayServers//,/ })
-for pythonGatewayServer in "${pythonGatewayHost[@]}"
-do
-  echo "$pythonGatewayServer python gateway server is starting"
-  ssh -p $sshPort $pythonGatewayServer "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start python-gateway-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start api-server;"
 done
 
 # query server status
 echo "query server status"
-cd $installPath/; sh bin/status-all.sh
+cd $installPath/; bash bin/status-all.sh

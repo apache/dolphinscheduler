@@ -2,12 +2,16 @@
 
 ## Overview
 
-Flink task type for executing Flink programs. For Flink nodes, the worker submits the task by using the Flink command `flink run`. See [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) for more details.
+Flink task type, used to execute Flink programs. For Flink nodes:
+
+1. When the program type is Java, Scala or Python, the worker submits the task `flink run` using the Flink command. See [flink cli](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/deployment/cli/) for more details.
+
+2. When the program type is SQL, the worker submit tasks using `sql-client.sh`. See [flink sql client](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/sqlclient/) for more details.
 
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/flink.png" width="15"/>task node to canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/flink.png" width="15"/>task node to canvas.
 
 ## Task Parameter
 
@@ -21,10 +25,12 @@ Flink task type for executing Flink programs. For Flink nodes, the worker submit
 - **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
 - **Delayed execution time**: The time (unit minute) that a task delays in execution.
 - **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- **Program type**: Supports Java, Scala and Python.
+- **Program type**: Support Java, Scala, Python and SQL four languages.
 - **The class of main function**: The **full path** of Main Class, the entry point of the Flink program.
 - **Main jar package**: The jar package of the Flink program (upload by Resource Center).
 - **Deployment mode**: Support 2 deployment modes: cluster and local.
+- **Initialization script**: Script file to initialize session context.
+- **Script**: The sql script file developed by the user that should be executed.
 - **Flink version**: Select version according to the execution env.
 - **Task name** (optional): Flink task name.
 - **JobManager memory size**: Used to set the size of jobManager memories, which can be set according to the actual production environment.
@@ -46,24 +52,32 @@ This is a common introductory case in the big data ecosystem, which often apply 
 
 #### Configure the flink environment in DolphinScheduler
 
-If you are using the flink task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+If you are using the flink task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `bin/env/dolphinscheduler_env.sh`.
 
-![demo-flink-simple](/img/tasks/demo/flink_task01.png)
+![demo-flink-simple](../../../../img/tasks/demo/flink_task01.png)
 
 #### Upload the Main Package
 
-When using the Flink task node, you need to upload the jar package to the Resource Centre for the execution, refer to the [resource center](../resource.md).
+When using the Flink task node, you need to upload the jar package to the Resource Center for the execution, refer to the [resource center](../resource/configuration.md).
 
 After finish the Resource Centre configuration, upload the required target files directly by dragging and dropping.
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
 #### Configure Flink Nodes
 
 Configure the required content according to the parameter descriptions above.
 
-![demo-flink-simple](/img/tasks/demo/flink_task02.png)
+![demo-flink-simple](../../../../img/tasks/demo/flink_task02.png)
+
+### Execute the FlinkSQL Program
+
+Configure the required content according to the parameter descriptions above.
+
+![demo-flink-sql-simple](../../../../img/tasks/demo/flink_sql_test.png)
 
 ## Notice
 
-JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
+- JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
+
+- Use SQL to execute Flink SQL tasks, currently only Flink 1.13 and above are supported.

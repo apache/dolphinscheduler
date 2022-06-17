@@ -71,12 +71,12 @@ public interface ProjectMapper extends BaseMapper<Project> {
     /**
      * project page
      * @param page page
-     * @param userId userId
+     * @param projectsIds projectsIds
      * @param searchName searchName
      * @return project Ipage
      */
     IPage<Project> queryProjectListPaging(IPage<Project> page,
-                                          @Param("userId") int userId,
+                                          @Param("projectsIds") List<Integer> projectsIds,
                                           @Param("searchName") String searchName);
 
     /**
@@ -123,7 +123,18 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query all project
+     * @param userId
      * @return projectList
      */
-    List<Project> queryAllProject();
+    List<Project> queryAllProject(@Param("userId") int userId);
+
+
+    /**
+     * list authorized Projects
+     * @param userId
+     * @param projectsIds
+     * @param <T>
+     * @return
+     */
+    List<Project> listAuthorizedProjects(@Param("userId") int userId, @Param("projectsIds")List<Integer> projectsIds);
 }

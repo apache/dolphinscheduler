@@ -31,16 +31,8 @@ log.addHandler(logging.StreamHandler())
 root_dir: Path = Path(__file__).parent
 img_dir: Path = root_dir.joinpath("img")
 doc_dir: Path = root_dir.joinpath("docs")
-
-expect_img_types: Set = {
-    "jpg",
-    "png",
-}
-
-
-def build_pattern() -> re.Pattern:
-    """Build current document image regexp pattern."""
-    return re.compile(f"(/img.*?\\.({'|'.join(expect_img_types)}))")
+dev_en_dir: Path = doc_dir.joinpath("en", "development")
+dev_zh_dir: Path = doc_dir.joinpath("zh", "development")
 
 
 def get_files_recurse(path: Path) -> Set:
@@ -68,14 +60,15 @@ def get_paths_rel_path(paths: Set[Path], rel: Path) -> Set:
     return {f"/{path.relative_to(rel)}" for path in paths}
 
 
-def get_docs_img_path(paths: Set[Path], pattern: re.Pattern) -> Set:
+def get_docs_img_path(paths: Set[Path]) -> Set:
     """Get all img syntax from given :param:`paths` using the regexp from :param:`pattern`."""
     res = set()
+    pattern = re.compile(r"../img[\w./-]+")
     for path in paths:
         content = path.read_text()
         find = pattern.findall(content)
         if find:
-            res |= {item[0] for item in find}
+            res |= {item.lstrip(".") for item in find}
     return res
 
 
@@ -102,16 +95,6 @@ def diff_two_set(first: Set, second: Set) -> Tuple[set, set]:
     return first.difference(second), second.difference(first)
 
 
-def check_diff_img_type() -> Tuple[set, set]:
-    """Check images difference type.
-
-    :return: Tuple[(actual - expect), (expect - actual)]
-    """
-    img = get_files_recurse(img_dir)
-    img_suffix = get_paths_uniq_suffix(img)
-    return diff_two_set(img_suffix, expect_img_types)
-
-
 def check_diff_img() -> Tuple[set, set]:
     """Check images difference files.
 
@@ -120,20 +103,12 @@ def check_diff_img() -> Tuple[set, set]:
     img = get_files_recurse(img_dir)
     docs = get_files_recurse(doc_dir)
     img_rel_path = get_paths_rel_path(img, root_dir)
-    pat = build_pattern()
-    docs_rel_path = get_docs_img_path(docs, pat)
+    docs_rel_path = get_docs_img_path(docs)
     return diff_two_set(docs_rel_path, img_rel_path)
 
 
 def check() -> None:
     """Runner for `check` sub command."""
-    img_type_act, img_type_exp = check_diff_img_type()
-    assert not img_type_act and not img_type_exp, (
-        f"Images type assert failed: \n"
-        f"* difference actual types to expect is: {img_type_act if img_type_act else 'None'}\n"
-        f"* difference expect types to actual is: {img_type_exp if img_type_exp else 'None'}\n"
-    )
-
     img_docs, img_img = check_diff_img()
     assert not img_docs and not img_img, (
         f"Images assert failed: \n"
@@ -147,6 +122,20 @@ def prune() -> None:
     _, img_img = check_diff_img()
     del_rel_path(img_img)
     del_empty_dir_recurse(img_dir)
+
+
+def dev_syntax() -> None:
+    """Check whether directory development contain do not support syntax or not.
+
+    * It should not ref document from other document in `docs` directory
+    """
+    pattern = re.compile("(\\(\\.\\.[\\w./-]+\\.md\\))")
+    dev_files_path = get_files_recurse(dev_en_dir) | get_files_recurse(dev_zh_dir)
+    get_files_recurse(dev_en_dir)
+    for path in dev_files_path:
+        content = path.read_text()
+        find = pattern.findall(content)
+        assert not find, f"File {str(path)} contain temporary not support syntax: {find}."
 
 
 def build_argparse() -> argparse.ArgumentParser:
@@ -176,6 +165,11 @@ def build_argparse() -> argparse.ArgumentParser:
         "prune", help="Remove img in directory `img` but not use in directory `docs`."
     )
     parser_prune.set_defaults(func=prune)
+
+    parser_prune = subparsers.add_parser(
+        "dev-syntax", help="Check whether temporary does not support syntax in development directory."
+    )
+    parser_prune.set_defaults(func=dev_syntax)
 
     # TODO Add subcommand `reorder`
     return parser

@@ -22,87 +22,18 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-python</artifactId>
     <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
-    <dependencies>
-        <!-- dolphinscheduler -->
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-api</artifactId>
-        </dependency>
-
-        <!--springboot-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>log4j-to-slf4j</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>net.sf.py4j</groupId>
-            <artifactId>py4j</artifactId>
-        </dependency>
-
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>*.yaml</exclude>
-                        <exclude>*.xml</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>dolphinscheduler-python-gateway-server</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>python-gateway-server</finalName>
-                            <descriptors>
-                                <descriptor>src/main/assembly/dolphinscheduler-python-gateway-server.xml</descriptor>
-                            </descriptors>
-                            <appendAssemblyId>false</appendAssemblyId>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
-            <id>docker</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
+            <id>release</id>
+            <properties>
+                <python.sign.skip>false</python.sign.skip>
+            </properties>
         </profile>
         <profile>
             <id>python</id>
@@ -161,6 +92,37 @@
                                     </arguments>
                                 </configuration>
                             </execution>
+                            <!-- Rename Python dist package to avoid confusion with dolphinscheduler main package -->
+                            <execution>
+                                <id>python-pkg-rename-tar</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mv dist/apache-dolphinscheduler-*.tar.gz dist/apache-dolphinscheduler-python-${project.version}.tar.gz</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-pkg-rename-whl</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mv dist/apache_dolphinscheduler-*py3-none-any.whl dist/apache_dolphinscheduler-python-${project.version}-py3-none-any.whl</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>sign-source</id>
                                 <phase>prepare-package</phase>
@@ -174,7 +136,7 @@
                                     <arguments>
                                         <argument>-c</argument>
                                         <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
-                                        <argument>gpg --armor --sign dist/*.tar.gz</argument>
+                                        <argument>gpg --armor --detach-sign --digest-algo=SHA512 dist/*.tar.gz</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -191,7 +153,7 @@
                                     <arguments>
                                         <argument>-c</argument>
                                         <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
-                                        <argument>gpg --armor --sign dist/*.whl</argument>
+                                        <argument>gpg --armor --detach-sign --digest-algo=SHA512 dist/*.whl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

@@ -2,12 +2,16 @@
 
 ## Overview
 
-Spark task type used to execute Spark program. For Spark nodes, the worker submits the task by using the spark command `spark submit`. See [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit) for more details.
+Spark task type for executing Spark application. When executing the Spark task, the worker will submits a job to the Spark cluster by following commands:
+
+(1) `spark submit` method to submit tasks. See [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit) for more details.
+
+(2) `spark sql` method to submit tasks. See [spark sql](https://spark.apache.org/docs/3.2.1/sql-ref-syntax.html) for more details.
 
 ## Create Task
 
 - Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="/img/tasks/icons/spark.png" width="15"/> to the canvas.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/spark.png" width="15"/> to the canvas.
 
 ## Task Parameter
 
@@ -21,11 +25,13 @@ Spark task type used to execute Spark program. For Spark nodes, the worker submi
 - **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
 - **Delayed execution time**: The time (unit minute) that a task delays in execution.
 - **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- **Program type**: Supports Java, Scala and Python.
+- **Program type**: Supports Java, Scala, Python and SQL.
 - **Spark version**: Support Spark1 and Spark2.
 - **The class of main function**: The **full path** of Main Class, the entry point of the Spark program.
 - **Main jar package**: The Spark jar package (upload by Resource Center).
-- **Deployment mode**: Support 3 deployment modes: yarn-cluster, yarn-client and local. 
+- **SQL scripts**: SQL statements in .sql files that Spark sql runs.
+- **Deployment mode**: (1) spark submit supports three modes: yarn-clusetr, yarn-client and local.
+                       (2) spark sql supports yarn-client and local modes.
 - **Task name** (optional): Spark task name.
 - **Driver core number**: Set the number of Driver core, which can be set according to the actual production environment.
 - **Driver memory size**: Set the size of Driver memories, which can be set according to the actual production environment.
@@ -39,30 +45,42 @@ Spark task type used to execute Spark program. For Spark nodes, the worker submi
 
 ## Task Example
 
-### Execute the WordCount Program
+### spark submit
+
+#### Execute the WordCount Program
 
 This is a common introductory case in the big data ecosystem, which often apply to computational frameworks such as MapReduce, Flink and Spark. The main purpose is to count the number of identical words in the input text. (Flink's releases attach this example job)
 
-#### Configure the Spark Environment in DolphinScheduler
+##### Configure the Spark Environment in DolphinScheduler
 
-If you are using the Spark task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+If you are using the Spark task type in a production environment, it is necessary to configure the required environment first. The following is the configuration file: `bin/env/dolphinscheduler_env.sh`.
 
-![spark_configure](/img/tasks/demo/spark_task01.png)
+![spark_configure](../../../../img/tasks/demo/spark_task01.png)
 
-#### Upload the Main Package
+##### Upload the Main Package
 
-When using the Spark task node, you need to upload the jar package to the Resource Centre for the execution, refer to the [resource center](../resource.md).
+When using the Spark task node, you need to upload the jar package to the Resource Centre for the execution, refer to the [resource center](../resource/configuration.md).
 
 After finish the Resource Centre configuration, upload the required target files directly by dragging and dropping.
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
-#### Configure Spark Nodes
+##### Configure Spark Nodes
 
 Configure the required content according to the parameter descriptions above.
 
-![demo-spark-simple](/img/tasks/demo/spark_task02.png)
+![demo-spark-simple](../../../../img/tasks/demo/spark_task02.png)
+
+### spark sql
+
+#### Execute DDL and DML statements
+
+This case is to create a view table terms and write three rows of data and a table wc in parquet format and determine whether the table exists. The program type is SQL. Insert the data of the view table terms into the table wc in parquet format.
+
+![spark_sql](../../../../img/tasks/demo/spark_sql.png)
 
 ## Notice
 
-JAVA and Scala only used for identification, there is no difference. If use Python to develop Flink, there is no class of the main function and the rest is the same.
+JAVA and Scala are only used for identification, and there is no difference when you use the Spark task. If your application is developed by Python, you could just ignore the parameter **Main Class** in the form. Parameter **SQL scripts** is only for SQL type and could be ignored in JAVA, Scala and Python.
+
+SQL does not currently support cluster mode.

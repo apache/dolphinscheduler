@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
+import org.apache.dolphinscheduler.alert.api.ShowType;
+
 import java.util.Map;
 
 public class WechatAppChatMessage {
@@ -24,6 +26,7 @@ public class WechatAppChatMessage {
     private String chatid;
     private String msgtype;
     private Map<String,String> text;
+    private Map<String,String> markdown;
     private Integer safe;
 
     public String getChatid() {
@@ -58,13 +61,25 @@ public class WechatAppChatMessage {
         this.safe = safe;
     }
 
+    public Map<String, String> getMarkdown() {
+        return markdown;
+    }
+
+    public void setMarkdown(Map<String, String> markdown) {
+        this.markdown = markdown;
+    }
+
     public WechatAppChatMessage() {
     }
 
-    public WechatAppChatMessage(String chatid, String msgtype, Map<String, String> text, Integer safe) {
+    public WechatAppChatMessage(String chatid, String msgtype, Map<String, String> contentMap, Integer safe) {
         this.chatid = chatid;
         this.msgtype = msgtype;
-        this.text = text;
+        if (msgtype.equals(ShowType.MARKDOWN.getDescp())) {
+            this.markdown = contentMap;
+        } else {
+            this.text = contentMap;
+        }
         this.safe = safe;
     }
 }

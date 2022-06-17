@@ -279,6 +279,7 @@ DROP TABLE IF EXISTS `t_ds_alert`;
 CREATE TABLE `t_ds_alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `title` varchar(64) DEFAULT NULL COMMENT 'title',
+  `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
   `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed',
@@ -286,8 +287,13 @@ CREATE TABLE `t_ds_alert` (
   `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project_code',
+  `process_definition_code` bigint(20) DEFAULT NULL COMMENT 'process_definition_code',
+  `process_instance_id` int(11) DEFAULT NULL COMMENT 'process_instance_id',
+  `alert_type` int(11) DEFAULT NULL COMMENT 'alert_type',
   PRIMARY KEY (`id`),
-  KEY `idx_status` (`alert_status`) USING BTREE
+  KEY `idx_status` (`alert_status`) USING BTREE,
+  KEY `idx_sign` (`sign`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -481,6 +487,8 @@ CREATE TABLE `t_ds_task_definition` (
   `resource_ids` text COMMENT 'resource id, separated by comma',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `task_group_priority` tinyint(4) DEFAULT '0' COMMENT 'task group priority',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
@@ -515,6 +523,8 @@ CREATE TABLE `t_ds_task_definition_log` (
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `task_group_priority` tinyint(4) DEFAULT 0 COMMENT 'task group priority',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
@@ -684,7 +694,9 @@ CREATE TABLE `t_ds_relation_process_instance` (
   `parent_process_instance_id` int(11) DEFAULT NULL COMMENT 'parent process instance id',
   `parent_task_instance_id` int(11) DEFAULT NULL COMMENT 'parent process instance id',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'child process instance id',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_parent_process_task` (`parent_process_instance_id`,`parent_task_instance_id`) ,
+  KEY `idx_process_instance_id` (`process_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -703,7 +715,7 @@ CREATE TABLE `t_ds_relation_project_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `user_id_index` (`user_id`) USING BTREE
+  UNIQUE KEY uniq_uid_pid(user_id,project_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -847,6 +859,8 @@ CREATE TABLE `t_ds_task_instance` (
   `var_pool` longtext COMMENT 'var_pool',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
+  `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
+  `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
@@ -1885,11 +1899,10 @@ CREATE TABLE `t_ds_k8s_namespace` (
   `limits_memory` int(11) DEFAULT NULL,
   `namespace` varchar(100) DEFAULT NULL,
   `online_job_num` int(11) DEFAULT NULL,
-  `owner` varchar(100) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `pod_replicas` int(11) DEFAULT NULL,
   `pod_request_cpu` decimal(14,3) DEFAULT NULL,
   `pod_request_memory` int(11) DEFAULT NULL,
-  `tag` varchar(100) DEFAULT NULL,
   `limits_cpu` decimal(14,3) DEFAULT NULL,
   `k8s` varchar(100) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
@@ -1897,3 +1910,52 @@ CREATE TABLE `t_ds_k8s_namespace` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `k8s_namespace_unique` (`namespace`,`k8s`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_namespace_user`;
+CREATE TABLE `t_ds_relation_namespace_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `namespace_id` int(11) DEFAULT NULL COMMENT 'namespace id',
+  `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+  `id`                            int(11) NOT NULL AUTO_INCREMENT,
+  `alert_id`                      int(11) NOT NULL,
+  `alert_plugin_instance_id`      int(11) NOT NULL,
+  `send_status`                   tinyint(4) DEFAULT '0',
+  `log`                           text,
+  `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for t_ds_cluster
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_cluster`;
+CREATE TABLE `t_ds_cluster` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'cluster name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cluster_name_unique` (`name`),
+  UNIQUE KEY `cluster_code_unique` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

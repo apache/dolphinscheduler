@@ -18,6 +18,13 @@ name: Docs
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/docs.yml'
+      - '**/*.md'
+      - 'docs/**'
+      - '.dlc.json'
+  schedule:
+    - cron: '0 18 * * *'  # TimeZone: UTC 0
 
 concurrency:
   group: doc-${{ github.event.pull_request.number || github.ref }}
@@ -37,15 +44,20 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - name: Run Dev Relative Reference
+        run: python img_utils.py -v dev-syntax
       - name: Run Image Check
         run: python img_utils.py -v check
   dead-link:
     name: Dead Link
+    if: (github.event_name == 'schedule' && github.repository == 'apache/dolphinscheduler') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
       - run: sudo npm install -g markdown-link-check@3.10.0
+      # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
+      # if you want to run check locally
       - run: |
           for file in $(find . -name "*.md"); do
             markdown-link-check -c .dlc.json -q "$file"

@@ -26,14 +26,14 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.base.Functions;
 
 /**
- * types for whether to send warning when process ending;
+ * types for whether to send warning when process ends;
  */
 public enum WarningType {
     /**
      * 0 do not send warning;
      * 1 send if process success;
      * 2 send if process failed;
-     * 3 send if process ending;
+     * 3 send if process ends, whatever the result;
      */
     NONE(0, "none"),
     SUCCESS(1, "success"),

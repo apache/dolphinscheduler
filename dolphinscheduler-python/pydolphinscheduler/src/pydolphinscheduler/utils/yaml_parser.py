@@ -146,20 +146,6 @@ class YamlParser:
         """Get value by key, is call ``__getitem__``."""
         return self[key]
 
-    def get_int(self, key: str) -> int:
-        """Get value and covert it to int."""
-        return int(self.get(key))
-
-    def get_bool(self, key: str) -> bool:
-        """Get value and covert it to boolean."""
-        val = self.get(key)
-        if isinstance(val, str):
-            return val.lower() in {"true", "t"}
-        elif isinstance(val, int):
-            return val != 0
-        else:
-            return val
-
     def __str__(self) -> str:
         """Transfer :class:`YamlParser` to string object.
 

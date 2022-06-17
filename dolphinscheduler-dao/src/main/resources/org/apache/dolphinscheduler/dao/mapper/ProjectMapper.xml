@@ -94,11 +94,11 @@
         from t_ds_project p
         left join t_ds_user u on u.id=p.user_id
         where 1=1
-        <if test="userId != 0">
-            and p.id in
-            (select project_id from t_ds_relation_project_user where user_id=#{userId}
-            union select id as project_id from t_ds_project where user_id=#{userId}
-            )
+        <if test="projectsIds != null and projectsIds.size() > 0">
+            and p.id  in
+            <foreach item="id" index="index" collection="projectsIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
         </if>
         <if test="searchName!=null and searchName != ''">
             AND (p.name LIKE concat('%', #{searchName}, '%')
@@ -164,5 +164,20 @@
         select
         <include refid="baseSql"/>
         from t_ds_project
+        where 1=1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
+    </select>
+
+    <select id="listAuthorizedProjects" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSql"/>
+        from t_ds_project dp
+        where  1=1
+        <if test="userId != 0">
+            and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+            union select id as project_id  from t_ds_project where user_id=#{userId})
+        </if>
     </select>
 </mapper>

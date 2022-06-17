@@ -19,21 +19,21 @@ Followings are examples shows task parameters priority problems:#############
 
 1: Use shell nodes to explain the first case.
 
-![png01](/img/globalParam/image-20210723102938239.png)
+![priority-parameter01](../../../../img/new_ui/dev/parameter/priority_parameter01.png)
 
 The [useParam] node can use the parameters which are set in the [createParam] node. The [useParam] node cannot obtain the parameters from the [noUseParam] node due to there is no dependency between them. Other task node types have the same usage rules with the Shell example here.
 
-![png02](/img/globalParam/image-20210723103316896.png)
+![priority-parameter02](../../../../img/new_ui/dev/parameter/priority_parameter02.png)
 
 The [createParam] node can use parameters directly. In addition, the node creates two parameters named "key" and "key1", and "key1" has the same name as the one passed by the upstream node and assign value "12". However, due to the priority rules, the value assignment will assign "12" and the value from the upstream node is discarded.
 
 2: Use SQL nodes to explain another case.
 
-![png03](/img/globalParam/image-20210723103937052.png)
+![priority-parameter03](../../../../img/new_ui/dev/parameter/priority_parameter03.png)
 
 The following shows the definition of the [use_create] node:
 
-![png04](/img/globalParam/image-20210723104411489.png)
+![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
 "status" is the own parameters of the node set by the current node. However, the user also sets the "status" parameter (global parameter) when saving the process definition and assign its value to -1. Then the value of status will be 2 with higher priority when the SQL executes. The global parameter value is discarded.
 

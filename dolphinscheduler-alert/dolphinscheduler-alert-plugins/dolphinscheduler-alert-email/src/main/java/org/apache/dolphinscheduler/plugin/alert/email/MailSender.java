@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -326,13 +327,15 @@ public final class MailSender {
         part1.setContent(partContent, EmailConstants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLSX);
+        // add random uuid to filename to avoid potential issue
+        String randomFilename = title + UUID.randomUUID();
+        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + randomFilename + EmailConstants.EXCEL_SUFFIX_XLSX);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         // make excel file
 
-        ExcelUtils.genExcelFile(content, title, xlsFilePath);
+        ExcelUtils.genExcelFile(content, randomFilename, xlsFilePath);
 
         part2.attachFile(file);
         part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLSX, EmailConstants.UTF_8, "B"));

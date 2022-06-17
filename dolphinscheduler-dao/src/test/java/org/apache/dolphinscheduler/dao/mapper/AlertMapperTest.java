@@ -28,8 +28,9 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -100,26 +101,6 @@ public class AlertMapperTest extends BaseDaoTest {
     }
 
     /**
-     * test list alert by status
-     */
-    @Test
-    public void testListAlertByStatus() {
-        Integer count = 10;
-        AlertStatus waitExecution = AlertStatus.WAIT_EXECUTION;
-
-        Map<Integer, Alert> expectedAlertMap = createAlertMap(count, waitExecution);
-
-        List<Alert> actualAlerts = alertMapper.listAlertByStatus(waitExecution);
-
-        for (Alert actualAlert : actualAlerts) {
-            Alert expectedAlert = expectedAlertMap.get(actualAlert.getId());
-            if (expectedAlert != null) {
-                assertEquals(expectedAlert, actualAlert);
-            }
-        }
-    }
-
-    /**
      * create alert map
      *
      * @param count       alert count
@@ -153,9 +134,11 @@ public class AlertMapperTest extends BaseDaoTest {
      * @return alert
      */
     private Alert createAlert(AlertStatus alertStatus) {
+        String content = "[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]";
         Alert alert = new Alert();
         alert.setTitle("test alert");
-        alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
+        alert.setContent(content);
+        alert.setSign(DigestUtils.sha1Hex(content));
         alert.setAlertStatus(alertStatus);
         alert.setWarningType(WarningType.FAILURE);
         alert.setLog("success");

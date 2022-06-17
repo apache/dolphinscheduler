@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -36,9 +38,10 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +63,8 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * task definition service impl
@@ -91,7 +96,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ENVIRONMENT, ENVIRONMENT_CREATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -144,6 +150,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             }
             result.put(Constants.DATA_LIST, env.getCode());
             putMsg(result, Status.SUCCESS);
+            permissionPostHandle(AuthorizationType.ENVIRONMENT, loginUser.getId(), Collections.singletonList(env.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_ENVIRONMENT_ERROR);
         }
@@ -159,14 +166,24 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @return environment list page
      */
     @Override
-    public Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal) {
-        Result result = new Result();
+    public Result queryEnvironmentListPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+        Result<Object> result = new Result();
 
         Page<Environment> page = new Page<>(pageNo, pageSize);
-
-        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
-
         PageInfo<EnvironmentDto> pageInfo = new PageInfo<>(pageNo, pageSize);
+        IPage<Environment> environmentIPage;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.setData(pageInfo);
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            environmentIPage = environmentMapper.queryEnvironmentListPagingByIds(page, new ArrayList<>(ids), searchVal);
+        }
+
         pageInfo.setTotal((int) environmentIPage.getTotal());
 
         if (CollectionUtils.isNotEmpty(environmentIPage.getRecords())) {
@@ -284,7 +301,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ENVIRONMENT,ENVIRONMENT_DELETE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -322,7 +340,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ENVIRONMENT,ENVIRONMENT_UPDATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -425,13 +444,14 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     private Map<String, Object> checkUsedEnvironmentWorkerGroupRelation(Set<String> deleteKeySet,String environmentName, Long environmentCode) {
         Map<String, Object> result = new HashMap<>();
         for (String workerGroup : deleteKeySet) {
-            TaskDefinition taskDefinition = taskDefinitionMapper
-                    .selectOne(new QueryWrapper<TaskDefinition>().lambda()
+            List<TaskDefinition> taskDefinitionList = taskDefinitionMapper
+                    .selectList(new QueryWrapper<TaskDefinition>().lambda()
                             .eq(TaskDefinition::getEnvironmentCode,environmentCode)
                             .eq(TaskDefinition::getWorkerGroup,workerGroup));
 
-            if (Objects.nonNull(taskDefinition)) {
-                putMsg(result, Status.UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR,workerGroup,environmentName,taskDefinition.getName());
+            if (Objects.nonNull(taskDefinitionList) && taskDefinitionList.size() != 0) {
+                Set<String> collect = taskDefinitionList.stream().map(TaskDefinition::getName).collect(Collectors.toSet());
+                putMsg(result, Status.UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR,workerGroup,environmentName, collect);
                 return result;
             }
         }
@@ -461,4 +481,3 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     }
 
 }
-

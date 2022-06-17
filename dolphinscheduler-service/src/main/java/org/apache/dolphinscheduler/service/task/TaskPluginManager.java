@@ -40,8 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -86,8 +84,7 @@ public class TaskPluginManager {
         return taskChannel.parseParameters(parametersNode);
     }
 
-    @EventListener
-    public void installPlugin(ApplicationReadyEvent readyEvent) {
+    public void installPlugin() {
         final Set<String> names = new HashSet<>();
 
         ServiceLoader.load(TaskChannelFactory.class).forEach(factory -> {

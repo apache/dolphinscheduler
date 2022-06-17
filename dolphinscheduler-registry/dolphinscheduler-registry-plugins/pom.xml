@@ -22,9 +22,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dolphinscheduler-registry</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.4-SNAPSHOT</version>
+        <artifactId>dolphinscheduler-registry</artifactId>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-registry-plugins</artifactId>
     <modelVersion>4.0.0</modelVersion>
@@ -32,5 +32,6 @@
 
     <modules>
         <module>dolphinscheduler-registry-zookeeper</module>
+        <module>dolphinscheduler-registry-mysql</module>
     </modules>
 </project>

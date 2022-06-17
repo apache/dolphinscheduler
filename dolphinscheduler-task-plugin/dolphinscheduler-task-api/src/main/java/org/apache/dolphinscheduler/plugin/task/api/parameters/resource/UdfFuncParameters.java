@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -30,6 +31,18 @@ public class UdfFuncParameters extends AbstractResourceParameters {
      * id
      */
     private int id;
+
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    @JsonProperty(value = "UDF")
+    private String resourceType;
+
     /**
      * user id
      */

@@ -88,4 +88,14 @@ public class AlertSendRequestCommand implements Serializable {
         command.setBody(body);
         return command;
     }
+
+    @Override
+    public String toString() {
+        return "AlertSendRequestCommand{" +
+                "groupId=" + groupId +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", warnType=" + warnType +
+                '}';
+    }
 }

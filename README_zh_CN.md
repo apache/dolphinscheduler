@@ -3,7 +3,6 @@ Dolphin Scheduler Official Website
 ============
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Total Lines](https://tokei.rs/b1/github/apache/dolphinscheduler?category=lines)](https://github.com/apache/dolphinscheduler)
 [![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/dolphinscheduler/branch/dev)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 
@@ -36,19 +35,11 @@ Dolphin Scheduler Official Website
 
 ## 系统部分截图
 
-![home page](https://user-images.githubusercontent.com/15833811/75208819-abbad000-57b7-11ea-8d3c-67e7c270671f.jpg)
-
-![dag](https://user-images.githubusercontent.com/15833811/75209584-93e44b80-57b9-11ea-952e-537fb24ec72d.jpg)
-
-![log](https://user-images.githubusercontent.com/15833811/75209645-c55d1700-57b9-11ea-94d4-e3fa91ab5218.jpg)
-
-![gantt](https://user-images.githubusercontent.com/15833811/75209640-c0986300-57b9-11ea-878e-a2098533ad44.jpg)
-
-![resources](https://user-images.githubusercontent.com/15833811/75209403-11f42280-57b9-11ea-9b59-d4be77063553.jpg)
-
-![monitor](https://user-images.githubusercontent.com/15833811/75209631-b5ddce00-57b9-11ea-8d22-cdf15cf0ee25.jpg)
-
-![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
+![dag](./images/zh_CN/dag.png)
+![data-source](./images/zh_CN/data-source.png)
+![home](./images/zh_CN/home.png)
+![master](./images/zh_CN/master.png)
+![workflow-tree](./images/zh_CN/workflow-tree.png)
 
 ## 近期研发计划
 
@@ -61,7 +52,7 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/dolphinsche
 
 ## 快速试用 Docker
 
-请参考官方文档: [快速试用 Docker 部署](http://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/installation/docker.html)
+请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/start/docker.html)
 
 ## 快速试用 Kubernetes
 
@@ -82,17 +73,17 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-s
 
 ## 感谢
 
-Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，quartz，以及apache的众多开源项目等等，
+Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、grpc，netty，quartz，以及apache的众多开源项目等等，
 正是由于站在这些开源项目的肩膀上，才有Dolphin Scheduler的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的贡献者,也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
 
 ## 获得帮助
 
-1. 提交issue
-2. 先订阅邮件开发列表:[订阅邮件列表](https://dolphinscheduler.apache.org/zh-cn/community/development/subscribe.html), 订阅成功后发送邮件到dev@dolphinscheduler.apache.org.
+1. 提交 [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
+2. [加入slack群](https://s.apache.org/dolphinscheduler-slack) 并在频道 `#troubleshooting` 中提问
 
 ## 社区
 
-1. 通过[该申请链接](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)加入slack channel
+1. 通过[该申请链接](https://s.apache.org/dolphinscheduler-slack)加入slack channel
 2. 关注[Apache Dolphin Scheduler的Twitter账号](https://twitter.com/dolphinschedule)获取实时动态
 
 ## 版权

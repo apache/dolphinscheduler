@@ -29,7 +29,7 @@ BUILD_IN_CONFIG_PATH = Path(__file__).resolve().parent.joinpath("default_config.
 
 def config_path() -> Path:
     """Get the path of pydolphinscheduler configuration file."""
-    pyds_home = os.environ.get("PYDOLPHINSCHEDULER_HOME", "~/pydolphinscheduler")
+    pyds_home = os.environ.get("PYDS_HOME", "~/pydolphinscheduler")
     config_file_path = Path(pyds_home).joinpath("config.yaml").expanduser()
     return config_file_path
 
@@ -118,6 +118,21 @@ def set_single_config(key: str, value: Any) -> None:
     file.write(content=str(config), to_path=str(config_path()), overwrite=True)
 
 
+def get_int(val: Any) -> int:
+    """Covert value to int."""
+    return int(val)
+
+
+def get_bool(val: Any) -> bool:
+    """Covert value to boolean."""
+    if isinstance(val, str):
+        return val.lower() in {"true", "t"}
+    elif isinstance(val, int):
+        return val == 1
+    else:
+        return bool(val)
+
+
 # Start Common Configuration Settings
 
 # Add configs as module variables to avoid read configuration multiple times when
@@ -126,23 +141,53 @@ def set_single_config(key: str, value: Any) -> None:
 configs: YamlParser = get_configs()
 
 # Java Gateway Settings
-JAVA_GATEWAY_ADDRESS = configs.get("java_gateway.address")
-JAVA_GATEWAY_PORT = configs.get_int("java_gateway.port")
-JAVA_GATEWAY_AUTO_CONVERT = configs.get_bool("java_gateway.auto_convert")
+JAVA_GATEWAY_ADDRESS = os.environ.get(
+    "PYDS_JAVA_GATEWAY_ADDRESS", configs.get("java_gateway.address")
+)
+JAVA_GATEWAY_PORT = get_int(
+    os.environ.get("PYDS_JAVA_GATEWAY_PORT", configs.get("java_gateway.port"))
+)
+JAVA_GATEWAY_AUTO_CONVERT = get_bool(
+    os.environ.get(
+        "PYDS_JAVA_GATEWAY_AUTO_CONVERT", configs.get("java_gateway.auto_convert")
+    )
+)
 
 # User Settings
-USER_NAME = configs.get("default.user.name")
-USER_PASSWORD = configs.get("default.user.password")
-USER_EMAIL = configs.get("default.user.email")
-USER_PHONE = str(configs.get("default.user.phone"))
-USER_STATE = configs.get_int("default.user.state")
+USER_NAME = os.environ.get("PYDS_USER_NAME", configs.get("default.user.name"))
+USER_PASSWORD = os.environ.get(
+    "PYDS_USER_PASSWORD", configs.get("default.user.password")
+)
+USER_EMAIL = os.environ.get("PYDS_USER_EMAIL", configs.get("default.user.email"))
+USER_PHONE = str(os.environ.get("PYDS_USER_PHONE", configs.get("default.user.phone")))
+USER_STATE = get_int(
+    os.environ.get("PYDS_USER_STATE", configs.get("default.user.state"))
+)
 
 # Workflow Settings
-WORKFLOW_PROJECT = configs.get("default.workflow.project")
-WORKFLOW_TENANT = configs.get("default.workflow.tenant")
-WORKFLOW_USER = configs.get("default.workflow.user")
-WORKFLOW_QUEUE = configs.get("default.workflow.queue")
-WORKFLOW_WORKER_GROUP = configs.get("default.workflow.worker_group")
-WORKFLOW_TIME_ZONE = configs.get("default.workflow.time_zone")
+WORKFLOW_PROJECT = os.environ.get(
+    "PYDS_WORKFLOW_PROJECT", configs.get("default.workflow.project")
+)
+WORKFLOW_TENANT = os.environ.get(
+    "PYDS_WORKFLOW_TENANT", configs.get("default.workflow.tenant")
+)
+WORKFLOW_USER = os.environ.get(
+    "PYDS_WORKFLOW_USER", configs.get("default.workflow.user")
+)
+WORKFLOW_QUEUE = os.environ.get(
+    "PYDS_WORKFLOW_QUEUE", configs.get("default.workflow.queue")
+)
+WORKFLOW_RELEASE_STATE = os.environ.get(
+    "PYDS_WORKFLOW_RELEASE_STATE", configs.get("default.workflow.release_state")
+)
+WORKFLOW_WORKER_GROUP = os.environ.get(
+    "PYDS_WORKFLOW_WORKER_GROUP", configs.get("default.workflow.worker_group")
+)
+WORKFLOW_TIME_ZONE = os.environ.get(
+    "PYDS_WORKFLOW_TIME_ZONE", configs.get("default.workflow.time_zone")
+)
+WORKFLOW_WARNING_TYPE = os.environ.get(
+    "PYDS_WORKFLOW_WARNING_TYPE", configs.get("default.workflow.warning_type")
+)
 
 # End Common Configuration Setting

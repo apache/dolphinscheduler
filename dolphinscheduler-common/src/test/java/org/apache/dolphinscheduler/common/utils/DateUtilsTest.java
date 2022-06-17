@@ -214,9 +214,14 @@ public class DateUtilsTest {
 
     @Test
     public void testTransformToTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
         Date date = new Date();
-        Date mst = DateUtils.getTimezoneDate(date, TimeZone.getDefault().getID());
-        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(mst));
+        Date defaultTimeZoneDate = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID());
+        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(defaultTimeZoneDate));
+
+        Date targetTimeZoneDate = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID(), "Asia/Shanghai");
+        Assert.assertEquals(DateUtils.dateToString(date, TimeZone.getDefault().getID()), DateUtils.dateToString(targetTimeZoneDate, "Asia/Shanghai"));
     }
 
     @Test

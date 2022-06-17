@@ -272,6 +272,7 @@ CREATE TABLE t_ds_alert
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
     title         varchar(64) DEFAULT NULL,
+    sign           char(40) NOT NULL DEFAULT '',
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
     warning_type  tinyint(4) DEFAULT '2',
@@ -279,7 +280,12 @@ CREATE TABLE t_ds_alert
     alertgroup_id int(11) DEFAULT NULL,
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
-    PRIMARY KEY (id)
+    project_code        bigint(20) DEFAULT NULL,
+    process_definition_code        bigint(20) DEFAULT NULL,
+    process_instance_id     int(11) DEFAULT NULL,
+    alert_type     int(11) DEFAULT NULL,
+    PRIMARY KEY (id),
+    KEY            idx_sign (sign)
 );
 
 -- ----------------------------
@@ -480,6 +486,8 @@ CREATE TABLE t_ds_task_definition
     delay_time              int(11) DEFAULT '0',
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -515,6 +523,8 @@ CREATE TABLE t_ds_task_definition_log
     operator                int(11) DEFAULT NULL,
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -703,7 +713,8 @@ CREATE TABLE t_ds_relation_project_user
     perm        int(11) DEFAULT '1',
     create_time datetime DEFAULT NULL,
     update_time datetime DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_uid_pid(user_id,project_id)
 );
 
 -- ----------------------------
@@ -853,6 +864,8 @@ CREATE TABLE t_ds_task_instance
     task_group_id           int(11) DEFAULT NULL,
     var_pool                longtext,
     dry_run                 int NULL DEFAULT 0,
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE
 );
@@ -1892,11 +1905,10 @@ CREATE TABLE t_ds_k8s_namespace (
     limits_memory      int(11) DEFAULT NULL,
     namespace          varchar(100) DEFAULT NULL,
     online_job_num     int(11) DEFAULT NULL,
-    owner              varchar(100) DEFAULT NULL,
+    user_id            int(11) DEFAULT NULL,
     pod_replicas       int(11) DEFAULT NULL,
     pod_request_cpu    decimal(14,3) DEFAULT NULL,
     pod_request_memory int(11) DEFAULT NULL,
-    tag                varchar(100) DEFAULT NULL,
     limits_cpu         decimal(14,3) DEFAULT NULL,
     k8s                varchar(100) DEFAULT NULL,
     create_time        datetime DEFAULT NULL ,
@@ -1908,5 +1920,69 @@ CREATE TABLE t_ds_k8s_namespace (
 -- ----------------------------
 -- Records of t_ds_k8s_namespace
 -- ----------------------------
-INSERT INTO t_ds_k8s_namespace
-VALUES (1, 10000, 'default', 99, 'owner',1,NULL,1,'test',NULL,'default',null,null);
+INSERT INTO `t_ds_k8s_namespace`
+(`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
+VALUES (1, 1000, 'flink_test', 99, 1, 1, 0.1, 1, NULL, 'ds_null_k8s',  '2022-03-03 11:31:24.0', '2022-03-03 11:31:24.0');
+
+INSERT INTO `t_ds_k8s_namespace`
+(`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
+VALUES (2, 500, 'spark_test', 90, 2,1,10000,1, NULL, 'ds_null_k8s', '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+
+INSERT INTO `t_ds_k8s_namespace`
+(`id`,`limits_memory`,`namespace`,`online_job_num`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`k8s`,`create_time`,`update_time`)
+VALUES (3, 200, 'auth_test', 68, 3,1,100,1, 10000, 'ds_null_k8s', '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
+
+-- ----------------------------
+-- Table structure for t_ds_relation_namespace_user
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_relation_namespace_user;
+CREATE TABLE t_ds_relation_namespace_user (
+    id                int(11) NOT NULL AUTO_INCREMENT ,
+    user_id           int(11) NOT NULL ,
+    namespace_id      int(11) NOT NULL ,
+    perm              int(11) DEFAULT '1' ,
+    create_time       datetime DEFAULT NULL ,
+    update_time       datetime DEFAULT NULL ,
+    PRIMARY KEY (id) ,
+    UNIQUE KEY namespace_user_unique (user_id,namespace_id)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status CASCADE;
+CREATE TABLE t_ds_alert_send_status
+(
+    id                            int NOT NULL AUTO_INCREMENT,
+    alert_id                      int NOT NULL,
+    alert_plugin_instance_id      int NOT NULL,
+    send_status                   tinyint(4) DEFAULT '0',
+    log                           text,
+    create_time                   timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
+);
+
+
+--
+-- Table structure for table t_ds_cluster
+--
+DROP TABLE IF EXISTS t_ds_cluster CASCADE;
+CREATE TABLE t_ds_cluster
+(
+    id          int       NOT NULL AUTO_INCREMENT,
+    code        bigint(20) NOT NULL,
+    name        varchar(100)       DEFAULT NULL,
+    config      text               DEFAULT NULL,
+    description text,
+    operator    int                DEFAULT NULL,
+    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY cluster_name_unique (name),
+    UNIQUE KEY cluster_code_unique (code)
+);
+
+INSERT INTO `t_ds_cluster`
+(`id`,`code`,`name`,`config`,`description`,`operator`,`create_time`,`update_time`)
+VALUES (100, 100, 'ds_null_k8s', '{"k8s":"ds_null_k8s"}', 'test', 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');

@@ -17,17 +17,19 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.User;
-
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -48,6 +50,7 @@ public interface ProcessDefinitionService {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @return create result code
      */
     Map<String, Object> createProcessDefinition(User loginUser,
@@ -60,6 +63,7 @@ public interface ProcessDefinitionService {
                                                 String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
+                                                String otherParamsJson,
                                                 ProcessExecutionTypeEnum executionType);
 
     /**
@@ -88,6 +92,7 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param searchVal search value
+     * @param otherParamsJson otherParamsJson handle other params
      * @param pageNo page number
      * @param pageSize page size
      * @param userId user id
@@ -96,6 +101,7 @@ public interface ProcessDefinitionService {
     Result queryProcessDefinitionListPaging(User loginUser,
                                             long projectCode,
                                             String searchVal,
+                                            String otherParamsJson,
                                             Integer userId,
                                             Integer pageNo,
                                             Integer pageSize);
@@ -166,6 +172,7 @@ public interface ProcessDefinitionService {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @return update result code
      */
     Map<String, Object> updateProcessDefinition(User loginUser,
@@ -179,6 +186,7 @@ public interface ProcessDefinitionService {
                                                 String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
+                                                String otherParamsJson,
                                                 ProcessExecutionTypeEnum executionType);
 
     /**
@@ -297,6 +305,23 @@ public interface ProcessDefinitionService {
     Map<String, Object> queryAllProcessDefinitionByProjectCode(User loginUser, long projectCode);
 
     /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @return process definitions in the project
+     */
+    Map<String, Object> queryProcessDefinitionListByProjectCode(long projectCode);
+
+    /**
+     * query process definition list by project code
+     *
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @return process definitions in the project
+     */
+    Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode, Long processDefinitionCode);
+
+    /**
      * Encapsulates the TreeView structure
      *
      * @param projectCode project code
@@ -304,7 +329,7 @@ public interface ProcessDefinitionService {
      * @param limit limit
      * @return tree view json data
      */
-    Map<String, Object> viewTree(long projectCode, long code, Integer limit);
+    Map<String, Object> viewTree(User loginUser,long projectCode, long code, Integer limit);
 
     /**
      * switch the defined process definition version
@@ -385,6 +410,7 @@ public interface ProcessDefinitionService {
      * @param timeout timeout
      * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @param executionType executionType
      * @return update result code
      */
@@ -397,6 +423,7 @@ public interface ProcessDefinitionService {
                                                          int timeout,
                                                          String tenantCode,
                                                          String scheduleJson,
+                                                         String otherParamsJson,
                                                          ProcessExecutionTypeEnum executionType);
 
     /**
@@ -412,5 +439,115 @@ public interface ProcessDefinitionService {
                                                    long projectCode,
                                                    long code,
                                                    ReleaseState releaseState);
+
+    /**
+     * delete other relation
+     * @param project
+     * @param result
+     * @param processDefinition
+     */
+    void deleteOtherRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition);
+
+    /**
+     * save other relation
+     * @param loginUser
+     * @param processDefinition
+     * @param result
+     * @param otherParamsJson
+     */
+    void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson);
+
+    /**
+     * get Json String
+     * @param loginUser
+     * @param processDefinition
+     * @return Json String
+     */
+    String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
+
+    /**
+     * update dag define
+     * @param loginUser
+     * @param taskRelationList
+     * @param processDefinition
+     * @param processDefinitionDeepCopy
+     * @param taskDefinitionLogs
+     * @param otherParamsJson
+     */
+    Map<String, Object> updateDagDefine(User loginUser,
+                    List<ProcessTaskRelationLog> taskRelationList,
+                    ProcessDefinition processDefinition,
+                    ProcessDefinition processDefinitionDeepCopy,
+                    List<TaskDefinitionLog> taskDefinitionLogs,
+                    String otherParamsJson);
+
+    /**
+     * check task relation
+     * @param taskRelationList
+     * @param taskRelationJson
+     * @param taskDefinitionLogs
+     * @return
+     */
+    Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs);
+
+    /**
+     * check task define
+     * @param taskDefinitionLogs
+     * @param taskDefinitionJson
+     * @return
+     */
+    Map<String, Object> checkTaskDefinitionList(List<TaskDefinitionLog> taskDefinitionLogs, String taskDefinitionJson);
+
+    /**
+     * create dag define
+     * @param loginUser
+     * @param taskRelationList
+     * @param processDefinition
+     * @param taskDefinitionLogs
+     * @param otherParamsJson
+     * @return
+     */
+    Map<String, Object> createDagDefine(User loginUser,
+                                        List<ProcessTaskRelationLog> taskRelationList,
+                                        ProcessDefinition processDefinition,
+                                        List<TaskDefinitionLog> taskDefinitionLogs, String otherParamsJson);
+
+    /**
+     *
+     * @param loginUser
+     * @param targetProjectCode
+     * @param failedProcessList
+     * @param processDefinitionCodes
+     * @param result
+     * @param isCopy
+     */
+    void doBatchOperateProcessDefinition(User loginUser,
+                                    long targetProjectCode,
+                                    List<String> failedProcessList,
+                                    String processDefinitionCodes,
+                                    Map<String, Object> result,
+                                    boolean isCopy);
+
+    /**
+     * create dag schedule
+     * @param loginUser
+     * @param processDefinition
+     * @param scheduleJson
+     * @return
+     */
+    Map<String, Object> createDagSchedule(User loginUser, ProcessDefinition processDefinition, String scheduleJson);
+
+    /**
+     * update dag schedule
+     * @param loginUser
+     * @param projectCode
+     * @param processDefinitionCode
+     * @param scheduleJson
+     * @return
+     */
+    Map<String, Object> updateDagSchedule(User loginUser,
+                                          long projectCode,
+                                          long processDefinitionCode,
+                                          String scheduleJson);
 }
 

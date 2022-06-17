@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRecallCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
@@ -55,7 +56,7 @@ public class TaskCallbackService {
     private static final int[] RETRY_BACKOFF = {1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200};
 
     @Autowired
-    private TaskExecuteResponseAckProcessor taskExecuteRunningProcessor;
+    private TaskExecuteRunningAckProcessor taskExecuteRunningProcessor;
 
     @Autowired
     private TaskExecuteResponseAckProcessor taskExecuteResponseAckProcessor;
@@ -118,7 +119,7 @@ public class TaskCallbackService {
         return null;
     }
 
-    public int pause(int ntries) {
+    public long pause(int ntries) {
         return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
     }
 
@@ -162,6 +163,8 @@ public class TaskCallbackService {
                     }
                 }
             });
+        } else {
+            logger.warn("Remote channel of taskInstanceId is null: {}, cannot send command: {}", taskInstanceId, command);
         }
     }
 
@@ -222,6 +225,14 @@ public class TaskCallbackService {
         return taskKillResponseCommand;
     }
 
+    private TaskRecallCommand buildRecallCommand(TaskExecutionContext taskExecutionContext) {
+        TaskRecallCommand taskRecallCommand = new TaskRecallCommand();
+        taskRecallCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskRecallCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        taskRecallCommand.setHost(taskExecutionContext.getHost());
+        return taskRecallCommand;
+    }
+
     /**
      * send task execute running command
      * todo unified callback command
@@ -256,6 +267,14 @@ public class TaskCallbackService {
     public void sendTaskKillResponseCommand(TaskExecutionContext taskExecutionContext) {
         TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(taskExecutionContext);
         send(taskExecutionContext.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
-        TaskCallbackService.remove(taskExecutionContext.getTaskInstanceId());
+    }
+
+    /**
+     * send task execute response command
+     */
+    public void sendRecallCommand(TaskExecutionContext taskExecutionContext) {
+        TaskRecallCommand taskRecallCommand = buildRecallCommand(taskExecutionContext);
+        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), taskRecallCommand.convert2Command(), Event.WORKER_REJECT);
+        send(taskExecutionContext.getTaskInstanceId(), taskRecallCommand.convert2Command());
     }
 }
