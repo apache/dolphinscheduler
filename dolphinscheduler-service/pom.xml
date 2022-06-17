@@ -80,5 +80,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-python</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

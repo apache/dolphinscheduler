@@ -112,4 +112,29 @@ public class ParametersNode {
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ParametersNode parametersNode = (ParametersNode) obj;
+        if (this.taskType != null && !this.taskType.equals(parametersNode.getTaskType())) {
+            return false;
+        }
+        if (this.taskParams != null && !this.taskParams.equals(parametersNode.getTaskParams())) {
+            return false;
+        }
+        if (this.dependence != null && !this.dependence.equals(parametersNode.getDependence())) {
+            return false;
+        }
+        if (this.switchResult != null && !this.switchResult.equals(parametersNode.getSwitchResult())) {
+            return false;
+        }
+        return true;
+    }
+
 }

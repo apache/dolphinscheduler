@@ -30,21 +30,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
@@ -71,8 +57,11 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.python.PythonParameters;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -87,12 +76,7 @@ import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
@@ -158,6 +142,9 @@ public class ProcessServiceTest {
 
     @Mock
     private ScheduleMapper scheduleMapper;
+
+    @Mock
+    private TaskPluginManager taskPluginManager;
 
     @Test
     public void testCreateSubCommand() {
@@ -579,6 +566,32 @@ public class ProcessServiceTest {
     public void getDqExecuteSql() {
         Mockito.when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
         Assert.assertNotNull(processService.getDqExecuteSql(1));
+    }
+
+    @Test
+    public void getResourceIds() {
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTaskType("PYTHON");
+        String resourceInfo1ResourceName = "/test.py";
+        taskDefinition.setTaskParams(
+                "{\"localParams\":[],\"varPool\":null,\"rawScript\":\"print('hello world')\",\"resourceList\":[{\"resourceName\":\""
+                        + resourceInfo1ResourceName
+                        + "\"},{\"id\":2}]}");
+        PythonParameters pythonParameters = new PythonParameters();
+        ResourceInfo resourceInfo1 = new ResourceInfo();
+        resourceInfo1.setResourceName(resourceInfo1ResourceName);
+        ResourceInfo resourceInfo2 = new ResourceInfo();
+        resourceInfo2.setId(2);
+        pythonParameters.setResourceList(Arrays.asList(resourceInfo1, resourceInfo2));
+        Mockito.when(taskPluginManager.getParameters(ParametersNode.builder().taskType(taskDefinition.getTaskType())
+                .taskParams(taskDefinition.getTaskParams()).build()))
+                .thenReturn(pythonParameters);
+        Resource resource1 = new Resource();
+        resource1.setId(1);
+        resource1.setFullName(resourceInfo1ResourceName);
+        Mockito.when(resourceMapper.queryResource(resourceInfo1.getResourceName(), resourceInfo1.getType().getCode()))
+                .thenReturn(Collections.singletonList(resource1));
+        Assert.assertEquals("1,2", processService.getResourceIds(taskDefinition));
     }
 
     private List<DqRuleInputEntry> getRuleInputEntryList() {
