@@ -162,6 +162,15 @@ public class HttpParameters extends AbstractParameters {
             for (int i = 0; i < httpMapByString.size() ; i++) {
                 Map<String, String> stringStringMap = httpMapByString.get(i);
                 info.setValue(stringStringMap.get(info.getProp()));
+
+                // If varPool contains some key objects delete and add again
+                List<Property> tmpList = new ArrayList<>(varPool);
+                for (Property p : varPool) {
+                    if (p.getProp().equals(info.getProp())) {
+                        tmpList.remove(p);
+                    }
+                }
+                varPool = tmpList;
                 varPool.add(info);
             }
         }
