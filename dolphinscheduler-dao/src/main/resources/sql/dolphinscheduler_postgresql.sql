@@ -615,6 +615,8 @@ CREATE TABLE t_ds_relation_process_instance (
   process_instance_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+create index idx_relation_process_instance_parent_process_task on t_ds_relation_process_instance (parent_process_instance_id, parent_task_instance_id);
+create index idx_relation_process_instance_process_instance_id on t_ds_relation_process_instance (process_instance_id);
 
 
 --
