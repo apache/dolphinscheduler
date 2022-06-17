@@ -113,39 +113,4 @@ public class ParametersNode {
         this.switchResult = switchResult;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        ParametersNode parametersNode = (ParametersNode) obj;
-        if (this.taskType != null && !this.taskType.equals(parametersNode.getTaskType())) {
-            return false;
-        }
-        if (this.taskParams != null && !this.taskParams.equals(parametersNode.getTaskParams())) {
-            return false;
-        }
-        if (this.dependence != null && !this.dependence.equals(parametersNode.getDependence())) {
-            return false;
-        }
-        if (this.switchResult != null && !this.switchResult.equals(parametersNode.getSwitchResult())) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 59;
-        int result = 1;
-        result = result * prime + (this.taskType == null ? 43 : this.taskType.hashCode());
-        result = result * prime + (this.taskParams == null ? 43 : this.taskParams.hashCode());
-        result = result * prime + (this.dependence == null ? 43 : this.dependence.hashCode());
-        result = result * prime + (this.switchResult == null ? 43 : this.switchResult.hashCode());
-        return result;
-    }
-
 }

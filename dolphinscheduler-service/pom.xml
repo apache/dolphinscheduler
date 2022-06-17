@@ -53,6 +53,7 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-python</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

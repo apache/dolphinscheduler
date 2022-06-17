@@ -583,9 +583,7 @@ public class ProcessServiceTest {
         ResourceInfo resourceInfo2 = new ResourceInfo();
         resourceInfo2.setId(2);
         pythonParameters.setResourceList(Arrays.asList(resourceInfo1, resourceInfo2));
-        Mockito.when(taskPluginManager.getParameters(ParametersNode.builder().taskType(taskDefinition.getTaskType())
-                .taskParams(taskDefinition.getTaskParams()).build()))
-                .thenReturn(pythonParameters);
+        Mockito.when(taskPluginManager.getParameters(Mockito.any())).thenReturn(pythonParameters);
         Resource resource1 = new Resource();
         resource1.setId(1);
         resource1.setFullName(resourceInfo1ResourceName);
