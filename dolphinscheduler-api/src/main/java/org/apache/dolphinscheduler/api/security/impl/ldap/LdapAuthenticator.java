@@ -43,4 +43,3 @@ public class LdapAuthenticator extends AbstractAuthenticator {
         return user;
     }
 }
-
