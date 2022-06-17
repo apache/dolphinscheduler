@@ -110,11 +110,13 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
 
         // test username pwd correct and user not exist, config user not exist action deny, so login denied
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.DENY);
+        when(ldapService.createIfUserNotExists()).thenReturn(false);
         Result<Map<String, String>> result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
 
         // test username pwd correct and user not exist, config user not exist action create, so login success
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATE);
+        when(ldapService.createIfUserNotExists()).thenReturn(true);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
