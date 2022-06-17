@@ -279,7 +279,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
     }
 
-    private Map<String, Object> createDagDefine(User loginUser,
+    public Map<String, Object> createDagDefine(User loginUser,
                                                 List<ProcessTaskRelationLog> taskRelationList,
                                                 ProcessDefinition processDefinition,
                                                 List<TaskDefinitionLog> taskDefinitionLogs, String otherParamsJson) {
@@ -310,7 +310,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-    private Map<String, Object> checkTaskDefinitionList(List<TaskDefinitionLog> taskDefinitionLogs, String taskDefinitionJson) {
+    public Map<String, Object> checkTaskDefinitionList(List<TaskDefinitionLog> taskDefinitionLogs, String taskDefinitionJson) {
         Map<String, Object> result = new HashMap<>();
         try {
             if (taskDefinitionLogs.isEmpty()) {
@@ -338,7 +338,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-    private Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs) {
+    public Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs) {
         Map<String, Object> result = new HashMap<>();
         try {
             if (taskRelationList == null || taskRelationList.isEmpty()) {
@@ -614,7 +614,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs, otherParamsJson);
     }
 
-    private Map<String, Object> updateDagDefine(User loginUser,
+    public Map<String, Object> updateDagDefine(User loginUser,
                                                 List<ProcessTaskRelationLog> taskRelationList,
                                                 ProcessDefinition processDefinition,
                                                 ProcessDefinition processDefinitionDeepCopy,
@@ -863,7 +863,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * download the process definition file
      */
-    private void downloadProcessDefinitionFile(HttpServletResponse response, List<DagDataSchedule> dagDataSchedules) {
+    public void downloadProcessDefinitionFile(HttpServletResponse response, List<DagDataSchedule> dagDataSchedules) {
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         BufferedOutputStream buff = null;
         ServletOutputStream out = null;
