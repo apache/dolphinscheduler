@@ -145,4 +145,8 @@ public class LdapService {
 
         return LdapUserNotExistActionType.valueOf(ldapUserNotExistAction);
     }
+
+    public boolean createIfUserNotExists(){
+        return getLdapUserNotExistAction() == LdapUserNotExistActionType.CREATE;
+    }
 }

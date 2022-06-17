@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.security.impl.ldap.LdapService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
@@ -47,5 +46,8 @@ public class SecurityConfigLDAPTest extends AbstractControllerTest {
     public void testLdapUserNotExistAction() {
         LdapUserNotExistActionType authenticator = ldapService.getLdapUserNotExistAction();
         Assert.assertEquals(LdapUserNotExistActionType.CREATE, authenticator);
+
+        boolean isCreateAction = ldapService.createIfUserNotExists();
+        Assert.assertEquals(Boolean.TRUE, isCreateAction);
     }
 }
