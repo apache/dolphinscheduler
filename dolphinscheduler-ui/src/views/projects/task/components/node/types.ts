@@ -398,8 +398,6 @@ interface INodeData
   udfs?: string[]
   customConfig?: boolean
   mapping_columns?: object[]
-  useCustom?: boolean
-  runMode?: string
 }
 
 interface ITaskData
