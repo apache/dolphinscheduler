@@ -137,4 +137,15 @@ public class ParametersNode {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 59;
+        int result = 1;
+        result = result * prime + (this.taskType == null ? 43 : this.taskType.hashCode());
+        result = result * prime + (this.taskParams == null ? 43 : this.taskParams.hashCode());
+        result = result * prime + (this.dependence == null ? 43 : this.dependence.hashCode());
+        result = result * prime + (this.switchResult == null ? 43 : this.switchResult.hashCode());
+        return result;
+    }
+
 }
