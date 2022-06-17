@@ -51,3 +51,4 @@ public class SecurityConfigLDAPTest extends AbstractControllerTest {
         Assert.assertEquals(Boolean.TRUE, isCreateAction);
     }
 }
+
