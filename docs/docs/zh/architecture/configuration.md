@@ -212,12 +212,12 @@ spring.messages.basename|i18n/messages|i18n配置
 security.authentication.type|PASSWORD|权限校验类型
 security.authentication.ldap.user.admin|read-only-admin|LDAP登陆时，系统管理员账号
 security.authentication.ldap.urls|ldap://ldap.forumsys.com:389/|LDAP urls
-security.authentication.ldap.base.dn|dc=example,dc=com|LDAP base dn
+security.authentication.ldap.base-dn|dc=example,dc=com|LDAP base dn
 security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP账号
 security.authentication.ldap.password|password|LDAP密码
-security.authentication.ldap.user.identity.attribute|uid|LDAP用户身份标识字段名
-security.authentication.ldap.user.email.attribute|mail|LDAP邮箱字段名
-
+security.authentication.ldap.user.identity-attribute|uid|LDAP用户身份标识字段名
+security.authentication.ldap.user.email-attribute|mail|LDAP邮箱字段名
+security.authentication.ldap.user.not-exist-action|CREATE|当LDAP用户不存在时执行的操作。CREATE：当用户不存在时自动新建用户, DENY：当用户不存在时拒绝登陆
 
 ## 6.master.properties [Master服务配置]
 |参数 |默认值| 描述| 

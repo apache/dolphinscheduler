@@ -221,11 +221,12 @@ spring.messages.basename|i18n/messages| i18n config
 security.authentication.type|PASSWORD| authentication type
 security.authentication.ldap.user.admin|read-only-admin|admin user account when you log-in with LDAP
 security.authentication.ldap.urls|ldap://ldap.forumsys.com:389/|LDAP urls
-security.authentication.ldap.base.dn|dc=example,dc=com|LDAP base dn
+security.authentication.ldap.base-dn|dc=example,dc=com|LDAP base dn
 security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP username
 security.authentication.ldap.password|password|LDAP password
-security.authentication.ldap.user.identity.attribute|uid|LDAP user identity attribute 
-security.authentication.ldap.user.email.attribute|mail|LDAP user email attribute
+security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute 
+security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute
+security.authentication.ldap.user.not-exist-action|CREATE|action when LDAP user is not exist. Default CREATE: automatically create user when user not exist, DENY: deny log-in when user not exist
 
 ### master.properties [master-service log config]
 
