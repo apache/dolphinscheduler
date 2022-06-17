@@ -594,7 +594,7 @@ public class ProcessServiceTest {
         taskDefinition.setTaskType("PYTHON");
         String resourceInfo1ResourceName = "/test.py";
         taskDefinition.setTaskParams(
-                "{\"localParams\":[],\"varPool\":null,\"rawScript\":\"print('hello  world')\",\"resourceList\":[{\"resourceName\":\""
+                "{\"localParams\":[],\"varPool\":null,\"rawScript\":\"print('hello world')\",\"resourceList\":[{\"resourceName\":\""
                         + resourceInfo1ResourceName
                         + "\"},{\"id\":2}]}");
         PythonParameters pythonParameters = new PythonParameters();
