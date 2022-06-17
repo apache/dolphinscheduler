@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Properties;
 
@@ -48,7 +51,7 @@ public class LdapService {
     @Value("${security.authentication.ldap.urls:null}")
     private String ldapUrls;
 
-    @Value("${security.authentication.ldap.base.dn:null}")
+    @Value("${security.authentication.ldap.base-dn:null}")
     private String ldapBaseDn;
 
     @Value("${security.authentication.ldap.username:null}")
@@ -57,11 +60,14 @@ public class LdapService {
     @Value("${security.authentication.ldap.password:null}")
     private String ldapPrincipalPassword;
 
-    @Value("${security.authentication.ldap.user.identity.attribute:null}")
+    @Value("${security.authentication.ldap.user.identity-attribute:null}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${security.authentication.ldap.user.email.attribute:null}")
+    @Value("${security.authentication.ldap.user.email-attribute:null}")
     private String ldapEmailAttribute;
+
+    @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
+    private String ldapUserNotExistAction;
 
     /***
      * get user type by configured admin userId
@@ -129,5 +135,18 @@ public class LdapService {
         env.put(Context.SECURITY_CREDENTIALS, ldapPrincipalPassword);
         env.put(Context.PROVIDER_URL, ldapUrls);
         return env;
+    }
+
+    public LdapUserNotExistActionType getLdapUserNotExistAction(){
+        if (StringUtils.isBlank(ldapUserNotExistAction)) {
+            logger.info("security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
+            return LdapUserNotExistActionType.CREATE;
+        }
+
+        return LdapUserNotExistActionType.valueOf(ldapUserNotExistAction);
+    }
+
+    public boolean createIfUserNotExists(){
+        return getLdapUserNotExistAction() == LdapUserNotExistActionType.CREATE;
     }
 }

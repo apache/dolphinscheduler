@@ -92,15 +92,18 @@ security:
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
-      # admin userId
-      user.admin: read-only-admin
       # ldap server config
       urls: ldap://ldap.forumsys.com:389/
-      base.dn: dc=example,dc=com
+      base-dn: dc=example,dc=com
       username: cn=read-only-admin,dc=example,dc=com
       password: password
-      user.identity.attribute: uid
-      user.email.attribute: mail
+      user:
+        # admin userId when you use LDAP login
+        admin: read-only-admin
+        identity-attribute: uid
+        email-attribute: mail
+        # action when ldap user is not exist (supported types: CREATE,DENY)
+        not-exist-action: CREATE
 
 master:
   listen-port: 5678
