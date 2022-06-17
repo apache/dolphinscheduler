@@ -221,32 +221,42 @@ public class ResourceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryResourcePaging() {
-        Resource resource = insertOne();
-        ResourcesUser resourcesUser = new ResourcesUser();
-        resourcesUser.setResourcesId(resource.getId());
-        resourcesUser.setUserId(1110);
-        resourceUserMapper.insert(resourcesUser);
+        User user = new User();
+        user.setUserName("11");
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setCreateTime(new Date());
+        user.setTenantId(1);
+        user.setUpdateTime(new Date());
+        userMapper.insert(user);
+        Resource resource = new Resource();
+        resource.setAlias("ut-resource");
+        resource.setFullName("/ut-resource");
+        resource.setPid(-1);
+        resource.setDirectory(false);
+        resource.setType(ResourceType.FILE);
+        resource.setUserId(user.getId());
+        resourceMapper.insert(resource);
 
         Page<Resource> page = new Page(1, 3);
 
         IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
                 page,
-                0,
                 -1,
                 resource.getType().ordinal(),
                 "",
-                new ArrayList<>()
+                new ArrayList<>(resource.getId())
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
-                1110,
                 -1,
                 resource.getType().ordinal(),
                 "",
                 null
         );
-        Assert.assertEquals(resourceIPage.getTotal(), 0);
-        Assert.assertEquals(resourceIPage1.getTotal(), 0);
+        Assert.assertEquals(resourceIPage.getTotal(), 1);
+        Assert.assertEquals(resourceIPage1.getTotal(), 1);
 
     }
 

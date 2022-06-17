@@ -53,7 +53,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -316,8 +316,7 @@ public class ResourcesController extends BaseController {
                                                @RequestParam(value = "type") ResourceType type,
                                                @RequestParam(value = "programType", required = false) ProgramType programType
     ) {
-        Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type, programType);
-        return returnDataList(result);
+         return resourceService.queryResourceByProgramType(loginUser, type, programType);
     }
 
     /**
@@ -345,7 +344,7 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "type") ResourceType type
     ) {
 
-        return resourceService.queryResource(fullName, id, type);
+        return resourceService.queryResource(loginUser, fullName, id, type);
     }
 
     /**
@@ -371,7 +370,7 @@ public class ResourcesController extends BaseController {
                                @RequestParam(value = "skipLineNum") int skipLineNum,
                                @RequestParam(value = "limit") int limit
     ) {
-        return resourceService.readResource(resourceId, skipLineNum, limit);
+        return resourceService.readResource(loginUser, resourceId, skipLineNum, limit);
     }
 
     /**
@@ -432,7 +431,7 @@ public class ResourcesController extends BaseController {
             logger.error("The resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
-        return resourceService.updateResourceContent(resourceId, content);
+        return resourceService.updateResourceContent(loginUser, resourceId, content);
     }
 
     /**
@@ -452,7 +451,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ResponseEntity downloadResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int resourceId) throws Exception {
-        Resource file = resourceService.downloadResource(resourceId);
+        Resource file = resourceService.downloadResource(loginUser, resourceId);
         if (file == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RESOURCE_NOT_EXIST.getMsg());
         }
@@ -521,8 +520,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @PathVariable("id") int id) {
-        Map<String, Object> map = udfFuncService.queryUdfFuncDetail(id);
-        return returnDataList(map);
+        return udfFuncService.queryUdfFuncDetail(loginUser, id);
     }
 
     /**
@@ -563,8 +561,7 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "database", required = false) String database,
                                 @RequestParam(value = "description", required = false) String description,
                                 @PathVariable(value = "resourceId") int resourceId) {
-        Map<String, Object> result = udfFuncService.updateUdfFunc(udfFuncId, funcName, className, argTypes, database, description, type, resourceId);
-        return returnDataList(result);
+        return udfFuncService.updateUdfFunc(loginUser, udfFuncId, funcName, className, argTypes, database, description, type, resourceId);
     }
 
     /**
@@ -595,8 +592,7 @@ public class ResourcesController extends BaseController {
         if (!result.checkResult()) {
             return result;
         }
-        result = udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        return udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**
@@ -616,8 +612,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("type") UdfType type) {
-        Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
-        return returnDataList(result);
+        return udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
     }
 
     /**
@@ -639,7 +634,7 @@ public class ResourcesController extends BaseController {
     public Result verifyUdfFuncName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "name") String name
     ) {
-        return udfFuncService.verifyUdfFuncByName(name);
+        return udfFuncService.verifyUdfFuncByName(loginUser, name);
     }
 
     /**
@@ -660,7 +655,7 @@ public class ResourcesController extends BaseController {
     public Result deleteUdfFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId
     ) {
-        return udfFuncService.delete(udfFuncId);
+        return udfFuncService.delete(loginUser, udfFuncId);
     }
 
     /**
@@ -770,6 +765,6 @@ public class ResourcesController extends BaseController {
         @PathVariable(value = "id", required = true) Integer id
     ) {
 
-        return resourceService.queryResourceById(id);
+        return resourceService.queryResourceById(loginUser, id);
     }
 }

@@ -56,7 +56,7 @@
         <spring.version>5.3.12</spring.version>
         <spring.boot.version>2.5.6</spring.boot.version>
         <java.version>1.8</java.version>
-        <logback.version>1.2.3</logback.version>
+        <logback.version>1.2.11</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
         <quartz.version>2.3.2</quartz.version>
         <jackson.version>2.10.5</jackson.version>
@@ -67,17 +67,16 @@
         <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <httpcore.version>4.4.1</httpcore.version>
+        <httpcore.version>4.4.15</httpcore.version>
         <junit.version>4.12</junit.version>
         <mysql.connector.version>8.0.16</mysql.connector.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
         <slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
-        <commons.collections.version>3.2.2</commons.collections.version>
         <commons.httpclient>3.0.1</commons.httpclient>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
-        <commons.lang.version>2.6</commons.lang.version>
         <commons.email.version>1.5</commons.email.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
@@ -85,7 +84,7 @@
         <guava.version>24.1-jre</guava.version>
         <postgresql.version>42.3.4</postgresql.version>
         <hive.jdbc.version>2.1.0</hive.jdbc.version>
-        <commons.io.version>2.4</commons.io.version>
+        <commons.io.version>2.11.0</commons.io.version>
         <oshi.core.version>6.1.1</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
@@ -132,6 +131,8 @@
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
         <aws.sdk.version>1.12.160</aws.sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
+        <owasp-dependency-check-maven.version>7.0.4</owasp-dependency-check-maven.version>
+        <lombok.version>1.18.20</lombok.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
@@ -139,6 +140,7 @@
         <docker.push.skip>true</docker.push.skip>
 
         <python.sign.skip>true</python.sign.skip>
+        <skipDepCheck>true</skipDepCheck>
     </properties>
 
     <dependencyManagement>
@@ -189,11 +191,6 @@
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
-                <version>${quartz.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz-jobs</artifactId>
                 <version>${quartz.version}</version>
             </dependency>
             <dependency>
@@ -277,6 +274,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-registry-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-registry-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -391,6 +393,22 @@
                 <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-registry-mysql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-scheduler-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
@@ -406,6 +424,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-task-python</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -495,6 +518,11 @@
                 <version>${commons.logging.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient.version}</version>
@@ -574,12 +602,6 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commons.collections.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
                 <version>${commons.httpclient}</version>
@@ -594,12 +616,6 @@
                 <groupId>commons-configuration</groupId>
                 <artifactId>commons-configuration</artifactId>
                 <version>${commons.configuration.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>${commons.lang.version}</version>
             </dependency>
 
             <dependency>
@@ -649,6 +665,10 @@
                         <groupId>junit</groupId>
                         <artifactId>junit</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -666,8 +686,6 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
-
-
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
@@ -778,12 +796,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>6.2.1</version>
-            </dependency>
-
-            <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1</version>
@@ -799,12 +811,6 @@
                 <groupId>net.sf.py4j</groupId>
                 <artifactId>py4j</artifactId>
                 <version>${py4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.janino</groupId>
-                <artifactId>janino</artifactId>
-                <version>${janino.version}</version>
             </dependency>
 
             <dependency>
@@ -980,10 +986,33 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${owasp-dependency-check-maven.version}</version>
+                    <configuration>
+                        <skip>${skipDepCheck}</skip>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipRuntimeScope>true</skipRuntimeScope>
+                        <skipSystemScope>true</skipSystemScope>
+                        <failBuildOnCVSS>7</failBuildOnCVSS>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -1163,6 +1192,29 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>analyze-dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <ignoredDependencies>
+                                <!-- Because of SpringBoot auto-configurations, the configuration is happening outside of your application code, so Maven believes these dependencies to be unused -->
+                                <!-- Static code analysis tools like (maven-dependency-plugin) can not detect runtime dependencies, so you should instruct them about runtime dependencies -->
+                                <!-- https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin -->
+                                <ignoredDependency>org.springframework*:*</ignoredDependency>
+                                <ignoredDependency>org.apache.dolphinscheduler:dolphinscheduler-meter</ignoredDependency>
+                            </ignoredDependencies>
+                            <ignoreNonCompile>true</ignoreNonCompile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -1204,6 +1256,12 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>${auto-service.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -1249,5 +1307,6 @@
         <module>dolphinscheduler-log-server</module>
         <module>dolphinscheduler-tools</module>
         <module>dolphinscheduler-ui</module>
+        <module>dolphinscheduler-scheduler-plugin</module>
     </modules>
 </project>

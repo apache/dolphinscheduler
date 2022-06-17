@@ -166,7 +166,7 @@ public class PythonGateway {
         return taskDefinitionService.genTaskCodeList(genNum);
     }
 
-    public Map<String, Long> getCodeAndVersion(String projectName, String taskName) throws CodeGenerateUtils.CodeGenerateException {
+    public Map<String, Long> getCodeAndVersion(String projectName, String processDefinitionName, String taskName) throws CodeGenerateUtils.CodeGenerateException {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
@@ -175,7 +175,15 @@ public class PythonGateway {
             result.put("version", 0L);
             return result;
         }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), taskName);
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        if (processDefinition == null) {
+            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
         if (taskDefinition == null) {
             result.put("code", CodeGenerateUtils.getInstance().genCode());
             result.put("version", 0L);
@@ -221,6 +229,7 @@ public class PythonGateway {
                                                 int timeout,
                                                 String workerGroup,
                                                 String tenantCode,
+                                                int releaseState,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType) {
@@ -248,7 +257,7 @@ public class PythonGateway {
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.getEnum(releaseState));
         return processDefinitionCode;
     }
 
@@ -519,7 +528,7 @@ public class PythonGateway {
         result.put("processDefinitionCode", processDefinition.getCode());
 
         if (taskName != null) {
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskName);
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, processDefinition.getCode(), taskName);
             result.put("taskDefinitionCode", taskDefinition.getCode());
         }
         return result;
@@ -535,8 +544,8 @@ public class PythonGateway {
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        Map<String, Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
-        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.get(Constants.DATA_LIST);
+        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
+        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.getData();
         List<ResourceComponent> namedResources = resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(namedResources)) {
             String msg = String.format("Can not find valid resource by program type %s and name %s", programType, fullName);

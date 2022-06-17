@@ -37,8 +37,9 @@ public class ResponseCache {
         return instance;
     }
 
-    private Map<Integer, Command> runningCache = new ConcurrentHashMap<>();
-    private Map<Integer, Command> responseCache = new ConcurrentHashMap<>();
+    private final Map<Integer, Command> runningCache = new ConcurrentHashMap<>();
+    private final Map<Integer, Command> responseCache = new ConcurrentHashMap<>();
+    private final Map<Integer,Command> recallCache = new ConcurrentHashMap<>();
 
     /**
      * cache response
@@ -55,9 +56,25 @@ public class ResponseCache {
             case RESULT:
                 responseCache.put(taskInstanceId, command);
                 break;
+            case WORKER_REJECT:
+                recallCache.put(taskInstanceId, command);
+                break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
+    }
+
+    /**
+     * recall response cache
+     *
+     * @param taskInstanceId taskInstanceId
+     */
+    public void removeRecallCache(Integer taskInstanceId) {
+        recallCache.remove(taskInstanceId);
+    }
+
+    public Map<Integer, Command> getRecallCache() {
+        return recallCache;
     }
 
     /**

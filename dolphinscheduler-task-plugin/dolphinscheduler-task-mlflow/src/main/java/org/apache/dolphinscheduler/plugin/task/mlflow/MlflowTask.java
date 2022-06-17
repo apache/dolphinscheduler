@@ -101,7 +101,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         shellCommandExecutor.cancelApplication();
     }
 
-    public String buildCommand(){
+    public String buildCommand() {
         String command = "";
         if (mlflowParameters.getMlflowTaskType().equals(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS)) {
             command = buildCommandForMlflowProjects();
@@ -141,8 +141,13 @@ public class MlflowTask extends AbstractTaskExecutor {
             runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
 
 
+        } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT)) {
+            args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));
+
+            runCommand = MlflowConstants.MLFLOW_RUN_CUSTOM_PROJECT;
+            runCommand = String.format(runCommand, mlflowParameters.getParams(), mlflowParameters.getExperimentName(), mlflowParameters.getMlflowProjectVersion());
         } else {
-            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowTaskType());
+            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowJobType());
 
         }
         args.add(runCommand);
@@ -167,11 +172,19 @@ public class MlflowTask extends AbstractTaskExecutor {
 
         } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER)) {
             String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
-            String containerName = "mlflow-" + mlflowParameters.getModelKeyName("-");
+            String containerName = mlflowParameters.getContainerName();
 
             args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
             args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
             args.add(String.format(MlflowConstants.DOCKER_RUN, containerName, mlflowParameters.getDeployPort(), imageName));
+        } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE)) {
+            String templatePath = getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE);
+            args.add(String.format("cp %s %s", templatePath, taskExecutionContext.getExecutePath()));
+            String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
+            args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
+            args.add(mlflowParameters.getDockerComposeEnvCommand());
+            args.add(MlflowConstants.DOCKER_COMPOSE_RUN);
+            args.add(String.format(MlflowConstants.DOCKER_HEALTH_CHECK_COMMAND, mlflowParameters.getContainerName()));
         }
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
@@ -191,9 +204,15 @@ public class MlflowTask extends AbstractTaskExecutor {
 
     }
 
+
     @Override
     public AbstractParameters getParameters() {
         return mlflowParameters;
+    }
+
+    public String getTemplatePath(String template) {
+        String templatePath = MlflowTask.class.getClassLoader().getResource(template).getPath();
+        return templatePath;
     }
 
 }
