@@ -112,5 +112,4 @@ public class ParametersNode {
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
     }
-
 }
