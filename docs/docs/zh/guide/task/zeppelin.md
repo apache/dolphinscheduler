@@ -22,7 +22,7 @@
 - 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.
 - 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 - Zeppelin Note ID：Zeppelin Note对应的唯一ID。
-- Zepplin Paragraph：Zeppelin Paragraph对应的唯一ID。
+- Zeppelin Paragraph ID：Zeppelin Paragraph对应的唯一ID。如果你想一次性调度整个note，这一栏不填即可。
 - Zeppelin Parameters: 用于传入Zeppelin Dynamic Form的参数。
 
 ## Task Example
