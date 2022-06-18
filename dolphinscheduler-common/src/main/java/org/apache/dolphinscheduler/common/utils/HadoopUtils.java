@@ -21,6 +21,25 @@ import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.exception.BaseException;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.security.UserGroupInformation;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -35,28 +54,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.common.exception.BaseException;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * hadoop utils
@@ -149,10 +154,9 @@ public class HadoopUtils implements Closeable, StorageOperate {
                     return true;
                 });
             } else {
-                logger.warn("hdfs.root.user is not set value!");
+                logger.warn("resource.hdfs.root.user is not set value!");
                 fs = FileSystem.get(configuration);
             }
-//
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -275,7 +279,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean mkdir(String bucketName, String hdfsPath) throws IOException {
+    public boolean mkdir(String tenantCode, String hdfsPath) throws IOException {
         return fs.mkdirs(new Path(hdfsPath));
     }
 

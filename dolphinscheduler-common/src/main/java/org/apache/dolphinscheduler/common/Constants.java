@@ -61,14 +61,12 @@ public final class Constants {
 
     public static final String STORAGE_HDFS = "HDFS";
 
-    public static final String BUCKET_NAME = "dolphinscheduler-test";
-
     public static final String EMPTY_STRING = "";
 
     /**
-     * fs.defaultFS
+     * resource.hdfs.fs.defaultFS
      */
-    public static final String FS_DEFAULT_FS = "fs.defaultFS";
+    public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
 
     /**
@@ -96,15 +94,15 @@ public final class Constants {
 
     /**
      * hdfs configuration
-     * hdfs.root.user
+     * resource.hdfs.root.user
      */
-    public static final String HDFS_ROOT_USER = "hdfs.root.user";
+    public static final String HDFS_ROOT_USER = "resource.hdfs.root.user";
 
     /**
      * hdfs/s3 configuration
-     * resource.upload.path
+     * resource.storage.upload.base.path
      */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
     /**
      * data basedir path
@@ -148,7 +146,8 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
-    public static final String AWS_END_POINT = "aws.endpoint";
+    public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
+    public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
     /**
      * comma ,
      */

@@ -182,27 +182,28 @@ zookeeper.retry.maxtime|10| maximum retry times
 ### common.properties [hadoop、s3、yarn config properties]
 
 Currently, common.properties mainly configures Hadoop,s3a related configurations.
-|Parameters | Default value| Description|
+| Parameters | Default value | Description |
 |--|--|--|
-data.basedir.path|/tmp/dolphinscheduler| local directory used to store temp files
-resource.storage.type|NONE| type of resource files: HDFS, S3, NONE
-resource.upload.path|/dolphinscheduler| storage path of resource files
-hadoop.security.authentication.startup.state|false| whether hadoop grant kerberos permission
-java.security.krb5.conf.path|/opt/krb5.conf|kerberos config directory
-login.user.keytab.username|hdfs-mycluster@ESZ.COM|kerberos username
-login.user.keytab.path|/opt/hdfs.headless.keytab|kerberos user keytab
-kerberos.expire.time|2|kerberos expire time,integer,the unit is hour
-resource.view.suffixs| txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties| file types supported by resource center
-hdfs.root.user|hdfs| configure users with corresponding permissions if storage type is HDFS
-fs.defaultFS|hdfs://mycluster:8020|If resource.storage.type=S3, then the request url would be similar to 's3a://dolphinscheduler'. Otherwise if resource.storage.type=HDFS and hadoop supports HA, copy core-site.xml and hdfs-site.xml into 'conf' directory
-fs.s3a.endpoint||s3 endpoint url
-fs.s3a.access.key||s3 access key
-fs.s3a.secret.key||s3 secret key
-yarn.resourcemanager.ha.rm.ids||specify the yarn resourcemanager url. if resourcemanager supports HA, input HA IP addresses (separated by comma), or input null for standalone
-yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode
-dolphinscheduler.env.path|env/dolphinscheduler_env.sh|load environment variables configs [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-development.state|false| specify whether in development state
-task.resource.limit.state|false|specify whether in resource limit state
+data.basedir.path | /tmp/dolphinscheduler | local directory used to store temp files
+resource.storage.type | NONE | type of resource files: HDFS, S3, NONE
+resource.storage.upload.base.path | /dolphinscheduler | storage path of resource files
+resource.aws.access.key.id | minioadmin | access key id of S3
+resource.aws.secret.access.key | minioadmin | secret access key of S3
+resource.aws.region |us-east-1 | region of S3
+resource.aws.s3.bucket.name | dolphinscheduler | bucket name of S3
+resource.aws.s3.endpoint | http://minio:9000 | endpoint of S3
+resource.hdfs.root.user | hdfs | configure users with corresponding permissions if storage type is HDFS
+resource.hdfs.fs.defaultFS | hdfs://mycluster:8020 | If resource.storage.type=S3, then the request url would be similar to 's3a://dolphinscheduler'. Otherwise if resource.storage.type=HDFS and hadoop supports HA, copy core-site.xml and hdfs-site.xml into 'conf' directory
+hadoop.security.authentication.startup.state | false | whether hadoop grant kerberos permission
+java.security.krb5.conf.path | /opt/krb5.conf | kerberos config directory
+login.user.keytab.username | hdfs-mycluster@ESZ.COM | kerberos username
+login.user.keytab.path | /opt/hdfs.headless.keytab | kerberos user keytab
+kerberos.expire.time | 2 | kerberos expire time,integer,the unit is hour
+yarn.resourcemanager.ha.rm.ids |  | specify the yarn resourcemanager url. if resourcemanager supports HA, input HA IP addresses (separated by comma), or input null for standalone
+yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode
+dolphinscheduler.env.path | env/dolphinscheduler_env.sh | load environment variables configs [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
+development.state | false | specify whether in development state
+task.resource.limit.state | false | specify whether in resource limit state
 
 
 ### application-api.properties [API-service log config]
