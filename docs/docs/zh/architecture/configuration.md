@@ -174,27 +174,28 @@ zookeeper.retry.maxtime|10|最大重试次数
 
 ## 4.common.properties [hadoop、s3、yarn配置]
 common.properties配置文件目前主要是配置hadoop/s3a相关的配置. 
-|参数 |默认值| 描述| 
+| 参数 | 默认值 | 描述 |
 |--|--|--|
-data.basedir.path|/tmp/dolphinscheduler|本地工作目录,用于存放临时文件
-resource.storage.type|NONE|资源文件存储类型: HDFS,S3,NONE
-resource.upload.path|/dolphinscheduler|资源文件存储路径
-hadoop.security.authentication.startup.state|false|hadoop是否开启kerberos权限
-java.security.krb5.conf.path|/opt/krb5.conf|kerberos配置目录
-login.user.keytab.username|hdfs-mycluster@ESZ.COM|kerberos登录用户
-login.user.keytab.path|/opt/hdfs.headless.keytab|kerberos登录用户keytab
-kerberos.expire.time|2|kerberos过期时间,整数,单位为小时
-resource.view.suffixs| txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties|资源中心支持的文件格式
-hdfs.root.user|hdfs|如果存储类型为HDFS,需要配置拥有对应操作权限的用户
-fs.defaultFS|hdfs://mycluster:8020|请求地址如果resource.storage.type=S3,该值类似为: s3a://dolphinscheduler. 如果resource.storage.type=HDFS, 如果 hadoop 配置了 HA,需要复制core-site.xml 和 hdfs-site.xml 文件到conf目录
-fs.s3a.endpoint||s3 endpoint地址
-fs.s3a.access.key||s3 access key
-fs.s3a.secret.key||s3 secret key
-yarn.resourcemanager.ha.rm.ids||yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可
-yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname
-dolphinscheduler.env.path|env/dolphinscheduler_env.sh|运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-development.state|false|是否处于开发模式
-task.resource.limit.state|false|是否启用资源限制模式
+data.basedir.path | /tmp/dolphinscheduler | 本地工作目录,用于存放临时文件
+resource.storage.type | NONE | 资源文件存储类型: HDFS,S3,NONE
+resource.storage.upload.base.path | /dolphinscheduler | 资源文件存储路径
+resource.aws.access.key.id | minioadmin | S3 access key
+resource.aws.secret.access.key | minioadmin | S3 secret access key
+resource.aws.region | us-east-1 | S3 区域
+resource.aws.s3.bucket.name | dolphinscheduler | S3 存储桶名称
+resource.aws.s3.endpoint | http://minio:9000 | s3 endpoint地址
+resource.hdfs.root.user | hdfs | 如果存储类型为HDFS,需要配置拥有对应操作权限的用户
+resource.hdfs.fs.defaultFS | hdfs://mycluster:8020 | 请求地址如果resource.storage.type=S3,该值类似为: s3a://dolphinscheduler. 如果resource.storage.type=HDFS, 如果 hadoop 配置了 HA,需要复制core-site.xml 和 hdfs-site.xml 文件到conf目录
+hadoop.security.authentication.startup.state | false | hadoop是否开启kerberos权限
+java.security.krb5.conf.path | /opt/krb5.conf | kerberos配置目录
+login.user.keytab.username | hdfs-mycluster@ESZ.COM | kerberos登录用户
+login.user.keytab.path | /opt/hdfs.headless.keytab | kerberos登录用户keytab
+kerberos.expire.time | 2 | kerberos过期时间,整数,单位为小时
+yarn.resourcemanager.ha.rm.ids |  | yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可
+yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | 如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname
+dolphinscheduler.env.path | env/dolphinscheduler_env.sh | 运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
+development.state | false | 是否处于开发模式
+task.resource.limit.state | false | 是否启用资源限制模式
 
 
 ## 5.application-api.properties [API服务配置]
