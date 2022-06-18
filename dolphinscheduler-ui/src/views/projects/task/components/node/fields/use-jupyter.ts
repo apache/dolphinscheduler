@@ -80,15 +80,6 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.jupyter_parameters_tips')
       }
-      //       validate: {
-      //         trigger: ['input', 'blur'],
-      //         required: false,
-      //         validator(validate: any, value: string) {
-      //           if (!value) {
-      //             return new Error(t('project.node.jupyter_parameters_tips'))
-      //           }
-      //         }
-      //       }
     },
     {
       type: 'input',
@@ -97,15 +88,6 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.jupyter_kernel_tips')
       }
-      //       validate: {
-      //         trigger: ['input', 'blur'],
-      //         required: false,
-      //         validator(validate: any, value: string) {
-      //           if (!value) {
-      //             return new Error(t('project.node.jupyter_kernel_tips'))
-      //           }
-      //         }
-      //       }
     },
     {
       type: 'input',
@@ -114,15 +96,6 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.jupyter_engine_tips')
       }
-      //       validate: {
-      //         trigger: ['input', 'blur'],
-      //         required: false,
-      //         validator(validate: any, value: string) {
-      //           if (!value) {
-      //             return new Error(t('project.node.jupyter_engine_tips'))
-      //           }
-      //         }
-      //       }
     },
     {
       type: 'input',
@@ -131,15 +104,6 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.jupyter_execution_timeout_tips')
       }
-      //       validate: {
-      //         trigger: ['input', 'blur'],
-      //         required: false,
-      //         validator(validate: any, value: string) {
-      //           if (!value) {
-      //             return new Error(t('project.node.jupyter_execution_timeout_tips'))
-      //           }
-      //         }
-      //       }
     },
     {
       type: 'input',
@@ -148,15 +112,6 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.jupyter_start_timeout_tips')
       }
-      //       validate: {
-      //         trigger: ['input', 'blur'],
-      //         required: false,
-      //         validator(validate: any, value: string) {
-      //           if (!value) {
-      //             return new Error(t('project.node.jupyter_start_timeout_tips'))
-      //           }
-      //         }
-      //       }
     },
     {
       type: 'input',
@@ -165,15 +120,6 @@ export function useJupyter(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.jupyter_others_tips')
       }
-      //       validate: {
-      //         trigger: ['input', 'blur'],
-      //         required: false,
-      //         validator(validate: any, value: string) {
-      //           if (!value) {
-      //             return new Error(t('project.node.jupyter_others_tips'))
-      //           }
-      //         }
-      //       }
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
