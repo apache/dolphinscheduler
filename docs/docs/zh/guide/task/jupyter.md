@@ -11,6 +11,9 @@
 点击 [这里](https://docs.conda.io/en/latest/) 获取更多关于`conda`的信息.
 - `conda.path`默认设置为`/opt/anaconda3/etc/profile.d/conda.sh`。 如果您不清楚您的`conda`环境在哪里，只需要在命令行执行`conda info | grep -i 'base environment'`即可获得。
 
+> 注意：`Jupyter任务插件`使用`source`命令激活conda环境， 
+> 如果您的租户没有`source`命令使用权限，`Jupyter任务插件`将无法使用。 
+
 ## Python依赖管理
 
 ### 使用预装好的Conda环境
@@ -24,7 +27,7 @@
 2. 将您打包好的conda环境上传到`资源中心`.
 3. 在您的`jupyter任务`资源设置中，添加您在上一步中上传的conda环境包，如`jupyter_env.tar.gz`.
 
-> **_注意:_** 请您按照 [Conda-Pack](https://conda.github.io/conda-pack/) 官方指导打包conda环境， 
+> **_提示:_** 请您按照 [Conda-Pack](https://conda.github.io/conda-pack/) 官方指导打包conda环境， 
 > 正确打包出的conda环境包解压后文件目录结构应和下图完全一致：
 
 ```
@@ -37,6 +40,10 @@
 ├── share
 └── ssl
 ```   
+
+> 注意: 请严格按照上述`conda pack`指示操作，并且不要随意修改`bin/activate`。
+> `Jupyter任务插件`使用`source`命令激活您打包的conda环境。
+> 若您对使用`source`命令有安全性上的担忧，请使用其他方法管理您的python依赖。   
 
 ## 创建任务
 

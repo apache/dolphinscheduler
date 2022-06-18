@@ -11,6 +11,10 @@ it will use `papermill` to evaluate jupyter notes. Click [here](https://papermil
 Click [here](https://docs.conda.io/en/latest/) for more information about `conda`.
 - `conda.path` is set to `/opt/anaconda3/etc/profile.d/conda.sh` by default. If you have no idea where your `conda` is, simply run `conda info | grep -i 'base environment'`.
 
+> NOTICE: `Jupyter Task Plugin` uses `source` command to activate conda environment. 
+> If your tenant does not have permission to use `source`, `Jupyter Task Plugin` will not function. 
+
+
 ## Python Dependency Management
 
 ### Use Pre-Installed Conda Environment
@@ -37,6 +41,10 @@ Click [here](https://docs.conda.io/en/latest/) for more information about `conda
 ├── share
 └── ssl
 ```   
+
+> NOTICE: Please follow the `conda pack` instructions above strictly, and DO NOT modify `bin/activate`.
+> `Jupyter Task Plugin` uses `source` command to activate your packed conda environment.
+> If you are concerned about using `source`, choose other options to manage your python dependency.   
 
 ## Create Task
 
