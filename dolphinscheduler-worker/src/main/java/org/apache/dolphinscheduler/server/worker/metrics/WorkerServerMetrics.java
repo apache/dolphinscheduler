@@ -30,12 +30,12 @@ public final class WorkerServerMetrics {
     }
 
     private static final Counter WORKER_OVERLOAD_COUNTER =
-            Counter.builder("ds.system.worker.overload.count")
+            Counter.builder("ds.worker.overload.count")
                     .description("overloaded workers count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER =
-            Counter.builder("ds.system.worker.full.submit.queue.count")
+            Counter.builder("ds.worker.full.submit.queue.count")
                     .description("full worker submit queues count")
                     .register(Metrics.globalRegistry);
 
