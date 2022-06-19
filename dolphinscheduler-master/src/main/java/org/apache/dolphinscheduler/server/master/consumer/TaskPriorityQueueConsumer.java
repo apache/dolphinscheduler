@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -60,7 +61,7 @@ import org.springframework.stereotype.Component;
  * TaskUpdateQueue consumer
  */
 @Component
-public class TaskPriorityQueueConsumer extends Thread {
+public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
     /**
      * logger of TaskUpdateQueueConsumer
@@ -107,6 +108,10 @@ public class TaskPriorityQueueConsumer extends Thread {
      * consumer thread pool
      */
     private ThreadPoolExecutor consumerThreadPoolExecutor;
+
+    protected TaskPriorityQueueConsumer() {
+        super("TaskPriorityQueueConsumeThread");
+    }
 
     @PostConstruct
     public void init() {
@@ -198,10 +203,8 @@ public class TaskPriorityQueueConsumer extends Thread {
             } else {
                 logger.info("Master failed to dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
             }
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | ExecuteException e) {
             logger.error("Master dispatch task to worker error: ", e);
-        } catch (ExecuteException e) {
-            logger.error("Master dispatch task to worker error: {}", e);
         }
         return result;
     }
