@@ -1,5 +1,5 @@
 # DolphinScheduler — API 测试
-## 一、前置知识：
+## 前置知识：
 
 ### API 测试与单元测试的区别
 
@@ -9,9 +9,9 @@ API测试，它模仿用户调用API，从某个入口开始，逐步执行操�
 
 比如，租户管理界面的 API 测试，关注用户是否能够正常登录；登陆失败的话，是否能够正确显示错误信息。登陆之后时候能够通过携带的 SessionId 进行租户管理的操作等等。
 
-## 二、API 测试
+## API 测试
 
-### 1、API-Pages
+### API-Pages
 
 DolphinScheduler 的 API 测试使用 docker-compose 部署，当前测试的为单机模式，主要用于检验一些例如“增删改查”基本功能，后期如需做集群验证，例如不同服务之间的协作，或者各个服务之间的通讯机制，可参考 `deploy/docker/docker-compose.yml`来配置。
 
@@ -84,7 +84,7 @@ public final class LoginPage {
 https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/cases
 
 
-## 三、补充
+## 补充
 
 在本地运行的时候，首先需要启动相应的本地服务，可以参考该页面: [环境搭建](https://dolphinscheduler.apache.org/zh-cn/development/development-environment-setup.html)
 

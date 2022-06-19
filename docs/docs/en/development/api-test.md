@@ -1,8 +1,8 @@
 # DolphinScheduler API Automation Test
 
-## I. Preparatory knowledge
+## Preparatory knowledge
 
-### 1. The difference between API Test and Unit Test
+### The difference between API Test and Unit Test
 
 API test, which imitates the user calling API, starts from a certain entry and performs operations step by step until a certain work is completed. Different from unit testing, the latter usually needs to test parameters, parameter types, parameter values, parameter numbers, return values, throw errors, etc. in order to ensure that a specific function can complete its work stably and reliably in any case. Unit tests assume that the entire product will work as long as all functions work properly.
 
@@ -11,9 +11,9 @@ In contrast, API testing focuses on whether a complete operation chain can be co
 For example, the API test of the tenant management interface focuses on whether users can log in normally; If the login fails, whether the error message can be displayed correctly. After logging in, you can perform tenant management operations through the sessionid you carry.
 
 
-## II. 1、API Test
+## API Test
 
-### 1. 1、API-Pages
+### API-Pages
 
 DolphinScheduler's API tests are deployed using docker-compose. The current tests are in standalone mode and are mainly used to check some basic functions such as "add, delete, change and check". For further cluster validation, such as collaboration between services or communication mechanisms between services, refer to `deploy/docker/docker-compose.yml` for configuration.
 
@@ -84,7 +84,7 @@ The rest are similar cases and can be understood by referring to the specific so
 
 https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/cases
 
-##  III. Supplements
+## Supplements
 
 When running API tests locally, First, you need to start the local service, you can refer to this page: 
 [development-environment-setup](https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html)
