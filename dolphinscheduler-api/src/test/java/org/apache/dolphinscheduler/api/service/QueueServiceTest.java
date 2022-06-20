@@ -143,13 +143,13 @@ public class QueueServiceTest {
         Mockito.when(queueMapper.existQueue("test", null)).thenReturn(true);
         Mockito.when(queueMapper.existQueue(null, "test")).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, getLoginUser().getId(), YARN_QUEUE_UPDATE , baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[0], 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{0}, 0, baseServiceLogger)).thenReturn(true);
         // not exist
         Map<String, Object> result = queueService.updateQueue(getLoginUser(), 0, "queue", queueName);
         logger.info(result.toString());
         Assert.assertEquals(Status.QUEUE_NOT_EXIST.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
         //no need update
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[1], 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{1}, 0, baseServiceLogger)).thenReturn(true);
         result = queueService.updateQueue(getLoginUser(), 1, queueName, queueName);
         logger.info(result.toString());
         Assert.assertEquals(Status.NEED_NOT_UPDATE_QUEUE.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
