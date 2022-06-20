@@ -171,7 +171,7 @@ def test_python_resource_list(mock_code_version, mock_resource, resources, expec
     """Test python task resource list."""
     task = Python(
         name="python_resource_list",
-        definition='print("hello world.")',
+        definition='print("hello  world.")',
         resource_list=resources,
     )
     assert task.resource_list == expect
