@@ -93,6 +93,7 @@ class Python(Task):
         return func_str
 
     def query_resource(self, resource_type, full_name):
+        """Get resource info from java gateway, contains resource id, name."""
         gateway = launch_gateway()
         return gateway.entry_point.getResourcesFileInfo(
             self.process_definition.user.name, resource_type, full_name
