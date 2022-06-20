@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -52,7 +53,7 @@ import org.springframework.stereotype.Service;
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
 @Service
-public class MasterSchedulerService extends Thread {
+public class MasterSchedulerService extends BaseDaemonThread {
 
     /**
      * logger of MasterSchedulerService
@@ -102,6 +103,10 @@ public class MasterSchedulerService extends Thread {
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+    protected MasterSchedulerService() {
+        super("MasterCommandLoopThread");
+    }
+
     /**
      * constructor of MasterSchedulerService
      */
@@ -113,9 +118,8 @@ public class MasterSchedulerService extends Thread {
 
     @Override
     public synchronized void start() {
-        super.setName("MasterSchedulerService");
-        super.start();
         this.stateWheelExecuteThread.start();
+        super.start();
     }
 
     public void close() {

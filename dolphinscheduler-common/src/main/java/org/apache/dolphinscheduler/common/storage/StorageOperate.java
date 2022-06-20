@@ -28,21 +28,21 @@ import java.util.List;
 
 public interface StorageOperate {
 
-    public static final String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+    String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
 
     /**
      * if the resource of tenant 's exist, the resource of folder will be created
      * @param tenantCode
      * @throws Exception
      */
-    public void createTenantDirIfNotExists(String tenantCode) throws Exception;
+    void createTenantDirIfNotExists(String tenantCode) throws Exception;
 
     /**
      * get the resource directory of tenant
      * @param tenantCode
      * @return
      */
-    public String getResDir(String tenantCode);
+    String getResDir(String tenantCode);
 
     /**
      * return the udf directory of tenant
@@ -50,7 +50,7 @@ public interface StorageOperate {
      * @return
      */
 
-    public String getUdfDir(String tenantCode);
+    String getUdfDir(String tenantCode);
 
     /**
      * create the directory that the path of tenant wanted to create
@@ -59,7 +59,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean mkdir(String tenantCode,String path) throws IOException;
+    boolean mkdir(String tenantCode, String path) throws IOException;
 
     /**
      * get the path of the resource file
@@ -67,7 +67,7 @@ public interface StorageOperate {
      * @param fullName
      * @return
      */
-    public String getResourceFileName(String tenantCode, String fullName);
+    String getResourceFileName(String tenantCode, String fullName);
 
     /**
      * get the path of the file
@@ -76,7 +76,7 @@ public interface StorageOperate {
      * @param fileName
      * @return
      */
-    public String getFileName(ResourceType resourceType, String tenantCode, String fileName);
+    String getFileName(ResourceType resourceType, String tenantCode, String fileName);
 
     /**
      * predicate  if the resource of tenant exists
@@ -85,7 +85,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public  boolean exists(String tenantCode,String fileName) throws IOException;
+    boolean exists(String tenantCode, String fileName) throws IOException;
 
     /**
      * delete the resource of  filePath
@@ -96,7 +96,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean delete(String tenantCode,String filePath, boolean recursive) throws IOException;
+    boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException;
 
     /**
      * copy the file from srcPath to dstPath
@@ -107,7 +107,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
+    boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
 
     /**
      * get the root path of the tenant with resourceType
@@ -115,7 +115,7 @@ public interface StorageOperate {
      * @param tenantCode
      * @return
      */
-    public  String getDir(ResourceType resourceType, String tenantCode);
+    String getDir(ResourceType resourceType, String tenantCode);
 
     /**
      * upload the local srcFile to dstPath
@@ -127,7 +127,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean upload(String tenantCode,String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
+    boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
 
     /**
      * download the srcPath to local
@@ -138,7 +138,7 @@ public interface StorageOperate {
      * @param overwrite
      * @throws IOException
      */
-    public void download(String tenantCode,String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite)throws IOException;
+    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite)throws IOException;
 
     /**
      * vim the context of filePath
@@ -149,7 +149,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException;
+    List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException;
 
     /**
      * delete the files and directory of the tenant
@@ -157,13 +157,13 @@ public interface StorageOperate {
      * @param tenantCode
      * @throws Exception
      */
-    public void deleteTenant(String tenantCode) throws Exception;
+    void deleteTenant(String tenantCode) throws Exception;
 
     /**
      * return the storageType
      *
      * @return
      */
-    public ResUploadType returnStorageType();
+    ResUploadType returnStorageType();
 
 }

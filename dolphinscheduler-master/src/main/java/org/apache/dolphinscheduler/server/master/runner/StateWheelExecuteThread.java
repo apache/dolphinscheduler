@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -50,7 +51,7 @@ import org.springframework.stereotype.Component;
  * 4. timeout process check
  */
 @Component
-public class StateWheelExecuteThread extends Thread {
+public class StateWheelExecuteThread extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(StateWheelExecuteThread.class);
 
@@ -82,6 +83,10 @@ public class StateWheelExecuteThread extends Thread {
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
+    protected StateWheelExecuteThread() {
+        super("StateWheelExecuteThread");
+    }
 
     @Override
     public void run() {
