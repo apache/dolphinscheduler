@@ -623,28 +623,33 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    public static final String WORKFLOW_INFO_MDC_KEY = "workflowInfo";
+    public static final String WORKFLOW_HEADER_FORMAT = "[WorkflowInstance-%s]";
+    public static final String WORKFLOW_TASK_HEADER_FORMAT = "[WorkflowInstance-%s][TaskInstance-%s]";
+    public static final String TASK_HEADER_FORMAT = "[TaskInstance-%s]";
+
     /**
      * task log info format
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITING_THREAD.ordinal(),
-            ExecutionStatus.WAITING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[] {
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.DELAY_EXECUTION.ordinal(),
+        ExecutionStatus.READY_PAUSE.ordinal(),
+        ExecutionStatus.READY_STOP.ordinal(),
+        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+        ExecutionStatus.WAITING_THREAD.ordinal(),
+        ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
-    public static final int[] RUNNING_PROCESS_STATE = new int[]{
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.SERIAL_WAIT.ordinal()
+    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.SERIAL_WAIT.ordinal()
     };
 
     /**

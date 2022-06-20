@@ -46,6 +46,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -173,7 +174,8 @@ public class MasterSchedulerService extends BaseDaemonThread {
         MasterServerMetrics.incMasterConsumeCommand(commands.size());
 
         for (ProcessInstance processInstance : processInstances) {
-            logger.info("[WorkflowInstance-{}] Master schedule service starting workflow instance", processInstance.getId());
+            MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_HEADER_FORMAT, processInstance.getId()));
+            logger.info("Master schedule service starting workflow instance");
             WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
                 processInstance
                 , processService
@@ -187,7 +189,8 @@ public class MasterSchedulerService extends BaseDaemonThread {
                 stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
             workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
-            logger.info("[WorkflowInstance-{}] Master schedule service started workflow instance", processInstance.getId());
+            logger.info("Master schedule service started workflow instance");
+            MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
         }
     }
 

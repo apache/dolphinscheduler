@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
@@ -36,6 +37,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import io.netty.channel.Channel;
 
@@ -71,12 +73,14 @@ public class TaskExecuteRunnable implements Runnable {
     public void run() {
         while (!this.events.isEmpty()) {
             TaskEvent event = this.events.peek();
+            MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, event.getProcessInstanceId(), event.getTaskInstanceId()));
             try {
                 persist(event);
             } catch (Exception e) {
                 logger.error("persist error, event:{}, error: {}", event, e);
             } finally {
                 this.events.remove(event);
+                MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
             }
         }
     }

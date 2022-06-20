@@ -91,13 +91,11 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     public void submitStateEvent(StateEvent stateEvent) {
         WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
-                stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent);
+            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}", stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
-        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Submit state event success, stateEvent: {}",
-            stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent);
+        logger.info("Submit state event success, stateEvent: {}", stateEvent);
     }
 
     /**
@@ -116,7 +114,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
-            logger.warn("[WorkflowInstance-{}] The workflow has been executed by another thread", workflowExecuteThread.getProcessInstance().getId());
+            logger.warn("The workflow has been executed by another thread");
             return;
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
@@ -173,8 +171,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      */
     private void notifyMyself(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
-            logger.warn("[WorkflowInstance-{}][TaskInstance-{}] The execute cache manager doesn't contains this workflow instance",
-                processInstance.getId(), taskInstance.getId());
+            logger.warn("The execute cache manager doesn't contains this workflow instance");
             return;
         }
         StateEvent stateEvent = new StateEvent();

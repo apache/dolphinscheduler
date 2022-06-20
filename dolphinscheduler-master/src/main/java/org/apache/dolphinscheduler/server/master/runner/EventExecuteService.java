@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +73,10 @@ public class EventExecuteService extends BaseDaemonThread {
 
     private void eventHandler() {
         for (WorkflowExecuteRunnable workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
+            MDC.put(Constants.WORKFLOW_INFO_MDC_KEY,
+                String.format(Constants.WORKFLOW_HEADER_FORMAT, workflowExecuteThread.getProcessInstance().getId()));
             workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
+            MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
         }
     }
 }

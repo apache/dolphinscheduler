@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.server.master.processor.queue.StateEventRespo
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,9 +60,10 @@ public class TaskEventProcessor implements NettyRequestProcessor {
         stateEvent.setProcessInstanceId(taskEventChangeCommand.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskEventChangeCommand.getTaskInstanceId());
         stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
-        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Received task event change command, event: {}",
-            stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent);
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId()));
+        logger.info("Received task event change command, event: {}", stateEvent);
         stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
+        MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
     }
 
 }

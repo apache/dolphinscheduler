@@ -70,11 +70,12 @@ public class AlertServer implements Closeable {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        logger.info("Alert server is ready ...");
+        logger.info("Alert server is staring ...");
 
         checkTable();
         startServer();
         alertSenderService.start();
+        logger.info("Alert server is started ...");
     }
 
     @Override

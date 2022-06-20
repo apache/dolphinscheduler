@@ -47,6 +47,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -117,6 +118,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY,
+            String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId()));
         TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
         // set cache, it will be used when kill task
@@ -189,6 +192,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendRecallCommand(taskExecutionContext);
         }
+        MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
     }
 
     /**

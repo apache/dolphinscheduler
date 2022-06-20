@@ -52,12 +52,10 @@ public final class ProcessUtils {
      */
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
-            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Begin kill task instance, processId: {}",
-                request.getProcessInstanceId(), request.getTaskInstanceId(), request.getProcessId());
+            logger.info("Begin kill task instance, processId: {}", request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                logger.error("[WorkflowInstance-{}][TaskInstance-{}] Task instance kill failed, processId is not exist",
-                    request.getProcessInstanceId(), request.getTaskInstanceId());
+                logger.error("Task instance kill failed, processId is not exist");
                 return false;
             }
 
@@ -66,12 +64,10 @@ public final class ProcessUtils {
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
-            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Success kill task instance, processId: {}",
-                request.getProcessInstanceId(), request.getTaskInstanceId(), request.getProcessId());
+            logger.info("Success kill task instance, processId: {}", request.getProcessId());
             return true;
         } catch (Exception e) {
-            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Kill task instance error, processId: {}",
-                request.getProcessInstanceId(), request.getTaskInstanceId(), request.getProcessId(), e);
+            logger.error("Kill task instance error, processId: {}", request.getProcessId(), e);
             return false;
         }
     }

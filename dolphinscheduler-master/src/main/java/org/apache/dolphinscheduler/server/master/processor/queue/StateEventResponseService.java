@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -36,6 +37,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -81,7 +83,9 @@ public class StateEventResponseService {
             List<StateEvent> remainEvents = new ArrayList<>(eventQueue.size());
             eventQueue.drainTo(remainEvents);
             for (StateEvent event : remainEvents) {
+                MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, event.getProcessInstanceId(), event.getTaskInstanceId()));
                 this.persist(event);
+                MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
             }
         }
     }
@@ -93,8 +97,7 @@ public class StateEventResponseService {
         try {
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
-            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Put state event : {} error",
-                stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent, e);
+            logger.error("Put state event : {} error", stateEvent, e);
             Thread.currentThread().interrupt();
         }
     }
@@ -115,7 +118,9 @@ public class StateEventResponseService {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
+                    MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId()));
                     persist(stateEvent);
+                    MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
                 } catch (InterruptedException e) {
                     logger.warn("State event loop service interrupted, will stop this loop", e);
                     Thread.currentThread().interrupt();
@@ -137,8 +142,8 @@ public class StateEventResponseService {
     private void persist(StateEvent stateEvent) {
         try {
             if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
-                logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Persist event into workflow execute thread error, "
-                    + "cannot find the workflow instance from cache manager, event: {}", stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent);
+                logger.warn("Persist event into workflow execute thread error, "
+                    + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
                 writeResponse(stateEvent, ExecutionStatus.FAILURE);
                 return;
             }
@@ -156,8 +161,7 @@ public class StateEventResponseService {
             workflowExecuteThreadPool.submitStateEvent(stateEvent);
             writeResponse(stateEvent, ExecutionStatus.SUCCESS);
         } catch (Exception e) {
-            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Persist event queue error, event: {}",
-                stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent, e);
+            logger.error("Persist event queue error, event: {}", stateEvent, e);
         }
     }
 

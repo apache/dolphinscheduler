@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -27,6 +28,7 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventServic
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,8 +58,9 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_RECALL == command.getType(), String.format("invalid command type : %s", command.getType()));
         TaskRecallCommand recallCommand = JSONUtils.parseObject(command.getBody(), TaskRecallCommand.class);
         TaskEvent taskEvent = TaskEvent.newRecallEvent(recallCommand, channel);
-        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Receive task recall command: {}",
-            recallCommand.getProcessInstanceId(), recallCommand.getTaskInstanceId(), recallCommand);
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, recallCommand.getProcessInstanceId(), recallCommand.getTaskInstanceId()));
+        logger.info("Receive task recall command: {}", recallCommand);
         taskEventService.addEvent(taskEvent);
+        MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
     }
 }

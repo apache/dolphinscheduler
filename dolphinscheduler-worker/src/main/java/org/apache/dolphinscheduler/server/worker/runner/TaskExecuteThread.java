@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.google.common.base.Strings;
 
@@ -126,6 +127,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     @Override
     public void run() {
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId()));
         if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUCCESS);
             taskExecutionContext.setStartTime(new Date());
@@ -208,6 +210,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             clearTaskExecPath();
+            MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
         }
     }
 
@@ -305,11 +308,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * download resource check
+     *
      * @param execLocalPath
      * @param projectRes
      * @return
      */
-    public List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes){
+    public List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes) {
         if (MapUtils.isEmpty(projectRes)) {
             return Collections.emptyList();
         }
@@ -317,13 +321,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
         projectRes.forEach((key, value) -> {
             File resFile = new File(execLocalPath, key);
             boolean notExist = !resFile.exists();
-            if (notExist){
+            if (notExist) {
                 downloadFile.add(Pair.of(key, value));
-            } else{
+            } else {
                 logger.info("file : {} exists ", resFile.getName());
             }
         });
-        if (!downloadFile.isEmpty() && !PropertyUtils.getResUploadStartupState()){
+        if (!downloadFile.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
             throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
         }
         return downloadFile;
