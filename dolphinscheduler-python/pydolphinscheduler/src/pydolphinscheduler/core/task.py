@@ -155,7 +155,7 @@ class Task(Base):
 
         # Attribute for task param
         self.local_params = local_params or []
-        self.resource_list = resource_list or []
+        self._resource_list = resource_list or []
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
         self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
@@ -195,6 +195,11 @@ class Task(Base):
         }
         custom_attr |= self._task_custom_attr
         return self.get_define_custom(custom_attr=custom_attr)
+
+    @property
+    def resource_list(self) -> List:
+        """Get attribute resource_list."""
+        return self._resource_list
 
     def __hash__(self):
         return hash(self.code)
