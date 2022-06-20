@@ -486,8 +486,6 @@ CREATE TABLE t_ds_task_definition
     delay_time              int(11) DEFAULT '0',
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
-    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
-    memory_max              int(11) DEFAULT '-1' NOT NULL,
     resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
