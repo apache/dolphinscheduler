@@ -162,7 +162,7 @@ public class QueueServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.QUEUE_NAME_EXIST.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
         //success
-        Mockito.when(userMapper.existUser("test1")).thenReturn(false);
+        Mockito.when(userMapper.existUser(Mockito.anyString())).thenReturn(false);
         result = queueService.updateQueue(getLoginUser(), 1, "test1", "test1");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());

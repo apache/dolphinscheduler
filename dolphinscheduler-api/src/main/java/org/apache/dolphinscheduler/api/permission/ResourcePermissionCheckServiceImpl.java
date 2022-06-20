@@ -161,7 +161,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String permissionKey, Logger logger) {
-            // all users can create projects
+            // admin can create projects
             return false;
         }
 
@@ -347,32 +347,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             return Collections.emptySet();
         }
     }
-
-    @Component
-    public static class QueueResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
-
-        private final QueueMapper queueMapper;
-
-        public QueueResourceList(QueueMapper queueMapper) {
-            this.queueMapper = queueMapper;
-        }
-
-        @Override
-        public List<AuthorizationType> authorizationTypes() {
-            return Collections.singletonList(AuthorizationType.QUEUE);
-        }
-
-        @Override
-        public boolean permissionCheck(int userId, String url, Logger logger) {
-            return false;
-        }
-
-        @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return Collections.emptySet();
-        }
-    }
-
 
     @Component
     public static class WorkerGroupResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
