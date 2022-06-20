@@ -46,8 +46,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class JupyterTaskTest {
 
     @Test
-    public void testBuildJupyterCommand() throws Exception {
-        String parameters = buildJupyterCommand();
+    public void testBuildJupyterCommandWithLocalEnv() throws Exception {
+        String parameters = buildJupyterCommandWithLocalEnv();
         TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         PowerMockito.mockStatic(PropertyUtils.class);
@@ -71,9 +71,51 @@ public class JupyterTaskTest {
                 "--progress-bar");
     }
 
-    private String buildJupyterCommand() {
+    @Test
+    public void testBuildJupyterCommandWithPackedEnv() throws Exception {
+        String parameters = buildJupyterCommandWithPackedEnv();
+        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
+        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        PowerMockito.mockStatic(PropertyUtils.class);
+        when(PropertyUtils.getString(any())).thenReturn("/opt/anaconda3/etc/profile.d/conda.sh");
+        JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
+        jupyterTask.init();
+        Assert.assertEquals(jupyterTask.buildCommand(),
+                "source /opt/anaconda3/etc/profile.d/conda.sh && " +
+                        "mkdir jupyter_env && " +
+                        "tar -xzf jupyter.tar.gz -C jupyter_env && " +
+                        "source jupyter_env/bin/activate && " +
+                        "papermill " +
+                        "/test/input_note.ipynb " +
+                        "/test/output_note.ipynb " +
+                        "--parameters city Shanghai " +
+                        "--parameters factor 0.01 " +
+                        "--kernel python3 " +
+                        "--engine default_engine " +
+                        "--execution-timeout 10 " +
+                        "--start-timeout 3 " +
+                        "--version " +
+                        "--inject-paths " +
+                        "--progress-bar");
+    }
+
+    private String buildJupyterCommandWithLocalEnv() {
         JupyterParameters jupyterParameters = new JupyterParameters();
         jupyterParameters.setCondaEnvName("jupyter-lab");
+        jupyterParameters.setInputNotePath("/test/input_note.ipynb");
+        jupyterParameters.setOutputNotePath("/test/output_note.ipynb");
+        jupyterParameters.setParameters("{\"city\": \"Shanghai\", \"factor\": \"0.01\"}");
+        jupyterParameters.setKernel("python3");
+        jupyterParameters.setEngine("default_engine");
+        jupyterParameters.setExecutionTimeout("10");
+        jupyterParameters.setStartTimeout("3");
+        jupyterParameters.setOthers("--version");
+        return JSONUtils.toJsonString(jupyterParameters);
+    }
+
+    private String buildJupyterCommandWithPackedEnv() {
+        JupyterParameters jupyterParameters = new JupyterParameters();
+        jupyterParameters.setCondaEnvName("jupyter.tar.gz");
         jupyterParameters.setInputNotePath("/test/input_note.ipynb");
         jupyterParameters.setOutputNotePath("/test/output_note.ipynb");
         jupyterParameters.setParameters("{\"city\": \"Shanghai\", \"factor\": \"0.01\"}");
