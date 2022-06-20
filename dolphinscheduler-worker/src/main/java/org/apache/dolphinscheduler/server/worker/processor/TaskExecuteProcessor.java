@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
@@ -90,15 +91,18 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     @Autowired
     private WorkerManagerThread workerManager;
 
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
     @Counted(value = "ds.task.execution.count", description = "task execute total count")
     @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
-                command.getBody(), TaskExecuteRequestCommand.class);
+            command.getBody(), TaskExecuteRequestCommand.class);
 
         if (taskRequestCommand == null) {
             logger.error("task execute request command is null");
@@ -124,17 +128,17 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
         if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
-            boolean osUserExistFlag ;
+            boolean osUserExistFlag;
             //if Using distributed is true and Currently supported systems are linux,Should not let it automatically
             //create tenants,so TenantAutoCreate has no effect
-            if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX){
+            if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
                 //use the id command to judge in linux
                 osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
-            }else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()){
+            } else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
                 // if not exists this user, then create
                 OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
                 osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
-            }else {
+            } else {
                 osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
             }
 
@@ -178,7 +182,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
 
         // submit task to manager
-        boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager));
+        boolean offer = workerManager.offer(
+            new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager, storageOperate));
         if (!offer) {
             logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
                 workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());

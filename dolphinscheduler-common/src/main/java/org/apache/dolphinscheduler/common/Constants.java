@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.time.Duration;
 import java.util.regex.Pattern;
 
 /**
@@ -379,6 +380,8 @@ public final class Constants {
      * short sleep 100ms
      */
     public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
+
+    public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
 
     /**
      * one second mils

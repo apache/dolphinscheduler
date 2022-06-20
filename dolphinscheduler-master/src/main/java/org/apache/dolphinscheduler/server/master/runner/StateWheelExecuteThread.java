@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import lombok.NonNull;
+
 /**
  * Check thread
  * 1. timeout task check
@@ -110,10 +112,16 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
     public void addProcess4TimeoutCheck(ProcessInstance processInstance) {
         processInstanceTimeoutCheckList.add(processInstance.getId());
+        logger.info("[WorkflowInstance-{}] Success add workflow instance into timeout check list", processInstance.getId());
     }
 
     public void removeProcess4TimeoutCheck(ProcessInstance processInstance) {
-        processInstanceTimeoutCheckList.remove(processInstance.getId());
+        boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstance.getId());
+        if (removeFlag) {
+            logger.info("[WorkflowInstance-{}] Success remove workflow instance from timeout check list", processInstance.getId());
+        } else {
+            logger.warn("[WorkflowInstance-{}] Failed to remove workflow instance from timeout check list", processInstance.getId());
+        }
     }
 
     private void checkProcess4Timeout() {
@@ -121,106 +129,110 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             return;
         }
         for (Integer processInstanceId : processInstanceTimeoutCheckList) {
-            if (processInstanceId == null) {
-                continue;
-            }
             WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
             if (workflowExecuteThread == null) {
-                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}", processInstanceId);
+                logger.warn("[WorkflowInstance-{}] Check workflow timeout failed, can not find workflowExecuteThread from cache manager, will remove this workflowInstance from check list",
+                    processInstanceId);
                 processInstanceTimeoutCheckList.remove(processInstanceId);
                 continue;
             }
             ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
             if (processInstance == null) {
+                logger.warn("[WorkflowInstance-{}] check workflow timeout failed, the workflowInstance is null", processInstanceId);
                 continue;
             }
             long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(), (long) processInstance.getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
             if (timeRemain < 0) {
+                logger.info("[WorkflowInstance-{}] workflow instance timeout, adding timeout event", processInstanceId);
                 addProcessTimeoutEvent(processInstance);
                 processInstanceTimeoutCheckList.remove(processInstance.getId());
+                logger.info("[WorkflowInstance-{}] workflow instance timeout, added timeout event", processInstanceId);
             }
         }
     }
 
-    public void addTask4TimeoutCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public void addTask4TimeoutCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
-        if (taskInstanceKey == null) {
-            logger.error("taskInstanceKey is null");
-            return;
-        }
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Adding task instance into timeout check list",
+            processInstance.getId(), taskInstance.getId());
         if (taskInstanceTimeoutCheckList.contains(taskInstanceKey)) {
+            logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Task instance is already in timeout check list",
+                processInstance.getId(), taskInstance.getId());
             return;
         }
         TaskDefinition taskDefinition = taskInstance.getTaskDefine();
         if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Failed to add task instance into timeout check list, taskDefinition is null",
+                processInstance.getId(), taskInstance.getId());
             return;
         }
         if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
             taskInstanceTimeoutCheckList.add(taskInstanceKey);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Timeout flag is open, added task instance into timeout check list",
+                processInstance.getId(), taskInstance.getId());
         }
         if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
             taskInstanceTimeoutCheckList.add(taskInstanceKey);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] task instance is dependTask orSubProcess, added task instance into timeout check list",
+                processInstance.getId(), taskInstance.getId());
         }
     }
 
-    public void removeTask4TimeoutCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public void removeTask4TimeoutCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
-        if (taskInstanceKey == null) {
-            logger.error("taskInstanceKey is null");
-            return;
-        }
         taskInstanceTimeoutCheckList.remove(taskInstanceKey);
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] remove task instance from timeout check list",
+            processInstance.getId(), taskInstance.getId());
     }
 
-    public void addTask4RetryCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public void addTask4RetryCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Adding task instance into retry check list",
+            processInstance.getId(), taskInstance.getId());
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
-        if (taskInstanceKey == null) {
-            logger.error("taskInstanceKey is null");
-            return;
-        }
         if (taskInstanceRetryCheckList.contains(taskInstanceKey)) {
+            logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Task instance is already in retry check list",
+                processInstance.getId(), taskInstance.getId());
             return;
         }
         TaskDefinition taskDefinition = taskInstance.getTaskDefine();
         if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Add task instance into retry check list error, taskDefinition is null",
+                processInstance.getId(), taskInstance.getId());
             return;
         }
-        logger.debug("addTask4RetryCheck, taskCode:{}, processInstanceId:{}", taskInstance.getTaskCode(), taskInstance.getProcessInstanceId());
         taskInstanceRetryCheckList.add(taskInstanceKey);
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Added task instance into retry check list",
+            processInstance.getId(), taskInstance.getId());
     }
 
-    public void removeTask4RetryCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public void removeTask4RetryCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
-        if (taskInstanceKey == null) {
-            logger.error("taskInstanceKey is null");
-            return;
-        }
         taskInstanceRetryCheckList.remove(taskInstanceKey);
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] remove task instance from retry check list",
+            processInstance.getId(), taskInstance.getId());
     }
 
-    public void addTask4StateCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public void addTask4StateCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Adding task instance into state check list",
+            processInstance.getId(), taskInstance.getId());
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
-        if (taskInstanceKey == null) {
-            logger.error("taskInstanceKey is null");
-            return;
-        }
         if (taskInstanceStateCheckList.contains(taskInstanceKey)) {
+            logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Task instance is already in state check list",
+                processInstance.getId(), taskInstance.getId());
             return;
         }
         if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
             taskInstanceStateCheckList.add(taskInstanceKey);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Added task instance into state check list",
+                processInstance.getId(), taskInstance.getId());
         }
     }
 
-    public void removeTask4StateCheck(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public void removeTask4StateCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
-        if (taskInstanceKey == null) {
-            logger.error("taskInstanceKey is null");
-            return;
-        }
         taskInstanceStateCheckList.remove(taskInstanceKey);
+        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Removed task instance from state check list",
+            processInstance.getId(), taskInstance.getId());
     }
 
     private void checkTask4Timeout() {
@@ -233,15 +245,15 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
             WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
             if (workflowExecuteThread == null) {
-                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
-                        processInstanceId, taskCode);
+                logger.warn("[WorkflowInstance-{}][TaskCode-{}] Check task instance timeout failed, can not find workflowExecuteThread from cache manager, "
+                    + "will remove this check task", processInstanceId, taskCode);
                 taskInstanceTimeoutCheckList.remove(taskInstanceKey);
                 continue;
             }
             Optional<TaskInstance> taskInstanceOptional = workflowExecuteThread.getActiveTaskInstanceByTaskCode(taskCode);
             if (!taskInstanceOptional.isPresent()) {
-                logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
-                        processInstanceId, taskCode);
+                logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Check task instance timeout failed, can not get taskInstance from workflowExecuteThread, "
+                    + "will remove this check task", processInstanceId, taskCode);
                 taskInstanceTimeoutCheckList.remove(taskInstanceKey);
                 continue;
             }
@@ -249,6 +261,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                 long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), (long) taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
                 if (timeRemain < 0) {
+                    logger.info("[WorkflowInstance-{}][TaskInstance-{}] Task instance is timeout, adding task timeout event and remove the check",
+                        processInstanceId, taskInstance.getId());
                     addTaskTimeoutEvent(taskInstance);
                     taskInstanceTimeoutCheckList.remove(taskInstanceKey);
                 }
@@ -268,8 +282,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
 
             if (workflowExecuteThread == null) {
-                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
-                        processInstanceId, taskCode);
+                logger.warn("[WorkflowInstance-{}][TaskCode-{}] Task instance retry check failed, can not find workflowExecuteThread from cache manager, "
+                    + "will remove this check task", processInstanceId, taskInstanceKey.getTaskCode());
                 taskInstanceRetryCheckList.remove(taskInstanceKey);
                 continue;
             }
@@ -278,14 +292,16 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
 
             if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                logger.warn("[WorkflowInstance-{}][TaskCode-{}] The process instance is ready to stop, will send process stop event and remove the check task",
+                    processInstanceId, taskInstanceKey.getTaskCode());
                 addProcessStopEvent(processInstance);
                 taskInstanceRetryCheckList.remove(taskInstanceKey);
                 break;
             }
 
             if (!taskInstanceOptional.isPresent()) {
-                logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
-                        processInstanceId, taskCode);
+                logger.warn("[WorkflowInstance-{}][TaskCode-{}] Task instance retry check failed, can not find taskInstance from workflowExecuteThread, will remove this check",
+                    processInstanceId, taskCode);
                 taskInstanceRetryCheckList.remove(taskInstanceKey);
                 continue;
             }
@@ -313,15 +329,16 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
             WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
             if (workflowExecuteThread == null) {
-                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
-                        processInstanceId, taskCode);
+                logger.warn("[WorkflowInstance-{}][TaskCode-{}] Task instance state check failed, can not find workflowExecuteThread from cache manager, will remove this check task",
+                    processInstanceId, taskCode);
                 taskInstanceStateCheckList.remove(taskInstanceKey);
                 continue;
             }
             Optional<TaskInstance> taskInstanceOptional = workflowExecuteThread.getActiveTaskInstanceByTaskCode(taskCode);
             if (!taskInstanceOptional.isPresent()) {
-                logger.warn("can not find taskInstance from workflowExecuteThread, this check event will remove, processInstanceId:{}, taskCode:{}",
-                        processInstanceId, taskCode);
+                logger.warn(
+                    "[WorkflowInstance-{}][TaskCode-{}] Task instance state check failed, can not find taskInstance from workflowExecuteThread, will remove this check event",
+                    processInstanceId, taskCode);
                 taskInstanceStateCheckList.remove(taskInstanceKey);
                 continue;
             }

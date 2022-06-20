@@ -21,19 +21,10 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResponseAckProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskRecallAckProcessor;
+import org.apache.dolphinscheduler.server.worker.prc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
@@ -75,17 +66,6 @@ public class WorkerServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
     /**
-     * netty remote server
-     */
-    private NettyRemotingServer nettyRemotingServer;
-
-    /**
-     * worker config
-     */
-    @Autowired
-    private WorkerConfig workerConfig;
-
-    /**
      * spring application context
      * only use it for initialization
      */
@@ -116,25 +96,7 @@ public class WorkerServer implements IStoppable {
     private TaskPluginManager taskPluginManager;
 
     @Autowired
-    private TaskExecuteProcessor taskExecuteProcessor;
-
-    @Autowired
-    private TaskKillProcessor taskKillProcessor;
-
-    @Autowired
-    private TaskRecallAckProcessor taskRecallAckProcessor;
-
-    @Autowired
-    private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
-
-    @Autowired
-    private TaskExecuteResponseAckProcessor taskExecuteResponseAckProcessor;
-
-    @Autowired
-    private HostUpdateProcessor hostUpdateProcessor;
-
-    @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
+    private WorkerRpcServer workerRpcServer;
 
     /**
      * worker server startup, not use web service
@@ -146,48 +108,19 @@ public class WorkerServer implements IStoppable {
         SpringApplication.run(WorkerServer.class);
     }
 
-    /**
-     * worker server run
-     */
     @PostConstruct
     public void run() {
-        // init remoting server
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(workerConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, taskExecuteProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK, taskExecuteRunningAckProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE_ACK, taskExecuteResponseAckProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL_ACK, taskRecallAckProcessor);
-        // logger server
-        this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
+        this.workerRpcServer.start();
 
-        this.nettyRemotingServer.start();
-
-        // install task plugin
         this.taskPluginManager.installPlugin();
 
-        // worker registry
-        try {
-            this.workerRegistryClient.registry();
-            this.workerRegistryClient.setRegistryStoppable(this);
-            Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
+        this.workerRegistryClient.registry();
+        this.workerRegistryClient.setRegistryStoppable(this);
+        Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
+        this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
 
-            this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e);
-        }
-
-        // task execute manager
         this.workerManagerThread.start();
 
-        // retry report task status
         this.retryReportTaskStatusThread.start();
 
         /*
@@ -195,7 +128,7 @@ public class WorkerServer implements IStoppable {
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
-                close("shutdownHook");
+                close("WorkerServer shutdown hook");
             }
         }));
     }
@@ -203,24 +136,23 @@ public class WorkerServer implements IStoppable {
     public void close(String cause) {
         try {
             // execute only once
-            if (Stopper.isStopped()) {
+            // set stop signal is true
+            if (!Stopper.stop()) {
+                logger.warn("WorkerServer is already stopped, current cause: {}", cause);
                 return;
             }
 
-            logger.info("worker server is stopping ..., cause : {}", cause);
-
-            // set stop signal is true
-            Stopper.stop();
+            logger.info("Worker server is stopping, current cause : {}", cause);
 
             try {
                 // thread sleep 3 seconds for thread quitely stop
-                Thread.sleep(3000L);
+                Thread.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
             } catch (Exception e) {
-                logger.warn("thread sleep exception", e);
+                logger.warn("Worker server close wait error", e);
             }
 
             // close
-            this.nettyRemotingServer.close();
+            this.workerRpcServer.close();
             this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
 
@@ -229,8 +161,9 @@ public class WorkerServer implements IStoppable {
 
             // close the application context
             this.springApplicationContext.close();
+            logger.info("Worker server stopped, current cause: {}", cause);
         } catch (Exception e) {
-            logger.error("worker server stop exception ", e);
+            logger.error("Worker server stop failed, current cause: {}", cause, e);
         }
     }
 
@@ -244,15 +177,17 @@ public class WorkerServer implements IStoppable {
      */
     public void killAllRunningTasks() {
         Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
-        logger.info("ready to kill all cache job, job size:{}", taskRequests.size());
-
         if (CollectionUtils.isEmpty(taskRequests)) {
             return;
         }
-
+        logger.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
+        int killNumber = 0;
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
-            org.apache.dolphinscheduler.plugin.task.api.ProcessUtils.kill(taskRequest);
+            if (ProcessUtils.kill(taskRequest)) {
+                killNumber++;
+            }
         }
+        logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(), killNumber);
     }
 }

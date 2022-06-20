@@ -77,14 +77,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
      */
     private TaskExecutionContext taskExecutionContext;
 
-    public StorageOperate getStorageOperate() {
-        return storageOperate;
-    }
-
-    public void setStorageOperate(StorageOperate storageOperate) {
-        this.storageOperate = storageOperate;
-    }
-
     private StorageOperate storageOperate;
 
     /**
@@ -108,24 +100,28 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param taskCallbackService taskCallbackService
+     * @param taskCallbackService  taskCallbackService
      */
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
-                             AlertClientService alertClientService) {
+                             AlertClientService alertClientService,
+                             StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
+        this.storageOperate = storageOperate;
     }
 
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
                              AlertClientService alertClientService,
-                             TaskPluginManager taskPluginManager) {
+                             TaskPluginManager taskPluginManager,
+                             StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
+        this.storageOperate = storageOperate;
     }
 
     @Override
@@ -152,7 +148,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // copy hdfs/minio file to local
             List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources());
-            if (!fileDownloads.isEmpty()){
+            if (!fileDownloads.isEmpty()) {
                 downloadResource(taskExecutionContext.getExecutePath(), logger, fileDownloads);
             }
 

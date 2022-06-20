@@ -93,7 +93,8 @@ public class StateEventResponseService {
         try {
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
-            logger.error("put state event : {} error :{}", stateEvent, e);
+            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Put state event : {} error",
+                stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent, e);
             Thread.currentThread().interrupt();
         }
     }
@@ -109,18 +110,19 @@ public class StateEventResponseService {
 
         @Override
         public void run() {
-
+            logger.info("State event loop service started");
             while (Stopper.isRunning()) {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
                     persist(stateEvent);
                 } catch (InterruptedException e) {
+                    logger.warn("State event loop service interrupted, will stop this loop", e);
                     Thread.currentThread().interrupt();
                     break;
                 }
             }
-            logger.info("StateEventResponseWorker stopped");
+            logger.info("State event loop service stopped");
         }
     }
 
@@ -135,6 +137,8 @@ public class StateEventResponseService {
     private void persist(StateEvent stateEvent) {
         try {
             if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
+                logger.warn("[WorkflowInstance-{}][TaskInstance-{}] Persist event into workflow execute thread error, "
+                    + "cannot find the workflow instance from cache manager, event: {}", stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent);
                 writeResponse(stateEvent, ExecutionStatus.FAILURE);
                 return;
             }
@@ -152,7 +156,8 @@ public class StateEventResponseService {
             workflowExecuteThreadPool.submitStateEvent(stateEvent);
             writeResponse(stateEvent, ExecutionStatus.SUCCESS);
         } catch (Exception e) {
-            logger.error("persist event queue error, event: {}", stateEvent, e);
+            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Persist event queue error, event: {}",
+                stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId(), stateEvent, e);
         }
     }
 

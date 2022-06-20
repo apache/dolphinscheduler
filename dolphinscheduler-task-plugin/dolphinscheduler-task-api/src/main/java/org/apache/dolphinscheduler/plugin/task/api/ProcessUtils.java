@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.NonNull;
+
 public final class ProcessUtils {
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
@@ -48,13 +50,15 @@ public final class ProcessUtils {
     /**
      * kill tasks according to different task types.
      */
-    public static void kill(TaskExecutionContext request) {
+    public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Begin kill task instance, processId: {}",
+                request.getProcessInstanceId(), request.getTaskInstanceId(), request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                logger.error("process kill failed, process id :{}, task id:{}",
-                        processId, request.getTaskInstanceId());
-                return;
+                logger.error("[WorkflowInstance-{}][TaskInstance-{}] Task instance kill failed, processId is not exist",
+                    request.getProcessInstanceId(), request.getTaskInstanceId());
+                return false;
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
@@ -62,8 +66,13 @@ public final class ProcessUtils {
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Success kill task instance, processId: {}",
+                request.getProcessInstanceId(), request.getTaskInstanceId(), request.getProcessId());
+            return true;
         } catch (Exception e) {
-            logger.error("kill task failed", e);
+            logger.error("[WorkflowInstance-{}][TaskInstance-{}] Kill task instance error, processId: {}",
+                request.getProcessInstanceId(), request.getTaskInstanceId(), request.getProcessId(), e);
+            return false;
         }
     }
 

@@ -49,18 +49,23 @@ public class EventExecuteService extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
+        logger.info("Master Event execute service starting");
         super.start();
+        logger.info("Master Event execute service started");
     }
 
     @Override
     public void run() {
-        logger.info("Event service started");
         while (Stopper.isRunning()) {
             try {
                 eventHandler();
                 TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS_SHORT);
+            } catch (InterruptedException interruptedException) {
+                logger.warn("Master event service interrupted, will exit this loop", interruptedException);
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
-                logger.error("Event service thread error", e);
+                logger.error("Master event execute service error", e);
             }
         }
     }
