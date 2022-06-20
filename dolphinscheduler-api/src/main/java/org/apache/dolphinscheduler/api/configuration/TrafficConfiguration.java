@@ -25,15 +25,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TrafficConfiguration {
 
-    @Value("${traffic.control.global.switch:false}")
+    @Value("${traffic.control.global-switch:false}")
     private boolean trafficGlobalControlSwitch;
-    @Value("${traffic.control.max.global.qps.rate:300}")
+    @Value("${traffic.control.max-global-qps-rate:300}")
     private Integer maxGlobalQpsRate;
-    @Value("${traffic.control.tenant.switch:false}")
+    @Value("${traffic.control.tenant-switch:false}")
     private boolean trafficTenantControlSwitch;
-    @Value("${traffic.control.default.tenant.qps.rate:10}")
+    @Value("${traffic.control.default-tenant-qps-rate:10}")
     private Integer defaultTenantQpsRate;
-    @Value("#{'${traffic.control.customize.tenant.qps.rate:}'.empty?null:'${traffic.control.customize.tenant.qps.rate:}'}")
+    @Value("#{'${traffic.control.customize-tenant-qps-rate:}'.empty?null:'${traffic.control.customize-tenant-qps-rate:}'}")
     private Map<String, Integer> customizeTenantQpsRate;
 
     public boolean isTrafficGlobalControlSwitch() {
