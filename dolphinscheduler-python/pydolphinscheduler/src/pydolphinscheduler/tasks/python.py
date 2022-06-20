@@ -21,13 +21,12 @@ import inspect
 import logging
 import re
 import types
-from typing import Union, List
-
-from pydolphinscheduler.java_gateway import launch_gateway
+from typing import List, Union
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.java_gateway import launch_gateway
 
 log = logging.getLogger(__file__)
 
@@ -95,7 +94,9 @@ class Python(Task):
 
     def query_resource(self, resource_type, full_name):
         gateway = launch_gateway()
-        return gateway.entry_point.getResourcesFileInfo(self.process_definition.user.name, resource_type, full_name)
+        return gateway.entry_point.getResourcesFileInfo(
+            self.process_definition.user.name, resource_type, full_name
+        )
 
     @property
     def raw_script(self) -> str:
@@ -112,10 +113,15 @@ class Python(Task):
         """Get python task define attribute `resource_list`."""
         if super().resource_list is not None and len(super().resource_list) > 0:
             for resource in super().resource_list:
-                if resource.get("id") is None and resource.get("resourceName") is not None:
+                if (
+                    resource.get("id") is None
+                    and resource.get("resourceName") is not None
+                ):
                     if resource.get("resourceType") is not None:
                         resource_type = resource.get("resourceType")
                     else:
-                        resource_type = 'FILE'
-                    resource["id"] = self.query_resource(resource_type, resource.get("resourceName")).get("id")
+                        resource_type = "FILE"
+                    resource["id"] = self.query_resource(
+                        resource_type, resource.get("resourceName")
+                    ).get("id")
         return super().resource_list
