@@ -162,7 +162,7 @@ def test_python_get_define(name, script_code, raw):
     return_value=({"id": 1, "name": "/dev/test.py"}),
 )
 def test_python_resource_list(mock_code_version, mock_resource, resources, expect):
-    """Test python task parameters."""
+    """Test python task resource list."""
     task = Python(
         name="python_resource_list",
         definition='print("hello world.")',
