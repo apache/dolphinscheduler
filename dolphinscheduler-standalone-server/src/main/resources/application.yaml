@@ -105,6 +105,20 @@ security:
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
 
+# Traffic control, if you turn on this config, the maximum number of request/s will be limited.
+# global max request number per second
+# default tenant-level max request number
+traffic:
+  control:
+    global-switch: false
+    max-global-qps-rate: 300
+    tenant-switch: false
+    default-tenant-qps-rate: 10
+    #customize-tenant-qps-rate:
+      # eg.
+      #tenant1: 11
+      #tenant2: 20
+
 master:
   listen-port: 5678
   # master fetch command num

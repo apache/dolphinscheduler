@@ -95,7 +95,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // i18n
         registry.addInterceptor(localeChangeInterceptor());
-        if (trafficConfiguration.isTrafficGlobalControlSwitch() || trafficConfiguration.isTrafficTenantControlSwitch()) {
+        if (trafficConfiguration.isGlobalSwitch() || trafficConfiguration.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
         registry.addInterceptor(loginInterceptor())

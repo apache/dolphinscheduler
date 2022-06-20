@@ -48,7 +48,7 @@ public class RateLimitInterceptorTest {
     @Test
     public void testPreHandleWithTenantLevenControl() throws ExecutionException {
         TrafficConfiguration trafficConfiguration = new TrafficConfiguration();
-        trafficConfiguration.setTrafficTenantControlSwitch(true);
+        trafficConfiguration.setTenantSwitch(true);
         Map<String, Integer> map = new HashMap<>();
         map.put("tenant1", 2);
         map.put("tenant2", 2);
@@ -72,8 +72,8 @@ public class RateLimitInterceptorTest {
     @Test
     public void testPreHandleWithGlobalControl() throws ExecutionException {
         TrafficConfiguration trafficConfiguration = new TrafficConfiguration();
-        trafficConfiguration.setTrafficTenantControlSwitch(true);
-        trafficConfiguration.setTrafficGlobalControlSwitch(true);
+        trafficConfiguration.setTenantSwitch(true);
+        trafficConfiguration.setGlobalSwitch(true);
         trafficConfiguration.setMaxGlobalQpsRate(3);
 
         RateLimitInterceptor rateLimitInterceptor = new RateLimitInterceptor(trafficConfiguration);
