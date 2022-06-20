@@ -144,3 +144,28 @@ def test_python_get_define(name, script_code, raw):
     ):
         shell = Python(name, script_code)
         assert shell.get_define() == expect
+
+
+@pytest.mark.parametrize(
+    "resources, expect",
+    [
+        ([{"resourceName": "/dev/test.py"}], [{"id": 1, "resourceName": "/dev/test.py"}]),
+        ([{"resourceName": "/dev/test.py"}, {"id": 2}], [{"id": 1, "resourceName": "/dev/test.py"}, {"id": 2}])
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+@patch(
+    "pydolphinscheduler.tasks.python.Python.query_resource",
+    return_value=({"id": 1, "name": "/dev/test.py"}),
+)
+def test_python_resource_list(mock_code_version, mock_resource, resources, expect):
+    """Test python task parameters."""
+    task = Python(
+        name="python_resource_list",
+        definition='print("hello world.")',
+        resource_list=resources
+    )
+    assert task.resource_list == expect

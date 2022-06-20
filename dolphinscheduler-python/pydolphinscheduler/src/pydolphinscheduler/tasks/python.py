@@ -21,7 +21,9 @@ import inspect
 import logging
 import re
 import types
-from typing import Union
+from typing import Union, List
+
+from pydolphinscheduler.java_gateway import launch_gateway
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
@@ -91,6 +93,10 @@ class Python(Task):
             )
         return func_str
 
+    def query_resource(self, resource_type, full_name):
+        gateway = launch_gateway()
+        return gateway.entry_point.getResourcesFileInfo(self.process_definition.user.name, resource_type, full_name)
+
     @property
     def raw_script(self) -> str:
         """Get python task define attribute `raw_script`."""
@@ -100,3 +106,16 @@ class Python(Task):
             raise PyDSParamException(
                 "Parameter definition do not support % for now.", type(self.definition)
             )
+
+    @property
+    def resource_list(self) -> List:
+        """Get python task define attribute `resource_list`."""
+        if super().resource_list is not None and len(super().resource_list) > 0:
+            for resource in super().resource_list:
+                if resource.get("id") is None and resource.get("resourceName") is not None:
+                    if resource.get("resourceType") is not None:
+                        resource_type = resource.get("resourceType")
+                    else:
+                        resource_type = 'FILE'
+                    resource["id"] = self.query_resource(resource_type, resource.get("resourceName")).get("id")
+        return super().resource_list
