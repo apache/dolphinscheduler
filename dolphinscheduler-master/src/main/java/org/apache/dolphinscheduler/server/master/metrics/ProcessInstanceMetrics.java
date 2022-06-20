@@ -50,7 +50,7 @@ public final class ProcessInstanceMetrics {
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_FAILURE_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_failure_count")
+            Counter.builder("ds.workflow.instance.failure.count")
                     .description("Process instance failure total count")
                     .register(Metrics.globalRegistry);
 
