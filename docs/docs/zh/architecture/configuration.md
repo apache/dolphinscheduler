@@ -219,6 +219,11 @@ security.authentication.ldap.password|password|LDAP密码
 security.authentication.ldap.user.identity-attribute|uid|LDAP用户身份标识字段名
 security.authentication.ldap.user.email-attribute|mail|LDAP邮箱字段名
 security.authentication.ldap.user.not-exist-action|CREATE|当LDAP用户不存在时执行的操作。CREATE：当用户不存在时自动新建用户, DENY：当用户不存在时拒绝登陆
+traffic.control.global.switch|false|流量控制全局开关
+traffic.control.max-global-qps-rate|300|全局最大请求数/秒
+traffic.control.tenant-switch|false|流量控制租户开关
+traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制
+traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制
 
 ## 6.master.properties [Master服务配置]
 |参数 |默认值| 描述| 
