@@ -27,10 +27,10 @@ public abstract class BaseDaemonThread extends Thread {
         this.setDaemon(true);
     }
 
-
     protected BaseDaemonThread(String threadName) {
         super();
         this.setName(threadName);
         this.setDaemon(true);
     }
+
 }

@@ -119,6 +119,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
     @Override
     public synchronized void start() {
         this.stateWheelExecuteThread.start();
+        super.start();
     }
 
     public void close() {
