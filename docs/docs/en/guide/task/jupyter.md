@@ -11,6 +11,41 @@ it will use `papermill` to evaluate jupyter notes. Click [here](https://papermil
 Click [here](https://docs.conda.io/en/latest/) for more information about `conda`.
 - `conda.path` is set to `/opt/anaconda3/etc/profile.d/conda.sh` by default. If you have no idea where your `conda` is, simply run `conda info | grep -i 'base environment'`.
 
+> NOTICE: `Jupyter Task Plugin` uses `source` command to activate conda environment. 
+> If your tenant does not have permission to use `source`, `Jupyter Task Plugin` will not function. 
+
+
+## Python Dependency Management
+
+### Use Pre-Installed Conda Environment
+
+1. Create a conda environment manually or using `shell task` on your target worker.
+2. In your `jupyter task`, set `condaEnvName` as the name of the conda environment you just created. 
+
+### Use Packed Conda Environment
+
+1. Use [Conda-Pack](https://conda.github.io/conda-pack/) to pack your conda environment into `tarball`.
+2. Upload packed conda environment to `resource center`.
+3. Select your packed conda environment as `resource` in your `jupyter task`, e.g. `jupyter_env.tar.gz`.
+
+> **_Note:_** Make sure you follow the [Conda-Pack](https://conda.github.io/conda-pack/) official instructions. 
+> If you unpack your packed conda environment, the directory structure should be the same as below:
+
+```
+.
+├── bin
+├── conda-meta
+├── etc
+├── include
+├── lib
+├── share
+└── ssl
+```   
+
+> NOTICE: Please follow the `conda pack` instructions above strictly, and DO NOT modify `bin/activate`.
+> `Jupyter Task Plugin` uses `source` command to activate your packed conda environment.
+> If you are concerned about using `source`, choose other options to manage your python dependency.   
+
 ## Create Task
 
 - Click Project Management-Project Name-Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
@@ -28,7 +63,7 @@ Click [here](https://docs.conda.io/en/latest/) for more information about `conda
 - Cpu quota: Assign the specified CPU time quota to the task executed. Takes a percentage value. Default -1 means unlimited. For example, the full CPU load of one core is 100%,and that of 16 cores is 1600%. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
 - Max memory：Assign the specified max memory to the task executed. Exceeding this limit will trigger oom to be killed and will not automatically retry. Takes an MB value. Default -1 means unlimited. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
 - Timeout alarm: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will send and the task execution will fail.
-- Conda Env Name: Name of conda environment.
+- Conda Env Name: Name of conda environment or packed conda environment tarball.
 - Input Note Path: Path of input jupyter note template.
 - Out Note Path: Path of output note.
 - Jupyter Parameters: Parameters in json format used for jupyter note parameterization.
