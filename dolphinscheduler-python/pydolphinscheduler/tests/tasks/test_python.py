@@ -149,8 +149,14 @@ def test_python_get_define(name, script_code, raw):
 @pytest.mark.parametrize(
     "resources, expect",
     [
-        ([{"resourceName": "/dev/test.py"}], [{"id": 1, "resourceName": "/dev/test.py"}]),
-        ([{"resourceName": "/dev/test.py"}, {"id": 2}], [{"id": 1, "resourceName": "/dev/test.py"}, {"id": 2}])
+        (
+            [{"resourceName": "/dev/test.py"}],
+            [{"id": 1, "resourceName": "/dev/test.py"}],
+        ),
+        (
+            [{"resourceName": "/dev/test.py"}, {"id": 2}],
+            [{"id": 1, "resourceName": "/dev/test.py"}, {"id": 2}],
+        ),
     ],
 )
 @patch(
@@ -166,6 +172,6 @@ def test_python_resource_list(mock_code_version, mock_resource, resources, expec
     task = Python(
         name="python_resource_list",
         definition='print("hello world.")',
-        resource_list=resources
+        resource_list=resources,
     )
     assert task.resource_list == expect
