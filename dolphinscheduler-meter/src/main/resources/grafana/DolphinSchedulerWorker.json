@@ -265,7 +265,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "increase(ds_system_worker_full_submit_queue_count_total{}[1m])",
+          "expr": "increase(ds_worker_full_submit_queue_count_total{}[1m])",
           "refId": "A"
         }
       ],
@@ -351,7 +351,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "increase(ds_system_worker_overload_count_total{}[1m])",
+          "expr": "increase(ds_worker_overload_count_total{}[1m])",
           "refId": "A"
         }
       ],
