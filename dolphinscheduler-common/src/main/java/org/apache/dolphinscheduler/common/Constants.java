@@ -847,4 +847,8 @@ public final class Constants {
      * Security authentication types (supported types: PASSWORD,LDAP)
      */
     public static final String SECURITY_CONFIG_TYPE= "securityConfigType";
+
+    public static final String SECURITY_CONFIG_TYPE_PASSWORD= "PASSWORD";
+
+    public static final String SECURITY_CONFIG_TYPE_LDAP= "LDAP";
 }
