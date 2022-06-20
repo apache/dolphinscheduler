@@ -155,11 +155,11 @@ export const ENGINE = [
 export const FLINK_RUN_MODE = [
   {
     label: 'run',
-    value: 'run'
+    value: 'RUN'
   },
   {
     label: 'run-application',
-    value: 'run-application'
+    value: 'RUN_APPLICATION'
   }
 ]
 

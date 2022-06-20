@@ -51,7 +51,7 @@ export function useSeaTunnel({
     useCustom: true,
     deployMode: 'client',
     queue: 'default',
-    master: 'yarn',
+    master: 'YARN',
     masterUrl: '',
     resourceFiles: [],
     timeoutNotifyStrategy: ['WARN'],
