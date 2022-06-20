@@ -176,7 +176,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,new Object[id], AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
