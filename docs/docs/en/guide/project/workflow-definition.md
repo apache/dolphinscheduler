@@ -79,17 +79,17 @@ The following are the operation functions of the workflow definition list:
 
     ![workflow-date](../../../../img/new_ui/dev/project/workflow-date.png)
 
-  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 10 process instances;
+  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 2 process instances;
 
-  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 10 process instances;
+  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 2 process instances;
  
       * You can manually enter the makeup time (independent of the timing configuration) execute the workflow definition of manually entering the date.  For example, need to fill in the data from 1st May to 10th May, as shown in the figure below:
  
     ![workflow-date](../../../../img/new_ui/dev/project/workflow_date_manual.png)
 
-  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 10 process instances;
+  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 2 process instances;
 
-  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 10 process instances;
+  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 2 process instances;
 
 ## Workflow Timing
 
