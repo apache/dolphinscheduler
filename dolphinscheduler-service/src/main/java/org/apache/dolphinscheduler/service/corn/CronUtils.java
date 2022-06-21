@@ -132,7 +132,7 @@ public class CronUtils {
 
         while (Stopper.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime)) {
+            if (startTime == null || startTime.after(endTime)) {
                 break;
             }
             dateList.add(startTime);
