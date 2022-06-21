@@ -127,7 +127,7 @@ public class CronUtils {
 
         while (Stopper.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime)) {
+            if (startTime == null || startTime.after(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -149,7 +149,7 @@ public class CronUtils {
         List<Date> dateList = new ArrayList<>();
         while (fireTimes > 0) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime) || startTime.equals(endTime)) {
+            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -172,7 +172,7 @@ public class CronUtils {
 
         while (Stopper.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime) || startTime.equals(endTime)) {
+            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
                 break;
             }
             dateList.add(startTime);
