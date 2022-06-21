@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
@@ -185,11 +186,11 @@ public class WorkerServer implements IStoppable {
         int killNumber = 0;
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
-            MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, taskRequest.getProcessInstanceId(), taskRequest.getTaskInstanceId()));
+            LoggerUtils.setWorkflowTaskMDC(taskRequest.getProcessInstanceId(), taskRequest.getTaskInstanceId());
             if (ProcessUtils.kill(taskRequest)) {
                 killNumber++;
             }
-            MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+            LoggerUtils.removeWorkflowInfoMDC();
         }
         logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(), killNumber);
     }

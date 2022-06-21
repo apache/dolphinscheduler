@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -46,7 +47,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -174,7 +174,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
         MasterServerMetrics.incMasterConsumeCommand(commands.size());
 
         for (ProcessInstance processInstance : processInstances) {
-            MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_HEADER_FORMAT, processInstance.getId()));
+            LoggerUtils.setWorkflowMDC(processInstance.getId());
             logger.info("Master schedule service starting workflow instance");
             WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
                 processInstance
@@ -190,7 +190,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
             }
             workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
             logger.info("Master schedule service started workflow instance");
-            MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+            LoggerUtils.removeWorkflowInfoMDC();
         }
     }
 

@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -101,7 +102,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import com.google.common.collect.Lists;
 
@@ -275,11 +275,11 @@ public class WorkflowExecuteRunnable implements Runnable {
         while (!this.stateEvents.isEmpty()) {
             try {
                 StateEvent stateEvent = this.stateEvents.peek();
-                MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId()));
+                LoggerUtils.setWorkflowTaskMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
                 if (stateEventHandler(stateEvent)) {
                     this.stateEvents.remove(stateEvent);
                 }
-                MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+                LoggerUtils.removeWorkflowInfoMDC();
             } catch (Exception e) {
                 logger.error("state handle error:", e);
             }

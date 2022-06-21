@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -54,13 +55,13 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
             logger.error("task execute running ack command is null");
             return;
         }
-        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.TASK_HEADER_FORMAT, runningAckCommand.getTaskInstanceId()));
+        LoggerUtils.setTaskMDC(runningAckCommand.getTaskInstanceId());
         logger.info("task execute running ack command : {}", runningAckCommand);
 
         if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponseCache.get().removeRunningCache(runningAckCommand.getTaskInstanceId());
         }
-        MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+        LoggerUtils.removeWorkflowInfoMDC();
     }
 
 }

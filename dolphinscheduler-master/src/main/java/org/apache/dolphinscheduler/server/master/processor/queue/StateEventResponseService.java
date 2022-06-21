@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -37,7 +37,6 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -83,9 +82,9 @@ public class StateEventResponseService {
             List<StateEvent> remainEvents = new ArrayList<>(eventQueue.size());
             eventQueue.drainTo(remainEvents);
             for (StateEvent event : remainEvents) {
-                MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, event.getProcessInstanceId(), event.getTaskInstanceId()));
+                LoggerUtils.setWorkflowTaskMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 this.persist(event);
-                MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+                LoggerUtils.removeWorkflowInfoMDC();
             }
         }
     }
@@ -118,9 +117,9 @@ public class StateEventResponseService {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
-                    MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId()));
+                    LoggerUtils.setWorkflowTaskMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
                     persist(stateEvent);
-                    MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+                    LoggerUtils.removeWorkflowInfoMDC();
                 } catch (InterruptedException e) {
                     logger.warn("State event loop service interrupted, will stop this loop", e);
                     Thread.currentThread().interrupt();

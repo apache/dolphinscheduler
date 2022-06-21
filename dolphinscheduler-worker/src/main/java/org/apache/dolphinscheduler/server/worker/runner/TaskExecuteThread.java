@@ -59,7 +59,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import com.google.common.base.Strings;
 
@@ -127,7 +126,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     @Override
     public void run() {
-        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_HEADER_FORMAT, taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId()));
+        LoggerUtils.setWorkflowTaskMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
         if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUCCESS);
             taskExecutionContext.setStartTime(new Date());
@@ -210,7 +209,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             clearTaskExecPath();
-            MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+            LoggerUtils.removeWorkflowInfoMDC();
         }
     }
 

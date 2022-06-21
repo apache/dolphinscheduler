@@ -624,9 +624,9 @@ public final class Constants {
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
     public static final String WORKFLOW_INFO_MDC_KEY = "workflowInfo";
-    public static final String WORKFLOW_HEADER_FORMAT = "[WorkflowInstance-%s]";
-    public static final String WORKFLOW_TASK_HEADER_FORMAT = "[WorkflowInstance-%s][TaskInstance-%s]";
-    public static final String TASK_HEADER_FORMAT = "[TaskInstance-%s]";
+    public static final String WORKFLOW_LOG_PREFIX_FORMAT = "[WorkflowInstance-%s]";
+    public static final String WORKFLOW_TASK_LOG_PREFIX_FORMAT = "[WorkflowInstance-%s][TaskInstance-%s]";
+    public static final String TASK_LOG_PREFIX_FORMAT = "[TaskInstance-%s]";
 
     /**
      * task log info format

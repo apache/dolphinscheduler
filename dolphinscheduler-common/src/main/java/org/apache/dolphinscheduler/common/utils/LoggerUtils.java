@@ -32,15 +32,15 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
+import lombok.experimental.UtilityClass;
 
 /**
  * logger utils
  */
+@UtilityClass
 public class LoggerUtils {
-
-    private LoggerUtils() {
-        throw new UnsupportedOperationException("Construct LoggerUtils");
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
 
@@ -108,5 +108,33 @@ public class LoggerUtils {
             logger.error("read file error", e);
         }
         return "";
+    }
+
+    /**
+     * Set the {@link Constants#WORKFLOW_INFO_MDC_KEY} key in MDC, value is formatted with workflowInstanceId and taskInstanceId.
+     */
+    public static void setWorkflowTaskMDC(int workflowInstanceId, int taskInstanceId) {
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_LOG_PREFIX_FORMAT, workflowInstanceId, taskInstanceId));
+    }
+
+    /**
+     * Set the {@link Constants#WORKFLOW_INFO_MDC_KEY} key in MDC, value is formatted with taskInstanceId.
+     */
+    public static void setTaskMDC(int taskInstanceId) {
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.TASK_LOG_PREFIX_FORMAT, taskInstanceId));
+    }
+
+    /**
+     * Set the {@link Constants#WORKFLOW_INFO_MDC_KEY} key in MDC, value is formatted with workflowInstanceId.
+     */
+    public static void setWorkflowMDC(int workflowInstanceId) {
+        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_LOG_PREFIX_FORMAT, workflowInstanceId));
+    }
+
+    /**
+     * Remove the {@link Constants#WORKFLOW_INFO_MDC_KEY} from MDC.
+     */
+    public static void removeWorkflowInfoMDC() {
+        MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
     }
 }
