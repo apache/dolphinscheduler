@@ -77,8 +77,8 @@ public class FailoverService {
     /**
      * check master failover
      */
-    @Counted(value = "failover_scheduler_check_task_count")
-    @Timed(value = "failover_scheduler_check_task_time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
+    @Counted(value = "ds.master.scheduler.failover.check.count")
+    @Timed(value = "ds.master.scheduler.failover.check.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     public void checkMasterFailover() {
         List<String> hosts = getNeedFailoverMasterServers();
         if (CollectionUtils.isEmpty(hosts)) {
