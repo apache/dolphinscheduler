@@ -104,7 +104,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * execute workflow
      */
-    public void executeEvent(WorkflowExecuteRunnable workflowExecuteThread) {
+    public void executeEvent(final WorkflowExecuteRunnable workflowExecuteThread) {
         if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
             return;
         }
