@@ -37,7 +37,7 @@ source ${BIN_DIR}/env/dolphinscheduler_env.sh
 export JAVA_HOME=$JAVA_HOME
 
 export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
-export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
+export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/libs/*
 
 export DOLPHINSCHEDULER_OPTS="-Xmx1g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
 export STOP_TIMEOUT=5
