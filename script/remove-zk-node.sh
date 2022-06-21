@@ -42,10 +42,9 @@ export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/api-server/libs/*
 export DOLPHINSCHEDULER_OPTS="-Xmx1g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
 export STOP_TIMEOUT=5
 
-registryServers=$REGISTRY_ZOOKEEPER_CONNECT_STRING
 CLASS=org.apache.zookeeper.ZooKeeperMain
 
-exec_command="$DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS -server $registryServers rmr $rootNode"
+exec_command="$DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS -server $REGISTRY_ZOOKEEPER_CONNECT_STRING rmr $rootNode"
 
 cd $DOLPHINSCHEDULER_HOME
 $JAVA_HOME/bin/java $exec_command
