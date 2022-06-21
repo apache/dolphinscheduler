@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.quartz.CronExpression;
+import org.quartz.TriggerUtils;
+import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,7 +152,7 @@ public class CronUtils {
         List<Date> dateList = new ArrayList<>();
         while (fireTimes > 0) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime) || startTime.equals(endTime)) {
+            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -173,7 +175,7 @@ public class CronUtils {
 
         while (Stopper.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime) || startTime.equals(endTime)) {
+            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
                 break;
             }
             dateList.add(startTime);
