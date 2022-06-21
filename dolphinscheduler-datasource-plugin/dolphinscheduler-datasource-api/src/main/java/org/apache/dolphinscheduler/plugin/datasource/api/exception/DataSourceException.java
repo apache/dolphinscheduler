@@ -15,28 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.datasource;
+package org.apache.dolphinscheduler.plugin.datasource.api.exception;
 
-import org.apache.commons.lang3.tuple.MutableTriple;
+public class DataSourceException extends RuntimeException {
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
+    public DataSourceException() {
+    }
 
-public interface DataSourceClient {
+    public DataSourceException(String message) {
+        super(message);
+    }
 
-    void checkClient();
+    public DataSourceException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    void close();
+    public static DataSourceException getInstance(String message) {
+        return new DataSourceException(message);
+    }
 
-    Connection getConnection();
-
-    List<String> getDatabaseList(String databasePattern);
-
-    List<String> getTableList(String dbName, String schemaName, String tablePattern);
-
-    List<Map<String, Object>> getTableStruct(String dbName, String schemaName, String tableName);
-
-    MutableTriple<Map<String, String>, List<Map<String, Object>>, List<Map<String, String>>> executeSql(String dbName, String schemaName, Boolean oneSession, String querySql);
-
+    public static DataSourceException getInstance(String message, Throwable cause) {
+        return new DataSourceException(message + ": " + cause.getMessage(), cause);
+    }
 }

@@ -15,28 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.datasource;
+package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
-import org.apache.commons.lang3.tuple.MutableTriple;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.SqlProvider;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
-public interface DataSourceClient {
-
-    void checkClient();
-
-    void close();
-
-    Connection getConnection();
-
-    List<String> getDatabaseList(String databasePattern);
-
-    List<String> getTableList(String dbName, String schemaName, String tablePattern);
-
-    List<Map<String, Object>> getTableStruct(String dbName, String schemaName, String tableName);
-
-    MutableTriple<Map<String, String>, List<Map<String, Object>>, List<Map<String, String>>> executeSql(String dbName, String schemaName, Boolean oneSession, String querySql);
-
+public interface ConnectionCallbackWithSqlProvider<T> extends ConnectionCallback<T>, SqlProvider {
 }

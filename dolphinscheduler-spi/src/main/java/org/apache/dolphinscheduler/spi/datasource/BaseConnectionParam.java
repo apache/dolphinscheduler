@@ -42,6 +42,8 @@ public abstract class BaseConnectionParam implements ConnectionParam {
 
     protected String validationQuery;
 
+    private Boolean connMetaStore;
+
     protected String other;
 
     private Map<String, String> props = new HashMap<>();
@@ -108,6 +110,14 @@ public abstract class BaseConnectionParam implements ConnectionParam {
 
     public void setValidationQuery(String validationQuery) {
         this.validationQuery = validationQuery;
+    }
+
+    public Boolean getConnMetaStore() {
+        return connMetaStore;
+    }
+
+    public void setConnMetaStore(Boolean connMetaStore) {
+        this.connMetaStore = connMetaStore;
     }
 
     public String getOther() {
