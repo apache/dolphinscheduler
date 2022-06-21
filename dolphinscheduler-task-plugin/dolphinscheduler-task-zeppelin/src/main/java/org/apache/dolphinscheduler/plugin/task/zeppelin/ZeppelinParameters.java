@@ -32,17 +32,16 @@ public class ZeppelinParameters extends AbstractParameters {
      */
     private String noteId;
     private String paragraphId;
+    private String parameters;
 
     @Override
     public boolean checkParameters() {
-
-        return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.paragraphId);
+        return StringUtils.isNotEmpty(this.noteId);
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return Collections.emptyList();
-
     }
 
     public String getNoteId() {
@@ -61,11 +60,21 @@ public class ZeppelinParameters extends AbstractParameters {
         this.paragraphId = paragraphId;
     }
 
+    public String getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
+
     @Override
     public String toString() {
         return "ZeppelinParameters{" +
                 "noteId='" + noteId + '\'' +
                 ", paragraphId='" + paragraphId + '\'' +
+                ", parameters='" + parameters + '\'' +
                 '}';
     }
+
 }

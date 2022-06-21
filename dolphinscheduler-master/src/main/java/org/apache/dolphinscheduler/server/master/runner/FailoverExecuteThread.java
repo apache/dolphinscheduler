@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FailoverExecuteThread extends Thread {
+public class FailoverExecuteThread extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(FailoverExecuteThread.class);
 
@@ -42,25 +43,30 @@ public class FailoverExecuteThread extends Thread {
     @Autowired
     private FailoverService failoverService;
 
+    protected FailoverExecuteThread() {
+        super("FailoverExecuteThread");
+    }
+
     @Override
     public synchronized void start() {
-        super.setName("FailoverExecuteThread");
         super.start();
     }
 
     @Override
     public void run() {
         // when startup, wait 10s for ready
-        ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * 10);
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 10);
 
         logger.info("failover execute thread started");
         while (Stopper.isRunning()) {
             try {
+                // todo: DO we need to schedule a task to do this kind of check
+                // This kind of check may only need to be executed when a master server start
                 failoverService.checkMasterFailover();
             } catch (Exception e) {
                 logger.error("failover execute error", e);
             } finally {
-                ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
             }
         }
     }

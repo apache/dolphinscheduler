@@ -23,8 +23,10 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
@@ -36,11 +38,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,12 +57,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DqExecuteResultServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(DqExecuteResultServiceTest.class);
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
     private DqExecuteResultServiceImpl dqExecuteResultService;
 
     @Mock
     DqExecuteResultMapper dqExecuteResultMapper;
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Test
     public void testQueryResultListPaging() {
@@ -71,7 +79,8 @@ public class DqExecuteResultServiceTest {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0, baseServiceLogger)).thenReturn(true);
         Page<DqExecuteResult> page = new Page<>(1, 10);
         page.setTotal(1);
         page.setRecords(getExecuteResultList());

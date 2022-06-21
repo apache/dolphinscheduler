@@ -28,9 +28,10 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -320,7 +321,7 @@ public class FlinkTask extends AbstractYarnTask {
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
             try {
-                if (OSUtils.isWindows()) {
+                if (SystemUtils.IS_OS_WINDOWS) {
                     Files.createFile(path);
                 } else {
                     if (!file.getParentFile().exists()) {
@@ -363,7 +364,7 @@ public class FlinkTask extends AbstractYarnTask {
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
             try {
-                if (OSUtils.isWindows()) {
+                if (SystemUtils.IS_OS_WINDOWS) {
                     Files.createFile(path);
                 } else {
                     if (!file.getParentFile().exists()) {

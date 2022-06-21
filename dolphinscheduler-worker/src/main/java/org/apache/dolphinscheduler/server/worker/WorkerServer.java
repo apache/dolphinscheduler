@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResponseAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskRecallAckProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
@@ -53,11 +54,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan("org.apache.dolphinscheduler")
+@ComponentScan(basePackages = "org.apache.dolphinscheduler",
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                        "org.apache.dolphinscheduler.service.process.*",
+                        "org.apache.dolphinscheduler.service.queue.*",
+                })
+        }
+)
 public class WorkerServer implements IStoppable {
 
     /**
@@ -101,6 +110,8 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
+    // todo: Can we just load the task spi, and don't install into mysql?
+    //  we don't need to rely the dao module in worker.
     @Autowired
     private TaskPluginManager taskPluginManager;
 
@@ -109,6 +120,9 @@ public class WorkerServer implements IStoppable {
 
     @Autowired
     private TaskKillProcessor taskKillProcessor;
+
+    @Autowired
+    private TaskRecallAckProcessor taskRecallAckProcessor;
 
     @Autowired
     private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
@@ -146,7 +160,7 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK, taskExecuteRunningAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE_ACK, taskExecuteResponseAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
-
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL_ACK, taskRecallAckProcessor);
         // logger server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);

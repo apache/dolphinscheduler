@@ -7,7 +7,7 @@ DataX task type for executing DataX programs. For DataX nodes, the worker will e
 ## Create Task
 
 - Click Project Management -> Project Name -> Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag the <img src="/img/tasks/icons/datax.png" width="15"/> from the toolbar to the drawing board.
+- Drag the <img src="../../../../img/tasks/icons/datax.png" width="15"/> from the toolbar to the drawing board.
 
 ## Task Parameter
 
@@ -19,6 +19,8 @@ DataX task type for executing DataX programs. For DataX nodes, the worker will e
 - **Environment Name**: Configure the environment name in which to run the script.
 - **Number of failed retry attempts**: The number of times the task failed to be resubmitted.
 - **Failed retry interval**: The time, in cents, interval for resubmitting the task after a failed task.
+- **Cpu quota**: Assign the specified CPU time quota to the task executed. Takes a percentage value. Default -1 means unlimited. For example, the full CPU load of one core is 100%,and that of 16 cores is 1600%. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
+- **Max memory**：Assign the specified max memory to the task executed. Exceeding this limit will trigger oom to be killed and will not automatically retry. Takes an MB value. Default -1 means unlimited. This function is controlled by [task.resource.limit.state](../../architecture/configuration.md)
 - **Delayed execution time**: The time, in cents, that a task is delayed in execution.
 - **Timeout alarm**: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will be sent and the task execution will fail.
 - **Custom template**: Custom the content of the DataX node's json profile when the default data source provided does not meet the required requirements.
@@ -42,7 +44,7 @@ This example demonstrates importing data from Hive into MySQL.
 
 If you are using the DataX task type in a production environment, it is necessary to configure the required environment first. The configuration file is as follows: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
 
-![datax_task01](/img/tasks/demo/datax_task01.png)
+![datax_task01](../../../../img/tasks/demo/datax_task01.png)
 
 After the environment has been configured, DolphinScheduler needs to be restarted.
 
@@ -52,11 +54,11 @@ As the default data source does not contain data to be read from Hive, a custom 
 
 After writing the required json file, you can configure the node content by following the steps in the diagram below.
 
-![datax_task02](/img/tasks/demo/datax_task02.png)
+![datax_task02](../../../../img/tasks/demo/datax_task02.png)
 
 ### View run results
 
-![datax_task03](/img/tasks/demo/datax_task03.png)
+![datax_task03](../../../../img/tasks/demo/datax_task03.png)
 
 ### Notice
 

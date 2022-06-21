@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,7 +78,7 @@ public final class ProcessUtils {
         StringBuilder sb = new StringBuilder();
         Matcher mat = null;
         // pstree pid get sub pids
-        if (OSUtils.isMacOS()) {
+        if (SystemUtils.IS_OS_MAC) {
             String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
             if (null != pids) {
                 mat = MACPATTERN.matcher(pids);

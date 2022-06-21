@@ -365,9 +365,9 @@ public class TaskConstants {
 
     /**
      * hdfs/s3 configuration
-     * resource.upload.path
+     * resource.storage.upload.base.path
      */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
     /**
      * data.quality.jar.name
@@ -400,9 +400,9 @@ public class TaskConstants {
     /**
      * aws config
      */
-    public static final String AWS_ACCESS_KEY_ID= "aws.access.key.id";
-    public static final String AWS_SECRET_ACCESS_KEY= "aws.secret.access.key";
-    public static final String AWS_REGION = "aws.region";
+    public static final String AWS_ACCESS_KEY_ID = "resource.aws.access.key.id";
+    public static final String AWS_SECRET_ACCESS_KEY = "resource.aws.secret.access.key";
+    public static final String AWS_REGION = "resource.aws.region";
 
     /**
      * use for k8s task
@@ -424,7 +424,7 @@ public class TaskConstants {
     /**
      * zeppelin config
      */
-    public static final String ZEPPELIN_REST_URL= "zeppelin.rest.url";
+    public static final String ZEPPELIN_REST_URL = "zeppelin.rest.url";
 
     /**
      * conda config used by jupyter task plugin

@@ -17,26 +17,48 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.service.BaseService;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
+    private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+    @Autowired
+    protected ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Override
+    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
+        try{
+            resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
+        }catch (Exception e){
+            logger.error("post handle error", e);
+            throw new RuntimeException("resource association user error", e);
+        }
+    }
 
     /**
      * check admin
@@ -146,6 +168,20 @@ public class BaseServiceImpl implements BaseService {
     }
 
     /**
+     * Verify that the operator has permissions
+     * @param user operate user
+     * @param ids Object[]
+     * @param type AuthorizationType
+     * @return boolean
+     */
+    @Override
+    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+        return operationPermissionCheck && resourcePermissionCheck;
+    }
+
+    /**
      * check and parse date parameters
      *
      * @param startDateStr start date string
@@ -178,5 +214,4 @@ public class BaseServiceImpl implements BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 }

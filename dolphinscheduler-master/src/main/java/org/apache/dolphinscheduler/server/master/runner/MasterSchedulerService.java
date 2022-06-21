@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -49,10 +50,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * master scheduler thread
+ * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
 @Service
-public class MasterSchedulerService extends Thread {
+public class MasterSchedulerService extends BaseDaemonThread {
 
     /**
      * logger of MasterSchedulerService
@@ -102,6 +103,10 @@ public class MasterSchedulerService extends Thread {
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+    protected MasterSchedulerService() {
+        super("MasterCommandLoopThread");
+    }
+
     /**
      * constructor of MasterSchedulerService
      */
@@ -113,9 +118,8 @@ public class MasterSchedulerService extends Thread {
 
     @Override
     public synchronized void start() {
-        super.setName("MasterSchedulerService");
-        super.start();
         this.stateWheelExecuteThread.start();
+        super.start();
     }
 
     public void close() {
@@ -133,6 +137,7 @@ public class MasterSchedulerService extends Thread {
             try {
                 boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
                 if (!runCheckFlag) {
+                    MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
@@ -159,13 +164,11 @@ public class MasterSchedulerService extends Thread {
         if (CollectionUtils.isEmpty(processInstances)) {
             return;
         }
+        MasterServerMetrics.incMasterConsumeCommand(commands.size());
 
         for (ProcessInstance processInstance : processInstances) {
-            if (processInstance == null) {
-                continue;
-            }
 
-            WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
+            WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
                     processInstance
                     , processService
                     , nettyExecutorManager
@@ -173,11 +176,11 @@ public class MasterSchedulerService extends Thread {
                     , masterConfig
                     , stateWheelExecuteThread);
 
-            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
+            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
             if (processInstance.getTimeout() > 0) {
                 stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
-            workflowExecuteThreadPool.startWorkflow(workflowExecuteThread);
+            workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
         }
     }
 
@@ -201,7 +204,7 @@ public class MasterSchedulerService extends Thread {
                         logger.info("handle command {} end, create process instance {}", command.getId(), processInstance.getId());
                     }
                 } catch (Exception e) {
-                    logger.error("handle command error ", e);
+                    logger.error("handle command {} error ", command.getId(), e);
                     processService.moveToErrorCommand(command, e.toString());
                 } finally {
                     latch.countDown();

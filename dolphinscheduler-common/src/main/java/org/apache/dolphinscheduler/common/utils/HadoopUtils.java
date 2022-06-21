@@ -17,18 +17,20 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -37,11 +39,12 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
@@ -52,10 +55,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * hadoop utils
@@ -148,10 +154,9 @@ public class HadoopUtils implements Closeable, StorageOperate {
                     return true;
                 });
             } else {
-                logger.warn("hdfs.root.user is not set value!");
+                logger.warn("resource.hdfs.root.user is not set value!");
                 fs = FileSystem.get(configuration);
             }
-//
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -274,7 +279,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean mkdir(String bucketName, String hdfsPath) throws IOException {
+    public boolean mkdir(String tenantCode, String hdfsPath) throws IOException {
         return fs.mkdirs(new Path(hdfsPath));
     }
 
@@ -363,11 +368,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
         return FileUtil.copy(fs, srcPath, dstPath, deleteSource, fs.getConf());
     }
-
-//    @Override
-//    public boolean copyStorage2Local(String srcHdfsFilePath, String dstFile, boolean deleteSource, boolean overwrite)throws IOException{
-//        return copyHdfsToLocal(srcHdfsFilePath,dstFile,deleteSource,overwrite);
-//    }
 
     /**
      * delete a file
@@ -547,17 +547,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
         return String.format("%s/" + RESOURCE_TYPE_FILE, getHdfsTenantDir(tenantCode));
     }
 
-//    /**
-//     * hdfs user dir
-//     *
-//     * @param tenantCode tenant code
-//     * @param userId     user id
-//     * @return hdfs resource dir
-//     */
-//    public static String getHdfsUserDir(String tenantCode, int userId) {
-//        return String.format("%s/home/%d", getHdfsTenantDir(tenantCode), userId);
-//    }
-
     /**
      * hdfs udf dir
      *
@@ -668,7 +657,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
     /**
      * yarn ha admin utils
      */
-    private static final class YarnHAAdminUtils extends RMAdminCLI {
+    private static final class YarnHAAdminUtils {
 
         /**
          * get active resourcemanager

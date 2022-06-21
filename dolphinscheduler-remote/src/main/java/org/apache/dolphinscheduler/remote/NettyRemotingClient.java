@@ -58,6 +58,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -127,7 +128,7 @@ public class NettyRemotingClient {
      */
     public NettyRemotingClient(final NettyClientConfig clientConfig) {
         this.clientConfig = clientConfig;
-        if (NettyUtils.useEpoll()) {
+        if (Epoll.isAvailable()) {
             this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
                 private final AtomicInteger threadIndex = new AtomicInteger(0);
 
@@ -303,6 +304,8 @@ public class NettyRemotingClient {
                 logger.error(msg, future.cause());
                 throw new RemotingException(msg);
             }
+        } catch (RemotingException remotingException) {
+            throw remotingException;
         } catch (Exception e) {
             logger.error("Send command {} to address {} encounter error.", command, host.getAddress());
             throw new RemotingException(String.format("Send command : %s , to :%s encounter error", command, host.getAddress()), e);
@@ -384,10 +387,10 @@ public class NettyRemotingClient {
                 if (this.responseFutureExecutor != null) {
                     this.responseFutureExecutor.shutdownNow();
                 }
+                logger.info("netty client closed");
             } catch (Exception ex) {
                 logger.error("netty client close exception", ex);
             }
-            logger.info("netty client closed");
         }
     }
 

@@ -213,6 +213,7 @@ interface IRuleParameters {
   target_datasource_id?: number
   target_table?: string
   threshold?: string
+  mapping_columns?: string
 }
 
 interface ITaskParams {
@@ -335,6 +336,18 @@ interface ITaskParams {
   deployType?: string
   deployPort?: string
   deployModelKey?: string
+  cpuLimit?: string
+  memoryLimit?: string
+  zk?: string
+  zkPath?: string
+  executeMode?: string
+  dvcTaskType?: string
+  dvcRepository?: string
+  dvcVersion?: string
+  dvcDataLocation?: string
+  dvcMessage?: string
+  dvcLoadSaveDataPath?: string
+  dvcStoreUrl?: string
 }
 
 interface INodeData
@@ -352,7 +365,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
-    IRuleParameters {
+    Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -361,6 +374,8 @@ interface INodeData
   environmentCode?: number | null
   failRetryInterval?: number
   failRetryTimes?: number
+  cpuQuota?: number
+  memoryMax?: number
   flag?: 'YES' | 'NO'
   taskGroupId?: number
   taskGroupPriority?: number
@@ -387,6 +402,7 @@ interface INodeData
   failedBranch?: number
   udfs?: string[]
   customConfig?: boolean
+  mapping_columns?: object[]
 }
 
 interface ITaskData

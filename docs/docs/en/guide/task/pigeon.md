@@ -4,7 +4,7 @@ Pigeon is a task used to trigger remote tasks, acquire logs or status by calling
 
 ## Create
 
-Drag from the toolbar <img src="/img/pigeon.png" width="20"/> to the canvas to create a new Pigeon task.
+Drag from the toolbar <img src="../../../../img/pigeon.png" width="20"/> to the canvas to create a new Pigeon task.
 
 ## Parameter
 

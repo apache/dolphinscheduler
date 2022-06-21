@@ -1,13 +1,13 @@
 # DolphinScheduler development
 
-## Software Requests
-
+## Software Requirements
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
-* [Git](https://git-scm.com/downloads): DolphinScheduler version control system
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): DolphinScheduler backend language, have to use version after JDK 1.8
-* [Maven](http://maven.apache.org/download.cgi): Java Package Management System
-* [Node](https://nodejs.org/en/download): DolphinScheduler frontend, have to use version after Node 12.20.2
+* [Git](https://git-scm.com/downloads)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)
+* [Maven](http://maven.apache.org/download.cgi): v3.5+
+* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
+* [Pnpm](https://pnpm.io/installation): v6.x
 
 ### Clone Git Repository
 
@@ -103,7 +103,7 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.server.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
 
 ### Start frontend server
 
