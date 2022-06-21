@@ -360,16 +360,14 @@ public class ProcessServiceImpl implements ProcessService {
                 int update = updateProcessInstance(info);
                 // determine whether the process is normal
                 if (update > 0) {
-                    String host = info.getHost();
-                    String address = host.split(":")[0];
-                    int port = Integer.parseInt(host.split(":")[1]);
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                             info.getId(), 0, info.getState(), info.getId(), 0
                     );
                     try {
-                        stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+                        Host host = new Host(info.getHost());
+                        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
                     } catch (Exception e) {
-                        logger.error("sendResultError");
+                        logger.error("sendResultError",e );
                     }
                 }
             }
@@ -3042,13 +3040,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void sendStartTask2Master(ProcessInstance processInstance, int taskId,
                                      org.apache.dolphinscheduler.remote.command.CommandType taskType) {
-        String host = processInstance.getHost();
-        String address = host.split(":")[0];
-        int port = Integer.parseInt(host.split(":")[1]);
         TaskEventChangeCommand taskEventChangeCommand = new TaskEventChangeCommand(
             processInstance.getId(), taskId
         );
-        stateEventCallbackService.sendResult(address, port, taskEventChangeCommand.convert2Command(taskType));
+        Host host = new Host(processInstance.getHost());
+        stateEventCallbackService.sendResult(host, taskEventChangeCommand.convert2Command(taskType));
     }
 
     @Override
