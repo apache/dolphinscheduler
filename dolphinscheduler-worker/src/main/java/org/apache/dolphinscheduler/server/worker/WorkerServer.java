@@ -42,7 +42,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -186,11 +185,14 @@ public class WorkerServer implements IStoppable {
         int killNumber = 0;
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
-            LoggerUtils.setWorkflowTaskMDC(taskRequest.getProcessInstanceId(), taskRequest.getTaskInstanceId());
-            if (ProcessUtils.kill(taskRequest)) {
-                killNumber++;
+            try {
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(), taskRequest.getTaskInstanceId());
+                if (ProcessUtils.kill(taskRequest)) {
+                    killNumber++;
+                }
+            } finally {
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
-            LoggerUtils.removeWorkflowInfoMDC();
         }
         logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(), killNumber);
     }

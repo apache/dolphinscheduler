@@ -59,10 +59,13 @@ public class TaskEventProcessor implements NettyRequestProcessor {
         stateEvent.setProcessInstanceId(taskEventChangeCommand.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskEventChangeCommand.getTaskInstanceId());
         stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
-        LoggerUtils.setWorkflowTaskMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
-        logger.info("Received task event change command, event: {}", stateEvent);
-        stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
-        LoggerUtils.removeWorkflowInfoMDC();
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+            logger.info("Received task event change command, event: {}", stateEvent);
+            stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
     }
 
 }

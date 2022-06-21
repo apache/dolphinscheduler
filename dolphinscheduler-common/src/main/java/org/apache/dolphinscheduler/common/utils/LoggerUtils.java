@@ -110,31 +110,29 @@ public class LoggerUtils {
         return "";
     }
 
-    /**
-     * Set the {@link Constants#WORKFLOW_INFO_MDC_KEY} key in MDC, value is formatted with workflowInstanceId and taskInstanceId.
-     */
-    public static void setWorkflowTaskMDC(int workflowInstanceId, int taskInstanceId) {
-        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_TASK_LOG_PREFIX_FORMAT, workflowInstanceId, taskInstanceId));
+    public static void setWorkflowAndTaskInstanceIDMDC(int workflowInstanceId, int taskInstanceId) {
+        setWorkflowInstanceIdMDC(workflowInstanceId);
+        setTaskInstanceIdMDC(taskInstanceId);
     }
 
-    /**
-     * Set the {@link Constants#WORKFLOW_INFO_MDC_KEY} key in MDC, value is formatted with taskInstanceId.
-     */
-    public static void setTaskMDC(int taskInstanceId) {
-        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.TASK_LOG_PREFIX_FORMAT, taskInstanceId));
+    public static void setWorkflowInstanceIdMDC(int workflowInstanceId) {
+        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
     }
 
-    /**
-     * Set the {@link Constants#WORKFLOW_INFO_MDC_KEY} key in MDC, value is formatted with workflowInstanceId.
-     */
-    public static void setWorkflowMDC(int workflowInstanceId) {
-        MDC.put(Constants.WORKFLOW_INFO_MDC_KEY, String.format(Constants.WORKFLOW_LOG_PREFIX_FORMAT, workflowInstanceId));
+    public static void setTaskInstanceIdMDC(int taskInstanceId) {
+        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
     }
 
-    /**
-     * Remove the {@link Constants#WORKFLOW_INFO_MDC_KEY} from MDC.
-     */
-    public static void removeWorkflowInfoMDC() {
-        MDC.remove(Constants.WORKFLOW_INFO_MDC_KEY);
+    public static void removeWorkflowAndTaskInstanceIdMDC() {
+        removeWorkflowInstanceIdMDC();
+        removeTaskInstanceIdMDC();
+    }
+
+    public static void removeWorkflowInstanceIdMDC() {
+        MDC.remove(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY);
+    }
+
+    public static void removeTaskInstanceIdMDC() {
+        MDC.remove(Constants.TASK_INSTANCE_ID_MDC_KEY);
     }
 }

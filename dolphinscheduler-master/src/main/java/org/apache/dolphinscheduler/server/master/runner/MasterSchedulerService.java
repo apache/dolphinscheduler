@@ -174,23 +174,27 @@ public class MasterSchedulerService extends BaseDaemonThread {
         MasterServerMetrics.incMasterConsumeCommand(commands.size());
 
         for (ProcessInstance processInstance : processInstances) {
-            LoggerUtils.setWorkflowMDC(processInstance.getId());
-            logger.info("Master schedule service starting workflow instance");
-            WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
-                processInstance
-                , processService
-                , nettyExecutorManager
-                , processAlertManager
-                , masterConfig
-                , stateWheelExecuteThread);
+            try {
+                LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
+                logger.info("Master schedule service starting workflow instance");
+                WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
+                    processInstance
+                    , processService
+                    , nettyExecutorManager
+                    , processAlertManager
+                    , masterConfig
+                    , stateWheelExecuteThread);
 
-            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
-            if (processInstance.getTimeout() > 0) {
-                stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
+                this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
+                if (processInstance.getTimeout() > 0) {
+                    stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
+                }
+                workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
+                logger.info("Master schedule service started workflow instance");
+
+            } finally {
+                LoggerUtils.removeWorkflowInstanceIdMDC();
             }
-            workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
-            logger.info("Master schedule service started workflow instance");
-            LoggerUtils.removeWorkflowInfoMDC();
         }
     }
 

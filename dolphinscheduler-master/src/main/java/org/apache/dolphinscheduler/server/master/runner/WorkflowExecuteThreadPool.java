@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -123,24 +124,31 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
-                logger.error("[WorkflowInstance-{}] Workflow instance events handle failed", processInstanceId, ex);
-                multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                try {
+                    logger.error("Workflow instance events handle failed", ex);
+                    multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                } finally {
+                    LoggerUtils.removeWorkflowInstanceIdMDC();
+                }
             }
 
             @Override
             public void onSuccess(Object result) {
                 try {
+                    LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish()) {
                         stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                        logger.info("[WorkflowInstance-{}] Workflow instance is finished.", processInstanceId);
+                        logger.info("Workflow instance is finished.");
                     }
                 } catch (Exception e) {
-                    logger.error("[WorkflowInstance-{}] Workflow instance is finished, but notify changed error", processInstanceId, e);
+                    logger.error("Workflow instance is finished, but notify changed error", e);
                 } finally {
                     // make sure the process has been removed from multiThreadFilterMap
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                    LoggerUtils.removeWorkflowInstanceIdMDC();
                 }
             }
         });

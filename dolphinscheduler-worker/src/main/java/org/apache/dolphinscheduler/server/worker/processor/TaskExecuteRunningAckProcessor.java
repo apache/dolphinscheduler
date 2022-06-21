@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -29,7 +28,6 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -47,21 +45,24 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteRunningAckCommand runningAckCommand = JSONUtils.parseObject(
-                command.getBody(), TaskExecuteRunningAckCommand.class);
+            command.getBody(), TaskExecuteRunningAckCommand.class);
         if (runningAckCommand == null) {
             logger.error("task execute running ack command is null");
             return;
         }
-        LoggerUtils.setTaskMDC(runningAckCommand.getTaskInstanceId());
-        logger.info("task execute running ack command : {}", runningAckCommand);
+        try {
+            LoggerUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
+            logger.info("task execute running ack command : {}", runningAckCommand);
 
-        if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-            ResponseCache.get().removeRunningCache(runningAckCommand.getTaskInstanceId());
+            if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+                ResponseCache.get().removeRunningCache(runningAckCommand.getTaskInstanceId());
+            }
+        } finally {
+            LoggerUtils.removeTaskInstanceIdMDC();
         }
-        LoggerUtils.removeWorkflowInfoMDC();
     }
 
 }

@@ -72,14 +72,14 @@ public class TaskExecuteRunnable implements Runnable {
     public void run() {
         while (!this.events.isEmpty()) {
             TaskEvent event = this.events.peek();
-            LoggerUtils.setWorkflowTaskMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
             try {
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 persist(event);
             } catch (Exception e) {
                 logger.error("persist error, event:{}, error: {}", event, e);
             } finally {
                 this.events.remove(event);
-                LoggerUtils.removeWorkflowInfoMDC();
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }

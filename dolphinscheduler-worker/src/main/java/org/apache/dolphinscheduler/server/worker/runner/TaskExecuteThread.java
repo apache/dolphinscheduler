@@ -126,7 +126,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     @Override
     public void run() {
-        LoggerUtils.setWorkflowTaskMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
         if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUCCESS);
             taskExecutionContext.setStartTime(new Date());
@@ -137,6 +136,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
 
         try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
@@ -209,7 +209,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             clearTaskExecPath();
-            LoggerUtils.removeWorkflowInfoMDC();
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

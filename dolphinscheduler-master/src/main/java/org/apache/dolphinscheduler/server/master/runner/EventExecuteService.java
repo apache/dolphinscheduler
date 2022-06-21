@@ -73,9 +73,13 @@ public class EventExecuteService extends BaseDaemonThread {
 
     private void eventHandler() {
         for (WorkflowExecuteRunnable workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
-            LoggerUtils.setWorkflowMDC(workflowExecuteThread.getProcessInstance().getId());
-            workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
-            LoggerUtils.removeWorkflowInfoMDC();
+            try {
+                LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
+                workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
+
+            } finally {
+                LoggerUtils.removeWorkflowInstanceIdMDC();
+            }
         }
     }
 }

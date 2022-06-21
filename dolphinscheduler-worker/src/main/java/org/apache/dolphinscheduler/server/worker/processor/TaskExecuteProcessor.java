@@ -118,80 +118,84 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
-        LoggerUtils.setWorkflowTaskMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-        TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
 
-        // set cache, it will be used when kill task
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+            TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
-        // todo custom logger
+            // set cache, it will be used when kill task
+            TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
 
-        taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
-        taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
+            // todo custom logger
 
-        if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
-            boolean osUserExistFlag;
-            //if Using distributed is true and Currently supported systems are linux,Should not let it automatically
-            //create tenants,so TenantAutoCreate has no effect
-            if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
-                //use the id command to judge in linux
-                osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
-            } else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
-                // if not exists this user, then create
-                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
-                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
-            } else {
-                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
-            }
+            taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
+            taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
-            // check if the OS user exists
-            if (!osUserExistFlag) {
-                logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
+            if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
+                boolean osUserExistFlag;
+                //if Using distributed is true and Currently supported systems are linux,Should not let it automatically
+                //create tenants,so TenantAutoCreate has no effect
+                if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
+                    //use the id command to judge in linux
+                    osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
+                } else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
+                    // if not exists this user, then create
+                    OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+                    osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
+                } else {
+                    osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
+                }
+
+                // check if the OS user exists
+                if (!osUserExistFlag) {
+                    logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
                         taskExecutionContext.getTenantCode(), taskExecutionContext.getTaskInstanceId());
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-                taskExecutionContext.setEndTime(new Date());
-                taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
-                return;
+                    TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                    taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
+                    taskExecutionContext.setEndTime(new Date());
+                    taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+                    return;
+                }
+
+                // local execute path
+                String execLocalPath = getExecLocalPath(taskExecutionContext);
+                logger.info("task instance local execute path : {}", execLocalPath);
+                taskExecutionContext.setExecutePath(execLocalPath);
+
+                try {
+                    FileUtils.createWorkDirIfAbsent(execLocalPath);
+                } catch (Throwable ex) {
+                    logger.error("create execLocalPath fail, path: {}, taskInstanceId: {}", execLocalPath, taskExecutionContext.getTaskInstanceId());
+                    logger.error("create executeLocalPath fail", ex);
+                    TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                    taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
+                    taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+                    return;
+                }
             }
 
-            // local execute path
-            String execLocalPath = getExecLocalPath(taskExecutionContext);
-            logger.info("task instance local execute path : {}", execLocalPath);
-            taskExecutionContext.setExecutePath(execLocalPath);
+            taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
 
-            try {
-                FileUtils.createWorkDirIfAbsent(execLocalPath);
-            } catch (Throwable ex) {
-                logger.error("create execLocalPath fail, path: {}, taskInstanceId: {}", execLocalPath, taskExecutionContext.getTaskInstanceId());
-                logger.error("create executeLocalPath fail", ex);
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-                taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
-                return;
+            // delay task process
+            long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
+            if (remainTime > 0) {
+                logger.info("delay the execution of task instance {}, delay time: {} s", taskExecutionContext.getTaskInstanceId(), remainTime);
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
+                taskExecutionContext.setStartTime(null);
+                taskCallbackService.sendTaskExecuteDelayCommand(taskExecutionContext);
             }
-        }
 
-        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
-
-        // delay task process
-        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
-        if (remainTime > 0) {
-            logger.info("delay the execution of task instance {}, delay time: {} s", taskExecutionContext.getTaskInstanceId(), remainTime);
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-            taskExecutionContext.setStartTime(null);
-            taskCallbackService.sendTaskExecuteDelayCommand(taskExecutionContext);
+            // submit task to manager
+            boolean offer = workerManager.offer(
+                new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager, storageOperate));
+            if (!offer) {
+                logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
+                    workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());
+                taskCallbackService.sendRecallCommand(taskExecutionContext);
+            }
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
-
-        // submit task to manager
-        boolean offer = workerManager.offer(
-            new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager, storageOperate));
-        if (!offer) {
-            logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
-                workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());
-            taskCallbackService.sendRecallCommand(taskExecutionContext);
-        }
-        LoggerUtils.removeWorkflowInfoMDC();
     }
 
     /**

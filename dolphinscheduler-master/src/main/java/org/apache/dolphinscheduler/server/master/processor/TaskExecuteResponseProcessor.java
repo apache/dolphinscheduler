@@ -59,10 +59,13 @@ public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
 
         TaskExecuteResponseCommand taskExecuteResponseCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteResponseCommand.class);
         TaskEvent taskResponseEvent = TaskEvent.newResultEvent(taskExecuteResponseCommand, channel);
-        LoggerUtils.setWorkflowTaskMDC(taskResponseEvent.getProcessInstanceId(), taskResponseEvent.getTaskInstanceId());
-        logger.info("Received task execute response, event: {}", taskResponseEvent);
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskResponseEvent.getProcessInstanceId(), taskResponseEvent.getTaskInstanceId());
+            logger.info("Received task execute response, event: {}", taskResponseEvent);
 
-        taskEventService.addEvent(taskResponseEvent);
-        LoggerUtils.removeWorkflowInfoMDC();
+            taskEventService.addEvent(taskResponseEvent);
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
     }
 }

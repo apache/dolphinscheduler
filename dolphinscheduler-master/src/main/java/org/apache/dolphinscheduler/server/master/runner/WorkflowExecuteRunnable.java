@@ -275,14 +275,16 @@ public class WorkflowExecuteRunnable implements Runnable {
         while (!this.stateEvents.isEmpty()) {
             try {
                 StateEvent stateEvent = this.stateEvents.peek();
-                LoggerUtils.setWorkflowTaskMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
                 if (stateEventHandler(stateEvent)) {
                     this.stateEvents.remove(stateEvent);
                 }
-                LoggerUtils.removeWorkflowInfoMDC();
             } catch (Exception e) {
                 logger.error("state handle error:", e);
+            } finally {
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
+
         }
     }
 

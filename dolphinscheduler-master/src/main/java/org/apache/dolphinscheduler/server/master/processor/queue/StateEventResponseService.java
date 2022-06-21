@@ -82,9 +82,13 @@ public class StateEventResponseService {
             List<StateEvent> remainEvents = new ArrayList<>(eventQueue.size());
             eventQueue.drainTo(remainEvents);
             for (StateEvent event : remainEvents) {
-                LoggerUtils.setWorkflowTaskMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
-                this.persist(event);
-                LoggerUtils.removeWorkflowInfoMDC();
+                try {
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
+                    this.persist(event);
+
+                } finally {
+                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                }
             }
         }
     }
@@ -117,13 +121,14 @@ public class StateEventResponseService {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
-                    LoggerUtils.setWorkflowTaskMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
                     persist(stateEvent);
-                    LoggerUtils.removeWorkflowInfoMDC();
                 } catch (InterruptedException e) {
                     logger.warn("State event loop service interrupted, will stop this loop", e);
                     Thread.currentThread().interrupt();
                     break;
+                } finally {
+                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
             logger.info("State event loop service stopped");
