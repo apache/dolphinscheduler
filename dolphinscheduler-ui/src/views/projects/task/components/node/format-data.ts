@@ -359,6 +359,17 @@ export function formatParams(data: INodeData): {
     taskParams.memoryLimit = data.memoryLimit
   }
 
+  if (data.taskType === 'DVC') {
+
+    taskParams.dvcTaskType = data.dvcTaskType
+    taskParams.dvcRepository = data.dvcRepository
+    taskParams.dvcVersion = data.dvcVersion
+    taskParams.dvcDataLocation = data.dvcDataLocation
+    taskParams.dvcMessage = data.dvcMessage
+    taskParams.dvcLoadSaveDataPath = data.dvcLoadSaveDataPath
+    taskParams.dvcStoreUrl = data.dvcStoreUrl
+  }
+
   if (data.taskType === 'OPENMLDB') {
     taskParams.zk = data.zk
     taskParams.zkPath = data.zkPath
