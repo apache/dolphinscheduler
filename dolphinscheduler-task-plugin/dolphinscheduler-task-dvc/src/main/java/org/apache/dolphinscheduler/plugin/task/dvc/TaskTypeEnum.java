@@ -15,33 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
+package org.apache.dolphinscheduler.plugin.task.dvc;
 
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+public enum TaskTypeEnum {
 
-/**
- * RefreshResourceTask test
- */
-@RunWith(MockitoJUnitRunner.class)
-public class RefreshResourceTaskTest {
-
-    @Mock
-    private ServerNodeManager serverNodeManager;
-
-    @InjectMocks
-    LowerWeightHostManager lowerWeightHostManager;
-
-    @Test
-    public void testGetHostWeightWithResult() {
-        Assert.assertTrue(!lowerWeightHostManager.new RefreshResourceTask()
-            .getHostWeight("192.168.1.1:22", "default", null)
-            .isPresent());
-    }
+    @JsonProperty("Upload")
+    UPLOAD,
+    @JsonProperty("Download")
+    DOWNLOAD,
+    @JsonProperty("Init DVC")
+    INIT
 }
