@@ -19,9 +19,10 @@
 /deploy/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-alert/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-e2e/ @kezhenxu94 @SbloodyS
+/dolphinscheduler-api-test/ @SbloodyS
 /dolphinscheduler-registry/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-api/ @caishunfeng
-/dolphinscheduler-dao/ @caishunfeng
+/dolphinscheduler-api/ @caishunfeng @SbloodyS
+/dolphinscheduler-dao/ @caishunfeng @SbloodyS
 /dolphinscheduler-common/ @caishunfeng
 /dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-log-server/ @caishunfeng

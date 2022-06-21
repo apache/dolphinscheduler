@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 
 import java.util.ArrayList;
@@ -63,11 +64,9 @@ public class TaskEventService {
     @PostConstruct
     public void start() {
         this.taskEventThread = new TaskEventThread();
-        this.taskEventThread.setName("TaskEventThread");
         this.taskEventThread.start();
 
         this.taskEventHandlerThread = new TaskEventHandlerThread();
-        this.taskEventHandlerThread.setName("TaskEventHandlerThread");
         this.taskEventHandlerThread.start();
     }
 
@@ -85,7 +84,7 @@ public class TaskEventService {
                 taskExecuteThreadPool.eventHandler();
             }
         } catch (Exception e) {
-            logger.error("stop error:", e);
+            logger.error("TaskEventService stop error:", e);
         }
     }
 
@@ -101,7 +100,11 @@ public class TaskEventService {
     /**
      * task worker thread
      */
-    class TaskEventThread extends Thread {
+    class TaskEventThread extends BaseDaemonThread {
+        protected TaskEventThread() {
+            super("TaskEventLoopThread");
+        }
+
         @Override
         public void run() {
             while (Stopper.isRunning()) {
@@ -123,7 +126,11 @@ public class TaskEventService {
     /**
      * event handler thread
      */
-    class TaskEventHandlerThread extends Thread {
+    class TaskEventHandlerThread extends BaseDaemonThread {
+
+        protected TaskEventHandlerThread() {
+            super("TaskEventHandlerThread");
+        }
 
         @Override
         public void run() {
