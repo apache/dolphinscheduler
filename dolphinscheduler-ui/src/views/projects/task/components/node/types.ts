@@ -341,6 +341,13 @@ interface ITaskParams {
   zk?: string
   zkPath?: string
   executeMode?: string
+  dvcTaskType?: string
+  dvcRepository?: string
+  dvcVersion?: string
+  dvcDataLocation?: string
+  dvcMessage?: string
+  dvcLoadSaveDataPath?: string
+  dvcStoreUrl?: string
 }
 
 interface INodeData

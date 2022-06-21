@@ -55,5 +55,6 @@
         <module>dolphinscheduler-task-jupyter</module>
         <module>dolphinscheduler-task-mlflow</module>
         <module>dolphinscheduler-task-openmldb</module>
+        <module>dolphinscheduler-task-dvc</module>
     </modules>
 </project>
