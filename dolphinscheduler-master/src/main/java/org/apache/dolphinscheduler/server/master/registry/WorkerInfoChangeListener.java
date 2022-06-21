@@ -15,33 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
+package org.apache.dolphinscheduler.server.master.registry;
 
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * RefreshResourceTask test
+ * The listener used in {@link ServerNodeManager} to notify the change of worker info.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RefreshResourceTaskTest {
+public interface WorkerInfoChangeListener {
 
-    @Mock
-    private ServerNodeManager serverNodeManager;
+    /**
+     * Used to notify the change of worker info.
+     *
+     * @param workerGroups   worker groups map, key is worker group name, value is worker address.
+     * @param workerNodeInfo worker node info map, key is worker address, value is worker info.
+     */
+    void notify(Map<String, Set<String>> workerGroups, Map<String, String> workerNodeInfo);
 
-    @InjectMocks
-    LowerWeightHostManager lowerWeightHostManager;
-
-    @Test
-    public void testGetHostWeightWithResult() {
-        Assert.assertTrue(!lowerWeightHostManager.new RefreshResourceTask()
-            .getHostWeight("192.168.1.1:22", "default", null)
-            .isPresent());
-    }
 }
