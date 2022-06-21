@@ -408,7 +408,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return create result
      */
     @Override
-    @Counted("dolphinscheduler_create_command_count")
+    @Counted("ds.workflow.create.command.count")
     public int createCommand(Command command) {
         int result = 0;
         if (command != null) {

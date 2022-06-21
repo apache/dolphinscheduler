@@ -265,7 +265,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "increase(dolphinscheduler_worker_submit_queue_is_full_count_total{}[1m])",
+          "expr": "increase(ds_worker_full_submit_queue_count_total{}[1m])",
           "refId": "A"
         }
       ],
@@ -351,7 +351,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "increase(dolphinscheduler_worker_overload_count_total{}[1m])",
+          "expr": "increase(ds_worker_overload_count_total{}[1m])",
           "refId": "A"
         }
       ],
@@ -437,7 +437,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "dolphinscheduler_worker_running_task_gauge{}",
+          "expr": "ds_task_running{}",
           "refId": "A"
         }
       ],
@@ -495,7 +495,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(dolphinscheduler_task_execution_count_total)",
+          "expr": "sum(ds_task_execution_count_total)",
           "refId": "A"
         }
       ],
@@ -551,7 +551,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(dolphinscheduler_task_execution_count_total{result=\"success\"}) / sum(dolphinscheduler_task_execution_count_total) * 100",
+          "expr": "sum(ds_task_execution_count_total{result=\"success\"}) / sum(ds_task_execution_count_total) * 100",
           "refId": "A"
         }
       ],
@@ -614,7 +614,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "rate(dolphinscheduler_task_execution_timer_seconds_sum[1m])/rate(dolphinscheduler_task_execution_timer_seconds_count[1m])",
+          "expr": "rate(ds_task_execution_duration_seconds_sum[1m])/rate(ds_task_execution_duration_seconds_count[1m])",
           "legendFormat": "avg ({{exception}})",
           "range": true,
           "refId": "A"
@@ -625,7 +625,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "dolphinscheduler_task_execution_timer_seconds_max",
+          "expr": "ds_task_execution_duration_seconds_max",
           "hide": false,
           "legendFormat": "max ({{exception}})",
           "range": true,
@@ -715,7 +715,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(increase(dolphinscheduler_task_execution_count_total[1m]))",
+          "expr": "sum(increase(ds_task_execution_count_total[1m]))",
           "legendFormat": "Total",
           "range": true,
           "refId": "A"
@@ -727,7 +727,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "increase(dolphinscheduler_task_execution_count_total{result=\"success\"}[1m])",
+          "expr": "increase(ds_task_execution_count_total{result=\"success\"}[1m])",
           "hide": false,
           "legendFormat": "Successful",
           "range": true,
@@ -857,7 +857,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"SHELL\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"SHELL\"}[1d]))",
           "legendFormat": "SHELL",
           "range": true,
           "refId": "A"
@@ -946,7 +946,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"unknown\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"unknown\"}[1d]))",
           "legendFormat": "unknown",
           "range": true,
           "refId": "A"
@@ -1035,7 +1035,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"CONDITIONS\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"CONDITIONS\"}[1d]))",
           "legendFormat": "CONDITIONS",
           "range": true,
           "refId": "A"
@@ -1124,7 +1124,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"BLOCKING\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"BLOCKING\"}[1d]))",
           "legendFormat": "BLOCKING",
           "range": true,
           "refId": "A"
@@ -1213,7 +1213,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"DATAX\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"DATAX\"}[1d]))",
           "legendFormat": "DATAX",
           "range": true,
           "refId": "A"
@@ -1302,7 +1302,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"DATA_QUALITY\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"DATA_QUALITY\"}[1d]))",
           "legendFormat": "DATA_QUALITY",
           "range": true,
           "refId": "A"
@@ -1391,7 +1391,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"DATA_QUALITY\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"DATA_QUALITY\"}[1d]))",
           "legendFormat": "DATA_QUALITY",
           "range": true,
           "refId": "A"
@@ -1480,7 +1480,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"DEPENDENT\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"DEPENDENT\"}[1d]))",
           "legendFormat": "DEPENDENT",
           "range": true,
           "refId": "A"
@@ -1569,7 +1569,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(increase(dolphinscheduler_task_execute_count_total{task_type=\"EMR\"}[1d]))",
+          "expr": "sum(increase(ds_task_execution_count_by_type_total{task_type=\"EMR\"}[1d]))",
           "legendFormat": "EMR",
           "range": true,
           "refId": "A"

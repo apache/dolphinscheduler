@@ -1585,7 +1585,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_dispatch_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_dispatch_count_total{}[1m]))",
           "refId": "A"
         },
         {
@@ -1593,7 +1593,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_dispatch_failed_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_dispatch_failure_count_total{}[1m]))",
           "hide": false,
           "refId": "B"
         },
@@ -1602,7 +1602,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_dispatch_error_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_dispatch_error_count_total{}[1m]))",
           "hide": false,
           "refId": "C"
         }
@@ -1689,7 +1689,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_submit_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_submit_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -1775,7 +1775,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_finish_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_finish_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -1861,7 +1861,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_success_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_success_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -1947,7 +1947,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_failure_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_failure_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -2033,7 +2033,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_timeout_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_timeout_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -2119,7 +2119,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_retry_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_retry_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -2205,7 +2205,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_stop_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_stop_count_total{}[1m]))",
           "refId": "A"
         }
       ],
@@ -2291,7 +2291,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(dolphinscheduler_task_failover_count_total{}[1m]))",
+          "expr": "sum(increase(ds_task_failover_count_total{}[1m]))",
           "refId": "A"
         }
       ],

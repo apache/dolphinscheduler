@@ -254,7 +254,7 @@ public class WorkflowExecuteRunnable implements Runnable {
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
-        TaskMetrics.registerTaskRunning(readyToSubmitTaskQueue::size);
+        TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 
     /**

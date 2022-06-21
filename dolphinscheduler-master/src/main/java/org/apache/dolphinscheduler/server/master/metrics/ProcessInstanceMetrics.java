@@ -30,42 +30,42 @@ public final class ProcessInstanceMetrics {
     }
 
     private static final Counter PROCESS_INSTANCE_SUBMIT_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_submit_count")
+            Counter.builder("ds.workflow.instance.submit.count")
                     .description("Process instance submit total count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_TIMEOUT_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_timeout_count")
+            Counter.builder("ds.workflow.instance.timeout.count")
                     .description("Process instance timeout total count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_FINISH_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_finish_count")
+            Counter.builder("ds.workflow.instance.finish.count")
                     .description("Process instance finish total count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_SUCCESS_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_success_count")
+            Counter.builder("ds.workflow.instance.success.count")
                     .description("Process instance success total count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_FAILURE_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_failure_count")
+            Counter.builder("ds.workflow.instance.failure.count")
                     .description("Process instance failure total count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_STOP_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_stop_count")
+            Counter.builder("ds.workflow.instance.stop.count")
                     .description("Process instance stop total count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_FAILOVER_COUNTER =
-            Counter.builder("dolphinscheduler_process_instance_failover_count")
+            Counter.builder("ds.workflow.instance.failover.count")
                     .description("Process instance failover total count")
                     .register(Metrics.globalRegistry);
 
     public static synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
-        Gauge.builder("dolphinscheduler_process_instance_running_gauge", function)
+        Gauge.builder("ds.workflow.instance.running", function)
                 .description("The current running process instance count")
                 .register(Metrics.globalRegistry);
     }
