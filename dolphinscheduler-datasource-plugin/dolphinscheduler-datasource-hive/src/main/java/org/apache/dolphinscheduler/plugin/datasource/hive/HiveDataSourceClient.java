@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.zaxxer.hikari.HikariDataSource;
+import static org.apache.dolphinscheduler.spi.utils.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5_CONF_PATH;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.exception.DataSourceException;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
@@ -28,12 +30,9 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import sun.security.krb5.Config;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -47,7 +46,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.zaxxer.hikari.HikariDataSource;
+
+import sun.security.krb5.Config;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
@@ -66,7 +72,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     /**
      * Stores metastore clients for direct accesses to HMS.
      */
-    private MetaStoreClientPool metaStoreClientPool_;
+    private MetaStoreClientPool metaStoreClientPool;
 
     public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -76,7 +82,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     protected void preInit() {
         logger.info("PreInit in {}", getClass().getName());
         this.kerberosRenewalService = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("Hive-Kerberos-Renewal-Thread-").setDaemon(true).build());
+            new ThreadFactoryBuilder().setNameFormat("Hive-Kerberos-Renewal-Thread-").setDaemon(true).build());
     }
 
     @Override
@@ -90,7 +96,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("Create ugi success.");
 
         if (baseConnectionParam.getConnMetaStore()) {
-            this.metaStoreClientPool_ = new MetaStoreClientPool(5, 2, getHadoopConf());
+            this.metaStoreClientPool = new MetaStoreClientPool(5, 2, getHadoopConf());
             logger.info("Create HiveMetaStore success.");
         }
 
@@ -128,11 +134,11 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             throw DataSourceException.getInstance("Hive metastore not connect");
         }
         try {
-            this.metaStoreClientPool_.getClient().getHiveClient().getAllDatabases();
+            this.metaStoreClientPool.getClient().getHiveClient().getAllDatabases();
         } catch (Exception e) {
             this.ugi.doAs((PrivilegedAction<Void>) () -> {
                 try {
-                    this.metaStoreClientPool_.getClient().getHiveClient().reconnect();
+                    this.metaStoreClientPool.getClient().getHiveClient().reconnect();
                     return null;
                 } catch (Exception e2) {
                     throw DataSourceException.getInstance("Hive metastore connect failed." + " : " + hadoopConf.get("hive.metastore.uris"), e2);
@@ -202,9 +208,9 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         try {
             checkHiveMetaStoreClient();
             if (StringUtils.isBlank(databasePattern)) {
-                return this.metaStoreClientPool_.getClient().getHiveClient().getAllDatabases();
+                return this.metaStoreClientPool.getClient().getHiveClient().getAllDatabases();
             }
-            return this.metaStoreClientPool_.getClient().getHiveClient().getDatabases(databasePattern.trim());
+            return this.metaStoreClientPool.getClient().getHiveClient().getDatabases(databasePattern.trim());
         } catch (Exception e) {
             throw DataSourceException.getInstance("META_EXCEPTION", e);
         }
@@ -218,9 +224,9 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         try {
             checkHiveMetaStoreClient();
             if (StringUtils.isBlank(tablePattern)) {
-                return this.metaStoreClientPool_.getClient().getHiveClient().getAllTables(dbName.trim());
+                return this.metaStoreClientPool.getClient().getHiveClient().getAllTables(dbName.trim());
             }
-            return this.metaStoreClientPool_.getClient().getHiveClient().getTables(dbName.trim(), "*" + tablePattern.trim() + "*");
+            return this.metaStoreClientPool.getClient().getHiveClient().getTables(dbName.trim(), "*" + tablePattern.trim() + "*");
         } catch (Exception e) {
             throw DataSourceException.getInstance("META_EXCEPTION", e);
         }

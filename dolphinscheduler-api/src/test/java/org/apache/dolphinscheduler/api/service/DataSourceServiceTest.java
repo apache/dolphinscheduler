@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.plugin.datasource.oracle.param.OracleDataSour
 import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
@@ -75,7 +76,7 @@ import org.slf4j.LoggerFactory;
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
-@PrepareForTest({DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({DataSourceUtils.class, CommonUtils.class, DataSourceClientManager.class, PasswordUtils.class})
 public class DataSourceServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceTest.class);
@@ -470,15 +471,17 @@ public class DataSourceServiceTest {
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
 
         PowerMockito.mockStatic(DataSourceUtils.class);
-        PowerMockito.mockStatic(DataSourceClientProvider.class);
-        DataSourceClientProvider clientProvider = PowerMockito.mock(DataSourceClientProvider.class);
-        PowerMockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+        PowerMockito.mockStatic(DataSourceClientManager.class);
+        DataSourceClientManager clientProvider = PowerMockito.mock(DataSourceClientManager.class);
+        PowerMockito.when(DataSourceClientManager.getInstance()).thenReturn(clientProvider);
 
         Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
         Assert.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
         Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+        DataSourceClient dataSourceClient = PowerMockito.mock(DataSourceClient.class);
+        PowerMockito.when(clientProvider.getDataSource(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        PowerMockito.when(dataSourceClient.getConnection()).thenReturn(connection);
         result = dataSourceService.checkConnection(dataSourceType, connectionParam);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 

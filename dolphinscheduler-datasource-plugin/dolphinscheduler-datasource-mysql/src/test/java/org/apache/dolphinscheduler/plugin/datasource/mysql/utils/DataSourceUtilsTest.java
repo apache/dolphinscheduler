@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.utils;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLConnection
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
@@ -46,7 +47,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
-@PrepareForTest({Class.class, DriverManager.class, MySQLDataSourceProcessor.class, DataSourceClientProvider.class, PasswordUtils.class, CommonUtils.class, PropertyUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, MySQLDataSourceProcessor.class, DataSourceClientManager.class, PasswordUtils.class, CommonUtils.class, PropertyUtils.class})
 public class DataSourceUtilsTest {
 
     @Test
@@ -95,17 +96,19 @@ public class DataSourceUtilsTest {
     public void testGetConnection() throws ExecutionException {
         PowerMockito.mockStatic(PropertyUtils.class);
         PowerMockito.when(PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-        PowerMockito.mockStatic(DataSourceClientProvider.class);
-        DataSourceClientProvider clientProvider = PowerMockito.mock(DataSourceClientProvider.class);
-        PowerMockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+        PowerMockito.mockStatic(DataSourceClientManager.class);
+        DataSourceClientManager clientProvider = PowerMockito.mock(DataSourceClientManager.class);
+        PowerMockito.when(DataSourceClientManager.getInstance()).thenReturn(clientProvider);
 
         Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+        DataSourceClient dataSourceClient = PowerMockito.mock(DataSourceClient.class);
+        PowerMockito.when(clientProvider.getDataSource(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        PowerMockito.when(dataSourceClient.getConnection()).thenReturn(connection);
 
         MySQLConnectionParam connectionParam = new MySQLConnectionParam();
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
-        connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
+        connection = DataSourceClientManager.getInstance().getDataSource(DbType.MYSQL, connectionParam).getConnection();
 
         Assert.assertNotNull(connection);
 

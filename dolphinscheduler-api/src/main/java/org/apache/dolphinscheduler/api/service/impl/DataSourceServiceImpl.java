@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -351,7 +351,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
-        try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
+        try (Connection connection = DataSourceClientManager.getInstance().getDataSource(type, connectionParam).getConnection()) {
             if (connection == null) {
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;

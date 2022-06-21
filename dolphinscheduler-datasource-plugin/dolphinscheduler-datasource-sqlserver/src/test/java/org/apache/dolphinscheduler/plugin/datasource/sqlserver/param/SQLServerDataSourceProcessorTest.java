@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -38,7 +38,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientManager.class, PasswordUtils.class})
 public class SQLServerDataSourceProcessorTest {
 
     private SQLServerDataSourceProcessor sqlServerDatasourceProcessor = new SQLServerDataSourceProcessor();

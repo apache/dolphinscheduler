@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -548,9 +548,9 @@ public class DataxTask extends AbstractTaskExecutor {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                ResultSet resultSet = stmt.executeQuery()) {
+            Connection connection = DataSourceClientManager.getInstance().getDataSource(sourceType, baseDataSource).getConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet resultSet = stmt.executeQuery()) {
 
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
@@ -558,7 +558,7 @@ public class DataxTask extends AbstractTaskExecutor {
             for (int i = 1; i <= num; i++) {
                 columnNames[i - 1] = md.getColumnName(i);
             }
-        } catch (SQLException | ExecutionException e) {
+        } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return null;
         }

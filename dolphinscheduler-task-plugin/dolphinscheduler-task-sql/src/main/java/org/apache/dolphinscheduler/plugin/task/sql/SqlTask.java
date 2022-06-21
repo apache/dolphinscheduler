@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -183,7 +183,7 @@ public class SqlTask extends AbstractTaskExecutor {
         try {
 
             // create connection
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
+            connection = DataSourceClientManager.getInstance().getDataSource(DbType.valueOf(sqlParameters.getType()), baseConnectionParam).getConnection();
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
