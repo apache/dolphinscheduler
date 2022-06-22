@@ -76,8 +76,6 @@ Node_mysql 运行结果如下：
 
 虽然在 Node_A 的脚本中为 output 赋值为 1，但日志中显示的值仍然为 100。但根据[参数优先级](priority.md)的原则：`本地参数 > 上游任务传递的参数 > 全局参数`，在 Node_B 中输出的值为 1。则证明 output 参数参照预期的值在该工作流中传递，并在 Node_mysql 中使用该值完成查询操作。
 
-<img src="../../../../img/globalParam/image-20210723102522383.png" alt="image-20210723102522383" style="zoom:50%;" />
-
 但是 value 的值却只有在 Node_A 中输出为 66，其原因为 value 的方向选择为 IN，只有当方向为 OUT 时才会被定义为变量输出。
 
 
