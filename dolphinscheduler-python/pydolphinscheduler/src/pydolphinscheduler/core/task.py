@@ -155,7 +155,7 @@ class Task(Base):
 
         # Attribute for task param
         self.local_params = local_params or []
-        self.resource_list = resource_list or []
+        self._resource_list = resource_list or []
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
         self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
@@ -169,6 +169,24 @@ class Task(Base):
     def process_definition(self, process_definition: Optional[ProcessDefinition]):
         """Set attribute process_definition."""
         self._process_definition = process_definition
+
+    @property
+    def resource_list(self) -> List:
+        """Get python task define attribute `resource_list`."""
+        if self._resource_list is not None and len(self._resource_list) > 0:
+            for resource in self._resource_list:
+                if (
+                    resource.get("id") is None
+                    and resource.get("resourceName") is not None
+                ):
+                    if resource.get("resourceType") is not None:
+                        resource_type = resource.get("resourceType")
+                    else:
+                        resource_type = "FILE"
+                    resource["id"] = self.query_resource(
+                        resource_type, resource.get("resourceName")
+                    ).get("id")
+        return self._resource_list
 
     @property
     def condition_result(self) -> Dict:
@@ -278,3 +296,10 @@ class Task(Base):
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")
+
+    def query_resource(self, resource_type, full_name):
+        """Get resource info from java gateway, contains resource id, name."""
+        gateway = launch_gateway()
+        return gateway.entry_point.getResourcesFileInfo(
+            self.process_definition.user.name, resource_type, full_name
+        )
