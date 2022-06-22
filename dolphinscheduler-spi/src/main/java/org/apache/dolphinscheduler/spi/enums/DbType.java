@@ -38,6 +38,7 @@ public enum DbType {
     PRESTO(8, "presto"),
     H2(9, "h2"),
     REDSHIFT(10,"redshift"),
+    DAMENG(101, "dameng"),
     ;
 
     @EnumValue
