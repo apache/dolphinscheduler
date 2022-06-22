@@ -106,12 +106,14 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param code process definition code
+     * @param showSubtask whether to display sub-process task info
      * @return process definition detail
      */
 
     Map<String, Object> queryProcessDefinitionByCode(User loginUser,
                                                      long projectCode,
-                                                     long code);
+                                                     long code,
+                                                     boolean showSubtask);
 
     /**
      * query detail of process definition

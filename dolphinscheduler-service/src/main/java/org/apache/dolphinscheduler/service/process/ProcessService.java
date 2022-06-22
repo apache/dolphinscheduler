@@ -238,6 +238,8 @@ public interface ProcessService {
 
     DagData genDagData(ProcessDefinition processDefinition);
 
+    DagData genDagData(ProcessDefinition processDefinition, boolean showSubTask);
+
     List<TaskDefinitionLog> genTaskDefineList(List<ProcessTaskRelation> processTaskRelations);
 
     List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations);

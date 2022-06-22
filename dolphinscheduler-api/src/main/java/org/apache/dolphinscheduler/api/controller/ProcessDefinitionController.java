@@ -380,8 +380,9 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                               @PathVariable(value = "code", required = true) long code) {
-        Map<String, Object> result = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, code);
+                                               @PathVariable(value = "code", required = true) long code,
+                                               @RequestParam(required = false) boolean showSubTask) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, code, showSubTask);
         return returnDataList(result);
     }
 

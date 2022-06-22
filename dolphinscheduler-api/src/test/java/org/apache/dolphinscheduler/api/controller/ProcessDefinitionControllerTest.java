@@ -196,8 +196,8 @@ public class ProcessDefinitionControllerTest {
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, processDefinition);
 
-        Mockito.when(processDefinitionService.queryProcessDefinitionByCode(user, projectCode, code)).thenReturn(result);
-        Result response = processDefinitionController.queryProcessDefinitionByCode(user, projectCode, code);
+        Mockito.when(processDefinitionService.queryProcessDefinitionByCode(user, projectCode, code, false)).thenReturn(result);
+        Result response = processDefinitionController.queryProcessDefinitionByCode(user, projectCode, code, false);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }

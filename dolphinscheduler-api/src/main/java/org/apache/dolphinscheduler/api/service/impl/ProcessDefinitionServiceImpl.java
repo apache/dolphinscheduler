@@ -469,10 +469,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param loginUser login user
      * @param projectCode project code
      * @param code process definition code
+     * @param showSubtask whether to display sub-process task info
      * @return process definition detail
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionByCode(User loginUser, long projectCode, long code) {
+    public Map<String, Object> queryProcessDefinitionByCode(User loginUser, long projectCode, long code, boolean showSubtask) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -488,7 +489,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (tenant != null) {
                 processDefinition.setTenantCode(tenant.getTenantCode());
             }
-            DagData dagData = processService.genDagData(processDefinition);
+            DagData dagData = processService.genDagData(processDefinition, showSubtask);
             result.put(Constants.DATA_LIST, dagData);
             putMsg(result, Status.SUCCESS);
         }

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
@@ -27,6 +29,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
@@ -2641,11 +2644,57 @@ public class ProcessServiceImpl implements ProcessService {
      * generate DagData
      */
     @Override
-    public DagData genDagData(ProcessDefinition processDefinition) {
-        List<ProcessTaskRelation> taskRelations = this.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+    public DagData genDagData(ProcessDefinition processDefinition, boolean showSubTask) {
+        List<ProcessTaskRelation> taskRelations = findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
         List<TaskDefinitionLog> taskDefinitionLogList = genTaskDefineList(taskRelations);
-        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream().map(t -> (TaskDefinition) t).collect(Collectors.toList());
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream().map(TaskDefinition.class::cast).collect(Collectors.toList());
+        // when enable showSubTask try to find sub-process task info.
+        if (showSubTask) {
+            List<TaskDefinition> copyList = new ArrayList<>(taskDefinitions);
+            copyList.forEach(taskDefinition -> {
+                if (TaskConstants.TASK_TYPE_SUB_PROCESS.equals(taskDefinition.getTaskType())) {
+                    JsonNode processDefinitionCode = JSONUtils.parseObject(taskDefinition.getTaskParams())
+                            .findValue("processDefinitionCode");
+                    long subProcessId = processDefinitionCode.asLong();
+                    ProcessDefinition subProcess = processDefineMapper.queryByCode(subProcessId);
+                    List<ProcessTaskRelation> subTaskRelations = findRelationByCode(subProcess.getCode(), subProcess.getVersion());
+                    // bind to subProcess
+                    for (int j = 0; j < subTaskRelations.size(); j++) {
+                        ProcessTaskRelation subTask = subTaskRelations.get(j);
+                        if (subTask.getPreTaskCode() == 0) {
+                            subTask.setPreTaskCode(taskDefinition.getCode());
+                            subTask.setPreTaskVersion(taskDefinition.getVersion());
+                        }
+                        ArrayNode jsonNodes = JSONUtils.parseArray(processDefinition.getLocations());
+                        for (int i = 0; i < jsonNodes.size(); i++) {
+                            ObjectNode node = (ObjectNode) jsonNodes.path(i);
+                            if (node.get("taskCode").asLong() == subTask.getPreTaskCode()) {
+                                int x = node.get("x").asInt();
+                                int y = node.get("y").asInt();
+                                node.put("taskCode", subTask.getPostTaskCode());
+                                node.put("x", x + 50 * (j - 1));
+                                node.put("y", y + 100);
+                                jsonNodes.add(node);
+                                break;
+                            }
+                        }
+                        processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
+                    }
+                    List<TaskDefinitionLog> subTaskDefinitionLogList = genTaskDefineList(subTaskRelations);
+                    List<TaskDefinition> subTaskDefinitions = subTaskDefinitionLogList.stream().map(TaskDefinition.class::cast).collect(Collectors.toList());
+                    subTaskDefinitions.remove(taskDefinition);
+                    taskRelations.addAll(subTaskRelations);
+                    taskDefinitionLogList.addAll(subTaskDefinitionLogList);
+                    taskDefinitions.addAll(subTaskDefinitions);
+                }
+            });
+        }
         return new DagData(processDefinition, taskRelations, taskDefinitions);
+    }
+
+    @Override
+    public DagData genDagData(ProcessDefinition processDefinition) {
+        return genDagData(processDefinition, false);
     }
 
     @Override
