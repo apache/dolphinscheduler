@@ -20,7 +20,7 @@
 /dolphinscheduler-alert/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-e2e/ @kezhenxu94 @SbloodyS
 /dolphinscheduler-api-test/ @SbloodyS
-/dolphinscheduler-registry/ @kezhenxu94 @caishunfeng
+/dolphinscheduler-registry/ @kezhenxu94 @caishunfeng @ruanwenjun
 /dolphinscheduler-api/ @caishunfeng @SbloodyS
 /dolphinscheduler-dao/ @caishunfeng @SbloodyS
 /dolphinscheduler-common/ @caishunfeng
@@ -28,10 +28,10 @@
 /dolphinscheduler-log-server/ @caishunfeng
 /dolphinscheduler-datasource-plugin/ @caishunfeng
 /dolphinscheduler-dist/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-meter/ @caishunfeng @kezhenxu94
+/dolphinscheduler-meter/ @caishunfeng @kezhenxu94 @ruanwenjun
 /dolphinscheduler-scheduler-plugin/ @caishunfeng
-/dolphinscheduler-master/ @caishunfeng @SbloodyS
-/dolphinscheduler-worker/ @caishunfeng @SbloodyS
+/dolphinscheduler-master/ @caishunfeng @SbloodyS @ruanwenjun
+/dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-server/ @caishunfeng
 /dolphinscheduler-service/ @caishunfeng
 /dolphinscheduler-remote/ @caishunfeng
