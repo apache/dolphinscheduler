@@ -129,6 +129,20 @@ public class TaskCallbackService {
     }
 
     /**
+     * get opaque
+     *
+     * @param taskInstanceId taskInstanceId
+     */
+    public static long getOpaque(int taskInstanceId) {
+        NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(taskInstanceId);
+        long opaque = 0L;
+        if (nettyRemoteChannel != null) {
+            opaque = nettyRemoteChannel.getOpaque();
+        }
+        return opaque;
+    }
+
+    /**
      * send ack
      *
      * @param taskInstanceId taskInstanceId

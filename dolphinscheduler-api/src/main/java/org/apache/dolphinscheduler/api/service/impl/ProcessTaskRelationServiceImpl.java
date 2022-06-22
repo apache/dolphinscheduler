@@ -288,33 +288,45 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
             return result;
         }
+        List<Long> currentUpstreamList = upstreamList.stream().map(ProcessTaskRelation::getPreTaskCode).collect(Collectors.toList());
+        if (currentUpstreamList.contains(0L)) {
+            putMsg(result, Status.DATA_IS_NOT_VALID, "currentUpstreamList");
+            return result;
+        }
+        List<Long> tmpPreTaskCodeList = Lists.newArrayList(preTaskCodeList);
+        tmpPreTaskCodeList.removeAll(currentUpstreamList);
+        if (!tmpPreTaskCodeList.isEmpty()) {
+            putMsg(result, Status.DATA_IS_NOT_VALID, StringUtils.join(preTaskCodeList, Constants.COMMA));
+            return result;
+        }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(upstreamList.get(0).getProcessDefinitionCode());
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, upstreamList.get(0).getProcessDefinitionCode());
             return result;
         }
+
+        List<Long> remainCurrentUpstreamList = Lists.newArrayList(currentUpstreamList);
+        remainCurrentUpstreamList.removeAll(preTaskCodeList);
+
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
-        List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
+        List<ProcessTaskRelation> remainProcessTaskRelationList = Lists.newArrayList();
         List<ProcessTaskRelation> processTaskRelationWaitRemove = Lists.newArrayList();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
-            if (preTaskCodeList.size() > 1) {
-                if (preTaskCodeList.contains(processTaskRelation.getPreTaskCode())) {
-                    preTaskCodeList.remove(processTaskRelation.getPreTaskCode());
-                    processTaskRelationWaitRemove.add(processTaskRelation);
-                }
-            } else {
-                if (processTaskRelation.getPostTaskCode() == taskCode) {
-                    processTaskRelation.setPreTaskVersion(0);
-                    processTaskRelation.setPreTaskCode(0L);
-                }
-            }
-            if (preTaskCodeList.contains(processTaskRelation.getPostTaskCode())) {
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPostTaskCode() == taskCode
+                && preTaskCodeList.contains(processTaskRelation.getPreTaskCode())) {
                 processTaskRelationWaitRemove.add(processTaskRelation);
+            } else {
+                remainProcessTaskRelationList.add(processTaskRelation);
             }
         }
-        processTaskRelationList.removeAll(processTaskRelationWaitRemove);
+        if (remainCurrentUpstreamList.isEmpty() && processTaskRelationWaitRemove.size() > 0) {
+            ProcessTaskRelation lastTaskRelation = processTaskRelationWaitRemove.get(0);
+            lastTaskRelation.setPreTaskVersion(0);
+            lastTaskRelation.setPreTaskCode(0L);
+            remainProcessTaskRelationList.add(lastTaskRelation);
+        }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
-        updateRelation(loginUser, result, processDefinition, processTaskRelationList);
+        updateRelation(loginUser, result, processDefinition, remainProcessTaskRelationList);
         return result;
     }
 

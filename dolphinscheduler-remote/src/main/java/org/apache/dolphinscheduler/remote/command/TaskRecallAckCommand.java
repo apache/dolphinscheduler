@@ -21,40 +21,44 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
-/**
- *  execute task request command
- */
-public class TaskExecuteRequestCommand implements Serializable {
+public class TaskRecallAckCommand implements Serializable {
+
+    private int taskInstanceId;
+    private int status;
+
+    public TaskRecallAckCommand() {
+        super();
+    }
+
+    public TaskRecallAckCommand(int status, int taskInstanceId) {
+        this.status = status;
+        this.taskInstanceId = taskInstanceId;
+    }
+
+    public int getTaskInstanceId() {
+        return taskInstanceId;
+    }
+
+    public void setTaskInstanceId(int taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     /**
-     *  task execution context
-     */
-    private String taskExecutionContext;
-
-    public String getTaskExecutionContext() {
-        return taskExecutionContext;
-    }
-
-    public void setTaskExecutionContext(String taskExecutionContext) {
-        this.taskExecutionContext = taskExecutionContext;
-    }
-
-    public TaskExecuteRequestCommand() {
-    }
-
-    public TaskExecuteRequestCommand(String taskExecutionContext) {
-        this.taskExecutionContext = taskExecutionContext;
-    }
-
-    /**
-     *  package request command
+     * package response command
      *
      * @return command
      */
-    public Command convert2Command() {
-        Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_REQUEST);
-        command.setGenCommandTimeMillis(System.currentTimeMillis());
+    public Command convert2Command(long opaque) {
+        Command command = new Command(opaque);
+        command.setType(CommandType.TASK_RECALL_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
@@ -62,8 +66,6 @@ public class TaskExecuteRequestCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskExecuteRequestCommand{"
-                + "taskExecutionContext='" + taskExecutionContext + '\''
-                + '}';
+        return "TaskRecallAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
     }
 }

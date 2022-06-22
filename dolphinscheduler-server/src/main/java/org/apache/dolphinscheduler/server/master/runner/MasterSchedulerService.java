@@ -125,6 +125,11 @@ public class MasterSchedulerService extends Thread {
      */
     ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
 
+    /**
+     * dep task check list
+     */
+    ConcurrentHashMap<Integer, TaskInstance> depStateCheckList = new ConcurrentHashMap<>();
+
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
@@ -144,6 +149,7 @@ public class MasterSchedulerService extends Thread {
                 processTimeoutCheckList,
                 taskTimeoutCheckList,
                 taskRetryCheckList,
+                depStateCheckList,
                 this.processInstanceExecMaps,
                 masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
@@ -204,15 +210,9 @@ public class MasterSchedulerService extends Thread {
                 ProcessInstance processInstance = processService.handleCommand(logger, getLocalAddress(), command);
 
                 if (processInstance != null) {
-                    WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
-                            processInstance
-                            , taskResponseService
-                            , processService
-                            , nettyExecutorManager
-                            , processAlertManager
-                            , masterConfig
-                            , taskTimeoutCheckList
-                            , taskRetryCheckList);
+                    WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(processInstance,
+                            taskResponseService, processService, nettyExecutorManager, processAlertManager,
+                            masterConfig, taskTimeoutCheckList, taskRetryCheckList, depStateCheckList);
 
                     this.processInstanceExecMaps.put(processInstance.getId(), workflowExecuteThread);
                     if (processInstance.getTimeout() > 0) {

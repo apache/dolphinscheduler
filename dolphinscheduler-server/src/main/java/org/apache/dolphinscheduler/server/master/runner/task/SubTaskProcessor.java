@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
@@ -48,9 +49,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
-        );
+        taskDefinition = processService.findTaskDefinition(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
         this.taskInstance = processService.submitTask(taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
@@ -59,10 +58,13 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
         setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+                processInstance.getProcessDefinitionVersion(), taskInstance.getProcessInstanceId(), taskInstance.getId()));
 
+        return true;
+    }
+
+    @Override
+    protected boolean resubmitTask() {
         return true;
     }
 
@@ -79,10 +81,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
                 updateTaskState();
             }
         } catch (Exception e) {
-            logger.error("work flow {} sub task {} exceptions",
-                    this.processInstance.getId(),
-                    this.taskInstance.getId(),
-                    e);
+            logger.error("work flow {} sub task {} exceptions", this.processInstance.getId(), this.taskInstance.getId(), e);
         } finally {
             this.runLock.unlock();
         }
@@ -91,25 +90,19 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean taskTimeout() {
-        TaskTimeoutStrategy taskTimeoutStrategy =
-                taskDefinition.getTimeoutNotifyStrategy();
-        if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
+        TaskTimeoutStrategy taskTimeoutStrategy = taskDefinition.getTimeoutNotifyStrategy();
+        if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
-        logger.info("sub process task {} timeout, strategy {} ",
-                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+        logger.info("sub process task {} timeout, strategy {} ", taskInstance.getId(), taskTimeoutStrategy.getDescp());
         killTask();
         return true;
     }
 
     private void updateTaskState() {
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        logger.info("work flow {} task {}, sub work flow: {} state: {}",
-                this.processInstance.getId(),
-                this.taskInstance.getId(),
-                subProcessInstance.getId(),
-                subProcessInstance.getState().getDescp());
+        logger.info("work flow {} task {}, sub work flow: {} state: {}", this.processInstance.getId(), this.taskInstance.getId(),
+                subProcessInstance.getId(), subProcessInstance.getState().getDescp());
         if (subProcessInstance != null && subProcessInstance.getState().typeIsFinished()) {
             taskInstance.setState(subProcessInstance.getState());
             taskInstance.setEndTime(new Date());
@@ -123,7 +116,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
             case STOP:
                 return true;
             default:
-                logger.error("unknown task action: {}", taskAction.toString());
+                logger.error("unknown task action: {}", taskAction);
         }
         return false;
     }
@@ -135,7 +128,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     private boolean pauseSubWorkFlow() {
-        ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+        subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
@@ -156,7 +149,11 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
-
+        TaskInstance instance = processService.findTaskInstanceById(taskInstance.getId());
+        if (instance.getState() == ExecutionStatus.RUNNING_EXECUTION) {
+            taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+            return true;
+        }
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
@@ -165,25 +162,26 @@ public class SubTaskProcessor extends BaseTaskProcessor {
                 taskInstance.getId(),
                 taskInstance.getState());
         return true;
-
     }
 
     @Override
     protected boolean killTask() {
-        ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+        subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);
         processService.updateProcessInstance(subProcessInstance);
         sendToSubProcess();
+        this.taskInstance.setState(ExecutionStatus.KILL);
+        this.taskInstance.setEndTime(new Date());
+        processService.saveTaskInstance(taskInstance);
         return true;
     }
 
     private void sendToSubProcess() {
-        StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(), subProcessInstance.getId(), 0
-        );
+        StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(processInstance.getId(),
+                taskInstance.getId(), subProcessInstance.getState(), subProcessInstance.getId(), 0);
         String address = subProcessInstance.getHost().split(":")[0];
         int port = Integer.parseInt(subProcessInstance.getHost().split(":")[1]);
         this.stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());

@@ -171,4 +171,29 @@
             submit_time = #{submitTime}
         where id = #{id}
     </update>
+    <select id="queryLastTaskInstance" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where task_code=#{taskCode}
+        <if test="startTime!=null and endTime != null">
+            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        order by end_time desc limit 1
+    </select>
+    <select id="queryLastTaskInstanceList" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where 1=1
+        <if test="taskCodes != null and taskCodes.size() != 0">
+            and task_code in
+            <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="startTime!=null and endTime != null">
+            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+    </select>
 </mapper>

@@ -20,10 +20,11 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 /**
  * task action
  */
-public enum  TaskAction {
+public enum TaskAction {
     PAUSE,
     STOP,
     TIMEOUT,
     SUBMIT,
-    RUN
+    RUN,
+    RESUBMIT
 }

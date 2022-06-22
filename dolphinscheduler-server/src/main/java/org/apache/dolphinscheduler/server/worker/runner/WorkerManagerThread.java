@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
@@ -49,7 +51,7 @@ public class WorkerManagerThread implements Runnable {
     /**
      * task queue
      */
-    private final DelayQueue<TaskExecuteThread> workerExecuteQueue = new DelayQueue<>();
+    private final BlockingQueue<TaskExecuteThread> waitSubmitQueue;
 
     /**
      * running task
@@ -73,6 +75,7 @@ public class WorkerManagerThread implements Runnable {
 
     public WorkerManagerThread() {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
+        this.waitSubmitQueue = new DelayQueue<>();
         this.workerExecService = new WorkerExecService(
                 ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads()),
                 taskExecuteThreadMap
@@ -85,12 +88,12 @@ public class WorkerManagerThread implements Runnable {
     }
 
     /**
-     * get delay queue size
+     * get wait submit queue size
      *
      * @return queue size
      */
-    public int getDelayQueueSize() {
-        return workerExecuteQueue.size();
+    public int getWaitSubmitQueueSize() {
+        return waitSubmitQueue.size();
     }
 
     /**
@@ -107,9 +110,9 @@ public class WorkerManagerThread implements Runnable {
      * then send Response to Master, update the execution status of task instance
      */
     public void killTaskBeforeExecuteByInstanceId(Integer taskInstanceId) {
-        workerExecuteQueue.stream()
+        waitSubmitQueue.stream()
                 .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
-                .forEach(workerExecuteQueue::remove);
+                .forEach(waitSubmitQueue::remove);
         sendTaskKillResponse(taskInstanceId);
     }
 
@@ -135,7 +138,14 @@ public class WorkerManagerThread implements Runnable {
      * @return submit result
      */
     public boolean offer(TaskExecuteThread taskExecuteThread) {
-        return workerExecuteQueue.offer(taskExecuteThread);
+        if (waitSubmitQueue.size() > workerConfig.getWorkerExecThreads()) {
+            // if waitSubmitQueue is full, it will wait 1s, then try add
+            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            if (waitSubmitQueue.size() > workerConfig.getWorkerExecThreads()) {
+                return false;
+            }
+        }
+        return waitSubmitQueue.offer(taskExecuteThread);
     }
 
     public void start() {
@@ -150,8 +160,14 @@ public class WorkerManagerThread implements Runnable {
         TaskExecuteThread taskExecuteThread;
         while (Stopper.isRunning()) {
             try {
-                taskExecuteThread = workerExecuteQueue.take();
-                workerExecService.submit(taskExecuteThread);
+                if (this.getThreadPoolQueueSize() <= workerConfig.getWorkerExecThreads()) {
+                    taskExecuteThread = waitSubmitQueue.take();
+                    workerExecService.submit(taskExecuteThread);
+                } else {
+                    logger.info("Exec queue is full, waiting submit queue {}, waiting exec queue size {}",
+                        this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
+                    ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+                }
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "
                         + "the exception will be ignored and this thread will continue to run", e);

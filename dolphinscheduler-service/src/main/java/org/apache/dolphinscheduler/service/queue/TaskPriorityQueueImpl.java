@@ -18,17 +18,21 @@
 package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import org.springframework.stereotype.Service;
 
 /**
  * A singleton of a task queue implemented using PriorityBlockingQueue
  */
 @Service
 public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskPriorityQueueImpl.class);
+
     /**
      * queue size
      */
@@ -47,7 +51,12 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
      */
     @Override
     public void put(TaskPriority taskPriorityInfo) throws TaskPriorityQueueException {
-        queue.put(taskPriorityInfo);
+        if (!queue.contains(taskPriorityInfo)) {
+            queue.put(taskPriorityInfo);
+        } else {
+            logger.warn("the priorityBlockingQueue contain the task already, taskId: {}, processInstanceId: {}",
+                    taskPriorityInfo.getTaskId(), taskPriorityInfo.getProcessInstanceId());
+        }
     }
 
     /**

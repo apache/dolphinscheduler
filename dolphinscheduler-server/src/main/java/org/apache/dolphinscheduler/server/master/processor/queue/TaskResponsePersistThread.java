@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
+import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
@@ -163,14 +165,39 @@ public class TaskResponsePersistThread implements Runnable {
                     TaskKillAckCommand taskKillAckCommand = new TaskKillAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
                     channel.writeAndFlush(taskKillAckCommand.convert2Command());
                 }
-
+                break;
+            case WORKER_REJECT:
+                try {
+                    WorkflowExecuteThread executeThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+                    if (executeThread != null) {
+                        ITaskProcessor taskProcessor = executeThread.getActiveTaskProcessorMaps().get(taskResponseEvent.getTaskInstanceId());
+                        if (taskProcessor != null) {
+                            taskProcessor.action(TaskAction.RESUBMIT);
+                            logger.info("RESUBMIT: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
+                        }
+                    }
+                    if (channel != null) {
+                        TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+                        channel.writeAndFlush(taskRecallAckCommand.convert2Command(taskResponseEvent.getOpaque()));
+                        logger.info("taskRecallAckCommand send successfully, task instance id:{}, opaque:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getOpaque());
+                    }
+                } catch (Exception e) {
+                    result = false;
+                    logger.error("worker reject error", e);
+                    TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.FAILURE.getCode(), taskResponseEvent.getTaskInstanceId());
+                    channel.writeAndFlush(taskRecallAckCommand.convert2Command(taskResponseEvent.getOpaque()));
+                    logger.info("taskRecallAckCommand send successfully, task instance id:{}, opaque:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getOpaque());
+                }
+                break;
+            case REALLOCATE:
+                logger.warn("Not yet supported");
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
 
         WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
-        if (workflowExecuteThread != null) {
+        if (workflowExecuteThread != null && taskResponseEvent.getState().typeIsFinished()) {
             StateEvent stateEvent = new StateEvent();
             stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
             stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());

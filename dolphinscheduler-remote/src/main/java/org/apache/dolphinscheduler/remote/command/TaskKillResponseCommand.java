@@ -114,6 +114,7 @@ public class TaskKillResponseCommand implements Serializable {
     public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_KILL_RESPONSE);
+        command.setGenCommandTimeMillis(System.currentTimeMillis());
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;

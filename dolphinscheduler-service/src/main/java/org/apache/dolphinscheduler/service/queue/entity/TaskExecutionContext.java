@@ -62,6 +62,12 @@ public class TaskExecutionContext implements Serializable {
     private Date startTime;
 
     /**
+     * endTime
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endTime;
+
+    /**
      * task type
      */
     private String taskType;
@@ -285,6 +291,14 @@ public class TaskExecutionContext implements Serializable {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public String getTaskType() {
@@ -573,6 +587,7 @@ public class TaskExecutionContext implements Serializable {
                 + ", currentExecutionStatus=" + currentExecutionStatus
                 + ", firstSubmitTime=" + firstSubmitTime
                 + ", startTime=" + startTime
+                + ", endTime=" + endTime
                 + ", taskType='" + taskType + '\''
                 + ", host='" + host + '\''
                 + ", executePath='" + executePath + '\''

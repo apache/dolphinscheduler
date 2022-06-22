@@ -121,6 +121,7 @@ public class TaskExecuteAckCommand implements Serializable {
     public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_EXECUTE_ACK);
+        command.setGenCommandTimeMillis(System.currentTimeMillis());
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
