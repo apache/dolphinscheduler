@@ -1,0 +1,31 @@
+Metadata-Version: 2.1
+Name: py4j
+Version: 0.10.9.5
+Summary: Enables Python programs to dynamically access arbitrary Java objects
+Home-page: https://www.py4j.org/
+Author: Barthelemy Dagenais
+Author-email: barthelemy@infobart.com
+License: BSD License
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Java
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Object Brokering
+License-File: LICENSE.txt
+
+Py4J enables Python programs running in a Python interpreter to dynamically access Java objects in a Java Virtual Machine. Methods are called as if the Java objects resided in the Python interpreter and Java collections can be accessed through standard Python collection methods. Py4J also enables Java programs to call back Python objects.
+

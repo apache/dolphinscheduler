@@ -1,0 +1,3 @@
+[console_scripts]
+tox = tox:cmdline
+tox-quickstart = tox._quickstart:main
