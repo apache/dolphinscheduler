@@ -211,11 +211,6 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     public Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize) {
 
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ALERT_PLUGIN_INSTANCE, ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
         Page<AlertPluginInstance> page = new Page<>(pageNo, pageSize);
         IPage<AlertPluginInstance> alertPluginInstanceIPage = alertPluginInstanceMapper.queryByInstanceNamePage(page, searchVal);
 

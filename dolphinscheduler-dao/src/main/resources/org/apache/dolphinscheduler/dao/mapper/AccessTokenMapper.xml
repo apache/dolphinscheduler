@@ -35,7 +35,10 @@
     <select id="queryAccessTokenByUser" resultType="org.apache.dolphinscheduler.dao.entity.AccessToken">
         select id, user_id, token, expire_time, create_time, update_time
         from t_ds_access_token
-        where user_id = #{userId}
+        where 1 = 1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
     </select>
 
     <delete id="deleteAccessTokenByUserId">

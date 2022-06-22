@@ -92,8 +92,6 @@ public class K8SNamespaceServiceTest {
         IPage<K8sNamespace> page = new Page<>(1, 10);
         page.setTotal(1L);
         page.setRecords(getNamespaceList());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(k8sNamespaceMapper.queryK8sNamespacePaging(Mockito.any(Page.class), Mockito.eq(namespace))).thenReturn(page);
         Result result = k8sNamespaceService.queryListPaging(getLoginUser(), namespace, 1, 10);
         logger.info(result.toString());

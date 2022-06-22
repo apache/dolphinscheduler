@@ -258,12 +258,6 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return result;
         }
         Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
-
-        // admin can view all
-        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, ApiFuncIdentificationConstant.MONITOR_STATISTICS_VIEW)){
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
-            return result;
-        }
         int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
 
         // count normal command state

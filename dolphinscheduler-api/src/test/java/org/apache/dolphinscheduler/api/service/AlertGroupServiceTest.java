@@ -36,8 +36,10 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
@@ -71,9 +73,6 @@ public class AlertGroupServiceTest {
 
     private String groupName = "AlertGroupServiceTest";
 
-    @InjectMocks
-    BaseServiceImpl baseService;
-
     @Spy
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
@@ -97,14 +96,15 @@ public class AlertGroupServiceTest {
         // no operate
         user.setUserType(UserType.GENERAL_USER);
         user.setId(88);
+
+        Set<Integer> ids = new HashSet<>();
+        ids.add(1);
         Result result = alertGroupService.listPaging(user, groupName, 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), (int) result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         //success
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, 1, ALERT_GROUP_VIEW, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, null, 0, baseServiceLogger)).thenReturn(true);
         result = alertGroupService.listPaging(user, groupName, 1, 10);
         logger.info(result.toString());
         PageInfo<AlertGroup> pageInfo = (PageInfo<AlertGroup>) result.getData();

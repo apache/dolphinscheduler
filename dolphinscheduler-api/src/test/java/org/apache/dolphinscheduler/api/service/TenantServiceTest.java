@@ -51,8 +51,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
@@ -64,6 +66,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 public class TenantServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
+    private static final Logger tenantServiceImplLogger = LoggerFactory.getLogger(TenantServiceImpl.class);
 
     @InjectMocks
     private TenantServiceImpl tenantService;
@@ -125,10 +128,11 @@ public class TenantServiceTest {
         IPage<Tenant> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_MANAGER, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
-        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq("TenantServiceTest")))
-                .thenReturn(page);
+        Set<Integer> ids = new HashSet<>();
+        ids.add(1);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
+        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq("TenantServiceTest")))
+        .thenReturn(page);
         Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();

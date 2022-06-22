@@ -30,10 +30,12 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +70,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE, YARN_QUEUE_MANAGE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
+        if (ids.isEmpty()) {
+            result.put(Constants.DATA_LIST, Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
             return result;
         }
-
-        List<Queue> queueList = queueMapper.selectList(null);
+        List<Queue> queueList = queueMapper.selectBatchIds(ids);
         result.put(Constants.DATA_LIST, queueList);
         putMsg(result, Status.SUCCESS);
 
@@ -92,17 +95,16 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.QUEUE,YARN_QUEUE_MANAGE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+        PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
+        if (ids.isEmpty()) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
             return result;
         }
-
         Page<Queue> page = new Page<>(pageNo, pageSize);
-
         IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
-
         Integer count = (int) queueList.getTotal();
-        PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal(count);
         pageInfo.setTotalList(queueList.getRecords());
         result.setData(pageInfo);
@@ -174,7 +176,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
+        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

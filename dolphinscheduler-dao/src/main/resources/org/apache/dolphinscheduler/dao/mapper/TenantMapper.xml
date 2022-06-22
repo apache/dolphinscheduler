@@ -41,6 +41,13 @@
         from t_ds_tenant
         where tenant_code = #{tenantCode}
     </select>
+
+    <select id="queryAll" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+        select
+        <include refid="baseSql"/>
+        from t_ds_tenant
+    </select>
+
     <select id="queryTenantPaging" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
         SELECT
         <include refid="baseSqlV2">
@@ -51,6 +58,12 @@
         WHERE t.queue_id = q.id
         <if test="searchVal != null and searchVal != ''">
             and t.tenant_code like concat('%', #{searchVal}, '%')
+        </if>
+        <if test="ids != null and ids.size() > 0">
+            and t.id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
         </if>
         order by t.update_time desc
     </select>

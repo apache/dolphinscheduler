@@ -150,14 +150,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Result<Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Result<Object> result = new Result<>();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.TENANT,TENANT_MANAGER)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+        PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, loginUser.getId(), logger);
+        if (ids.isEmpty()) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
             return result;
         }
         Page<Tenant> page = new Page<>(pageNo, pageSize);
-        IPage<Tenant> tenantPage = tenantMapper.queryTenantPaging(page, searchVal);
+        IPage<Tenant> tenantPage = tenantMapper.queryTenantPaging(page, new ArrayList<>(ids), searchVal);
 
-        PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) tenantPage.getTotal());
         pageInfo.setTotalList(tenantPage.getRecords());
         result.setData(pageInfo);
@@ -298,14 +300,15 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> queryTenantList(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.TENANT,TENANT_MANAGER)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, loginUser.getId(), logger);
+        if (ids.isEmpty()) {
+            result.put(Constants.DATA_LIST, Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
             return result;
         }
-        List<Tenant> resourceList = tenantMapper.selectList(null);
+        List<Tenant> resourceList = tenantMapper.selectBatchIds(ids);
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

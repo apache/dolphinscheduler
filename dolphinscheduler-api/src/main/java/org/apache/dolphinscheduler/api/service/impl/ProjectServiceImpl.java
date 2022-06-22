@@ -230,10 +230,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.PROJECTS, PROJECT)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
         Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
         if (projectIds.isEmpty()) {
             result.setData(pageInfo);

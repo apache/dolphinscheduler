@@ -367,11 +367,9 @@ public class ResourcesServiceTest {
         loginUser.setId(0);
         loginUser.setUserType(UserType.ADMIN_USER);
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 0, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 0, serviceLogger)).thenReturn(getSetIds());
+        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 0, resourceLogger)).thenReturn(getSetIds());
+        Mockito.when(resourcesMapper.selectBatchIds(Mockito.anySet())).thenReturn(getResourceList());
 
-        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 0)).thenReturn(getResourceList());
         Map<String, Object> result = resourcesService.queryResourceList(loginUser, ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -379,15 +377,11 @@ public class ResourcesServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(resourceList));
 
         // test udf
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 0, ApiFuncIdentificationConstant.UDF_FILE_VIEW, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 0, serviceLogger)).thenReturn(getSetIds());
+        PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF_FILE, 0, resourceLogger)).thenReturn(getSetIds());
+        Mockito.when(resourcesMapper.selectBatchIds(Mockito.anySet())).thenReturn(Arrays.asList(getResource(11, ResourceType.UDF),
+                getResource(10, ResourceType.UDF), getResource(9, ResourceType.UDF), getResource(8, ResourceType.UDF)));
+
         loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(0, 0))
-                .thenReturn(Arrays.asList(Integer.valueOf(10), Integer.valueOf(11)));
-        Mockito.when(resourcesMapper.queryResourceListById(Arrays.asList(Integer.valueOf(10), Integer.valueOf(11))))
-                .thenReturn(Arrays.asList(getResource(10, ResourceType.FILE), getResource(11, ResourceType.UDF)));
-        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 1)).thenReturn(getResourceList());
         result = resourcesService.queryResourceList(loginUser, ResourceType.UDF);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

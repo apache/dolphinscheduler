@@ -281,8 +281,6 @@ public class DataAnalysisServiceTest {
         CommandCount commandCount = new CommandCount();
         commandCount.setCommandType(CommandType.START_PROCESS);
         commandCounts.add(commandCount);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_ANALYSIS, user.getId(), ApiFuncIdentificationConstant.MONITOR_STATISTICS_VIEW, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_ANALYSIS, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(commandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
         Mockito.when(errorCommandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
 

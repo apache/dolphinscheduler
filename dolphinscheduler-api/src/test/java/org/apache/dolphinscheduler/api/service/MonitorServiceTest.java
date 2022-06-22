@@ -94,7 +94,7 @@ public class MonitorServiceTest {
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, false);
         Map<String,Object> noPermission = monitorService.queryDatabaseState(user);
-        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION,noPermission.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class MonitorServiceTest {
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, false);
         Map<String,Object> noPermission = monitorService.queryMaster(user);
-        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION,noPermission.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
     @Test
@@ -118,7 +118,7 @@ public class MonitorServiceTest {
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, false);
         Map<String,Object> noPermission = monitorService.queryWorker(user);
-        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION,noPermission.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
     @Test

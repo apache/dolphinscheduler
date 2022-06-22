@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
@@ -66,10 +64,6 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.MONITOR, ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
         List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
         result.put(Constants.DATA_LIST, monitorRecordList);
         putMsg(result, Status.SUCCESS);
@@ -85,10 +79,6 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryMaster(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.MONITOR, ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
         List<Server> masterServers = getServerListFromRegistry(true);
         result.put(Constants.DATA_LIST, masterServers);
         putMsg(result, Status.SUCCESS);
@@ -106,12 +96,6 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     public Map<String, Object> queryWorker(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
-
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.MONITOR, ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         List<WorkerServerModel> workerServers = getServerListFromRegistry(false)
             .stream()
             .map((Server server) -> {
