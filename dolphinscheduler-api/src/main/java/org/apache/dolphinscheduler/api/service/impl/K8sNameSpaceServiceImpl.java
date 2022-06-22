@@ -81,13 +81,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Result queryListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.K8S_NAMESPACE,null)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
         Page<K8sNameSpace> page = new Page<>(pageNo, pageSize);
-
         IPage<K8sNameSpace> k8sNamespaceList = k8sNamespaceMapper.queryK8sNamespacePaging(page, searchVal);
 
         Integer count = (int) k8sNamespaceList.getTotal();

@@ -21,12 +21,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
-import java.util.List;
 
 public class TenantMapperTest extends BaseDaoTest {
 
@@ -134,7 +136,7 @@ public class TenantMapperTest extends BaseDaoTest {
         Page<Tenant> page = new Page(1, 3);
 
         //tenant.getTenantCode() used instead of tenant.getTenantName()
-        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantCode());
+        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
 
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }

@@ -118,10 +118,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Result listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ALERT_GROUP,ALERT_GROUP_VIEW)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         IPage<AlertGroup> alertGroupPage;
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AlertGroup> page = new Page<>(pageNo, pageSize);
