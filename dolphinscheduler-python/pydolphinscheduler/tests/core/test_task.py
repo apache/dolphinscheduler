@@ -47,14 +47,14 @@ TEST_TASK_RELATION_SIZE = 0
         (
             {
                 "local_params": ["foo", "bar"],
-                "resource_list": ["foo", "bar"],
+                "resource_list": [{"id": 1}, {"id": 2}],
                 "dependence": {"foo", "bar"},
                 "wait_start_timeout": {"foo", "bar"},
                 "condition_result": {"foo": ["bar"]},
             },
             {
                 "localParams": ["foo", "bar"],
-                "resourceList": ["foo", "bar"],
+                "resourceList": [{"id": 1}, {"id": 2}],
                 "dependence": {"foo", "bar"},
                 "waitStartTimeout": {"foo", "bar"},
                 "conditionResult": {"foo": ["bar"]},
@@ -242,16 +242,17 @@ def test_add_duplicate(caplog):
             ]
         )
 
+
 @pytest.mark.parametrize(
     "resources, expect",
     [
         (
-            [{"resourceName": "/dev/test.py"}],
-            [{"id": 1, "resourceName": "/dev/test.py"}],
+            ["/dev/test.py"],
+            [{"id": 1}],
         ),
         (
-            [{"resourceName": "/dev/test.py"}, {"id": 2}],
-            [{"id": 1, "resourceName": "/dev/test.py"}, {"id": 2}],
+            ["/dev/test.py", {"id": 2}],
+            [{"id": 1}, {"id": 2}],
         ),
     ],
 )
@@ -260,14 +261,14 @@ def test_add_duplicate(caplog):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.tasks.python.Python.query_resource",
+    "pydolphinscheduler.core.task.Task.query_resource",
     return_value=({"id": 1, "name": "/dev/test.py"}),
 )
 def test_python_resource_list(mock_code_version, mock_resource, resources, expect):
     """Test python task resource list."""
     task = Task(
         name="python_resource_list",
-        # definition='print("hello  world.")',
+        task_type="PYTHON",
         resource_list=resources,
     )
     assert task.resource_list == expect

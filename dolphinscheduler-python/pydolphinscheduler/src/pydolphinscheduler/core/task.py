@@ -172,21 +172,14 @@ class Task(Base):
 
     @property
     def resource_list(self) -> List:
-        """Get python task define attribute `resource_list`."""
-        if self._resource_list is not None and len(self._resource_list) > 0:
-            for resource in self._resource_list:
-                if (
-                    resource.get("id") is None
-                    and resource.get("resourceName") is not None
-                ):
-                    if resource.get("resourceType") is not None:
-                        resource_type = resource.get("resourceType")
-                    else:
-                        resource_type = "FILE"
-                    resource["id"] = self.query_resource(
-                        resource_type, resource.get("resourceName")
-                    ).get("id")
-        return self._resource_list
+        """Get task define attribute `resource_list`."""
+        resources = list()
+        for resource in self._resource_list:
+            if type(resource) == str:
+                resources.append(self.query_resource(resource))
+            elif type(resource) == dict and resource.get("id") is not None:
+                resources.append(resource)
+        return [{"id": r.get("id")} for r in resources]
 
     @property
     def condition_result(self) -> Dict:
@@ -297,9 +290,9 @@ class Task(Base):
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")
 
-    def query_resource(self, resource_type, full_name):
+    def query_resource(self, full_name):
         """Get resource info from java gateway, contains resource id, name."""
         gateway = launch_gateway()
-        return gateway.entry_point.getResourcesFileInfo(
-            self.process_definition.user.name, resource_type, full_name
+        return gateway.entry_point.queryResourcesFileInfo(
+            self.process_definition.user.name, full_name
         )

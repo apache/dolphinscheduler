@@ -94,7 +94,7 @@ public class PythonGatewayTest {
 
 
     @Test
-    public void testGetResourcesFileInfo() {
+    public void testQueryResourcesFileInfo() {
         User user = getTestUser();
         Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
 
