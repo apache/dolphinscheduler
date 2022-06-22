@@ -345,25 +345,29 @@ public class ProcessServiceImpl implements ProcessService {
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                     processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
-            if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
-                for (ProcessInstance info : runningProcessInstances) {
-                    info.setCommandType(CommandType.STOP);
-                    info.addHistoryCmd(CommandType.STOP);
-                    info.setState(ExecutionStatus.READY_STOP);
-                    int update = updateProcessInstance(info);
-                    // determine whether the process is normal
-                    if (update > 0) {
-                        String host = info.getHost();
-                        String address = host.split(":")[0];
-                        int port = Integer.parseInt(host.split(":")[1]);
-                        StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
+            if (CollectionUtils.isEmpty(runningProcessInstances)) {
+                processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+                saveProcessInstance(processInstance);
+                return;
+            }
+            for (ProcessInstance info : runningProcessInstances) {
+                if (Objects.nonNull(info.getState()) && (ExecutionStatus.READY_STOP.equals(info.getState()) || info.getState().typeIsFinished())) {
+                    continue;
+                }
+                info.setCommandType(CommandType.STOP);
+                info.addHistoryCmd(CommandType.STOP);
+                info.setState(ExecutionStatus.READY_STOP);
+                int update = updateProcessInstance(info);
+                // determine whether the process is normal
+                if (update > 0) {
+                    StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                             info.getId(), 0, info.getState(), info.getId(), 0
-                        );
-                        try {
-                            stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
-                        } catch (Exception e) {
-                            logger.error("sendResultError");
-                        }
+                    );
+                    try {
+                        Host host = new Host(info.getHost());
+                        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
+                    } catch (Exception e) {
+                        logger.error("sendResultError",e );
                     }
                 }
             }
@@ -3037,13 +3041,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void sendStartTask2Master(ProcessInstance processInstance, int taskId,
                                      org.apache.dolphinscheduler.remote.command.CommandType taskType) {
-        String host = processInstance.getHost();
-        String address = host.split(":")[0];
-        int port = Integer.parseInt(host.split(":")[1]);
         TaskEventChangeCommand taskEventChangeCommand = new TaskEventChangeCommand(
             processInstance.getId(), taskId
         );
-        stateEventCallbackService.sendResult(address, port, taskEventChangeCommand.convert2Command(taskType));
+        Host host = new Host(processInstance.getHost());
+        stateEventCallbackService.sendResult(host, taskEventChangeCommand.convert2Command(taskType));
     }
 
     @Override
