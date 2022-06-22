@@ -120,9 +120,9 @@ public class LdapService {
         } catch (NamingException e) {
             logger.error("ldap search error", e);
             return null;
-        }finally {
+        } finally {
             try {
-                if(ctx != null){
+                if (ctx != null) {
                     ctx.close();
                 }
             } catch (NamingException e) {
@@ -147,7 +147,7 @@ public class LdapService {
         return env;
     }
 
-    public LdapUserNotExistActionType getLdapUserNotExistAction(){
+    public LdapUserNotExistActionType getLdapUserNotExistAction() {
         if (StringUtils.isBlank(ldapUserNotExistAction)) {
             logger.info("security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
             return LdapUserNotExistActionType.CREATE;
@@ -156,7 +156,7 @@ public class LdapService {
         return LdapUserNotExistActionType.valueOf(ldapUserNotExistAction);
     }
 
-    public boolean createIfUserNotExists(){
+    public boolean createIfUserNotExists() {
         return getLdapUserNotExistAction() == LdapUserNotExistActionType.CREATE;
     }
 }
