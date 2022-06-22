@@ -62,7 +62,14 @@
         <include refid="baseSql">
         </include>
         from t_ds_task_group
-        where project_code in ( #{projectCode} ,  0)
+        where 1=1
+        <if test="ids != null and ids.size() > 0">
+            and id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        and project_code in ( #{projectCode} ,  0)
         order by update_time desc
     </select>
 
