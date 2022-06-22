@@ -65,6 +65,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -499,13 +500,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // determine whether the process is normal
         if (update > 0) {
-            String host = processInstance.getHost();
-            String address = host.split(":")[0];
-            int port = Integer.parseInt(host.split(":")[1]);
             StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                     processInstance.getId(), 0, processInstance.getState(), processInstance.getId(), 0
             );
-            stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+            Host host = new Host(processInstance.getHost());
+            stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
