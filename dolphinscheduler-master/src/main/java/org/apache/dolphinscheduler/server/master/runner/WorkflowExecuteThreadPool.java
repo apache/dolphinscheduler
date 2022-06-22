@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
@@ -182,16 +183,15 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * notify process's master
      */
     private void notifyProcess(ProcessInstance finishProcessInstance, ProcessInstance processInstance, TaskInstance taskInstance) {
-        String host = processInstance.getHost();
-        if (Strings.isNullOrEmpty(host)) {
+        String processInstanceHost = processInstance.getHost();
+        if (Strings.isNullOrEmpty(processInstanceHost)) {
             logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(), taskInstance.getId());
             return;
         }
-        String address = host.split(":")[0];
-        int port = Integer.parseInt(host.split(":")[1]);
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                 finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(), taskInstance.getId()
         );
-        stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+        Host host = new Host(processInstanceHost);
+        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
     }
 }
