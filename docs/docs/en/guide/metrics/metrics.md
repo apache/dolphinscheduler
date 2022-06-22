@@ -5,10 +5,10 @@ Currently, we only support `Prometheus Exporter` but more are coming soon.
 
 ## Quick Start 
 
-- We enable Apache DolphinScheduler export metrics in `standalone` mode to help users get hands dirty easily. 
+- We enable Apache DolphinScheduler to export metrics in `standalone` mode to help users get hands dirty easily. 
 - After triggering tasks in `standalone` mode, you could access metrics list by visiting url `http://localhost:12345/dolphinscheduler/actuator/metrics`.
 - After triggering tasks in `standalone` mode, you could access `prometheus-format` metrics by visiting url `http://localhost:12345/dolphinscheduler/actuator/prometheus`.
-- For a better experience with `Prometheus` and `Grafana`, we have prepared the out-of-the-box `Grafana` configuration for you, you could find the `Grafana` dashboard
+- For a better experience with `Prometheus` and `Grafana`, we have prepared the out-of-the-box `Grafana` configurations for you, you could find the `Grafana` dashboards
 at `dolphinscheduler-meter/resources/grafana` and directly import these dashboards to your `Grafana` instance.
 - If you want to try with `docker`, you can use the following command to start the out-of-the-box `Prometheus` and `Grafana`:
 
@@ -42,8 +42,8 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 ## Naming Convention & Mapping
 
-- Apache DolphinScheduler metrics naming follows the officially-recommended approach by [Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc#:~:text=Micrometer%20employs%20a%20naming%20convention,between%20one%20system%20and%20another.)
-- `Micrometer` automatically maps the metrics name to suit the external metrics system you configured. Currently, we only support `Prometheus Exporter` but more are coming soon.
+- Naming of Apache DolphinScheduler metrics follows the officially-recommended approach by [Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc)
+- `Micrometer` automatically maps the metrics names to suit the external metrics system you configured. Currently, we only support `Prometheus Exporter` but more are coming soon.
 
 ### Prometheus
 
@@ -104,10 +104,13 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.worker.overload.count: (counter) the number of times the worker overloaded
 - ds.worker.full.submit.queue.count: (counter) the number of times the worker's submit queue being full
 
-
 ### Api Server Metrics
 
+- Currently, we have not embedded any metrics in Api Server. 
+
 ### Alert Server Related
+
+- Currently, we have not embedded any metrics in Alert Server.
 
 In each server, there are some default system-level metrics related to `database connection`, `JVM`, etc. We list them below for your reference:
 

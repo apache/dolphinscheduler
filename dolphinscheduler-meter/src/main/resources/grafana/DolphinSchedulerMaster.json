@@ -137,7 +137,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "increase(dolphinscheduler_master_overload_count_total[1m])",
+              "expr": "increase(ds_master_overload_count_total[1m])",
               "legendFormat": "",
               "range": true,
               "refId": "A"
@@ -226,7 +226,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "increase(dolphinscheduler_master_consume_command_count_total{}[1m])",
+              "expr": "increase(ds_master_consume_command_count_total{}[1m])",
               "legendFormat": "master_consume_command",
               "range": true,
               "refId": "A"
@@ -505,7 +505,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(quartz_job_executed_total)",
+              "expr": "sum(ds_master_quartz_job_executed_total)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -572,7 +572,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(quartz_job_executed_total{result=\"success\"}) / sum(quartz_job_executed_total) * 100",
+              "expr": "sum(ds_master_quartz_job_executed_total{result=\"success\"}) / sum(ds_master_quartz_job_executed_total) * 100",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -634,7 +634,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(quartz_job_executed_total{})",
+              "expr": "sum(ds_master_quartz_job_executed_total{})",
               "hide": false,
               "interval": "",
               "legendFormat": "Total",
@@ -642,7 +642,7 @@
             },
             {
               "exemplar": true,
-              "expr": "quartz_job_executed_total{result=\"success\"}",
+              "expr": "ds_master_quartz_job_executed_total{result=\"success\"}",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -652,7 +652,7 @@
             },
             {
               "exemplar": true,
-              "expr": "quartz_job_executed_total{result=\"failure\"}",
+              "expr": "ds_master_quartz_job_executed_total{result=\"failure\"}",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -741,7 +741,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "rate(quartz_job_execution_seconds_sum[1m])/rate(quartz_job_execution_seconds_count[1m])",
+              "expr": "rate(ds_master_quartz_job_execution_time_seconds_sum[1m])/rate(ds_master_quartz_job_execution_time_seconds_count[1m])",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -845,7 +845,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(increase(quartz_job_executed_total[1m]))",
+              "expr": "sum(increase(ds_master_quartz_job_executed_total[1m]))",
               "hide": false,
               "interval": "",
               "legendFormat": "Total",
@@ -853,7 +853,7 @@
             },
             {
               "exemplar": true,
-              "expr": "increase(quartz_job_executed_total{result=\"success\"}[1m])",
+              "expr": "increase(ds_master_quartz_job_executed_total{result=\"success\"}[1m])",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -863,7 +863,7 @@
             },
             {
               "exemplar": true,
-              "expr": "increase(quartz_job_executed_total{result=\"failure\"}[1m])",
+              "expr": "increase(ds_master_quartz_job_executed_total{result=\"failure\"}[1m])",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -937,7 +937,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "histogram_quantile(0.95, sum(rate(quartz_job_execution_seconds_bucket[5m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(ds_master_quartz_job_execution_time_seconds_bucket[5m])) by (le))",
               "interval": "",
               "legendFormat": "",
               "refId": "A"
@@ -1052,7 +1052,7 @@
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "increase(dolphinscheduler_process_instance_submit_count_total{}[1m])",
+              "expr": "increase(ds_workflow_instance_submit_count_total{}[1m])",
               "refId": "A"
             }
           ],
@@ -1138,7 +1138,7 @@
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "increase(dolphinscheduler_process_instance_finish_count_total{}[1m])",
+              "expr": "increase(ds_workflow_instance_finish_count_total{}[1m])",
               "refId": "A"
             }
           ],
@@ -1224,7 +1224,7 @@
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "increase(dolphinscheduler_process_instance_success_count_total{}[1m])",
+              "expr": "increase(ds_workflow_instance_success_count_total{}[1m])",
               "refId": "A"
             }
           ],
@@ -1310,7 +1310,7 @@
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "increase(dolphinscheduler_process_instance_stop_count_total{}[1m])",
+              "expr": "increase(ds_workflow_instance_stop_count_total{}[1m])",
               "refId": "A"
             }
           ],
@@ -1396,7 +1396,7 @@
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "increase(dolphinscheduler_process_instance_timeout_count_total{}[1m])",
+              "expr": "increase(ds_workflow_instance_timeout_count_total{}[1m])",
               "refId": "A"
             }
           ],
@@ -1482,7 +1482,7 @@
                 "type": "prometheus",
                 "uid": "PBFA97CFB590B2093"
               },
-              "expr": "increase(dolphinscheduler_process_instance_failure_count_total{}[1m])",
+              "expr": "increase(ds_workflow_instance_failure_count_total{}[1m])",
               "refId": "A"
             }
           ],

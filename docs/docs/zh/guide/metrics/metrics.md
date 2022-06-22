@@ -42,7 +42,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 ## 命名规则 & 命名映射
 
-- Apache DolphinScheduler指标命名遵循[Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc#:~:text=Micrometer%20employs%20a%20naming%20convention,between%20one%20system%20and%20another)
+- Apache DolphinScheduler指标命名遵循[Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc)
 官方推荐的命名方式。
 - `Micrometer` 会根据您配置的外部指标系统自动将指标名称转化成适合您指标系统的格式。目前，我们只支持`Prometheus Exporter`，但是多样化的指标格式将会持续贡献给用户。
 
@@ -105,10 +105,13 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 - ds.worker.overload.count: (counter) worker过载次数
 - ds.worker.full.submit.queue.count: (counter) worker提交队列全满次数
 
-
 ### Api Server指标
 
+- 目前我们尚未提供任何Api Server指标
+
 ### Alert Server指标
+
+- 目前我们尚未提供任何Alert Server指标
 
 在每个server中都有一些系统层面（如数据库链接、JVM）的默认指标，为了您的检阅方便，我们也将它们列在了这里：
 
