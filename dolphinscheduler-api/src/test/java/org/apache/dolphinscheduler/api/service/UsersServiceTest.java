@@ -183,16 +183,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testQueryUser() {
-        String userName = "userTest0001";
-        String userPassword = "userTest0001";
-        when(userMapper.queryUserByNamePassword(userName, EncryptionUtils.getMd5(userPassword))).thenReturn(getGeneralUser());
-        User queryUser = usersService.queryUser(userName, userPassword);
-        logger.info(queryUser.toString());
-        Assert.assertTrue(queryUser != null);
-    }
-
-    @Test
     public void testSelectByIds() {
         List<Integer> ids = new ArrayList<>();
         List<User> users = usersService.queryUser(ids);

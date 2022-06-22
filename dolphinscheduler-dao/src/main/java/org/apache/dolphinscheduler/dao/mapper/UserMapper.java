@@ -72,16 +72,6 @@ public interface UserMapper extends BaseMapper<User> {
     User queryByUserNameAccurately(@Param("userName") String userName);
 
     /**
-     * query user by userName and password
-     *
-     * @param userName userName
-     * @param password password
-     * @return user
-     */
-    User queryUserByNamePassword(@Param("userName") String userName, @Param("password") String password);
-
-
-    /**
      * user page
      *
      * @param page     page

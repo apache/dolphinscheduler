@@ -20,10 +20,14 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 /**
  * encryption utils
  */
 public class EncryptionUtils {
+
+    public static BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     private EncryptionUtils() {
         throw new UnsupportedOperationException("Construct EncryptionUtils");
@@ -35,6 +39,27 @@ public class EncryptionUtils {
      */
     public static String getMd5(String rawStr) {
         return DigestUtils.md5Hex(null == rawStr ? StringUtils.EMPTY : rawStr);
+    }
+
+    /**
+     * BCrypt Strong Hashing Function
+     *
+     * @param rawStr raw string
+     * @return string
+     */
+    public static String getBcryptPasswordEncode(String rawStr) {
+        return bCryptPasswordEncoder.encode(rawStr);
+    }
+
+    /**
+     * compare rawPassword with encodedPassword
+     *
+     * @param rawPassword
+     * @param encodedPassword
+     * @return matches return true else false
+     */
+    public static boolean compareWithBcryptPassword(String rawPassword, String encodedPassword) {
+        return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
     }
 
 }

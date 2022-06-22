@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.security.impl.pwd;
 
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,12 @@ public class PasswordAuthenticator extends AbstractAuthenticator {
 
     @Override
     public User login(String userId, String password, String extra) {
-        return userService.queryUser(userId, password);
+        User user = userService.queryUser(userId);
+        if (user == null) {
+            return null;
+        } else {
+            String encodedPassword = user.getUserPassword();
+            return EncryptionUtils.compareWithBcryptPassword(password, encodedPassword) ? user : null;
+        }
     }
 }

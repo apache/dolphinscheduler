@@ -207,7 +207,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Date now = new Date();
 
         user.setUserName(userName);
-        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
+        user.setUserPassword(EncryptionUtils.getBcryptPasswordEncode(userPassword));
         user.setEmail(email);
         user.setTenantId(tenantId);
         user.setPhone(phone);
@@ -288,19 +288,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public User queryUser(String name) {
         return userMapper.queryByUserNameAccurately(name);
-    }
-
-    /**
-     * query user
-     *
-     * @param name     name
-     * @param password password
-     * @return user info
-     */
-    @Override
-    public User queryUser(String name, String password) {
-        String md5 = EncryptionUtils.getMd5(password);
-        return userMapper.queryUserByNamePassword(name, md5);
     }
 
     /**
@@ -419,7 +406,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
                 return result;
             }
-            user.setUserPassword(EncryptionUtils.getMd5(userPassword));
+            user.setUserPassword(EncryptionUtils.getBcryptPasswordEncode(userPassword));
         }
 
         if (StringUtils.isNotEmpty(email)) {

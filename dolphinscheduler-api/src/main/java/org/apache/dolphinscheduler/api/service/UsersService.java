@@ -87,15 +87,6 @@ public interface UsersService {
     User queryUser(String name);
 
     /**
-     * query user
-     *
-     * @param name name
-     * @param password password
-     * @return user info
-     */
-    User queryUser(String name, String password);
-
-    /**
      * get user id by user name
      *
      * @param name user name

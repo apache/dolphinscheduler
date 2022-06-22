@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -66,7 +67,7 @@ public class PasswordAuthenticatorTest extends AbstractControllerTest {
         mockUser = new User();
         mockUser.setUserName("test");
         mockUser.setEmail("test@test.com");
-        mockUser.setUserPassword("test");
+        mockUser.setUserPassword(EncryptionUtils.getBcryptPasswordEncode("test"));
         mockUser.setId(1);
         mockUser.setState(1);
 
@@ -79,21 +80,21 @@ public class PasswordAuthenticatorTest extends AbstractControllerTest {
 
     @Test
     public void testLogin() {
-        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
+        when(usersService.queryUser("test")).thenReturn(mockUser);
         User login = authenticator.login("test", "test", "127.0.0.1");
         Assert.assertNotNull(login);
     }
 
     @Test
     public void testAuthenticate() {
-        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
+        when(usersService.queryUser("test")).thenReturn(mockUser);
         when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
         Result result = authenticator.authenticate("test", "test", "127.0.0.1");
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
         mockUser.setState(0);
-        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
+        when(usersService.queryUser("test")).thenReturn(mockUser);
         when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
         Result result1 = authenticator.authenticate("test", "test", "127.0.0.1");
         Assert.assertEquals(Status.USER_DISABLED.getCode(), (int) result1.getCode());
