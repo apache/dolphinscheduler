@@ -76,6 +76,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void testDeleteWorkerGroupById() {
         User user = new User();
+        user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
         WorkerGroup wg2 = getWorkerGroup(2);
         Mockito.when(workerGroupMapper.selectById(2)).thenReturn(wg2);

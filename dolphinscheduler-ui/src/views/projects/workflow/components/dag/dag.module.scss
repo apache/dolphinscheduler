@@ -167,6 +167,12 @@ $bgLight: #ffffff;
     &.icon-mlflow {
       background-image: url('/images/task-icons/mlflow.png');
     }
+    &.icon-openmldb {
+      background-image: url('/images/task-icons/openmldb.png');
+    }
+    &.icon-dvc {
+      background-image: url('/images/task-icons/dvc.png');
+    }
   }
 
   &:hover {
@@ -236,6 +242,12 @@ $bgLight: #ffffff;
       }
       &.icon-mlflow {
         background-image: url('/images/task-icons/mlflow.png');
+      }
+      &.icon-openmldb {
+        background-image: url('/images/task-icons/openmldb_hover.png');
+      }
+      &.icon-dvc {
+        background-image: url('/images/task-icons/dvc_hover.png');
       }
     }
   }

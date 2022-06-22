@@ -8,7 +8,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 ## Create Task
 
 - Click Project Management-Project Name-Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
-- Drag <img src="/img/tasks/icons/zeppelin.png" width="15"/> from the toolbar to the canvas.
+- Drag <img src="../../../../img/tasks/icons/zeppelin.png" width="15"/> from the toolbar to the canvas.
 
 ## Task Parameter
 
@@ -21,7 +21,8 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 - Failed retry interval: The time interval for resubmitting the task after a failed task. It supports drop-down and hand-filling.
 - Timeout alarm: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will send and the task execution will fail.
 - Zeppelin Note ID: The unique note id for a zeppelin notebook note.
-- Zeppelin Paragraph ID: The unique paragraph id for a zeppelin notebook paragraph.
+- Zeppelin Paragraph ID: The unique paragraph id for a zeppelin notebook paragraph. If you want to schedule a whole note at a time, leave this field blank.
+- Zeppelin Parameters: Parameters in json format used for zeppelin dynamic form.
 
 ## Task Example
 
@@ -29,7 +30,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 This example illustrates how to create a zeppelin paragraph task node.
 
-![demo-zeppelin-paragraph](/img/tasks/demo/zeppelin.png)
+![demo-zeppelin-paragraph](../../../../img/tasks/demo/zeppelin.png)
 
-![demo-get-zeppelin-id](/img/tasks/demo/zeppelin_id.png)
+![demo-get-zeppelin-id](../../../../img/tasks/demo/zeppelin_id.png)
 

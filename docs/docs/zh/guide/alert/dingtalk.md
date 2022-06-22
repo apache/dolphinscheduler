@@ -2,7 +2,7 @@
 
 如果您需要使用到钉钉进行告警，请在告警实例管理里创建告警实例，选择 DingTalk 插件。钉钉的配置样例如下:
 
-![dingtalk-plugin](/img/alert/dingtalk-plugin.png)
+![alert-dingtalk](../../../../img/new_ui/dev/alert/alert_dingtalk.png)
 
 参数配置
 

@@ -18,15 +18,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * process instance service
@@ -68,6 +68,7 @@ public interface ProcessInstanceService {
      * @param host host
      * @param startDate start time
      * @param endDate end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
     Result queryProcessInstanceList(User loginUser,
@@ -79,6 +80,7 @@ public interface ProcessInstanceService {
                                     String executorName,
                                     ExecutionStatus stateType,
                                     String host,
+                                    String otherParamsJson,
                                     Integer pageNo,
                                     Integer pageSize);
 

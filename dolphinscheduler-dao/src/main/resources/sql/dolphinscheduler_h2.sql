@@ -486,6 +486,8 @@ CREATE TABLE t_ds_task_definition
     delay_time              int(11) DEFAULT '0',
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -521,6 +523,8 @@ CREATE TABLE t_ds_task_definition_log
     operator                int(11) DEFAULT NULL,
     task_group_id           int(11) DEFAULT NULL,
     task_group_priority     tinyint(4) DEFAULT '0',
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -860,6 +864,8 @@ CREATE TABLE t_ds_task_instance
     task_group_id           int(11) DEFAULT NULL,
     var_pool                longtext,
     dry_run                 int NULL DEFAULT 0,
+    cpu_quota               int(11) DEFAULT '-1' NOT NULL,
+    memory_max              int(11) DEFAULT '-1' NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE
 );
@@ -1957,3 +1963,26 @@ CREATE TABLE t_ds_alert_send_status
     UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
 );
 
+
+--
+-- Table structure for table t_ds_cluster
+--
+DROP TABLE IF EXISTS t_ds_cluster CASCADE;
+CREATE TABLE t_ds_cluster
+(
+    id          int       NOT NULL AUTO_INCREMENT,
+    code        bigint(20) NOT NULL,
+    name        varchar(100)       DEFAULT NULL,
+    config      text               DEFAULT NULL,
+    description text,
+    operator    int                DEFAULT NULL,
+    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY cluster_name_unique (name),
+    UNIQUE KEY cluster_code_unique (code)
+);
+
+INSERT INTO `t_ds_cluster`
+(`id`,`code`,`name`,`config`,`description`,`operator`,`create_time`,`update_time`)
+VALUES (100, 100, 'ds_null_k8s', '{"k8s":"ds_null_k8s"}', 'test', 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');

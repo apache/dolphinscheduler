@@ -62,7 +62,6 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return resource page
      */
     IPage<Resource> queryResourcePaging(IPage<Resource> page,
-                                        @Param("userId") int userId,
                                         @Param("id") int id,
                                         @Param("type") int type,
                                         @Param("searchVal") String searchVal,

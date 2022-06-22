@@ -32,7 +32,7 @@
     </resultMap>
 
     <sql id = "baseSql">
-        id,name,description,project_code,group_size,use_size,status,create_time,update_time
+        id,name,description,user_id,project_code,group_size,use_size,status,create_time,update_time
     </sql>
 
     <select id="queryTaskGroupPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -41,8 +41,11 @@
         </include>
         from t_ds_task_group
         <where>
-            <if test="userId != 0">
-                and user_id = #{userId}
+            <if test="ids != null and ids.size() > 0">
+                and id in
+                <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                    #{i}
+                </foreach>
             </if>
             <if test="status != null">
                 and status = #{status}
@@ -101,6 +104,16 @@
         from t_ds_task_group
         where
         id = #{id} and status = #{status}
+    </select>
+
+    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group
+        where 1=1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
     </select>
 
 </mapper>
