@@ -619,13 +619,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions){
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         Page<Resource> page = new Page<>(pageNo, pageSize);
         if (directoryId != -1) {
             Resource directory = resourcesMapper.selectById(directoryId);
@@ -729,13 +722,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
 
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions){
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
@@ -754,12 +740,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions){
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
 
         Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
         if (resourceIds.isEmpty()){
@@ -1575,23 +1555,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return all authored resource list
      */
     private List<Resource> queryAuthoredResourceList(User loginUser, ResourceType type) {
-        List<Resource> relationResources;
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-            relationResources = new ArrayList<>();
-        } else {
-            // query resource relation
-            relationResources = queryResourceList(userId, 0);
+        Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
+        if (resourceIds.isEmpty()){
+            return Collections.emptyList();
         }
-        // filter by resource type
-        List<Resource> relationTypeResources =
-                relationResources.stream().filter(rs -> rs.getType() == type).collect(Collectors.toList());
-
-        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        ownResourceList.addAll(relationTypeResources);
-
-        return ownResourceList;
+        List<Resource> resources = resourcesMapper.selectBatchIds(resourceIds);
+        resources = resources.stream().filter(rs -> rs.getType() == type).collect(Collectors.toList());
+        return resources;
     }
 
     /**

@@ -40,7 +40,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.assertj.core.util.Lists;
@@ -83,8 +82,6 @@ public class AccessTokenServiceTest {
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1, ACCESS_TOKEN_MANAGE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
 
         Result result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
@@ -96,19 +93,17 @@ public class AccessTokenServiceTest {
     @Test
     public void testQueryAccessTokenByUser() {
         List<AccessToken> accessTokenList = Lists.newArrayList(this.getEntity());
-        Mockito.when(this.accessTokenMapper.queryAccessTokenByUser(1)).thenReturn(accessTokenList);
+        Mockito.when(this.accessTokenMapper.queryAccessTokenByUser(Mockito.anyInt())).thenReturn(accessTokenList);
 
         // USER_NO_OPERATION_PERM
         User user = this.getLoginUser();
         user.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, user.getId(), ACCESS_TOKEN_MANAGE, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(user, 1);
+        Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(user, 3);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // SUCCESS
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         result = this.accessTokenService.queryAccessTokenByUser(user, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
