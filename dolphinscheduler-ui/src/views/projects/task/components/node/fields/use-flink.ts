@@ -191,7 +191,8 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.task_manager_number'),
       span: taskManagerNumberSpan,
       props: {
-        placeholder: t('project.node.task_manager_number_tips')
+        placeholder: t('project.node.task_manager_number_tips'),
+        min: 1
       },
       value: model.taskManager
     },
