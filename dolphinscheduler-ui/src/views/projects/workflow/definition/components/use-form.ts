@@ -59,7 +59,7 @@ export const useForm = () => {
       execType: 'START_PROCESS',
       startNodeList: '',
       taskDependType: 'TASK_POST',
-      dependentMode: 'OFF_MODE',
+      complementDependentMode: 'OFF_MODE',
       runMode: 'RUN_MODE_SERIAL',
       processInstancePriority: 'MEDIUM',
       workerGroup: 'default',
