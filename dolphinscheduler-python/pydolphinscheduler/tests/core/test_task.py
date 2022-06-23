@@ -271,7 +271,7 @@ def test_add_duplicate(caplog):
 def test_python_resource_list(mock_code_version, mock_resource, resources, expect):
     """Test python task resource list."""
     task = Task(
-        name="python_resource_list.",
+        name="python_resource_list",
         task_type="PYTHON",
         resource_list=resources,
     )
