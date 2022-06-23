@@ -180,7 +180,7 @@ class Task(Base):
                 resources.add(self.query_resource(resource).get(ResourceKey.ID))
             elif type(resource) == dict and resource.get(ResourceKey.ID) is not None:
                 logger.warning(
-                    """Resource_list should be defined using List[str] with resource paths,
+                    """`resource_list` should be defined using List[str] with resource paths,
                        the use of ids to define resources will be remove in version 3.2.0.
                     """
                 )
