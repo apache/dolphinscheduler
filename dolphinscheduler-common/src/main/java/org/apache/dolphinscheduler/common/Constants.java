@@ -391,9 +391,14 @@ public final class Constants {
     public static final long CACHE_REFRESH_TIME_MILLIS = 20 * 1_000L;
 
     /**
-     * heartbeat for zk info length
+     * worker heartbeat length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 14;
+    public static final int WORKER_HEARTBEAT_LENGTH = 14;
+
+    /**
+     * master heartbeat length
+     */
+    public static final int MASTER_HEARTBEAT_LENGTH = 11;
 
     /**
      * jar

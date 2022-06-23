@@ -17,53 +17,38 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.junit.Assert.assertEquals;
-
-import org.apache.dolphinscheduler.common.Constants;
-
+import org.apache.dolphinscheduler.common.model.HeartBeatModel;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * NetUtilsTest
+ * HeartBeatUtilsTest
  */
-public class HeartBeatTest {
-
+public class HeartBeatUtilsTest {
     @Test
-    public void testAbnormalState() {
-        long startupTime = System.currentTimeMillis();
-        double loadAverage = 100;
-        double reservedMemory = 100;
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setStartupTime(startupTime);
-        heartBeat.setLoadAverage(loadAverage);
-        heartBeat.setReservedMemory(reservedMemory);
-        heartBeat.updateServerState();
-        assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    public void testDecodeMasterHeartBeat() {
+        String heartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,65.86";
+        HeartBeatModel heartBeat = HeartBeatUtils.decodeMasterHeartBeat(heartBeatInfo);
+
+        double delta = 0.001;
+        assertEquals(0.35, heartBeat.getCpuUsage(), delta);
+        assertEquals(0.58, heartBeat.getMemoryUsage(), delta);
+        assertEquals(3.09, heartBeat.getLoadAverage(), delta);
+        assertEquals(6.47, heartBeat.getAvailablePhysicalMemorySize(), delta);
+        assertEquals(5.0, heartBeat.getMaxCpuloadAvg(), delta);
+        assertEquals(1.0, heartBeat.getReservedMemory(), delta);
+        assertEquals(1634033006749L, heartBeat.getStartupTime());
+        assertEquals(1634033006857L, heartBeat.getReportTime());
+        assertEquals(1, heartBeat.getServerStatus());
+        assertEquals(29732, heartBeat.getProcessId());
+        assertEquals(65.86, heartBeat.getDiskAvailable(), delta);
     }
 
     @Test
-    public void testBusyState() {
-        long startupTime = System.currentTimeMillis();
-        double loadAverage = 0;
-        double reservedMemory = 0;
-        int hostWeight = 1;
-        int workerWaitingTaskCount = 200;
-        int workerThreadCount = 199;
-        HeartBeat heartBeat = new HeartBeat();
-        heartBeat.setStartupTime(startupTime);
-        heartBeat.setLoadAverage(loadAverage);
-        heartBeat.setReservedMemory(reservedMemory);
-        heartBeat.setWorkerHostWeight(hostWeight);
-        heartBeat.setWorkerExecThreadCount(workerThreadCount);
-        heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
-        heartBeat.updateServerState();
-        assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
-    }
-
-    @Test
-    public void testDecodeHeartBeat() throws Exception {
+    public void testDecodeWorkerHeartBeat() {
         String heartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,1,199,200,65.86";
-        HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+        HeartBeatModel heartBeat = HeartBeatUtils.decodeWorkerHeartBeat(heartBeatInfo);
 
         double delta = 0.001;
         assertEquals(0.35, heartBeat.getCpuUsage(), delta);

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +43,10 @@ public class WorkerHeartBeatTest {
         double reservedMemory = 100;
         int hostWeight = 1;
         int workerThreadCount = 199;
-        HeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
         assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
@@ -56,16 +58,13 @@ public class WorkerHeartBeatTest {
         double reservedMemory = 0;
         int hostWeight = 1;
         int workerThreadCount = 199;
-        HeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
-        // registry info check
         Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(200);
-        String encodeHeartBeat = heartBeat.encodeHeartBeat();
-        assertEquals(Constants.BUSY_NODE_STATUE, Integer.parseInt(encodeHeartBeat.split(Constants.COMMA)[8]));
-
-        // heartBeat info check
-        HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        assertEquals(Constants.BUSY_NODE_STATUE, decodeHeartBeat.getServerStatus());
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
     }
 
     @Test
@@ -75,16 +74,13 @@ public class WorkerHeartBeatTest {
         double reservedMemory = 0;
         int hostWeight = 1;
         int workerThreadCount = 199;
-        HeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
-        // registry info check
         Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(198);
-        String encodeHeartBeat = heartBeat.encodeHeartBeat();
-        assertEquals(Constants.NORMAL_NODE_STATUS, Integer.parseInt(encodeHeartBeat.split(Constants.COMMA)[8]));
-
-        // heartBeat info check
-        HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        assertEquals(Constants.NORMAL_NODE_STATUS, decodeHeartBeat.getServerStatus());
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
 
 }

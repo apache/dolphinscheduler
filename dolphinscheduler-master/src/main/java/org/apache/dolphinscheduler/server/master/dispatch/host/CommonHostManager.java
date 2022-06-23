@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.model.HeartBeatModel;
+import org.apache.dolphinscheduler.common.utils.HeartBeatUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -91,7 +92,7 @@ public abstract class CommonHostManager implements HostManager {
     protected int getWorkerHostWeightFromHeartbeat(String heartBeatInfo) {
         int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
         if (!StringUtils.isEmpty(heartBeatInfo)) {
-            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+            HeartBeatModel heartBeat = HeartBeatUtils.decodeWorkerHeartBeat(heartBeatInfo);
             if (heartBeat != null) {
                 hostWeight = heartBeat.getWorkerHostWeight();
             }

@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.model.HeartBeatModel;
+import org.apache.dolphinscheduler.common.utils.HeartBeatUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
@@ -136,7 +137,7 @@ public class LowerWeightHostManager extends CommonHostManager {
             logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
             return Optional.empty();
         }
-        HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+        HeartBeatModel heartBeat = HeartBeatUtils.decodeWorkerHeartBeat(heartBeatInfo);
         if (heartBeat == null) {
             return Optional.empty();
         }

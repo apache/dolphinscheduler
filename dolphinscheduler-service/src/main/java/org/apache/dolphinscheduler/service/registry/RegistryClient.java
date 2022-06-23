@@ -33,8 +33,9 @@ import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.HeartBeatModel;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.utils.HeartBeatUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -97,7 +98,7 @@ public class RegistryClient {
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
-            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(entry.getValue());
+            HeartBeatModel heartBeat = HeartBeatUtils.decodeHeartBeat(entry.getValue(), nodeType);
             if (heartBeat == null) {
                 continue;
             }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
@@ -35,12 +34,12 @@ public class HeartBeatTask implements Runnable {
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
     private final String serverType;
-    private final HeartBeat heartBeat;
+    private final AbstractHeartBeat heartBeat;
 
     public HeartBeatTask(Set<String> heartBeatPaths,
                          String serverType,
                          RegistryClient registryClient,
-                         HeartBeat heartBeat) {
+                         AbstractHeartBeat heartBeat) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
         this.serverType = serverType;
@@ -48,7 +47,7 @@ public class HeartBeatTask implements Runnable {
     }
 
     public String getHeartBeatInfo() {
-        return this.heartBeat.encodeHeartBeat();
+        return this.heartBeat.getRealTimeHeartBeatInfo();
     }
 
     @Override
@@ -75,9 +74,8 @@ public class HeartBeatTask implements Runnable {
 
     private void persistEphemeral() {
         for (String heartBeatPath : heartBeatPaths) {
-            registryClient.persistEphemeral(heartBeatPath, getHeartBeatInfo());
+            registryClient.persistEphemeral(heartBeatPath, this.heartBeat.getRealTimeHeartBeatInfo());
         }
     }
-
 
 }

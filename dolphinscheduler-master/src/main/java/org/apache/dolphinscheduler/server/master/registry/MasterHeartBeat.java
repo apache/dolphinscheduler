@@ -17,18 +17,59 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.server.registry.AbstractHeartBeat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MasterHeartBeat extends HeartBeat {
+public class MasterHeartBeat extends AbstractHeartBeat {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterHeartBeat.class);
 
     public MasterHeartBeat(long startupTime, double maxCpuloadAvg, double reservedMemory) {
-        super();
         this.startupTime = startupTime;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.reservedMemory = reservedMemory;
     }
+
+    @Override
+    public void init() {
+        this.reportTime = System.currentTimeMillis();
+    }
+
+    /**
+     * update server state
+     */
+    @Override
+    public void updateServerState() {
+        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
+            this.serverStatus = Constants.ABNORMAL_NODE_STATUS;
+        } else {
+            this.serverStatus = Constants.NORMAL_NODE_STATUS;
+        }
+    }
+
+    /**
+     * encode heartbeat
+     */
+    @Override
+    public String encodeHeartBeat() {
+        StringBuilder builder = new StringBuilder(100);
+        builder.append(cpuUsage).append(Constants.COMMA);
+        builder.append(memoryUsage).append(Constants.COMMA);
+        builder.append(loadAverage).append(Constants.COMMA);
+        builder.append(availablePhysicalMemorySize).append(Constants.COMMA);
+        builder.append(maxCpuloadAvg).append(Constants.COMMA);
+        builder.append(reservedMemory).append(Constants.COMMA);
+        builder.append(startupTime).append(Constants.COMMA);
+        builder.append(reportTime).append(Constants.COMMA);
+        builder.append(serverStatus).append(Constants.COMMA);
+        builder.append(processId).append(Constants.COMMA);
+        builder.append(diskAvailable);
+
+        return builder.toString();
+    }
+
 }

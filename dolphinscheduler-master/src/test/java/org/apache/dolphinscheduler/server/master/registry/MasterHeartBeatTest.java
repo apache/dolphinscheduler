@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,15 +32,12 @@ public class MasterHeartBeatTest {
         long startupTime = System.currentTimeMillis();
         double loadAverage = 100;
         double reservedMemory = 100;
-        HeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
+        MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
 
-        // registry info check
-        String encodeHeartBeat = heartBeat.encodeHeartBeat();
-        assertEquals(Constants.ABNORMAL_NODE_STATUS, Integer.parseInt(encodeHeartBeat.split(Constants.COMMA)[8]));
-
-        // heartBeat info check
-        HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        assertEquals(Constants.ABNORMAL_NODE_STATUS, decodeHeartBeat.getServerStatus());
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
 
     @Test
@@ -49,15 +45,14 @@ public class MasterHeartBeatTest {
         long startupTime = System.currentTimeMillis();
         double loadAverage = 0;
         double reservedMemory = 0;
-        HeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
+        MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
 
-        // registry info check
-        String encodeHeartBeat = heartBeat.encodeHeartBeat();
-        assertEquals(Constants.NORMAL_NODE_STATUS, Integer.parseInt(encodeHeartBeat.split(Constants.COMMA)[8]));
-
-        // heartBeat info check
-        HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        assertEquals(Constants.NORMAL_NODE_STATUS, decodeHeartBeat.getServerStatus());
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
+
+
 
 }
