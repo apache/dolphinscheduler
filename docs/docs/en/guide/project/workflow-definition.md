@@ -74,14 +74,22 @@ The following are the operation functions of the workflow definition list:
     * Recipient: select notification policy||timeout alarm||when fault tolerance occurs, process result information or alarm email will be sent to the recipient list
     * Cc: select notification policy||timeout alarm||when fault tolerance occurs, the process result information or warning email will be copied to the CC list
     * Startup parameter: Set or overwrite global parameter values when starting a new process instance
-    * Complement: two modes including serial complement and parallel complement. Serial complement: within the specified time range, the complements are executed from the start date to the end date and N process instances are generated in turn; parallel complement: within the specified time range, multiple days are complemented at the same time to generate N process instances.
+    * Complement: includes serial complement and parallel complement and supports manual date input and date selection. Serial complement defines, within the specified time range, executes the complements from the start date to the end date by sequential and N process instances are generated in sequence. Parallel complement defines executing the complement concurrently in the multiple days to generate N process instances within the specified time range. Manual date input defines: manually input the date following the date format `yyyy-MM-dd HH:mm:ss` and separate dates by a comma. Date selection defines: to select dates via UI.
       * You can select complement time range (When the scheduled configuration is not online, the daily complement will be performed by default according to the selected time range.If the timing configuration is online, it will be complemented according to the selected time range in combination with the timing configuration) when executing a timing workflow definition. For example, need to fill in the data from 1st May to 10th May, as shown in the figure below:
 
     ![workflow-date](../../../../img/new_ui/dev/project/workflow-date.png)
 
-  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 10 process instances;
+  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 2 process instances;
 
-  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 10 process instances;
+  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 2 process instances;
+ 
+      * You can manually enter the complement dates (independent from the timing configuration) to execute the complement data to workflow definitions. The figure below is an example to make complement data from 9th May to 10th May:
+ 
+    ![workflow-date](../../../../img/new_ui/dev/project/workflow_date_manual.png)
+
+  > Serial mode: the complement execute sequentially from 9th May to 10th May, and the process instance page generates 2 process instances;
+
+  > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 2 process instances;
 
 ## Workflow Timing
 
