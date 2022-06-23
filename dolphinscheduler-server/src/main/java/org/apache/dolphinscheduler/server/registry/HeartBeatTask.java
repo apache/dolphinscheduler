@@ -34,37 +34,17 @@ public class HeartBeatTask implements Runnable {
 
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
-    private int workerWaitingTaskCount;
     private final String serverType;
     private final HeartBeat heartBeat;
 
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         Set<String> heartBeatPaths,
-                         String serverType,
-                         RegistryClient registryClient) {
-        this.heartBeatPaths = heartBeatPaths;
-        this.registryClient = registryClient;
-        this.serverType = serverType;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
-    }
-
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         int hostWeight,
-                         Set<String> heartBeatPaths,
+    public HeartBeatTask(Set<String> heartBeatPaths,
                          String serverType,
                          RegistryClient registryClient,
-                         int workerThreadCount,
-                         int workerWaitingTaskCount
-    ) {
+                         HeartBeat heartBeat) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
-        this.workerWaitingTaskCount = workerWaitingTaskCount;
         this.serverType = serverType;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
+        this.heartBeat = heartBeat;
     }
 
     public String getHeartBeatInfo() {
@@ -74,22 +54,30 @@ public class HeartBeatTask implements Runnable {
     @Override
     public void run() {
         try {
-            // check dead or not in zookeeper
-            for (String heartBeatPath : heartBeatPaths) {
-                if (registryClient.checkIsDeadServer(heartBeatPath, serverType)) {
-                    registryClient.getStoppable().stop("i was judged to death, release resources and stop myself");
-                    return;
-                }
-            }
+            // check dead
+            checkIsDead();
+            // persist
+            persistEphemeral();
 
-            // update waiting task count
-            heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
-
-            for (String heartBeatPath : heartBeatPaths) {
-                registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
-            }
         } catch (Throwable ex) {
             logger.error("HeartBeat task execute failed", ex);
         }
     }
+
+    private void checkIsDead() {
+        for (String heartBeatPath : heartBeatPaths) {
+            if (registryClient.checkIsDeadServer(heartBeatPath, serverType)) {
+                registryClient.getStoppable().stop("i was judged to death, release resources and stop myself");
+                return;
+            }
+        }
+    }
+
+    private void persistEphemeral() {
+        for (String heartBeatPath : heartBeatPaths) {
+            registryClient.persistEphemeral(heartBeatPath, getHeartBeatInfo());
+        }
+    }
+
+
 }

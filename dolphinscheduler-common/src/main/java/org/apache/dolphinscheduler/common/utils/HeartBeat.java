@@ -26,22 +26,22 @@ public class HeartBeat {
 
     private static final Logger logger = LoggerFactory.getLogger(HeartBeat.class);
 
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double memoryUsage;
-    private double loadAverage;
-    private double availablePhysicalMemorySize;
-    private double maxCpuloadAvg;
-    private double reservedMemory;
-    private int serverStatus;
-    private int processId;
+    protected long startupTime;
+    protected long reportTime;
+    protected double cpuUsage;
+    protected double memoryUsage;
+    protected double loadAverage;
+    protected double availablePhysicalMemorySize;
+    protected double maxCpuloadAvg;
+    protected double reservedMemory;
+    protected int serverStatus;
+    protected int processId;
 
-    private int workerHostWeight; // worker host weight
-    private int workerWaitingTaskCount; // worker waiting task count
-    private int workerExecThreadCount; // worker thread pool thread count
+    protected int workerHostWeight; // worker host weight
+    protected int workerWaitingTaskCount; // worker waiting task count
+    protected int workerExecThreadCount; // worker thread pool thread count
 
-    private double diskAvailable;
+    protected double diskAvailable;
 
     public double getDiskAvailable() {
         return diskAvailable;
@@ -160,22 +160,10 @@ public class HeartBeat {
         this.serverStatus = Constants.NORMAL_NODE_STATUS;
     }
 
-    public HeartBeat(long startupTime, double maxCpuloadAvg, double reservedMemory) {
-        this.reportTime = System.currentTimeMillis();
-        this.serverStatus = Constants.NORMAL_NODE_STATUS;
-        this.startupTime = startupTime;
-        this.maxCpuloadAvg = maxCpuloadAvg;
-        this.reservedMemory = reservedMemory;
-    }
-
-    public HeartBeat(long startupTime, double maxCpuloadAvg, double reservedMemory, int hostWeight, int workerExecThreadCount) {
-        this.reportTime = System.currentTimeMillis();
-        this.serverStatus = Constants.NORMAL_NODE_STATUS;
-        this.startupTime = startupTime;
-        this.maxCpuloadAvg = maxCpuloadAvg;
-        this.reservedMemory = reservedMemory;
-        this.workerHostWeight = hostWeight;
-        this.workerExecThreadCount = workerExecThreadCount;
+    /**
+     * init
+     */
+    public void init() {
     }
 
     /**
@@ -211,6 +199,7 @@ public class HeartBeat {
      * encode heartbeat
      */
     public String encodeHeartBeat() {
+        this.init();
         this.fillSystemInfo();
         this.updateServerState();
 

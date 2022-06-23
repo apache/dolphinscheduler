@@ -99,16 +99,19 @@ public class WorkerRegistryClient {
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
 
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
+        WorkerHeartBeat workerHeartBeat = new WorkerHeartBeat(
+                startupTime,
                 workerConfig.getMaxCpuLoadAvg(),
                 workerConfig.getReservedMemory(),
                 workerConfig.getHostWeight(),
+                workerConfig.getExecThreads(),
+                workerManagerThread);
+
+        HeartBeatTask heartBeatTask = new HeartBeatTask(
                 workerZkPaths,
                 Constants.WORKER_TYPE,
                 registryClient,
-                workerConfig.getExecThreads(),
-                workerManagerThread.getThreadPoolQueueSize()
-        );
+                workerHeartBeat);
 
         for (String workerZKPath : workerZkPaths) {
             // remove before persist

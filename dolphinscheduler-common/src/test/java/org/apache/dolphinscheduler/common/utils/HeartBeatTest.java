@@ -33,7 +33,10 @@ public class HeartBeatTest {
         long startupTime = System.currentTimeMillis();
         double loadAverage = 100;
         double reservedMemory = 100;
-        HeartBeat heartBeat = new HeartBeat(startupTime, loadAverage, reservedMemory);
+        HeartBeat heartBeat = new HeartBeat();
+        heartBeat.setStartupTime(startupTime);
+        heartBeat.setLoadAverage(loadAverage);
+        heartBeat.setReservedMemory(reservedMemory);
         heartBeat.updateServerState();
         assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
@@ -44,11 +47,15 @@ public class HeartBeatTest {
         double loadAverage = 0;
         double reservedMemory = 0;
         int hostWeight = 1;
-        int taskCount = 200;
+        int workerWaitingTaskCount = 200;
         int workerThreadCount = 199;
-        HeartBeat heartBeat = new HeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount);
-
-        heartBeat.setWorkerWaitingTaskCount(taskCount);
+        HeartBeat heartBeat = new HeartBeat();
+        heartBeat.setStartupTime(startupTime);
+        heartBeat.setLoadAverage(loadAverage);
+        heartBeat.setReservedMemory(reservedMemory);
+        heartBeat.setWorkerHostWeight(hostWeight);
+        heartBeat.setWorkerExecThreadCount(workerThreadCount);
+        heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
         heartBeat.updateServerState();
         assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
     }

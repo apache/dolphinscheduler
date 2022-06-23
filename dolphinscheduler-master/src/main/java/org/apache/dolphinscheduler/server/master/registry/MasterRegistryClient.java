@@ -188,12 +188,17 @@ public class MasterRegistryClient {
         logger.info("master node : {} registering to registry center...", masterAddress);
         String localNodePath = getCurrentNodePath();
         int masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
+
+        MasterHeartBeat masterHeartBeat = new MasterHeartBeat(
+                startupTime,
                 masterConfig.getMaxCpuLoadAvg(),
-                masterConfig.getReservedMemory(),
+                masterConfig.getReservedMemory());
+
+        HeartBeatTask heartBeatTask = new HeartBeatTask(
                 Sets.newHashSet(localNodePath),
                 Constants.MASTER_TYPE,
-                registryClient);
+                registryClient,
+                masterHeartBeat);
 
         // remove before persist
         registryClient.remove(localNodePath);
