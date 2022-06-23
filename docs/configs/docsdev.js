@@ -165,6 +165,10 @@ export default {
                                 title: 'Openmldb',
                                 link: '/en-us/docs/dev/user_doc/guide/task/openmldb.html',
                             },
+                            {
+                                title: 'DVC',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dvc.html',
+                            },
                         ],
                     },
                     {
@@ -532,6 +536,10 @@ export default {
                             {
                                 title: 'Openmldb',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dvc.html',
                             },
                         ],
                     },
