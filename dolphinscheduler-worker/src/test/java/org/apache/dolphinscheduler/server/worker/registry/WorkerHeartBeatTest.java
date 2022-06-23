@@ -65,8 +65,6 @@ public class WorkerHeartBeatTest {
 
         // heartBeat info check
         HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        decodeHeartBeat.updateServerState();
-
         assertEquals(Constants.BUSY_NODE_STATUE, decodeHeartBeat.getServerStatus());
     }
 
@@ -86,8 +84,6 @@ public class WorkerHeartBeatTest {
 
         // heartBeat info check
         HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        decodeHeartBeat.updateServerState();
-
         assertEquals(Constants.NORMAL_NODE_STATUS, decodeHeartBeat.getServerStatus());
     }
 

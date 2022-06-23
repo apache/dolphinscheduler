@@ -35,15 +35,12 @@ public class MasterHeartBeatTest {
         double reservedMemory = 100;
         HeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
 
-
         // registry info check
         String encodeHeartBeat = heartBeat.encodeHeartBeat();
         assertEquals(Constants.ABNORMAL_NODE_STATUS, Integer.parseInt(encodeHeartBeat.split(Constants.COMMA)[8]));
 
         // heartBeat info check
         HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        decodeHeartBeat.updateServerState();
-
         assertEquals(Constants.ABNORMAL_NODE_STATUS, decodeHeartBeat.getServerStatus());
     }
 
@@ -54,15 +51,12 @@ public class MasterHeartBeatTest {
         double reservedMemory = 0;
         HeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
 
-
         // registry info check
         String encodeHeartBeat = heartBeat.encodeHeartBeat();
         assertEquals(Constants.NORMAL_NODE_STATUS, Integer.parseInt(encodeHeartBeat.split(Constants.COMMA)[8]));
 
         // heartBeat info check
         HeartBeat decodeHeartBeat = HeartBeat.decodeHeartBeat(encodeHeartBeat);
-        decodeHeartBeat.updateServerState();
-
         assertEquals(Constants.NORMAL_NODE_STATUS, decodeHeartBeat.getServerStatus());
     }
 
