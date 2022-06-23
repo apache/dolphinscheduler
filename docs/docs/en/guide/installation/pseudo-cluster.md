@@ -142,7 +142,8 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 
 ## Initialize the Database
 
-DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the lib directory of DolphinScheduler, which is `tools/libs/`. Let's take MySQL as an example for how to initialize the database:
+DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
+which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`. Let's take MySQL as an example for how to initialize the database:
 
 For mysql 5.6 / 5.7
 
