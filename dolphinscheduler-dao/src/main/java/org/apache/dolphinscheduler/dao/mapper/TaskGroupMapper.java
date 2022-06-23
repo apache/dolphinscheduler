@@ -78,7 +78,7 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
     int selectCountByIdStatus(@Param("id") int id,@Param("status") int status);
 
-    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("projectCode") Long projectCode);
+    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("ids") List<Integer> ids, @Param("projectCode") Long projectCode);
 
     /**
      * listAuthorizedResource
