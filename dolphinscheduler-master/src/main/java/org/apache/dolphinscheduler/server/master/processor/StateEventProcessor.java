@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -64,8 +65,15 @@ public class StateEventProcessor implements NettyRequestProcessor {
         StateEventType type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
         stateEvent.setType(type);
 
-        logger.info("received command : {}", stateEvent);
-        stateEventResponseService.addResponse(stateEvent);
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+
+            logger.info("Received state event change command, event: {}", stateEvent);
+            stateEventResponseService.addResponse(stateEvent);
+        }finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
+
     }
 
 }

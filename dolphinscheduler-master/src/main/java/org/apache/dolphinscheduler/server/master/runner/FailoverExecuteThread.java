@@ -49,7 +49,9 @@ public class FailoverExecuteThread extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
+        logger.info("Master failover thread staring");
         super.start();
+        logger.info("Master failover thread stared");
     }
 
     @Override
@@ -57,14 +59,13 @@ public class FailoverExecuteThread extends BaseDaemonThread {
         // when startup, wait 10s for ready
         ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 10);
 
-        logger.info("failover execute thread started");
         while (Stopper.isRunning()) {
             try {
                 // todo: DO we need to schedule a task to do this kind of check
                 // This kind of check may only need to be executed when a master server start
                 failoverService.checkMasterFailover();
             } catch (Exception e) {
-                logger.error("failover execute error", e);
+                logger.error("Master failover thread execute error", e);
             } finally {
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
             }

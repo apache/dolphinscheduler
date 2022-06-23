@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
@@ -72,11 +73,13 @@ public class TaskExecuteRunnable implements Runnable {
         while (!this.events.isEmpty()) {
             TaskEvent event = this.events.peek();
             try {
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 persist(event);
             } catch (Exception e) {
                 logger.error("persist error, event:{}, error: {}", event, e);
             } finally {
                 this.events.remove(event);
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }

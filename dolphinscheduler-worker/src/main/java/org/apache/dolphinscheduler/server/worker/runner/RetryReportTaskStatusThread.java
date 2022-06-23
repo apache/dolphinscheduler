@@ -47,9 +47,11 @@ public class RetryReportTaskStatusThread implements Runnable {
     private TaskCallbackService taskCallbackService;
 
     public void start() {
+        logger.info("Retry report task status thread starting");
         Thread thread = new Thread(this, "RetryReportTaskStatusThread");
         thread.setDaemon(true);
         thread.start();
+        logger.info("Retry report task status thread started");
     }
 
     /**
@@ -91,7 +93,7 @@ public class RetryReportTaskStatusThread implements Runnable {
                     }
                 }
             } catch (Exception e) {
-                logger.warn("retry report task status error", e);
+                logger.warn("Retry report task status error", e);
             }
         }
     }
