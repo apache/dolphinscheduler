@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -46,9 +45,6 @@ public class WorkerManagerThread implements Runnable {
      * task queue
      */
     private final DelayQueue<TaskExecuteThread> workerExecuteQueue = new DelayQueue<>();
-
-    @Autowired(required = false)
-    private StorageOperate storageOperate;
 
     /**
      * thread executor service
@@ -129,9 +125,11 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public void start() {
+        logger.info("Worker manager thread starting");
         Thread thread = new Thread(this, this.getClass().getName());
         thread.setDaemon(true);
         thread.start();
+        logger.info("Worker manager thread started");
     }
 
     @Override
@@ -141,7 +139,6 @@ public class WorkerManagerThread implements Runnable {
         while (Stopper.isRunning()) {
             try {
                 taskExecuteThread = workerExecuteQueue.take();
-                taskExecuteThread.setStorageOperate(storageOperate);
                 workerExecService.submit(taskExecuteThread);
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "

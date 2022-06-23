@@ -49,7 +49,10 @@ public class AlertServer implements Closeable {
     private final AlertConfig alertConfig;
     private NettyRemotingServer nettyRemotingServer;
 
-    public AlertServer(PluginDao pluginDao, AlertSenderService alertSenderService, AlertRequestProcessor alertRequestProcessor, AlertConfig alertConfig) {
+    public AlertServer(PluginDao pluginDao,
+                       AlertSenderService alertSenderService,
+                       AlertRequestProcessor alertRequestProcessor,
+                       AlertConfig alertConfig) {
         this.pluginDao = pluginDao;
         this.alertSenderService = alertSenderService;
         this.alertRequestProcessor = alertRequestProcessor;
@@ -68,11 +71,12 @@ public class AlertServer implements Closeable {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        logger.info("alert server starting...");
+        logger.info("Alert server is staring ...");
 
         checkTable();
         startServer();
         alertSenderService.start();
+        logger.info("Alert server is started ...");
     }
 
     @Override
@@ -89,24 +93,23 @@ public class AlertServer implements Closeable {
     public void destroy(String cause) {
 
         try {
+            // set stop signal is true
             // execute only once
-            if (Stopper.isStopped()) {
+            if (!Stopper.stop()) {
+                logger.warn("AlterServer is already stopped");
                 return;
             }
 
-            logger.info("alert server is stopping ..., cause : {}", cause);
-
-            // set stop signal is true
-            Stopper.stop();
+            logger.info("Alert server is stopping, cause: {}", cause);
 
             // thread sleep 3 seconds for thread quietly stop
-            ThreadUtils.sleep(3000L);
+            ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
             // close
             this.nettyRemotingServer.close();
-
+            logger.info("Alter server stopped, cause: {}", cause);
         } catch (Exception e) {
-            logger.error("alert server stop exception ", e);
+            logger.error("Alert server stop failed, cause: {}", cause, e);
         }
     }
 
