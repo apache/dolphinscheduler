@@ -91,6 +91,15 @@ The following are the operation functions of the workflow definition list:
 
   > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 2 process instances;
 
+## Run the task alone
+- Right-click the task and click the "Start" button (only online tasks can be clicked to run)
+
+![workflow-task-run](../../../../img/new_ui/dev/project/workflow-task-run.png)
+
+- The startup parameter setting dialog box is displayed, and the parameter description is the same as run the workflow
+
+![workflow-task-run-config](../../../../img/new_ui/dev/project/workflow-task-run-config.png)
+
 ## Workflow Timing
 
 - Create timing: Click Project Management->Workflow->Workflow Definition, enter the workflow definition page, make the workflow online, click the "timing" button <img src="../../../../img/timing.png" width="35"/> , the timing parameter setting dialog box pops up, as shown in the figure below:
