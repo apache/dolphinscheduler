@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -554,6 +555,28 @@ public class PythonGateway {
 
         result.put("id", namedResources.get(0).getId());
         result.put("name", namedResources.get(0).getName());
+        return result;
+    }
+
+    /**
+     * Get resource by given resource type and full name. It return map contain resource id, name.
+     * Useful in Python API create task which need processDefinition information.
+     *
+     * @param userName user who query resource
+     * @param fullName full name of the resource
+     */
+    public Map<String, Object> queryResourcesFileInfo(String userName, String fullName) {
+        Map<String, Object> result = new HashMap<>();
+        User user = usersService.queryUser(userName);
+        Result<Object> resourceResponse = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
+        if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
+            String msg = String.format("Can not find valid resource by name %s", fullName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        Resource resource = (Resource) resourceResponse.getData();
+        result.put("id", resource.getId());
+        result.put("name", resource.getFullName());
         return result;
     }
 
