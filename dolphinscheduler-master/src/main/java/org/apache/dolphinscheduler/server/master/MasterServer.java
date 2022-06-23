@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
@@ -103,7 +104,7 @@ public class MasterServer implements IStoppable {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
-                close("shutdownHook");
+                close("MasterServer shutdownHook");
             }
         }));
     }
@@ -116,23 +117,17 @@ public class MasterServer implements IStoppable {
     public void close(String cause) {
 
         try {
+            // set stop signal is true
             // execute only once
-            if (Stopper.isStopped()) {
-                logger.warn("MasterServer has been stopped ..., current cause: {}", cause);
+            if (!Stopper.stop()) {
+                logger.warn("MasterServer is already stopped, current cause: {}", cause);
                 return;
             }
 
-            logger.info("master server is stopping ..., cause : {}", cause);
+            logger.info("Master server is stopping, current cause : {}", cause);
 
-            // set stop signal is true
-            Stopper.stop();
-
-            try {
-                // thread sleep 3 seconds for thread quietly stop
-                Thread.sleep(3000L);
-            } catch (Exception e) {
-                logger.warn("thread sleep exception ", e);
-            }
+            // thread sleep 3 seconds for thread quietly stop
+            ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
             // close
             this.masterSchedulerService.close();
             this.masterRPCServer.close();
@@ -141,9 +136,9 @@ public class MasterServer implements IStoppable {
             // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
             springApplicationContext.close();
 
-            logger.info("MasterServer stopped...");
+            logger.info("MasterServer stopped, current cause: {}", cause);
         } catch (Exception e) {
-            logger.error("master server stop exception ", e);
+            logger.error("MasterServer stop failed, current cause: {}", cause, e);
         }
     }
 

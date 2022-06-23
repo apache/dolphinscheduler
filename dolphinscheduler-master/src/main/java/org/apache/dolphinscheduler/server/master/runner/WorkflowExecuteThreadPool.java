@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -47,6 +48,8 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import com.google.common.base.Strings;
+
+import lombok.NonNull;
 
 /**
  * Used to execute {@link WorkflowExecuteRunnable}, when
@@ -79,7 +82,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     @PostConstruct
     private void init() {
         this.setDaemon(true);
-        this.setThreadNamePrefix("Workflow-Execute-Thread-");
+        this.setThreadNamePrefix("WorkflowExecuteThread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
         this.setCorePoolSize(masterConfig.getExecThreads());
     }
@@ -90,10 +93,11 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     public void submitStateEvent(StateEvent stateEvent) {
         WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.warn("workflowExecuteThread is null, stateEvent:{}", stateEvent);
+            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}", stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
+        logger.info("Submit state event success, stateEvent: {}", stateEvent);
     }
 
     /**
@@ -112,7 +116,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
-            logger.warn("The workflow:{} has been executed by another thread", workflowExecuteThread.getKey());
+            logger.warn("The workflow has been executed by another thread");
             return;
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
@@ -121,24 +125,31 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
-                logger.error("handle events {} failed", processInstanceId, ex);
-                multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                try {
+                    logger.error("Workflow instance events handle failed", ex);
+                    multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                } finally {
+                    LoggerUtils.removeWorkflowInstanceIdMDC();
+                }
             }
 
             @Override
             public void onSuccess(Object result) {
                 try {
+                    LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish()) {
                         stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                        logger.info("process instance {} finished.", processInstanceId);
+                        logger.info("Workflow instance is finished.");
                     }
                 } catch (Exception e) {
-                    logger.error("handle events {} success, but notify changed error", processInstanceId, e);
+                    logger.error("Workflow instance is finished, but notify changed error", e);
                 } finally {
                     // make sure the process has been removed from multiThreadFilterMap
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                    LoggerUtils.removeWorkflowInstanceIdMDC();
                 }
             }
         });
@@ -167,9 +178,9 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * notify myself
      */
-    private void notifyMyself(ProcessInstance processInstance, TaskInstance taskInstance) {
-        logger.info("notify process {} task {} state change", processInstance.getId(), taskInstance.getId());
+    private void notifyMyself(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
+            logger.warn("The execute cache manager doesn't contains this workflow instance");
             return;
         }
         StateEvent stateEvent = new StateEvent();
