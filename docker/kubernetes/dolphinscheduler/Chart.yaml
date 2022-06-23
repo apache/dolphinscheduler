@@ -44,9 +44,9 @@ appVersion: 2.0.5
 dependencies:
 - name: postgresql
   version: 10.3.18
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: postgresql.enabled
 - name: zookeeper
   version: 6.5.3
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: zookeeper.enabled
