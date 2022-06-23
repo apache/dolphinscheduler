@@ -50,8 +50,6 @@ function overwrite_server_env() {
   fi
 }
 
-source "${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
-
 export HOSTNAME=`hostname`
 
 export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/$command/logs
