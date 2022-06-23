@@ -22,6 +22,7 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
     Delimiter,
+    ResourceKey,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
@@ -173,13 +174,18 @@ class Task(Base):
     @property
     def resource_list(self) -> List:
         """Get task define attribute `resource_list`."""
-        resources = list()
+        resources = set()
         for resource in self._resource_list:
             if type(resource) == str:
-                resources.append(self.query_resource(resource))
-            elif type(resource) == dict and resource.get("id") is not None:
-                resources.append(resource)
-        return [{"id": r.get("id")} for r in resources]
+                resources.add(self.query_resource(resource).get(ResourceKey.ID))
+            elif type(resource) == dict and resource.get(ResourceKey.ID) is not None:
+                logger.warning(
+                    """Resource_list should be defined using List[str] with resource paths,
+                       the use of ids to define resources will be remove in version 3.2.0.
+                    """
+                )
+                resources.add(resource.get(ResourceKey.ID))
+        return [{ResourceKey.ID: r} for r in resources]
 
     @property
     def condition_result(self) -> Dict:

@@ -47,14 +47,14 @@ TEST_TASK_RELATION_SIZE = 0
         (
             {
                 "local_params": ["foo", "bar"],
-                "resource_list": [{"id": 1}, {"id": 2}],
+                "resource_list": ["foo", "bar"],
                 "dependence": {"foo", "bar"},
                 "wait_start_timeout": {"foo", "bar"},
                 "condition_result": {"foo": ["bar"]},
             },
             {
                 "localParams": ["foo", "bar"],
-                "resourceList": [{"id": 1}, {"id": 2}],
+                "resourceList": [{"id": 1}],
                 "dependence": {"foo", "bar"},
                 "waitStartTimeout": {"foo", "bar"},
                 "conditionResult": {"foo": ["bar"]},
@@ -62,7 +62,11 @@ TEST_TASK_RELATION_SIZE = 0
         ),
     ],
 )
-def test_property_task_params(attr, expect):
+@patch(
+    "pydolphinscheduler.core.task.Task.query_resource",
+    return_value=({"id": 1, "name": "foo"}),
+)
+def test_property_task_params(mock_resource, attr, expect):
     """Test class task property."""
     task = testTask(
         "test-property-task-params",
