@@ -97,7 +97,7 @@ public class NettyExecutorManagerTest {
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
+        requestCommand.setTaskExecutionContext(taskExecutionContext);
         return requestCommand.convert2Command();
     }
 }

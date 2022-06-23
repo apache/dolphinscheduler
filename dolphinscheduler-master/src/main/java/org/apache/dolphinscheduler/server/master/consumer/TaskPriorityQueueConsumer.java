@@ -133,7 +133,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                     }
                     // If there are tasks in a cycle that cannot find the worker group,
                     // sleep for 1 second
-                    if (taskPriorityQueue.size() <= failedDispatchTasks.size()) {
+                    if (fetchTaskNum == failedDispatchTasks.size()) {
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
@@ -218,8 +218,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
         return requestCommand.convert2Command();
     }
 

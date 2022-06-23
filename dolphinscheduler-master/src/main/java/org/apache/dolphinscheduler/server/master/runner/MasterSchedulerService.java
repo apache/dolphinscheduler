@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
+import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -62,31 +63,19 @@ public class MasterSchedulerService extends BaseDaemonThread {
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerService.class);
 
-    /**
-     * dolphinscheduler database interface
-     */
     @Autowired
     private ProcessService processService;
 
-    /**
-     * master config
-     */
     @Autowired
     private MasterConfig masterConfig;
 
-    /**
-     * alert manager
-     */
     @Autowired
     private ProcessAlertManager processAlertManager;
 
-    /**
-     * netty remoting client
-     */
     private NettyRemotingClient nettyRemotingClient;
 
     @Autowired
-    NettyExecutorManager nettyExecutorManager;
+    private NettyExecutorManager nettyExecutorManager;
 
     /**
      * master prepare exec service
@@ -108,6 +97,8 @@ public class MasterSchedulerService extends BaseDaemonThread {
     @Autowired
     private CuringGlobalParamsService curingGlobalParamsService;
 
+    private String masterAddress;
+
     protected MasterSchedulerService() {
         super("MasterCommandLoopThread");
     }
@@ -119,6 +110,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
         this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
     }
 
     @Override
@@ -142,13 +134,13 @@ public class MasterSchedulerService extends BaseDaemonThread {
     public void run() {
         while (Stopper.isRunning()) {
             try {
-                boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
-                if (!runCheckFlag) {
+                boolean isOverload = OSUtils.checkOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
+                if (isOverload) {
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
-                scheduleProcess();
+                scheduleWorkflow();
             } catch (InterruptedException interruptedException) {
                 logger.warn("Master schedule service interrupted, close the loop", interruptedException);
                 Thread.currentThread().interrupt();
@@ -160,13 +152,12 @@ public class MasterSchedulerService extends BaseDaemonThread {
     }
 
     /**
-     * 1. get command by slot
-     * 2. donot handle command if slot is empty
+     * Query command from database by slot, and transform to workflow instance, then submit to workflowExecuteThreadPool.
      */
-    private void scheduleProcess() throws InterruptedException {
+    private void scheduleWorkflow() throws InterruptedException {
         List<Command> commands = findCommands();
         if (CollectionUtils.isEmpty(commands)) {
-            //indicate that no command ,sleep for 1s
+            // indicate that no command ,sleep for 1s
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             return;
         }
@@ -181,7 +172,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
             try {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                 logger.info("Master schedule service starting workflow instance");
-                WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
+                final WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
                     processInstance
                     , processService
                     , nettyExecutorManager
@@ -194,9 +185,14 @@ public class MasterSchedulerService extends BaseDaemonThread {
                 if (processInstance.getTimeout() > 0) {
                     stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                 }
-                workflowExecuteThreadPool.startWorkflow(workflowExecuteRunnable);
+                ProcessInstanceMetrics.incProcessInstanceSubmit();
+                workflowExecuteThreadPool.submit(workflowExecuteRunnable);
                 logger.info("Master schedule service started workflow instance");
 
+            } catch (Exception ex) {
+                processInstanceExecCacheManager.removeByProcessInstanceId(processInstance.getId());
+                stateWheelExecuteThread.removeProcess4TimeoutCheck(processInstance.getId());
+                logger.info("Master submit workflow to thread pool failed, will remove workflow runnable from cache manager", ex);
             } finally {
                 LoggerUtils.removeWorkflowInstanceIdMDC();
             }
@@ -204,21 +200,21 @@ public class MasterSchedulerService extends BaseDaemonThread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) throws InterruptedException {
+        long commandTransformStartTime = System.currentTimeMillis();
         logger.info("Master schedule service transforming command to ProcessInstance, commandSize: {}", commands.size());
         List<ProcessInstance> processInstances = Collections.synchronizedList(new ArrayList<>(commands.size()));
         CountDownLatch latch = new CountDownLatch(commands.size());
         for (final Command command : commands) {
             masterPrepareExecService.execute(() -> {
                 try {
+                    // todo: this check is not safe, the slot may change after command transform.
                     // slot check again
                     SlotCheckState slotCheckState = slotCheck(command);
                     if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
                         logger.info("Master handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
                         return;
                     }
-                    ProcessInstance processInstance = processService.handleCommand(logger,
-                            getLocalAddress(),
-                            command);
+                    ProcessInstance processInstance = processService.handleCommand(masterAddress, command);
                     if (processInstance != null) {
                         processInstances.add(processInstance);
                         logger.info("Master handle command {} end, create process instance {}", command.getId(), processInstance.getId());
@@ -236,24 +232,26 @@ public class MasterSchedulerService extends BaseDaemonThread {
         latch.await();
         logger.info("Master schedule service transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
             commands.size(), processInstances.size());
+        ProcessInstanceMetrics.recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
     }
 
     private List<Command> findCommands() {
+        long scheduleStartTime = System.currentTimeMillis();
+        int thisMasterSlot = ServerNodeManager.getSlot();
+        int masterCount = ServerNodeManager.getMasterSize();
+        if (masterCount <= 0) {
+            logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
+            return Collections.emptyList();
+        }
         int pageNumber = 0;
         int pageSize = masterConfig.getFetchCommandNum();
-        List<Command> result = new ArrayList<>();
-        if (Stopper.isRunning()) {
-            int thisMasterSlot = ServerNodeManager.getSlot();
-            int masterCount = ServerNodeManager.getMasterSize();
-            if (masterCount > 0) {
-                result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
-                if (CollectionUtils.isNotEmpty(result)) {
-                    logger.info("Master schedule service loop command success, command size: {}, current slot: {}, total slot size: {}",
-                        result.size(), thisMasterSlot, masterCount);
-                }
-            }
+        final List<Command> result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+        if (CollectionUtils.isNotEmpty(result)) {
+            logger.info("Master schedule service loop command success, command size: {}, current slot: {}, total slot size: {}",
+                result.size(), thisMasterSlot, masterCount);
         }
+        ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
         return result;
     }
 
@@ -271,7 +269,4 @@ public class MasterSchedulerService extends BaseDaemonThread {
         return state;
     }
 
-    private String getLocalAddress() {
-        return NetUtils.getAddr(masterConfig.getListenPort());
-    }
 }

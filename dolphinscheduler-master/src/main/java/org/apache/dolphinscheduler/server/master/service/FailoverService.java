@@ -24,12 +24,14 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
@@ -49,6 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,7 @@ import org.springframework.stereotype.Component;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
+import lombok.NonNull;
 
 /**
  * failover service
@@ -67,15 +71,20 @@ public class FailoverService {
     private final MasterConfig masterConfig;
     private final ProcessService processService;
     private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final ProcessInstanceExecCacheManager cacheManager;
+    private final String localAddress;
 
     public FailoverService(RegistryClient registryClient,
                            MasterConfig masterConfig,
                            ProcessService processService,
-                           WorkflowExecuteThreadPool workflowExecuteThreadPool) {
+                           WorkflowExecuteThreadPool workflowExecuteThreadPool,
+                           ProcessInstanceExecCacheManager cacheManager) {
         this.registryClient = checkNotNull(registryClient);
         this.masterConfig = checkNotNull(masterConfig);
         this.processService = checkNotNull(processService);
         this.workflowExecuteThreadPool = checkNotNull(workflowExecuteThreadPool);
+        this.cacheManager = checkNotNull(cacheManager);
+        this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
     }
 
     /**
@@ -88,7 +97,7 @@ public class FailoverService {
         if (CollectionUtils.isEmpty(hosts)) {
             return;
         }
-        LOGGER.info("Master failover service {} begin to failover hosts:{}", getLocalAddress(), hosts);
+        LOGGER.info("Master failover service {} begin to failover hosts:{}", localAddress, hosts);
 
         for (String host : hosts) {
             failoverMasterWithLock(host);
@@ -174,11 +183,10 @@ public class FailoverService {
     }
 
     /**
-     * failover worker tasks
+     * Do the worker failover. Will find the SUBMITTED_SUCCESS/DISPATCH/RUNNING_EXECUTION/DELAY_EXECUTION/READY_PAUSE/READY_STOP tasks belong the given worker,
+     * and failover these tasks.
      * <p>
-     * 1. kill yarn job if there are yarn jobs in tasks.
-     * 2. change task state from running to need failover.
-     * 3. failover all tasks when workerHost is null
+     * Note: When we do worker failover, the master will only failover the processInstance belongs to the current master.
      *
      * @param workerHost worker host
      */
@@ -188,29 +196,40 @@ public class FailoverService {
         }
 
         long startTime = System.currentTimeMillis();
-        List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
-        Map<Integer, ProcessInstance> processInstanceCacheMap = new HashMap<>();
+        // we query the task instance from cache, so that we can directly update the cache
+        final List<TaskInstance> needFailoverTaskInstanceList = cacheManager.getAll()
+            .stream()
+            .flatMap(workflowExecuteRunnable -> workflowExecuteRunnable.getAllTaskInstances().stream())
+            .filter(taskInstance ->
+                workerHost.equals(taskInstance.getHost()) && ExecutionStatus.isNeedFailoverWorkflowInstanceState(taskInstance.getState()))
+            .collect(Collectors.toList());
+        final Map<Integer, ProcessInstance> processInstanceCacheMap = new HashMap<>();
         LOGGER.info("start worker[{}] failover, task list size:{}", workerHost, needFailoverTaskInstanceList.size());
-        List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
+        final List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
-            ProcessInstance processInstance = processInstanceCacheMap.get(taskInstance.getProcessInstanceId());
-            if (processInstance == null) {
-                processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
+            try {
+                ProcessInstance processInstance = processInstanceCacheMap.get(taskInstance.getProcessInstanceId());
                 if (processInstance == null) {
-                    LOGGER.error("failover task instance error, processInstance {} of taskInstance {} is null",
-                        taskInstance.getProcessInstanceId(), taskInstance.getId());
+                    processInstance = cacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId()).getProcessInstance();
+                    if (processInstance == null) {
+                        LOGGER.error("failover task instance error, processInstance {} of taskInstance {} is null",
+                            taskInstance.getProcessInstanceId(), taskInstance.getId());
+                        continue;
+                    }
+                    processInstanceCacheMap.put(processInstance.getId(), processInstance);
+                }
+
+                // only failover the task owned myself if worker down.
+                if (!StringUtils.equalsIgnoreCase(processInstance.getHost(), localAddress)) {
                     continue;
                 }
-                processInstanceCacheMap.put(processInstance.getId(), processInstance);
-            }
 
-            // only failover the task owned myself if worker down.
-            if (!processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
-                continue;
+                LOGGER.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
+                failoverTaskInstance(processInstance, taskInstance, workerServers);
+            } finally {
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
-
-            LOGGER.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
-            failoverTaskInstance(processInstance, taskInstance, workerServers);
         }
         LOGGER.info("end worker[{}] failover, useTime:{}ms", workerHost, System.currentTimeMillis() - startTime);
     }
@@ -221,17 +240,14 @@ public class FailoverService {
      * 1. kill yarn job if run on worker and there are yarn jobs in tasks.
      * 2. change task state from running to need failover.
      * 3. try to notify local master
+     *
      * @param processInstance
      * @param taskInstance
-     * @param servers if failover master, servers container master servers and worker servers; if failover worker, servers contain worker servers.
+     * @param servers         if failover master, servers container master servers and worker servers; if failover worker, servers contain worker servers.
      */
-    private void failoverTaskInstance(ProcessInstance processInstance, TaskInstance taskInstance, List<Server> servers) {
-        if (processInstance == null) {
-            LOGGER.error("failover task instance error, processInstance {} of taskInstance {} is null",
-                taskInstance.getProcessInstanceId(), taskInstance.getId());
-            return;
-        }
+    private void failoverTaskInstance(@NonNull ProcessInstance processInstance, TaskInstance taskInstance, List<Server> servers) {
         if (!checkTaskInstanceNeedFailover(servers, taskInstance)) {
+            LOGGER.info("The taskInstance doesn't need to failover");
             return;
         }
         TaskMetrics.incTaskFailover();
@@ -240,6 +256,7 @@ public class FailoverService {
         taskInstance.setProcessInstance(processInstance);
 
         if (!isMasterTask) {
+            LOGGER.info("The failover taskInstance is not master task");
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(processInstance)
@@ -249,6 +266,8 @@ public class FailoverService {
                 // only kill yarn job if exists , the local thread has exited
                 ProcessUtils.killYarnJob(taskExecutionContext);
             }
+        } else {
+            LOGGER.info("The failover taskInstance is a master task");
         }
 
         taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
@@ -278,7 +297,7 @@ public class FailoverService {
         while (iterator.hasNext()) {
             String host = iterator.next();
             if (registryClient.checkNodeExists(host, NodeType.MASTER)) {
-                if (!getLocalAddress().equals(host)) {
+                if (!localAddress.equals(host)) {
                     iterator.remove();
                 }
             }
@@ -390,11 +409,8 @@ public class FailoverService {
         return serverStartupTime;
     }
 
-    /**
-     * get local address
-     */
-    String getLocalAddress() {
-        return NetUtils.getAddr(masterConfig.getListenPort());
+    public String getLocalAddress() {
+        return localAddress;
     }
 
 }
