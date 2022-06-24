@@ -54,7 +54,7 @@ export default {
                 title: 'Introduction to Functions',
                 children: [
                     {
-                        title: 'Workflow Overview',
+                        title: 'Application Homepage',
                         link: '/en-us/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -284,6 +284,15 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
                     },
                     {
+                        title: 'Metrics',
+                        children: [
+                            {
+                                title: 'Metrics',
+                                link: '/en-us/docs/dev/user_doc/guide/metrics/metrics.html',
+                            }
+                        ],
+                    },
+                    {
                         title: 'How-To',
                         children: [
                             {
@@ -367,6 +376,10 @@ export default {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
                     },
+                    {
+                        title: 'Health Check',
+                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
                 ],
             },
             {
@@ -426,7 +439,7 @@ export default {
                 title: '功能介绍',
                 children: [
                     {
-                        title: '指标总览',
+                        title: '应用首页',
                         link: '/zh-cn/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -656,6 +669,15 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
                     },
                     {
+                        title: '指标相关',
+                        children: [
+                            {
+                                title: '指标',
+                                link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
+                            }
+                        ],
+                    },
+                    {
                         title: '常用指引',
                         children: [
                             {
@@ -738,6 +760,10 @@ export default {
                     {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
+                    },
+                    {
+                        title: '健康检查',
+                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
                     },
                 ],
             },
