@@ -23,6 +23,7 @@ curl --request GET 'http://localhost:5679/actuator/health'
 ```
 
 ### Worker-Server
+
 ```shell
 curl --request GET 'http://localhost:1235/actuator/health'
 
