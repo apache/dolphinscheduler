@@ -59,7 +59,7 @@
         <add.exports.java.security.jgss.sun.security.krb5></add.exports.java.security.jgss.sun.security.krb5>
         <add.opens.java.base.jdk.internal.loader></add.opens.java.base.jdk.internal.loader>
         <add.exports.java.xml.jdk.xml.internal></add.exports.java.xml.jdk.xml.internal>
-        <logback.version>1.2.3</logback.version>
+        <logback.version>1.2.11</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
         <quartz.version>2.3.2</quartz.version>
         <jackson.version>2.10.5</jackson.version>
