@@ -7,6 +7,7 @@ Health check are designed to provide a unique way to check the health of the dol
 ## Endpoint
 
 ### API-Server
+
 ```shell
 curl --request GET 'http://localhost:12345/dolphinscheduler/actuator/health'
 
