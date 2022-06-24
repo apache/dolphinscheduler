@@ -367,6 +367,10 @@ export default {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
                     },
+                    {
+                        title: 'Health Check',
+                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
                 ],
             },
             {
@@ -738,6 +742,10 @@ export default {
                     {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
+                    },
+                    {
+                        title: '健康检查',
+                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
                     },
                 ],
             },
