@@ -15,6 +15,7 @@ curl --request GET 'http://localhost:12345/dolphinscheduler/actuator/health'
 ```
 
 ### Master-Server
+
 ```shell
 curl --request GET 'http://localhost:5679/actuator/health'
 
