@@ -284,7 +284,7 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: 'Metrics Related',
+                        title: 'Metrics',
                         children: [
                             {
                                 title: 'Metrics',
