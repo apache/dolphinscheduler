@@ -93,6 +93,16 @@
 
     > 并行模式：同时执行 5 月 9 号到 5 月 10 号的任务，同时在流程实例页面生成两条流程实例。
 
+## 单独运行任务
+
+- 右键选中任务，点击"启动"按钮(只有已上线的任务才能点击运行)
+
+![workflow-task-run](../../../../img/new_ui/dev/project/workflow-task-run.png)
+
+- 弹出启动参数设置弹框，参数说明同运行工作流
+
+![workflow-task-run-config](../../../../img/new_ui/dev/project/workflow-task-run-config.png)
+
 ## 工作流定时
 
 - 创建定时：点击项目管理->工作流->工作流定义，进入工作流定义页面，上线工作流，点击"定时"按钮<img src="../../../../img/timing.png" width="35"/>,弹出定时参数设置弹框，如下图所示：
