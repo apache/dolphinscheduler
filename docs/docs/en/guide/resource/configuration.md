@@ -12,6 +12,7 @@ Configure the file in the following paths: `api-server/conf/common.properties` a
 
 - Change `data.basedir.path` to the local directory path. Please make sure the user who deploy dolphinscheduler have read and write permissions, such as: `data.basedir.path=/tmp/dolphinscheduler`. And the directory you configured will be auto-created if it does not exists.
 - Modify the following two parameters, `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///`.
+- Modify `resource.storage.type=LOCAL` which will use HDFS local mode and will automatically configure `resource.hdfs.fs.defaultFS=file:///`. And you can also modify the following two parameters, `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///` manually.
 
 ## Configuring the common.properties
 

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
+import static org.apache.dolphinscheduler.common.Constants.STORAGE_LOCAL;
 
 
 /**
@@ -43,6 +44,8 @@ public class StoreConfiguration {
         switch (PropertyUtils.getString(RESOURCE_STORAGE_TYPE)) {
             case STORAGE_S3:
                 return S3Utils.getInstance();
+            case STORAGE_LOCAL:
+                return HadoopUtils.getInstance();
             case STORAGE_HDFS:
                 return HadoopUtils.getInstance();
             default:

@@ -63,6 +63,15 @@ public final class Constants {
     public static final String STORAGE_S3 = "S3";
 
     public static final String STORAGE_HDFS = "HDFS";
+    /**
+     * HDFS LOCAL mode
+     */
+    public static final String STORAGE_LOCAL = "LOCAL";
+
+    /**
+     * fs.defaultFS for HDFS LOCAL mode
+     */
+    public static final String STORAGE_LOCAL_DEFAULT_FS = "file:///";
 
     public static final String EMPTY_STRING = "";
 

@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -29,7 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import com.google.common.base.Strings;
-import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 public class PropertyUtils {
 
@@ -61,6 +61,13 @@ public class PropertyUtils {
             logger.info("Overriding property from system property: {}", key);
             PropertyUtils.setValue(key, String.valueOf(v));
         });
+        // load storage local mode
+        if (properties.get(RESOURCE_STORAGE_TYPE).equals(STORAGE_LOCAL)){
+            // override the FS_DEFAULT_FS configuration
+            properties.setProperty(FS_DEFAULT_FS, STORAGE_LOCAL_DEFAULT_FS);
+            // the RESOURCE_STORAGE_TYPE must be HDFS in local mode
+            properties.setProperty(RESOURCE_STORAGE_TYPE, STORAGE_HDFS);
+        }
     }
 
     /**

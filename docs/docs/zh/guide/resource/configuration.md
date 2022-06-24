@@ -11,7 +11,7 @@
 对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
 
 - 将 `data.basedir.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`data.basedir.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
-- 修改下列两个参数，分别是 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
+- 我们推荐你修改`resource.storage.type=LOCAL`来使用HDFS的本地模式，它会帮助你自动配置`resource.hdfs.fs.defaultFS=file:///`。当然你也可以手动修改以下两个参数，`resource.storage.type=HDFS`和`resource.hdfs.fs.defaultFS=file:///`来实现同样的功能，不过我们并不推荐。
 
 ## HDFS 资源配置
 
