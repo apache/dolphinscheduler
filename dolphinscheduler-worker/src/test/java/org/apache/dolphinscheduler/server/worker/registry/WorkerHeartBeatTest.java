@@ -18,13 +18,16 @@
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.server.registry.AbstractHeartBeat;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
 
 /**
  * WorkerHeartBeatTest
@@ -34,6 +37,11 @@ public class WorkerHeartBeatTest {
 
     @Mock
     private WorkerManagerThread workerManagerThread;
+
+    @Before
+    public void before(){
+        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(200);
+    }
 
     @Test
     public void testAbnormalState() {
@@ -57,29 +65,12 @@ public class WorkerHeartBeatTest {
         double reservedMemory = 0;
         int hostWeight = 1;
         int workerThreadCount = 199;
-        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+        AbstractHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
         heartBeat.init();
-        heartBeat.setWorkerWaitingTaskCount(200);
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
         assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
-    }
-
-    @Test
-    public void testNormalState() {
-        long startupTime = System.currentTimeMillis();
-        double loadAverage = 0;
-        double reservedMemory = 0;
-        int hostWeight = 1;
-        int workerThreadCount = 199;
-        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
-
-        heartBeat.init();
-        heartBeat.setWorkerWaitingTaskCount(198);
-        heartBeat.fillSystemInfo();
-        heartBeat.updateServerState();
-        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
 
 }
