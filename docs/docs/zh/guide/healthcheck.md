@@ -29,6 +29,7 @@ curl --request GET 'http://localhost:1235/actuator/health'
 ```
 
 ### Alert-Server
+
 ```shell
 curl --request GET 'http://localhost:50053/actuator/health'
 
