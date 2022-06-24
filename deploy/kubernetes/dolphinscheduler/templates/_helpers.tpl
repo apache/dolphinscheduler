@@ -143,7 +143,7 @@ Create a database environment variables.
     secretKeyRef:
       {{- if .Values.postgresql.enabled }}
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
-      key: postgres-password
+      key: postgresql-password
       {{- else }}
       name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
