@@ -38,16 +38,11 @@ public class WorkerHeartBeatTest {
     @Mock
     private WorkerManagerThread workerManagerThread;
 
-    @Before
-    public void before(){
-        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(200);
-    }
-
     @Test
     public void testAbnormalState() {
         long startupTime = System.currentTimeMillis();
-        double loadAverage = 100;
-        double reservedMemory = 100;
+        double loadAverage = -1 * Double.MAX_VALUE;
+        double reservedMemory = Double.MAX_VALUE;
         int hostWeight = 1;
         int workerThreadCount = 199;
         WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
@@ -61,11 +56,13 @@ public class WorkerHeartBeatTest {
     @Test
     public void testBusyState() {
         long startupTime = System.currentTimeMillis();
-        double loadAverage = 0;
-        double reservedMemory = 0;
+        double loadAverage = Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
         int hostWeight = 1;
         int workerThreadCount = 199;
-        AbstractHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+
+        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(200);
 
         heartBeat.init();
         heartBeat.fillSystemInfo();
