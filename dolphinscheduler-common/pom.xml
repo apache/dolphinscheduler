@@ -293,5 +293,12 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>
+
+        <dependency>
+            <artifactId>servlet-api</artifactId>
+            <groupId>javax.servlet</groupId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

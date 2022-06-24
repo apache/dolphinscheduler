@@ -122,4 +122,12 @@ public class StateEventCallbackService {
             nettyRemoteChannel.writeAndFlush(command);
         }
     }
+
+    public void sendResult(Host host, Command command) {
+        logger.info("send result, host:{}, command:{}", host.getAddress(), command.toString());
+        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
+        if (nettyRemoteChannel != null) {
+            nettyRemoteChannel.writeAndFlush(command);
+        }
+    }
 }

@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -464,90 +463,5 @@ public interface ProcessDefinitionService {
      * @return Json String
      */
     String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
-
-    /**
-     * update dag define
-     * @param loginUser
-     * @param taskRelationList
-     * @param processDefinition
-     * @param processDefinitionDeepCopy
-     * @param taskDefinitionLogs
-     * @param otherParamsJson
-     */
-    Map<String, Object> updateDagDefine(User loginUser,
-                    List<ProcessTaskRelationLog> taskRelationList,
-                    ProcessDefinition processDefinition,
-                    ProcessDefinition processDefinitionDeepCopy,
-                    List<TaskDefinitionLog> taskDefinitionLogs,
-                    String otherParamsJson);
-
-    /**
-     * check task relation
-     * @param taskRelationList
-     * @param taskRelationJson
-     * @param taskDefinitionLogs
-     * @return
-     */
-    Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs);
-
-    /**
-     * check task define
-     * @param taskDefinitionLogs
-     * @param taskDefinitionJson
-     * @return
-     */
-    Map<String, Object> checkTaskDefinitionList(List<TaskDefinitionLog> taskDefinitionLogs, String taskDefinitionJson);
-
-    /**
-     * create dag define
-     * @param loginUser
-     * @param taskRelationList
-     * @param processDefinition
-     * @param taskDefinitionLogs
-     * @param otherParamsJson
-     * @return
-     */
-    Map<String, Object> createDagDefine(User loginUser,
-                                        List<ProcessTaskRelationLog> taskRelationList,
-                                        ProcessDefinition processDefinition,
-                                        List<TaskDefinitionLog> taskDefinitionLogs, String otherParamsJson);
-
-    /**
-     *
-     * @param loginUser
-     * @param targetProjectCode
-     * @param failedProcessList
-     * @param processDefinitionCodes
-     * @param result
-     * @param isCopy
-     */
-    void doBatchOperateProcessDefinition(User loginUser,
-                                    long targetProjectCode,
-                                    List<String> failedProcessList,
-                                    String processDefinitionCodes,
-                                    Map<String, Object> result,
-                                    boolean isCopy);
-
-    /**
-     * create dag schedule
-     * @param loginUser
-     * @param processDefinition
-     * @param scheduleJson
-     * @return
-     */
-    Map<String, Object> createDagSchedule(User loginUser, ProcessDefinition processDefinition, String scheduleJson);
-
-    /**
-     * update dag schedule
-     * @param loginUser
-     * @param projectCode
-     * @param processDefinitionCode
-     * @param scheduleJson
-     * @return
-     */
-    Map<String, Object> updateDagSchedule(User loginUser,
-                                          long projectCode,
-                                          long processDefinitionCode,
-                                          String scheduleJson);
 }
 

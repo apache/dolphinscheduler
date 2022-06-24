@@ -30,9 +30,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * the factory to create task processor
  */
+@UtilityClass
 public final class TaskProcessorFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessorFactory.class);
@@ -46,7 +49,7 @@ public final class TaskProcessorFactory {
             try {
                 PROCESS_MAP.put(iTaskProcessor.getType(), (Constructor<ITaskProcessor>) iTaskProcessor.getClass().getConstructor());
             } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException("The task processor should has a no args constructor");
+                throw new IllegalArgumentException("The task processor should has a no args constructor", e);
             }
         }
     }
@@ -57,7 +60,6 @@ public final class TaskProcessorFactory {
         }
         Constructor<ITaskProcessor> iTaskProcessorConstructor = PROCESS_MAP.get(type);
         if (iTaskProcessorConstructor == null) {
-            logger.warn("ITaskProcessor could not found for taskType: {}", type);
             iTaskProcessorConstructor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
         }
 
@@ -74,7 +76,4 @@ public final class TaskProcessorFactory {
         return PROCESS_MAP.containsKey(type);
     }
 
-    private TaskProcessorFactory() {
-        throw new UnsupportedOperationException("TaskProcessorFactory cannot be instantiated");
-    }
 }
