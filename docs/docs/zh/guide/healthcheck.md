@@ -7,6 +7,7 @@
 ## Endpoint
 
 ### API-Server
+
 ```shell
 curl --request GET 'http://localhost:12345/dolphinscheduler/actuator/health'
 
