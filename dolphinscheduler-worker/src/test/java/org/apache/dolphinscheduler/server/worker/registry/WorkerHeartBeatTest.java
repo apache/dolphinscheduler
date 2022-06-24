@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -53,8 +52,6 @@ public class WorkerHeartBeatTest {
 
     @Test
     public void testBusyState() {
-        Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(200);
-
         long startupTime = System.currentTimeMillis();
         double loadAverage = 0;
         double reservedMemory = 0;
@@ -63,6 +60,7 @@ public class WorkerHeartBeatTest {
         WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
         heartBeat.init();
+        heartBeat.setWorkerWaitingTaskCount(200);
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
         assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
@@ -70,8 +68,6 @@ public class WorkerHeartBeatTest {
 
     @Test
     public void testNormalState() {
-        Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(198);
-
         long startupTime = System.currentTimeMillis();
         double loadAverage = 0;
         double reservedMemory = 0;
@@ -80,6 +76,7 @@ public class WorkerHeartBeatTest {
         WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
         heartBeat.init();
+        heartBeat.setWorkerWaitingTaskCount(198);
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
         assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
