@@ -92,6 +92,7 @@ The following are the operation functions of the workflow definition list:
   > Parallel mode: The tasks from 9th May to 10th May execute simultaneously, and the process instance page generates 2 process instances;
 
 ## Run the task alone
+
 - Right-click the task and click the "Start" button (only online tasks can be clicked to run)
 
 ![workflow-task-run](../../../../img/new_ui/dev/project/workflow-task-run.png)
