@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * MasterHeartBeatTest
@@ -28,9 +28,22 @@ import static org.junit.Assert.assertEquals;
 public class MasterHeartBeatTest {
 
     @Test
-    public void testAbnormalState() {
+    public void testAbnormalStateOfLoadAverage() {
         long startupTime = System.currentTimeMillis();
         double loadAverage = -1 * Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
+        MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
+
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testAbnormalStateOfReservedMemory() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = Double.MAX_VALUE;
         double reservedMemory = Double.MAX_VALUE;
         MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
 
@@ -38,6 +51,42 @@ public class MasterHeartBeatTest {
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
         assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testNormalState() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
+        MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
+
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testGetRealTimeHeartBeatInfo() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = 100;
+        double reservedMemory = 100;
+        MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
+
+        String realTimeHeartBeatInfo = heartBeat.getRealTimeHeartBeatInfo();
+        assertNotNull(realTimeHeartBeatInfo);
+
+        assertNotEquals(0, heartBeat.getCpuUsage());
+        assertNotEquals(0, heartBeat.getMemoryUsage());
+        assertNotEquals(0, heartBeat.getLoadAverage());
+        assertNotEquals(0, heartBeat.getAvailablePhysicalMemorySize());
+        assertNotEquals(0, heartBeat.getMaxCpuloadAvg());
+        assertNotEquals(0, heartBeat.getReservedMemory());
+        assertNotEquals(0, heartBeat.getStartupTime());
+        assertNotEquals(0, heartBeat.getReportTime());
+        assertNotEquals(-1, heartBeat.getServerStatus());
+        assertNotEquals(-1, heartBeat.getProcessId());
+        assertNotEquals(-1, heartBeat.getDiskAvailable());
     }
 
 }

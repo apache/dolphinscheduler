@@ -20,14 +20,15 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.HeartBeatModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *  HeartBeat utils
  */
 public class HeartBeatUtils {
-    private static final Logger logger = LoggerFactory.getLogger(HeartBeatUtils.class);
+
+    private HeartBeatUtils(){
+        throw new UnsupportedOperationException("Construct HeartBeatUtils");
+    }
 
     /**
      * decode master heartbeat

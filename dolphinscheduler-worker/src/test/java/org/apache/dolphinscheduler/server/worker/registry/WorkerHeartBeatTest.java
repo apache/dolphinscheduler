@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -37,9 +37,24 @@ public class WorkerHeartBeatTest {
     private WorkerManagerThread workerManagerThread;
 
     @Test
-    public void testAbnormalState() {
+    public void testAbnormalStateOfLoadAverage() {
         long startupTime = System.currentTimeMillis();
         double loadAverage = -1 * Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
+        int hostWeight = 1;
+        int workerThreadCount = 199;
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testAbnormalStateOfReservedMemory() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = Double.MAX_VALUE;
         double reservedMemory = Double.MAX_VALUE;
         int hostWeight = 1;
         int workerThreadCount = 199;
@@ -66,6 +81,68 @@ public class WorkerHeartBeatTest {
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
         assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testNormalState() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
+        int hostWeight = 1;
+        int workerThreadCount = 199;
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+
+        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(198);
+
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testNormalState2() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
+        int hostWeight = 1;
+        int workerThreadCount = 199;
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+
+        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(199);
+
+        heartBeat.init();
+        heartBeat.fillSystemInfo();
+        heartBeat.updateServerState();
+        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
+    }
+
+    @Test
+    public void testGetRealTimeHeartBeatInfo() {
+        long startupTime = System.currentTimeMillis();
+        double loadAverage = Double.MAX_VALUE;
+        double reservedMemory = -1 * Double.MAX_VALUE;
+        int hostWeight = 1;
+        int workerThreadCount = 199;
+        WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
+
+        String realTimeHeartBeatInfo = heartBeat.getRealTimeHeartBeatInfo();
+        assertNotNull(realTimeHeartBeatInfo);
+
+        assertNotEquals(0, heartBeat.getCpuUsage());
+        assertNotEquals(0, heartBeat.getMemoryUsage());
+        assertNotEquals(0, heartBeat.getLoadAverage());
+        assertNotEquals(0, heartBeat.getAvailablePhysicalMemorySize());
+        assertNotEquals(0, heartBeat.getMaxCpuloadAvg());
+        assertNotEquals(0, heartBeat.getReservedMemory());
+        assertNotEquals(0, heartBeat.getStartupTime());
+        assertNotEquals(0, heartBeat.getReportTime());
+        assertNotEquals(-1, heartBeat.getServerStatus());
+        assertNotEquals(-1, heartBeat.getProcessId());
+        assertNotEquals(-1, heartBeat.getDiskAvailable());
+        assertNotEquals(-1, heartBeat.getWorkerHostWeight());
+        assertNotEquals(-1, heartBeat.getWorkerExecThreadCount());
+        assertNotEquals(-1, heartBeat.getWorkerWaitingTaskCount());
     }
 
 }

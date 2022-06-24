@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.HeartBeatModel;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 
 /**
  * HeartBeatUtilsTest
@@ -43,6 +46,14 @@ public class HeartBeatUtilsTest {
         assertEquals(1, heartBeat.getServerStatus());
         assertEquals(29732, heartBeat.getProcessId());
         assertEquals(65.86, heartBeat.getDiskAvailable(), delta);
+
+        assertEquals(0, heartBeat.getWorkerHostWeight());
+        assertEquals(0, heartBeat.getWorkerExecThreadCount());
+        assertEquals(0, heartBeat.getWorkerWaitingTaskCount());
+
+        String errorHeartBeatInfo = heartBeatInfo + ",0";
+        HeartBeatModel errorHeartBeat = HeartBeatUtils.decodeMasterHeartBeat(errorHeartBeatInfo);
+        assertNull(errorHeartBeat);
     }
 
     @Test
@@ -61,9 +72,32 @@ public class HeartBeatUtilsTest {
         assertEquals(1634033006857L, heartBeat.getReportTime());
         assertEquals(1, heartBeat.getServerStatus());
         assertEquals(29732, heartBeat.getProcessId());
+        assertEquals(1, heartBeat.getWorkerHostWeight());
         assertEquals(199, heartBeat.getWorkerExecThreadCount());
         assertEquals(200, heartBeat.getWorkerWaitingTaskCount());
         assertEquals(65.86, heartBeat.getDiskAvailable(), delta);
+
+        String errorHeartBeatInfo = heartBeatInfo + ",0";
+        HeartBeatModel errorHeartBeat = HeartBeatUtils.decodeWorkerHeartBeat(errorHeartBeatInfo);
+        assertNull(errorHeartBeat);
+    }
+
+    @Test
+    public void testDecodeHeartBeat() {
+
+        String masterHeartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,65.86";
+        HeartBeatModel masterHeartBeat = HeartBeatUtils.decodeHeartBeat(masterHeartBeatInfo, NodeType.MASTER);
+        assertNotNull(masterHeartBeat);
+
+        String workerHeartBeatInfo = "0.35,0.58,3.09,6.47,5.0,1.0,1634033006749,1634033006857,1,29732,1,199,200,65.86";
+        HeartBeatModel workerHeartBeat = HeartBeatUtils.decodeHeartBeat(workerHeartBeatInfo, NodeType.WORKER);
+        assertNotNull(workerHeartBeat);
+
+        try {
+            HeartBeatModel errorHeartBeat = HeartBeatUtils.decodeHeartBeat(workerHeartBeatInfo, NodeType.DEAD_SERVER);
+        } catch (IllegalStateException e) {
+            Assert.assertThat(e.getMessage(), is("Should not reach here"));
+        }
     }
 
 }
