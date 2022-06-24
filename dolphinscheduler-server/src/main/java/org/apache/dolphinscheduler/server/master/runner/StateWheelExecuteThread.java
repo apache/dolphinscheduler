@@ -27,13 +27,11 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
 import org.apache.hadoop.util.ThreadUtil;
-
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 1. timeout check wheel
@@ -48,7 +46,7 @@ public class StateWheelExecuteThread extends Thread {
     private ConcurrentHashMap<Integer, TaskInstance> taskInstanceTimeoutCheckList;
     private ConcurrentHashMap<Integer, TaskInstance> taskInstanceRetryCheckList;
     private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
-
+    private ConcurrentHashMap<Integer, TaskInstance> depStateCheckList;
     /**
      * start process failed map
      */
@@ -68,6 +66,7 @@ public class StateWheelExecuteThread extends Thread {
             ConcurrentHashMap<Integer, ProcessInstance> processInstanceTimeoutCheckList,
             ConcurrentHashMap<Integer, TaskInstance> taskInstanceTimeoutCheckList,
             ConcurrentHashMap<Integer, TaskInstance> taskInstanceRetryCheckList,
+            ConcurrentHashMap<Integer, TaskInstance> depStateCheckList,
             ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps,
             int stateCheckIntervalSecs) {
         this.masterExecService = masterExecService;
@@ -78,6 +77,7 @@ public class StateWheelExecuteThread extends Thread {
         this.taskInstanceRetryCheckList = taskInstanceRetryCheckList;
         this.processInstanceExecMaps = processInstanceExecMaps;
         this.stateCheckIntervalSecs = stateCheckIntervalSecs;
+        this.depStateCheckList = depStateCheckList;
     }
 
     @Override
@@ -90,10 +90,36 @@ public class StateWheelExecuteThread extends Thread {
                 checkTask4Timeout();
                 checkTask4Retry();
                 checkProcess4Timeout();
+                checkDepTask();
             } catch (Exception e) {
                 logger.error("state wheel thread check error:", e);
             }
             ThreadUtil.sleepAtLeastIgnoreInterrupts(stateCheckIntervalSecs);
+        }
+    }
+
+    private void checkDepTask() {
+        if (depStateCheckList.isEmpty()) {
+            return;
+        }
+        for (TaskInstance taskInstance : depStateCheckList.values()) {
+            WorkflowExecuteThread workflowExecuteThread = processInstanceExecMaps.get(taskInstance.getProcessInstanceId());
+            if (workflowExecuteThread == null) {
+                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskId:{}",
+                        taskInstance.getProcessInstanceId(), taskInstance.getId());
+                depStateCheckList.remove(taskInstance.getId());
+                continue;
+            }
+            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                depStateCheckList.remove(taskInstance.getId());
+                break;
+            }
+            if (taskInstance.getState().typeIsFinished()) {
+                depStateCheckList.remove(taskInstance.getId());
+                continue;
+            }
+            addTaskStateChangeEvent(taskInstance);
         }
     }
 
@@ -114,6 +140,18 @@ public class StateWheelExecuteThread extends Thread {
             return;
         }
         for (TaskInstance taskInstance : taskInstanceTimeoutCheckList.values()) {
+            WorkflowExecuteThread workflowExecuteThread = processInstanceExecMaps.get(taskInstance.getProcessInstanceId());
+            if (workflowExecuteThread == null) {
+                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskId:{}",
+                        taskInstance.getProcessInstanceId(), taskInstance.getId());
+                taskInstanceTimeoutCheckList.remove(taskInstance.getId());
+                continue;
+            }
+            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                taskInstanceTimeoutCheckList.remove(taskInstance.getId());
+                break;
+            }
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                 if (taskInstance.getStartTime() == null) {
                     TaskInstance newTaskInstance = processService.findTaskInstanceById(taskInstance.getId());
@@ -132,11 +170,21 @@ public class StateWheelExecuteThread extends Thread {
         if (taskInstanceRetryCheckList.isEmpty()) {
             return;
         }
-
         for (TaskInstance taskInstance : this.taskInstanceRetryCheckList.values()) {
-            if (!taskInstance.getState().typeIsFinished() && (taskInstance.isSubProcess() || taskInstance.isDependTask())) {
-                addTaskStateChangeEvent(taskInstance);
-            } else if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
+            WorkflowExecuteThread workflowExecuteThread = processInstanceExecMaps.get(taskInstance.getProcessInstanceId());
+            if (workflowExecuteThread == null) {
+                logger.warn("can not find workflowExecuteThread, this check event will remove, processInstanceId:{}, taskId:{}",
+                        taskInstance.getProcessInstanceId(), taskInstance.getId());
+                taskInstanceRetryCheckList.remove(taskInstance.getId());
+                continue;
+            }
+            ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+                taskInstanceRetryCheckList.remove(taskInstance.getId());
+                break;
+            }
+            if (((taskInstance.getRetryTimes() <= taskInstance.getMaxRetryTimes() && taskInstance.isDependTask())
+                || (taskInstance.getState().typeIsFinished() && taskInstance.taskCanRetry())) && taskInstance.retryTaskIntervalOverTime()) {
                 addTaskStateChangeEvent(taskInstance);
                 taskInstanceRetryCheckList.remove(taskInstance.getId());
             }
@@ -148,7 +196,6 @@ public class StateWheelExecuteThread extends Thread {
             return;
         }
         for (ProcessInstance processInstance : this.processInstanceTimeoutCheckList.values()) {
-
             long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(), processInstance.getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
             if (timeRemain < 0) {
                 addProcessTimeoutEvent(processInstance);

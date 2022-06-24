@@ -17,18 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.util.Set;
 
 /**
  * task instance mapper interface
@@ -51,8 +50,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance queryByInstanceIdAndName(@Param("processInstanceId") int processInstanceId,
                                           @Param("name") String name);
 
-    TaskInstance queryByInstanceIdAndCode(@Param("processInstanceId") int processInstanceId,
-        @Param("taskCode") Long taskCode);
+    TaskInstance queryByInstanceIdAndCode(@Param("processInstanceId") int processInstanceId, @Param("taskCode") Long taskCode);
 
     Integer countTask(@Param("projectCodes") Long[] projectCodes,
                       @Param("taskIds") int[] taskIds);
@@ -71,8 +69,19 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
                                                     @Param("startTime") Date startTime,
-                                                    @Param("endTime") Date endTime
-    );
+                                                    @Param("endTime") Date endTime);
 
     int updateHostAndSubmitTimeById(@Param("id") int id, @Param("host") String host, @Param("submitTime") Date submitTime);
+
+    /**
+     * query last task instance
+     *
+     * @param taskCode taskCode
+     * @param startTime startTime
+     * @param endTime endTime
+     * @return task instance
+     */
+    TaskInstance queryLastTaskInstance(@Param("taskCode") long taskCode, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+    List<TaskInstance> queryLastTaskInstanceList(@Param("taskCodes") Set<Long> taskCodes, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

@@ -76,6 +76,11 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean resubmitTask() {
+        return true;
+    }
+
+    @Override
     public boolean runTask() {
         try {
             if (!this.taskState().typeIsFinished() && setSwitchResult()) {
@@ -120,6 +125,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(ExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
+        processService.saveTaskInstance(taskInstance);
         return true;
     }
 

@@ -77,6 +77,11 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean resubmitTask() {
+        return true;
+    }
+
+    @Override
     public ExecutionStatus taskState() {
         return this.taskInstance.getState();
     }
@@ -135,6 +140,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(ExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
+        processService.saveTaskInstance(taskInstance);
         return true;
     }
 

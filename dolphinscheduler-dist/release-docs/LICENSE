@@ -462,7 +462,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aspectjweaver 1.9.7:https://mvnrepository.com/artifact/org.aspectj/aspectjweaver/1.9.7, EPL 1.0
     logback-classic 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic/1.2.3, EPL 1.0 and LGPL 2.1
     logback-core 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-core/1.2.3, EPL 1.0 and LGPL 2.1
-    oshi-core 3.9.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.9.1, EPL 1.0
+    oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, EPL 1.0
     h2-1.4.200 https://github.com/h2database/h2database/blob/master/LICENSE.txt, MPL 2.0 or EPL 1.0
 
 ========================================================================

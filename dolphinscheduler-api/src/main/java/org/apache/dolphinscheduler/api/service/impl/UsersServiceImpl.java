@@ -180,7 +180,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
     public User createUser(String userName,
                            String userPassword,
                            String email,

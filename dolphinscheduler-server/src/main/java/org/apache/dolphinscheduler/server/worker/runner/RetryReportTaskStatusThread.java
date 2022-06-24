@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -24,13 +25,12 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * Retry Report Task Status Thread
@@ -44,17 +44,17 @@ public class RetryReportTaskStatusThread implements Runnable {
     WorkerConfig workerConfig;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private final TaskCallbackService taskCallbackService;
 
-    public void start(){
-        Thread thread = new Thread(this,"RetryReportTaskStatusThread");
+    public void start() {
+        Thread thread = new Thread(this, "RetryReportTaskStatusThread");
         thread.setDaemon(true);
         thread.start();
     }
 
-    public RetryReportTaskStatusThread(){
+    public RetryReportTaskStatusThread() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
     }
 
@@ -64,40 +64,28 @@ public class RetryReportTaskStatusThread implements Runnable {
     @Override
     public void run() {
         ResponceCache responceCache = ResponceCache.get();
-
-        while (Stopper.isRunning()){
-
-            // sleep 5 minutes
-            ThreadUtils.sleep(workerConfig.getRetryReportTaskStatusInterval() * 1000);
-
+        long interval = workerConfig.getRetryReportTaskStatusInterval() * Constants.SLEEP_TIME_MILLIS * 60L;
+        while (Stopper.isRunning()) {
+            ThreadUtils.sleep(60 * Constants.SLEEP_TIME_MILLIS);
+            long nowTimeMillis = System.currentTimeMillis();
             try {
-                if (!responceCache.getAckCache().isEmpty()){
-                    Map<Integer,Command> ackCache =  responceCache.getAckCache();
-                    for (Map.Entry<Integer, Command> entry : ackCache.entrySet()){
-                        Integer taskInstanceId = entry.getKey();
-                        Command ackCommand = entry.getValue();
-                        taskCallbackService.sendAck(taskInstanceId,ackCommand);
-                    }
-                }
-
-                if (!responceCache.getResponseCache().isEmpty()){
-                    Map<Integer,Command> responseCache =  responceCache.getResponseCache();
-                    for (Map.Entry<Integer, Command> entry : responseCache.entrySet()){
-                        Integer taskInstanceId = entry.getKey();
-                        Command responseCommand = entry.getValue();
-                        taskCallbackService.sendResult(taskInstanceId,responseCommand);
-                    }
-                }
-                if (!responceCache.getKillResponseCache().isEmpty()) {
-                    Map<Integer, Command> killResponseCache = responceCache.getKillResponseCache();
-                    for (Map.Entry<Integer, Command> entry : killResponseCache.entrySet()) {
-                        Integer taskInstanceId = entry.getKey();
-                        Command killResponseCommand = entry.getValue();
-                        taskCallbackService.sendResult(taskInstanceId, killResponseCommand);
-                    }
-                }
-            }catch (Exception e){
+                retrySendCommand(responceCache.getAckCache(), interval, nowTimeMillis);
+                retrySendCommand(responceCache.getResponseCache(), interval, nowTimeMillis);
+                retrySendCommand(responceCache.getKillResponseCache(), interval, nowTimeMillis);
+                retrySendCommand(responceCache.getRecallCache(), interval, nowTimeMillis);
+            } catch (Exception e) {
                 logger.warn("retry report task status error", e);
+            }
+        }
+    }
+
+    private void retrySendCommand(Map<Integer, Command> cache, long interval, long nowTimeMillis) {
+        for (Map.Entry<Integer, Command> entry : cache.entrySet()) {
+            Command command = entry.getValue();
+            if (nowTimeMillis - command.getGenCommandTimeMillis() > interval) {
+                Integer taskInstanceId = entry.getKey();
+                taskCallbackService.sendResult(taskInstanceId, command);
+                logger.info("retry send command successfully, the command type {}, the task id:{}", command.getType(),taskInstanceId);
             }
         }
     }

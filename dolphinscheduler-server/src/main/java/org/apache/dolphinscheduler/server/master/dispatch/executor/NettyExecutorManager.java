@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
@@ -81,6 +83,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_RECALL, new TaskRecallProcessor());
     }
 
     /**
@@ -91,30 +94,15 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      */
     @Override
     public Boolean execute(ExecutionContext context) throws ExecuteException {
-
-        /**
-         *  all nodes
-         */
         Set<String> allNodes = getAllNodes(context);
-
-        /**
-         * fail nodes
-         */
         Set<String> failNodeSet = new HashSet<>();
-
-        /**
-         *  build command accord executeContext
-         */
         Command command = context.getCommand();
-
-        /**
-         * execute task host
-         */
+        // execute task host
         Host host = context.getHost();
         boolean success = false;
         while (!success) {
             try {
-                doExecute(host,command);
+                doExecute(host, command);
                 success = true;
                 context.setHost(host);
             } catch (ExecuteException ex) {
@@ -163,7 +151,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
             } catch (Exception ex) {
                 logger.error(String.format("send command : %s to %s error", command, host), ex);
                 retryCount--;
-                ThreadUtils.sleep(100);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } while (retryCount >= 0 && !success);
 

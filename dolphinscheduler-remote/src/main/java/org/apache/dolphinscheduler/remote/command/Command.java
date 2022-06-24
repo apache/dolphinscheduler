@@ -44,6 +44,11 @@ public class Command implements Serializable {
     private CommandType type;
 
     /**
+     * gen command time millis
+     */
+    private long genCommandTimeMillis;
+
+    /**
      *  request unique identification
      */
     private long opaque;
@@ -64,6 +69,14 @@ public class Command implements Serializable {
 
     public void setType(CommandType type) {
         this.type = type;
+    }
+
+    public long getGenCommandTimeMillis() {
+        return genCommandTimeMillis;
+    }
+
+    public void setGenCommandTimeMillis(long genCommandTimeMillis) {
+        this.genCommandTimeMillis = genCommandTimeMillis;
     }
 
     public long getOpaque() {
@@ -115,7 +128,8 @@ public class Command implements Serializable {
 
     @Override
     public String toString() {
-        return "Command [type=" + type + ", opaque=" + opaque + ", bodyLen=" + (body == null ? 0 : body.length) + "]";
+        return "Command [type=" + type + ", opaque=" + opaque + ", genCommandTimeMillis=" + genCommandTimeMillis
+                + ", bodyLen=" + (body == null ? 0 : body.length) + "]";
     }
 
 }

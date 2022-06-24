@@ -17,19 +17,34 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
+import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
 /**
- *  kill task request command
+ * kill task recall command
  */
-public class TaskKillRequestCommand implements Serializable {
+public class TaskRecallCommand implements Serializable {
 
     /**
-     *  task id
+     * taskInstanceId
      */
     private int taskInstanceId;
+
+    /**
+     * host
+     */
+    private String host;
+
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    private Event event;
+
+    private int status;
 
     public int getTaskInstanceId() {
         return taskInstanceId;
@@ -39,14 +54,46 @@ public class TaskKillRequestCommand implements Serializable {
         this.taskInstanceId = taskInstanceId;
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     /**
-     *  package request command
+     * package request command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_KILL_REQUEST);
+        command.setType(CommandType.TASK_RECALL);
         command.setGenCommandTimeMillis(System.currentTimeMillis());
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
@@ -55,8 +102,12 @@ public class TaskKillRequestCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskKillRequestCommand{"
+        return "TaskRecallCommand{"
                 + "taskInstanceId=" + taskInstanceId
+                + ", host='" + host + '\''
+                + ", processInstanceId=" + processInstanceId
+                + ", event=" + event
+                + ", status=" + status
                 + '}';
     }
 }

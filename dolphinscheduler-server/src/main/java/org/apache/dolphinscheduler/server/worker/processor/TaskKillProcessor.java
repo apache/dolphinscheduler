@@ -161,7 +161,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      * build TaskKillResponseCommand
      *
-     * @param killCommand kill command
+     * @param taskRequest taskRequest
      * @param result exe result
      * @return build TaskKillResponseCommand
      */

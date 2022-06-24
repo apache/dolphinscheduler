@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
 import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
@@ -148,6 +149,7 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, ackProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL, new TaskRecallProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, new CacheProcessor());
         this.nettyRemotingServer.start();

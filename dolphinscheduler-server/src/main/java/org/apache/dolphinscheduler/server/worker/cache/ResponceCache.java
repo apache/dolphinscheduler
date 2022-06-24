@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Responce Cache : cache worker send master result
+ * Response Cache : cache worker send master result
  */
 public class ResponceCache {
 
@@ -38,7 +38,8 @@ public class ResponceCache {
 
     private Map<Integer,Command> ackCache = new ConcurrentHashMap<>();
     private Map<Integer,Command> responseCache = new ConcurrentHashMap<>();
-    private final Map<Integer,Command> killResponseCache = new ConcurrentHashMap<>();
+    private Map<Integer,Command> killResponseCache = new ConcurrentHashMap<>();
+    private Map<Integer,Command> recallCache = new ConcurrentHashMap<>();
 
 
     /**
@@ -57,6 +58,10 @@ public class ResponceCache {
                 break;
             case ACTION_STOP:
                 killResponseCache.put(taskInstanceId,command);
+                break;
+            case WORKER_REJECT:
+            case REALLOCATE:
+                recallCache.put(taskInstanceId,command);
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
@@ -83,6 +88,19 @@ public class ResponceCache {
 
     public Map<Integer, Command> getKillResponseCache() {
         return killResponseCache;
+    }
+
+    /**
+     * recall response cache
+     *
+     * @param taskInstanceId taskInstanceId
+     */
+    public void removeRecallCache(Integer taskInstanceId) {
+        recallCache.remove(taskInstanceId);
+    }
+
+    public Map<Integer, Command> getRecallCache() {
+        return recallCache;
     }
 
     /**

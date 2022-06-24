@@ -20,5 +20,7 @@ package org.apache.dolphinscheduler.common.enums;
 public enum Event {
     ACK,
     RESULT,
-    ACTION_STOP;
+    ACTION_STOP,
+    WORKER_REJECT,
+    REALLOCATE
 }

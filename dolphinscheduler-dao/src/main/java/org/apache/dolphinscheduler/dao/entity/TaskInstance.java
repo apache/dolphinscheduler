@@ -546,7 +546,6 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isTaskComplete() {
-
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
                 || this.getState().typeIsCancel()
@@ -590,7 +589,7 @@ public class TaskInstance implements Serializable {
             return true;
         } else {
             return (this.getState().typeIsFailure()
-                    && this.getRetryTimes() < this.getMaxRetryTimes());
+                    && this.getRetryTimes() <= this.getMaxRetryTimes());
         }
     }
 
@@ -601,12 +600,12 @@ public class TaskInstance implements Serializable {
      */
     public boolean retryTaskIntervalOverTime() {
         if (getState() != ExecutionStatus.FAILURE) {
-            return true;
+            return false;
         }
         if (getId() == 0
                 || getMaxRetryTimes() == 0
                 || getRetryInterval() == 0) {
-            return true;
+            return false;
         }
         Date now = new Date();
         long failedTimeInterval = DateUtils.differSec(now, getEndTime());

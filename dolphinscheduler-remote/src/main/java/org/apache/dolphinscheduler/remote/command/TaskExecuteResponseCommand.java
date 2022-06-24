@@ -45,20 +45,39 @@ public class TaskExecuteResponseCommand implements Serializable {
     /**
      * process instance id
      */
-    private  int processInstanceId;
+    private int processInstanceId;
 
     /**
      *  status
      */
     private int status;
 
+    /**
+     * startTime
+     */
+    private Date startTime;
+
+    /**
+     * host
+     */
+    private String host;
+
+    /**
+     * logPath
+     */
+    private String logPath;
+
+    /**
+     *  end time
+     * executePath
+     */
+    private String executePath;
 
     /**
      *  end time
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
-
 
     /**
      * processId
@@ -123,6 +142,38 @@ public class TaskExecuteResponseCommand implements Serializable {
         this.appIds = appIds;
     }
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public void setLogPath(String logPath) {
+        this.logPath = logPath;
+    }
+
+    public String getExecutePath() {
+        return executePath;
+    }
+
+    public void setExecutePath(String executePath) {
+        this.executePath = executePath;
+    }
+
     /**
      * package response command
      * @return command
@@ -130,6 +181,7 @@ public class TaskExecuteResponseCommand implements Serializable {
     public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_EXECUTE_RESPONSE);
+        command.setGenCommandTimeMillis(System.currentTimeMillis());
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
@@ -138,12 +190,18 @@ public class TaskExecuteResponseCommand implements Serializable {
     @Override
     public String toString() {
         return "TaskExecuteResponseCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", status=" + status
-                + ", endTime=" + endTime
-                + ", processId=" + processId
-                + ", appIds='" + appIds + '\''
-                + '}';
+            + "taskInstanceId=" + taskInstanceId
+            + ", processInstanceId=" + processInstanceId
+            + ", status=" + status
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", host=" + host
+            + ", logPath=" + logPath
+            + ", executePath=" + executePath
+            + ", processId=" + processId
+            + ", appIds='" + appIds + '\''
+            + ", varPool=" + varPool
+            + '}';
     }
 
     public int getProcessInstanceId() {

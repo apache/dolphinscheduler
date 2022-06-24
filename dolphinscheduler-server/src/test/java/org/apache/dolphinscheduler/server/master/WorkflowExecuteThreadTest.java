@@ -102,7 +102,10 @@ public class WorkflowExecuteThreadTest {
 
         ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
         ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, null,processService, null, null, config, taskTimeoutCheckList, taskRetryCheckList));
+        ConcurrentHashMap<Integer, TaskInstance> depStateCheckList = new ConcurrentHashMap<>();
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, null,
+                processService, null, null,
+                config, taskTimeoutCheckList, taskRetryCheckList, depStateCheckList));
         // prepareProcess init dag
         Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
         dag.setAccessible(true);
@@ -112,7 +115,7 @@ public class WorkflowExecuteThreadTest {
 
 
     @Test
-    public void testParseStartNodeName() throws ParseException {
+    public void testParseStartNodeName() {
         try {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODES, "1,2,3");

@@ -21,10 +21,9 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskKillAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,28 +32,32 @@ import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 
-public class TaskKillAckProcessor implements NettyRequestProcessor {
+public class TaskRecallAckProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskKillAckProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskRecallAckProcessor.class);
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE_ACK == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_RECALL_ACK == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
 
-        TaskKillAckCommand taskKillAckCommand = JSONUtils.parseObject(
-                command.getBody(), TaskKillAckCommand.class);
-
-        if (taskKillAckCommand == null) {
+        TaskRecallAckCommand taskRecallAckCommand = JSONUtils.parseObject(
+                command.getBody(), TaskRecallAckCommand.class);
+        logger.info("taskRecallAckCommand:{}, opaque:{}", taskRecallAckCommand, command.getOpaque());
+        if (taskRecallAckCommand == null) {
             return;
         }
 
-        if (taskKillAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-            ResponceCache.get().removeKillResponseCache(taskKillAckCommand.getTaskInstanceId());
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskKillAckCommand.getTaskInstanceId());
-            logger.debug("removeKillResponseCache: task instance id:{}", taskKillAckCommand.getTaskInstanceId());
-            TaskCallbackService.remove(taskKillAckCommand.getTaskInstanceId());
-            logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskKillAckCommand.getTaskInstanceId());
+        if (taskRecallAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+            Command recallCommand = ResponceCache.get().getRecallCache().get(taskRecallAckCommand.getTaskInstanceId());
+            if (recallCommand != null && command.getOpaque() == recallCommand.getOpaque()) {
+                ResponceCache.get().removeRecallCache(taskRecallAckCommand.getTaskInstanceId());
+                logger.info("removeRecallCache: task instance id:{}", taskRecallAckCommand.getTaskInstanceId());
+            }
+            if (command.getOpaque() == TaskCallbackService.getOpaque(taskRecallAckCommand.getTaskInstanceId())) {
+                TaskCallbackService.remove(taskRecallAckCommand.getTaskInstanceId());
+                logger.info("remove REMOTE_CHANNELS, task instance id:{}", taskRecallAckCommand.getTaskInstanceId());
+            }
         }
     }
 }

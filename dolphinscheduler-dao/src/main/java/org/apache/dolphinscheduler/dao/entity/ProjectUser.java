@@ -38,6 +38,12 @@ public class ProjectUser {
     private int projectId;
 
     /**
+     * project code
+     */
+    @TableField(exist = false)
+    private long projectCode;
+
+    /**
      * project name
      */
     @TableField(exist = false)
@@ -124,12 +130,21 @@ public class ProjectUser {
         this.perm = perm;
     }
 
+    public long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(long projectCode) {
+        this.projectCode = projectCode;
+    }
+
     @Override
     public String toString() {
         return "ProjectUser{"
                + "id=" + id
                + ", userId=" + userId
                + ", projectId=" + projectId
+               + ", projectCode=" + projectCode
                + ", projectName='" + projectName + '\''
                + ", userName='" + userName + '\''
                + ", perm=" + perm

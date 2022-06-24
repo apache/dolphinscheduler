@@ -481,7 +481,11 @@ public class MasterRegistryClient {
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .create();
 
-        if (masterConfig.getMasterKillYarnJobWhenHandleFailOver()) {
+        if (masterConfig.getMasterKillYarnJobWhenHandleFailOver()
+            && !(taskInstance.isSubProcess()
+            || taskInstance.isDependTask()
+            || taskInstance.isConditionsTask()
+            || taskInstance.isSwitchTask())) {
             // only kill yarn job if exists , the local thread has exited
             ProcessUtils.killYarnJob(taskExecutionContext);
         }

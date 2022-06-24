@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.remote;
 
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.Ping;
@@ -27,22 +28,19 @@ import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import io.netty.channel.Channel;
-
 /**
- *  netty remote client test
+ * netty remote client test
  */
 public class NettyRemotingClientTest {
 
     /**
-     *  test send sync
+     * test send sync
      */
     @Test
     public void testSendSync() {
@@ -73,10 +71,10 @@ public class NettyRemotingClientTest {
     }
 
     /**
-     *  test sned async
+     * test sned async
      */
     @Test
-    public void testSendAsync(){
+    public void testSendAsync() {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);

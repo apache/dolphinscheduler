@@ -24,10 +24,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
@@ -104,7 +102,7 @@ public class ProcessAlertManager {
         if (processInstance.getState().typeIsSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                    .projectId(projectUser.getProjectId())
+                    .projectCode(projectUser.getProjectCode())
                     .projectName(projectUser.getProjectName())
                     .owner(projectUser.getUserName())
                     .processId(processInstance.getId())
@@ -128,7 +126,7 @@ public class ProcessAlertManager {
                     continue;
                 }
                 ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                        .projectId(projectUser.getProjectId())
+                        .projectCode(projectUser.getProjectCode())
                         .projectName(projectUser.getProjectName())
                         .owner(projectUser.getUserName())
                         .processId(processInstance.getId())
@@ -197,7 +195,6 @@ public class ProcessAlertManager {
         } catch (Exception e) {
             logger.error("send alert failed:{} ", e.getMessage());
         }
-
     }
 
     /**
@@ -263,13 +260,13 @@ public class ProcessAlertManager {
      * send process timeout alert
      *
      * @param processInstance process instance
-     * @param processDefinition process definition
+     * @param projectUser projectUser
      */
-    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
+        alertDao.sendProcessTimeoutAlert(processInstance, projectUser);
     }
 
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
-        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, ProjectUser projectUser ) {
+        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
     }
 }

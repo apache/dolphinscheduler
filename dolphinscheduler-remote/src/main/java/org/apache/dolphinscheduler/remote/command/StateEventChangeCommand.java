@@ -46,8 +46,7 @@ public class StateEventChangeCommand implements Serializable {
     public StateEventChangeCommand(int sourceProcessInstanceId, int sourceTaskInstanceId,
                                    ExecutionStatus sourceStatus,
                                    int destProcessInstanceId,
-                                   int destTaskInstanceId
-    ) {
+                                   int destTaskInstanceId) {
         this.key = String.format("%d-%d-%d-%d",
                 sourceProcessInstanceId,
                 sourceTaskInstanceId,

@@ -19,21 +19,16 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRecallCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
@@ -44,9 +39,6 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-
-import java.util.Date;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +104,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
-
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
                 command.getBody(), TaskExecuteRequestCommand.class);
 
@@ -132,90 +123,39 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
 
         setTaskCache(taskExecutionContext);
-        // todo custom logger
-
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
-        taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
+        if (CommonUtils.isSudoEnable() && workerConfig.getWorkerTenantAutoCreate()) {
+            OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+        }
 
-        // local execute path
-        String execLocalPath = getExecLocalPath(taskExecutionContext);
-        logger.info("task instance local execute path : {}", execLocalPath);
-        taskExecutionContext.setExecutePath(execLocalPath);
-
-        try {
-            FileUtils.createWorkDirIfAbsent(execLocalPath);
-            if (CommonUtils.isSudoEnable() && workerConfig.getWorkerTenantAutoCreate()) {
-                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
-            }
-        } catch (Throwable ex) {
-            logger.error("create execLocalPath: {}", execLocalPath, ex);
+        ResponceCache.get().removeRecallCache(taskExecutionContext.getTaskInstanceId());
+        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
+        // submit task to manager
+        boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager));
+        if (!offer) {
+            logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
+                workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());
+            sendRecallCommand(taskExecutionContext, channel);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
-
-        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
-
-        // delay task process
-        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
-        if (remainTime > 0) {
-            logger.info("delay the execution of task instance {}, delay time: {} s", taskExecutionContext.getTaskInstanceId(), remainTime);
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-            taskExecutionContext.setStartTime(null);
-        } else {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            taskExecutionContext.setStartTime(new Date());
-        }
-
-        this.doAck(taskExecutionContext);
-
-        // submit task to manager
-        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager))) {
-            logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getDelayQueueSize());
-        }
     }
 
-    private void doAck(TaskExecutionContext taskExecutionContext) {
-        // tell master that task is in executing
-        TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command(), Event.ACK);
-        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
+    private void sendRecallCommand(TaskExecutionContext taskExecutionContext, Channel channel) {
+        TaskRecallCommand taskRecallCommand = buildRecallCommand(taskExecutionContext);
+        Command command = taskRecallCommand.convert2Command();
+        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), command, Event.WORKER_REJECT);
+        taskCallbackService.changeRemoteChannel(taskExecutionContext.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
+        taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), command);
+        logger.info("send recall command successfully, taskId:{}, opaque:{}", taskExecutionContext.getTaskInstanceId(), command.getOpaque());
     }
 
-    /**
-     * build ack command
-     *
-     * @param taskExecutionContext taskExecutionContext
-     * @return TaskExecuteAckCommand
-     */
-    private TaskExecuteAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
-        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
-        ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        ackCommand.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());
-        ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
-        ackCommand.setHost(taskExecutionContext.getHost());
-        ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
-            ackCommand.setExecutePath(null);
-        } else {
-            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
-        }
-        taskExecutionContext.setLogPath(ackCommand.getLogPath());
-        ackCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-
-        return ackCommand;
-    }
-
-    /**
-     * get execute local path
-     *
-     * @param taskExecutionContext taskExecutionContext
-     * @return execute local path
-     */
-    private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
-        return FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+    private TaskRecallCommand buildRecallCommand(TaskExecutionContext taskExecutionContext) {
+        TaskRecallCommand taskRecallCommand = new TaskRecallCommand();
+        taskRecallCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskRecallCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        taskRecallCommand.setHost(taskExecutionContext.getHost());
+        taskRecallCommand.setEvent(Event.WORKER_REJECT);
+        taskRecallCommand.setStatus(ExecutionStatus.SUBMITTED_SUCCESS.getCode());
+        return taskRecallCommand;
     }
 }

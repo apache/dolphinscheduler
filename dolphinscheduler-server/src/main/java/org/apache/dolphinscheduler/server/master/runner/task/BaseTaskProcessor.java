@@ -143,6 +143,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected abstract boolean submitTask();
 
+    /*
+     * resubmit task
+     */
+    protected abstract boolean resubmitTask();
+
     /**
      * run task
      */
@@ -166,6 +171,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return submit();
             case RUN:
                 return run();
+            case RESUBMIT:
+                return resubmit();
             default:
                 logger.error("unknown task action: {}", taskAction.toString());
         }
@@ -173,6 +180,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         // reset thread name
         Thread.currentThread().setName(threadName);
         return false;
+    }
+
+    protected boolean resubmit() {
+        return resubmitTask();
     }
 
     protected boolean submit() {
