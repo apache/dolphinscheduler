@@ -17,12 +17,20 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClientTest;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,11 +38,6 @@ import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 public class TaskExecuteThreadTest {
@@ -51,19 +54,23 @@ public class TaskExecuteThreadTest {
     private AlertClientService alertClientService;
 
     @Mock
+    private StorageOperate storageOperate;
+
+    @Mock
     private TaskPluginManager taskPluginManager;
 
     @Test
-    public void checkTest(){
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager);
+    public void checkTest() {
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService,
+            alertClientService, taskPluginManager, storageOperate);
 
         String path = "/";
         Map<String, String> projectRes = new HashMap<>();
         projectRes.put("shell", "shell.sh");
         List<Pair<String, String>> downloads = new ArrayList<>();
-        try{
+        try {
             downloads = taskExecuteThread.downloadCheck(path, projectRes);
-        }catch (Exception e){
+        } catch (Exception e) {
             Assert.assertNotNull(e);
         }
         downloads.add(Pair.of("shell", "shell.sh"));
