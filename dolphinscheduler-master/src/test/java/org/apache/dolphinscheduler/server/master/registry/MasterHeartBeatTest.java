@@ -30,8 +30,8 @@ public class MasterHeartBeatTest {
     @Test
     public void testAbnormalState() {
         long startupTime = System.currentTimeMillis();
-        double loadAverage = 100;
-        double reservedMemory = 100;
+        double loadAverage = -1 * Double.MAX_VALUE;
+        double reservedMemory = Double.MAX_VALUE;
         MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
 
         heartBeat.init();
@@ -39,20 +39,5 @@ public class MasterHeartBeatTest {
         heartBeat.updateServerState();
         assertEquals(Constants.ABNORMAL_NODE_STATUS, heartBeat.getServerStatus());
     }
-
-    @Test
-    public void testNormalState() {
-        long startupTime = System.currentTimeMillis();
-        double loadAverage = 0;
-        double reservedMemory = 0;
-        MasterHeartBeat heartBeat = new MasterHeartBeat(startupTime, loadAverage, reservedMemory);
-
-        heartBeat.init();
-        heartBeat.fillSystemInfo();
-        heartBeat.updateServerState();
-        assertEquals(Constants.NORMAL_NODE_STATUS, heartBeat.getServerStatus());
-    }
-
-
 
 }

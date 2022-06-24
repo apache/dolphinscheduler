@@ -18,9 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.server.registry.AbstractHeartBeat;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
