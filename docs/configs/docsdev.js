@@ -58,7 +58,7 @@ export default {
                 title: 'Introduction to Functions',
                 children: [
                     {
-                        title: 'Application Homepage',
+                        title: 'Workflow Overview',
                         link: '/en-us/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
