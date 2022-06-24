@@ -76,17 +76,17 @@ public class MasterHeartBeatTest {
         String realTimeHeartBeatInfo = heartBeat.getRealTimeHeartBeatInfo();
         assertNotNull(realTimeHeartBeatInfo);
 
-        assertNotEquals(0, heartBeat.getCpuUsage());
-        assertNotEquals(0, heartBeat.getMemoryUsage());
-        assertNotEquals(0, heartBeat.getLoadAverage());
-        assertNotEquals(0, heartBeat.getAvailablePhysicalMemorySize());
-        assertNotEquals(0, heartBeat.getMaxCpuloadAvg());
-        assertNotEquals(0, heartBeat.getReservedMemory());
-        assertNotEquals(0, heartBeat.getStartupTime());
-        assertNotEquals(0, heartBeat.getReportTime());
+        assertNotEquals(0.0, heartBeat.getCpuUsage());
+        assertNotEquals(0.0, heartBeat.getMemoryUsage());
+        assertNotEquals(0.0, heartBeat.getLoadAverage());
+        assertNotEquals(0.0, heartBeat.getAvailablePhysicalMemorySize());
+        assertNotEquals(0.0, heartBeat.getMaxCpuloadAvg());
+        assertNotEquals(0.0, heartBeat.getReservedMemory());
+        assertNotEquals(0L, heartBeat.getStartupTime());
+        assertNotEquals(0L, heartBeat.getReportTime());
         assertNotEquals(-1, heartBeat.getServerStatus());
         assertNotEquals(-1, heartBeat.getProcessId());
-        assertNotEquals(-1, heartBeat.getDiskAvailable());
+        assertNotEquals(-1.0, heartBeat.getDiskAvailable());
     }
 
 }

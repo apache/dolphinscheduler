@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class HeartBeatModel {
 
     private long startupTime;
@@ -33,116 +38,4 @@ public class HeartBeatModel {
     private int workerHostWeight;
     private int workerWaitingTaskCount;
     private int workerExecThreadCount;
-
-    public long getStartupTime() {
-        return startupTime;
-    }
-
-    public void setStartupTime(long startupTime) {
-        this.startupTime = startupTime;
-    }
-
-    public long getReportTime() {
-        return reportTime;
-    }
-
-    public void setReportTime(long reportTime) {
-        this.reportTime = reportTime;
-    }
-
-    public double getCpuUsage() {
-        return cpuUsage;
-    }
-
-    public void setCpuUsage(double cpuUsage) {
-        this.cpuUsage = cpuUsage;
-    }
-
-    public double getMemoryUsage() {
-        return memoryUsage;
-    }
-
-    public void setMemoryUsage(double memoryUsage) {
-        this.memoryUsage = memoryUsage;
-    }
-
-    public double getLoadAverage() {
-        return loadAverage;
-    }
-
-    public void setLoadAverage(double loadAverage) {
-        this.loadAverage = loadAverage;
-    }
-
-    public double getAvailablePhysicalMemorySize() {
-        return availablePhysicalMemorySize;
-    }
-
-    public void setAvailablePhysicalMemorySize(double availablePhysicalMemorySize) {
-        this.availablePhysicalMemorySize = availablePhysicalMemorySize;
-    }
-
-    public double getMaxCpuloadAvg() {
-        return maxCpuloadAvg;
-    }
-
-    public void setMaxCpuloadAvg(double maxCpuloadAvg) {
-        this.maxCpuloadAvg = maxCpuloadAvg;
-    }
-
-    public double getReservedMemory() {
-        return reservedMemory;
-    }
-
-    public void setReservedMemory(double reservedMemory) {
-        this.reservedMemory = reservedMemory;
-    }
-
-    public int getServerStatus() {
-        return serverStatus;
-    }
-
-    public void setServerStatus(int serverStatus) {
-        this.serverStatus = serverStatus;
-    }
-
-    public int getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(int processId) {
-        this.processId = processId;
-    }
-
-    public double getDiskAvailable() {
-        return diskAvailable;
-    }
-
-    public void setDiskAvailable(double diskAvailable) {
-        this.diskAvailable = diskAvailable;
-    }
-
-    public int getWorkerHostWeight() {
-        return workerHostWeight;
-    }
-
-    public void setWorkerHostWeight(int workerHostWeight) {
-        this.workerHostWeight = workerHostWeight;
-    }
-
-    public int getWorkerWaitingTaskCount() {
-        return workerWaitingTaskCount;
-    }
-
-    public void setWorkerWaitingTaskCount(int workerWaitingTaskCount) {
-        this.workerWaitingTaskCount = workerWaitingTaskCount;
-    }
-
-    public int getWorkerExecThreadCount() {
-        return workerExecThreadCount;
-    }
-
-    public void setWorkerExecThreadCount(int workerExecThreadCount) {
-        this.workerExecThreadCount = workerExecThreadCount;
-    }
 }

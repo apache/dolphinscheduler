@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
+@Getter
+@Setter
 public abstract class AbstractHeartBeat {
 
     protected long startupTime;
@@ -72,94 +76,6 @@ public abstract class AbstractHeartBeat {
         this.memoryUsage = OSUtils.memoryUsage();
         this.diskAvailable = OSUtils.diskAvailable();
         this.processId = OSUtils.getProcessID();
-    }
-
-    public double getDiskAvailable() {
-        return diskAvailable;
-    }
-
-    public void setDiskAvailable(double diskAvailable) {
-        this.diskAvailable = diskAvailable;
-    }
-
-    public long getStartupTime() {
-        return startupTime;
-    }
-
-    public void setStartupTime(long startupTime) {
-        this.startupTime = startupTime;
-    }
-
-    public long getReportTime() {
-        return reportTime;
-    }
-
-    public void setReportTime(long reportTime) {
-        this.reportTime = reportTime;
-    }
-
-    public double getCpuUsage() {
-        return cpuUsage;
-    }
-
-    public void setCpuUsage(double cpuUsage) {
-        this.cpuUsage = cpuUsage;
-    }
-
-    public double getMemoryUsage() {
-        return memoryUsage;
-    }
-
-    public void setMemoryUsage(double memoryUsage) {
-        this.memoryUsage = memoryUsage;
-    }
-
-    public double getLoadAverage() {
-        return loadAverage;
-    }
-
-    public void setLoadAverage(double loadAverage) {
-        this.loadAverage = loadAverage;
-    }
-
-    public double getAvailablePhysicalMemorySize() {
-        return availablePhysicalMemorySize;
-    }
-
-    public void setAvailablePhysicalMemorySize(double availablePhysicalMemorySize) {
-        this.availablePhysicalMemorySize = availablePhysicalMemorySize;
-    }
-
-    public double getMaxCpuloadAvg() {
-        return maxCpuloadAvg;
-    }
-
-    public void setMaxCpuloadAvg(double maxCpuloadAvg) {
-        this.maxCpuloadAvg = maxCpuloadAvg;
-    }
-
-    public double getReservedMemory() {
-        return reservedMemory;
-    }
-
-    public void setReservedMemory(double reservedMemory) {
-        this.reservedMemory = reservedMemory;
-    }
-
-    public int getServerStatus() {
-        return serverStatus;
-    }
-
-    public void setServerStatus(int serverStatus) {
-        this.serverStatus = serverStatus;
-    }
-
-    public int getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(int processId) {
-        this.processId = processId;
     }
 
 }

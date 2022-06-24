@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.server.registry.AbstractHeartBeat;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Getter
+@Setter
 public class WorkerHeartBeat extends AbstractHeartBeat {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerHeartBeat.class);
@@ -86,29 +90,5 @@ public class WorkerHeartBeat extends AbstractHeartBeat {
         builder.append(diskAvailable);
 
         return builder.toString();
-    }
-
-    public int getWorkerHostWeight() {
-        return workerHostWeight;
-    }
-
-    public void setWorkerHostWeight(int workerHostWeight) {
-        this.workerHostWeight = workerHostWeight;
-    }
-
-    public int getWorkerWaitingTaskCount() {
-        return workerWaitingTaskCount;
-    }
-
-    public void setWorkerWaitingTaskCount(int workerWaitingTaskCount) {
-        this.workerWaitingTaskCount = workerWaitingTaskCount;
-    }
-
-    public int getWorkerExecThreadCount() {
-        return workerExecThreadCount;
-    }
-
-    public void setWorkerExecThreadCount(int workerExecThreadCount) {
-        this.workerExecThreadCount = workerExecThreadCount;
     }
 }
