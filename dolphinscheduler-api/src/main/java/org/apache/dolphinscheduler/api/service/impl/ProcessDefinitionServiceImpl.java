@@ -1824,7 +1824,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                     taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setVersion(0);
-                    taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                    taskDefinitionLog.setName(taskDefinitionLog.getName());
                 }
                 for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
                     if (processTaskRelationLog.getPreTaskCode() > 0) {
