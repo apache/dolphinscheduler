@@ -53,6 +53,8 @@ public class WorkerHeartBeatTest {
 
     @Test
     public void testBusyState() {
+        Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(200);
+
         long startupTime = System.currentTimeMillis();
         double loadAverage = 0;
         double reservedMemory = 0;
@@ -60,7 +62,6 @@ public class WorkerHeartBeatTest {
         int workerThreadCount = 199;
         WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
-        Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(200);
         heartBeat.init();
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
@@ -69,6 +70,8 @@ public class WorkerHeartBeatTest {
 
     @Test
     public void testNormalState() {
+        Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(198);
+
         long startupTime = System.currentTimeMillis();
         double loadAverage = 0;
         double reservedMemory = 0;
@@ -76,7 +79,6 @@ public class WorkerHeartBeatTest {
         int workerThreadCount = 199;
         WorkerHeartBeat heartBeat = new WorkerHeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount, workerManagerThread);
 
-        Mockito.when(workerManagerThread.getThreadPoolQueueSize()).thenReturn(198);
         heartBeat.init();
         heartBeat.fillSystemInfo();
         heartBeat.updateServerState();
