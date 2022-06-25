@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.java;
+
 public class JavaConstants {
 
     private JavaConstants() {

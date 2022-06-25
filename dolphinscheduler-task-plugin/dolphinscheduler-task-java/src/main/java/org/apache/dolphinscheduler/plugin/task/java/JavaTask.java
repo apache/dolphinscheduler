@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.plugin.task.java;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.io.FileUtils;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import static org.apache.dolphinscheduler.plugin.task.java.JavaVersion.*;
 
 /**
  * java task
@@ -118,7 +119,7 @@ public class JavaTask extends AbstractTaskExecutor {
         }
     }
 
-    private String buildJavaCommand() throws Exception {
+    protected String buildJavaCommand() throws Exception {
         String sourceCode = buildJavaSourceContent();
         String className = compilerRawScript(sourceCode);
         StringBuilder builder = new StringBuilder();
@@ -132,7 +133,7 @@ public class JavaTask extends AbstractTaskExecutor {
 
 
 
-    private String buildJarCommand() {
+    protected String buildJarCommand() {
         String fullName = javaParameters.getMainJar().getResourceName();
         String mainJarName = fullName.substring(0, fullName.lastIndexOf('.'));
         mainJarName = mainJarName.substring(mainJarName.lastIndexOf('.') + 1) + ".jar";
@@ -163,7 +164,7 @@ public class JavaTask extends AbstractTaskExecutor {
      * @return String
      * @throws StringIndexOutOfBoundsException StringIndexOutOfBoundsException
      */
-    private static String convertJavaSourceCodePlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
+    protected static String convertJavaSourceCodePlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
         int len = "${setShareVar(${".length();
         int scriptStart = 0;
         while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
@@ -211,9 +212,9 @@ public class JavaTask extends AbstractTaskExecutor {
         return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(), taskRequest.getTaskAppId());
     }
 
-    private String buildResourcePath() {
+    protected String buildResourcePath() {
         StringBuilder builder = new StringBuilder();
-        if (javaParameters.getJavaVersion() == JavaVersion.JAVA_8) {
+        if (javaParameters.getJavaVersion() == JAVA_8) {
             builder.append("-class-path");
         }else{
             builder.append("-module-path");
@@ -231,15 +232,20 @@ public class JavaTask extends AbstractTaskExecutor {
         createJavaSourceFileIfNotExists(sourceCode, fileName);
         String className = fileName.substring(0 ,fileName.lastIndexOf('.'));
         className = className.substring(className.lastIndexOf('.') + 1);
-        StringBuilder compilerCommand = new StringBuilder().append("javac").append(" ")
-                .append(className + ".java").append(" ")
-                .append(buildResourcePath());
-        shellCommandExecutor.run(compilerCommand.toString());
+        shellCommandExecutor.run(buildJavaCompileCommand(className,sourceCode));
         return className;
     }
 
+    protected String buildJavaCompileCommand(String className, String sourceCode) throws IOException {
 
-    private String buildJavaSourceContent(){
+        StringBuilder compilerCommand = new StringBuilder().append("javac").append(" ")
+                .append(className + ".java").append(" ")
+                .append(buildResourcePath());
+        return compilerCommand.toString();
+    }
+
+
+    protected String buildJavaSourceContent(){
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
         // replace placeholder
         Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, javaParameters);
@@ -254,7 +260,7 @@ public class JavaTask extends AbstractTaskExecutor {
         return rawJavaScript;
     }
 
-    private String buildJavaExecuteCommand(String args) {
+    protected String buildJavaExecuteCommand(String args) {
         Preconditions.checkNotNull(args, "command's args cannot be null");
         String javaHome = null;
         switch (javaParameters.getJavaVersion()) {
