@@ -622,6 +622,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                 List<TaskDefinitionLog> taskDefinitionLogs,
                                                 String otherParamsJson) {
         Map<String, Object> result = new HashMap<>();
+        // delete expansion task and relation
+        List<Long> expansionList = taskDefinitionLogs.stream().filter(TaskDefinition::isExpansion).map(TaskDefinition::getCode).collect(Collectors.toList());
+        taskRelationList = taskRelationList.stream().filter(relation -> !expansionList.contains(relation.getPostTaskCode()) && !expansionList.contains(relation.getPreTaskCode())).collect(Collectors.toList());
+        taskDefinitionLogs = taskDefinitionLogs.stream().filter(t -> !t.isExpansion()).collect(Collectors.toList());
         int saveTaskResult = processService.saveTaskDefine(loginUser, processDefinition.getProjectCode(), taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
             logger.info("The task has not changed, so skip");
@@ -634,8 +638,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition.equals(processDefinitionDeepCopy) && saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
             List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
             if (taskRelationList.size() == processTaskRelationLogList.size()) {
-                Set<ProcessTaskRelationLog> taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
-                Set<ProcessTaskRelationLog> processTaskRelationLogSet = processTaskRelationLogList.stream().collect(Collectors.toSet());
+                Set<ProcessTaskRelationLog> taskRelationSet = new HashSet<>(taskRelationList);
+                Set<ProcessTaskRelationLog> processTaskRelationLogSet = new HashSet<>(processTaskRelationLogList);
                 if (taskRelationSet.size() == processTaskRelationLogSet.size()) {
                     taskRelationSet.removeAll(processTaskRelationLogSet);
                     if (!taskRelationSet.isEmpty()) {

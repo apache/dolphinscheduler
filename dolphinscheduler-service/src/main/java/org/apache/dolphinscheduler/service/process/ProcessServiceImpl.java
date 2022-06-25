@@ -2652,6 +2652,42 @@ public class ProcessServiceImpl implements ProcessService {
         return DagHelper.buildDagGraph(processDag);
     }
 
+    private void genSubTaskData(List<ProcessTaskRelation> taskRelations, List<TaskDefinitionLog> taskDefinitionLogList,
+                                List<TaskDefinition> taskDefinitions, List<TaskDefinition> curTaskDefinitions) {
+        List<TaskDefinition> copyList = new ArrayList<>(curTaskDefinitions);
+        for (TaskDefinition taskDefinition : copyList) {
+            if (TaskConstants.TASK_TYPE_SUB_PROCESS.equals(taskDefinition.getTaskType())) {
+                JsonNode processDefinitionCode = JSONUtils.parseObject(taskDefinition.getTaskParams())
+                    .findValue("processDefinitionCode");
+                long subProcessId = processDefinitionCode.asLong();
+                ProcessDefinition subProcess = processDefineMapper.queryByCode(subProcessId);
+                List<ProcessTaskRelation> subTaskRelations = findRelationByCode(subProcess.getCode(), subProcess.getVersion());
+                // bind to subProcess
+                for (ProcessTaskRelation subTaskRelation : subTaskRelations) {
+                    if (subTaskRelation.getPreTaskCode() == 0) {
+                        subTaskRelation.setPreTaskCode(taskDefinition.getCode());
+                        subTaskRelation.setPreTaskVersion(taskDefinition.getVersion());
+                    }
+                    TaskDefinition subTask = findTaskDefinition(subTaskRelation.getPostTaskCode(), subTaskRelation.getPostTaskVersion());
+                    // recursive expansion
+                    if (TaskConstants.TASK_TYPE_SUB_PROCESS.equals(subTask.getTaskType())) {
+                        genSubTaskData(taskRelations, taskDefinitionLogList, taskDefinitions, Lists.newArrayList(subTask));
+                    }
+                }
+                List<TaskDefinitionLog> subTaskDefinitionLogList = genTaskDefineList(subTaskRelations);
+                // deletes an expansion task
+                subTaskDefinitionLogList.removeIf(task -> task.getCode() == taskDefinition.getCode());
+                List<TaskDefinition> subTaskDefinitions = subTaskDefinitionLogList.stream().map(taskDefinitionLog -> {
+                    taskDefinitionLog.setExpansion(true);
+                    return (TaskDefinition) taskDefinitionLog;
+                }).collect(Collectors.toList());
+                taskRelations.addAll(subTaskRelations);
+                taskDefinitionLogList.addAll(subTaskDefinitionLogList);
+                taskDefinitions.addAll(subTaskDefinitions);
+            }
+        }
+    }
+
     /**
      * generate DagData
      */
@@ -2662,44 +2698,7 @@ public class ProcessServiceImpl implements ProcessService {
         List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream().map(TaskDefinition.class::cast).collect(Collectors.toList());
         // when enable showSubTask try to find sub-process task info.
         if (showSubTask) {
-            List<TaskDefinition> copyList = new ArrayList<>(taskDefinitions);
-            copyList.forEach(taskDefinition -> {
-                if (TaskConstants.TASK_TYPE_SUB_PROCESS.equals(taskDefinition.getTaskType())) {
-                    JsonNode processDefinitionCode = JSONUtils.parseObject(taskDefinition.getTaskParams())
-                            .findValue("processDefinitionCode");
-                    long subProcessId = processDefinitionCode.asLong();
-                    ProcessDefinition subProcess = processDefineMapper.queryByCode(subProcessId);
-                    List<ProcessTaskRelation> subTaskRelations = findRelationByCode(subProcess.getCode(), subProcess.getVersion());
-                    // bind to subProcess
-                    for (int j = 0; j < subTaskRelations.size(); j++) {
-                        ProcessTaskRelation subTask = subTaskRelations.get(j);
-                        if (subTask.getPreTaskCode() == 0) {
-                            subTask.setPreTaskCode(taskDefinition.getCode());
-                            subTask.setPreTaskVersion(taskDefinition.getVersion());
-                        }
-                        ArrayNode jsonNodes = JSONUtils.parseArray(processDefinition.getLocations());
-                        for (int i = 0; i < jsonNodes.size(); i++) {
-                            ObjectNode node = (ObjectNode) jsonNodes.path(i);
-                            if (node.get("taskCode").asLong() == subTask.getPreTaskCode()) {
-                                int x = node.get("x").asInt();
-                                int y = node.get("y").asInt();
-                                node.put("taskCode", subTask.getPostTaskCode());
-                                node.put("x", x + 50 * (j - 1));
-                                node.put("y", y + 100);
-                                jsonNodes.add(node);
-                                break;
-                            }
-                        }
-                        processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
-                    }
-                    List<TaskDefinitionLog> subTaskDefinitionLogList = genTaskDefineList(subTaskRelations);
-                    List<TaskDefinition> subTaskDefinitions = subTaskDefinitionLogList.stream().map(TaskDefinition.class::cast).collect(Collectors.toList());
-                    subTaskDefinitions.remove(taskDefinition);
-                    taskRelations.addAll(subTaskRelations);
-                    taskDefinitionLogList.addAll(subTaskDefinitionLogList);
-                    taskDefinitions.addAll(subTaskDefinitions);
-                }
-            });
+            genSubTaskData(taskRelations, taskDefinitionLogList, taskDefinitions, taskDefinitions);
         }
         return new DagData(processDefinition, taskRelations, taskDefinitions);
     }

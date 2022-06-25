@@ -211,6 +211,12 @@ public class TaskDefinition {
      */
     private Integer memoryMax;
 
+    /**
+     * Whether it is an expansion task
+     **/
+    @TableField(exist = false)
+    private boolean expansion;
+
     public TaskDefinition() {
     }
 
@@ -483,6 +489,14 @@ public class TaskDefinition {
         this.memoryMax = memoryMax;
     }
 
+    public boolean isExpansion() {
+        return expansion;
+    }
+
+    public void setExpansion(boolean expansion) {
+        this.expansion = expansion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -509,7 +523,8 @@ public class TaskDefinition {
             && taskGroupId == that.taskGroupId
             && taskGroupPriority == that.taskGroupPriority
             && Objects.equals(cpuQuota, that.cpuQuota)
-            && Objects.equals(memoryMax, that.memoryMax);
+            && Objects.equals(memoryMax, that.memoryMax)
+            && expansion == that.expansion;
     }
 
     @Override
@@ -545,6 +560,7 @@ public class TaskDefinition {
                 + ", memoryMax=" + memoryMax
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
+                + ", expansion=" + expansion
                 + '}';
     }
 

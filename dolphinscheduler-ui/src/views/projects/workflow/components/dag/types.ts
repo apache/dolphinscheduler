@@ -90,6 +90,7 @@ export interface TaskDefinition {
   updateTime: string
   modifyBy: any
   dependence: string
+  expansion: boolean
 }
 
 export type NodeData = {
