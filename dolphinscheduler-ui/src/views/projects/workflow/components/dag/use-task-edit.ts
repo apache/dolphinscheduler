@@ -102,7 +102,6 @@ export function useTaskEdit(options: Options) {
       name,
     } as NodeData
 
-    console.info(JSON.stringify(newDefinition))
     processDefinition.value.taskDefinitionList.push(newDefinition)
   }
 
