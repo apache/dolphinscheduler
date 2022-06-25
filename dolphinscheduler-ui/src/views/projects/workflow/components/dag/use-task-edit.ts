@@ -99,7 +99,7 @@ export function useTaskEdit(options: Options) {
     const newDefinition = {
       ...cloneDeep(definition),
       code,
-      name,
+      name
     } as NodeData
 
     processDefinition.value.taskDefinitionList.push(newDefinition)
