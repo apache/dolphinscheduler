@@ -262,6 +262,7 @@ public class TaskCallbackService {
         // add response cache
         ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), command.convert2Command(), Event.RESULT);
         send(taskExecutionContext.getTaskInstanceId(), command.convert2Command());
+        logger.info("task execute response command : {}", command);
     }
 
     public void sendTaskKillResponseCommand(TaskExecutionContext taskExecutionContext) {

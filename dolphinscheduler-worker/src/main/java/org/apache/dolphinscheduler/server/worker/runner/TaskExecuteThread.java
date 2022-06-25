@@ -135,6 +135,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             return;
         }
 
+        boolean errorFlag = false;
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
@@ -191,21 +192,20 @@ public class TaskExecuteThread implements Runnable, Delayed {
             if (this.task.getNeedAlert()) {
                 sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus().getCode());
             }
-
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(this.task.getExitStatus().getCode()));
-            taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
-            taskExecutionContext.setProcessId(this.task.getProcessId());
-            taskExecutionContext.setAppIds(this.task.getAppIds());
-            taskExecutionContext.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
-            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), this.task.getExitStatus());
+            logger.info("task instance id : {}, task final status : {}", taskExecutionContext.getTaskInstanceId(), this.task.getExitStatus());
         } catch (Throwable e) {
-            logger.error("task scheduler failure", e);
+            logger.error("task instance id : {}, scheduler failure", taskExecutionContext.getTaskInstanceId(), e);
+            errorFlag = true;
             kill();
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
+        } finally {
+            taskExecutionContext.setCurrentExecutionStatus(errorFlag ? ExecutionStatus.FAILURE : ExecutionStatus.of(this.task.getExitStatus().getCode()));
             taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
             taskExecutionContext.setProcessId(this.task.getProcessId());
             taskExecutionContext.setAppIds(this.task.getAppIds());
-        } finally {
+            if (!errorFlag) {
+                taskExecutionContext.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
+            }
+
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             clearTaskExecPath();
@@ -277,7 +277,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 task.cancelApplication(true);
                 ProcessUtils.killYarnJob(taskExecutionContext);
             } catch (Exception e) {
-                logger.error("Kill task failed", e);
+                logger.error("Kill task {} failed", taskExecutionContext.getTaskInstanceId(), e);
             }
         }
     }
