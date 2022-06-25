@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -55,6 +54,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+
 /**
  * failover service
  */
@@ -66,25 +68,27 @@ public class FailoverService {
     private final ProcessService processService;
     private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    public FailoverService(RegistryClient registryClient, MasterConfig masterConfig, ProcessService processService,
+    public FailoverService(RegistryClient registryClient,
+                           MasterConfig masterConfig,
+                           ProcessService processService,
                            WorkflowExecuteThreadPool workflowExecuteThreadPool) {
-        this.registryClient = registryClient;
-        this.masterConfig = masterConfig;
-        this.processService = processService;
-        this.workflowExecuteThreadPool = workflowExecuteThreadPool;
+        this.registryClient = checkNotNull(registryClient);
+        this.masterConfig = checkNotNull(masterConfig);
+        this.processService = checkNotNull(processService);
+        this.workflowExecuteThreadPool = checkNotNull(workflowExecuteThreadPool);
     }
 
     /**
      * check master failover
      */
-    @Counted(value = "failover_scheduler_check_task_count")
-    @Timed(value = "failover_scheduler_check_task_time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
+    @Counted(value = "ds.master.scheduler.failover.check.count")
+    @Timed(value = "ds.master.scheduler.failover.check.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     public void checkMasterFailover() {
         List<String> hosts = getNeedFailoverMasterServers();
         if (CollectionUtils.isEmpty(hosts)) {
             return;
         }
-        LOGGER.info("{} begin to failover hosts:{}", getLocalAddress(), hosts);
+        LOGGER.info("Master failover service {} begin to failover hosts:{}", getLocalAddress(), hosts);
 
         for (String host : hosts) {
             failoverMasterWithLock(host);
@@ -274,7 +278,7 @@ public class FailoverService {
         while (iterator.hasNext()) {
             String host = iterator.next();
             if (registryClient.checkNodeExists(host, NodeType.MASTER)) {
-                if (!host.equals(getLocalAddress())) {
+                if (!getLocalAddress().equals(host)) {
                     iterator.remove();
                 }
             }
@@ -294,7 +298,7 @@ public class FailoverService {
         boolean taskNeedFailover = true;
 
         if (taskInstance == null) {
-            LOGGER.error("failover task instance error, taskInstance is null");
+            LOGGER.error("Master failover task instance error, taskInstance is null");
             return false;
         }
 

@@ -70,10 +70,6 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page<>(pageNo, pageSize);
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_MANAGE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         int userId = loginUser.getId();
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             userId = 0;
@@ -97,13 +93,12 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     public Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-
-        // only admin can operate
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_MANAGE)) {
+        // no permission
+        if (loginUser.getUserType().equals(UserType.GENERAL_USER) && loginUser.getId() != userId) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
+        userId = loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId;
         // query access token for specified user
         List<AccessToken> accessTokenList = this.accessTokenMapper.queryAccessTokenByUser(userId);
         result.put(Constants.DATA_LIST, accessTokenList);
@@ -173,7 +168,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!(canOperatorPermissions(loginUser,null,AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
+        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

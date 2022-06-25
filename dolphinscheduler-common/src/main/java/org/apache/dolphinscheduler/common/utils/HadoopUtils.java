@@ -194,9 +194,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
         if (StringUtils.isBlank(appUrl)) {
             throw new BaseException("yarn application url generation failed");
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
-        }
+        logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         return String.format(appUrl, HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE, applicationId);
     }
 
@@ -447,9 +445,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
         String result;
         String applicationUrl = getApplicationUrl(applicationId);
-        if (logger.isDebugEnabled()) {
-            logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
-        }
+        logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
 
         String responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
@@ -462,9 +458,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            if (logger.isDebugEnabled()) {
-                logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
-            }
+            logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
             responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
 
             if (null != responseContent) {
