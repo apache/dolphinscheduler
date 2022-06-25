@@ -28,6 +28,7 @@ import type {
   WorkflowDefinition,
   EditWorkflowDefinition
 } from './types'
+import {any2Json} from "@/utils/json";
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -98,7 +99,8 @@ export function useTaskEdit(options: Options) {
     const newDefinition = {
       ...definition,
       code,
-      name
+      name,
+      taskParams: any2Json(definition.taskParams),
     } as NodeData
 
     processDefinition.value.taskDefinitionList.push(newDefinition)

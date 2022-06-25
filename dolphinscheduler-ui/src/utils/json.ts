@@ -33,4 +33,12 @@ const isJson = (str: string) => {
   }
 }
 
+/**
+ * Convert any to json
+ */
+export const any2Json = (src: any) => {
+  const s = JSON.stringify(src)
+  return JSON.parse(s)
+}
+
 export default isJson
