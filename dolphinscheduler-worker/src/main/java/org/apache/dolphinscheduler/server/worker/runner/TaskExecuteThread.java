@@ -192,19 +192,23 @@ public class TaskExecuteThread implements Runnable, Delayed {
             if (this.task.getNeedAlert()) {
                 sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus().getCode());
             }
+
+            taskExecutionContext.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
+
             logger.info("task instance id : {}, task final status : {}", taskExecutionContext.getTaskInstanceId(), this.task.getExitStatus());
         } catch (Throwable e) {
             logger.error("task instance id : {}, scheduler failure", taskExecutionContext.getTaskInstanceId(), e);
             errorFlag = true;
             kill();
         } finally {
-            taskExecutionContext.setCurrentExecutionStatus(errorFlag ? ExecutionStatus.FAILURE : ExecutionStatus.of(this.task.getExitStatus().getCode()));
+            if (errorFlag) {
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
+            } else {
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(this.task.getExitStatus().getCode()));
+            }
             taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
             taskExecutionContext.setProcessId(this.task.getProcessId());
             taskExecutionContext.setAppIds(this.task.getAppIds());
-            if (!errorFlag) {
-                taskExecutionContext.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
-            }
 
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
