@@ -32,7 +32,7 @@ const mapping = (modules: any) => {
 
     let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
 
-    name = name.replaceAll('/', '-')
+    name = name.replace(new RegExp('/', 'g'), '-')
 
     components[name] = modules[key]
   })
