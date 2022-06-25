@@ -28,7 +28,7 @@ import type {
   WorkflowDefinition,
   EditWorkflowDefinition
 } from './types'
-import {any2Json} from "@/utils/json";
+import {any2Json} from "@/utils/json"
 
 interface Options {
   graph: Ref<Graph | undefined>
