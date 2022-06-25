@@ -16,7 +16,7 @@
  */
 
 import { ref, onMounted, watch } from 'vue'
-import { remove } from 'lodash'
+import { remove, cloneDeep }  from 'lodash'
 import { TaskType } from '@/views/projects/task/constants/task-type'
 import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
@@ -28,7 +28,7 @@ import type {
   WorkflowDefinition,
   EditWorkflowDefinition
 } from './types'
-import {any2Json} from "@/utils/json"
+
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -97,12 +97,12 @@ export function useTaskEdit(options: Options) {
     )
 
     const newDefinition = {
-      ...definition,
+      ...cloneDeep(definition),
       code,
       name,
-      taskParams: any2Json(definition.taskParams),
     } as NodeData
 
+    console.info(JSON.stringify(newDefinition))
     processDefinition.value.taskDefinitionList.push(newDefinition)
   }
 
