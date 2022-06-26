@@ -62,7 +62,7 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
             logger.info("Receive task recall command: {}", recallCommand);
             taskEventService.addEvent(taskEvent);
         } finally {
-            LoggerUtils.removeWorkflowInstanceIdMDC();
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 }
