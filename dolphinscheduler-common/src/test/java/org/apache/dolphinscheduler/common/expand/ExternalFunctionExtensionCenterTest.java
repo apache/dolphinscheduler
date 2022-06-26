@@ -49,12 +49,12 @@ public class ExternalFunctionExtensionCenterTest {
     public void testTimePlaceholderResolverExpandService() {
         boolean checkResult = timePlaceholderResolverExpandService.timeFunctionNeedExpand(placeHolderName);
         Assert.assertFalse(checkResult);
-        String resultString = timePlaceholderResolverExpandService.timeFunctionExtension(placeHolderName);
+        String resultString = timePlaceholderResolverExpandService.timeFunctionExtension(1, "", placeHolderName);
         Assert.assertTrue(StringUtils.isEmpty(resultString));
 
         boolean implCheckResult = timePlaceholderResolverExpandServiceImpl.timeFunctionNeedExpand(placeHolderName);
         Assert.assertFalse(implCheckResult);
-        String implResultString = timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(placeHolderName);
+        String implResultString = timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
         Assert.assertTrue(StringUtils.isEmpty(implResultString));
     }
 
@@ -63,7 +63,7 @@ public class ExternalFunctionExtensionCenterTest {
         boolean checkResult = ExternalFunctionExtensionCenter.timeFunctionNeedExpand(placeHolderName);
         Assert.assertFalse(checkResult);
 
-        String resultString = ExternalFunctionExtensionCenter.timeFunctionExtension(placeHolderName);
+        String resultString = ExternalFunctionExtensionCenter.timeFunctionExtension(1, "", placeHolderName);
         Assert.assertTrue(StringUtils.isEmpty(resultString));
     }
 }

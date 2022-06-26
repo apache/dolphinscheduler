@@ -32,7 +32,7 @@ public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholder
     }
 
     @Override
-    public String timeFunctionExtension(String placeholderName) {
+    public String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName) {
         logger.warn("time function external expansion");
         return null;
     }

@@ -40,7 +40,7 @@ public class ExternalFunctionExtensionCenter {
         return expandCenter.expandService.timeFunctionNeedExpand(placeholderName);
     }
 
-    public static String timeFunctionExtension(String placeholderName) {
-        return expandCenter.expandService.timeFunctionExtension(placeholderName);
+    public static String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName) {
+        return expandCenter.expandService.timeFunctionExtension(processInstanceId, timeZone, placeholderName);
     }
 }

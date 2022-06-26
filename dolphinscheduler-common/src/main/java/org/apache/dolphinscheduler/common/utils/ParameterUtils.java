@@ -89,7 +89,7 @@ public class ParameterUtils {
      * @param scheduleTime    schedule time
      * @return curing user define parameters
      */
-    public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
+    public static String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap, List<Property> globalParamList,
                                             CommandType commandType, Date scheduleTime, String timezone) {
 
         if (globalParamList == null || globalParamList.isEmpty()) {
@@ -118,8 +118,9 @@ public class ParameterUtils {
             String val = entry.getValue();
             if (val.startsWith("$")) {
                 String str = "";
+
                 if (ExternalFunctionExtensionCenter.timeFunctionNeedExpand(val)) {
-                    str = ExternalFunctionExtensionCenter.timeFunctionExtension(val);
+                    str = ExternalFunctionExtensionCenter.timeFunctionExtension(processInstanceId, timezone, val);
                 } else {
                     str = ParameterUtils.convertParameterPlaceholders(val, allParamMap);
                 }

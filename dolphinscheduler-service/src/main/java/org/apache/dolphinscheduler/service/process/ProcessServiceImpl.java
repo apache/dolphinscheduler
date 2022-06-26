@@ -803,6 +803,7 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+            processInstance.getId(),
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             getCommandTypeIfComplement(processInstance, command),
@@ -954,6 +955,7 @@ public class ProcessServiceImpl implements ProcessService {
 
             // Recalculate global parameters after rerun.
             processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                processInstance.getId(),
                 processDefinition.getGlobalParamMap(),
                 processDefinition.getGlobalParamList(),
                 commandTypeIfComplement,
@@ -1140,6 +1142,7 @@ public class ProcessServiceImpl implements ProcessService {
         String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+            processInstance.getId(),
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId));
