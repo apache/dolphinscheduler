@@ -19,12 +19,15 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.expand.ExternalFunctionExtensionCenter;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -114,7 +117,12 @@ public class ParameterUtils {
         for (Map.Entry<String, String> entry : entries) {
             String val = entry.getValue();
             if (val.startsWith("$")) {
-                String str = ParameterUtils.convertParameterPlaceholders(val, allParamMap);
+                String str = "";
+                if (ExternalFunctionExtensionCenter.timeFunctionNeedExpand(val)) {
+                    str = ExternalFunctionExtensionCenter.timeFunctionExtension(val);
+                } else {
+                    str = ParameterUtils.convertParameterPlaceholders(val, allParamMap);
+                }
                 resolveMap.put(entry.getKey(), str);
             }
         }

@@ -21,6 +21,9 @@ import static org.apache.dolphinscheduler.common.utils.placeholder.TimePlacehold
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.expand.ExternalFunctionExtensionCenter;
+import org.apache.dolphinscheduler.common.expand.TimePlaceholderResolverExpandService;
+import org.apache.dolphinscheduler.common.expand.TimePlaceholderResolverExpandServiceImpl;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -34,12 +37,32 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ParameterUtilsTest {
     public static final Logger logger = LoggerFactory.getLogger(ParameterUtilsTest.class);
+
+    @Mock
+    private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
+
+    @InjectMocks
+    private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
+
+    @InjectMocks
+    private ExternalFunctionExtensionCenter expandCenter;
+
+    @Before
+    public void init() {
+        expandCenter.init();
+    }
 
     /**
      * Test convertParameterPlaceholders
