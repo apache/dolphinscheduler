@@ -113,6 +113,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1010,7 +1011,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (index > 0) {
             processDefinitionName = processDefinitionName.substring(0, index);
         }
-        processDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
+        processDefinitionName = getNewName(processDefinitionName, "_import_");
 
         ProcessDefinition processDefinition;
         List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
@@ -1206,7 +1207,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // generate import processDefinitionName
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
-        String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
+        String importProcessDefinitionName = getNewName(processDefinitionName, "_import_");
 
         //unique check
         Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
@@ -1842,7 +1843,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 processDefinition.setId(0);
                 processDefinition.setUserId(loginUser.getId());
-                processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                processDefinition.setName(getNewName(processDefinition.getName(), "_copy_"));
                 final Date date = new Date();
                 processDefinition.setCreateTime(date);
                 processDefinition.setUpdateTime(date);
@@ -1874,6 +1875,31 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
             }
         }
+    }
+
+    /**
+     * get new Task name or Process name when copy or import operate
+     * @param originalName Task or Process original name
+     * @param suffix "_copy_" or "_import_"
+     * @return
+     */
+    private String getNewName(String originalName, String suffix) {
+        StringBuilder newName = new StringBuilder();
+        if (originalName.contains(suffix)) {
+            final String originalTimeStamp = originalName.substring(originalName.lastIndexOf(suffix) + suffix.length());
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.YYYYMMDDHHMMSSSSS);
+                dateFormat.parse(originalTimeStamp);
+                //replace timestamp in originalName
+                newName.append(originalName, 0, originalName.lastIndexOf(suffix))
+                        .append(suffix)
+                        .append(DateUtils.getCurrentTimeStamp());
+                return newName.toString();
+            } catch (Exception e) {
+                logger.error("error while parse last timestamp in {}", originalName);
+            }
+        }
+        return newName.append(originalName).append(suffix).append(DateUtils.getCurrentTimeStamp()).toString();
     }
 
     /**
