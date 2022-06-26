@@ -147,10 +147,11 @@ export function verifyName(params: NameReq, code: number): any {
 
 export function queryProcessDefinitionByCode(
   code: number,
-  projectCode: number
+  projectCode: number,
+  showSubTask?: boolean
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/${code}`,
+    url: `/projects/${projectCode}/process-definition/${code}?showSubTask=${showSubTask}`,
     method: 'get'
   })
 }

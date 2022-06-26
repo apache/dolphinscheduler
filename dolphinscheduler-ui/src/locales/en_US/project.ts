@@ -281,7 +281,8 @@ export default {
     copy_name: 'Copy Name',
     view_variables: 'View Variables',
     startup_parameter: 'Startup Parameter',
-    online: 'Online'
+    online: 'Online',
+    show_sub_task_info: 'Show Sub-Process'
   },
   node: {
     return_back: 'Return',

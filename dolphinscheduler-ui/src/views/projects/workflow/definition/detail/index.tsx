@@ -56,9 +56,9 @@ export default defineComponent({
     const readonly = ref(false)
     const isLoading = ref(true)
 
-    const refresh = () => {
+    const refresh = (showSubTask = false) => {
       isLoading.value = true
-      queryProcessDefinitionByCode(code, projectCode).then((res: any) => {
+      queryProcessDefinitionByCode(code, projectCode, showSubTask).then((res: any) => {
         readonly.value = res.processDefinition.releaseState === 'ONLINE'
         definition.value = res
         isLoading.value = false

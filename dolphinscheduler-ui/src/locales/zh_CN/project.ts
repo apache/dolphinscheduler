@@ -281,7 +281,8 @@ export default {
     copy_name: '复制名称',
     view_variables: '查看变量',
     startup_parameter: '启动参数',
-    online: '已上线'
+    online: '已上线',
+    show_sub_task_info: '展示子任务'
   },
   node: {
     return_back: '返回上一节点',

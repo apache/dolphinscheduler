@@ -283,6 +283,11 @@ export default defineComponent({
       }
     }
 
+    const showSubTasks = () => {
+      context.emit('refresh', true)
+      // todo: auto format
+    }
+
     watch(
       () => props.definition,
       () => {
@@ -323,6 +328,7 @@ export default defineComponent({
           onSaveModelToggle={saveModelToggle}
           onRemoveTasks={removeTasks}
           onRefresh={refreshTaskStatus}
+          onShowSubTasks={showSubTasks}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />

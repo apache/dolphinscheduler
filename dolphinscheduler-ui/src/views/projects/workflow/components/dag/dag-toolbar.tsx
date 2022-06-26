@@ -34,6 +34,7 @@ import {
   FullscreenExitOutlined,
   InfoCircleOutlined,
   FormatPainterOutlined,
+  ClusterOutlined,
   CopyOutlined,
   DeleteOutlined,
   RightCircleOutlined,
@@ -70,7 +71,7 @@ const props = {
 export default defineComponent({
   name: 'workflow-dag-toolbar',
   props,
-  emits: ['versionToggle', 'saveModelToggle', 'removeTasks', 'refresh'],
+  emits: ['versionToggle', 'saveModelToggle', 'removeTasks', 'refresh', 'showSubTasks'],
   setup(props, context) {
     const { t } = useI18n()
 
@@ -425,6 +426,31 @@ export default defineComponent({
                   ? t('project.dag.fullscreen_close')
                   : t('project.dag.fullscreen_open')
             }}
+          ></NTooltip>
+          {/* Show sub-precess */}
+          <NTooltip
+              v-slots={{
+                trigger: () => (
+                    <NButton
+                        class={Styles['toolbar-right-item']}
+                        strong
+                        secondary
+                        circle
+                        type='info'
+                        onClick={() => {
+                          context.emit('showSubTasks')
+                        }}
+                        v-slots={{
+                          icon: () => (
+                              <NIcon>
+                                <ClusterOutlined />
+                              </NIcon>
+                          )
+                        }}
+                    />
+                ),
+                default: () => t('project.dag.show_sub_task_info')
+              }}
           ></NTooltip>
           {/* DAG Format */}
           <NTooltip
