@@ -606,6 +606,8 @@ export default {
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    emr_steps_define_json: 'stepsDefineJson',
+    emr_steps_define_json_tips: 'Please enter the definition of the emr step.',
     segment_separator: 'Segment Execution Separator',
     segment_separator_tips: 'Please enter the segment execution separator',
     zeppelin_note_id: 'zeppelinNoteId',

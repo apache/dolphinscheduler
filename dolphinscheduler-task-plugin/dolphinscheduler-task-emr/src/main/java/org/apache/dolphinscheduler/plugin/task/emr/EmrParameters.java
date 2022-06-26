@@ -27,21 +27,47 @@ import java.util.List;
 public class EmrParameters extends AbstractParameters {
 
     /**
+     * emr program type
+     * 0 RUN_JOB_FLOW, 1 ADD_JOB_FLOW_STEPS
+     */
+    private ProgramType programType;
+
+    /**
      * job flow define in json format
+     *
      * @see <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples">API_RunJobFlow_Examples</a>
      */
     private String jobFlowDefineJson;
 
+    /**
+     * steps define in json format
+     *
+     * @see <a href="https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples">API_AddJobFlowSteps_Examples</a>
+     */
+    private String stepsDefineJson;
+
     @Override
     public boolean checkParameters() {
-
-        return StringUtils.isNotEmpty(jobFlowDefineJson);
+        /*
+         * When saving a task, the programType cannot be empty and jobFlowDefineJson or stepsDefineJson cannot be empty:
+         * (1) When ProgramType is RUN_JOB_FLOW, jobFlowDefineJson cannot be empty.
+         * (2) When ProgramType is ADD_JOB_FLOW_STEPS, stepsDefineJson cannot be empty.
+         */
+        return programType != null && (StringUtils.isNotEmpty(jobFlowDefineJson) || StringUtils.isNotEmpty(stepsDefineJson));
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return Collections.emptyList();
 
+    }
+
+    public ProgramType getProgramType() {
+        return programType;
+    }
+
+    public void setProgramType(ProgramType programType) {
+        this.programType = programType;
     }
 
     public String getJobFlowDefineJson() {
@@ -52,10 +78,20 @@ public class EmrParameters extends AbstractParameters {
         this.jobFlowDefineJson = jobFlowDefineJson;
     }
 
+    public String getStepsDefineJson() {
+        return stepsDefineJson;
+    }
+
+    public void setStepsDefineJson(String stepsDefineJson) {
+        this.stepsDefineJson = stepsDefineJson;
+    }
+
     @Override
     public String toString() {
         return "EmrParameters{"
-            + "jobFlowDefineJson='" + jobFlowDefineJson + '\''
+            + "programType=" + programType
+            + ", jobFlowDefineJson='" + jobFlowDefineJson + '\''
+            + ", stepsDefineJson='" + stepsDefineJson + '\''
             + '}';
     }
 }

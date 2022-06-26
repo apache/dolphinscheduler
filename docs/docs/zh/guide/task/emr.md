@@ -2,7 +2,11 @@
 
 ## 综述
 
-Amazon EMR任务类型，用于在AWS上创建EMR集群并执行计算任务。 后台使用[aws-java-sdk](https://aws.amazon.com/cn/sdk-for-java/) 将json参数转换为[RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象，提交到AWS
+Amazon EMR 任务类型，用于在AWS上操作EMR集群并执行计算任务。 
+后台使用 [aws-java-sdk](https://aws.amazon.com/cn/sdk-for-java/) 将JSON参数转换为任务对象，提交到AWS，目前支持两种程序类型：
+
+* `RUN_JOB_FLOW` 使用 [API_RunJobFlow](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples) 提交 [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象
+* `ADD_JOB_FLOW_STEPS` 使用 [API_AddJobFlowSteps](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples) 提交 [AddJobFlowStepsRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/AddJobFlowStepsRequest.html) 对象
 
 ## 任务参数
 - 节点名称：一个工作流定义中的节点名称是唯一的。
@@ -13,9 +17,11 @@ Amazon EMR任务类型，用于在AWS上创建EMR集群并执行计算任务。 
 - 失败重试次数：任务失败重新提交的次数，支持下拉和手填。
 - 失败重试间隔：任务失败重新提交任务的时间间隔，支持下拉和手填。
 - 超时告警：勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.
-- json: [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象对应的json，详细json定义参见 [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples)
+- 程序类型：选择程序类型，如果是`RUN_JOB_FLOW`，则需要填写`jobFlowDefineJson`，如果是`ADD_JOB_FLOW_STEPS`，则需要填写`stepsDefineJson`。
+- jobFlowDefineJson: [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象对应的JSON，详细JSON定义参见 [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples)
+- stepsDefineJson：[AddJobFlowStepsRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/AddJobFlowStepsRequest.html) 对象对应的JSON，详细JSON定义参见 [API_AddJobFlowSteps_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples)
 
-## json参数样例
+## jobFlowDefineJson 参数样例
 ```json
 {
   "Name": "SparkPi",
@@ -56,3 +62,28 @@ Amazon EMR任务类型，用于在AWS上创建EMR集群并执行计算任务。 
 }
 ```
 
+## stepsDefineJson 参数样例
+```json
+{
+  "JobFlowId": "j-3V628TKAERHP8",
+  "Steps": [
+    {
+      "Name": "calculate_pi",
+      "ActionOnFailure": "CONTINUE",
+      "HadoopJarStep": {
+        "Jar": "command-runner.jar",
+        "Args": [
+          "/usr/lib/spark/bin/run-example",
+          "SparkPi",
+          "15"
+        ]
+      }
+    }
+  ]
+}
+```
+
+## 注意事项：
+
+- EMR 任务类型的故障转移尚未实现。目前，DS 仅支持对 yarn task type 进行故障转移。其他任务类型，如 EMR 任务、k8s 任务尚未准备好。 
+- `stepsDefineJson` 一个任务定义仅支持关联单个step，这样可以更好的保证任务状态的可靠性。
