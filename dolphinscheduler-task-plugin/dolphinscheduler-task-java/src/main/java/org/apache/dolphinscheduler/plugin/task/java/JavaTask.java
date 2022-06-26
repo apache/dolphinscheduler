@@ -38,6 +38,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.apache.dolphinscheduler.plugin.task.java.JavaVersion.*;
 
 /**
@@ -124,10 +127,11 @@ public class JavaTask extends AbstractTaskExecutor {
         String className = compilerRawScript(sourceCode);
         StringBuilder builder = new StringBuilder();
         builder.append("java").append(" ")
+                .append(buildResourcePath())
+                .append(" ")
                 .append(className).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
-                .append(javaParameters.getJvmArgs().trim()).append(" ")
-                .append(buildResourcePath());
+                .append(javaParameters.getJvmArgs().trim());
         return builder.toString();
     }
 
@@ -139,11 +143,11 @@ public class JavaTask extends AbstractTaskExecutor {
         mainJarName = mainJarName.substring(mainJarName.lastIndexOf('.') + 1) + ".jar";
         StringBuilder builder = new StringBuilder();
         builder.append("java").append(" ")
+                .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
-                .append(javaParameters.getJvmArgs().trim()).append(" ")
-                .append(buildResourcePath());
+                .append(javaParameters.getJvmArgs().trim());
         return builder.toString();
     }
     @Override
@@ -208,18 +212,20 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
 
-    protected String buildJavaSourceCodeFileFullName() {
-        return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(), taskRequest.getTaskAppId());
+    protected String buildJavaSourceCodeFileFullName(String publicClassName) {
+        return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(), publicClassName);
     }
 
     protected String buildResourcePath() {
         StringBuilder builder = new StringBuilder();
         if (javaParameters.getJavaVersion() == JAVA_8) {
-            builder.append("-class-path");
+            builder.append("--class-path");
         }else{
-            builder.append("-module-path");
+            builder.append("--module-path");
         }
-        builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR);
+        builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
+                .append(JavaConstants.PATH_SEPARATOR)
+                .append(taskRequest.getExecutePath());
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
             builder.append(info.getResourceName());
@@ -228,19 +234,18 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     protected String compilerRawScript(String sourceCode) throws IOException, InterruptedException {
-        String fileName =  buildJavaSourceCodeFileFullName();
+        String publicClassName = getPublicClassName(sourceCode);
+        String fileName =  buildJavaSourceCodeFileFullName(publicClassName);
         createJavaSourceFileIfNotExists(sourceCode, fileName);
-        String className = fileName.substring(0 ,fileName.lastIndexOf('.'));
-        className = className.substring(className.lastIndexOf('.') + 1);
-        shellCommandExecutor.run(buildJavaCompileCommand(className,sourceCode));
-        return className;
+        shellCommandExecutor.run(buildJavaCompileCommand(fileName,sourceCode));
+        return publicClassName;
     }
 
-    protected String buildJavaCompileCommand(String className, String sourceCode) throws IOException {
+    protected String buildJavaCompileCommand(String fileName, String sourceCode) throws IOException {
 
         StringBuilder compilerCommand = new StringBuilder().append("javac").append(" ")
-                .append(className + ".java").append(" ")
-                .append(buildResourcePath());
+                .append(buildResourcePath()).append(" ")
+                .append(fileName);
         return compilerCommand.toString();
     }
 
@@ -282,6 +287,16 @@ public class JavaTask extends AbstractTaskExecutor {
         }
         Preconditions.checkNotNull(javaHome, "java home cannot be null");
         return javaHome + System.getProperty("file.separator") + args;
+    }
+
+    public String getPublicClassName(String sourceCode) {
+        String pattern = "(^\\s*public\\s+class\\s+)([a-zA-Z_]+[//w_]*)([.\\s\\S]*)";
+        Pattern compile = Pattern.compile(pattern);
+        Matcher matcher = compile.matcher(sourceCode);
+        if (!matcher.find()) {
+            throw new RuntimeException("public class is not be found in sourcecode : " + sourceCode);
+        }
+        return matcher.group(2).trim();
     }
 
 }

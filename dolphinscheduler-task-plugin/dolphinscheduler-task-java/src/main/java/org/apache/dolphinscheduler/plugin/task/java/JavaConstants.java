@@ -39,7 +39,7 @@ public class JavaConstants {
 
     public static final String CLASSPATH_CURRENT_DIR = ".";
 
-    public static final String JAVA_SOURCE_CODE_NAME_TEMPLATE = "%s/java_%s.java";
+    public static final String JAVA_SOURCE_CODE_NAME_TEMPLATE = "%s/%s.java";
 
 
 

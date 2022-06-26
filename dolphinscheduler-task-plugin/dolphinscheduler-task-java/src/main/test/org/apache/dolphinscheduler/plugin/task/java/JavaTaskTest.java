@@ -38,6 +38,34 @@ import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYP
 
 public class JavaTaskTest {
 
+
+    @Test
+    public void buildJarCommand() {
+        JavaTask javaTask = runJarType();
+        Assert.assertEquals(javaTask.buildJarCommand(), "java --class-path .:/tmp/dolphinscheduler/test/executepath:/opt/share/jar/resource2.jar -jar /opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+    }
+
+    @Test
+    public void buildJavaCompileCommand() throws IOException {
+        JavaTask javaTask = runJavaType();
+        String sourceCode = javaTask.buildJavaSourceContent();
+        String publicClassName = javaTask.getPublicClassName(sourceCode);
+        Assert.assertEquals("HelloWorld",publicClassName);
+        String fileName =  javaTask.buildJavaSourceCodeFileFullName(publicClassName);
+        Path path = Paths.get(fileName);
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
+        javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
+        Assert.assertEquals("javac --class-path .:/tmp/dolphinscheduler/test/executepath:/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/HelloWorld.java", javaTask.buildJavaCompileCommand(fileName,sourceCode));
+    }
+
+    @Test
+    public void buildJavaCommand() throws Exception {
+        JavaTask javaTask = runJavaType();
+        Assert.assertEquals(javaTask.buildJavaCommand(),"java --class-path .:/tmp/dolphinscheduler/test/executepath:/opt/share/jar/resource2.jar HelloWorld -host 127.0.0.1 -port 8080 -xms:50m");
+    }
+
     public JavaParameters createJavaParametersObject(String runType) {
         JavaParameters javaParameters = new JavaParameters();
         javaParameters.setRunType(runType);
@@ -95,34 +123,7 @@ public class JavaTaskTest {
         return javaTask;
     }
 
-    @Test
-    public void buildJarCommand() {
-        JavaTask javaTask = runJarType();
-        Assert.assertEquals(javaTask.buildJarCommand(), "java -jar /opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m -class-path .:/opt/share/jar/resource2.jar");
-    }
 
-    @Test
-    public void buildJavaCompileCommand() throws IOException {
-        JavaTask javaTask = runJavaType();
-        String sourceCode = javaTask.buildJavaSourceContent();
-        String fileName =  javaTask.buildJavaSourceCodeFileFullName();
-        Path path = Paths.get(fileName);
-        if (Files.exists(path)) {
-            Files.delete(path);
-            System.out.println(1);
-        }
-        javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
-        String className = fileName.substring(0 ,fileName.lastIndexOf('.'));
-        className = className.substring(className.lastIndexOf('.') + 1);
-        Assert.assertEquals(className,"/tmp/dolphinscheduler/test/executepath/java_runJavaType");
-        Assert.assertEquals(javaTask.buildJavaCompileCommand(className,sourceCode),"javac /tmp/dolphinscheduler/test/executepath/java_runJavaType.java -class-path .:/opt/share/jar/resource2.jar");
-    }
-
-    @Test
-    public void buildJavaCommand() throws Exception {
-        JavaTask javaTask = runJavaType();
-        Assert.assertEquals(javaTask.buildJavaCommand(),"java /tmp/dolphinscheduler/test/executepath/java_runJavaType -host 127.0.0.1 -port 8080 -xms:50m -class-path .:/opt/share/jar/resource2.jar");
-    }
 
 
 }
