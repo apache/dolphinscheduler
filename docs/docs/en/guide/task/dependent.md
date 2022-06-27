@@ -26,7 +26,7 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 | Delayed execution time | The time (unit minute) that a task delays in execution. |
 | Pre task | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task. |
 
-## Examples
+## Task Examples
 
 The Dependent node provides a logical judgment function, which can detect the execution of the dependent node according to the logic.
 
