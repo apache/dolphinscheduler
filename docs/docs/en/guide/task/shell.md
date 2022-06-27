@@ -45,7 +45,7 @@ After running this example, we would see "param_val" print in the log.
 
 ![demo-shell-custom-param](/img/tasks/demo/shell_custom_param.jpg)
 
-## Attention
+## Note
 The shell task type resolves whether the task log contains ```application_xxx_xxx``` to determine whether is the yarn task. If so, the corresponding application
 will be use to judge the running state of the current shell node. At this time, if stops the operation of the workflow, the corresponding ```application_id```
 will be killed.
