@@ -370,6 +370,12 @@ export function formatParams(data: INodeData): {
     taskParams.dvcStoreUrl = data.dvcStoreUrl
   }
 
+  if (data.taskType === 'DINKY') {
+    taskParams.address = data.address
+    taskParams.taskId = data.taskId
+    taskParams.online = data.online
+  }
+
   if (data.taskType === 'OPENMLDB') {
     taskParams.zk = data.zk
     taskParams.zkPath = data.zkPath
