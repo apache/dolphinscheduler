@@ -245,6 +245,9 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(tenant);
         Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 46L, false);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        Map<String, Object> successShowSubTaskRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 46L, true);
+        Assert.assertEquals(Status.SUCCESS, successShowSubTaskRes.get(Constants.STATUS));
     }
 
     @Test
