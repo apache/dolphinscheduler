@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.expand;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExternalFunctionExtensionCenterTest {
+public class TimePlaceholderResolverExpandServiceTest {
 
     @Mock
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
@@ -35,15 +34,7 @@ public class ExternalFunctionExtensionCenterTest {
     @InjectMocks
     private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
 
-    @InjectMocks
-    private ExternalFunctionExtensionCenter expandCenter;
-
     private static final String placeHolderName = "$[yyyy-MM-dd-1]";
-
-    @Before
-    public void init() {
-        expandCenter.init();
-    }
 
     @Test
     public void testTimePlaceholderResolverExpandService() {
@@ -56,14 +47,5 @@ public class ExternalFunctionExtensionCenterTest {
         Assert.assertFalse(implCheckResult);
         String implResultString = timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
         Assert.assertTrue(StringUtils.isEmpty(implResultString));
-    }
-
-    @Test
-    public void testExternalFunctionExtensionCenter() {
-        boolean checkResult = ExternalFunctionExtensionCenter.timeFunctionNeedExpand(placeHolderName);
-        Assert.assertFalse(checkResult);
-
-        String resultString = ExternalFunctionExtensionCenter.timeFunctionExtension(1, "", placeHolderName);
-        Assert.assertTrue(StringUtils.isEmpty(resultString));
     }
 }

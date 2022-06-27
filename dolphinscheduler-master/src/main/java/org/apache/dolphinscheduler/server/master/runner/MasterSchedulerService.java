@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
+import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -104,6 +105,9 @@ public class MasterSchedulerService extends BaseDaemonThread {
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+    @Autowired
+    private CuringGlobalParamsService curingGlobalParamsService;
+
     protected MasterSchedulerService() {
         super("MasterCommandLoopThread");
     }
@@ -183,7 +187,8 @@ public class MasterSchedulerService extends BaseDaemonThread {
                     , nettyExecutorManager
                     , processAlertManager
                     , masterConfig
-                    , stateWheelExecuteThread);
+                    , stateWheelExecuteThread
+                    , curingGlobalParamsService);
 
                 this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
                 if (processInstance.getTimeout() > 0) {
