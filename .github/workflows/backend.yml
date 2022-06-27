@@ -85,10 +85,7 @@ jobs:
                  -Dmaven.wagon.http.pool=false \
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
-        run: |
-          if [[ ${{ matrix.java == '8' }} ]]; then
-            tools/dependencies/check-LICENSE.sh
-          fi
+        run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v2
         if: ${{ matrix.java == '8' }}
         name: Upload Binary Package
