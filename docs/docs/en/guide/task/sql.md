@@ -10,24 +10,21 @@ Refer to [DataSource](../datasource/introduction.md)
 
 ## Create Task
 
-- Click `Project -> Management-Project -> Name-Workflow Definition`, and click the "Create Workflow" button to enter the DAG editing page.
+- Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag from the toolbar <img src="../../../../img/tasks/icons/sql.png" width="25"/> to the canvas.
 
 ## Task Parameter
 
-- Data source: Select the corresponding DataSource.
-- SQL type: Supports query and non-query. 
-  - Query: supports `DML select` type commands, which return a result set. You can specify three templates for email notification as form, attachment or form attachment;
-  - Non-query: support `DDL` all commands and `DML update, delete, insert` three types of commands;
-    - Segmented execution symbol: When the data source does not support executing multiple SQL statements at a time, the symbol for splitting SQL statements is provided to call the data source execution method multiple times.
-    Example: 1. When the Hive data source is selected as the data source, this parameter does not need to be filled in. Because the Hive data source itself supports executing multiple SQL statements at one time;
-             2. When the MySQL data source is selected as the data source, and multi-segment SQL statements are to be executed, this parameter needs to be filled in with a semicolon `;`. Because the MySQL data source does not support executing multiple SQL statements at one time;
-- SQL parameter: The input parameter format is `key1=value1;key2=value2...`.
-- SQL statement: SQL statement.
-- UDF function: For Hive DataSources, you can refer to UDF functions created in the resource center, but other DataSource do not support UDF functions.
-- Custom parameters: SQL task type, and stored procedure is a custom parameter order, to set customized parameter type and data type for the method is the same as the stored procedure task type. The difference is that the custom parameter of the SQL task type replaces the `${variable}` in the SQL statement.
-- Pre-SQL: Pre-SQL executes before the SQL statement.
-- Post-SQL: Post-SQL executes after the SQL statement.
+| **Parameter** | **Description** |
+| ------- | ---------- |
+| Data source | Select the corresponding DataSource. |
+| SQL type | Supports query and non-query. <ul><li>Query: supports<span>&nbsp;</span><code>DML select</code><span>&nbsp;</span>type commands, which return a result set. You can specify three templates for email notification as form, attachment or form attachment;</li><li>Non-query: support<span>&nbsp;</span><code>DDL</code><span>&nbsp;</span>all commands and<span>&nbsp;</span><code>DML update, delete, insert</code><span>&nbsp;</span>three types of commands;<ul><li>Segmented execution symbol: When the data source does not support executing multiple SQL statements at a time, the symbol for splitting SQL statements is provided to call the data source execution method multiple times. Example: 1. When the Hive data source is selected as the data source, this parameter does not need to be filled in. Because the Hive data source itself supports executing multiple SQL statements at one time; 2. When the MySQL data source is selected as the data source, and multi-segment SQL statements are to be executed, this parameter needs to be filled in with a semicolon<span>&nbsp;</span><code>;</code>. Because the MySQL data source does not support executing multiple SQL statements at one time.</li></ul></li></ul> |
+| SQL parameter | The input parameter format is `key1=value1;key2=value2...`. |
+| SQL statement | SQL statement. |
+| UDF function | For Hive DataSources, you can refer to UDF functions created in the resource center, but other DataSource do not support UDF functions. |
+| Custom parameters | SQL task type, and stored procedure is a custom parameter order, to set customized parameter type and data type for the method is the same as the stored procedure task type. The difference is that the custom parameter of the SQL task type replaces the `${variable}` in the SQL statement. |
+| Pre-SQL | Pre-SQL executes before the SQL statement. |
+| Post-SQL | Post-SQL executes after the SQL statement. |
 
 ## Task Example
 
@@ -43,7 +40,7 @@ Log in to the bigdata cluster and use 'hive' command or 'beeline' or 'JDBC' and 
 
 ![hive-sql](../../../../img/tasks/demo/hive-result.png)
 
-## Notice
+## Note
 
 Pay attention to the selection of SQL type. If it is an insert operation, need to change to "Non-Query" type.
 

@@ -9,6 +9,8 @@ Shell task type, used to create a shell type task and execute a series of shell 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag  from the toolbar <img src="../../../../img/tasks/icons/shell.png" width="15"/> to the canvas.
 
+## Task Parameters
+
 | **Parameter** | **Description** |
 | ------- | ---------- |
 | Node Name | Set the name of the task. Node names within a workflow definition are unique. |
