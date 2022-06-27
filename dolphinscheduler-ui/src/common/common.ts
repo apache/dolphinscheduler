@@ -46,8 +46,7 @@ export const bytesToSize = (bytes: number) => {
   const k = 1024 // or 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-  return parseInt((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
+  return parseFloat((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
 }
 
 export const fileTypeArr = [
