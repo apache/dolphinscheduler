@@ -131,7 +131,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
 
     private void checkHiveMetaStoreClient() {
         if (!super.baseConnectionParam.getConnMetaStore()) {
-            throw DataSourceException.getInstance("Hive metastore not connect");
+            throw new DataSourceException("Hive metastore not connect");
         }
         try {
             this.metaStoreClientPool.getClient().getHiveClient().getAllDatabases();

@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import org.apache.dolphinscheduler.plugin.datasource.api.exception.DataSourceException;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -29,13 +26,16 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class DataSourceClientManager {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientManager.class);
@@ -69,12 +69,12 @@ public class DataSourceClientManager {
                 Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
                 DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
                 if (null == dataSourceChannel) {
-                    throw DataSourceException.getInstance(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+                    throw new DataSourceException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
                 }
                 return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
             });
         } catch (ExecutionException e) {
-            throw DataSourceException.getInstance(String.format("datasourceUniqueId '%s' is not found datasource", datasourceUniqueId));
+            throw new DataSourceException(String.format("datasourceUniqueId '%s' is not found datasource", datasourceUniqueId));
         }
     }
 
