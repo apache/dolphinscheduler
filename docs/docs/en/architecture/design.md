@@ -30,7 +30,7 @@
 
     #### The Service Mainly Includes:
   
-    - **Distributed Quartz** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
+    - **DistributedQuartz** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
 
     - **MasterSchedulerService** is a scanning thread that regularly scans the `t_ds_command` table in the database, runs different business operations according to different **command types**;
 
@@ -38,7 +38,7 @@
 
     - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the process instance;
 
-    - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instance;
+    - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instances;
 
     - **StateWheelExecuteThread** is mainly responsible for process instance and task timeout, task retry, task-dependent polling, and generates the corresponding process instance or task event and submits it to the event queue of the process instance;
 
@@ -57,7 +57,7 @@
 
     - **TaskExecuteThread** is mainly responsible for the process of task execution, and the actual processing of tasks according to different task types;
 
-    - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the status of the task to the Master until the Master replies to the status ack to avoid the loss of the task status;
+    - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
 * **ZooKeeper** 
 
@@ -162,7 +162,7 @@ Next to the main point, we divide the task nodes in the workflow into two types.
 
 - Another is a logical task, which does not operate actual script or process command, but only logical processing to the entire process flow, such as sub-process task, dependent task.
 
-**business node** can configure the number of failed retries. When the task node fails, it will automatically retry until it succeeds or exceeds the retry times.**Logical node** failure retry is not supported.
+**Business node** can configure the number of failed retries. When the task node fails, it will automatically retry until it succeeds or exceeds the retry times. **Logical node** failure retry is not supported.
 
 If there is a task failure in the workflow that reaches the maximum retry times, the workflow will fail and stop, and the failed workflow can be manually re-run or process recovery operations.
 
