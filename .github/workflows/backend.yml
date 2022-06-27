@@ -56,6 +56,9 @@ jobs:
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
@@ -67,7 +70,7 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven
-      - name: Build and Package
+      - name: Build and Package on ${{ matrix.java }}
         run: |
           ./mvnw -B clean install \
                  -Prelease,docker \
@@ -81,7 +84,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         name: Upload Binary Package
         with:
-          name: binary-package
+          name: binary-package-${{ matrix.java }}
           path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
           retention-days: 1
   cluster-test:
@@ -103,7 +106,8 @@ jobs:
       - uses: actions/download-artifact@v2
         name: Download Binary Package
         with:
-          name: binary-package
+          # Only run cluster test on jdk8
+          name: binary-package-8
           path: ./
       - name: Running cluster test
         run: |
