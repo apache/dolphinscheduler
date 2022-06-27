@@ -129,6 +129,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
             }
 
             String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
+
+            if (defaultFS == null) {
+                defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+            }
+
             //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
             if (defaultFS.startsWith("file")) {
