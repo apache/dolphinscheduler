@@ -36,7 +36,7 @@ This example shows how to simulate simple tasks with just one or more simple lin
 
 ### Use custom parameters
 
-This example simulates a custom parameter task. In order to reuse existing tasks more conveniently, or when faced with dynamic requirements, we will use variables to ensure the reusability of scripts. In this example, we first define the parameter "param\_key" in the custom script and set its value to "param\_val". Then the echo command is declared in the "script", and the parameter "param\_key" is printed out. When we save and run the task, we will see in the log that the value "param\_val" corresponding to the parameter "param\_key" is printed out.
+This example simulates a custom parameter task. In order to reuse existing tasks more conveniently, or when faced with dynamic requirements, we will use variables to ensure the reusability of scripts. In this example, we first define the parameter "param_key" in the custom script and set its value to "param_val". Then the echo command is declared in the "script", and the parameter "param_key" is printed out. When we save and run the task, we will see in the log that the value "param_val" corresponding to the parameter "param_key" is printed out.
 
 ![demo-shell-custom-param](../../../../img/tasks/demo/shell_custom_param.jpg)
 
