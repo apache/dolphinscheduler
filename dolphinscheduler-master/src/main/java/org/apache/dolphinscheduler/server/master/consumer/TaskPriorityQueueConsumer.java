@@ -131,8 +131,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
-                    // If there are tasks in a cycle that cannot find the worker group,
-                    // sleep for 1 second
+                    // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
                     if (fetchTaskNum == failedDispatchTasks.size()) {
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
