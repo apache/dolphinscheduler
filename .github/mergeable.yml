@@ -27,6 +27,7 @@ mergeable:
           - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_mysql.sql'
           - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_postgresql.sql'
         message: 'Sql files not change synchronize'
+# Temporary comment this because sometime mergable will become mad keep adding or deleting the label
 #    # Add labels 'sql not sync' and comment to reviewers if Sql files not change synchronize
 #    fail:
 #      - do: comment
