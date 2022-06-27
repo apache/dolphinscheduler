@@ -87,6 +87,7 @@ jobs:
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v2
+        if: ${{ matrix.java == '8' }}
         name: Upload Binary Package
         with:
           name: binary-package-${{ matrix.java }}
