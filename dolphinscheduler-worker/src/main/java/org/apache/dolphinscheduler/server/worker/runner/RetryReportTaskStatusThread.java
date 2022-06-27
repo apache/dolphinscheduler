@@ -52,7 +52,7 @@ public class RetryReportTaskStatusThread extends BaseDaemonThread {
     }
 
     @Override
-    public void start() {
+    public synchronized void start() {
         logger.info("Retry report task status thread starting");
         super.start();
         logger.info("Retry report task status thread started");
