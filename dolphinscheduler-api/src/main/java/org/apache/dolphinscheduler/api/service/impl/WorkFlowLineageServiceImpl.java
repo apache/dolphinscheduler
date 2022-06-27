@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * work flow lineage service impl
@@ -206,11 +207,13 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                     DependentParameters dependentParameters = JSONUtils.parseObject(taskDefinitionLog.getDependence(), DependentParameters.class);
                     if (dependentParameters != null) {
                         List<DependentTaskModel> dependTaskList = dependentParameters.getDependTaskList();
-                        for (DependentTaskModel taskModel : dependTaskList) {
-                            List<DependentItem> dependItemList = taskModel.getDependItemList();
-                            for (DependentItem dependentItem : dependItemList) {
-                                if (dependentItem.getProjectCode() == projectCode && dependentItem.getDefinitionCode() != workFlowCode) {
-                                    sourceWorkFlowCodes.add(dependentItem.getDefinitionCode());
+                        if (!CollectionUtils.isEmpty(dependTaskList)) {
+                            for (DependentTaskModel taskModel : dependTaskList) {
+                                List<DependentItem> dependItemList = taskModel.getDependItemList();
+                                for (DependentItem dependentItem : dependItemList) {
+                                    if (dependentItem.getProjectCode() == projectCode && dependentItem.getDefinitionCode() != workFlowCode) {
+                                        sourceWorkFlowCodes.add(dependentItem.getDefinitionCode());
+                                    }
                                 }
                             }
                         }
