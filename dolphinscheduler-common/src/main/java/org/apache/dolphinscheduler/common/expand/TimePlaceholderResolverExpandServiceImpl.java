@@ -17,14 +17,10 @@
 
 package org.apache.dolphinscheduler.common.expand;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholderResolverExpandService {
-
-    private static final Logger logger = LoggerFactory.getLogger(TimePlaceholderResolverExpandServiceImpl.class);
 
     @Override
     public boolean timeFunctionNeedExpand(String placeholderName) {
@@ -33,7 +29,6 @@ public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholder
 
     @Override
     public String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName) {
-        logger.warn("time function external expansion");
         return null;
     }
 }
