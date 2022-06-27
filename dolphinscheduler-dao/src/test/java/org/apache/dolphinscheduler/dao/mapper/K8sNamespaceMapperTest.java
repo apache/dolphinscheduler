@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,12 +46,12 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
         //insertOne
         K8sNamespace k8sNamespace = new K8sNamespace();
         k8sNamespace.setNamespace("testNamespace");
-        k8sNamespace.setK8s("ds_null_k8s");
+        k8sNamespace.setClusterCode(100L);
+        k8sNamespace.setClusterName("ds_null_k8s");
         k8sNamespace.setLimitsCpu(100.0);
         k8sNamespace.setLimitsMemory(100);
         k8sNamespace.setCreateTime(new Date());
         k8sNamespace.setUpdateTime(new Date());
-        k8sNamespace.setId(1);
         k8sNamespaceMapper.insert(k8sNamespace);
         return k8sNamespace;
     }

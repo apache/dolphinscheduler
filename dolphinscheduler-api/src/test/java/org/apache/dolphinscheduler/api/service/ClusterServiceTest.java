@@ -221,6 +221,12 @@ public class ClusterServiceTest {
         result = clusterService.deleteClusterByCode(loginUser,1L);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Mockito.when(clusterMapper.deleteByCode(0L)).thenReturn(0);
+        Mockito.when(k8sNamespaceMapper.selectCount(Mockito.any())).thenReturn(1);
+        result = clusterService.deleteClusterByCode(loginUser,1L);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS, result.get(Constants.STATUS));
     }
 
     @Test

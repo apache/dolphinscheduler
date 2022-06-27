@@ -1895,20 +1895,21 @@ CREATE TABLE t_ds_k8s (
 DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
    id serial NOT NULL,
+   code               bigint  NOT NULL,
    limits_memory      int DEFAULT NULL ,
    namespace          varchar(100) DEFAULT NULL ,
-   online_job_num     int DEFAULT '0' ,
    user_id            int DEFAULT NULL,
    pod_replicas       int DEFAULT NULL,
    pod_request_cpu    NUMERIC(13,4) NULL,
    pod_request_memory int DEFAULT NULL,
    limits_cpu         NUMERIC(13,4) NULL,
-   k8s                varchar(100) DEFAULT NULL,
+   cluster_code       bigint  NOT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
    PRIMARY KEY (id) ,
-   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,cluster_code)
 );
+
 
 --
 -- Table structure for table t_ds_relation_namespace_user
