@@ -7,20 +7,24 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 
 ## Create Task
 
-- Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
+- Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag from the toolbar <img src="../../../../img/tasks/icons/dependent.png" width="15"/> task node to canvas.
 
 ## Task Parameter
 
-- **Node name**: The node name in a workflow definition is unique.
-- **Run flag**: Identifies whether this node schedules normally, if it does not need to execute, select the `prohibition execution`.
-- **Descriptive information**: Describe the function of the node.
-- **Task priority**: When the number of worker threads is insufficient, execute in the order of priority from high to low, and tasks with the same priority will execute in a first-in first-out order.
-- **Worker grouping**: Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution.
-- **Environment Name**: Configure the environment name in which run the script.
-- **Times of failed retry attempts**: The number of times the task failed to resubmit.
-- **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
-- **Delayed execution time**: The time (unit minute) that a task delays in execution.
+| **Parameter** | **Description** |
+| ----- | -----------|
+| Node name | Unique name of node in workflow definition. |
+| Run flag | Identifies whether this node schedules normally. |
+| Description | Describe the function of the node. |
+| Task priority | When the number of worker threads is insufficient, execute in the order of priority from high to low, and tasks with the same priority will execute in a first-in first-out order. |
+| Worker group | Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution. |
+| Task group name | The group in Resources, if not configured, it will not be used. |
+| Environment Name | Configure the environment name in which run the script. |
+| Number of failed retries | The number of times the task failed to resubmit. |
+| Failed retry interval | The time interval (unit minute) for resubmitting the task after a failed task. | 
+| Delayed execution time | The time (unit minute) that a task delays in execution. |
+| Pre task | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task. |
 
 ## Examples
 
