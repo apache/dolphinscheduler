@@ -88,7 +88,7 @@ public final class TaskMetrics {
         TASK_SUBMIT_COUNTER.increment();
     }
 
-    public synchronized static void registerTaskRunning(Supplier<Number> consumer) {
+    public synchronized static void registerTaskPrepared(Supplier<Number> consumer) {
         Gauge.builder("dolphinscheduler_task_running_gauge", consumer)
                 .description("Task running count")
                 .register(Metrics.globalRegistry);

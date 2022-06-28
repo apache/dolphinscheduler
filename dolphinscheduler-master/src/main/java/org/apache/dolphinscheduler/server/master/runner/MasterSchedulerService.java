@@ -19,11 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
-<<<<<<< HEAD
-=======
 import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
->>>>>>> b5184138f... [Feature] Time function analysis extension. (#10624)
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -55,10 +52,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * master scheduler thread
+ * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
 @Service
-public class MasterSchedulerService extends Thread {
+public class MasterSchedulerService extends BaseDaemonThread {
 
     /**
      * logger of MasterSchedulerService
@@ -108,8 +105,6 @@ public class MasterSchedulerService extends Thread {
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
 
-<<<<<<< HEAD
-=======
     @Autowired
     private CuringGlobalParamsService curingGlobalParamsService;
 
@@ -117,7 +112,6 @@ public class MasterSchedulerService extends Thread {
         super("MasterCommandLoopThread");
     }
 
->>>>>>> b5184138f... [Feature] Time function analysis extension. (#10624)
     /**
      * constructor of MasterSchedulerService
      */

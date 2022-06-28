@@ -49,7 +49,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -262,12 +261,8 @@ public class WorkflowExecuteRunnable implements Runnable {
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
-<<<<<<< HEAD
-        TaskMetrics.registerTaskRunning(readyToSubmitTaskQueue::size);
-=======
         this.curingGlobalParamsService = curingGlobalParamsService;
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
->>>>>>> b5184138f... [Feature] Time function analysis extension. (#10624)
     }
 
     /**

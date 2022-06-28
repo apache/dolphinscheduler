@@ -85,6 +85,7 @@ import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
@@ -268,15 +269,12 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private TaskPluginManager taskPluginManager;
 
-<<<<<<< HEAD
-=======
     @Autowired
     private K8sMapper k8sMapper;
 
     @Autowired
     private CuringGlobalParamsService curingGlobalParamsService;
 
->>>>>>> b5184138f... [Feature] Time function analysis extension. (#10624)
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
