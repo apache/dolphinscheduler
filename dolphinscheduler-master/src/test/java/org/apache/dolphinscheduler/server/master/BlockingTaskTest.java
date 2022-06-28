@@ -123,7 +123,7 @@ public class BlockingTaskTest {
         Mockito.when(processService
             .submitTaskWithRetry(Mockito.any(ProcessInstance.class)
                 , Mockito.any(TaskInstance.class)
-                , Mockito.any(Integer.class), Mockito.any(Integer.class)))
+                , Mockito.any(Integer.class), Mockito.any(Long.class)))
             .thenReturn(taskInstance);
         return taskInstance;
     }
