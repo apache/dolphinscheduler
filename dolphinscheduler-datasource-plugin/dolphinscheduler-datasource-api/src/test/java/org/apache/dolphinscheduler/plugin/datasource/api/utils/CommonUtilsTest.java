@@ -28,26 +28,32 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
+@SuppressStaticInitializationFor(
+    value = {"org.apache.dolphinscheduler.spi.utils.PropertyUtils", "org.apache.hadoop.security.UserGroupInformation"}
+)
 @PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class, CommonUtils.class, PasswordUtils.class})
+@PowerMockIgnore({"jdk.xml.*", "org.apache.hadoop.security.*"})
 public class CommonUtilsTest {
 
     @Test
     public void testGetKerberosStartupState() {
         PowerMockito.mockStatic(CommonUtils.class);
-        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
+        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenAnswer((Answer<Boolean>) invocation -> false);
         boolean kerberosStartupState = CommonUtils.getKerberosStartupState();
         Assert.assertFalse(kerberosStartupState);
 
         PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true)).thenReturn(Boolean.TRUE);
+        PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenAnswer((Answer<String>) invocation -> "HDFS");
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true))
+            .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
         kerberosStartupState = CommonUtils.getKerberosStartupState();
         Assert.assertFalse(kerberosStartupState);
     }
@@ -56,34 +62,43 @@ public class CommonUtilsTest {
     public void testLoadKerberosConf() {
         try {
             PowerMockito.mockStatic(PropertyUtils.class);
-            PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
-            PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(Boolean.TRUE);
-            PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/opt/krb5.conf");
-            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("hdfs-mycluster@ESZ.COM");
-            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/opt/hdfs.headless.keytab");
+            PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenAnswer((Answer<String>) invocation -> "HDFS");
+            PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
+            PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                .thenAnswer((Answer<String>) invocation -> "/opt/krb5.conf");
+            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME))
+                .thenAnswer((Answer<String>) invocation -> "hdfs-mycluster@ESZ.COM");
+            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH))
+                .thenAnswer((Answer<String>) invocation -> "/opt/hdfs.headless.keytab");
 
             PowerMockito.mockStatic(UserGroupInformation.class);
-            boolean result = CommonUtils.loadKerberosConf(new Configuration());
+            Configuration configuration = PowerMockito.mock(Configuration.class);
+            PowerMockito.whenNew(Configuration.class).withNoArguments().thenReturn(configuration);
+
+            boolean result = CommonUtils.loadKerberosConf(configuration);
             Assert.assertTrue(result);
 
             CommonUtils.loadKerberosConf(null, null, null);
 
         } catch (Exception e) {
-            Assert.fail("load Kerberos Conf failed");
+            Assert.fail("load Kerberos Conf failed" + e.getMessage());
         }
     }
 
     @Test
     public void encodePassword() {
         PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.TRUE);
+        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
+            .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
 
         Assert.assertEquals("", PasswordUtils.encodePassword(""));
         Assert.assertEquals("bnVsbE1USXpORFUy", PasswordUtils.encodePassword("123456"));
         Assert.assertEquals("bnVsbElWRkJXbGhUVjBBPQ==", PasswordUtils.encodePassword("!QAZXSW@"));
         Assert.assertEquals("bnVsbE5XUm1aMlZ5S0VBPQ==", PasswordUtils.encodePassword("5dfger(@"));
 
-        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.FALSE);
+        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
+            .thenAnswer((Answer<Boolean>) invocation -> Boolean.FALSE);
 
         Assert.assertEquals("", PasswordUtils.encodePassword(""));
         Assert.assertEquals("123456", PasswordUtils.encodePassword("123456"));
@@ -95,7 +110,8 @@ public class CommonUtilsTest {
     @Test
     public void decodePassword() {
         PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.TRUE);
+        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
+            .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
 
         PropertyUtils.setValue(DATASOURCE_ENCRYPTION_ENABLE, "true");
 
@@ -109,7 +125,8 @@ public class CommonUtilsTest {
         Assert.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ=="));
         Assert.assertEquals("5dfger(@", PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ=="));
 
-        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.FALSE);
+        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
+            .thenAnswer((Answer<Boolean>) invocation -> Boolean.FALSE);
 
         PowerMockito.when(PasswordUtils.decodePassword("123456")).thenReturn("123456");
         PowerMockito.when(PasswordUtils.decodePassword("!QAZXSW@")).thenReturn("!QAZXSW@");
