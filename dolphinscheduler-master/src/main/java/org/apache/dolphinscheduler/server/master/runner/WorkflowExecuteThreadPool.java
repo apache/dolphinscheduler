@@ -53,7 +53,7 @@ import com.google.common.base.Strings;
 import lombok.NonNull;
 
 /**
- * Used to execute {@link WorkflowExecuteRunnable}, when
+ * Used to execute {@link WorkflowExecuteRunnable}.
  */
 @Component
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
@@ -102,14 +102,6 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     /**
-     * start workflow
-     */
-    public void startWorkflow(WorkflowExecuteRunnable workflowExecuteThread) {
-        ProcessInstanceMetrics.incProcessInstanceSubmit();
-        submit(workflowExecuteThread);
-    }
-
-    /**
      * execute workflow
      */
     public void executeEvent(final WorkflowExecuteRunnable workflowExecuteThread) {
@@ -142,7 +134,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                 try {
                     LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish()) {
-                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
+                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                         logger.info("Workflow instance is finished.");

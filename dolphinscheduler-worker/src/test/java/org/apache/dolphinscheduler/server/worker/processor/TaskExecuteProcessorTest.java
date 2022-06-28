@@ -88,7 +88,7 @@ public class TaskExecuteProcessorTest {
         command = new Command();
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
         ackCommand = new TaskExecuteRunningCommand().convert2Command();
-        taskRequestCommand = new TaskExecuteRequestCommand();
+        taskRequestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
         alertClientService = PowerMockito.mock(AlertClientService.class);
         workerExecService = PowerMockito.mock(ExecutorService.class);
         PowerMockito.when(workerExecService.submit(Mockito.any(TaskExecuteThread.class)))
@@ -127,8 +127,6 @@ public class TaskExecuteProcessorTest {
         PowerMockito.mockStatic(JSONUtils.class);
         PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskExecuteRequestCommand.class))
                 .thenReturn(taskRequestCommand);
-        PowerMockito.when(JSONUtils.parseObject(taskRequestCommand.getTaskExecutionContext(), TaskExecutionContext.class))
-                .thenReturn(taskExecutionContext);
 
         PowerMockito.mockStatic(FileUtils.class);
         PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),

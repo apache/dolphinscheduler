@@ -57,24 +57,24 @@ public class StateWheelExecuteThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(StateWheelExecuteThread.class);
 
     /**
-     * process timeout check list
+     * ProcessInstance timeout check list, element is the processInstanceId.
      */
-    private ConcurrentLinkedQueue<Integer> processInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Integer> processInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
 
     /**
      * task time out check list
      */
-    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
 
     /**
      * task retry check list
      */
-    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceRetryCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceRetryCheckList = new ConcurrentLinkedQueue<>();
 
     /**
      * task state check list
      */
-    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceStateCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceStateCheckList = new ConcurrentLinkedQueue<>();
 
     @Autowired
     private MasterConfig masterConfig;
@@ -105,8 +105,8 @@ public class StateWheelExecuteThread extends Thread {
         logger.info("Success add workflow instance into timeout check list");
     }
 
-    public void removeProcess4TimeoutCheck(ProcessInstance processInstance) {
-        boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstance.getId());
+    public void removeProcess4TimeoutCheck(int processInstanceId) {
+        boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstanceId);
         if (removeFlag) {
             logger.info("Success remove workflow instance from timeout check list");
         } else {

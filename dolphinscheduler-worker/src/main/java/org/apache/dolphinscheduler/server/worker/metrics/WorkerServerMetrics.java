@@ -22,22 +22,20 @@ import java.util.function.Supplier;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
+import lombok.experimental.UtilityClass;
 
-public final class WorkerServerMetrics {
-
-    public WorkerServerMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+@UtilityClass
+public class WorkerServerMetrics {
 
     private static final Counter WORKER_OVERLOAD_COUNTER =
-            Counter.builder("dolphinscheduler_worker_overload_count")
-                    .description("worker load count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.worker.overload.count")
+            .description("overloaded workers count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER =
-            Counter.builder("dolphinscheduler_worker_submit_queue_is_full_count")
-                    .description("worker task submit queue is full count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.worker.full.submit.queue.count")
+            .description("full worker submit queues count")
+            .register(Metrics.globalRegistry);
 
     public static void incWorkerOverloadCount() {
         WORKER_OVERLOAD_COUNTER.increment();
@@ -48,9 +46,10 @@ public final class WorkerServerMetrics {
     }
 
     public static void registerWorkerRunningTaskGauge(Supplier<Number> supplier) {
-        Gauge.builder("dolphinscheduler_worker_running_task_gauge", supplier)
-                .description("worker running task gauge")
-                .register(Metrics.globalRegistry);
+        Gauge.builder("ds.task.running", supplier)
+            .description("number of running tasks on workers")
+            .register(Metrics.globalRegistry);
 
     }
+
 }

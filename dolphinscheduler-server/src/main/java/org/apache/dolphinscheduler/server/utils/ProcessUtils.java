@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +43,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lombok.NonNull;
 
 /**
  * mainly used to get the start command line of a process.
@@ -182,7 +184,10 @@ public class ProcessUtils {
      * @param taskExecutionContext taskExecutionContext
      * @return yarn application ids
      */
-    public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
+    public static List<String> killYarnJob(@NonNull TaskExecutionContext taskExecutionContext) {
+        if (taskExecutionContext.getLogPath() == null) {
+            return Collections.emptyList();
+        }
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             String log;

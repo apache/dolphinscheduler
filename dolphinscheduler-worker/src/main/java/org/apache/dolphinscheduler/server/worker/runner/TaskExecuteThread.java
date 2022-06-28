@@ -133,9 +133,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setEndTime(new Date());
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Task dry run success",
+                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             return;
         }
-
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
