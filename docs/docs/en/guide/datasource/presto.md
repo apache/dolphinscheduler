@@ -1,6 +1,6 @@
 # Presto
 
-![Presto Datasource](img/new_ui/dev/datasource/presto.png)
+![Presto Datasource](../../../../img/new_ui/dev/datasource/presto.png)
 
 ## Datasource Parameters
 

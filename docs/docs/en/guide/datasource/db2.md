@@ -1,6 +1,6 @@
 # DB2
 
-![DB2 Datasource](img/new_ui/dev/datasource/DB2.png)
+![DB2 Datasource](../../../../img/new_ui/dev/datasource/DB2.png)
 
 ## Datasource Parameters
 

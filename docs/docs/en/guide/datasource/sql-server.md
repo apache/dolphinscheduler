@@ -1,6 +1,6 @@
 # SQL Server
 
-![SQL Server](/img/new_ui/dev/datasource/sql_server.png)
+![SQL Server](../../../..//img/new_ui/dev/datasource/sql_server.png)
 
 ## Datasource Parameters
 

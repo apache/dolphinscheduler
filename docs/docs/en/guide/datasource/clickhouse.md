@@ -1,6 +1,6 @@
 # ClickHouse
 
-![ClickHouse Datasource](img/new_ui/dev/datasource/ClickHouse.png)
+![ClickHouse Datasource](../../../../img/new_ui/dev/datasource/ClickHouse.png)
 
 ## Datasource Parameters
 
