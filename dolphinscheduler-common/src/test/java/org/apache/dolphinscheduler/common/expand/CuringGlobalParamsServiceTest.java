@@ -56,7 +56,7 @@ public class CuringGlobalParamsServiceTest {
     @InjectMocks
     private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
 
-    private Map<String, String> globalParamMap = new HashMap<>();
+    private final Map<String, String> globalParamMap = new HashMap<>();
 
     @Before
     public void init() {
