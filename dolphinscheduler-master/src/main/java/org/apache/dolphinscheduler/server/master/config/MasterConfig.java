@@ -17,25 +17,25 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.time.Duration;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
 import lombok.Data;
 
 @Data
+@Validated
 @Configuration
 @ConfigurationProperties(prefix = "master")
-public class MasterConfig {
+public class MasterConfig implements Validator {
     /**
      * The master RPC server listen port.
      */
@@ -83,21 +83,46 @@ public class MasterConfig {
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killYarnJobWhenTaskFailover = true;
 
-    @PostConstruct
-    public void validate() {
-        checkArgument(listenPort > 0, "listen-port " + listenPort + " is invalidated");
-        checkArgument(fetchCommandNum > 0, "fetch-command-num " + fetchCommandNum + " should bigger then 0");
-        checkArgument(preExecThreads > 0, "pre-exec-threads " + preExecThreads + " should bigger then 0");
-        checkArgument(execThreads > 0, "exec-threads " + execThreads + " should bigger then 0");
-        checkArgument(dispatchTaskNumber > 0, "dispatch-task-number " + dispatchTaskNumber + " should bigger then 0");
-        checkArgument(heartbeatInterval.toMillis() > 0, "heartbeat-interval " + heartbeatInterval + " should bigger then 0");
-        checkArgument(taskCommitRetryTimes > 0, "task-commit-retry-times " + taskCommitRetryTimes + " should bigger then 0");
-        checkArgument(taskCommitInterval.toMillis() > 0, "task-commit-interval " + taskCommitInterval + " should bigger then 0");
-        checkArgument(stateWheelInterval.toMillis() > 0, "state-wheel-interval " + stateWheelInterval + " should bigger then 0");
-        checkArgument(failoverInterval.toMillis() > 0, "failover-interval " + failoverInterval + " should bigger then 0");
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return MasterConfig.class.isAssignableFrom(clazz);
+    }
 
-        if (maxCpuLoadAvg <= 0) {
-            maxCpuLoadAvg = Runtime.getRuntime().availableProcessors() * 2;
+    @Override
+    public void validate(Object target, Errors errors) {
+        MasterConfig masterConfig = (MasterConfig) target;
+        if (masterConfig.getListenPort() <= 0) {
+            errors.rejectValue("listen-port", null, "is invalidated");
+        }
+        if (masterConfig.getFetchCommandNum() <= 0) {
+            errors.rejectValue("fetch-command-num", null, "should be a positive value");
+        }
+        if (masterConfig.getPreExecThreads() <= 0) {
+            errors.rejectValue("per-exec-threads", null, "should be a positive value");
+        }
+        if (masterConfig.getExecThreads() <= 0) {
+            errors.rejectValue("exec-threads", null, "should be a positive value");
+        }
+        if (masterConfig.getDispatchTaskNumber() <= 0) {
+            errors.rejectValue("dispatch-task-number", null, "should be a positive value");
+        }
+        if (masterConfig.getHeartbeatInterval().toMillis() < 0) {
+            errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
+        }
+        if (masterConfig.getTaskCommitRetryTimes() <= 0) {
+            errors.rejectValue("task-commit-retry-times", null, "should better a positive value");
+        }
+        if (masterConfig.getTaskCommitInterval().toMillis() <= 0) {
+            errors.rejectValue("task-commit-interval", null, "should be a valid duration");
+        }
+        if (masterConfig.getStateWheelInterval().toMillis() <= 0) {
+            errors.rejectValue("state-wheel-interval", null, "should be a valid duration");
+        }
+        if (masterConfig.getFailoverInterval().toMillis() <= 0) {
+            errors.rejectValue("failover-interval", null, "should be a valid duration");
+        }
+        if (masterConfig.getMaxCpuLoadAvg() <= 0) {
+            masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
     }
 }

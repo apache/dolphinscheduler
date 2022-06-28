@@ -17,24 +17,24 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.time.Duration;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
 import com.google.common.collect.Sets;
 
 import lombok.Data;
 
 @Data
+@Validated
 @Configuration
 @ConfigurationProperties(prefix = "worker")
-public class WorkerConfig {
+public class WorkerConfig implements Validator {
     private int listenPort = 1234;
     private int execThreads = 10;
     private Duration heartbeatInterval = Duration.ofSeconds(10);
@@ -47,12 +47,23 @@ public class WorkerConfig {
     private String alertListenHost = "localhost";
     private int alertListenPort = 50052;
 
-    @PostConstruct
-    public void validate() {
-        checkArgument(execThreads > 0, "exec-threads " + execThreads + " should bigger then 0");
-        checkArgument(heartbeatInterval.toMillis() > 0, "heartbeat-interval " + heartbeatInterval + " should bigger then 0");
-        if (maxCpuLoadAvg <= 0) {
-            maxCpuLoadAvg = Runtime.getRuntime().availableProcessors() * 2;
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return WorkerConfig.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        WorkerConfig workerConfig = (WorkerConfig) target;
+        if (workerConfig.getExecThreads() <= 0) {
+            errors.rejectValue("exec-threads", null, "should be a positive value");
         }
+        if (workerConfig.getHeartbeatInterval().toMillis() <= 0) {
+            errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
+        }
+        if (workerConfig.getMaxCpuLoadAvg() <= 0) {
+            workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
+        }
+
     }
 }
