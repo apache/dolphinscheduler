@@ -110,7 +110,7 @@ public class MasterConfig implements Validator {
             errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
         }
         if (masterConfig.getTaskCommitRetryTimes() <= 0) {
-            errors.rejectValue("task-commit-retry-times", null, "should better a positive value");
+            errors.rejectValue("task-commit-retry-times", null, "should be a positive value");
         }
         if (masterConfig.getTaskCommitInterval().toMillis() <= 0) {
             errors.rejectValue("task-commit-interval", null, "should be a valid duration");
