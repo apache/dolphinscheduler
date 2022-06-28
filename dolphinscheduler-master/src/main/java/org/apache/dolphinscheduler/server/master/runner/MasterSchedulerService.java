@@ -19,6 +19,11 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
+<<<<<<< HEAD
+=======
+import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+>>>>>>> b5184138f... [Feature] Time function analysis extension. (#10624)
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -103,6 +108,16 @@ public class MasterSchedulerService extends Thread {
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+<<<<<<< HEAD
+=======
+    @Autowired
+    private CuringGlobalParamsService curingGlobalParamsService;
+
+    protected MasterSchedulerService() {
+        super("MasterCommandLoopThread");
+    }
+
+>>>>>>> b5184138f... [Feature] Time function analysis extension. (#10624)
     /**
      * constructor of MasterSchedulerService
      */
@@ -178,7 +193,8 @@ public class MasterSchedulerService extends Thread {
                     , nettyExecutorManager
                     , processAlertManager
                     , masterConfig
-                    , stateWheelExecuteThread);
+                    , stateWheelExecuteThread
+                    , curingGlobalParamsService);
 
                 this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
                 if (processInstance.getTimeout() > 0) {

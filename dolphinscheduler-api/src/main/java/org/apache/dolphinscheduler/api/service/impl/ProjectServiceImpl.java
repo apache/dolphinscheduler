@@ -478,7 +478,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        List<Project> projects = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
+        List<Project> projects = projectMapper.selectBatchIds(projectIds);
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
