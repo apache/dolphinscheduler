@@ -32,7 +32,7 @@ export function useDinky(model: { [field: string]: any }): IJsonItem[] {
             validate: {
                 trigger: ['input', 'blur'],
                 required: true,
-                validator(validate: any, value: string) {
+                validator(_validate: any, value: string) {
                     if (!value) {
                         return new Error(t('project.node.dinky_address_tips'))
                     }
@@ -49,7 +49,7 @@ export function useDinky(model: { [field: string]: any }): IJsonItem[] {
             validate: {
                 trigger: ['input', 'blur'],
                 required: true,
-                validator(validate: any, value: string) {
+                validator(_validate: any, value: string) {
                     if (!value) {
                         return new Error(t('project.node.dinky_task_id_tips'))
                     }

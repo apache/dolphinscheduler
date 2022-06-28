@@ -29,7 +29,7 @@ public class DinkyTaskChannel implements TaskChannel {
 
     @Override
     public void cancelApplication(boolean status) {
-
+        // nothing to do
     }
 
     @Override
