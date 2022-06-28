@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -158,6 +159,9 @@ public class ProcessServiceTest {
 
     @Mock
     private ScheduleMapper scheduleMapper;
+
+    @Mock
+    CuringGlobalParamsService curingGlobalParamsService;
 
     @Test
     public void testCreateSubCommand() {
@@ -365,6 +369,11 @@ public class ProcessServiceTest {
         command5.setCommandType(CommandType.START_PROCESS);
         command5.setDryRun(Constants.DRY_RUN_FLAG_NO);
         Mockito.when(commandMapper.deleteById(5)).thenReturn(1);
+        Mockito.when(curingGlobalParamsService.curingGlobalParams(0,
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                CommandType.START_PROCESS,
+                processInstance.getScheduleTime(), null)).thenReturn("\"testStartParam1\"");
         ProcessInstance processInstance1 = processService.handleCommand(logger, host, command5);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
 
