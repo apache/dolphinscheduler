@@ -134,7 +134,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
     public void run() {
         while (Stopper.isRunning()) {
             try {
-                boolean isOverload = OSUtils.checkOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
+                boolean isOverload = OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
                 if (isOverload) {
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);

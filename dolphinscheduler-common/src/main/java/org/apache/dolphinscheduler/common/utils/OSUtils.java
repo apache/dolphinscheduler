@@ -466,7 +466,7 @@ public class OSUtils {
      * @param reservedMemory reservedMemory
      * @return True, if the cpu or memory exceed the given thredshod.
      */
-    public static Boolean checkOverload(double maxCpuLoadAvg, double reservedMemory) {
+    public static Boolean isOverload(double maxCpuLoadAvg, double reservedMemory) {
         // system load average
         double loadAverage = loadAverage();
         // system available physical memory
@@ -475,9 +475,8 @@ public class OSUtils {
             logger.warn("Current cpu load average {} is too high or available memory {}G is too low, under max.cpuLoad.avg={} and reserved.memory={}G",
                 loadAverage, availablePhysicalMemorySize, maxCpuLoadAvg, reservedMemory);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 }

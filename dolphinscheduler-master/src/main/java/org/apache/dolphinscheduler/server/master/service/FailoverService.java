@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
@@ -74,16 +72,16 @@ public class FailoverService {
     private final ProcessInstanceExecCacheManager cacheManager;
     private final String localAddress;
 
-    public FailoverService(RegistryClient registryClient,
-                           MasterConfig masterConfig,
-                           ProcessService processService,
-                           WorkflowExecuteThreadPool workflowExecuteThreadPool,
-                           ProcessInstanceExecCacheManager cacheManager) {
-        this.registryClient = checkNotNull(registryClient);
-        this.masterConfig = checkNotNull(masterConfig);
-        this.processService = checkNotNull(processService);
-        this.workflowExecuteThreadPool = checkNotNull(workflowExecuteThreadPool);
-        this.cacheManager = checkNotNull(cacheManager);
+    public FailoverService(@NonNull RegistryClient registryClient,
+                           @NonNull MasterConfig masterConfig,
+                           @NonNull ProcessService processService,
+                           @NonNull WorkflowExecuteThreadPool workflowExecuteThreadPool,
+                           @NonNull ProcessInstanceExecCacheManager cacheManager) {
+        this.registryClient = registryClient;
+        this.masterConfig = masterConfig;
+        this.processService = processService;
+        this.workflowExecuteThreadPool = workflowExecuteThreadPool;
+        this.cacheManager = cacheManager;
         this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
     }
 
