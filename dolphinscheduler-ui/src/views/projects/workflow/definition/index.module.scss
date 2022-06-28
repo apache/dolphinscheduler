@@ -111,6 +111,9 @@
       .n-button,
       .n-button__content {
         width: 100%;
+        span {
+          padding-bottom: 1px;
+        }
       }
     }
   }
