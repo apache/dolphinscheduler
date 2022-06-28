@@ -93,7 +93,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
     @Override
     public void run() {
-        Duration checkInterval = Duration.ofMillis(masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
+        Duration checkInterval = masterConfig.getStateWheelInterval();
         while (Stopper.isRunning()) {
             try {
                 checkTask4Timeout();

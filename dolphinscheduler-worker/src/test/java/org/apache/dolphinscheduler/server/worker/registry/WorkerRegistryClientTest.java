@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -86,15 +87,15 @@ public class WorkerRegistryClientTest {
     @Test
     public void testRegistry() {
         workerRegistryClient.initWorkRegistry();
-    
+
         given(workerManagerThread.getThreadPoolQueueSize()).willReturn(1);
-    
+
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(NodeType.class))).willReturn(true);
-    
-        given(workerConfig.getHeartbeatInterval()).willReturn(1);
-    
+
+        given(workerConfig.getHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
+
         workerRegistryClient.registry();
-    
+
         Mockito.verify(registryClient, Mockito.times(1)).handleDeadServer(Mockito.anyCollection(), Mockito.any(NodeType.class), Mockito.anyString());
     }
 

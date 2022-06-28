@@ -81,6 +81,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +115,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected int maxRetryTimes;
 
-    protected int commitInterval;
+    protected long commitInterval;
 
     protected ProcessService processService;
 
@@ -132,7 +133,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
-        this.commitInterval = masterConfig.getTaskCommitInterval();
+        this.commitInterval = masterConfig.getTaskCommitInterval().toMillis();
     }
 
     protected javax.sql.DataSource defaultDataSource =

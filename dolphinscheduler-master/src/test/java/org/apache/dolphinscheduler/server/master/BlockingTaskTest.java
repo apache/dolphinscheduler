@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,7 +78,7 @@ public class BlockingTaskTest {
         config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
         config.setTaskCommitRetryTimes(3);
-        config.setTaskCommitInterval(1000);
+        config.setTaskCommitInterval(Duration.ofSeconds(1));
 
         // mock process service
         processService = Mockito.mock(ProcessService.class);
@@ -122,7 +123,7 @@ public class BlockingTaskTest {
         Mockito.when(processService
             .submitTaskWithRetry(Mockito.any(ProcessInstance.class)
                 , Mockito.any(TaskInstance.class)
-                , Mockito.any(Integer.class), Mockito.any(Integer.class)))
+                , Mockito.any(Integer.class), Mockito.any(Long.class)))
             .thenReturn(taskInstance);
         return taskInstance;
     }
