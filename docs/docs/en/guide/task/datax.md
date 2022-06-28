@@ -62,6 +62,6 @@ After writing the required json file, you can configure the node content by foll
 
 ![datax_task03](../../../../img/tasks/demo/datax_task03.png)
 
-### Notice
+### Note
 
 If the default data source provided does not meet your needs, you can configure the writer and reader of DataX according to the actual usage environment in the custom template option, available at https://github.com/alibaba/DataX.

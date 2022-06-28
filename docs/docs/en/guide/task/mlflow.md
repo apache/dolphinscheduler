@@ -98,7 +98,7 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 ### MLflow Models
 
-General Parameters:
+**General Parameters**
 
 | **Parameter** | **Description** |
 | ------- | ---------- |
@@ -106,7 +106,7 @@ General Parameters:
 | Port | The port to listen on. |
 
 
-#### MLFLOW
+#### MLflow
 
 ![mlflow-models-mlflow](../../../../img/tasks/demo/mlflow-models-mlflow.png)
 
@@ -125,7 +125,7 @@ General Parameters:
 
 ## Environment to Prepare
 
-### Conda env
+### Conda environment
 
 You need to enter the admin account to configure a conda environment variable（Please
 install [anaconda](https://docs.continuum.io/anaconda/install/)
