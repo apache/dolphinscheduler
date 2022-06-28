@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -236,6 +237,11 @@ public class WorkflowExecuteRunnable implements Runnable {
     private final StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
+     * curing global params service
+     */
+    private final CuringGlobalParamsService curingGlobalParamsService;
+
+    /**
      * @param processInstance         processInstance
      * @param processService          processService
      * @param nettyExecutorManager    nettyExecutorManager
@@ -248,13 +254,15 @@ public class WorkflowExecuteRunnable implements Runnable {
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
-            , StateWheelExecuteThread stateWheelExecuteThread) {
+            , StateWheelExecuteThread stateWheelExecuteThread
+            , CuringGlobalParamsService curingGlobalParamsService) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
+        this.curingGlobalParamsService = curingGlobalParamsService;
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 
@@ -999,10 +1007,11 @@ public class WorkflowExecuteRunnable implements Runnable {
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
                         processInstance.setScheduleTime(complementListDate.get(0));
-                        processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
                                 processDefinition.getGlobalParamMap(),
                                 processDefinition.getGlobalParamList(),
-                                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE)));
+                                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));
+                        processInstance.setGlobalParams(globalParams);
                         processService.updateProcessInstance(processInstance);
                     }
                 }
