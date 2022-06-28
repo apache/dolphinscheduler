@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -92,9 +93,6 @@ public class TaskCallbackService {
      * change remote channel
      */
     public void changeRemoteChannel(int taskInstanceId, NettyRemoteChannel channel) {
-        if (REMOTE_CHANNELS.containsKey(taskInstanceId)) {
-            REMOTE_CHANNELS.remove(taskInstanceId);
-        }
         REMOTE_CHANNELS.put(taskInstanceId, channel);
     }
 
@@ -104,19 +102,19 @@ public class TaskCallbackService {
      * @param taskInstanceId taskInstanceId
      * @return callback channel
      */
-    private NettyRemoteChannel getRemoteChannel(int taskInstanceId) {
+    private Optional<NettyRemoteChannel> getRemoteChannel(int taskInstanceId) {
         Channel newChannel;
         NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(taskInstanceId);
         if (nettyRemoteChannel != null) {
             if (nettyRemoteChannel.isActive()) {
-                return nettyRemoteChannel;
+                return Optional.of(nettyRemoteChannel);
             }
             newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
             if (newChannel != null) {
-                return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+                return Optional.of(getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public long pause(int ntries) {
@@ -151,15 +149,13 @@ public class TaskCallbackService {
      * @param command command
      */
     public void send(int taskInstanceId, Command command) {
-        NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(taskInstanceId);
-        if (nettyRemoteChannel != null) {
-            nettyRemoteChannel.writeAndFlush(command).addListener(new ChannelFutureListener() {
-
+        Optional<NettyRemoteChannel> nettyRemoteChannel = getRemoteChannel(taskInstanceId);
+        if (nettyRemoteChannel.isPresent()) {
+            nettyRemoteChannel.get().writeAndFlush(command).addListener(new ChannelFutureListener() {
                 @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess()) {
-                        // remove(taskInstanceId);
-                        return;
+                public void operationComplete(ChannelFuture future) {
+                    if (!future.isSuccess()) {
+                        logger.error("Send callback command error, taskInstanceId: {}, command: {}", taskInstanceId, command);
                     }
                 }
             });

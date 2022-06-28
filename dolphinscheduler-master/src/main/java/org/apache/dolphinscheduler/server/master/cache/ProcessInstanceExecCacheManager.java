@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.cache;
 
+import lombok.NonNull;
+
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.util.Collection;
@@ -55,7 +57,7 @@ public interface ProcessInstanceExecCacheManager {
      * @param processInstanceId     processInstanceId
      * @param workflowExecuteThread if it is null, will not be cached
      */
-    void cache(int processInstanceId, WorkflowExecuteRunnable workflowExecuteThread);
+    void cache(int processInstanceId, @NonNull WorkflowExecuteRunnable workflowExecuteThread);
 
     /**
      * get all WorkflowExecuteThread from cache

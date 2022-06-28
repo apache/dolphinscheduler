@@ -96,6 +96,8 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import lombok.NonNull;
+
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
@@ -114,22 +116,19 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected int commitInterval;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    protected ProcessService processService;
 
-    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+    protected MasterConfig masterConfig;
 
-    protected TaskPluginManager taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
+    protected TaskPluginManager taskPluginManager;
 
     protected String threadLoggerInfoName;
 
     @Override
-    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
-        if (processService == null) {
-            processService = SpringApplicationContext.getBean(ProcessService.class);
-        }
-        if (masterConfig == null) {
-            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        }
+    public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
+        processService = SpringApplicationContext.getBean(ProcessService.class);
+        masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -245,7 +244,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public String getType() {
-        return null;
+        throw new UnsupportedOperationException("This abstract class doesn's has type");
     }
 
     @Override

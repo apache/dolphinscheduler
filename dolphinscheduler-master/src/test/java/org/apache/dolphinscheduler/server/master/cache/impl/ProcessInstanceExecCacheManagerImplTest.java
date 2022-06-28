@@ -56,7 +56,7 @@ public class ProcessInstanceExecCacheManagerImplTest {
         Assert.assertTrue(processInstanceExecCacheManager.contains(1));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testCacheNull() {
         processInstanceExecCacheManager.cache(2, null);
         WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(2);

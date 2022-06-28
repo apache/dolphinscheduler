@@ -49,8 +49,7 @@ public class ExecutionContextTestUtils {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
 
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(context));
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(context);
         Command command = requestCommand.convert2Command();
 
         ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER);
