@@ -167,7 +167,6 @@ public class DataxTask extends AbstractTaskExecutor {
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
         } catch (Exception e) {
-            logger.error("datax task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         }
