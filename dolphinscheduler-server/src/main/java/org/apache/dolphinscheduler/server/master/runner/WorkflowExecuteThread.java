@@ -921,6 +921,10 @@ public class WorkflowExecuteThread implements Runnable {
             if (allProperty.size() > 0) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
+        } else {
+            if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
+                taskInstance.setVarPool(processInstance.getVarPool());
+            }
         }
     }
 
