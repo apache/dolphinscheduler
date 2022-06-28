@@ -130,25 +130,24 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
             String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
 
-            if (defaultFS == null) {
-                defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+            if (StringUtils.isBlank(defaultFS)){
+                defaultFS= PropertyUtils.getString(Constants.FS_DEFAULT_FS);
             }
 
             //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
-            if (defaultFS.startsWith("file")) {
-                String defaultFSProp = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
-                if (StringUtils.isNotBlank(defaultFSProp)) {
-                    Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
-                    configuration.set(Constants.FS_DEFAULT_FS, defaultFSProp);
-                    fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
-                } else {
-                    logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
-                    throw new NullPointerException(
-                            String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
-                    );
-                }
+            if (StringUtils.isNotBlank(defaultFS)) {
+                Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
+                configuration.set(Constants.FS_DEFAULT_FS, defaultFS);
+                fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {
+                logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
+                throw new NullPointerException(
+                        String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
+                );
+            }
+
+            if (!defaultFS.startsWith("file")) {
                 logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS, defaultFS);
             }
 
