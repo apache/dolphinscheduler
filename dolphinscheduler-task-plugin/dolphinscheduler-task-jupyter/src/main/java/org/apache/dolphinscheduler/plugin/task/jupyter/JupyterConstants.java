@@ -41,9 +41,26 @@ public class JupyterConstants {
             "source jupyter_env/bin/activate";
 
     /**
+     * create and activate tmp conda env from txt
+     */
+    public static final String CREATE_ENV_FROM_TXT = "conda create -n %s && " +
+            "conda activate %s && " +
+            "pip install -r %s && ";
+
+    /**
+     * remove tmp conda env
+     */
+    public static final String REMOVE_ENV = "conda remove --name %s --all -y";
+
+    /**
      * file suffix tar.gz
      */
     public static final String TAR_SUFFIX = ".tar.gz";
+
+    /**
+     * file suffix .txt
+     */
+    public static final String TXT_SUFFIX = ".txt";
 
     /**
      * jointer to combine two command

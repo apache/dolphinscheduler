@@ -104,12 +104,15 @@ public class JupyterTask extends AbstractTaskExecutor {
          */
         List<String> args = new ArrayList<>();
         final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
+        final String timestamp = String.valueOf(System.currentTimeMillis());
         args.add(JupyterConstants.CONDA_INIT);
         args.add(condaPath);
         args.add(JupyterConstants.JOINTER);
         String condaEnvName = jupyterParameters.getCondaEnvName();
         if (condaEnvName.endsWith(JupyterConstants.TAR_SUFFIX)) {
             args.add(String.format(JupyterConstants.CREATE_ENV_FROM_TAR, condaEnvName));
+        } else if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(String.format(JupyterConstants.CREATE_ENV_FROM_TXT, timestamp, timestamp, condaEnvName));
         } else {
             args.add(JupyterConstants.CONDA_ACTIVATE);
             args.add(jupyterParameters.getCondaEnvName());
@@ -126,6 +129,11 @@ public class JupyterTask extends AbstractTaskExecutor {
         // populate jupyter options
         args.addAll(populateJupyterOptions());
 
+        // remove tmp conda env, if created from requirements.txt
+        if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(String.format(JupyterConstants.REMOVE_ENV, timestamp));
+        }
+
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
         if (MapUtils.isEmpty(paramsMap)) {
@@ -135,7 +143,8 @@ public class JupyterTask extends AbstractTaskExecutor {
             paramsMap.putAll(taskExecutionContext.getParamsMap());
         }
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        String command = ParameterUtils
+                .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
         logger.info("jupyter task command: {}", command);
 
