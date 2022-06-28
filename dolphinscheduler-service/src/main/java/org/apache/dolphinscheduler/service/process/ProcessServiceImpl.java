@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
@@ -30,6 +29,8 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+
+import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -170,13 +171,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final int[] stateArray = new int[] {ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.DISPATCH.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal()};
-
     @Autowired
     private UserMapper userMapper;
 
@@ -281,7 +275,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     @Transactional
-    public ProcessInstance handleCommand(Logger logger, String host, Command command) {
+    public ProcessInstance handleCommand(String host, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
@@ -1947,8 +1941,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param intList intList
      * @return string list
      */
-    @Override
-    public List<String> convertIntListToString(List<Integer> intList) {
+    private List<String> convertIntListToString(List<Integer> intList) {
         if (intList == null) {
             return new ArrayList<>();
         }
@@ -2013,12 +2006,12 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public List<ProcessInstance> queryNeedFailoverProcessInstances(String host) {
-        return processInstanceMapper.queryByHostAndStatus(host, stateArray);
+        return processInstanceMapper.queryByHostAndStatus(host, ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     @Override
     public List<String> queryNeedFailoverProcessInstanceHost() {
-        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(stateArray);
+        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -2055,7 +2048,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host) {
         return taskInstanceMapper.queryByHostAndStatus(host,
-            stateArray);
+            ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -2189,7 +2182,7 @@ public class ProcessServiceImpl implements ProcessService {
         return processInstanceMapper.queryLastRunningProcess(definitionCode,
             startTime,
             endTime,
-            stateArray);
+            ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**

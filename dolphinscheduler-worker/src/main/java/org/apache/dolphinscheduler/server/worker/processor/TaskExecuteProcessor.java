@@ -109,8 +109,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
         logger.info("task execute request command : {}", taskRequestCommand);
 
-        String contextJson = taskRequestCommand.getTaskExecutionContext();
-        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = taskRequestCommand.getTaskExecutionContext();
 
         if (taskExecutionContext == null) {
             logger.error("task execution context is null");
