@@ -27,15 +27,16 @@ mergeable:
           - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_mysql.sql'
           - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_postgresql.sql'
         message: 'Sql files not change synchronize'
-    # Add labels 'sql not sync' and comment to reviewers if Sql files not change synchronize
-    fail:
-      - do: comment
-        payload:
-          body: >
-            :warning: This PR do not change database DDL synchronize.
-      - do: labels
-        add: 'sql not sync'
-    # Remove labels 'sql not sync' if pass
-    pass:
-      - do: labels
-        delete: 'sql not sync'
+# Temporary comment this because sometime mergable will become mad keep adding or deleting the label
+#    # Add labels 'sql not sync' and comment to reviewers if Sql files not change synchronize
+#    fail:
+#      - do: comment
+#        payload:
+#          body: >
+#            :warning: This PR do not change database DDL synchronize.
+#      - do: labels
+#        add: 'sql not sync'
+#    # Remove labels 'sql not sync' if pass
+#    pass:
+#      - do: labels
+#        delete: 'sql not sync'
