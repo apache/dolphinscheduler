@@ -310,8 +310,4 @@ public class RegistryClient {
             }
         }
     }
-
-    public Duration getSessionTimeout() {
-        return registry.getSessionTimeout();
-    }
 }

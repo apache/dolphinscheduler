@@ -156,10 +156,6 @@ public class MysqlRegistry implements Registry {
         return true;
     }
 
-    @Override
-    public Duration getSessionTimeout() {
-        throw new UnsupportedOperationException("Not support session timeout at Mysql Registry");
-    }
 
     @Override
     public void close() {
