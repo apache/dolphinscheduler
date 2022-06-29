@@ -24,11 +24,11 @@
         - N months before：`$[add_months(yyyyMMdd,-N)]`
       
     2. Add or minus numbers directly after the time format.
-       - Next N weeks：$[yyyyMMdd+7*N]
-       - First N weeks：$[yyyyMMdd-7*N]
-       - Next N days：$[yyyyMMdd+N]
-       - N days before：$[yyyyMMdd-N]
-       - Next N hours：$[HHmmss+N/24]
-       - First N hours：$[HHmmss-N/24]
-       - Next N minutes：$[HHmmss+N/24/60]
-       - First N minutes：$[HHmmss-N/24/60]
+       - Next N weeks：`$[yyyyMMdd+7*N]`
+       - First N weeks：`$[yyyyMMdd-7*N]`
+       - Next N days：`$[yyyyMMdd+N]`
+       - N days before：`$[yyyyMMdd-N]`
+       - Next N hours：`$[HHmmss+N/24]`
+       - First N hours：`$[HHmmss-N/24]`
+       - Next N minutes：`$[HHmmss+N/24/60]`
+       - First N minutes：`$[HHmmss-N/24/60]`
