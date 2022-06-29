@@ -258,13 +258,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         @NonNull ProcessAlertManager processAlertManager,
         @NonNull MasterConfig masterConfig,
         @NonNull StateWheelExecuteThread stateWheelExecuteThread,
-        @NonNull CuringGlobalParamsService curingGlobalParamsService) {
+        @NonNull CuringParamsService curingParamsService) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
-        this.curingGlobalParamsService = curingGlobalParamsService;
+        this.curingParamsService = curingParamsService;
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
@@ -1926,7 +1926,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param cmdParam command param
      * @return task instance list
      */
-    private List<TaskInstance> getRecoverTaskInstanceList(String cmdParam) {
+    protected List<TaskInstance> getRecoverTaskInstanceList(String cmdParam) {
         Map<String, String> paramMap = JSONUtils.toMap(cmdParam);
 
         // todo: Can we use a better way to set the recover taskInstanceId list? rather then use the cmdParam
