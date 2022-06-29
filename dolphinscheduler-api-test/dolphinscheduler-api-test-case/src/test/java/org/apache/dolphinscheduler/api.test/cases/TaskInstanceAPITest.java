@@ -23,26 +23,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
+import org.apache.dolphinscheduler.api.test.pages.project.TaskInstancePage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.junit.jupiter.api.*;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
-public class TenantAPITest {
+public class TaskInstanceAPITest {
     private static final String tenant = System.getProperty("user.name");
-
+    private static final String projectName = "wen";
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
 
     private static String sessionId = null;
 
-    private static Integer existTenantId = null;
+    private static String genNumId = null;
 
     @BeforeAll
     public static void setup() {
@@ -59,51 +57,25 @@ public class TenantAPITest {
 
     @Test
     @Order(1)
-    public void testCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
+    public void testQueryTaskInstance() {
+        TaskInstancePage taskInstance = new TaskInstancePage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, "admin", 1, "");
+        String res = taskInstance.queryTaskInstance(sessionId, "wen", "shell123");
 
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
+        Assertions.assertTrue(res.equals("SUCCESS"));
+
     }
 
     @Test
-    @Order(2)
-    public void testDuplicateCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
+    @Order(1)
+    public void testQueryTaskInstanceLog() {
+        TaskInstancePage taskInstance = new TaskInstancePage();
+        HttpResponse res = taskInstance.queryTaskInstanceLog(sessionId, "wen", "shell123");
+        System.out.println(res.body());
+        Assertions.assertTrue(res.body().success());
 
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
-
-        Assertions.assertFalse(createTenantHttpResponse.body().success());
     }
 
-    @Test
-    @Order(5)
-    public void testGetTenantListPaging() {
-        TenantPage tenantPage = new TenantPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
-        boolean result = false;
 
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.body().data(), TenantListPagingResponseData.class).totalList()) {
-            if (tenantListPagingResponseTotalList.tenantCode().equals(tenant)) {
-                result = true;
-                existTenantId = tenantListPagingResponseTotalList.id();
-                break;
-            }
-        }
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
-        Assertions.assertTrue(result);
-    }
-
-    @Test
-    @Order(10)
-    public void testDeleteTenant() {
-        TenantPage tenantPage = new TenantPage();
-
-        HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
-
-        Assertions.assertTrue(deleteTenantHttpResponse.body().success());
-    }
 }

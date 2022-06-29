@@ -23,26 +23,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
+import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.junit.jupiter.api.*;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
-public class TenantAPITest {
+public class WorkFlowAPITest {
     private static final String tenant = System.getProperty("user.name");
-
+    private static final String projectName = "wen";
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
 
     private static String sessionId = null;
 
-    private static Integer existTenantId = null;
+    private static String genNumId = null;
 
     @BeforeAll
     public static void setup() {
@@ -59,51 +57,48 @@ public class TenantAPITest {
 
     @Test
     @Order(1)
-    public void testCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
-
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, "admin", 1, "");
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
+    public void testCreateWorkflow() {
+        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
+        flow.getGenNumId(sessionId,"wen");
+        HttpResponse res = flow.createWorkflow(sessionId, "wen", "shell123");
+        System.out.println(res);
+        System.out.println(res.body());
+        Assertions.assertTrue(res.body().success());
     }
 
     @Test
-    @Order(2)
-    public void testDuplicateCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
-
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
-
-        Assertions.assertFalse(createTenantHttpResponse.body().success());
+    @Order(1)
+    public void testQueryWorkflow() {
+        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
+        flow.getGenNumId(sessionId,"wen");
+        HttpResponse res = flow.queryWorkflow(sessionId, "wen", "shell123");
+        System.out.println(res);
+        System.out.println(res.body());
+        Assertions.assertTrue(res.body().success());
     }
 
     @Test
-    @Order(5)
-    public void testGetTenantListPaging() {
-        TenantPage tenantPage = new TenantPage();
+    @Order(1)
+    public void testOnlineWorkflow() {
+        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
+        HttpResponse res = flow.onLineWorkflow(sessionId, "wen", "shell123");
+        System.out.println(res);
+        System.out.println(res.body());
+        Assertions.assertTrue(res.body().success());
 
-        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
-        boolean result = false;
-
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.body().data(), TenantListPagingResponseData.class).totalList()) {
-            if (tenantListPagingResponseTotalList.tenantCode().equals(tenant)) {
-                result = true;
-                existTenantId = tenantListPagingResponseTotalList.id();
-                break;
-            }
-        }
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
-        Assertions.assertTrue(result);
     }
+
 
     @Test
-    @Order(10)
-    public void testDeleteTenant() {
-        TenantPage tenantPage = new TenantPage();
+    @Order(1)
+    public void testRunWorkflow() {
+        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
+        HttpResponse res = flow.runWorkflow(sessionId, "wen", "shell123");
+        System.out.println(res);
+        System.out.println(res.body());
+        Assertions.assertTrue(res.body().success());
 
-        HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
-
-        Assertions.assertTrue(deleteTenantHttpResponse.body().success());
     }
+
+
 }
