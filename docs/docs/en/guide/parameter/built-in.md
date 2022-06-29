@@ -4,9 +4,9 @@
 
 | Variable | Declaration Method | Meaning |
 | ---- | ---- | -----------------------------| 
-| system.biz.date | ${system.biz.date} | The day before the schedule time of the daily scheduling instance, the format is yyyyMMdd |
-| system.biz.curdate | ${system.biz.curdate} | The schedule time of the daily scheduling instance, the format is yyyyMMdd |
-| system.datetime | ${system.datetime} | The schedule time of the daily scheduling instance, the format is yyyyMMddHHmmss |
+| system.biz.date | `${system.biz.date}` | The day before the schedule time of the daily scheduling instance, the format is `yyyyMMdd` |
+| system.biz.curdate | `${system.biz.curdate}` | The schedule time of the daily scheduling instance, the format is `yyyyMMdd` |
+| system.datetime | `${system.datetime}` | The schedule time of the daily scheduling instance, the format is `yyyyMMddHHmmss` |
 
 ## Extended Built-in Parameter
 
