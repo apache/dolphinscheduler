@@ -2,11 +2,11 @@
 
 DolphinScheduler has three parameter types:
 
-* [Global Parameter](global.md): parameters defined at the workflow define page
-* [Parameter Context](context.md): parameters passed by upstream task nodes
+* [Global Parameter](global.md): parameters defined at the workflow define page.
+* [Parameter Context](context.md): parameters passed by upstream task nodes.
 * [Local Parameter](local.md): parameters belong to its node, which is the parameters defined by the user in [Custom Parameters]. The user can define part of the parameters when creating workflow definitions.
 
-Due to there are multiple sources of the parameter value, there will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Local Parameter > Parameter Context > Global Parameter`
+As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Local Parameter > Parameter Context > Global Parameter`.
 
 In the case of upstream tasks can pass parameters to the downstream, there may be multiple tasks upstream that pass the same parameter name:
 
@@ -15,7 +15,7 @@ In the case of upstream tasks can pass parameters to the downstream, there may b
 
 ## Example
 
-Followings are examples shows task parameters priority problems:#############
+Followings are examples showing task parameters priority problems:
 
 1: Use shell nodes to explain the first case.
 
@@ -35,6 +35,6 @@ The following shows the definition of the [use_create] node:
 
 ![priority-parameter04](/img/new_ui/dev/parameter/priority_parameter04.png)
 
-"status" is the own parameters of the node set by the current node. However, the user also sets the "status" parameter (global parameter) when saving the process definition and assign its value to -1. Then the value of status will be 2 with higher priority when the SQL executes. The global parameter value is discarded.
+"status" is own parameter of the node set by the current node. However, the user also sets the "status" parameter (global parameter) when saving the process definition and assign its value to -1. Then the value of status will be 2, with higher priority when the SQL executes. The global parameter value is discarded.
 
 The "ID" here is the parameter set by the upstream node. The user sets the parameters of the same parameter name "ID" for the [createparam1] node and [createparam2] node. And the [use_create] node uses the value of [createParam1] which is finished first.
