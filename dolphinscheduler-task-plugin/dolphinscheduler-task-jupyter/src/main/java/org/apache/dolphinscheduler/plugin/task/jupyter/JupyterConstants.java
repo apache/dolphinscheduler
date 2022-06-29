@@ -50,7 +50,7 @@ public class JupyterConstants {
     /**
      * remove tmp conda env
      */
-    public static final String REMOVE_ENV = "conda remove --name jupyter-tmp-env-%s --all -y";
+    public static final String REMOVE_ENV = "conda deactivate && conda remove --name jupyter-tmp-env-%s --all -y";
 
     /**
      * file suffix tar.gz

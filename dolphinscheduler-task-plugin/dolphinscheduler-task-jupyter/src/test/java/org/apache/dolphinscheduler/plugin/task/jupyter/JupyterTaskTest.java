@@ -136,7 +136,7 @@ public class JupyterTaskTest {
                         "--version " +
                         "--inject-paths " +
                         "--progress-bar && " +
-                        "conda remove --name jupyter-tmp-env-123456789 --all -y"
+                        "conda deactivate && conda remove --name jupyter-tmp-env-123456789 --all -y"
                 );
     }
 
