@@ -23,16 +23,21 @@ public class JavaConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String JAVA_HOME8 = "JAVA_HOME";
-    public static final String JAVA_HOME11 = "JAVA_HOME8";
-    public static final String JAVA_HOME13 = "JAVA_HOME11";
-    public static final String JAVA_HOME15 = "JAVA_HOME13";
+    public static final String JAVA_HOME_GENERIC = "JAVA_HOME";
+    public static final String JAVA_HOME8 = "JAVA_HOME8";
+    public static final String JAVA_HOME11 = "JAVA_HOME11";
+    public static final String JAVA_HOME13 = "JAVA_HOME13";
+    public static final String JAVA_HOME15 = "JAVA_HOME15";
     public static final String JAVA_HOME17 = "JAVA_HOME17";
 
 
     public static final String RUN_TYPE_JAVA = "JAVA";
     public static final String RUN_TYPE_JAR = "JAR";
-    public static final String RUN_TYPE_JSHELL = "JSHELL";
+
+//    to be extended.
+//    public static final String RUN_TYPE_JSHELL = "JSHELL";
+//    public static final String RUN_TYPE_INJVM = "INJVM";
+
 
 
     public static final String PATH_SEPARATOR = System.getProperty("path.separator");

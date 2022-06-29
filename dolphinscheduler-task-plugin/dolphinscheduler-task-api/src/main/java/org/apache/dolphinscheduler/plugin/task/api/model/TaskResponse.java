@@ -123,4 +123,18 @@ public class TaskResponse {
     public void setStatus(TaskRunStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "TaskResponse{" +
+                "varPool='" + varPool + '\'' +
+                ", processId=" + processId +
+                ", resultString='" + resultString + '\'' +
+                ", appIds='" + appIds + '\'' +
+                ", process=" + process +
+                ", cancel=" + cancel +
+                ", exitStatusCode=" + exitStatusCode +
+                ", status=" + status +
+                '}';
+    }
 }

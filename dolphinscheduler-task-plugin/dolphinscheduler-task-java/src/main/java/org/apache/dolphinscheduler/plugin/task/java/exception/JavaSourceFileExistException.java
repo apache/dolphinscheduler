@@ -15,14 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.java;
+package org.apache.dolphinscheduler.plugin.task.java.exception;
 
-public enum JavaVersion {
+public class JavaSourceFileExistException extends RuntimeException{
+    public JavaSourceFileExistException() {
+    }
 
-    JAVA_GENERIC,
-    JAVA_8,
-    JAVA_11,
-    JAVA_13,
-    JAVA_15,
-    JAVA_17,
+    public JavaSourceFileExistException(String message) {
+        super(message);
+    }
+
+    public JavaSourceFileExistException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public JavaSourceFileExistException(Throwable cause) {
+        super(cause);
+    }
+
+    public JavaSourceFileExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }
