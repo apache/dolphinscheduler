@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.plugin.task.dinky;
  */
 public class DinkyTaskConstants {
 
+    private DinkyTaskConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+    
     private static final String API_ROUTE = "/openapi/";
     public static final String SUBMIT_TASK = API_ROUTE + "submitTask";
     public static final String ONLINE_TASK = API_ROUTE + "onLineTask";

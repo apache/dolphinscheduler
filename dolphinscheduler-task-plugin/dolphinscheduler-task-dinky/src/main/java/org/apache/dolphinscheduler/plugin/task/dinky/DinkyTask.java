@@ -120,7 +120,7 @@ public class DinkyTask extends AbstractTaskExecutor {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             errorHandle(e);
         }
     }
