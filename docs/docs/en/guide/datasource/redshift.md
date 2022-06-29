@@ -1,6 +1,6 @@
 # Amazon Redshift
 
-![Redshift datasource](../../../..//img/new_ui/dev/datasource/redshift.png)
+![Redshift datasource](../../../../img/new_ui/dev/datasource/redshift.png)
 
 ## Datasource Parameters
 
