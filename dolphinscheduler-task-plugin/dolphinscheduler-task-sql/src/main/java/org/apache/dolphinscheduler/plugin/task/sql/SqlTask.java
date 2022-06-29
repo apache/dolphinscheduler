@@ -162,7 +162,7 @@ public class SqlTask extends AbstractTaskExecutor {
 
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("sql task error: {}", e.toString());
+            logger.error("sql task error", e);
             throw e;
         }
     }
