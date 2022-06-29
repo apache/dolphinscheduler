@@ -1788,6 +1788,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
+    @Transactional(rollbackFor = RuntimeException.class)
     protected void doBatchOperateProcessDefinition(User loginUser,
                                                  long targetProjectCode,
                                                  List<String> failedProcessList,
@@ -1834,6 +1835,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
                     }
                 }
+                final long oldProcessDefinitionCode = processDefinition.getCode();
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
@@ -1855,6 +1857,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         jsonNodes.set(i, node);
                     }
                     processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
+                }
+                //copy timing configuration
+                Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
+                if (scheduleObj != null) {
+                    scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
+                    scheduleObj.setReleaseState(ReleaseState.OFFLINE);
+                    scheduleObj.setCreateTime(date);
+                    scheduleObj.setUpdateTime(date);
+                    int insertResult = scheduleMapper.insert(scheduleObj);
+                    if (insertResult != 1) {
+                        putMsg(result, Status.CREATE_SCHEDULE_ERROR);
+                        throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
+                    }
                 }
                 try {
                     result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson));
