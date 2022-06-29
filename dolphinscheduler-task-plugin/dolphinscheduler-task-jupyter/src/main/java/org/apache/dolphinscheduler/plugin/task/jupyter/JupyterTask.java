@@ -28,15 +28,13 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -104,7 +102,7 @@ public class JupyterTask extends AbstractTaskExecutor {
          */
         List<String> args = new ArrayList<>();
         final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
-        final String timestamp = String.valueOf(System.currentTimeMillis());
+        final String timestamp = DateUtils.formatTimeStamp(System.currentTimeMillis());
         args.add(JupyterConstants.CONDA_INIT);
         args.add(condaPath);
         args.add(JupyterConstants.JOINTER);
@@ -131,6 +129,7 @@ public class JupyterTask extends AbstractTaskExecutor {
 
         // remove tmp conda env, if created from requirements.txt
         if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(JupyterConstants.JOINTER);
             args.add(String.format(JupyterConstants.REMOVE_ENV, timestamp));
         }
 

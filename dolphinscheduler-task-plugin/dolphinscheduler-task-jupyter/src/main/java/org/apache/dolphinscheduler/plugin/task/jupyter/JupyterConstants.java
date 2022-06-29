@@ -43,14 +43,14 @@ public class JupyterConstants {
     /**
      * create and activate tmp conda env from txt
      */
-    public static final String CREATE_ENV_FROM_TXT = "conda create -n %s && " +
-            "conda activate %s && " +
-            "pip install -r %s && ";
+    public static final String CREATE_ENV_FROM_TXT = "conda create -n jupyter-tmp-env-%s && " +
+            "conda activate jupyter-tmp-env-%s && " +
+            "pip install -r %s";
 
     /**
      * remove tmp conda env
      */
-    public static final String REMOVE_ENV = "conda remove --name %s --all -y";
+    public static final String REMOVE_ENV = "conda remove --name jupyter-tmp-env-%s --all -y";
 
     /**
      * file suffix tar.gz

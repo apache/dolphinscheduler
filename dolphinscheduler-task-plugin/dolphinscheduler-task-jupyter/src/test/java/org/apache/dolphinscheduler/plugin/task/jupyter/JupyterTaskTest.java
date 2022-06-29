@@ -19,11 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.jupyter;
 
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -31,8 +30,8 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -40,17 +39,19 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest({
         JSONUtils.class,
         PropertyUtils.class,
-        System.class,
+        DateUtils.class,
+//        Date.class
+//        System.class,
 //        String.class,
 })
 @PowerMockIgnore({"javax.*"})
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
 public class JupyterTaskTest {
 
-    @Before
-    public void setup() {
-        PowerMockito.mockStatic(System.class);
-    }
+//    @Before
+//    public void setup() {
+//        PowerMockito.mockStatic(System.class);
+//    }
 
     @Test
     public void testBuildJupyterCommandWithLocalEnv() throws Exception {
@@ -113,16 +114,14 @@ public class JupyterTaskTest {
         when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         PowerMockito.mockStatic(PropertyUtils.class);
         when(PropertyUtils.getString(any())).thenReturn("/opt/anaconda3/etc/profile.d/conda.sh");
-        PowerMockito.mockStatic(System.class);
-//        Long currrentTimeMillis = System.currentTimeMillis();
-        when(System.currentTimeMillis()).thenReturn(100L);
-//        when(String.valueOf(any())).thenReturn("123456789");
+        PowerMockito.mockStatic(DateUtils.class);
+        when(DateUtils.formatTimeStamp(anyLong())).thenReturn("123456789");
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
         jupyterTask.init();
         Assert.assertEquals(jupyterTask.buildCommand(),
                 "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                        "conda create -n 123456789 && " +
-                        "conda activate 123456789 && " +
+                        "conda create -n jupyter-tmp-env-123456789 && " +
+                        "conda activate jupyter-tmp-env-123456789 && " +
                         "pip install -r requirements.txt && " +
                         "papermill " +
                         "/test/input_note.ipynb " +
@@ -135,7 +134,9 @@ public class JupyterTaskTest {
                         "--start-timeout 3 " +
                         "--version " +
                         "--inject-paths " +
-                        "--progress-bar");
+                        "--progress-bar && " +
+                        "conda remove --name jupyter-tmp-env-123456789 --all -y"
+                );
     }
 
     private String buildJupyterCommandWithLocalEnv() {
