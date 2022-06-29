@@ -23,26 +23,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
+import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.junit.jupiter.api.*;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
-public class TenantAPITest {
+public class ProjectAPITest {
     private static final String tenant = System.getProperty("user.name");
-
+    private static final String projectName = "wen";
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
 
     private static String sessionId = null;
 
-    private static Integer existTenantId = null;
 
     @BeforeAll
     public static void setup() {
@@ -59,51 +56,24 @@ public class TenantAPITest {
 
     @Test
     @Order(1)
-    public void testCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
+    public void testCreateProject() {
+        ProjectPage projectPage = new ProjectPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, "admin", 1, "");
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
+        HttpResponse createProjectHttpResponse = projectPage.createProject(sessionId, projectName, "123", "admin");
+        System.out.println(createProjectHttpResponse.body());
+        Assertions.assertTrue(createProjectHttpResponse.body().success());
     }
 
     @Test
-    @Order(2)
-    public void testDuplicateCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
+    @Order(1)
+    public void testQeuryProject() {
+        ProjectPage projectPage = new ProjectPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
-
-        Assertions.assertFalse(createTenantHttpResponse.body().success());
+        String aa = projectPage.getProjectCode(sessionId, "wen");
+        System.out.println(aa);
     }
 
-    @Test
-    @Order(5)
-    public void testGetTenantListPaging() {
-        TenantPage tenantPage = new TenantPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
-        boolean result = false;
 
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.body().data(), TenantListPagingResponseData.class).totalList()) {
-            if (tenantListPagingResponseTotalList.tenantCode().equals(tenant)) {
-                result = true;
-                existTenantId = tenantListPagingResponseTotalList.id();
-                break;
-            }
-        }
 
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
-        Assertions.assertTrue(result);
-    }
-
-    @Test
-    @Order(10)
-    public void testDeleteTenant() {
-        TenantPage tenantPage = new TenantPage();
-
-        HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
-
-        Assertions.assertTrue(deleteTenantHttpResponse.body().success());
-    }
 }
