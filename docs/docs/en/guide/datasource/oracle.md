@@ -1,6 +1,6 @@
 # Oracle
 
-![oracle](../../../..//img/new_ui/dev/datasource/oracle.png)
+![oracle](../../../../img/new_ui/dev/datasource/oracle.png)
 
 ## Datasource Parameters
 
