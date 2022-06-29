@@ -19,12 +19,15 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -39,16 +42,25 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import com.google.common.base.Strings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 /**
  * task scheduler thread
@@ -64,14 +76,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * task instance
      */
     private TaskExecutionContext taskExecutionContext;
-
-    public StorageOperate getStorageOperate() {
-        return storageOperate;
-    }
-
-    public void setStorageOperate(StorageOperate storageOperate) {
-        this.storageOperate = storageOperate;
-    }
 
     private StorageOperate storageOperate;
 
@@ -96,24 +100,28 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param taskCallbackService taskCallbackService
+     * @param taskCallbackService  taskCallbackService
      */
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
-                             AlertClientService alertClientService) {
+                             AlertClientService alertClientService,
+                             StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
+        this.storageOperate = storageOperate;
     }
 
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
                              AlertClientService alertClientService,
-                             TaskPluginManager taskPluginManager) {
+                             TaskPluginManager taskPluginManager,
+                             StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
+        this.storageOperate = storageOperate;
     }
 
     @Override
@@ -124,10 +132,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setEndTime(new Date());
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Task dry run success",
+                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             return;
         }
-
         try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
@@ -140,7 +150,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // copy hdfs/minio file to local
             List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources());
-            if (!fileDownloads.isEmpty()){
+            if (!fileDownloads.isEmpty()) {
                 downloadResource(taskExecutionContext.getExecutePath(), logger, fileDownloads);
             }
 
@@ -200,6 +210,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             clearTaskExecPath();
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
@@ -232,7 +243,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
                 logger.info("exec local path: {} cleared.", execLocalPath);
             } catch (IOException e) {
-                logger.error("delete exec dir failed : {}", e.getMessage(), e);
+                if (e instanceof NoSuchFileException) {
+                    // this is expected
+                } else {
+                    logger.error("Delete exec dir failed.", e);
+                }
             }
         }
     }
@@ -263,7 +278,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 task.cancelApplication(true);
                 ProcessUtils.killYarnJob(taskExecutionContext);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("Kill task failed", e);
             }
         }
     }
@@ -293,11 +308,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * download resource check
+     *
      * @param execLocalPath
      * @param projectRes
      * @return
      */
-    public List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes){
+    public List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes) {
         if (MapUtils.isEmpty(projectRes)) {
             return Collections.emptyList();
         }
@@ -305,13 +321,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
         projectRes.forEach((key, value) -> {
             File resFile = new File(execLocalPath, key);
             boolean notExist = !resFile.exists();
-            if (notExist){
+            if (notExist) {
                 downloadFile.add(Pair.of(key, value));
-            } else{
+            } else {
                 logger.info("file : {} exists ", resFile.getName());
             }
         });
-        if (!downloadFile.isEmpty() && !PropertyUtils.getResUploadStartupState()){
+        if (!downloadFile.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
             throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
         }
         return downloadFile;

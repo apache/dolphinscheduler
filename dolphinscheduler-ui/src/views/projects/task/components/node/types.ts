@@ -344,6 +344,13 @@ interface ITaskParams {
   executeMode?: string
   useCustom?: boolean
   runMode?: string
+  dvcTaskType?: string
+  dvcRepository?: string
+  dvcVersion?: string
+  dvcDataLocation?: string
+  dvcMessage?: string
+  dvcLoadSaveDataPath?: string
+  dvcStoreUrl?: string
 }
 
 interface INodeData

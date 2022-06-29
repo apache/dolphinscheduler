@@ -122,9 +122,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
+            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
         }
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
         return result;
     }
 
@@ -189,11 +189,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.WORKER_GROUP,WORKER_GROUP_MANAGE)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
         List<WorkerGroup> workerGroups = new ArrayList<>();
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             workerGroups = getWorkerGroups(true);

@@ -17,19 +17,25 @@
 
 package org.apache.dolphinscheduler.service.corn;
 
-import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
-import com.cronutils.parser.CronParser;
-import org.apache.commons.collections.CollectionUtils;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
+
+import static com.cronutils.model.CronType.QUARTZ;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.quartz.CronExpression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -40,15 +46,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
-import static com.cronutils.model.CronType.QUARTZ;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
+import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.cronutils.model.Cron;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.parser.CronParser;
 
 /**
  * // todo: this utils is heavy, it rely on quartz and corn-utils.
@@ -128,7 +132,7 @@ public class CronUtils {
 
         while (Stopper.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime)) {
+            if (startTime == null || startTime.after(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -150,7 +154,7 @@ public class CronUtils {
         List<Date> dateList = new ArrayList<>();
         while (fireTimes > 0) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime) || startTime.equals(endTime)) {
+            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -173,7 +177,7 @@ public class CronUtils {
 
         while (Stopper.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime.after(endTime) || startTime.equals(endTime)) {
+            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -288,10 +292,10 @@ public class CronUtils {
      * @param param
      * @return  date list
      */
-    public static List<Date> getSelfScheduleDateList(Map<String, String> param){
+    public static List<Date> getSelfScheduleDateList(Map<String, String> param) {
         List<Date> result = new ArrayList<>();
         String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-        if(StringUtils.isNotEmpty(scheduleDates)){
+        if (StringUtils.isNotEmpty(scheduleDates)) {
             for (String stringDate : scheduleDates.split(COMMA)) {
                 result.add(DateUtils.stringToDate(stringDate));
             }

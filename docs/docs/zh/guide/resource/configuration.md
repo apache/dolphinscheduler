@@ -11,7 +11,7 @@
 对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
 
 - 将 `data.basedir.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`data.basedir.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
-- 修改下列两个参数，分别是 `resource.storage.type=HDFS` 和 `fs.defaultFS=file:///`。
+- 修改下列两个参数，分别是 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
 
 ## HDFS 资源配置
 
@@ -47,7 +47,24 @@ resource.storage.type=HDFS
 
 # resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration,
 # please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
-resource.upload.path=/tmp/dolphinscheduler
+resource.storage.upload.base.path=/tmp/dolphinscheduler
+
+# The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.access.key.id=minioadmin
+# The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.secret.access.key=minioadmin
+# The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.region=cn-north-1
+# The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
+resource.aws.s3.bucket.name=dolphinscheduler
+# You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
+resource.aws.s3.endpoint=http://localhost:9000
+
+# if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
+resource.hdfs.root.user=root
+# if resource.storage.type=S3, the value like: s3a://dolphinscheduler;
+# if resource.storage.type=HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
+resource.hdfs.fs.defaultFS=hdfs://localhost:8020
 
 # whether to startup kerberos
 hadoop.security.authentication.startup.state=false
@@ -65,15 +82,7 @@ login.user.keytab.path=/opt/hdfs.headless.keytab
 kerberos.expire.time=2
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
-# if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
-hdfs.root.user=root
-# if resource.storage.type=S3, the value like: s3a://dolphinscheduler;
-# if resource.storage.type=HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
-fs.defaultFS=hdfs://localhost:8020
-aws.access.key.id=minioadmin
-aws.secret.access.key=minioadmin
-aws.region=us-east-1
-aws.endpoint=http://localhost:9000
+
 # resourcemanager port, the default value is 8088 if not specified
 resource.manager.httpaddress.port=8088
 # if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty

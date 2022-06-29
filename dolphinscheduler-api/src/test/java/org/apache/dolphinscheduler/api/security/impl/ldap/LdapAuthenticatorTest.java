@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,11 +53,12 @@ import org.springframework.test.context.TestPropertySource;
                 "security.authentication.type=LDAP",
                 "security.authentication.ldap.user.admin=read-only-admin",
                 "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
-                "security.authentication.ldap.base.dn=dc=example,dc=com",
+                "security.authentication.ldap.base-dn=dc=example,dc=com",
                 "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
                 "security.authentication.ldap.password=password",
-                "security.authentication.ldap.user.identity.attribute=uid",
-                "security.authentication.ldap.user.email.attribute=mail",
+                "security.authentication.ldap.user.identity-attribute=uid",
+                "security.authentication.ldap.user.email-attribute=mail",
+                "security.authentication.ldap.user.not-exist-action=CREATE",
         })
 public class LdapAuthenticatorTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
@@ -98,23 +101,32 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
         mockSession.setIp(ip);
         mockSession.setUserId(1);
         mockSession.setLastLoginTime(new Date());
-
     }
 
     @Test
     public void testAuthenticate() {
-        when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(mockSession.getId());
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
+        when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(mockSession.getId());
 
-        Result result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        // test username pwd correct and user not exist, config user not exist action deny, so login denied
+        when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.DENY);
+        when(ldapService.createIfUserNotExists()).thenReturn(false);
+        Result<Map<String, String>> result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
+
+        // test username pwd correct and user not exist, config user not exist action create, so login success
+        when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATE);
+        when(ldapService.createIfUserNotExists()).thenReturn(true);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
+        // test username pwd correct and user not exist, config action create but can't create session, so login failed
         when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(null);
-
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
+        // test username pwd error, login failed
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(null);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());

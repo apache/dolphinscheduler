@@ -15,33 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
+package org.apache.dolphinscheduler.api.security;
 
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * RefreshResourceTask test
+ * ldap user not exist action type
  */
-@RunWith(MockitoJUnitRunner.class)
-public class RefreshResourceTaskTest {
+public enum LdapUserNotExistActionType {
 
-    @Mock
-    private ServerNodeManager serverNodeManager;
+    CREATE(0, "automatically create user when user not exist"),
+    DENY(1, "deny log-in when user not exist"),
+    ;
 
-    @InjectMocks
-    LowerWeightHostManager lowerWeightHostManager;
-
-    @Test
-    public void testGetHostWeightWithResult() {
-        Assert.assertTrue(!lowerWeightHostManager.new RefreshResourceTask()
-            .getHostWeight("192.168.1.1:22", "default", null)
-            .isPresent());
+    LdapUserNotExistActionType(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
+
+    @EnumValue
+    private final int code;
+    private final String desc;
 }

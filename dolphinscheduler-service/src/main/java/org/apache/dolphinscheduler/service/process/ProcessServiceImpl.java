@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
@@ -31,6 +30,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
+import static java.util.stream.Collectors.toSet;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -41,6 +42,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -172,13 +174,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final int[] stateArray = new int[] {ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.DISPATCH.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal()};
-
     @Autowired
     private UserMapper userMapper;
 
@@ -276,6 +271,9 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private K8sMapper k8sMapper;
 
+    @Autowired
+    private CuringGlobalParamsService curingGlobalParamsService;
+
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -286,7 +284,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     @Transactional
-    public ProcessInstance handleCommand(Logger logger, String host, Command command) {
+    public ProcessInstance handleCommand(String host, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
@@ -345,25 +343,29 @@ public class ProcessServiceImpl implements ProcessService {
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                     processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
-            if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
-                for (ProcessInstance info : runningProcessInstances) {
-                    info.setCommandType(CommandType.STOP);
-                    info.addHistoryCmd(CommandType.STOP);
-                    info.setState(ExecutionStatus.READY_STOP);
-                    int update = updateProcessInstance(info);
-                    // determine whether the process is normal
-                    if (update > 0) {
-                        String host = info.getHost();
-                        String address = host.split(":")[0];
-                        int port = Integer.parseInt(host.split(":")[1]);
-                        StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
+            if (CollectionUtils.isEmpty(runningProcessInstances)) {
+                processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+                saveProcessInstance(processInstance);
+                return;
+            }
+            for (ProcessInstance info : runningProcessInstances) {
+                if (Objects.nonNull(info.getState()) && (ExecutionStatus.READY_STOP.equals(info.getState()) || info.getState().typeIsFinished())) {
+                    continue;
+                }
+                info.setCommandType(CommandType.STOP);
+                info.addHistoryCmd(CommandType.STOP);
+                info.setState(ExecutionStatus.READY_STOP);
+                int update = updateProcessInstance(info);
+                // determine whether the process is normal
+                if (update > 0) {
+                    StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                             info.getId(), 0, info.getState(), info.getId(), 0
-                        );
-                        try {
-                            stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
-                        } catch (Exception e) {
-                            logger.error("sendResultError");
-                        }
+                    );
+                    try {
+                        Host host = new Host(info.getHost());
+                        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
+                    } catch (Exception e) {
+                        logger.error("sendResultError",e );
                     }
                 }
             }
@@ -408,7 +410,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return create result
      */
     @Override
-    @Counted("dolphinscheduler_create_command_count")
+    @Counted("ds.workflow.create.command.count")
     public int createCommand(Command command) {
         int result = 0;
         if (command != null) {
@@ -766,7 +768,8 @@ public class ProcessServiceImpl implements ProcessService {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
-        processInstance.setRestartTime(processInstance.getStartTime());
+        // the new process instance restart time is null.
+        processInstance.setRestartTime(null);
         processInstance.setRunTimes(1);
         processInstance.setMaxTryTimes(0);
         processInstance.setCommandParam(command.getCommandParam());
@@ -797,11 +800,12 @@ public class ProcessServiceImpl implements ProcessService {
             timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
         }
 
-        processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-            processDefinition.getGlobalParamMap(),
-            processDefinition.getGlobalParamList(),
-            getCommandTypeIfComplement(processInstance, command),
-            processInstance.getScheduleTime(), timezoneId));
+        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                getCommandTypeIfComplement(processInstance, command),
+                processInstance.getScheduleTime(), timezoneId);
+        processInstance.setGlobalParams(globalParams);
 
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
@@ -948,11 +952,12 @@ public class ProcessServiceImpl implements ProcessService {
             String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
             // Recalculate global parameters after rerun.
-            processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                commandTypeIfComplement,
-                processInstance.getScheduleTime(), timezoneId));
+            String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                    processDefinition.getGlobalParamMap(),
+                    processDefinition.getGlobalParamList(),
+                    commandTypeIfComplement,
+                    processInstance.getScheduleTime(), timezoneId);
+            processInstance.setGlobalParams(globalParams);
             processInstance.setProcessDefinition(processDefinition);
         }
         //reset command parameter
@@ -1134,10 +1139,11 @@ public class ProcessServiceImpl implements ProcessService {
         // time zone
         String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
-        processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-            processDefinition.getGlobalParamMap(),
-            processDefinition.getGlobalParamList(),
-            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId));
+        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId);
+        processInstance.setGlobalParams(globalParams);
     }
 
     /**
@@ -1253,7 +1259,7 @@ public class ProcessServiceImpl implements ProcessService {
      * retry submit task to db
      */
     @Override
-    public TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
+    public TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval) {
         int retryTimes = 1;
         TaskInstance task = null;
         while (retryTimes <= commitRetryTimes) {
@@ -1285,7 +1291,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
-        logger.info("start submit task : {}, instance id:{}, state: {}",
+        logger.info("start submit task : {}, processInstance id:{}, state: {}",
             taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
         //submit to db
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
@@ -1961,8 +1967,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param intList intList
      * @return string list
      */
-    @Override
-    public List<String> convertIntListToString(List<Integer> intList) {
+    private List<String> convertIntListToString(List<Integer> intList) {
         if (intList == null) {
             return new ArrayList<>();
         }
@@ -2027,12 +2032,12 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public List<ProcessInstance> queryNeedFailoverProcessInstances(String host) {
-        return processInstanceMapper.queryByHostAndStatus(host, stateArray);
+        return processInstanceMapper.queryByHostAndStatus(host, ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     @Override
     public List<String> queryNeedFailoverProcessInstanceHost() {
-        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(stateArray);
+        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -2069,7 +2074,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host) {
         return taskInstanceMapper.queryByHostAndStatus(host,
-            stateArray);
+            ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -2203,7 +2208,7 @@ public class ProcessServiceImpl implements ProcessService {
         return processInstanceMapper.queryLastRunningProcess(definitionCode,
             startTime,
             endTime,
-            stateArray);
+            ExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -3036,13 +3041,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void sendStartTask2Master(ProcessInstance processInstance, int taskId,
                                      org.apache.dolphinscheduler.remote.command.CommandType taskType) {
-        String host = processInstance.getHost();
-        String address = host.split(":")[0];
-        int port = Integer.parseInt(host.split(":")[1]);
         TaskEventChangeCommand taskEventChangeCommand = new TaskEventChangeCommand(
             processInstance.getId(), taskId
         );
-        stateEventCallbackService.sendResult(address, port, taskEventChangeCommand.convert2Command(taskType));
+        Host host = new Host(processInstance.getHost());
+        stateEventCallbackService.sendResult(host, taskEventChangeCommand.convert2Command(taskType));
     }
 
     @Override

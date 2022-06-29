@@ -81,6 +81,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +96,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import lombok.NonNull;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -112,28 +115,25 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected int maxRetryTimes;
 
-    protected int commitInterval;
+    protected long commitInterval;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    protected ProcessService processService;
 
-    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+    protected MasterConfig masterConfig;
 
-    protected TaskPluginManager taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
+    protected TaskPluginManager taskPluginManager;
 
     protected String threadLoggerInfoName;
 
     @Override
-    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
-        if (processService == null) {
-            processService = SpringApplicationContext.getBean(ProcessService.class);
-        }
-        if (masterConfig == null) {
-            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        }
+    public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
+        processService = SpringApplicationContext.getBean(ProcessService.class);
+        masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
-        this.commitInterval = masterConfig.getTaskCommitInterval();
+        this.commitInterval = masterConfig.getTaskCommitInterval().toMillis();
     }
 
     protected javax.sql.DataSource defaultDataSource =
@@ -245,7 +245,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public String getType() {
-        return null;
+        throw new UnsupportedOperationException("This abstract class doesn's has type");
     }
 
     @Override

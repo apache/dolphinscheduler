@@ -84,6 +84,15 @@ management:
     web:
       exposure:
         include: '*'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+  health:
+    db:
+      enabled: true
+    defaults:
+      enabled: false
   metrics:
     tags:
       application: ${spring.application.name}
@@ -134,15 +143,33 @@ security:
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
-      # admin userId
-      user.admin: read-only-admin
       # ldap server config
       urls: ldap://ldap.forumsys.com:389/
-      base.dn: dc=example,dc=com
+      base-dn: dc=example,dc=com
       username: cn=read-only-admin,dc=example,dc=com
       password: password
-      user.identity.attribute: uid
-      user.email.attribute: mail
+      user:
+        # admin userId when you use LDAP login
+        admin: read-only-admin
+        identity-attribute: uid
+        email-attribute: mail
+        # action when ldap user is not exist (supported types: CREATE,DENY)
+        not-exist-action: CREATE
+
+# Traffic control, if you turn on this config, the maximum number of request/s will be limited.
+# global max request number per second
+# default tenant-level max request number
+traffic:
+  control:
+    global-switch: false
+    max-global-qps-rate: 300
+    tenant-switch: false
+    default-tenant-qps-rate: 10
+    #customize-tenant-qps-rate:
+      # eg.
+      #tenant1: 11
+      #tenant2: 20
+
 
 # Override by profile
 

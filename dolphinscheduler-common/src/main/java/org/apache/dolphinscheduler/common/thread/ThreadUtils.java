@@ -23,24 +23,28 @@ import java.util.concurrent.ThreadFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-/**
- * thread utils
- */
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class ThreadUtils {
     /**
      * Wrapper over newDaemonFixedThreadExecutor.
+     *
      * @param threadName threadName
      * @param threadsNum threadsNum
      * @return ExecutorService
      */
-    public static ExecutorService newDaemonFixedThreadExecutor(String threadName,int threadsNum) {
+    public static ExecutorService newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setNameFormat(threadName)
-                .build();
+            .setDaemon(true)
+            .setNameFormat(threadName)
+            .build();
         return Executors.newFixedThreadPool(threadsNum, threadFactory);
     }
 
+    /**
+     * Sleep in given mills, this is not accuracy.
+     */
     public static void sleep(final long millis) {
         try {
             Thread.sleep(millis);

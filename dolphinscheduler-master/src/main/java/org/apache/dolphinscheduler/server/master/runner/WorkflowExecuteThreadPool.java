@@ -20,12 +20,14 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
@@ -46,8 +48,10 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import com.google.common.base.Strings;
 
+import lombok.NonNull;
+
 /**
- * Used to execute {@link WorkflowExecuteRunnable}, when
+ * Used to execute {@link WorkflowExecuteRunnable}.
  */
 @Component
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
@@ -77,7 +81,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     @PostConstruct
     private void init() {
         this.setDaemon(true);
-        this.setThreadNamePrefix("Workflow-Execute-Thread-");
+        this.setThreadNamePrefix("WorkflowExecuteThread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
         this.setCorePoolSize(masterConfig.getExecThreads());
     }
@@ -88,29 +92,22 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     public void submitStateEvent(StateEvent stateEvent) {
         WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.warn("workflowExecuteThread is null, stateEvent:{}", stateEvent);
+            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}", stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
-    }
-
-    /**
-     * Start the given workflow.
-     */
-    public void startWorkflow(WorkflowExecuteRunnable workflowExecuteThread) {
-        ProcessInstanceMetrics.incProcessInstanceSubmit();
-        submit(workflowExecuteThread);
+        logger.info("Submit state event success, stateEvent: {}", stateEvent);
     }
 
     /**
      * Handle the events belong to the given workflow.
      */
-    public void executeEvent(WorkflowExecuteRunnable workflowExecuteThread) {
+    public void executeEvent(final WorkflowExecuteRunnable workflowExecuteThread) {
         if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
-            logger.warn("The workflow:{} has been executed by another thread", workflowExecuteThread.getKey());
+            logger.warn("The workflow has been executed by another thread");
             return;
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
@@ -119,24 +116,31 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
-                logger.error("handle events {} failed", processInstanceId, ex);
-                multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                try {
+                    logger.error("Workflow instance events handle failed", ex);
+                    multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                } finally {
+                    LoggerUtils.removeWorkflowInstanceIdMDC();
+                }
             }
 
             @Override
             public void onSuccess(Object result) {
                 try {
+                    LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish()) {
-                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
+                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                        logger.info("process instance {} finished.", processInstanceId);
+                        logger.info("Workflow instance is finished.");
                     }
                 } catch (Exception e) {
-                    logger.error("handle events {} success, but notify changed error", processInstanceId, e);
+                    logger.error("Workflow instance is finished, but notify changed error", e);
                 } finally {
                     // make sure the process has been removed from multiThreadFilterMap
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                    LoggerUtils.removeWorkflowInstanceIdMDC();
                 }
             }
         });
@@ -165,9 +169,9 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * notify myself
      */
-    private void notifyMyself(ProcessInstance processInstance, TaskInstance taskInstance) {
-        logger.info("notify process {} task {} state change", processInstance.getId(), taskInstance.getId());
+    private void notifyMyself(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
+            logger.warn("The execute cache manager doesn't contains this workflow instance");
             return;
         }
         StateEvent stateEvent = new StateEvent();
@@ -182,16 +186,15 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * notify process's master
      */
     private void notifyProcess(ProcessInstance finishProcessInstance, ProcessInstance processInstance, TaskInstance taskInstance) {
-        String host = processInstance.getHost();
-        if (Strings.isNullOrEmpty(host)) {
+        String processInstanceHost = processInstance.getHost();
+        if (Strings.isNullOrEmpty(processInstanceHost)) {
             logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(), taskInstance.getId());
             return;
         }
-        String address = host.split(":")[0];
-        int port = Integer.parseInt(host.split(":")[1]);
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                 finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(), taskInstance.getId()
         );
-        stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+        Host host = new Host(processInstanceHost);
+        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
     }
 }

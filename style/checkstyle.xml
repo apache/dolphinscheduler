@@ -21,7 +21,9 @@
 <module name="Checker">
     <property name="charset" value="UTF-8"/>
 
-    <property name="severity" value="info"/>
+    <property name="severity" value="warning"/>
+
+    <module name="SuppressWarningsFilter"/>
 
     <property name="fileExtensions" value="java, properties, xml"/>
 
@@ -40,6 +42,9 @@
     </module>
 
     <module name="TreeWalker">
+
+        <module name="SuppressWarningsHolder"/>
+
         <module name="OuterTypeFilename">
             <property name="severity" value="error"/>
         </module>

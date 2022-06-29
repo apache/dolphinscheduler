@@ -108,7 +108,6 @@ public class ProjectServiceTest {
     public void testCheckProjectAndAuth() {
 
         long projectCode = 1L;
-//        Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
         User loginUser = getLoginUser();
 
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, null, projectCode, PROJECT);
@@ -142,7 +141,6 @@ public class ProjectServiceTest {
         project1.setUserId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(), PROJECT, baseServiceLogger)).thenReturn(true);
-//        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{project.getId()}, 0, baseServiceLogger)).thenReturn(true);
         result2 = projectService.checkProjectAndAuth(loginUser, project1, projectCode,PROJECT);
         Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result2.get(Constants.STATUS));
 
@@ -329,9 +327,8 @@ public class ProjectServiceTest {
         List<Integer> list = new ArrayList<>(1);
         list.add(1);
         // not admin user
-        //     Mockito.when(projectMapper.queryProjectCreatedAndAuthorizedByUserId(1)).thenReturn(getList());
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),list)).thenReturn(getList());
+        Mockito.when(projectMapper.selectBatchIds(set)).thenReturn(getList());
         result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         List<Project> notAdminUserResult = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(notAdminUserResult));
@@ -339,8 +336,7 @@ public class ProjectServiceTest {
         //admin user
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),list)).thenReturn(getList());
-//        Mockito.when(projectMapper.selectList(null)).thenReturn(getList());
+        Mockito.when(projectMapper.selectBatchIds(set)).thenReturn(getList());
         result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
 
@@ -363,9 +359,6 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryUnauthorizedProject() {
-//        Mockito.when(projectMapper.queryProjectExceptUserId(2)).thenReturn(getList());
-        // Mockito.when(projectMapper.queryProjectCreatedByUser(2)).thenReturn(getList());
-//        Mockito.when(projectMapper.queryAuthedProjectListByUserId(2)).thenReturn(getSingleList());
         Set<Integer> set = new HashSet();
         set.add(1);
         // test admin user
