@@ -176,6 +176,19 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
+        File f = new File(dstFile);
+        File fp = f.getParentFile();
+        if (f.exists()) {
+            if (!overwrite) {
+                logger.error("The destination file {} already exists, the file can be overwritten by setting the override parameter to true", dstFile);
+                throw new IOException("The destination file already exists");
+            }
+        } else {
+            if (!fp.mkdirs() && !fp.exists()) {
+                logger.error("create destination directory {} failed", fp.getName());
+                throw new IOException("can't create directory");
+            }
+        }
         S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
         try (S3ObjectInputStream s3is = o.getObjectContent();
              FileOutputStream fos = new FileOutputStream(dstFile)) {
@@ -189,7 +202,7 @@ public class S3Utils implements Closeable, StorageOperate {
             throw new IOException(e.getMessage());
         } catch (FileNotFoundException e) {
             logger.error("the file isn`t exists");
-            throw new IOException("the file isn`t exists");
+            throw new IOException(e.getMessage());
         }
     }
 
