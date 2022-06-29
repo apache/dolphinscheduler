@@ -1349,7 +1349,12 @@ public class WorkflowExecuteThread implements Runnable {
         }
 
         if (taskRetryCheckList.size() > 0) {
-            this.taskRetryCheckList.clear();
+            for (Integer taskInstanceId : taskRetryCheckList.keySet()) {
+                if (this.taskInstanceHashMap.containsRow(taskInstanceId)) {
+                    taskRetryCheckList.remove(taskInstanceId);
+                }
+            }
+
             this.addProcessStopEvent(processInstance);
         }
     }
