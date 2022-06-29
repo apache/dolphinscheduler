@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -35,18 +34,19 @@ import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYP
 import java.io.IOException;
 public class JavaTaskTest {
     @Test
-    public void getSystemProperty() {
+    public void testJavaHome() {
         Assert.assertNotNull(System.getenv().get("JAVA_HOME"));
     }
 
 
     @Test
     public void buildJarCommand() {
-        String homePath = System.getenv(JavaConstants.JAVA_HOME_GENERIC);
+        String homePath = System.getenv(JavaConstants.JAVA_HOME);
         Assert.assertNotNull(homePath);
         String homeBinPath =  homePath+ System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
         JavaTask javaTask = runJarType();
-        Assert.assertEquals(javaTask.buildJarCommand(), homeBinPath+"java --class-path .:/tmp/dolphinscheduler/test/executepath:/opt/share/jar/resource2.jar -jar /opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+        Assert.assertEquals(javaTask.buildJarCommand(), homeBinPath
+                +"java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class JavaTaskTest {
         Assert.assertEquals("JavaTaskTest", publicClassName);
         String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
         try {
-            String homePath = System.getenv(JavaConstants.JAVA_HOME_GENERIC);
+            String homePath = System.getenv(JavaConstants.JAVA_HOME);
             Assert.assertNotNull(homePath);
             String homeBinPath = homePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
             Path path = Paths.get(fileName);
@@ -65,7 +65,8 @@ public class JavaTaskTest {
                 Files.delete(path);
             }
             javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
-            Assert.assertEquals(homeBinPath + "javac --class-path .:/tmp/dolphinscheduler/test/executepath:/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java", javaTask.buildJavaCompileCommand(fileName, sourceCode));
+            Assert.assertEquals(homeBinPath
+                    +"javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java", javaTask.buildJavaCompileCommand(fileName, sourceCode));
 
         } finally {
             Path path = Paths.get(fileName);
@@ -79,7 +80,7 @@ public class JavaTaskTest {
 
     @Test
     public void buildJavaCommand() throws Exception {
-        String homePath = System.getenv(JavaConstants.JAVA_HOME_GENERIC);
+        String homePath = System.getenv(JavaConstants.JAVA_HOME);
         Assert.assertNotNull(homePath);
         String homeBinPath =  homePath+ System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
         JavaTask javaTask = runJavaType();
@@ -91,13 +92,13 @@ public class JavaTaskTest {
         if (Files.exists(path)) {
             Files.delete(path);
         }
-        Assert.assertEquals(javaTask.buildJavaCommand(),homeBinPath+"java --class-path .:/tmp/dolphinscheduler/test/executepath:/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
+        Assert.assertEquals(javaTask.buildJavaCommand(), homeBinPath + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     public JavaParameters createJavaParametersObject(String runType) {
         JavaParameters javaParameters = new JavaParameters();
         javaParameters.setRunType(runType);
-        javaParameters.setJavaVersion(JavaVersion.JAVA_GENERIC);
+        javaParameters.setModulePath(false);
         javaParameters.setJvmArgs("-xms:50m");
         javaParameters.setMainArgs("-host 127.0.0.1 -port 8080");
         ResourceInfo resourceJar = new ResourceInfo();

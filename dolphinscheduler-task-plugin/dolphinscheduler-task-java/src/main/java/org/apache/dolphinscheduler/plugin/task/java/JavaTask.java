@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.dolphinscheduler.plugin.task.java.JavaVersion.*;
 
 /**
  * java task
@@ -87,9 +86,6 @@ public class JavaTask extends AbstractTaskExecutor {
         }
         if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
             setMainJarName();
-        }
-        if (javaParameters.getJavaVersion() == null) {
-            javaParameters.setJavaVersion(JAVA_GENERIC);
         }
     }
 
@@ -179,6 +175,7 @@ public class JavaTask extends AbstractTaskExecutor {
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
+        System.out.println(builder.toString());
         return builder.toString();
     }
     @Override
@@ -251,10 +248,10 @@ public class JavaTask extends AbstractTaskExecutor {
 
     protected String buildResourcePath() {
         StringBuilder builder = new StringBuilder();
-        if (javaParameters.getJavaVersion() == JAVA_8||javaParameters.getJavaVersion() == JAVA_GENERIC) {
-            builder.append("--class-path");
-        }else{
+        if (javaParameters.isModulePath()) {
             builder.append("--module-path");
+        }else{
+            builder.append("--class-path");
         }
         builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
                 .append(JavaConstants.PATH_SEPARATOR)
@@ -323,28 +320,7 @@ public class JavaTask extends AbstractTaskExecutor {
 
 
     private String getJavaHomeBinAbsolutePath() {
-
-        String JavaHomeEnvVar = null;
-        switch (javaParameters.getJavaVersion()) {
-            case JAVA_8:
-                JavaHomeEnvVar = JavaConstants.JAVA_HOME8;
-                break;
-            case JAVA_11:
-                JavaHomeEnvVar = JavaConstants.JAVA_HOME11;
-                break;
-            case JAVA_13:
-                JavaHomeEnvVar = JavaConstants.JAVA_HOME13;
-                break;
-            case JAVA_15:
-                JavaHomeEnvVar = JavaConstants.JAVA_HOME15;
-                break;
-            case JAVA_17:
-                JavaHomeEnvVar = JavaConstants.JAVA_HOME17;
-                break;
-            case JAVA_GENERIC:
-                JavaHomeEnvVar = JavaConstants.JAVA_HOME_GENERIC;
-        }
-        String javaHomeAbsolutePath = System.getenv(JavaHomeEnvVar);
+        String javaHomeAbsolutePath = System.getenv(JavaConstants.JAVA_HOME);
         Preconditions.checkNotNull(javaHomeAbsolutePath, "not find the java home in the version. ");
         return javaHomeAbsolutePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
     }

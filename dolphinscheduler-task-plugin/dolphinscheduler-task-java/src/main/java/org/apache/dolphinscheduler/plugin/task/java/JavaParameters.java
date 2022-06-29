@@ -35,16 +35,17 @@ public class JavaParameters extends AbstractParameters {
     private String mainArgs;
 
     private String jvmArgs;
+    private boolean isModulePath;
 
-    public JavaVersion getJavaVersion() {
-        return javaVersion;
+
+    public boolean isModulePath() {
+        return isModulePath;
     }
 
-    public void setJavaVersion(JavaVersion javaVersion) {
-        this.javaVersion = javaVersion;
+    public void setModulePath(boolean modulePath) {
+        isModulePath = modulePath;
     }
 
-    private JavaVersion javaVersion;
 
 
     /**

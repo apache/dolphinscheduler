@@ -23,12 +23,7 @@ public class JavaConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String JAVA_HOME_GENERIC = "JAVA_HOME";
-    public static final String JAVA_HOME8 = "JAVA_HOME8";
-    public static final String JAVA_HOME11 = "JAVA_HOME11";
-    public static final String JAVA_HOME13 = "JAVA_HOME13";
-    public static final String JAVA_HOME15 = "JAVA_HOME15";
-    public static final String JAVA_HOME17 = "JAVA_HOME17";
+    public static final String JAVA_HOME = "JAVA_HOME";
 
 
     public static final String RUN_TYPE_JAVA = "JAVA";
