@@ -41,7 +41,7 @@ export function formatParams(data: INodeData): {
     taskParams.mainArgs = data.mainArgs
     taskParams.jvmArgs = data.jvmArgs
     if(data.runType === 'JAR'){
-      taskParams.mainJar = data.mainJar
+      taskParams.mainJar = { id: data.mainJar }
     }
   }
 

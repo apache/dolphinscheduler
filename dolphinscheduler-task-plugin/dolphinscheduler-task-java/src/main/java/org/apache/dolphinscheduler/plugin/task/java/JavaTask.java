@@ -85,6 +85,9 @@ public class JavaTask extends AbstractTaskExecutor {
         if (javaParameters==null||!javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
         }
+        if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
+            setMainJarName();
+        }
         if (javaParameters.getJavaVersion() == null) {
             javaParameters.setJavaVersion(JAVA_GENERIC);
         }
@@ -145,7 +148,23 @@ public class JavaTask extends AbstractTaskExecutor {
         return builder.toString();
     }
 
+    private void setMainJarName() {
+        ResourceInfo mainJar = javaParameters.getMainJar();
+        String resourceName = getResourceNameOfMainJar(mainJar);
+        mainJar.setRes(resourceName);
+        javaParameters.setMainJar(mainJar);
+    }
 
+    private String getResourceNameOfMainJar(ResourceInfo mainJar) {
+        if (null == mainJar) {
+            throw new RuntimeException("The jar for the task is required.");
+        }
+
+        return mainJar.getId() == 0
+                ? mainJar.getRes()
+                // when update resource maybe has error
+                : mainJar.getResourceName().replaceFirst("/", "");
+    }
 
     protected String buildJarCommand() {
         String fullName = javaParameters.getMainJar().getResourceName();
@@ -156,6 +175,7 @@ public class JavaTask extends AbstractTaskExecutor {
                 .append("java").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
+                .append(taskRequest.getExecutePath())
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
@@ -241,7 +261,8 @@ public class JavaTask extends AbstractTaskExecutor {
                 .append(taskRequest.getExecutePath());
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
-            builder.append(info.getResourceName());
+            builder.append(taskRequest.getExecutePath())
+                    .append(info.getResourceName());
         }
         return builder.toString();
     }
