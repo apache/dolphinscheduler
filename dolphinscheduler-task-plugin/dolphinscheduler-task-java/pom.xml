@@ -7,6 +7,7 @@
         <groupId>org.apache.dolphinscheduler</groupId>
         <version>dev-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-java</artifactId>
@@ -16,18 +17,14 @@
     <dependencies>
 
         <dependency>
-            <artifactId>servlet-api</artifactId>
-            <groupId>javax.servlet</groupId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
         </dependency>
     </dependencies>
+
 </project>

@@ -103,10 +103,10 @@ public class JavaTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         try {
-            // 第一步，区分java还是jar类型
-            // jar类型直接构建命令，构建命令时将resource路劲加入类路劲  java -jar
-            // java类型，先替换自定义参数，然后编译代码，然后构建命令时将resource路劲加入类路劲，如果没有依赖的资源直接使用私有classloader加速执行。 java classname
-            // shell执行器run命令
+            // Step 1 judge if is java or jar run type.
+            // The  jar run type builds the command directly, adding resource to the java -jar class when building the command
+            // The java run type, first replace the custom parameters, then compile the code, and then build the command will add resource
+            // To run the coma
             String command = null;
             switch (javaParameters.getRunType()) {
                 case JavaConstants.RUN_TYPE_JAVA:
