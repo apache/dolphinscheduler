@@ -175,7 +175,20 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
+    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource, boolean overwrite) throws IOException {
+        File dstFile = new File(dstFilePath);
+        if (dstFile.exists()) {
+            if (dstFile.isFile() && !overwrite) {
+                logger.info("The destination file {} already exists and overwrite is false, do not download resources again. ", dstFilePath);
+                return;
+            } else if (!dstFile.isFile()) {
+                logger.error("destination file must be a file");
+            }
+        }
+        if (!dstFile.getParentFile().exists() && !dstFile.getParentFile().mkdirs()) {
+            throw new IOException("failed to create destination file parent directory, directory: " + dstFile.getParentFile().getAbsolutePath());
+        }
+
         S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
         try (S3ObjectInputStream s3is = o.getObjectContent();
              FileOutputStream fos = new FileOutputStream(dstFile)) {
@@ -185,11 +198,11 @@ public class S3Utils implements Closeable, StorageOperate {
                 fos.write(readBuf, 0, readLen);
             }
         } catch (AmazonServiceException e) {
-            logger.error("the resource can`t be downloaded,the bucket is {},and the src is {}", tenantCode, srcFilePath);
+            logger.error("the resource can`t be downloaded, the bucket is {}, and the src is {}", BUCKET_NAME, srcFilePath);
             throw new IOException(e.getMessage());
         } catch (FileNotFoundException e) {
-            logger.error("the file isn`t exists");
-            throw new IOException("the file isn`t exists");
+            logger.error("the destination file: {} isn`t exists", dstFilePath);
+            throw new IOException("the destination file:" + dstFilePath + " isn`t exists", e);
         }
     }
 
@@ -309,7 +322,7 @@ public class S3Utils implements Closeable, StorageOperate {
      * upload local directory to S3
      *
      * @param tenantCode
-     * @param keyPrefix the name of directory
+     * @param keyPrefix  the name of directory
      * @param strPath
      */
     private void uploadDirectory(String tenantCode, String keyPrefix, String strPath) {
@@ -322,7 +335,7 @@ public class S3Utils implements Closeable, StorageOperate {
      * download S3 Directory to local
      *
      * @param tenantCode
-     * @param keyPrefix the name of directory
+     * @param keyPrefix  the name of directory
      * @param srcPath
      */
     private void downloadDirectory(String tenantCode, String keyPrefix, String srcPath) {
