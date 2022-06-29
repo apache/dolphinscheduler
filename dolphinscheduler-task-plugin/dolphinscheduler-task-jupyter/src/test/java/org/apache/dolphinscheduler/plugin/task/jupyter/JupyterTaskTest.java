@@ -40,6 +40,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
         JSONUtils.class,
         PropertyUtils.class,
         DateUtils.class,
+        Long.class
 //        Date.class
 //        System.class,
 //        String.class,
@@ -115,12 +116,12 @@ public class JupyterTaskTest {
         PowerMockito.mockStatic(PropertyUtils.class);
         when(PropertyUtils.getString(any())).thenReturn("/opt/anaconda3/etc/profile.d/conda.sh");
         PowerMockito.mockStatic(DateUtils.class);
-        when(DateUtils.formatTimeStamp(anyLong())).thenReturn("123456789");
+        when(DateUtils.getTimestampString()).thenReturn("123456789");
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
         jupyterTask.init();
         Assert.assertEquals(jupyterTask.buildCommand(),
                 "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                        "conda create -n jupyter-tmp-env-123456789 && " +
+                        "conda create -n jupyter-tmp-env-123456789 -y && " +
                         "conda activate jupyter-tmp-env-123456789 && " +
                         "pip install -r requirements.txt && " +
                         "papermill " +

@@ -43,7 +43,7 @@ public class JupyterConstants {
     /**
      * create and activate tmp conda env from txt
      */
-    public static final String CREATE_ENV_FROM_TXT = "conda create -n jupyter-tmp-env-%s && " +
+    public static final String CREATE_ENV_FROM_TXT = "conda create -n jupyter-tmp-env-%s -y && " +
             "conda activate jupyter-tmp-env-%s && " +
             "pip install -r %s";
 

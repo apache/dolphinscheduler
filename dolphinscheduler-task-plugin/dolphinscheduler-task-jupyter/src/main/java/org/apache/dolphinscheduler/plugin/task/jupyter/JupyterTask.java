@@ -102,7 +102,7 @@ public class JupyterTask extends AbstractTaskExecutor {
          */
         List<String> args = new ArrayList<>();
         final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
-        final String timestamp = DateUtils.formatTimeStamp(System.currentTimeMillis());
+        final String timestamp = DateUtils.getTimestampString();
         args.add(JupyterConstants.CONDA_INIT);
         args.add(condaPath);
         args.add(JupyterConstants.JOINTER);
