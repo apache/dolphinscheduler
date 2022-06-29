@@ -2653,8 +2653,12 @@ public class ProcessServiceImpl implements ProcessService {
         return DagHelper.buildDagGraph(processDag);
     }
 
-    private void genSubTaskData(List<ProcessTaskRelation> taskRelations, List<TaskDefinitionLog> taskDefinitionLogList,
-                                List<TaskDefinition> taskDefinitions, List<TaskDefinition> curTaskDefinitions) {
+    /**
+     * @param taskRelations task relation, for relation sub-process task info
+     * @param taskDefinitions current process all task
+     * @param curTaskDefinitions list of current task for recursion
+     **/
+    private void genSubTaskData(List<ProcessTaskRelation> taskRelations, List<TaskDefinition> taskDefinitions, List<TaskDefinition> curTaskDefinitions) {
         List<TaskDefinition> copyList = new ArrayList<>(curTaskDefinitions);
         for (TaskDefinition taskDefinition : copyList) {
             if (TaskConstants.TASK_TYPE_SUB_PROCESS.equals(taskDefinition.getTaskType())) {
@@ -2672,7 +2676,7 @@ public class ProcessServiceImpl implements ProcessService {
                     TaskDefinition subTask = findTaskDefinition(subTaskRelation.getPostTaskCode(), subTaskRelation.getPostTaskVersion());
                     // recursive expansion
                     if (TaskConstants.TASK_TYPE_SUB_PROCESS.equals(subTask.getTaskType())) {
-                        genSubTaskData(taskRelations, taskDefinitionLogList, taskDefinitions, Lists.newArrayList(subTask));
+                        genSubTaskData(taskRelations, taskDefinitions, Lists.newArrayList(subTask));
                     }
                 }
                 List<TaskDefinitionLog> subTaskDefinitionLogList = genTaskDefineList(subTaskRelations);
@@ -2683,14 +2687,14 @@ public class ProcessServiceImpl implements ProcessService {
                     return (TaskDefinition) taskDefinitionLog;
                 }).collect(Collectors.toList());
                 taskRelations.addAll(subTaskRelations);
-                taskDefinitionLogList.addAll(subTaskDefinitionLogList);
                 taskDefinitions.addAll(subTaskDefinitions);
             }
         }
     }
 
     /**
-     * generate DagData
+     * @param processDefinition process definition
+     * @param showSubTask whether to show sub-process task info
      */
     @Override
     public DagData genDagData(ProcessDefinition processDefinition, boolean showSubTask) {
@@ -2699,7 +2703,7 @@ public class ProcessServiceImpl implements ProcessService {
         List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream().map(TaskDefinition.class::cast).collect(Collectors.toList());
         // when enable showSubTask try to find sub-process task info.
         if (showSubTask) {
-            genSubTaskData(taskRelations, taskDefinitionLogList, taskDefinitions, taskDefinitions);
+            genSubTaskData(taskRelations, taskDefinitions, taskDefinitions);
         }
         return new DagData(processDefinition, taskRelations, taskDefinitions);
     }
