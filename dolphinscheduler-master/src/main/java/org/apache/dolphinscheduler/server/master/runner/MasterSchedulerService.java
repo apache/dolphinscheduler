@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.NonNull;
+
 /**
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
@@ -98,7 +100,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
 
     private final LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances = new LinkedBlockingQueue<>();
 
-    private Thread submitFailedProcessInstanceHandleThread;
+    private Thread failedProcessInstanceResubmitThread;
 
     private String masterAddress;
 
@@ -112,7 +114,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
     public void init() {
         this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
-        this.submitFailedProcessInstanceHandleThread = new SubmitFailedProcessInstanceHandleThread(submitFailedProcessInstances);
+        this.failedProcessInstanceResubmitThread = new FailedProcessInstanceResubmitThread(submitFailedProcessInstances);
         ProcessInstanceMetrics.registerProcessInstanceResubmitGauge(submitFailedProcessInstances::size);
     }
 
@@ -120,6 +122,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
     public synchronized void start() {
         logger.info("Master schedule service starting..");
         super.start();
+        this.failedProcessInstanceResubmitThread.start();
         logger.info("Master schedule service started...");
     }
 
@@ -180,7 +183,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
         }
     }
 
-    private void submitProcessInstance(ProcessInstance processInstance) {
+    private void submitProcessInstance(@NonNull ProcessInstance processInstance) {
         try {
             LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
             logger.info("Master schedule service starting workflow instance");
@@ -294,14 +297,16 @@ public class MasterSchedulerService extends BaseDaemonThread {
         return state;
     }
 
-    private class SubmitFailedProcessInstanceHandleThread extends Thread {
+    private class FailedProcessInstanceResubmitThread extends Thread {
 
         private final LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances;
 
-        public SubmitFailedProcessInstanceHandleThread(LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances) {
+        public FailedProcessInstanceResubmitThread(LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances) {
+            logger.info("Starting workflow resubmit thread");
             this.submitFailedProcessInstances = submitFailedProcessInstances;
             this.setDaemon(true);
             this.setName("SubmitFailedProcessInstanceHandleThread");
+            logger.info("Started workflow resubmit thread");
         }
 
         @Override
@@ -315,6 +320,9 @@ public class MasterSchedulerService extends BaseDaemonThread {
                     logger.warn("SubmitFailedProcessInstanceHandleThread has been interrupted, will return");
                     break;
                 }
+
+                // avoid the failed-fast cause CPU higher
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         }
     }
