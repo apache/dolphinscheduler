@@ -78,50 +78,46 @@ public class DinkyTask extends AbstractTaskExecutor {
 
     @Override
     public void handle() throws Exception {
-        try {
-            String address = this.dinkyParameters.getAddress();
-            String taskId = this.dinkyParameters.getTaskId();
-            boolean isOnline = this.dinkyParameters.isOnline();
-            JsonNode result;
-            if (isOnline) {
-                // Online dinky task, and only one job is allowed to execute
-                result = onlineTask(address, taskId);
-            } else {
-                // Submit dinky task
-                result = submitTask(address, taskId);
-            }
-            if (checkResult(result)) {
-                boolean status = result.get(DinkyTaskConstants.API_RESULT_DATAS).get("success").asBoolean();
-                String jobInstanceId = result.get(DinkyTaskConstants.API_RESULT_DATAS).get("jobInstanceId").asText();
-                boolean finishFlag = false;
-                while (!finishFlag) {
-                    JsonNode jobInstanceInfoResult = getJobInstanceInfo(address, jobInstanceId);
-                    if (!checkResult(jobInstanceInfoResult)) {
+        String address = this.dinkyParameters.getAddress();
+        String taskId = this.dinkyParameters.getTaskId();
+        boolean isOnline = this.dinkyParameters.isOnline();
+        JsonNode result;
+        if (isOnline) {
+            // Online dinky task, and only one job is allowed to execute
+            result = onlineTask(address, taskId);
+        } else {
+            // Submit dinky task
+            result = submitTask(address, taskId);
+        }
+        if (checkResult(result)) {
+            boolean status = result.get(DinkyTaskConstants.API_RESULT_DATAS).get("success").asBoolean();
+            String jobInstanceId = result.get(DinkyTaskConstants.API_RESULT_DATAS).get("jobInstanceId").asText();
+            boolean finishFlag = false;
+            while (!finishFlag) {
+                JsonNode jobInstanceInfoResult = getJobInstanceInfo(address, jobInstanceId);
+                if (!checkResult(jobInstanceInfoResult)) {
+                    break;
+                }
+                String jobInstanceStatus = jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("status").asText();
+                switch (jobInstanceStatus) {
+                    case DinkyTaskConstants.STATUS_FINISHED:
+                        final int exitStatusCode = mapStatusToExitCode(status);
+                        // Use address-taskId as app id
+                        setAppIds(String.format("%s-%s", address, taskId));
+                        setExitStatusCode(exitStatusCode);
+                        logger.info("dinky task finished with results: {}", result.get(DinkyTaskConstants.API_RESULT_DATAS));
+                        finishFlag = true;
                         break;
-                    }
-                    String jobInstanceStatus = jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("status").asText();
-                    switch (jobInstanceStatus) {
-                        case DinkyTaskConstants.STATUS_FINISHED:
-                            final int exitStatusCode = mapStatusToExitCode(status);
-                            // Use address-taskId as app id
-                            setAppIds(String.format("%s-%s", address, taskId));
-                            setExitStatusCode(exitStatusCode);
-                            logger.info("dinky task finished with results: {}", result.get(DinkyTaskConstants.API_RESULT_DATAS));
-                            finishFlag = true;
-                            break;
-                        case DinkyTaskConstants.STATUS_FAILED:
-                        case DinkyTaskConstants.STATUS_CANCELED:
-                        case DinkyTaskConstants.STATUS_UNKNOWN:
-                            errorHandle(jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("error").asText());
-                            finishFlag = true;
-                            break;
-                        default:
-                            Thread.sleep(DinkyTaskConstants.SLEEP_MILLIS);
-                    }
+                    case DinkyTaskConstants.STATUS_FAILED:
+                    case DinkyTaskConstants.STATUS_CANCELED:
+                    case DinkyTaskConstants.STATUS_UNKNOWN:
+                        errorHandle(jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("error").asText());
+                        finishFlag = true;
+                        break;
+                    default:
+                        Thread.sleep(DinkyTaskConstants.SLEEP_MILLIS);
                 }
             }
-        } catch (InterruptedException e) {
-            errorHandle(e);
         }
     }
 
@@ -170,7 +166,7 @@ public class DinkyTask extends AbstractTaskExecutor {
             address,
             taskId);
         cancelTask(address, taskId);
-        logger.info("dinky task terminated, taskId: {}, address: {}, taskId: {}",
+        logger.warn("dinky task terminated, taskId: {}, address: {}, taskId: {}",
             this.taskExecutionContext.getTaskInstanceId(),
             address,
             taskId);
@@ -231,7 +227,7 @@ public class DinkyTask extends AbstractTaskExecutor {
                 result = EntityUtils.toString(response.getEntity());
                 logger.info("dinky task succeed with results: {}", result);
             } else {
-                logger.info("dinky task terminated,response: {}", response);
+                logger.error("dinky task terminated,response: {}", response);
             }
         } catch (IllegalArgumentException ie) {
             logger.error("dinky task terminated: {}", ie.getMessage());
@@ -260,7 +256,7 @@ public class DinkyTask extends AbstractTaskExecutor {
                 result = EntityUtils.toString(response.getEntity());
                 logger.info("dinky task succeed with results: {}", result);
             } else {
-                logger.info("dinky task terminated,response: {}", response);
+                logger.error("dinky task terminated,response: {}", response);
             }
         } catch (IllegalArgumentException ie) {
             logger.error("dinky task terminated: {}", ie.getMessage());
