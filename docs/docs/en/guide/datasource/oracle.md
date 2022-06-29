@@ -17,6 +17,4 @@
 | jdbc connect parameters | Parameter settings for Oracle connection, in JSON format. |
 
 ## Native Supported
-
-
 Yes, could use this datasource by default.
