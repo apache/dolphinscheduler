@@ -132,6 +132,7 @@ export default {
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
     run_type: 'Run Type',
+    is_module_path: 'Module Path',
     scheduling_time: 'Scheduling Time',
     duration: 'Duration',
     run_times: 'Run Times',

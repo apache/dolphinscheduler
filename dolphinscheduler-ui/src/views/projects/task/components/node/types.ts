@@ -225,6 +225,7 @@ interface ITaskParams {
   localParams?: ILocalParam[]
   runType?:string
   jvmArgs?:string
+  isModulePath?:boolean
   rawScript?: string
   initScript?: string
   programType?: string

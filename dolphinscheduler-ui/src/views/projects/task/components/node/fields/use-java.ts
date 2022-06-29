@@ -42,6 +42,15 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
         value: model.runType
       },
       {
+          type: 'switch',
+          field: 'isModulePath',
+          span: 24,
+          name: t('project.node.is_module_path'),
+          props: {
+          },
+          value: model.isModulePath
+      },
+      {
         type: 'input',
         field: 'mainArgs',
         name: t('project.node.main_arguments'),

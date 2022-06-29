@@ -42,6 +42,7 @@ export function useJava({
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
+    isModulePath: false,
     rawScript: '',
     timeoutFlag: false,
     timeoutNotifyStrategy: ['WARN'],
