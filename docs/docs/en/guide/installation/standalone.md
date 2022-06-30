@@ -49,18 +49,4 @@ sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ## Database Configuration
 
 Standalone server use H2 database as its metadata store, it is easy and users do not need to start database before they set up server.
-But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. And we here use
-MySQL as an example to illustrate how to configure an external database:
-
-* First of all, follow the instructions in [pseudo-cluster deployment](pseudo-cluster.md) `Initialize the Database` section to create and initialize database
-* Set the following environment variables in your terminal with your database username and password for `{user}` and `{password}`:
-
-```shell
-export DATABASE=${DATABASE:-mysql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
-```
-
-* Add mysql-connector-java driver to `./standalone-server/libs/standalone-server/`, see [pseudo-cluster deployment](pseudo-cluster.md) `Initialize the Database` section about where to download
-* Start standalone-server, now you are using mysql as database and it will not clear up your data when you stop or restart standalone-server.
+But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [general-setting](../howto/general-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database
