@@ -3,7 +3,7 @@
 If you need `Telegram` to alert, create an alert instance in the alert instance management, and choose the `Telegram` plugin.
 The following shows the `Telegram` configuration example:
 
-![telegram-plugin](/img/alert/telegram-plugin.png)
+![alert-telegram](../../../../img/new_ui/dev/alert/alert_telegram.png)
 
 ## Parameter Configuration
 

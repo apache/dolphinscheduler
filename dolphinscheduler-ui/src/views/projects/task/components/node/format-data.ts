@@ -279,6 +279,13 @@ export function formatParams(data: INodeData): {
       operator: data.operator,
       src_connector_type: data.src_connector_type,
       src_datasource_id: data.src_datasource_id,
+      field_length: data.field_length,
+      begin_time: data.begin_time,
+      deadline: data.deadline,
+      datetime_format: data.datetime_format,
+      enum_list: data.enum_list,
+      regexp_pattern: data.regexp_pattern,
+      target_filter: data.target_filter,
       src_filter: data.src_filter,
       src_field: data.src_field,
       src_table: data.src_table,
@@ -287,7 +294,8 @@ export function formatParams(data: INodeData): {
       target_connector_type: data.target_connector_type,
       target_datasource_id: data.target_datasource_id,
       target_table: data.target_table,
-      threshold: data.threshold
+      threshold: data.threshold,
+      mapping_columns: JSON.stringify(data.mapping_columns)
     }
     taskParams.sparkParameters = {
       deployMode: data.deployMode,
@@ -308,6 +316,14 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'ZEPPELIN') {
     taskParams.noteId = data.zeppelinNoteId
     taskParams.paragraphId = data.zeppelinParagraphId
+    taskParams.parameters = data.parameters
+  }
+
+  if (data.taskType === 'K8S') {
+    taskParams.namespace = data.namespace
+    taskParams.minCpuCores = data.minCpuCores
+    taskParams.minMemorySpace = data.minMemorySpace
+    taskParams.image = data.image
   }
 
   if (data.taskType === 'JUPYTER') {
@@ -320,6 +336,45 @@ export function formatParams(data: INodeData): {
     taskParams.executionTimeout = data.executionTimeout
     taskParams.startTimeout = data.startTimeout
     taskParams.others = data.others
+  }
+
+  if (data.taskType === 'MLFLOW') {
+    taskParams.algorithm = data.algorithm
+    taskParams.params = data.params
+    taskParams.searchParams = data.searchParams
+    taskParams.dataPath = data.dataPath
+    taskParams.experimentName = data.experimentName
+    taskParams.modelName = data.modelName
+    taskParams.mlflowTrackingUri = data.mlflowTrackingUri
+    taskParams.mlflowJobType = data.mlflowJobType
+    taskParams.automlTool = data.automlTool
+    taskParams.registerModel = data.registerModel
+    taskParams.mlflowTaskType = data.mlflowTaskType
+    taskParams.deployType = data.deployType
+    taskParams.deployPort = data.deployPort
+    taskParams.deployModelKey = data.deployModelKey
+    taskParams.mlflowProjectRepository = data.mlflowProjectRepository
+    taskParams.mlflowProjectVersion = data.mlflowProjectVersion
+    taskParams.cpuLimit = data.cpuLimit
+    taskParams.memoryLimit = data.memoryLimit
+  }
+
+  if (data.taskType === 'DVC') {
+
+    taskParams.dvcTaskType = data.dvcTaskType
+    taskParams.dvcRepository = data.dvcRepository
+    taskParams.dvcVersion = data.dvcVersion
+    taskParams.dvcDataLocation = data.dvcDataLocation
+    taskParams.dvcMessage = data.dvcMessage
+    taskParams.dvcLoadSaveDataPath = data.dvcLoadSaveDataPath
+    taskParams.dvcStoreUrl = data.dvcStoreUrl
+  }
+
+  if (data.taskType === 'OPENMLDB') {
+    taskParams.zk = data.zk
+    taskParams.zkPath = data.zkPath
+    taskParams.executeMode = data.executeMode
+    taskParams.sql = data.sql
   }
 
   if (data.taskType === 'PIGEON') {
@@ -367,7 +422,9 @@ export function formatParams(data: INodeData): {
       timeout: data.timeoutFlag ? data.timeout : 0,
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
       timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
-      workerGroup: data.workerGroup
+      workerGroup: data.workerGroup,
+      cpuQuota: data.cpuQuota || -1,
+      memoryMax: data.memoryMax || -1
     }
   } as {
     processDefinitionCode: string
@@ -511,6 +568,13 @@ export function formatModel(data: ITaskData) {
     params.src_datasource_id =
       data.taskParams.ruleInputParameter.src_datasource_id
     params.src_table = data.taskParams.ruleInputParameter.src_table
+    params.field_length = data.taskParams.ruleInputParameter.field_length
+    params.begin_time = data.taskParams.ruleInputParameter.begin_time
+    params.deadline = data.taskParams.ruleInputParameter.deadline
+    params.datetime_format = data.taskParams.ruleInputParameter.datetime_format
+    params.target_filter = data.taskParams.ruleInputParameter.target_filter
+    params.regexp_pattern = data.taskParams.ruleInputParameter.regexp_pattern
+    params.enum_list = data.taskParams.ruleInputParameter.enum_list
     params.src_filter = data.taskParams.ruleInputParameter.src_filter
     params.src_field = data.taskParams.ruleInputParameter.src_field
     params.statistics_execute_sql =
@@ -522,6 +586,10 @@ export function formatModel(data: ITaskData) {
       data.taskParams.ruleInputParameter.target_datasource_id
     params.target_table = data.taskParams.ruleInputParameter.target_table
     params.threshold = data.taskParams.ruleInputParameter.threshold
+    if (data.taskParams.ruleInputParameter.mapping_columns)
+      params.mapping_columns = JSON.parse(
+        data.taskParams.ruleInputParameter.mapping_columns
+      )
   }
   if (data.taskParams?.sparkParameters) {
     params.deployMode = data.taskParams.sparkParameters.deployMode

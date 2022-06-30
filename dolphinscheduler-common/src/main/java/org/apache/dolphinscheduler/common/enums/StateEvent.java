@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.common.enums;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import io.netty.channel.Channel;
+import lombok.Data;
 
 /**
  * state event
  */
+@Data
 public class StateEvent {
 
     /**
@@ -45,79 +47,4 @@ public class StateEvent {
 
     private Channel channel;
 
-    public ExecutionStatus getExecutionStatus() {
-        return executionStatus;
-    }
-
-    public void setExecutionStatus(ExecutionStatus executionStatus) {
-        this.executionStatus = executionStatus;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public long getTaskCode() {
-        return taskCode;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public String getContext() {
-        return context;
-    }
-
-    public void setContext(String context) {
-        this.context = context;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public void setTaskCode(long taskCode) {
-        this.taskCode = taskCode;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
-
-    @Override
-    public String toString() {
-        return "State Event :"
-                + "key: " + key
-                + " type: " + type.toString()
-                + " executeStatus: " + executionStatus
-                + " task instance id: " + taskInstanceId
-                + " process instance id: " + processInstanceId
-                + " context: " + context
-                ;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setType(StateEventType type) {
-        this.type = type;
-    }
-
-    public StateEventType getType() {
-        return this.type;
-    }
 }

@@ -27,6 +27,8 @@ import java.util.Objects;
  */
 public class Host implements Serializable {
 
+    public static final Host EMPTY = new Host();
+
     /**
      * address
      */

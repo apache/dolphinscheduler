@@ -18,13 +18,6 @@
 """Constants for pydolphinscheduler."""
 
 
-class ProcessDefinitionReleaseState:
-    """Constants for :class:`pydolphinscheduler.core.process_definition.ProcessDefinition` release state."""
-
-    ONLINE: str = "ONLINE"
-    OFFLINE: str = "OFFLINE"
-
-
 class TaskPriority(str):
     """Constants for task priority."""
 
@@ -107,3 +100,9 @@ class Time(str):
 
     FMT_STD_TIME = "%H:%M:%S"
     FMT_NO_COLON_TIME = "%H%M%S"
+
+
+class ResourceKey(str):
+    """Constants for key of resource."""
+
+    ID = "id"

@@ -158,8 +158,20 @@ $bgLight: #ffffff;
     &.icon-zeppelin {
       background-image: url('/images/task-icons/zeppelin.png');
     }
+    &.icon-k8s {
+      background-image: url('/images/task-icons/k8s.png');
+    }
     &.icon-jupyter {
       background-image: url('/images/task-icons/jupyter.png');
+    }
+    &.icon-mlflow {
+      background-image: url('/images/task-icons/mlflow.png');
+    }
+    &.icon-openmldb {
+      background-image: url('/images/task-icons/openmldb.png');
+    }
+    &.icon-dvc {
+      background-image: url('/images/task-icons/dvc.png');
     }
   }
 
@@ -222,8 +234,20 @@ $bgLight: #ffffff;
       &.icon-zeppelin {
         background-image: url('/images/task-icons/zeppelin_hover.png');
       }
+      &.icon-k8s {
+        background-image: url('/images/task-icons/k8s_hover.png');
+      }
       &.icon-jupyter {
         background-image: url('/images/task-icons/jupyter_hover.png');
+      }
+      &.icon-mlflow {
+        background-image: url('/images/task-icons/mlflow.png');
+      }
+      &.icon-openmldb {
+        background-image: url('/images/task-icons/openmldb_hover.png');
+      }
+      &.icon-dvc {
+        background-image: url('/images/task-icons/dvc_hover.png');
       }
     }
   }

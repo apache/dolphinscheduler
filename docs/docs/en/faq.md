@@ -23,7 +23,8 @@ Note：**Due to the large number of services, it is recommended that the single-
 
 ## Q: Which mailboxes does the system support?
 
-A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supported. Support TLS and SSL protocols, optionally configured in alert.properties
+A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supported. Support TLS and SSL protocols, these can be configured in the ui of dolphinscheduler:
+[How to setup email alarm](../en/guide/alert/email.md).
 
 ---
 
@@ -125,7 +126,7 @@ A:   1, if the replacement variable contains special characters, **use the \ tra
 
 ​       4, monitorServerState = "false", whether the service monitoring script is started, the default is not to start the service monitoring script. **If the service monitoring script is started, the master and worker services are monitored every 5 minutes, and if the machine is down, it will automatically restart.**
 
-​       5, hdfsStartupSate="false", whether to enable HDFS resource upload function. The default is not enabled. **If it is not enabled, the resource center cannot be used.** If enabled, you need to configure the configuration of fs.defaultFS and yarn in conf/common/hadoop/hadoop.properties. If you use namenode HA, you need to copy core-site.xml and hdfs-site.xml to the conf root directory.
+​       5, hdfsStartupSate="false", whether to enable HDFS resource upload function. The default is not enabled. **If it is not enabled, the resource center cannot be used.** If enabled, you need to configure the configuration of resource.hdfs.fs.defaultFS and yarn in conf/common/hadoop/hadoop.properties. If you use namenode HA, you need to copy core-site.xml and hdfs-site.xml to the conf root directory.
 
 ​    Note: **The 1.0.x version does not automatically create the hdfs root directory, you need to create it yourself, and you need to deploy the user with hdfs operation permission.**
 
@@ -558,7 +559,7 @@ When the master service and worker service are registered with zookeeper, releva
 If the ip address is obtained incorrectly, please check the network information. For example, in the Linux system, use the `ifconfig` command to view the network information. The following figure is an example:
 
 <p align="center">
-  <img src="/img/network/network_config.png" width="60%" />
+  <img src="../../img/network/network_config.png" width="60%" />
 </p>
 
 You can use the three strategies provided by dolphinscheduler to get the available ip:
@@ -700,47 +701,14 @@ A：The repair can be completed by executing the following SQL in the database:
 update t_ds_version set version='2.0.1';
 ```
 
-## Can not find python-gateway-server in distribute package
+---
 
-After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
+## Q：Can not find python-gateway-server in distribute package
+
+A：After version 3.0.0-alpha, Python gateway server integrate into API server, and Python gateway service will start when you
 start API server. If you want disabled when Python gateway service you could change API server configuration in path
 `api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
 
-## How to Build Custom Docker Image
-
-DolphinScheduler will release new Docker images after it released, you could find them in DockerHub. You could create
-custom Docker images base on those images if you want to change image like add some dependencies or upgrade package.
-
-```Dockerfile
-FROM apache/dolphinscheduler-standalone-server
-RUN apt update ; \
-    apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
-```
-
-If you want to modify DolphinScheduler source code, then build and distribute your own images, you can run below command
-to build Docker images and install them locally, which you could find them by command `docker imaegs`.
-
-```shell
-./mvnw -B clean install \
-  -Dmaven.test.skip \
-  -Dmaven.javadoc.skip \
-  -Dmaven.checkstyle.skip \
-  -Dmaven.deploy.skip \
-  -Ddocker.tag=latest \
-  -Pdocker,release
-```
-
-If you want to modify DolphinScheduler source code, but also want to add customize dependencies of Docker image, you can
-modify the definition of Dockerfile after modifying the source code. You can run the following command in root source code
-directory to find all Dockerfile files.
-
-```shell
-find . -iname 'Dockerfile'
-```
-
-Then run the command above start with `./mvnw -B clean install`. You can see all docker images you just created with
-command `docker images` after finish commnand `mvnw`.
-
 ---
 
-## We will collect more FAQ later
+We will collect more FAQ later

@@ -26,7 +26,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 const Content = defineComponent({
-  name: 'Content',
+  name: 'DSContent',
   setup() {
     window.$message = useMessage()
 

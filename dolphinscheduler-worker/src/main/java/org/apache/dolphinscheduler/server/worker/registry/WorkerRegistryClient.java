@@ -33,8 +33,6 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.IOException;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -49,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 /**
@@ -99,7 +98,7 @@ public class WorkerRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
-        int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
+        long workerHeartbeatInterval = workerConfig.getHeartbeatInterval().getSeconds();
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 workerConfig.getMaxCpuLoadAvg(),
@@ -165,7 +164,7 @@ public class WorkerRegistryClient {
         for (String workGroup : this.workerGroups) {
             StringJoiner workerPathJoiner = new StringJoiner(SINGLE_SLASH);
             workerPathJoiner.add(REGISTRY_DOLPHINSCHEDULER_WORKERS);
-            if (StringUtils.isEmpty(workGroup)) {
+            if (Strings.isNullOrEmpty(workGroup)) {
                 workGroup = DEFAULT_WORKER_GROUP;
             }
             // trim and lower case is need

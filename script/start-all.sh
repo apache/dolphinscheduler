@@ -33,7 +33,7 @@ mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
   echo "$master master server is starting"
-	ssh -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start master-server;"
+	ssh -o StrictHostKeyChecking=no -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start master-server;"
 
 done
 
@@ -41,16 +41,16 @@ for worker in ${workerNames[@]}
 do
   echo "$worker worker server is starting"
 
-  ssh -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start worker-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start worker-server;"
 done
 
-ssh -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start alert-server;"
+ssh -o StrictHostKeyChecking=no -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start alert-server;"
 
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
   echo "$apiServer api server is starting"
-  ssh -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start api-server;"
+  ssh -o StrictHostKeyChecking=no -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh start api-server;"
 done
 
 # query server status

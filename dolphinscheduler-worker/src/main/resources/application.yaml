@@ -58,12 +58,14 @@ worker:
   listen-port: 1234
   # worker execute thread number to limit task instances in parallel
   exec-threads: 100
-  # worker heartbeat interval, the unit is second
-  heartbeat-interval: 10
+  # worker heartbeat interval
+  heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # worker tenant auto create
+  # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
   tenant-auto-create: true
+  #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
+  tenant-distributed-user: false
   # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
   max-cpu-load-avg: -1
   # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
@@ -83,9 +85,31 @@ management:
     web:
       exposure:
         include: '*'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+  health:
+    db:
+      enabled: true
+    defaults:
+      enabled: false
   metrics:
     tags:
       application: ${spring.application.name}
 
 metrics:
   enabled: true
+
+# Override by profile
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+    username: root
+    password: root

@@ -4,40 +4,40 @@
 
 
 * 管理员用户登录
-  >地址：http://localhost:12345/dolphinscheduler 用户名/密码：admin/dolphinscheduler123
+  >地址：http://localhost:12345/dolphinscheduler/ui 用户名/密码：admin/dolphinscheduler123
 
-![login](/img/new_ui/dev/quick-start/login.png)
+![login](../../../../img/new_ui/dev/quick-start/login.png)
 
 * 创建队列
 
-![create-queue](/img/new_ui/dev/quick-start/create-queue.png)
+![create-queue](../../../../img/new_ui/dev/quick-start/create-queue.png)
 
 * 创建租户
 
-![create-tenant](/img/new_ui/dev/quick-start/create-tenant.png)
+![create-tenant](../../../../img/new_ui/dev/quick-start/create-tenant.png)
 
 * 创建普通用户
 
-![create-user](/img/new_ui/dev/quick-start/create-user.png)
+![create-user](../../../../img/new_ui/dev/quick-start/create-user.png)
 
 * 创建告警组实例
 
-![create-alarmInstance](/img/new_ui/dev/quick-start/create-alarmInstance.png)
+![create-alarmInstance](../../../../img/new_ui/dev/quick-start/create-alarmInstance.png)
 
 * 创建告警组
 
-![create-alarmGroup](/img/new_ui/dev/quick-start/create-alarmGroup.png)
+![create-alarmGroup](../../../../img/new_ui/dev/quick-start/create-alarmGroup.png)
 
  * 创建 Worker 分组
 
-![create-workerGroup](/img/new_ui/dev/quick-start/create-workerGroup.png)
+![create-workerGroup](../../../../img/new_ui/dev/quick-start/create-workerGroup.png)
 
 * 创建环境
-![create-environment](/img/new_ui/dev/quick-start/create-environment.png)
+![create-environment](../../../../img/new_ui/dev/quick-start/create-environment.png)
  
  * 创建 Token 令牌
 
-![create-token](/img/new_ui/dev/quick-start/create-token.png)
+![create-token](../../../../img/new_ui/dev/quick-start/create-token.png)
 
 
 * 使用普通用户登录
@@ -45,16 +45,16 @@
 
 * 项目管理->创建项目->点击项目名称
 
-![project](/img/new_ui/dev/quick-start/project.png)
+![project](../../../../img/new_ui/dev/quick-start/project.png)
 
   * 点击工作流定义->创建工作流定义->上线工作流定义
 
 <p align="center">
-   <img src="/img/dag1.png" width="60%" />
+   <img src="../../../../img/dag1.png" width="60%" />
  </p>
 
   * 运行工作流定义->点击工作流实例->点击工作流实例名称->双击任务节点->查看任务执行日志
 
  <p align="center">
-   <img src="/img/task-log.png" width="60%" />
+   <img src="../../../../img/task-log.png" width="60%" />
 </p>

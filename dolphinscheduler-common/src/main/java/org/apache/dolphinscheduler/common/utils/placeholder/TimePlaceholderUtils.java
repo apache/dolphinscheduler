@@ -34,7 +34,7 @@ import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_STRING;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -512,7 +512,7 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = org.apache.commons.lang.time.DateUtils
+                Date targetDate = org.apache.commons.lang3.time.DateUtils
                     .addMinutes(date, calcMinutes(addMinuteExpr));
                 String dateFormat = expression.substring(0, index);
 

@@ -41,12 +41,12 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <modules>
         <module>dolphinscheduler-registry-api</module>
         <module>dolphinscheduler-registry-plugins</module>
+        <module>dolphinscheduler-registry-all</module>
     </modules>
 </project>

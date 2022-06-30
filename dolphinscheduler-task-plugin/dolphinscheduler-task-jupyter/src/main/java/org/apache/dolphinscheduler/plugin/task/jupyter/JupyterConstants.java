@@ -34,6 +34,18 @@ public class JupyterConstants {
     public static final String CONDA_ACTIVATE = "conda activate";
 
     /**
+     * create and activate conda env from tar
+     */
+    public static final String CREATE_ENV_FROM_TAR = "mkdir jupyter_env && " +
+            "tar -xzf %s -C jupyter_env && " +
+            "source jupyter_env/bin/activate";
+
+    /**
+     * file suffix tar.gz
+     */
+    public static final String TAR_SUFFIX = ".tar.gz";
+
+    /**
      * jointer to combine two command
      */
     public static final String JOINTER = "&&";
