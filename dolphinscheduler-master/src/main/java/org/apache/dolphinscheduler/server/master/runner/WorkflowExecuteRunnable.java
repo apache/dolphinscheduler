@@ -49,7 +49,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -1881,7 +1880,14 @@ public class WorkflowExecuteRunnable implements Runnable {
                 //init varPool only this task is the first time running
                 if (task.isFirstRun()) {
                     //get pre task ,get all the task varPool to this task
-                    Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
+                    Set<String> preTask = new HashSet<>();
+                    preTask.addAll(dag.getPreviousNodes(Long.toString(task.getTaskCode())));
+                    TaskNode taskNode = dag.getNode(Long.toString(task.getTaskCode()));
+                    if (null != taskNode && null != taskNode.getDepList() && !taskNode.getDepList().isEmpty()) {
+                        logger.debug("in submitStandByTask: taskCode:{}, taskType: {}, preTasks: {}, depList:{}",
+                                task.getTaskCode(), taskNode.getType(), taskNode.getPreTasks(), taskNode.getDepList());
+                        preTask.addAll(taskNode.getDepList());
+                    }
                     getPreVarPool(task, preTask);
                 }
                 DependResult dependResult = getDependResultForTask(task);
