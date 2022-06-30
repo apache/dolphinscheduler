@@ -47,12 +47,12 @@ export function useJava({
     timeoutFlag: false,
     timeoutNotifyStrategy: ['WARN'],
     timeout: 30,
-    mainJar:null,
+    mainJar: undefined,
     runType:'JAVA',
     mainArgs:'',
     jvmArgs:'',
     programType: 'JAVA'
-  } as INodeData)
+  } as unknown as INodeData)
 
   let extra: IJsonItem[] = []
   if (from === 1) {
