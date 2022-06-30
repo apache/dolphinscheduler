@@ -182,6 +182,7 @@ public class JavaTask extends AbstractTaskExecutor {
         System.out.println(builder.toString());
         return builder.toString();
     }
+    
     @Override
     public void cancelApplication(boolean cancelApplication) throws Exception {
         // cancel process
