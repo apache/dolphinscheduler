@@ -22,14 +22,13 @@ import {
   NDataTable,
   NIcon,
   NInput,
-  NPagination
+  NPagination,
+  NSpace
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
-import Card from '@/components/card'
 import EnvironmentModal from './components/environment-modal'
-import styles from './index.module.scss'
 
 const environmentManage = defineComponent({
   name: 'environment-manage',
@@ -102,20 +101,18 @@ const environmentManage = defineComponent({
     } = this
 
     return (
-      <div>
-        <NCard>
-          <div class={styles['search-card']}>
-            <div>
-              <NButton
-                size='small'
-                type='primary'
-                onClick={handleModalChange}
-                class='btn-create-environment'
-              >
-                {t('security.environment.create_environment')}
-              </NButton>
-            </div>
-            <div class={styles.box}>
+      <NSpace vertical>
+        <NCard size='small'>
+          <NSpace justify='space-between'>
+            <NButton
+              size='small'
+              type='primary'
+              onClick={handleModalChange}
+              class='btn-create-environment'
+            >
+              {t('security.environment.create_environment')}
+            </NButton>
+            <NSpace>
               <NInput
                 size='small'
                 clearable
@@ -131,30 +128,32 @@ const environmentManage = defineComponent({
                   )
                 }}
               </NButton>
-            </div>
-          </div>
+            </NSpace>
+          </NSpace>
         </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            row-class-name='items'
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestData}
-              onUpdatePageSize={onUpdatePageSize}
+        <NCard size='small'>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              row-class-name='items'
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
             />
-          </div>
-        </Card>
+            <NSpace>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </NCard>
         <EnvironmentModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
@@ -162,7 +161,7 @@ const environmentManage = defineComponent({
           onCancelModal={onCancelModal}
           onConfirmModal={onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })
