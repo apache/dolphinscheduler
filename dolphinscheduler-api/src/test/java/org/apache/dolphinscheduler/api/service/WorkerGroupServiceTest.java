@@ -17,37 +17,49 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ActiveProfiles(value = {ProfileType.H2})
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class WorkerGroupServiceTest {
 
-    @Mock
-    private WorkerGroupService workerGroupService;
+    @MockBean(name = "registryClient")
+    private RegistryClient registryClient;
 
-    @Mock
+    @Autowired
+    private WorkerGroupServiceImpl workerGroupService;
+
+    @MockBean(name = "workerGroupMapper")
     private WorkerGroupMapper workerGroupMapper;
 
-    @Mock
+    @MockBean(name = "processInstanceMapper")
     private ProcessInstanceMapper processInstanceMapper;
 
     private String groupName = "groupName000001";
@@ -63,7 +75,6 @@ public class WorkerGroupServiceTest {
     @Test
     public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup(loginUSer);
-        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(Arrays.asList(getWorkerGroup()));
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(workerGroups.size(), 1);
     }
