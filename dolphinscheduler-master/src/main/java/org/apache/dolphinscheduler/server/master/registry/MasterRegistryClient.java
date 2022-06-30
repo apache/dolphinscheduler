@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -186,7 +187,7 @@ public class MasterRegistryClient {
     void registry() {
         logger.info("Master node : {} registering to registry center", masterAddress);
         String localNodePath = getCurrentNodePath();
-        int masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
+        Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 masterConfig.getMaxCpuLoadAvg(),
                 masterConfig.getReservedMemory(),
@@ -209,7 +210,7 @@ public class MasterRegistryClient {
         // delete dead server
         registryClient.handleDeadServer(Collections.singleton(localNodePath), NodeType.MASTER, Constants.DELETE_OP);
 
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, masterHeartbeatInterval, TimeUnit.SECONDS);
+        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, masterHeartbeatInterval.getSeconds(), TimeUnit.SECONDS);
         logger.info("Master node : {} registered to registry center successfully with heartBeatInterval : {}s", masterAddress, masterHeartbeatInterval);
 
     }
