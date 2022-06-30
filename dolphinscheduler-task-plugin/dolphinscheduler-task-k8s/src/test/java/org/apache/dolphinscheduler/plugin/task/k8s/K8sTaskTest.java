@@ -65,6 +65,13 @@ public class K8sTaskTest {
         Map<String, Property> paramsMap = new HashMap<>();
         paramsMap.put(DAY,property);
         taskRequest.setParamsMap(paramsMap);
+
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        Property property1 = new Property();
+        property1.setProp("day");
+        property1.setValue("20220507");
+        prepareParamsMap.put("day", property1);
+        taskRequest.setPrepareParamsMap(prepareParamsMap);
         k8sTask = new K8sTask(taskRequest);
     }
 

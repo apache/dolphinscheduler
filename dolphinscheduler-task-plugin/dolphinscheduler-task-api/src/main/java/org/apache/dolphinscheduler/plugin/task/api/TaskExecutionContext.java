@@ -183,6 +183,11 @@ public class TaskExecutionContext implements Serializable {
     private Map<String, String> definedParams;
 
     /**
+     * prepare params map
+     */
+    private Map<String, Property> prepareParamsMap;
+
+    /**
      * task AppId
      */
     private String taskAppId;

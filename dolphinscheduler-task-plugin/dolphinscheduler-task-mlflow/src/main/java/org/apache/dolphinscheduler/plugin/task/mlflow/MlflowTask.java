@@ -193,14 +193,7 @@ public class MlflowTask extends AbstractTaskExecutor {
 
     private Map<String, Property> getParamsMap() {
         // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(taskExecutionContext.getParamsMap());
-        }
-        return paramsMap;
+        return taskExecutionContext.getPrepareParamsMap();
 
     }
 

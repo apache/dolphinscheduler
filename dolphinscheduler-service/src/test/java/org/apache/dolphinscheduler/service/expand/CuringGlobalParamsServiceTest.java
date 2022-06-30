@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.dolphinscheduler.common.expand;
+package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -45,10 +45,10 @@ public class CuringGlobalParamsServiceTest {
     private static final String placeHolderName = "$[yyyy-MM-dd-1]";
 
     @Mock
-    private CuringGlobalParamsService curingGlobalParamsService;
+    private CuringParamsService curingGlobalParamsService;
 
     @InjectMocks
-    private DolphinSchedulerCuringGlobalParams dolphinSchedulerCuringGlobalParams;
+    private CuringGlobalParams dolphinSchedulerCuringGlobalParams;
 
     @Mock
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;

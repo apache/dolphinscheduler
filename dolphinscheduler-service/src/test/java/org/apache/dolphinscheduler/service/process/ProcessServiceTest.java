@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -164,7 +164,7 @@ public class ProcessServiceTest {
     private ScheduleMapper scheduleMapper;
 
     @Mock
-    CuringGlobalParamsService curingGlobalParamsService;
+    CuringParamsService curingGlobalParamsService;
 
     @Test
     public void testCreateSubCommand() {

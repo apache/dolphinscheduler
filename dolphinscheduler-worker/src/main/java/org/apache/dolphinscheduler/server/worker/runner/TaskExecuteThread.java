@@ -155,13 +155,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             }
 
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
-            taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
             taskExecutionContext.setTaskAppId(String.format("%s_%s",
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
-
-            preBuildBusinessParams();
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
@@ -253,23 +250,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
     }
 
     /**
-     * get global paras map
-     *
-     * @return map
-     */
-    private Map<String, String> getGlobalParamsMap() {
-        Map<String, String> globalParamsMap = new HashMap<>(16);
-
-        // global params string
-        String globalParamsStr = taskExecutionContext.getGlobalParams();
-        if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
-            globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
-        }
-        return globalParamsMap;
-    }
-
-    /**
      * kill task
      */
     public void kill() {
@@ -358,19 +338,5 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     public AbstractTask getTask() {
         return task;
-    }
-
-    private void preBuildBusinessParams() {
-        Map<String, Property> paramsMap = new HashMap<>();
-        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-        if (taskExecutionContext.getScheduleTime() != null) {
-            Date date = taskExecutionContext.getScheduleTime();
-            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME, null);
-            Property p = new Property();
-            p.setValue(dateTime);
-            p.setProp(Constants.PARAMETER_DATETIME);
-            paramsMap.put(Constants.PARAMETER_DATETIME, p);
-        }
-        taskExecutionContext.setParamsMap(paramsMap);
     }
 }

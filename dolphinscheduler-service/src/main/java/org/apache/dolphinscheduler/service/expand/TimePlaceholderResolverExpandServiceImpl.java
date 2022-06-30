@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.expand;
+package org.apache.dolphinscheduler.service.expand;
 
 import org.springframework.stereotype.Component;
 
