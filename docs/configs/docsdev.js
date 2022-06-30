@@ -258,6 +258,10 @@ export default {
                         title: 'Resource',
                         children: [
                             {
+                                title: 'Resources',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/resources_introduction.html'
+                            },
+                            {
                                 title: 'Configuration',
                                 link: '/en-us/docs/dev/user_doc/guide/resource/configuration.html'
                             },
