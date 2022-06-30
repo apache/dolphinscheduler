@@ -78,6 +78,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -457,7 +458,7 @@ public class WorkflowExecuteThread implements Runnable {
         taskRetryCheckList.remove(task.getId());
         depStateCheckList.remove(task.getId());
         if (task.getState().typeIsSuccess()) {
-            processInstance.setVarPool(task.getVarPool());
+            // processInstance.setVarPool(task.getVarPool());
             processService.saveProcessInstance(processInstance);
             submitPostNode(Long.toString(task.getTaskCode()));
         } else if (task.getState().typeIsFailure()) {
@@ -921,11 +922,12 @@ public class WorkflowExecuteThread implements Runnable {
             if (allProperty.size() > 0) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
-        } else {
-            if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
-                taskInstance.setVarPool(processInstance.getVarPool());
-            }
         }
+//        else {
+//            if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
+//                taskInstance.setVarPool(processInstance.getVarPool());
+//            }
+//        }
     }
 
     private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance, TaskInstance preTaskInstance, Property thisProperty) {
@@ -1447,7 +1449,14 @@ public class WorkflowExecuteThread implements Runnable {
                 //init varPool only this task is the first time running
                 if (task.isFirstRun()) {
                     //get pre task ,get all the task varPool to this task
-                    Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
+                    Set<String> preTask = new HashSet<>();
+                    preTask.addAll(dag.getPreviousNodes(Long.toString(task.getTaskCode())));
+                    TaskNode taskNode = dag.getNode(Long.toString(task.getTaskCode()));
+                    if (null != taskNode && null != taskNode.getDepList() && !taskNode.getDepList().isEmpty()) {
+                        logger.debug("in submitStandByTask: taskCode:{}, taskType: {}, preTasks: {}, depList:{}",
+                                task.getTaskCode(), taskNode.getType(), taskNode.getPreTasks(), taskNode.getDepList());
+                        preTask.addAll(taskNode.getDepList());
+                    }
                     getPreVarPool(task, preTask);
                 }
                 DependResult dependResult = getDependResultForTask(task);
