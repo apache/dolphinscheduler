@@ -833,4 +833,6 @@ public final class Constants {
     public static final int USER_PASSWORD_MIN_LENGTH = 2;
 
     public static final String FUNCTION_START_WITH = "$";
+
+    public static final Integer DEFAULT_TENANT_ID = 1;
 }
