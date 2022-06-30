@@ -138,6 +138,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -373,7 +374,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * save error command, and delete original command
+     * Save error command, and delete original command. If the given command has already been moved into error command,
+     * will throw {@link SQLIntegrityConstraintViolationException ).
      *
      * @param command command
      * @param message message

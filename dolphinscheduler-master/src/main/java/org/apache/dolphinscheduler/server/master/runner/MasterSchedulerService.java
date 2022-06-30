@@ -207,8 +207,9 @@ public class MasterSchedulerService extends BaseDaemonThread {
         for (final Command command : commands) {
             masterPrepareExecService.execute(() -> {
                 try {
-                    // todo: this check is not safe, the slot may change after command transform.
-                    // slot check again
+                    // Note: this check is not safe, the slot may change after command transform.
+                    // We use the database transaction in `handleCommand` so that we can guarantee the command will always be executed
+                    // by only one master
                     SlotCheckState slotCheckState = slotCheck(command);
                     if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
                         logger.info("Master handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
