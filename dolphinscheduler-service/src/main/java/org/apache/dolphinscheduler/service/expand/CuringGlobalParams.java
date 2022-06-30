@@ -47,9 +47,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
 
 @Component
-public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
+public class CuringGlobalParams implements CuringParamsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerCuringGlobalParams.class);
+    private static final Logger logger = LoggerFactory.getLogger(CuringGlobalParams.class);
 
     @Autowired
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
@@ -69,6 +69,16 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
         return timePlaceholderResolverExpandService.timeFunctionExtension(processInstanceId, timezone, placeholderName);
     }
 
+    /**
+     * here it is judged whether external expansion calculation is required and the calculation result is obtained
+     * @param processInstanceId
+     * @param globalParamMap
+     * @param globalParamList
+     * @param commandType
+     * @param scheduleTime
+     * @param timezone
+     * @return
+     */
     @Override
     public String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap, List<Property> globalParamList, CommandType commandType, Date scheduleTime, String timezone) {
         if (globalParamList == null || globalParamList.isEmpty()) {
@@ -91,7 +101,7 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
         Map<String, String> resolveMap = new HashMap<>();
         for (Map.Entry<String, String> entry : entries) {
             String val = entry.getValue();
-            if (val.startsWith("$")) {
+            if (val.startsWith(Constants.FUNCTION_START_WITH)) {
                 String str = "";
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
@@ -112,6 +122,14 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
         return JSONUtils.toJsonString(globalParamList);
     }
 
+    /**
+     * the global parameters and local parameters used in the worker will be prepared here.
+     *
+     * @param taskExecutionContext
+     * @param parameters
+     * @param processInstance
+     * @return
+     */
     @Override
     public Map<String, Property> paramParsingPreparation(TaskExecutionContext taskExecutionContext, AbstractParameters parameters, ProcessInstance processInstance) {
         Preconditions.checkNotNull(taskExecutionContext);
@@ -119,7 +137,7 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
         setGlobalParamsMap(taskExecutionContext);
         Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams());
         Map<String,String> globalParamsMap = taskExecutionContext.getDefinedParams();
-        org.apache.dolphinscheduler.spi.enums.CommandType commandType = org.apache.dolphinscheduler.spi.enums.CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
+        CommandType commandType = CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
         Date scheduleTime = taskExecutionContext.getScheduleTime();
 
         // combining local and global parameters
@@ -134,9 +152,9 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
-        Map<String,String> params = org.apache.dolphinscheduler.plugin.task.api.parser.BusinessTimeUtils
-                .getBusinessTime(commandType,
-                        scheduleTime);
+        Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+        String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+        Map<String,String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
         if (globalParamsMap != null) {
             params.putAll(globalParamsMap);
@@ -159,7 +177,7 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
 
-            if (StringUtils.isNotEmpty(property.getValue()) && property.getValue().startsWith("$")) {
+            if (StringUtils.isNotEmpty(property.getValue()) && property.getValue().startsWith(Constants.FUNCTION_START_WITH)) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
@@ -168,15 +186,14 @@ public class DolphinSchedulerCuringGlobalParams implements CuringParamsService {
                 String val = property.getValue();
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
-                    Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-                    val = timeFunctionExtension(taskExecutionContext.getProcessInstanceId(), cmdParam.get(Constants.SCHEDULE_TIMEZONE), val);
+                    val = timeFunctionExtension(taskExecutionContext.getProcessInstanceId(), timeZone, val);
                 } else {
-                    val  = org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils.convertParameterPlaceholders(val, params);
+                    val  = convertParameterPlaceholders(val, params);
                 }
                 property.setValue(val);
             }
         }
-        if (org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils.isEmpty(globalParams)) {
+        if (MapUtils.isEmpty(globalParams)) {
             globalParams = new HashMap<>();
         }
         if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {

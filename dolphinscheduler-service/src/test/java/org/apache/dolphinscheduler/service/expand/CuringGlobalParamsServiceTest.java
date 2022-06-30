@@ -48,7 +48,7 @@ public class CuringGlobalParamsServiceTest {
     private CuringParamsService curingGlobalParamsService;
 
     @InjectMocks
-    private DolphinSchedulerCuringGlobalParams dolphinSchedulerCuringGlobalParams;
+    private CuringGlobalParams dolphinSchedulerCuringGlobalParams;
 
     @Mock
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
