@@ -1,6 +1,7 @@
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
 
+import io.etcd.jetcd.launcher.EtcdCluster;
 import io.etcd.jetcd.test.EtcdClusterExtension;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -8,10 +9,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,16 +23,17 @@ import java.util.concurrent.CountDownLatch;
 public class EtcdRegistryTest {
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
-    EtcdClusterExtension server;
+//    @RegisterExtension
+//    static final EtcdCluster server = new EtcdClusterExtension("test-etcd", 1);
 
     EtcdRegistry registry;
 
     @Before
     public void before() {
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
-        server = new EtcdClusterExtension("server",1);
-        server.start();
-        properties.setEndpoints(String.valueOf(server.getClientEndpoints()));
+//        server.start();
+
+        properties.setEndpoints("http://localhost:2379");
         registry = new EtcdRegistry(properties);
 
         registry.put("/sub", "", false);
@@ -39,10 +43,12 @@ public class EtcdRegistryTest {
     public void persistTest() {
         registry.put("/nodes/m1", "", false);
         registry.put("/nodes/m2", "", false);
-        Assert.assertEquals(Arrays.asList("m2", "m1"), registry.children("/nodes"));
+        Assert.assertEquals(Arrays.asList("m1", "m2"), registry.children("/nodes"));
         Assert.assertTrue(registry.exists("/nodes/m1"));
         registry.delete("/nodes/m2");
         Assert.assertFalse(registry.exists("/nodes/m2"));
+        registry.delete("/nodes");
+        Assert.assertFalse(registry.exists("/nodes/m1"));
     }
 
 
@@ -104,6 +110,6 @@ public class EtcdRegistryTest {
     @After
     public void after() throws IOException {
         registry.close();
-        server.close();
+//        server.close();
     }
 }

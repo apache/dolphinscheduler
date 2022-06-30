@@ -13,7 +13,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "registry")
 public class EtcdRegistryProperties {
     private String endpoints;
-    private String namespace;
+    private String namespace="dolphinscheduler";
     private Duration connectionTimeout = Duration.ofSeconds(9);
 
     // auth
