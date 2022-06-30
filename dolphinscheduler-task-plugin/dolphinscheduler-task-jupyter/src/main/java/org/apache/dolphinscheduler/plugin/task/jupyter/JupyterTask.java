@@ -103,10 +103,15 @@ public class JupyterTask extends AbstractTaskExecutor {
         List<String> args = new ArrayList<>();
         final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
         final String timestamp = DateUtils.getTimestampString();
+        String condaEnvName = jupyterParameters.getCondaEnvName();
+        if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(JupyterConstants.EXECUTION_FLAG);
+            args.add(JupyterConstants.NEW_LINE_SYMBOL);
+        }
+
         args.add(JupyterConstants.CONDA_INIT);
         args.add(condaPath);
         args.add(JupyterConstants.JOINTER);
-        String condaEnvName = jupyterParameters.getCondaEnvName();
         if (condaEnvName.endsWith(JupyterConstants.TAR_SUFFIX)) {
             args.add(String.format(JupyterConstants.CREATE_ENV_FROM_TAR, condaEnvName));
         } else if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
@@ -129,7 +134,7 @@ public class JupyterTask extends AbstractTaskExecutor {
 
         // remove tmp conda env, if created from requirements.txt
         if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
-            args.add(JupyterConstants.JOINTER);
+            args.add(JupyterConstants.NEW_LINE_SYMBOL);
             args.add(String.format(JupyterConstants.REMOVE_ENV, timestamp));
         }
 

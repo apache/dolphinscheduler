@@ -24,6 +24,16 @@ public class JupyterConstants {
     }
 
     /**
+     * execution flag, ignore errors and keep executing till the end
+     */
+    public static final String EXECUTION_FLAG = "set +e";
+
+    /**
+     * new line symbol
+     */
+    public static final String NEW_LINE_SYMBOL = "\n";
+
+    /**
      * conda init
      */
     public static final String CONDA_INIT = "source";

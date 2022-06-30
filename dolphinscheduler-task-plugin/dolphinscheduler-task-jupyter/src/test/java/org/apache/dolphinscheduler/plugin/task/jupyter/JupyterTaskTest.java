@@ -31,7 +31,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -39,20 +38,11 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest({
         JSONUtils.class,
         PropertyUtils.class,
-        DateUtils.class,
-        Long.class
-//        Date.class
-//        System.class,
-//        String.class,
+        DateUtils.class
 })
 @PowerMockIgnore({"javax.*"})
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
 public class JupyterTaskTest {
-
-//    @Before
-//    public void setup() {
-//        PowerMockito.mockStatic(System.class);
-//    }
 
     @Test
     public void testBuildJupyterCommandWithLocalEnv() throws Exception {
@@ -120,7 +110,8 @@ public class JupyterTaskTest {
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
         jupyterTask.init();
         Assert.assertEquals(jupyterTask.buildCommand(),
-                "source /opt/anaconda3/etc/profile.d/conda.sh && " +
+                "set +e \n " +
+                        "source /opt/anaconda3/etc/profile.d/conda.sh && " +
                         "conda create -n jupyter-tmp-env-123456789 -y && " +
                         "conda activate jupyter-tmp-env-123456789 && " +
                         "pip install -r requirements.txt && " +
@@ -135,7 +126,7 @@ public class JupyterTaskTest {
                         "--start-timeout 3 " +
                         "--version " +
                         "--inject-paths " +
-                        "--progress-bar && " +
+                        "--progress-bar \n " +
                         "conda deactivate && conda remove --name jupyter-tmp-env-123456789 --all -y"
                 );
     }
