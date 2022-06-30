@@ -5,17 +5,17 @@ When third party jars are used in the scheduling process or user defined scripts
 ![file-manage](/img/new_ui/dev/resource/file-manage.png)
 
 - Create a file
-  > The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
+  > The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql properties.
 
 ![create-file](/img/new_ui/dev/resource/create-file.png)
 
-- upload files
+- Upload files
 
-> Upload file: Click the "Upload File" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
+> Upload file: Click the "`Upload File`" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
 
 ![upload-file](/img/new_ui/dev/resource/upload-file.png)
 
-- File View
+- File view
 
 > For the files that can be viewed, click the file name to view the file details.
 
@@ -23,18 +23,18 @@ When third party jars are used in the scheduling process or user defined scripts
 
 - Download file
 
-> Click the "Download" button in the file list to download the file or click the "Download" button in the upper right corner of the file details to download the file.
+> Click the "`Download`" button in the file list to download the file or click the "`Download`" button in the upper right corner of the file details to download the file.
 
 - File rename
 
 ![rename-file](/img/new_ui/dev/resource/rename-file.png)
 
-- delete
-  > File list -> Click the "Delete" button to delete the specified file.
+- Delete
+  > File list -> Click the "`Delete`" button to delete the specified file.
 
 - Re-upload file
 
-  > Re-upload file: Click the "Re-upload File" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
+  > Re-upload file: Click the "`Re-upload File`" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
 
 ![reuplod_file](/img/reupload_file_en.png)
 

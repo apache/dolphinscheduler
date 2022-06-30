@@ -1,12 +1,8 @@
-# Configuration
-
-The Resource Center is usually used for operations such as uploading files, UDF functions, and task group management. You can appoint the local file directory as the upload directory for a single machine (this operation does not need to deploy Hadoop). Or you can also upload to a Hadoop or MinIO cluster, at this time, you need to have Hadoop (2.6+) or MinIO or other related environments.
-
-## HDFS Resource Configuration
+# HDFS Resource Configuration
 
 When it is necessary to use the Resource Center to create or upload relevant files, all files and resources will be stored on HDFS. Therefore the following configuration is required.
 
-### Configuring the common.properties
+## Configuring the common.properties
 
 After version 3.0.0-alpha, if you want to upload resources using HDFS or S3 from the Resource Center, you will need to configure the following paths The following paths need to be configured: `api-server/conf/common.properties` and `worker-server/conf/common.properties`. This can be found as follows.
 
@@ -109,7 +105,7 @@ development.state=false
 alert.rpc.port=50052
 ```
 
-> **_Note:_**
+> **Note:**
 > 
 > *  If only the `api-server/conf/common.properties` file is configured, then resource uploading is enabled, but you can not use resources in task. If you want to use or execute the files in the workflow you need to configure `worker-server/conf/common.properties` too.
 > * If you want to use the resource upload function, the deployment user in [installation and deployment](../installation/standalone.md) must have relevant operation authority.

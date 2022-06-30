@@ -50,7 +50,7 @@
 
 ## Token Management
 
-> Since the back-end interface has login check, token management provides a way to execute various operations on the system by calling interfaces.
+Since the back-end interface has login check, token management provides a way to execute various operations on the system by calling interfaces.
 
 - The administrator enters the `Security Center -> Token Management page`, clicks the `Create Token` button, selects the expiration time and user, clicks the `Generate Token` button, and clicks the `Submit` button, then create the selected user's token successfully.
 
@@ -96,9 +96,9 @@
 
 ## Granted Permissions
 
-    * Granted permissions include project permissions, resource permissions, data source permissions, UDF function permissions.
-    * The administrator can authorize the projects, resources, data sources and UDF functions to normal users which not created by them. Because the way to authorize projects, resources, data sources and UDF functions to users is the same, we take project authorization as an example.
-    * Note: The user has all permissions to the projects created by them. Projects will not be displayed in the project list and the selected project list.
+- Granted permissions include project permissions, resource permissions, data source permissions, UDF function permissions.
+- The administrator can authorize the projects, resources, data sources and UDF functions to normal users which not created by them. Because the way to authorize projects, resources, data sources and UDF functions to users is the same, we take project authorization as an example.
+- Note: The user has all permissions to the projects created by them. Projects will not be displayed in the project list and the selected project list.
 
 - The administrator enters the `Security Center -> User Management` page and clicks the `Authorize` button of the user who needs to be authorized, as shown in the figure below:
  <p align="center">
