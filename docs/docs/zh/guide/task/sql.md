@@ -43,6 +43,12 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ![hive-sql](../../../../img/tasks/demo/hive-result.png)
 
+### 使用前置sql和后置sql
+
+在前置sql中执行建表操作，在sql语句中执行操作，在后置sql中执行清理操作
+
+![pre_post_sql](../../../../img/tasks/demo/pre_post_sql.png)
+
 ## 注意事项
 
 * 注意SQL类型的选择，如果是INSERT等操作需要选择非查询类型。 

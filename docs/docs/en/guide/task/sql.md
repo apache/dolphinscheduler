@@ -43,6 +43,12 @@ Log in to the bigdata cluster and use 'hive' command or 'beeline' or 'JDBC' and 
 
 ![hive-sql](../../../../img/tasks/demo/hive-result.png)
 
+### Use Pre-SQL and Post-SQL
+
+Table created in the Pre-SQL, after use in the SQL statement, cleaned in the Post-SQL
+
+![pre_post_sql](../../../../img/tasks/demo/pre_post_sql.png)
+
 ## Notice
 
 Pay attention to the selection of SQL type. If it is an insert operation, need to change to "Non-Query" type.
