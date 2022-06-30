@@ -123,8 +123,12 @@ public class JavaTask extends AbstractTaskExecutor {
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            logger.error("java task interrupted ", e);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
-            logger.error("java task failure", e);
+            logger.error("java task failed ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("run java task error", e);
         }
