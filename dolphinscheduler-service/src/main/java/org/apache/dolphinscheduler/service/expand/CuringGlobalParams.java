@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
-import com.google.common.base.Preconditions;
 import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -27,17 +26,13 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -52,8 +47,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 
 @Component
 public class CuringGlobalParams implements CuringParamsService {
-
-    private static final Logger logger = LoggerFactory.getLogger(CuringGlobalParams.class);
 
     @Autowired
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
