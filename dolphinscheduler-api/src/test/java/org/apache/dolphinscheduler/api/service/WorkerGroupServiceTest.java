@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -63,9 +64,17 @@ public class WorkerGroupServiceTest {
 
     private String groupName = "groupName000001";
 
+    private User loginUSer;
+
+    @Before
+    public void init(){
+        loginUSer = new User();
+        loginUSer.setUserType(UserType.ADMIN_USER);
+    }
+
     @Test
     public void testQueryAllGroup() {
-        Map<String, Object> result = workerGroupService.queryAllGroup();
+        Map<String, Object> result = workerGroupService.queryAllGroup(loginUSer);
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(workerGroups.size(), 1);
     }
@@ -104,7 +113,7 @@ public class WorkerGroupServiceTest {
 
     @Test
     public void testQueryAllGroupWithDefault() {
-        Map<String, Object> result = workerGroupService.queryAllGroup();
+        Map<String, Object> result = workerGroupService.queryAllGroup(loginUSer);
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(1, workerGroups.size());
         Assert.assertEquals("default", workerGroups.toArray()[0]);

@@ -50,6 +50,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,6 +80,7 @@ import org.slf4j.LoggerFactory;
 public class DataSourceServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceTest.class);
+    private static final Logger dataSourceServiceLogger = LoggerFactory.getLogger(DataSourceServiceImpl.class);
 
     @InjectMocks
     private DataSourceServiceImpl dataSourceService;
@@ -304,8 +306,15 @@ public class DataSourceServiceTest {
     public void queryDataSourceListTest() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
+        Set<Integer> dataSourceIds = new HashSet<>();
+        dataSourceIds.add(1);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), dataSourceServiceLogger)).thenReturn(dataSourceIds);
+
+        DataSource dataSource = new DataSource();
+        dataSource.setType(DbType.MYSQL);
+        Mockito.when(dataSourceMapper.selectBatchIds(dataSourceIds)).thenReturn(Collections.singletonList(dataSource));
         Map<String, Object> map = dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
         Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
     }

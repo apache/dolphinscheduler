@@ -52,9 +52,10 @@ public interface WorkerGroupService {
     /**
      * query all worker group
      *
+     * @param loginUser
      * @return all worker group list
      */
-    Map<String, Object> queryAllGroup();
+    Map<String, Object> queryAllGroup(User loginUser);
 
     /**
      * delete worker group by id
