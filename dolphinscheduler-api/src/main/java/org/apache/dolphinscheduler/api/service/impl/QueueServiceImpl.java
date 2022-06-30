@@ -307,7 +307,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return queueMapper.existQueue(queue, null).equals(Boolean.TRUE);
+        return queueMapper.existQueue(queue, null) == Boolean.TRUE;
     }
 
     /**
@@ -318,7 +318,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.existQueue(null, queueName).equals(Boolean.TRUE);
+        return queueMapper.existQueue(null, queueName) == Boolean.TRUE;
     }
 
     /**
@@ -330,7 +330,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if need to update user
      */
     private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
-        return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue).equals(Boolean.TRUE);
+        return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
     }
 
 }
