@@ -293,15 +293,6 @@ export default {
                         ],
                     },
                     {
-                        title: 'How-To',
-                        children: [
-                            {
-                                title: 'General Setting',
-                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
-                            }
-                        ],
-                    },
-                    {
                         title: 'Data Quality',
                         link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
                     },
@@ -389,6 +380,10 @@ export default {
                         title: 'FAQ',
                         link: '/en-us/docs/release/faq.html',
                     },
+                    {
+                        title: 'General Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                    }
                 ],
             },
             {
