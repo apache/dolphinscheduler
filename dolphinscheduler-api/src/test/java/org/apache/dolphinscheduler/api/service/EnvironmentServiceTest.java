@@ -41,8 +41,10 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 
@@ -73,6 +75,7 @@ public class EnvironmentServiceTest {
 
     public static final Logger logger = LoggerFactory.getLogger(EnvironmentServiceTest.class);
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+    private static final Logger environmentServiceLogger = LoggerFactory.getLogger(EnvironmentServiceImpl.class);
 
     @InjectMocks
     private EnvironmentServiceImpl environmentService;
@@ -172,8 +175,12 @@ public class EnvironmentServiceTest {
 
     @Test
     public void testQueryAllEnvironmentList() {
-        Mockito.when(environmentMapper.queryAllEnvironmentList()).thenReturn(Lists.newArrayList(getEnvironment()));
-        Map<String, Object> result  = environmentService.queryAllEnvironmentList();
+        Set<Integer> ids = new HashSet<>();
+        ids.add(1);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT, 1, environmentServiceLogger)).thenReturn(ids);
+        Mockito.when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
+
+        Map<String, Object> result  = environmentService.queryAllEnvironmentList(getAdminUser());
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 

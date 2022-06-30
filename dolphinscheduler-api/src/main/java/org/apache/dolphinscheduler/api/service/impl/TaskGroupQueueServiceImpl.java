@@ -19,9 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,16 +27,18 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * task group queue service
@@ -50,10 +50,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     TaskGroupQueueMapper taskGroupQueueMapper;
 
     @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
-
-    @Autowired
-    private ProjectService projectService;
+    private ProjectMapper projectMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupQueueServiceImpl.class);
 
@@ -70,18 +67,18 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     public Map<String, Object> queryTasksByGroupId(User loginUser, String taskName
         , String processName, Integer status, int groupId, int pageNo, int pageSize) {
         Map<String, Object> result = new HashMap<>();
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_QUEUE);
-        if (!canOperatorPermissions){
-            result.put(Constants.STATUS, Status.NO_CURRENT_OPERATING_PERMISSION);
+        Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
+        PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        if (projectIds.isEmpty()) {
+            result.put(Constants.DATA_LIST, pageInfo);
+            putMsg(result, Status.SUCCESS);
             return result;
         }
-        Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
-        Map<String, Object> objectMap = this.projectService.queryAuthorizedProject(loginUser, loginUser.getId());
-        List<Project> projects = (List<Project>)objectMap.get(Constants.DATA_LIST);
+        List<Project> projects = projectMapper.selectBatchIds(projectIds);
         IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(page, taskName
             ,processName,status,groupId,projects);
 
-        PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) taskGroupQueue.getTotal());
         pageInfo.setTotalList(taskGroupQueue.getRecords());
 

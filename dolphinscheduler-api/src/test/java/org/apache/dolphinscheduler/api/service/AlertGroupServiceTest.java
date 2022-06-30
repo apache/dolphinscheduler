@@ -20,6 +20,11 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+
+import org.apache.commons.compress.utils.Sets;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -73,6 +78,7 @@ import static org.mockito.ArgumentMatchers.eq;
 public class AlertGroupServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupServiceTest.class);
+    private static final Logger alertGroupServiceLogger = LoggerFactory.getLogger(AlertGroupServiceImpl.class);
 
     @InjectMocks
     private AlertGroupServiceImpl alertGroupService;
@@ -89,7 +95,7 @@ public class AlertGroupServiceTest {
     public void testQueryAlertGroup() {
 
         Mockito.when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
-        Map<String, Object> result = alertGroupService.queryAlertgroup();
+        Map<String, Object> result = alertGroupService.queryAlertgroup(getLoginUser());
         logger.info(result.toString());
         List<AlertGroup> alertGroups = (List<AlertGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(alertGroups));

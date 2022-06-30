@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_CREATE_DATASOURCE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
@@ -305,14 +306,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList = null;
-        
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_UPDATE)){
-            datasourceList = dataSourceMapper.queryDataSourceByType(UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), type);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
         }
-
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

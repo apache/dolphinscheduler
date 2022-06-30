@@ -360,6 +360,7 @@ public class ProjectServiceTest {
 
         User user = new User();
         user.setId(0);
+        user.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = projectService.queryAllProjectList(user);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);

@@ -210,7 +210,7 @@ public class EnvironmentController extends BaseController {
     @ApiException(QUERY_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllEnvironmentList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = environmentService.queryAllEnvironmentList();
+        Map<String, Object> result = environmentService.queryAllEnvironmentList(loginUser);
         return returnDataList(result);
     }
 

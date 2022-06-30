@@ -33,9 +33,11 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,9 +81,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         Map<String, Object> result = new HashMap<>();
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
         if (ids.isEmpty()) {
-            result.put(Constants.DATA_LIST, Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
-            return result;
+            ids = new HashSet<>();
+            ids.add(1);
         }
         List<Queue> queueList = queueMapper.selectBatchIds(ids);
         result.put(Constants.DATA_LIST, queueList);
@@ -110,7 +111,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return result;
         }
         Page<Queue> page = new Page<>(pageNo, pageSize);
-        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
+        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
         Integer count = (int) queueList.getTotal();
         pageInfo.setTotal(count);
         pageInfo.setTotalList(queueList.getRecords());

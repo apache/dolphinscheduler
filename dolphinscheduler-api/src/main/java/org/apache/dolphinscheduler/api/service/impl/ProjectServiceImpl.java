@@ -544,7 +544,18 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryAllProjectList(User user) {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
+        List<Project> projects;
+        if (user.getUserType().equals(UserType.ADMIN_USER)) {
+            projects = projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
+        } else {
+            Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, user.getId(), logger);
+            if (projectIds.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            projects = projectMapper.selectBatchIds(projectIds);
+        }
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
