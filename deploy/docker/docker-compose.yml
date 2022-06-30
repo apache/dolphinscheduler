@@ -71,6 +71,7 @@ services:
     image: ${HUB}/dolphinscheduler-api:${TAG}
     ports:
       - "12345:12345"
+      - "25333:25333"
     profiles: ["all"]
     env_file: .env
     healthcheck:

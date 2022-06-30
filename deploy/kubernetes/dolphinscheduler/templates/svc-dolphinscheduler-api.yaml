@@ -40,6 +40,13 @@ spec:
       {{- end }}
       protocol: TCP
       name: api-port
+    - port: 25333
+      targetPort: python-api-port
+      {{- if and (eq .Values.api.service.type "NodePort") .Values.api.service.nodePort }}
+      nodePort: {{ .Values.api.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: python-api-port
   {{- if .Values.api.service.externalIPs }}
   externalIPs:
     {{- toYaml .Values.api.service.externalIPs | nindent 4 }}

@@ -62,6 +62,8 @@ spec:
           ports:
             - containerPort: 12345
               name: "api-port"
+            - containerPort: 25333
+              name: "python-api-port"
           env:
             - name: TZ
               value: {{ .Values.timezone }}
