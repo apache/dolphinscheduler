@@ -27,18 +27,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
@@ -209,22 +206,16 @@ public class PythonTask extends AbstractTaskExecutor {
      * @return raw python script
      * @throws Exception exception
      */
-    private String buildPythonScriptContent() throws Exception {
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
-
-        // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, pythonParameters);
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
-            paramsMap.putAll(taskRequest.getParamsMap());
-        }
-        rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
-
+    protected String buildPythonScriptContent() throws Exception {
         logger.info("raw python script : {}", pythonParameters.getRawScript());
+        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
+        return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
+    }
 
-        return rawPythonScript;
+    protected Map<String, Property> mergeParamsWithContext(AbstractParameters parameters) {
+        // replace placeholder
+        return taskRequest.getPrepareParamsMap();
     }
 
     /**

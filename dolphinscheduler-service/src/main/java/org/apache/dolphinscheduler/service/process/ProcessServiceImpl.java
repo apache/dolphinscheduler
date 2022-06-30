@@ -42,7 +42,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -270,7 +270,7 @@ public class ProcessServiceImpl implements ProcessService {
     private K8sMapper k8sMapper;
 
     @Autowired
-    private CuringGlobalParamsService curingGlobalParamsService;
+    private CuringParamsService curingGlobalParamsService;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction

@@ -50,7 +50,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -154,7 +154,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private CuringGlobalParamsService curingGlobalParamsService;
+    private CuringParamsService curingGlobalParamsService;
 
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime

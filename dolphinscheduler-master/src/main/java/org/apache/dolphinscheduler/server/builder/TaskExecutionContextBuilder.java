@@ -28,7 +28,10 @@ import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionConte
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+
+import java.util.Map;
 
 /**
  *  TaskExecutionContext builder
@@ -115,6 +118,26 @@ public class TaskExecutionContextBuilder {
 
     public TaskExecutionContextBuilder buildResourceParametersInfo(ResourceParametersHelper parametersHelper) {
         taskExecutionContext.setResourceParametersHelper(parametersHelper);
+        return this;
+    }
+
+    /**
+     * build global and local params
+     * @param propertyMap
+     * @return
+     */
+    public TaskExecutionContextBuilder buildParamInfo(Map<String, Property> propertyMap) {
+        taskExecutionContext.setPrepareParamsMap(propertyMap);
+        return this;
+    }
+
+    /**
+     * build business params
+     * @param businessParamsMap
+     * @return
+     */
+    public TaskExecutionContextBuilder buildBusinessParamsMap(Map<String, Property> businessParamsMap) {
+        taskExecutionContext.setParamsMap(businessParamsMap);
         return this;
     }
 

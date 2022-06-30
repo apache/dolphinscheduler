@@ -74,14 +74,7 @@ public class FlinkTask extends AbstractYarnTask {
             String args = flinkParameters.getMainArgs();
 
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
-            if (MapUtils.isEmpty(paramsMap)) {
-                paramsMap = new HashMap<>();
-            }
-            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-                paramsMap.putAll(taskExecutionContext.getParamsMap());
-            }
-
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
             logger.info("param Map : {}", paramsMap);
             args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
             logger.info("param args : {}", args);
