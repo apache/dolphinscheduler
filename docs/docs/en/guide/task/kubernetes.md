@@ -1,13 +1,13 @@
-# Pigeon
+# K8S Node
 
 ## Overview
 
-Pigeon is a task used to trigger remote tasks, acquire logs or status by calling remote WebSocket service. It is DolphinScheduler uses a remote WebSocket service to call tasks.
+K8S task type used to execute a batch task. In this task, the worker submits the task by using a k8s client.
 
 ## Create Task
 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="../../../../img/pigeon.png" width="20"/> to the canvas to create a new Pigeon task.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/kubernetes.png" width="15"/> to the canvas.
 
 ## Task Parameters
 
@@ -23,5 +23,26 @@ Pigeon is a task used to trigger remote tasks, acquire logs or status by calling
 | Number of failed retries | The number of times the task is resubmitted after failure. It supports drop-down and manual filling. | 
 | Failure Retry Interval | The time interval for resubmitting the task if the task fails. It supports drop-down and manual filling. | 
 | Timeout alarm | Check Timeout Alarm and Timeout Failure. When the task exceeds the "timeout duration", an alarm email will be sent and the task execution will fail. |
-| Target task name |  Target task name of this Pigeon node. |
-| Predecessor task | Selecting the predecessor task of the current task will set the selected predecessor task as the upstream of the current task. |
+| Namespace | The namespace for running k8s task. |
+| Min CPU | Minimum CPU requirement for running k8s task. |
+| Min Memory | Minimum memory requirement for running k8s task. |
+| Image | The registry url for image. |
+| Custom parameter | It is a local user-defined parameter for K8S task, these params will pass to container as environment variables. |
+| Predecessor task | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task. |
+
+
+## Task Example
+
+### Configure the K8S Environment in DolphinScheduler
+
+If you are using the K8S task type in a production environment, the K8S cluster environment is required.
+
+### Configure K8S Nodes
+
+Configure the required content according to the parameter descriptions above.
+
+![K8S](../../../../img/tasks/demo/kubernetes-task-en.png)
+
+## Note
+
+Task name contains only lowercase alphanumeric characters or '-'

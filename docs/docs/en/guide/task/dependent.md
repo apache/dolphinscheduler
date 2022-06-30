@@ -22,7 +22,8 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 - **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
 - **Delayed execution time**: The time (unit minute) that a task delays in execution.
 
-## Examples
+
+## Task Examples
 
 The Dependent node provides a logical judgment function, which can detect the execution of the dependent node according to the logic.
 
