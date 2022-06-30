@@ -348,12 +348,16 @@ public class WorkflowExecuteThread implements Runnable {
             return true;
         }
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
-        if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy && !taskInstance.getState().typeIsFinished()) {
+        if ((TaskTimeoutStrategy.FAILED == taskTimeoutStrategy || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) && !taskInstance.getState().typeIsFinished()) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             taskProcessor.action(TaskAction.TIMEOUT);
             if (taskInstance.isDependTask()) {
                 TaskInstance task = processService.findTaskInstanceById(taskInstance.getId());
                 taskFinished(task);
+            }
+            if (TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
+                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+                processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
             }
         } else {
             ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());

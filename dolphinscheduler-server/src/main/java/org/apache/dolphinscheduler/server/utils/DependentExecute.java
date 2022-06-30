@@ -196,7 +196,12 @@ public class DependentExecute {
         TaskInstance taskInstance = processService.findLastTaskInstanceInterval(taskCode, dateInterval);
         DependResult result;
         if (taskInstance == null) {
-            logger.warn("Cannot find the task in the process instance when the ProcessInstance is finish, taskCode: {}", taskCode);
+            TaskDefinition taskDefinition = processService.findTaskDefinitionByCode(taskCode);
+            if (taskDefinition == null) {
+                logger.error("Cannot find the task definition, something error, taskCode: {}", taskCode);
+            } else {
+                logger.warn("Cannot find the task in the process instance when the ProcessInstance is finish, taskCode: {}, taskName: {}", taskCode, taskDefinition.getName());
+            }
             result = DependResult.FAILED;
         } else {
             logger.info("The running task, taskId:{}, taskCode:{}, taskName:{}", taskInstance.getId(), taskInstance.getTaskCode(), taskInstance.getName());
