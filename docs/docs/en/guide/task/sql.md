@@ -28,17 +28,25 @@ Refer to [DataSource](../datasource/introduction.md)
 
 ## Task Example
 
-### Create a Temporary Table in Hive and Write Data
+### Hive Table Create Example
+
+#### Create a Temporary Table in Hive and Write Data
 
 This example creates a temporary table `tmp_hello_world` in Hive and writes a row of data. Before creating a temporary table, we need to ensure that the table does not exist. So we use custom parameters to obtain the time of the day as the suffix of the table name every time we run, this task can run every different day. The format of the created table name is: `tmp_hello_world_{yyyyMMdd}`.
 
 ![hive-sql](../../../../img/tasks/demo/hive-sql.png)
 
-### After Running the Task Successfully, Query the Results in Hive
+#### After Running the Task Successfully, Query the Results in Hive
 
 Log in to the bigdata cluster and use 'hive' command or 'beeline' or 'JDBC' and other methods to connect to the 'Apache Hive' for the query. The query SQL is `select * from tmp_hello_world_{yyyyMMdd}`, please replace `{yyyyMMdd}` with the date of the running day. The following shows the query screenshot:
 
 ![hive-sql](../../../../img/tasks/demo/hive-result.png)
+
+### Use Pre-SQL and Post-SQL Example
+
+Table created in the Pre-SQL, after use in the SQL statement, cleaned in the Post-SQL
+
+![pre_post_sql](../../../../img/tasks/demo/pre_post_sql.png)
 
 ## Note
 

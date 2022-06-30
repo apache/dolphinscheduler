@@ -1788,6 +1788,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setId(0);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                final Date date = new Date();
+                processDefinition.setCreateTime(date);
+                processDefinition.setUpdateTime(date);
                 if (StringUtils.isNotBlank(processDefinition.getLocations())) {
                     ArrayNode jsonNodes = JSONUtils.parseArray(processDefinition.getLocations());
                     for (int i = 0; i < jsonNodes.size(); i++) {

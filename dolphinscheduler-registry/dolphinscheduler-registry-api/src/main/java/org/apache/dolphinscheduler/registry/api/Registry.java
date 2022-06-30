@@ -43,6 +43,4 @@ public interface Registry extends Closeable {
     boolean acquireLock(String key);
 
     boolean releaseLock(String key);
-
-    Duration getSessionTimeout();
 }
