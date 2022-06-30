@@ -11,6 +11,8 @@ MapReduce(MR) task type used for executing MapReduce programs. For MapReduce nod
 
 ## Task Parameters
 
+### General
+
 | **Parameter** | **Description** |
 | ------- | ---------- |
 | Node Name | Set the name of the task. Node names within a workflow definition are unique. |
@@ -26,7 +28,11 @@ MapReduce(MR) task type used for executing MapReduce programs. For MapReduce nod
 | Resource | Refers to the list of resource files that called in the script, and upload or create files by the Resource Center file management. |
 | Custom parameters | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
 | Predecessor task | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task. |
-| **JAVA or SCALA Program**  |
+
+### JAVA or SCALA Program
+
+| **Parameter** | **Description** |
+| ------- | ---------- |
 | Program type | Select JAVA or SCALA program. |
 | The class of the main function | The **full path** of Main Class, the entry point of the MapReduce program. |
 | Main jar package | The jar package of the MapReduce program. |
@@ -35,10 +41,14 @@ MapReduce(MR) task type used for executing MapReduce programs. For MapReduce nod
 | Other parameters | Support `-D`, `-files`, `-libjars`, `-archives` format. |
 | Resource | Appoint resource files in the `Resource` if parameters refer to them. |
 | User-defined parameter | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
-| **Python Program** |
+
+### Python Program
+
+| **Parameter** | **Description** |
+| ------- | ---------- |
 | Program type | Select Python language. |
 | Main jar package | The Python jar package for running MapReduce. |
-| Other parameters | Support `-D`, `-mapper`, `-reducer,` `-input` `-output` format, and you can set the input of user-defined parameters, such as:<ul><li>`-mapper "mapper.py 1"` `-file mapper.py` `-reducer reducer.py` `-file reducer.py` `–input /journey/words.txt` `-output /journey/out/mr/\${currentTimeMillis}`</li><li>The `mapper.py 1` after `-mapper` is two parameters, the first parameter is `mapper.py`, and the second parameter is `1`. </li></ul> |
+| Other parameters | Support `-D`, `-mapper`, `-reducer,` `-input` `-output` format, and you can set the input of user-defined parameters, such as:<ul><li>`-mapper "mapper.py 1"` `-file mapper.py` `-reducer reducer.py` `-file reducer.py` `–input /journey/words.txt` `-output /journey/out/mr/${currentTimeMillis}`</li><li>The `mapper.py 1` after `-mapper` is two parameters, the first parameter is `mapper.py`, and the second parameter is `1`. </li></ul> |
 | Resource | Appoint resource files in the `Resource` if parameters refer to them. |
 | User-defined parameter | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
 
