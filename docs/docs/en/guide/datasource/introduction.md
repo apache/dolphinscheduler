@@ -2,9 +2,8 @@
 
 DataSource supports MySQL, PostgreSQL, Hive/Impala, Spark, ClickHouse, Oracle, SQL Server and other DataSources.
 
-- Click bottom "Data Source Center -> Create Data Source" to create a new datasource.
-- Click "Test Connection" to test whether the DataSource can connect successfully(datasource can be saved only if passed the
-  connection test).
+- Click bottom `Data Source Center -> Create Data Source` to create a new datasource.
+- Click `Test Connection` to test whether the DataSource can connect successfully (datasource can be saved only if it passes the connection test).
 
 ## Using datasource incompatible to Apache LICENSE V2 LICENSE
 
