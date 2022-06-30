@@ -28,7 +28,6 @@ import {
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
-import Card from '@/components/card'
 import ClusterModal from './components/cluster-modal'
 
 const clusterManage = defineComponent({
