@@ -1,4 +1,4 @@
-# Parameter Context
+# Refer to Parameter Context
 
 DolphinScheduler provides the ability to refer to each other between parameters, including local parameters refer to global parameters and upstream and downstream parameter transfer. Due to the existence of references, it involves the priority of parameters when the parameter names are the same. see also [Parameter Priority](priority.md)
 
