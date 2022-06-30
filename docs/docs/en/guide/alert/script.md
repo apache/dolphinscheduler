@@ -7,11 +7,11 @@ The following shows the `Script` configuration example:
 
 ## Parameter Configuration
 
-* User Params
-  > User defined parameters will pass to the script.
-* Script Path
-  > The file location path in the server.
-* Type
-  > Support `Shell` script.
+| **Parameter** | **Description** |
+| --- | --- |
+| User Params | User defined parameters will pass to the script. |
+| Script Path |The file location path in the server. |
+| Type | Support `Shell` script. |
 
-**_Notice:_** please consider the script file access privileges with the executing tenant.
+### Note 
+Consider the script file access privileges with the executing tenant.
