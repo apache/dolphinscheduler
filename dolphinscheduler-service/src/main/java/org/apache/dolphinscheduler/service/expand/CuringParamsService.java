@@ -15,16 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.expand;
+package org.apache.dolphinscheduler.service.expand;
 
+import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface CuringGlobalParamsService {
+public interface CuringParamsService {
 
     /**
      * time function need expand
@@ -61,4 +66,20 @@ public interface CuringGlobalParamsService {
      * @return
      */
     String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap, List<Property> globalParamList, CommandType commandType, Date scheduleTime, String timezone);
+
+    /**
+     * param parsing preparation
+     * @param parameters
+     * @param taskInstance
+     * @param processInstance
+     * @return
+     */
+    Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters, @NonNull ProcessInstance processInstance);
+
+    /**
+     * preBuildBusinessParams
+     * @param processInstance
+     * @return
+     */
+    Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance);
 }

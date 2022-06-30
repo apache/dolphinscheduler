@@ -65,13 +65,7 @@ public class K8sTask extends AbstractK8sTask {
     @Override
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(taskExecutionContext.getParamsMap());
-        }
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         Map<String,String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);
