@@ -160,8 +160,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            preBuildBusinessParams();
-
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
                 throw new ServiceException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
@@ -340,19 +338,5 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     public AbstractTask getTask() {
         return task;
-    }
-
-    private void preBuildBusinessParams() {
-        Map<String, Property> paramsMap = new HashMap<>();
-        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-        if (taskExecutionContext.getScheduleTime() != null) {
-            Date date = taskExecutionContext.getScheduleTime();
-            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME, null);
-            Property p = new Property();
-            p.setValue(dateTime);
-            p.setProp(Constants.PARAMETER_DATETIME);
-            paramsMap.put(Constants.PARAMETER_DATETIME, p);
-        }
-        taskExecutionContext.setParamsMap(paramsMap);
     }
 }

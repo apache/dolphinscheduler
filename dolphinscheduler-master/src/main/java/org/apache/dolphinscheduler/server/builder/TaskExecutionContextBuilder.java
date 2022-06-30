@@ -137,11 +137,26 @@ public class TaskExecutionContextBuilder {
         return this;
     }
 
-    public TaskExecutionContextBuilder buildParamInfo(CuringParamsService curingParamsService, AbstractParameters baseParam, ProcessInstance processInstance) {
-        Map<String, Property> propertyMap = curingParamsService.paramParsingPreparation(taskExecutionContext, baseParam, processInstance);
+    /**
+     * build global and local params
+     * @param propertyMap
+     * @return
+     */
+    public TaskExecutionContextBuilder buildParamInfo(Map<String, Property> propertyMap) {
         taskExecutionContext.setPrepareParamsMap(propertyMap);
         return this;
     }
+
+    /**
+     * build business params
+     * @param businessParamsMap
+     * @return
+     */
+    public TaskExecutionContextBuilder buildBusinessParamsMap(Map<String, Property> businessParamsMap) {
+        taskExecutionContext.setParamsMap(businessParamsMap);
+        return this;
+    }
+
 
     /**
      * create

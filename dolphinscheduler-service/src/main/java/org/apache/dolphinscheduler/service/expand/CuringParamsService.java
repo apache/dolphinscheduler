@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
+import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -67,10 +69,17 @@ public interface CuringParamsService {
 
     /**
      * param parsing preparation
-     * @param baseParam
-     * @param taskExecutionContext
+     * @param parameters
+     * @param taskInstance
      * @param processInstance
      * @return
      */
-    Map<String, Property> paramParsingPreparation(TaskExecutionContext taskExecutionContext, AbstractParameters baseParam, ProcessInstance processInstance);
+    Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters, @NonNull ProcessInstance processInstance);
+
+    /**
+     * preBuildBusinessParams
+     * @param processInstance
+     * @return
+     */
+    Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance);
 }

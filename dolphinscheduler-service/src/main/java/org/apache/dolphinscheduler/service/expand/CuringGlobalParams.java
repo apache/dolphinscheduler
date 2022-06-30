@@ -18,12 +18,15 @@
 package org.apache.dolphinscheduler.service.expand;
 
 import com.google.common.base.Preconditions;
+import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -34,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -125,20 +129,18 @@ public class CuringGlobalParams implements CuringParamsService {
     /**
      * the global parameters and local parameters used in the worker will be prepared here.
      *
-     * @param taskExecutionContext
+     * @param taskInstance
      * @param parameters
      * @param processInstance
      * @return
      */
     @Override
-    public Map<String, Property> paramParsingPreparation(TaskExecutionContext taskExecutionContext, AbstractParameters parameters, ProcessInstance processInstance) {
-        Preconditions.checkNotNull(taskExecutionContext);
-        Preconditions.checkNotNull(parameters);
-        setGlobalParamsMap(taskExecutionContext);
-        Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams());
-        Map<String,String> globalParamsMap = taskExecutionContext.getDefinedParams();
-        CommandType commandType = CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
-        Date scheduleTime = taskExecutionContext.getScheduleTime();
+    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters, @NonNull ProcessInstance processInstance) {
+        // assign value to definedParams here
+        Map<String,String> globalParamsMap = setGlobalParamsMap(processInstance);
+        Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
+        CommandType commandType = processInstance.getCmdTypeIfComplement();
+        Date scheduleTime = processInstance.getScheduleTime();
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
@@ -146,7 +148,7 @@ public class CuringGlobalParams implements CuringParamsService {
         //stream pass params
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams.size() == 0 && localParams.size() == 0 && varParams.size() == 0) {
+        if (globalParams.isEmpty() && localParams.isEmpty() && varParams.isEmpty()) {
             return null;
         }
         // if it is a complement,
@@ -160,10 +162,10 @@ public class CuringGlobalParams implements CuringParamsService {
             params.putAll(globalParamsMap);
         }
 
-        if (StringUtils.isNotBlank(taskExecutionContext.getExecutePath())) {
-            params.put(PARAMETER_TASK_EXECUTE_PATH, taskExecutionContext.getExecutePath());
+        if (StringUtils.isNotBlank(taskInstance.getExecutePath())) {
+            params.put(PARAMETER_TASK_EXECUTE_PATH, taskInstance.getExecutePath());
         }
-        params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskExecutionContext.getTaskInstanceId()));
+        params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
 
         if (varParams.size() != 0) {
             globalParams.putAll(varParams);
@@ -186,7 +188,7 @@ public class CuringGlobalParams implements CuringParamsService {
                 String val = property.getValue();
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
-                    val = timeFunctionExtension(taskExecutionContext.getProcessInstanceId(), timeZone, val);
+                    val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
                 } else {
                     val  = convertParameterPlaceholders(val, params);
                 }
@@ -196,21 +198,38 @@ public class CuringGlobalParams implements CuringParamsService {
         if (MapUtils.isEmpty(globalParams)) {
             globalParams = new HashMap<>();
         }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            globalParams.putAll(taskExecutionContext.getParamsMap());
+        // put schedule time param to params map
+        Map<String, Property> paramsMap = preBuildBusinessParams(processInstance);
+        if (MapUtils.isNotEmpty(paramsMap)) {
+            globalParams.putAll(paramsMap);
         }
         return globalParams;
     }
 
-    private void setGlobalParamsMap(TaskExecutionContext taskExecutionContext) {
+    private Map<String, String> setGlobalParamsMap(ProcessInstance processInstance) {
         Map<String, String> globalParamsMap = new HashMap<>(16);
 
         // global params string
-        String globalParamsStr = taskExecutionContext.getGlobalParams();
+        String globalParamsStr = processInstance.getGlobalParams();
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
-        taskExecutionContext.setDefinedParams(globalParamsMap);
+        return globalParamsMap;
+    }
+
+    @Override
+    public Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance) {
+        Map<String, Property> paramsMap = new HashMap<>();
+        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+        if (processInstance.getScheduleTime() != null) {
+            Date date = processInstance.getScheduleTime();
+            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME, null);
+            Property p = new Property();
+            p.setValue(dateTime);
+            p.setProp(Constants.PARAMETER_DATETIME);
+            paramsMap.put(Constants.PARAMETER_DATETIME, p);
+        }
+        return paramsMap;
     }
 }

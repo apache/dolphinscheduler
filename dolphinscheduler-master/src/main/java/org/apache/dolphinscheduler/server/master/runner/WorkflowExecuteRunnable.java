@@ -238,7 +238,7 @@ public class WorkflowExecuteRunnable implements Runnable {
     /**
      * curing global params service
      */
-    private final CuringParamsService curingGlobalParamsService;
+    private final CuringParamsService curingParamsService;
 
     /**
      * @param processInstance         processInstance
@@ -254,14 +254,14 @@ public class WorkflowExecuteRunnable implements Runnable {
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
             , StateWheelExecuteThread stateWheelExecuteThread
-            , CuringParamsService curingGlobalParamsService) {
+            , CuringParamsService curingParamsService) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
-        this.curingGlobalParamsService = curingGlobalParamsService;
+        this.curingParamsService = curingParamsService;
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 
@@ -1007,7 +1007,7 @@ public class WorkflowExecuteRunnable implements Runnable {
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
                         processInstance.setScheduleTime(complementListDate.get(0));
-                        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                        String globalParams = curingParamsService.curingGlobalParams(processInstance.getId(),
                                 processDefinition.getGlobalParamMap(),
                                 processDefinition.getGlobalParamList(),
                                 CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));

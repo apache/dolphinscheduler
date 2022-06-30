@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -305,7 +306,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
         }
 
+        Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(processInstance);
+
         AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        Map<String, Property> propertyMap = curingParamsService.paramParsingPreparation(taskInstance, baseParam, processInstance);
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
@@ -314,7 +318,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildResourceParametersInfo(resources)
                 .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
                 .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)
-                .buildParamInfo(curingParamsService, baseParam, processInstance)
+                .buildBusinessParamsMap(businessParamsMap)
+                .buildParamInfo(propertyMap)
                 .create();
     }
 
