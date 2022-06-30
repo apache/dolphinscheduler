@@ -80,7 +80,6 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         List<Queue> queueList = queueMapper.selectBatchIds(ids);
         result.put(Constants.DATA_LIST, queueList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
