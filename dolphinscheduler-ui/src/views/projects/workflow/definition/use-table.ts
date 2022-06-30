@@ -327,6 +327,12 @@ export function useTable() {
         pageNo: variables.page,
         searchVal: variables.searchVal
       })
+    }).catch(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
     })
   }
 
