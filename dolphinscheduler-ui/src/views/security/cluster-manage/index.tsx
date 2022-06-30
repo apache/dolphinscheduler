@@ -103,7 +103,7 @@ const clusterManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard>
+        <NCard size='small'>
           <NSpace justify='space-between'>
             <NButton
               size='small'
@@ -132,7 +132,7 @@ const clusterManage = defineComponent({
             </NSpace>
           </NSpace>
         </NCard>
-        <Card>
+        <NCard size='small'>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -154,7 +154,7 @@ const clusterManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </Card>
+        </NCard>
         <ClusterModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
