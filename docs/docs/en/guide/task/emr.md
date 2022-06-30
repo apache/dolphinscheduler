@@ -4,17 +4,24 @@
 
 Amazon EMR task type, for creating EMR clusters on AWS and running computing tasks. Using [aws-java-sdk](https://aws.amazon.com/cn/sdk-for-java/) in the background code, to transfer JSON parameters to  [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) object and submit to AWS.
 
-## Parameter
+## Create Task
 
-- Node name: The node name in a workflow definition is unique.
-- Run flag: Identifies whether this node schedules normally, if it does not need to execute, select the `prohibition execution`.
-- Descriptive information: Describe the function of the node.
-- Task priority: When the number of worker threads is insufficient, execute in the order of priority from high to low, and tasks with the same priority will execute in a first-in first-out order.
-- Worker grouping: Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution.
-- Times of failed retry attempts: The number of times the task failed to resubmit. You can select from drop-down or fill-in a number.
-- Failed retry interval: The time interval for resubmitting the task after a failed task. You can select from drop-down or fill-in a number.
-- Timeout alarm: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- JSON: JSON corresponding to the [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) object, for details refer to [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples).
+*   Click `Project Management -> Project Name -> Workflow Definition`, click the "`Create Workflow`" button to enter the DAG editing page.
+*   Drag `AmazonEMR` task from the toolbar to the artboard to complete the creation.
+
+## Task Parameters
+
+| **Parameter** | **Description** |
+| ------- | ---------- |
+| Node name | The node name in a workflow definition is unique. |
+| Run flag | Identifies whether this node schedules normally, if it does not need to execute, select the `prohibition execution`.|
+| Description | Describe the function of the node. |
+| Task priority | When the number of worker threads is insufficient, execute in the order of priority from high to low, and tasks with the same priority will execute in a first-in first-out order. |
+| Worker grouping | Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution. |
+| Times of failed retry attempts | The number of times the task failed to resubmit. You can select from drop-down or fill-in a number. |
+| Failed retry interval: The time interval for resubmitting the task after a failed task. You can select from drop-down or fill-in a number. |
+| Timeout alarm | Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail. |
+| JSON | JSON corresponding to the [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) object, for details refer to [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples). |
 
 ## JSON example
 
