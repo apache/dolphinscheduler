@@ -191,14 +191,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        List<WorkerGroup> workerGroups = new ArrayList<>();
+        List<WorkerGroup> workerGroups;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getWorkerGroups(true);
+            workerGroups = getWorkerGroups(true, null);
         } else {
             Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
-            if (!ids.isEmpty()) {
-                workerGroups = workerGroupMapper.selectBatchIds(ids);
-            }
+            workerGroups = getWorkerGroups(true, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<WorkerGroup> resultDataList = new ArrayList<>();
         int total = 0;
@@ -244,15 +242,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Map<String, Object> result = new HashMap<>();
         List<WorkerGroup> workerGroups;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getWorkerGroups(false);
+            workerGroups = getWorkerGroups(false, null);
         } else {
             Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
-            if (ids.isEmpty()) {
-                result.put(Constants.DATA_LIST, Collections.emptyList());
-                putMsg(result, Status.SUCCESS);
-                return result;
-            }
-            workerGroups = workerGroupMapper.selectBatchIds(ids);
+            workerGroups = getWorkerGroups(false, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
@@ -273,9 +266,14 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @param isPaging whether paging
      * @return WorkerGroup list
      */
-    private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
+    private List<WorkerGroup> getWorkerGroups(boolean isPaging, List<Integer> ids) {
         // worker groups from database
-        List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
+        List<WorkerGroup> workerGroups;
+        if (ids != null) {
+            workerGroups = ids.isEmpty() ? Collections.emptyList() : workerGroupMapper.selectBatchIds(ids);
+        } else {
+            workerGroups = workerGroupMapper.queryAllWorkerGroup();
+        }
         // worker groups from zookeeper
         String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
         Collection<String> workerGroupList = null;
