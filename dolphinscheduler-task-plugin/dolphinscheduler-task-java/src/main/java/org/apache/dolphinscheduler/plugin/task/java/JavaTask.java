@@ -310,7 +310,8 @@ public class JavaTask extends AbstractTaskExecutor {
     protected String buildJavaSourceContent(){
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, javaParameters);
+
+        Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
         if (MapUtils.isEmpty(paramsMap)) {
             paramsMap = new HashMap<>();
         }
