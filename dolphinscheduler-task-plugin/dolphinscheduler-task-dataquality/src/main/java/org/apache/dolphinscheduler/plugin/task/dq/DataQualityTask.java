@@ -165,19 +165,8 @@ public class DataQualityTask extends AbstractYarnTask {
         args.addAll(SparkArgsUtils.buildArgs(dataQualityParameters.getSparkParameters()));
 
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(dqTaskExecutionContext,getParameters());
-
-        String command = null;
-
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-
-        if (MapUtils.isNotEmpty(dqTaskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(dqTaskExecutionContext.getParamsMap());
-        }
-
-        command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
+        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
         logger.info("data quality task command: {}", command);
 
         return command;

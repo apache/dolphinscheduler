@@ -29,7 +29,12 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+
+import java.util.Map;
 
 /**
  *  TaskExecutionContext builder
@@ -131,6 +136,13 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
         return this;
     }
+
+    public TaskExecutionContextBuilder buildParamInfo(CuringParamsService curingParamsService, AbstractParameters baseParam, ProcessInstance processInstance) {
+        Map<String, Property> propertyMap = curingParamsService.paramParsingPreparation(taskExecutionContext, baseParam, processInstance);
+        taskExecutionContext.setPrepareParamsMap(propertyMap);
+        return this;
+    }
+
     /**
      * create
      *

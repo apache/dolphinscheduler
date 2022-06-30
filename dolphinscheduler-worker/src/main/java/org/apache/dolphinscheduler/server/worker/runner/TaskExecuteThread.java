@@ -155,7 +155,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
             }
 
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
-            taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
             taskExecutionContext.setTaskAppId(String.format("%s_%s",
                     taskExecutionContext.getProcessInstanceId(),
@@ -250,23 +249,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 }
             }
         }
-    }
-
-    /**
-     * get global paras map
-     *
-     * @return map
-     */
-    private Map<String, String> getGlobalParamsMap() {
-        Map<String, String> globalParamsMap = new HashMap<>(16);
-
-        // global params string
-        String globalParamsStr = taskExecutionContext.getGlobalParams();
-        if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
-            globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
-        }
-        return globalParamsMap;
     }
 
     /**

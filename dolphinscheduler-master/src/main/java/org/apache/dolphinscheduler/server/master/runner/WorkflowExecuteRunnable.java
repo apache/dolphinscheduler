@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -49,7 +49,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -239,7 +238,7 @@ public class WorkflowExecuteRunnable implements Runnable {
     /**
      * curing global params service
      */
-    private final CuringGlobalParamsService curingGlobalParamsService;
+    private final CuringParamsService curingGlobalParamsService;
 
     /**
      * @param processInstance         processInstance
@@ -255,7 +254,7 @@ public class WorkflowExecuteRunnable implements Runnable {
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
             , StateWheelExecuteThread stateWheelExecuteThread
-            , CuringGlobalParamsService curingGlobalParamsService) {
+            , CuringParamsService curingGlobalParamsService) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
