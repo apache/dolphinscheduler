@@ -377,12 +377,12 @@ export default {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
-                        link: '/en-us/docs/release/faq.html',
-                    },
-                    {
                         title: 'General Setting',
                         link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: 'Others',
+                        link: '/en-us/docs/release/faq.html',
                     }
                 ],
             },
@@ -673,15 +673,6 @@ export default {
                         ],
                     },
                     {
-                        title: '常用指引',
-                        children: [
-                            {
-                                title: '通用设置',
-                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
-                            }
-                        ],
-                    },
-                    {
                         title: '数据质量',
                         link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
@@ -766,7 +757,11 @@ export default {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
+                        title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '其他',
                         link: '/zh-cn/docs/release/faq.html',
                     },
                 ],
