@@ -18,8 +18,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
@@ -29,6 +32,10 @@ import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
 public class EtcdRegistry implements Registry {
     private final Client client;
+
+    // save the lock info for thread
+    // key:lockKey Value:leaseId
+    private static final ThreadLocal<Map<String, Long>> threadLocalLockMap = new ThreadLocal<>();
 
     private static Long TIME_TO_LIVE_SECONDS=30L;
     public EtcdRegistry(EtcdRegistryProperties registryProperties) {
@@ -138,12 +145,40 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public boolean acquireLock(String key) {
-        return false;
+        Lock lockClient = client.getLockClient();
+        Lease leaseClient = client.getLeaseClient();
+        // get the lock with a lease
+        try {
+            long leaseId = leaseClient.grant(TIME_TO_LIVE_SECONDS).get().getID();
+            // keep the lease
+            client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
+            }));
+            lockClient.lock(byteSequence(key),leaseId).get();
+
+            // save the leaseId for releaseLock
+            if(null == threadLocalLockMap.get()){
+                threadLocalLockMap.set(new HashMap<>());
+            }
+            threadLocalLockMap.get().put(key,leaseId);
+            return true;
+        } catch (Exception e) {
+            throw new RegistryException("zookeeper get lock error", e);
+        }
     }
 
     @Override
     public boolean releaseLock(String key) {
-        return false;
+        try {
+            Long leaseId = threadLocalLockMap.get().get(key);
+            client.getLeaseClient().revoke(leaseId);
+            threadLocalLockMap.get().remove(key);
+            if (threadLocalLockMap.get().isEmpty()) {
+                threadLocalLockMap.remove();
+            }
+        } catch (Exception e){
+            throw new RegistryException("zookeeper release lock error", e);
+        }
+        return true;
     }
 
     @Override
