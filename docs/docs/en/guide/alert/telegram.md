@@ -20,6 +20,7 @@ The following shows the `Telegram` configuration example:
 | Password | Authentication(Password) for the proxy server. |
 
 ### NOTE
+
 The webhook needs to be able to receive and use the same JSON body of HTTP POST that DolphinScheduler constructs and the following shows the JSON body:
 
 ```json
