@@ -2,15 +2,13 @@ package org.apache.dolphinscheduler.plugin.registry.etcd;
 
 import com.google.common.base.Strings;
 import io.etcd.jetcd.*;
-import io.etcd.jetcd.kv.PutResponse;
 import io.etcd.jetcd.options.DeleteOption;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
+import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
-import org.apache.dolphinscheduler.registry.api.ConnectionListener;
-import org.apache.dolphinscheduler.registry.api.Registry;
-import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import io.etcd.jetcd.watch.WatchEvent;
+import org.apache.dolphinscheduler.registry.api.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -36,6 +33,8 @@ public class EtcdRegistry implements Registry {
     // save the lock info for thread
     // key:lockKey Value:leaseId
     private static final ThreadLocal<Map<String, Long>> threadLocalLockMap = new ThreadLocal<>();
+
+    private final Map<String, Watch.Watcher> watcherMap = new ConcurrentHashMap<>();
 
     private static Long TIME_TO_LIVE_SECONDS=30L;
     public EtcdRegistry(EtcdRegistryProperties registryProperties) {
@@ -61,12 +60,28 @@ public class EtcdRegistry implements Registry {
     }
     @Override
     public boolean subscribe(String path, SubscribeListener listener) {
-        return false;
+        try {
+            ByteSequence watchKey = byteSequence(path);
+            WatchOption watchOption = WatchOption.newBuilder().isPrefix(true).build();
+            watcherMap.computeIfAbsent(path, $ -> client.getWatchClient().watch(watchKey, watchOption,watchResponse -> {
+                for (WatchEvent event : watchResponse.getEvents()) {
+                    listener.notify(new EventAdaptor(event, path));
+                }
+            }));
+        } catch (Exception e){
+            throw new RegistryException("Failed to subscribe listener for key: " + path, e);
+        }
+        return true;
     }
 
     @Override
     public void unsubscribe(String path) {
-
+        try {
+            watcherMap.get(path).close();
+            watcherMap.remove(path);
+        } catch (Exception e) {
+            throw new RegistryException("Failed to unsubscribe listener for key: " + path, e);
+        }
     }
 
     @Override
@@ -155,7 +170,7 @@ public class EtcdRegistry implements Registry {
             }));
             lockClient.lock(byteSequence(key),leaseId).get();
 
-            // save the leaseId for releaseLock
+            // save the leaseId for release Lock
             if(null == threadLocalLockMap.get()){
                 threadLocalLockMap.set(new HashMap<>());
             }
@@ -183,10 +198,33 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public void close() throws IOException {
+        // When the client closes, the watch also closes.
         client.close();
     }
     private static ByteSequence byteSequence(String val){
         return ByteSequence.from(val, StandardCharsets.UTF_8);
+    }
+
+    static final class EventAdaptor extends Event {
+        public EventAdaptor(WatchEvent event, String key) {
+            key(key);
+
+            switch (event.getEventType()) {
+                case PUT:
+                    type(Type.ADD);
+                    break;
+                case DELETE:
+                    type(Type.REMOVE);
+                    break;
+                default:
+                    break;
+            }
+            KeyValue keyValue = event.getKeyValue();
+            if (keyValue != null) {
+                path(keyValue.getKey().toString(StandardCharsets.UTF_8));
+                data(keyValue.getValue().toString(StandardCharsets.UTF_8));
+            }
+        }
     }
 }
 

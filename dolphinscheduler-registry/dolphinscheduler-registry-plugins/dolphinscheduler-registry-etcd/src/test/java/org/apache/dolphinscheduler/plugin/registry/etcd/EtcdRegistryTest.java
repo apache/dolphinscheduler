@@ -94,8 +94,13 @@ public class EtcdRegistryTest {
     }
 
     @Test
-    public void subscribeTest() {
+    public void subscribeTest() throws InterruptedException {
         boolean status = registry.subscribe("/sub", new TestListener());
+        // The following add and delete operations are used for debugging
+        registry.put("/sub/m1", "tt", false);
+        registry.put("/sub/m2", "tt", false);
+        registry.delete("/sub/m2");
+        registry.delete("/sub");
         Assert.assertTrue(status);
 
     }
