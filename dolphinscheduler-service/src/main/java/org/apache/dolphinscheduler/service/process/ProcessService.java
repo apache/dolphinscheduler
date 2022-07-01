@@ -2490,6 +2490,13 @@ public class ProcessService {
     }
 
     /**
+     * find task definition by code
+     */
+    public TaskDefinition findTaskDefinitionByCode(long taskCode) {
+        return taskDefinitionMapper.queryByCode(taskCode);
+    }
+
+    /**
      * find process task relation list by process
      */
     public List<ProcessTaskRelation> findRelationByCode(long processDefinitionCode, int processDefinitionVersion) {
