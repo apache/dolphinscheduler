@@ -46,7 +46,7 @@ Regarding the configuration of the task group, all you need to do is to configur
 
 The master judges whether the task is configured with a task group when distributing the task. If the task is not configured, it is normally thrown to the worker to run; if a task group is configured, it checks whether the remaining size of the task group resource pool meets the current task operation before throwing it to the worker for execution. , if the resource pool -1 is satisfied, continue to run; if not, exit the task distribution and wait for other tasks to wake up. 
 
-### Release and Wake Up: 
+### Release and Wake Up
 
 When the task that has occupied the task group resource is finished, the task group resource will be released. After the release, it will check whether there is a task waiting in the current task group. If there is, mark the task with the best priority to run, and create a new executable event. The event stores the task ID that is marked to acquire the resource, and then the task obtains the task group resource and run. 
 
