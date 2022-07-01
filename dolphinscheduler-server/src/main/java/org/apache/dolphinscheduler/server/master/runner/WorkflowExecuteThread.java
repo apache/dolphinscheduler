@@ -1430,10 +1430,9 @@ public class WorkflowExecuteThread implements Runnable {
                         this.processInstance.getId());
                 taskResponseService.addResponse(taskResponseEvent);
             }
+            this.taskRetryCheckList.remove(taskId);
+            this.depStateCheckList.remove(taskId);
         }
-
-        this.taskRetryCheckList.clear();
-        this.depStateCheckList.clear();
         this.addProcessStopEvent(processInstance);
     }
 
