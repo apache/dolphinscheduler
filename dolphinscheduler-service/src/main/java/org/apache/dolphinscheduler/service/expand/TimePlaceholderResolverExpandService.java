@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.expand;
+package org.apache.dolphinscheduler.service.expand;
 
-import org.springframework.stereotype.Component;
+public interface TimePlaceholderResolverExpandService {
 
-@Component
-public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholderResolverExpandService {
+    /**
+     * check is need expand function
+     * @param placeholderName
+     * @return
+     */
+    boolean timeFunctionNeedExpand(String placeholderName);
 
-    @Override
-    public boolean timeFunctionNeedExpand(String placeholderName) {
-        return false;
-    }
-
-    @Override
-    public String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName) {
-        return null;
-    }
+    /**
+     * time function extension
+     * @param placeholderName
+     * @return
+     */
+    String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName);
 }

@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -95,7 +95,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     @Autowired
-    private CuringGlobalParamsService curingGlobalParamsService;
+    private CuringParamsService curingGlobalParamsService;
 
     private String masterAddress;
 
@@ -207,8 +207,9 @@ public class MasterSchedulerService extends BaseDaemonThread {
         for (final Command command : commands) {
             masterPrepareExecService.execute(() -> {
                 try {
-                    // todo: this check is not safe, the slot may change after command transform.
-                    // slot check again
+                    // Note: this check is not safe, the slot may change after command transform.
+                    // We use the database transaction in `handleCommand` so that we can guarantee the command will always be executed
+                    // by only one master
                     SlotCheckState slotCheckState = slotCheck(command);
                     if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
                         logger.info("Master handle command {} skip, slot check state: {}", command.getId(), slotCheckState);

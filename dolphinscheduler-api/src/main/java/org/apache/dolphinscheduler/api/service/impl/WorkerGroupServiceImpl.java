@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -25,6 +28,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -52,8 +56,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.facebook.presto.jdbc.internal.guava.base.Strings;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * worker group service impl
@@ -234,12 +236,24 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     /**
      * query all worker group
      *
+     * @param loginUser
      * @return all worker group list
      */
     @Override
-    public Map<String, Object> queryAllGroup() {
+    public Map<String, Object> queryAllGroup(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        List<WorkerGroup> workerGroups = getWorkerGroups(false);
+        List<WorkerGroup> workerGroups;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            workerGroups = getWorkerGroups(false);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            workerGroups = workerGroupMapper.selectBatchIds(ids);
+        }
         List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
@@ -296,9 +310,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                String[] rv = registeredValue.split(Constants.COMMA);
-                wg.setCreateTime(new Date(Long.parseLong(rv[6])));
-                wg.setUpdateTime(new Date(Long.parseLong(rv[7])));
+                HeartBeat heartBeat = HeartBeat.decodeHeartBeat(registeredValue);
+                wg.setCreateTime(new Date(heartBeat.getStartupTime()));
+                wg.setUpdateTime(new Date(heartBeat.getReportTime()));
                 wg.setSystemDefault(true);
             }
             workerGroups.add(wg);

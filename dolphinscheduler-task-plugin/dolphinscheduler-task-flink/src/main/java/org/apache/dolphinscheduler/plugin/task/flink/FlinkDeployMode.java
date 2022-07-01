@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.expand;
+package org.apache.dolphinscheduler.plugin.task.flink;
 
-public interface TimePlaceholderResolverExpandService {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    /**
-     * check is need expand function
-     * @param placeholderName
-     * @return
-     */
-    boolean timeFunctionNeedExpand(String placeholderName);
-
-    /**
-     * time function extension
-     * @param placeholderName
-     * @return
-     */
-    String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName);
+/**
+ * Flink deploy mode
+ */
+public enum FlinkDeployMode {
+    @JsonProperty("local")
+    LOCAL,
+    @JsonProperty("cluster")
+    CLUSTER,
+    @JsonProperty("application")
+    APPLICATION
 }
