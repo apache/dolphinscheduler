@@ -166,7 +166,7 @@ export function useTable() {
         title: t('data_quality.task_result.error_output_path'),
         key: 'errorOutputPath',
         render: (row: ResultItem) => {
-          return row.errorOutputPath ? row : '-'
+          return row.errorOutputPath ? row.errorOutputPath : '-'
         },
         width: 200
       },
@@ -210,6 +210,7 @@ export function useTable() {
 
     const { state } = useAsyncState(
       queryExecuteResultListPaging(data).then((res: ResultListRes) => {
+        variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           return {
             ...item

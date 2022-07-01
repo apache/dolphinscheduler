@@ -2,7 +2,7 @@
 
 The purpose of the pseudo-cluster deployment is to deploy the DolphinScheduler service on a single machine. In this mode, DolphinScheduler's master, worker, API server, are all on the same machine.
 
-If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
+If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow[pseudo-cluster deployment. If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
 
 ## Preparation
 
@@ -89,7 +89,7 @@ alertServer="localhost"
 apiServers="localhost"
 
 # DolphinScheduler installation path, it will auto-create if not exists
-installPath="~/dolphinscheduler"
+installPath=~/dolphinscheduler
 
 # Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
@@ -114,8 +114,7 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
-export SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 
@@ -143,7 +142,8 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 
 ## Initialize the Database
 
-DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the lib directory of DolphinScheduler, which is `tools/libs/`. Let's take MySQL as an example for how to initialize the database:
+DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
+which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`. Let's take MySQL as an example for how to initialize the database:
 
 For mysql 5.6 / 5.7
 
@@ -179,8 +179,7 @@ Then, modify `./bin/env/dolphinscheduler_env.sh` to use mysql, change {user} and
 ```shell
 export DATABASE=${DATABASE:-mysql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```
@@ -188,7 +187,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 After the above steps done you would create a new database for DolphinScheduler, then run the Shell script to init database:
 
 ```shell
-sh tools/bin/create-schema.sh
+sh tools/bin/upgrade-schema.sh
 ```
 
 ## Start DolphinScheduler
@@ -204,7 +203,7 @@ sh ./bin/install.sh
 
 ## Login DolphinScheduler
 
-Access address `http://localhost:12345/dolphinscheduler` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
 
 ## Start or Stop Server
 

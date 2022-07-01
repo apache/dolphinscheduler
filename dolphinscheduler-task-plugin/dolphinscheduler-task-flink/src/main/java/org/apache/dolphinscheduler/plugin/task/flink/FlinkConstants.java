@@ -50,6 +50,7 @@ public class FlinkConstants {
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
+    public static final String FLINK_PYTHON = "-py";
 
     public static final String FLINK_FORMAT_EXECUTION_TARGET = "set execution.target=%s";
     public static final String FLINK_FORMAT_YARN_APPLICATION_NAME = "set yarn.application.name=%s";

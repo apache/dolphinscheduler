@@ -7,7 +7,7 @@
 ## 前置条件
 
 - [Docker](https://docs.docker.com/engine/install/) 1.13.1+
-- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+- [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
 
 ## 启动服务
 
@@ -47,9 +47,13 @@ $ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Mac Linux 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
-# Windows 用户
-$ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker
-$ docker-compose up -d
+#  Windows 用户, `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
+
+# 如果需要初始化或者升级数据库结构，需要指定profile为schema
+$ docker-compose --profile schema up -d
+
+# 启动dolphinscheduler所有服务，指定profile为all
+$ docker-compose --profile all up -d
 ```
 
 > 提醒：通过 docker-compose 启动服务时，除了会启动 DolphinScheduler 对应的服务外，还会启动必要依赖服务，如数据库 PostgreSQL(用户 
@@ -65,44 +69,43 @@ $ DOLPHINSCHEDULER_VERSION=<version>
 # 初始化数据库，其确保数据库 <DATABASE> 已经存在
 $ docker run -d --name dolphinscheduler-tools \
     -e DATABASE="postgresql" \
-    # 如果使用 MySQL 则使用 "com.mysql.cj.jdbc.driver"
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
-    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" bin/create-schema.sh
+    --net host \
+    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # 启动 DolphinScheduler 对应的服务
 $ docker run -d --name dolphinscheduler-master \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-worker \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-api \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-alert-server \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
+    --net host \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
@@ -115,7 +118,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
 访问 DolphinScheduler。访问上述链接后会跳转到登陆页面，DolphinScheduler 默认的用户和密码分别为 `admin` 和 `dolphinscheduler123`。
 想要了解更多操作请参考用户手册[快速上手](../start/quick-start.md)。
 
-![login](/img/new_ui/dev/quick-start/login.png)
+![login](../../../../img/new_ui/dev/quick-start/login.png)
 
 > 注意：如果你使用沿用已有的 PostgreSQL 和 ZooKeeper 服务方式启动服务，且服务分布在多台机器中，
 > 请将上述的地址改成你 API 容器启动的 hostname 或者 IP。

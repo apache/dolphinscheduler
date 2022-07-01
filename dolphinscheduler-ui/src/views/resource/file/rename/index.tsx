@@ -57,7 +57,7 @@ export default defineComponent({
     }
 
     watch(
-      () => props.name,
+      () => props.show,
       () => {
         state.renameForm.id = props.id
         state.renameForm.name = props.name

@@ -44,16 +44,24 @@ export default defineComponent({
     const customRequest = ({ file }: any) => {
       state.uploadForm.name = file.name
       state.uploadForm.file = file.file
+      state.uploadFormNameRef.validate({
+        trigger: 'input'
+      })
     }
 
     const handleFile = () => {
       handleUploadFile(ctx.emit, hideModal, resetForm)
     }
 
+    const removeFile = () => {
+      state.uploadForm.name = ''
+    }
+
     return {
       hideModal,
       customRequest,
       handleFile,
+      removeFile,
       ...toRefs(state)
     }
   },
@@ -70,7 +78,11 @@ export default defineComponent({
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='uploadFormRef'>
-          <NFormItem label={t('resource.file.file_name')} path='name'>
+          <NFormItem
+            label={t('resource.file.file_name')}
+            path='name'
+            ref='uploadFormNameRef'
+          >
             <NInput
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
@@ -90,6 +102,8 @@ export default defineComponent({
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
               class='btn-upload'
+              max={1}
+              onRemove={this.removeFile}
             >
               <NButton>{t('resource.file.upload_files')}</NButton>
             </NUpload>

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
@@ -38,6 +40,8 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +62,7 @@ import org.springframework.stereotype.Component;
  * TaskUpdateQueue consumer
  */
 @Component
-public class TaskPriorityQueueConsumer extends Thread {
+public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
     /**
      * logger of TaskUpdateQueueConsumer
@@ -125,6 +129,10 @@ public class TaskPriorityQueueConsumer extends Thread {
         }
     }
 
+    protected TaskPriorityQueueConsumer() {
+        super("TaskPriorityQueueConsumeThread");
+    }
+
     @PostConstruct
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
@@ -138,7 +146,8 @@ public class TaskPriorityQueueConsumer extends Thread {
             try {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
-                if (!failedDispatchTasks.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
+                    TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         // service alarm when retries 100 times
                         if (dispatchFailedTask.getDispatchFailedRetryTimes() == Constants.DEFAULT_MAX_RETRY_COUNT){
@@ -150,6 +159,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                     }
                 }
             } catch (Exception e) {
+                TaskMetrics.incTaskDispatchError();
                 logger.error("dispatcher task error", e);
             }
         }
@@ -184,12 +194,15 @@ public class TaskPriorityQueueConsumer extends Thread {
             }
 
             consumerThreadPoolExecutor.submit(() -> {
-                boolean dispatchResult = this.dispatchTask(taskPriority);
-                if (!dispatchResult) {
-                    taskPriority.setLastDispatchTime(System.currentTimeMillis());
-                    failedDispatchTasks.add(taskPriority);
+                try {
+                    boolean dispatchResult = this.dispatchTask(taskPriority);
+                    if (!dispatchResult) {
+                        taskPriority.setLastDispatchTime(System.currentTimeMillis());
+                        failedDispatchTasks.add(taskPriority);
+                    }
+                } catch (Exception e){
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
 
@@ -215,11 +228,13 @@ public class TaskPriorityQueueConsumer extends Thread {
 
     /**
      * dispatch task
+     * Dispatch task to worker.
      *
      * @param taskPriority taskPriority
-     * @return result
+     * @return dispatch result, return true if dispatch success, return false if dispatch failed.
      */
     protected boolean dispatchTask(TaskPriority taskPriority) {
+        TaskMetrics.incTaskDispatch();
         boolean result = false;
         try {
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
@@ -231,18 +246,16 @@ public class TaskPriorityQueueConsumer extends Thread {
                     return true;
                 }
             }
-
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
+                logger.info("Master success dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
                 addDispatchEvent(context, executionContext);
             } else {
                 dispatchFailedTaskInstanceState2Pending(context, executionContext);
             }
-        } catch (RuntimeException e) {
-            logger.error("dispatch error: ", e);
-        } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage());
+        } catch (RuntimeException | ExecuteException e) {
+            logger.error("Master dispatch task to worker error: ", e);
         }
         return result;
     }
@@ -281,8 +294,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
         return requestCommand.convert2Command();
     }
 

@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -82,8 +82,9 @@ public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * create function format
+     * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
      */
-    private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
+    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT = "create or replace temporary function {0} as ''{1}''";
 
     /**
      * default query sql limit
@@ -161,7 +162,7 @@ public class SqlTask extends AbstractTaskExecutor {
 
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("sql task error: {}", e.toString());
+            logger.error("sql task error", e);
             throw e;
         }
     }
@@ -179,7 +180,6 @@ public class SqlTask extends AbstractTaskExecutor {
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
-        ResultSet resultSet = null;
         try {
 
             // create connection
@@ -197,8 +197,7 @@ public class SqlTask extends AbstractTaskExecutor {
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
-                resultSet = executeQuery(connection, mainStatementsBinds.get(0), "main");
-                result = resultProcess(resultSet);
+                result = executeQuery(connection, mainStatementsBinds.get(0), "main");
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
                 String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
@@ -213,7 +212,7 @@ public class SqlTask extends AbstractTaskExecutor {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
         } finally {
-            close(resultSet, connection);
+            close(connection);
         }
     }
 
@@ -292,10 +291,11 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    private ResultSet executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
             logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            return statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
+            return resultProcess(resultSet);
         }
     }
 
@@ -329,18 +329,9 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * close jdbc resource
      *
-     * @param resultSet resultSet
      * @param connection connection
      */
-    private void close(ResultSet resultSet, Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                logger.error("close result set error : {}", e.getMessage(), e);
-            }
-        }
-
+    private void close(Connection connection) {
         if (connection != null) {
             try {
                 connection.close();
@@ -414,7 +405,7 @@ public class SqlTask extends AbstractTaskExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -489,7 +480,7 @@ public class SqlTask extends AbstractTaskExecutor {
      */
     private List<String> buildTempFuncSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> MessageFormat
-                .format(CREATE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
+                .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
     }
 
     /**

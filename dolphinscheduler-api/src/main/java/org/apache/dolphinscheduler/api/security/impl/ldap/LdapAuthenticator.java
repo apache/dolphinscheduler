@@ -36,7 +36,7 @@ public class LdapAuthenticator extends AbstractAuthenticator {
         if (ldapEmail != null) {
             //check if user exist
             user = usersService.getUserByUserName(userId);
-            if (user == null) {
+            if (user == null && ldapService.createIfUserNotExists()) {
                 user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
             }
         }

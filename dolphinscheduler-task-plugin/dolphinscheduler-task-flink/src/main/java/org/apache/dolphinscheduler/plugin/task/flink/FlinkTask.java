@@ -28,9 +28,10 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -149,19 +150,17 @@ public class FlinkTask extends AbstractYarnTask {
 
         ResourceInfo mainJar = flinkParameters.getMainJar();
         if (mainJar != null) {
+            // -py
+            if(ProgramType.PYTHON == programType) {
+                args.add(FlinkConstants.FLINK_PYTHON);
+            }
             args.add(mainJar.getRes());
         }
 
         String mainArgs = flinkParameters.getMainArgs();
         if (StringUtils.isNotEmpty(mainArgs)) {
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-            if (MapUtils.isEmpty(paramsMap)) {
-                paramsMap = new HashMap<>();
-            }
-            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-                paramsMap.putAll(taskExecutionContext.getParamsMap());
-            }
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
             args.add(ParameterUtils.convertParameterPlaceholders(mainArgs, ParamUtils.convert(paramsMap)));
         }
 
@@ -316,7 +315,7 @@ public class FlinkTask extends AbstractYarnTask {
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
             try {
-                if (OSUtils.isWindows()) {
+                if (SystemUtils.IS_OS_WINDOWS) {
                     Files.createFile(path);
                 } else {
                     if (!file.getParentFile().exists()) {
@@ -359,7 +358,7 @@ public class FlinkTask extends AbstractYarnTask {
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
             try {
-                if (OSUtils.isWindows()) {
+                if (SystemUtils.IS_OS_WINDOWS) {
                     Files.createFile(path);
                 } else {
                     if (!file.getParentFile().exists()) {

@@ -25,10 +25,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.ExecutorManag
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ExecutorDispatcher implements InitializingBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorDispatcher.class);
 
     /**
      * netty executor manager
@@ -71,18 +75,13 @@ public class ExecutorDispatcher implements InitializingBean {
      * @throws ExecuteException if error throws ExecuteException
      */
     public Boolean dispatch(final ExecutionContext context) throws ExecuteException {
-        /**
-         * get executor manager
-         */
+        // get executor manager
         ExecutorManager<Boolean> executorManager = this.executorManagers.get(context.getExecutorType());
         if (executorManager == null) {
             throw new ExecuteException("no ExecutorManager for type : " + context.getExecutorType());
         }
 
-        /**
-         * host select
-         */
-
+        // host select
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
             return false;
@@ -90,9 +89,7 @@ public class ExecutorDispatcher implements InitializingBean {
         context.setHost(host);
         executorManager.beforeExecute(context);
         try {
-            /**
-             * task execute
-             */
+            // task execute
             return executorManager.execute(context);
         } finally {
             executorManager.afterExecute(context);

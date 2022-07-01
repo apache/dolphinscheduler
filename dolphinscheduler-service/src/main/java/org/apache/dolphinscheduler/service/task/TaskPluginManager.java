@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
@@ -93,7 +94,7 @@ public class TaskPluginManager {
             logger.info("Registering task plugin: {}", name);
 
             if (!names.add(name)) {
-                throw new IllegalStateException(format("Duplicate task plugins named '%s'", name));
+                throw new TaskPluginException(format("Duplicate task plugins named '%s'", name));
             }
 
             loadTaskChannel(factory);
@@ -106,7 +107,7 @@ public class TaskPluginManager {
             PluginDefine pluginDefine = new PluginDefine(name, PluginType.TASK.getDesc(), paramsJson);
             int count = pluginDao.addOrUpdatePluginDefine(pluginDefine);
             if (count <= 0) {
-                throw new RuntimeException("Failed to update task plugin: " + name);
+                throw new TaskPluginException("Failed to update task plugin: " + name);
             }
         });
     }

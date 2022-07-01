@@ -17,104 +17,53 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
+import java.time.Duration;
 import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
-@Component
-@EnableConfigurationProperties
-@ConfigurationProperties("worker")
-public class WorkerConfig {
-    private int listenPort;
-    private int execThreads;
-    private int heartbeatInterval;
-    private int hostWeight;
-    private boolean tenantAutoCreate;
-    private int maxCpuLoadAvg;
-    private double reservedMemory;
-    private Set<String> groups;
-    private String alertListenHost;
-    private int alertListenPort;
+import com.google.common.collect.Sets;
 
-    public int getListenPort() {
-        return listenPort;
+import lombok.Data;
+
+@Data
+@Validated
+@Configuration
+@ConfigurationProperties(prefix = "worker")
+public class WorkerConfig implements Validator {
+    private int listenPort = 1234;
+    private int execThreads = 10;
+    private Duration heartbeatInterval = Duration.ofSeconds(10);
+    private int hostWeight = 100;
+    private boolean tenantAutoCreate = true;
+    private boolean tenantDistributedUser = false;
+    private int maxCpuLoadAvg = -1;
+    private double reservedMemory = 0.3;
+    private Set<String> groups = Sets.newHashSet("default");
+    private String alertListenHost = "localhost";
+    private int alertListenPort = 50052;
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return WorkerConfig.class.isAssignableFrom(clazz);
     }
 
-    public void setListenPort(int listenPort) {
-        this.listenPort = listenPort;
-    }
+    @Override
+    public void validate(Object target, Errors errors) {
+        WorkerConfig workerConfig = (WorkerConfig) target;
+        if (workerConfig.getExecThreads() <= 0) {
+            errors.rejectValue("exec-threads", null, "should be a positive value");
+        }
+        if (workerConfig.getHeartbeatInterval().toMillis() <= 0) {
+            errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
+        }
+        if (workerConfig.getMaxCpuLoadAvg() <= 0) {
+            workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
+        }
 
-    public int getExecThreads() {
-        return execThreads;
-    }
-
-    public void setExecThreads(int execThreads) {
-        this.execThreads = execThreads;
-    }
-
-    public int getHeartbeatInterval() {
-        return heartbeatInterval;
-    }
-
-    public void setHeartbeatInterval(int heartbeatInterval) {
-        this.heartbeatInterval = heartbeatInterval;
-    }
-
-    public int getHostWeight() {
-        return hostWeight;
-    }
-
-    public void setHostWeight(int hostWeight) {
-        this.hostWeight = hostWeight;
-    }
-
-    public boolean isTenantAutoCreate() {
-        return tenantAutoCreate;
-    }
-
-    public void setTenantAutoCreate(boolean tenantAutoCreate) {
-        this.tenantAutoCreate = tenantAutoCreate;
-    }
-
-    public int getMaxCpuLoadAvg() {
-        return maxCpuLoadAvg > 0 ? maxCpuLoadAvg : Runtime.getRuntime().availableProcessors() * 2;
-    }
-
-    public void setMaxCpuLoadAvg(int maxCpuLoadAvg) {
-        this.maxCpuLoadAvg = maxCpuLoadAvg;
-    }
-
-    public double getReservedMemory() {
-        return reservedMemory;
-    }
-
-    public void setReservedMemory(double reservedMemory) {
-        this.reservedMemory = reservedMemory;
-    }
-
-    public Set<String> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(Set<String> groups) {
-        this.groups = groups;
-    }
-
-    public String getAlertListenHost() {
-        return alertListenHost;
-    }
-
-    public void setAlertListenHost(String alertListenHost) {
-        this.alertListenHost = alertListenHost;
-    }
-
-    public int getAlertListenPort() {
-        return alertListenPort;
-    }
-
-    public void setAlertListenPort(final int alertListenPort) {
-        this.alertListenPort = alertListenPort;
     }
 }
