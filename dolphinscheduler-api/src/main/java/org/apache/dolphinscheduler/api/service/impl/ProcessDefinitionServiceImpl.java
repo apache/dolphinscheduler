@@ -1755,6 +1755,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 final Date date = new Date();
                 processDefinition.setCreateTime(date);
                 processDefinition.setUpdateTime(date);
+                processDefinition.setReleaseState(ReleaseState.OFFLINE);
                 if (StringUtils.isNotBlank(processDefinition.getLocations())) {
                     ArrayNode jsonNodes = JSONUtils.parseArray(processDefinition.getLocations());
                     for (int i = 0; i < jsonNodes.size(); i++) {
