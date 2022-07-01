@@ -328,6 +328,14 @@ export function useTable() {
         searchVal: variables.searchVal
       })
     }).catch(() => {
+      if (
+          Math.ceil((variables.columns.length - variables.checkedRowKeys.length) / variables.pageSize) < variables.page
+          && variables.page > 1
+      ) {
+        variables.page -= 1;
+      }
+
+      variables.checkedRowKeys = []
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
