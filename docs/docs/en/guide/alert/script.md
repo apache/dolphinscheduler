@@ -14,4 +14,5 @@ The following shows the `Script` configuration example:
 | Type | Support `Shell` script. |
 
 ### Note
+
 Consider the script file access privileges with the executing tenant.
