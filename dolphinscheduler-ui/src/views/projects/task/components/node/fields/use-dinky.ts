@@ -14,53 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {useI18n} from 'vue-i18n'
-import {useCustomParams} from '.'
-import type {IJsonItem} from '../types'
+import { useI18n } from 'vue-i18n'
+import { useCustomParams } from '.'
+import type { IJsonItem } from '../types'
 
 export function useDinky(model: { [field: string]: any }): IJsonItem[] {
-    const {t} = useI18n()
+  const { t } = useI18n()
 
-    return [
-        {
-            type: 'input',
-            field: 'address',
-            name: t('project.node.dinky_address'),
-            props: {
-                placeholder: t('project.node.dinky_address_tips')
-            },
-            validate: {
-                trigger: ['input', 'blur'],
-                required: true,
-                validator(_validate: any, value: string) {
-                    if (!value) {
-                        return new Error(t('project.node.dinky_address_tips'))
-                    }
-                }
-            }
-        },
-        {
-            type: 'input',
-            field: 'taskId',
-            name: t('project.node.dinky_task_id'),
-            props: {
-                placeholder: t('project.node.dinky_task_id_tips')
-            },
-            validate: {
-                trigger: ['input', 'blur'],
-                required: true,
-                validator(_validate: any, value: string) {
-                    if (!value) {
-                        return new Error(t('project.node.dinky_task_id_tips'))
-                    }
-                }
-            }
-        },
-        {
-            type: 'switch',
-            field: 'online',
-            name: t('project.node.dinky_online')
-        },
-        ...useCustomParams({model, field: 'localParams', isSimple: false})
-    ]
+  return [
+    {
+      type: 'input',
+      field: 'address',
+      name: t('project.node.dinky_address'),
+      props: {
+        placeholder: t('project.node.dinky_address_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(_validate: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.dinky_address_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'input',
+      field: 'taskId',
+      name: t('project.node.dinky_task_id'),
+      props: {
+        placeholder: t('project.node.dinky_task_id_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(_validate: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.dinky_task_id_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'switch',
+      field: 'online',
+      name: t('project.node.dinky_online')
+    },
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+  ]
 }

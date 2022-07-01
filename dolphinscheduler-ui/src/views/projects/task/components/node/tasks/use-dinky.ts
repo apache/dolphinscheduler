@@ -15,66 +15,67 @@
  * limitations under the License.
  */
 
-import {reactive} from 'vue'
+import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type {IJsonItem, INodeData, ITaskData} from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
 export function useDinky({
-                             projectCode,
-                             from = 0,
-                             readonly,
-                             data
-                         }: {
-    projectCode: number
-    from?: number
-    readonly?: boolean
-    data?: ITaskData
+  projectCode,
+  from = 0,
+  readonly,
+  data
+}: {
+  projectCode: number
+  from?: number
+  readonly?: boolean
+  data?: ITaskData
 }) {
-    const model = reactive({
-        name: '',
-        taskType: 'DINKY',
-        flag: 'YES',
-        description: '',
-        timeoutFlag: false,
-        localParams: [],
-        environmentCode: null,
-        failRetryInterval: 1,
-        failRetryTimes: 0,
-        workerGroup: 'default',
-        delayTime: 0,
-        timeout: 30
-    } as INodeData)
+  const model = reactive({
+    name: '',
+    taskType: 'DINKY',
+    flag: 'YES',
+    description: '',
+    timeoutFlag: false,
+    localParams: [],
+    environmentCode: null,
+    failRetryInterval: 1,
+    failRetryTimes: 0,
+    workerGroup: 'default',
+    delayTime: 0,
+    timeout: 30,
+    timeoutNotifyStrategy: ['WARN']
+  } as INodeData)
 
-    let extra: IJsonItem[] = []
-    if (from === 1) {
-        extra = [
-            Fields.useTaskType(model, readonly),
-            Fields.useProcessName({
-                model,
-                projectCode,
-                isCreate: !data?.id,
-                from,
-                processName: data?.processName
-            })
-        ]
-    }
+  let extra: IJsonItem[] = []
+  if (from === 1) {
+    extra = [
+      Fields.useTaskType(model, readonly),
+      Fields.useProcessName({
+        model,
+        projectCode,
+        isCreate: !data?.id,
+        from,
+        processName: data?.processName
+      })
+    ]
+  }
 
-    return {
-        json: [
-            Fields.useName(from),
-            ...extra,
-            Fields.useRunFlag(),
-            Fields.useDescription(),
-            Fields.useTaskPriority(),
-            Fields.useWorkerGroup(),
-            Fields.useEnvironmentName(model, !model.id),
-            ...Fields.useTaskGroup(model, projectCode),
-            ...Fields.useFailed(),
-            Fields.useDelayTime(model),
-            ...Fields.useTimeoutAlarm(model),
-            ...Fields.useDinky(model),
-            Fields.usePreTasks()
-        ] as IJsonItem[],
-        model
-    }
+  return {
+    json: [
+      Fields.useName(from),
+      ...extra,
+      Fields.useRunFlag(),
+      Fields.useDescription(),
+      Fields.useTaskPriority(),
+      Fields.useWorkerGroup(),
+      Fields.useEnvironmentName(model, !model.id),
+      ...Fields.useTaskGroup(model, projectCode),
+      ...Fields.useFailed(),
+      Fields.useDelayTime(model),
+      ...Fields.useTimeoutAlarm(model),
+      ...Fields.useDinky(model),
+      Fields.usePreTasks()
+    ] as IJsonItem[],
+    model
+  }
 }
