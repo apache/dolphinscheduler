@@ -105,20 +105,29 @@ public final class MailSender {
 
         enableSmtpAuth = config.get(MailParamsConstants.NAME_MAIL_SMTP_AUTH);
 
-        mailUser = config.get(MailParamsConstants.NAME_MAIL_USER);
-        requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
+        if (Boolean.TRUE.toString().equalsIgnoreCase(enableSmtpAuth)) {
+            mailUser = config.get(MailParamsConstants.NAME_MAIL_USER);
+            requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
 
-        mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
-        requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
+            mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
+            requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
 
-        mailUseStartTLS = config.get(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE);
-        requireNonNull(mailUseStartTLS, MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
+            mailUseStartTLS = config.get(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE);
+            requireNonNull(mailUseStartTLS, MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
 
-        mailUseSSL = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE);
-        requireNonNull(mailUseSSL, MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE + mustNotNull);
+            mailUseSSL = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE);
+            requireNonNull(mailUseSSL, MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE + mustNotNull);
 
-        sslTrust = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST);
-        requireNonNull(sslTrust, MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST + mustNotNull);
+            sslTrust = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST);
+            requireNonNull(sslTrust, MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST + mustNotNull);
+        } else {
+            //make compiler happy
+            mailUser = null;
+            mailPasswd = null;
+            mailUseStartTLS = null;
+            mailUseSSL = null;
+            sslTrust = null;
+        }
 
         showType = config.get(AlertConstants.NAME_SHOW_TYPE);
         requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + mustNotNull);
@@ -287,11 +296,7 @@ public final class MailSender {
         Properties props = new Properties();
         props.setProperty(MailParamsConstants.MAIL_SMTP_HOST, mailSmtpHost);
         props.setProperty(MailParamsConstants.MAIL_SMTP_PORT, mailSmtpPort);
-        props.setProperty(MailParamsConstants.MAIL_SMTP_AUTH, enableSmtpAuth);
         props.setProperty(EmailConstants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
-        props.setProperty(MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE, mailUseStartTLS);
-        props.setProperty(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, mailUseSSL);
-        props.setProperty(MailParamsConstants.MAIL_SMTP_SSL_TRUST, sslTrust);
 
         Authenticator auth = new Authenticator() {
             @Override
@@ -301,7 +306,16 @@ public final class MailSender {
             }
         };
 
-        Session session = Session.getInstance(props, auth);
+        Session session;
+        if (Boolean.TRUE.toString().equalsIgnoreCase(enableSmtpAuth)) {
+            props.setProperty(MailParamsConstants.MAIL_SMTP_AUTH, enableSmtpAuth);
+            props.setProperty(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, mailUseSSL);
+            props.setProperty(MailParamsConstants.MAIL_SMTP_SSL_TRUST, sslTrust);
+            props.setProperty(MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE, mailUseStartTLS);
+            session = Session.getInstance(props, auth);
+        } else {
+            session = Session.getInstance(props);
+        }
         session.addProvider(new SMTPProvider());
         return session;
     }

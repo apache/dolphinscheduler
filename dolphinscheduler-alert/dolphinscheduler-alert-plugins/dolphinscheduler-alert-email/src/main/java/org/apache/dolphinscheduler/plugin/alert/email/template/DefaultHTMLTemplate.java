@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,6 +76,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             boolean flag = true;
 
             String title = "";
+            if (CollectionUtils.isEmpty(mapItemsList)) {
+                return content;
+            }
             for (LinkedHashMap<String, Object> mapItems : mapItemsList) {
 
                 Set<Map.Entry<String, Object>> entries = mapItems.entrySet();

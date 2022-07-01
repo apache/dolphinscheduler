@@ -43,6 +43,10 @@ public class DefaultHTMLTemplateTest {
 
         assertEquals(tableTypeMessage, generateMockTableTypeResultByHand());
 
+        String nonMapContent = "content";
+        String tableTypeMes = template.getMessageFromTemplate(nonMapContent, ShowType.TABLE, true);
+        assertEquals(tableTypeMes, nonMapContent);
+
         String textTypeMessage = template.getMessageFromTemplate(list2String(), ShowType.TEXT, true);
 
         assertEquals(textTypeMessage, generateMockTextTypeResultByHand());
