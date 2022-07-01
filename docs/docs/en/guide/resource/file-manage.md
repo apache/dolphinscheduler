@@ -60,7 +60,3 @@ In the workflow definition module of project Manage, create a new workflow using
 You can view the log results of running the node in the workflow example. The diagram below:
 
 ![log-shell](/img/new_ui/dev/resource/demo/file-demo03.png)
-
-
-
-
