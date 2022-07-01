@@ -66,6 +66,6 @@ The following is the `create new group chat` API and `query userId` API example:
 
 ![enterprise-wechat-create-group](/img/alert/enterprise-wechat-query-userid.png)
 
-#### References
+## Reference
 
-Group Chat：https://work.weixin.qq.com/api/doc/90000/90135/90248
+- Group Chat：https://work.weixin.qq.com/api/doc/90000/90135/90248
