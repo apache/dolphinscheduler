@@ -21,4 +21,5 @@ If you need to use `DingTalk` for alerting, create an alert instance in the aler
 | Password | Authentication(Password) for the proxy server. |
 
 ## Reference
+
 - [DingTalk Custom Robot Access Development Documentation](https://open.dingtalk.com/document/robots/custom-robot-access) 
