@@ -39,9 +39,9 @@ public class FlinkParameters extends AbstractParameters {
     private String mainClass;
 
     /**
-     * deploy mode  yarn-cluster yarn-local
+     * deploy mode  yarn-cluster yarn-local yarn-application
      */
-    private String deployMode;
+    private FlinkDeployMode deployMode;
 
     /**
      * arguments
@@ -130,11 +130,11 @@ public class FlinkParameters extends AbstractParameters {
         this.mainClass = mainClass;
     }
 
-    public String getDeployMode() {
+    public FlinkDeployMode getDeployMode() {
         return deployMode;
     }
 
-    public void setDeployMode(String deployMode) {
+    public void setDeployMode(FlinkDeployMode deployMode) {
         this.deployMode = deployMode;
     }
 
