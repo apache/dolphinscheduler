@@ -1413,7 +1413,7 @@ public class ProcessServiceImpl implements ProcessService {
             String endTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
             String startTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
             String scheduleTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-            if (StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(startTime)) {
+            if (StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(endTime)) {
                 cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endTime);
                 cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
             }
