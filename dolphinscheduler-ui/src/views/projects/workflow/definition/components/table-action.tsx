@@ -212,7 +212,6 @@ export default defineComponent({
                 type='info'
                 tag='div'
                 circle
-                disabled={releaseState === 'ONLINE'}
                 onClick={this.handleCopyWorkflow}
               >
                 <NIcon>
