@@ -56,5 +56,6 @@ The `Room ID` we can acquire it from the `id` of creating a new group chat room 
 ![enterprise-webexteams-room-message-example](../../../../img/alert/enterprise-webexteams-room-msg.png)
 
 ## References:
+
 - [WebexTeams Application Bot Guide](https://developer.webex.com/docs/bots)
 - [WebexTeams Message Guide](https://developer.webex.com/docs/api/v1/messages/create-a-message)
