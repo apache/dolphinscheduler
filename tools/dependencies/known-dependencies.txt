@@ -133,8 +133,8 @@ jetty-util-ajax-9.4.44.v20210927.jar
 jetty-webapp-9.4.44.v20210927.jar
 jetty-xml-9.4.44.v20210927.jar
 jline-0.9.94.jar
-jna-4.5.2.jar
-jna-platform-4.5.2.jar
+jna-5.10.0.jar
+jna-platform-5.10.0.jar
 joda-time-2.5.jar
 jpam-1.1.jar
 jsch-0.1.42.jar
