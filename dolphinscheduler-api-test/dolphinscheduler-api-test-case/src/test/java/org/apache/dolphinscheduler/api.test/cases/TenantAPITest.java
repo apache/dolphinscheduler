@@ -29,14 +29,20 @@ import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class TenantAPITest {
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
+
     private static final String tenant = System.getProperty("user.name");
 
     private static final String user = "admin";
+
+    private static final String tenantName = "admin";
 
     private static final String password = "dolphinscheduler123";
 
@@ -54,7 +60,7 @@ public class TenantAPITest {
 
     @AfterAll
     public static void cleanup() {
-        LOGGER.info("success cleanup");
+        logger.info("success cleanup");
     }
 
     @Test
@@ -62,7 +68,7 @@ public class TenantAPITest {
     public void testCreateTenant() {
         TenantPage tenantPage = new TenantPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, "admin", 1, "");
+        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenantName, 1, "");
 
         Assertions.assertTrue(createTenantHttpResponse.body().success());
     }

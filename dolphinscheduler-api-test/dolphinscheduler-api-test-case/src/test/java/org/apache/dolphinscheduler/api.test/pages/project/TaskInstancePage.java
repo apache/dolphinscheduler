@@ -20,17 +20,22 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
+import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.TaskInstanceResponseData;
 import org.apache.dolphinscheduler.api.test.entity.TaskInstanceResponseTotalList;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class TaskInstancePage {
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
     private static String taskState = null;
     private static Integer taskInstanceId = null;
 
@@ -60,11 +65,12 @@ public final class TaskInstancePage {
 
 
         for (TaskInstanceResponseTotalList taskInstanceRes : JSONUtils.convertValue(res.body().data(), TaskInstanceResponseData.class).totalList()) {
-            System.out.println(taskInstanceRes.state());
+
             taskState =  taskInstanceRes.state();
             taskInstanceId = taskInstanceRes.id();
         }
-        System.out.printf("查询task状态：%s", taskState);
+
+        logger.info("查询task状态：%s", taskState);
         return taskState;
 
     }
@@ -85,7 +91,9 @@ public final class TaskInstancePage {
 
         HttpResponse res = requestClient.get("/log/detail", headers, params);
         String res_log = (String) res.body().data();
-        System.out.printf("查询实例log：%s", res_log);
+
+        logger.info("查询实例log：%s", res_log);
+
         return res;
 
     }

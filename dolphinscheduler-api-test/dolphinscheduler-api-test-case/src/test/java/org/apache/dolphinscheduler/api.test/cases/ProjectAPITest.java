@@ -26,14 +26,22 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class ProjectAPITest {
-    private static final String tenant = System.getProperty("user.name");
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
+
     private static final String projectName = "wen";
+
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
@@ -51,7 +59,7 @@ public class ProjectAPITest {
 
     @AfterAll
     public static void cleanup() {
-        LOGGER.info("success cleanup");
+        logger.info("success cleanup");
     }
 
     @Test
