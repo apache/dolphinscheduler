@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -84,7 +85,13 @@ public class MlflowTask extends AbstractTaskExecutor {
             // construct process
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
-            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            int exitCode = exitStatusCode;
+            if (mlflowParameters.getIsDeployDocker()){
+                exitCode = checkDockerHealth();
+            }else {
+                exitCode = getExitStatusCode();
+            }
+            setExitStatusCode(exitCode);
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
@@ -181,10 +188,12 @@ public class MlflowTask extends AbstractTaskExecutor {
             String templatePath = getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE);
             args.add(String.format("cp %s %s", templatePath, taskExecutionContext.getExecutePath()));
             String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
+            String containerName = mlflowParameters.getContainerName();
+
             args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
+            args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
             args.add(mlflowParameters.getDockerComposeEnvCommand());
             args.add(MlflowConstants.DOCKER_COMPOSE_RUN);
-            args.add(String.format(MlflowConstants.DOCKER_HEALTH_CHECK_COMMAND, mlflowParameters.getContainerName()));
         }
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
@@ -195,6 +204,33 @@ public class MlflowTask extends AbstractTaskExecutor {
         // replace placeholder, and combining local and global parameters
         return taskExecutionContext.getPrepareParamsMap();
 
+    }
+
+    public int checkDockerHealth() throws Exception {
+        logger.info("checking container healthy ... ");
+        int exitCode = -1;
+        String[] command = {"sh", "-c", String.format(MlflowConstants.DOCKER_HEALTH_CHECK, mlflowParameters.getContainerName())};
+        for(int x = 0; x < MlflowConstants.DOCKER_HEALTH_CHECK_TIMEOUT; x = x+1) {
+            String status;
+            try {
+                status = OSUtils.exeShell(command).replace("\n", "").replace("\"", "");
+            } catch (Exception e) {
+                status = String.format("error --- %s", e.getMessage());
+            }
+            logger.info("container healthy status: {}", status);
+
+            if (status.equals("healthy")) {
+                exitCode = 0;
+                logger.info("container is healthy");
+                return exitCode;
+            }else {
+                logger.info("The health check has been running for {} seconds", x * 5);
+                Thread.sleep(5000);
+            }
+        }
+
+        logger.info("health check fail");
+        return exitCode;
     }
 
 
