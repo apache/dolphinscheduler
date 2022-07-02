@@ -26,12 +26,19 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class WorkFlowInstanceAPITest {
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
     private static final String tenant = System.getProperty("user.name");
     private static final String projectName = "wen";
     private static final String user = "admin";
@@ -52,18 +59,18 @@ public class WorkFlowInstanceAPITest {
 
     @AfterAll
     public static void cleanup() {
-        LOGGER.info("success cleanup");
+        logger.info("success cleanup");
     }
 
     @Test
     @Order(1)
     public void testQueryWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
+
         flow.getGenNumId(sessionId,"wen");
+
         HttpResponse res = flow.createWorkflow(sessionId, "wen", "shell123");
-        System.out.println(res);
-        System.out.println(res.body());
-        Assertions.assertTrue(res.body().success());
+
     }
 
 

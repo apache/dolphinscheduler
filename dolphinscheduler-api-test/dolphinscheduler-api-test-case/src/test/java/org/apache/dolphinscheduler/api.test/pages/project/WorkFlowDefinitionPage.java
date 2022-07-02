@@ -20,20 +20,27 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
+import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseData;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowCreateRequestData;
 import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseTotalList;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseData;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowRunRequestData;
+import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public final class WorkFlowDefinitionPage {
     private static String genNumId = null;
     private static String workFlowCode = null;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
 
     public void getGenNumId(String sessionId, String projectName) {
 
@@ -55,27 +62,28 @@ public final class WorkFlowDefinitionPage {
     public HttpResponse createWorkflow(String sessionId, String projectName, String workFlowName) {
         Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
+
+        WorkFlowCreateRequestData workFlowCreateRequestData = new WorkFlowCreateRequestData();
+
         String taskDefinitionJson = "[{\"code\":" + genNumId + ",\"delayTime\":\"0\",\"description\":\"\",\"environmentCode\":-1,\"failRetryInterval\":\"1\",\"failRetryTimes\":\"0\",\"flag\":\"YES\",\"name\":\"echo_123\",\"taskParams\":{\"localParams\":[],\"rawScript\":\"echo 123\",\"resourceList\":[]},\"taskPriority\":\"MEDIUM\",\"taskType\":\"SHELL\",\"timeout\":0,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"workerGroup\":\"default\"}]";
         String taskRelationJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":"+ genNumId + ",\"postTaskVersion\":0,\"conditionType\":\"NONE\",\"conditionParams\":{}}]";
         String locations = "[{\"taskCode\":" + genNumId +",\"x\":33.5,\"y\":38.5}]";
-        params.put("taskDefinitionJson", taskDefinitionJson);
-        params.put("taskRelationJson", taskRelationJson);
-        params.put("locations", locations);
-        params.put("name", workFlowName);
-        params.put("tenantCode", "admin");
-        params.put("executionType", "PARALLEL");
-        params.put("description", "");
-        params.put("globalParams", "[]");
-        params.put("timeout", 0);
+        workFlowCreateRequestData.setTaskDefinitionJson(taskDefinitionJson);
+        workFlowCreateRequestData.setTaskRelationJson(taskRelationJson);
+        workFlowCreateRequestData.setLocations(locations);
+        workFlowCreateRequestData.setName(workFlowName);
+        workFlowCreateRequestData.setTenantCode("admin");
+        workFlowCreateRequestData.setExecutionType("PARALLEL");
+        workFlowCreateRequestData.setDescription("");
+        workFlowCreateRequestData.setGlobalParams("[]");
+        workFlowCreateRequestData.setTimeout(0);
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
-        System.out.printf("创建工作流 param是：%s",params);
-        System.out.printf("创建工作流header头是：%s", "/projects/"+projectCode+"/process-definition");
-        HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition", headers, params);
 
-        System.out.printf("创建工作流结果：%s", res);
+        HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition", headers, JSONUtils.convertValue(workFlowCreateRequestData, Map.class));
+        logger.info("创建工作流结果：%s", res);
         return res;
     }
 
@@ -90,7 +98,8 @@ public final class WorkFlowDefinitionPage {
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
         HttpResponse res = requestClient.get("/projects/"+ projectCode + "/process-definition", headers, params);
-        System.out.printf("查询工作流结果：%s\n", res);
+
+        logger.info("查询工作流结果：%s\n", res);
         for (WorkFlowResponseTotalList workFlowList : JSONUtils.convertValue(res.body().data(), WorkFlowResponseData.class).totalList()) {
             workFlowCode =  workFlowList.code();
         }
@@ -111,7 +120,7 @@ public final class WorkFlowDefinitionPage {
         String projectCode = project.getProjectCode(sessionId, projectName);
         HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition/"+workFlowCode+"/release", headers, params);
 
-        System.out.printf("上线工作流：%s", res);
+        logger.info("上线工作流：%s", res);
         return res;
 
     }
@@ -120,33 +129,33 @@ public final class WorkFlowDefinitionPage {
         WorkFlowDefinitionPage workflow = new WorkFlowDefinitionPage();
         workflow.queryWorkflow(sessionId, projectName, workFlowName);
         workflow.onLineWorkflow(sessionId, projectName, workFlowName);
-        Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
-        params.put("processDefinitionCode", workFlowCode);
-        params.put("startEndTime", "2022-06-25T16:00:00.000Z");
-        params.put("startEndTime", "2022-06-25T16:00:00.000Z");
-        params.put("scheduleTime", "2022-06-26 00:00:00,2022-06-26 00:00:00");
-        params.put("failureStrategy", "CONTINUE");
-        params.put("warningType", "NONE");
-        params.put("warningGroupId", "");
-        params.put("execType", "START_PROCESS");
-        params.put("startNodeList", "");
-        params.put("taskDependType", "TASK_POST");
-        params.put("dependentMode", "OFF_MODE");
-        params.put("runMode", "RUN_MODE_SERIAL");
-        params.put("processInstancePriority", "MEDIUM");
-        params.put("workerGroup", "default");
-        params.put("environmentCode", "");
-        params.put("startParams", "");
-        params.put("expectedParallelismNumber", "");
-        params.put("dryRun", 0);
+
+        WorkFlowRunRequestData workFlowRunRequestData = new WorkFlowRunRequestData();
+        workFlowRunRequestData.setProcessDefinitionCode(workFlowCode);
+        workFlowRunRequestData.setStartEndTime("2022-06-25T16:00:00.000Z");
+        workFlowRunRequestData.setScheduleTime("2022-06-26 00:00:00,2022-06-26 00:00:00");
+        workFlowRunRequestData.setFailureStrategy("CONTINUE");
+        workFlowRunRequestData.setWarningType("NONE");
+        workFlowRunRequestData.setWarningGroupId("");
+        workFlowRunRequestData.setExecType("START_PROCESS");
+        workFlowRunRequestData.setStartNodeList("");
+        workFlowRunRequestData.setTaskDependType("TASK_POST");
+        workFlowRunRequestData.setDependentMode("OFF_MODE");
+        workFlowRunRequestData.setRunMode("RUN_MODE_SERIAL");
+        workFlowRunRequestData.setProcessInstancePriority("MEDIUM");
+        workFlowRunRequestData.setWorkerGroup("default");
+        workFlowRunRequestData.setEnvironmentCode("");
+        workFlowRunRequestData.setStartParams("");
+        workFlowRunRequestData.setExpectedParallelismNumber("");
+        workFlowRunRequestData.setDryRun(0);
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
-        HttpResponse res = requestClient.post("/projects/"+projectCode+"/executors/start-process-instance", headers, params);
+        HttpResponse res = requestClient.post("/projects/"+projectCode+"/executors/start-process-instance", headers, JSONUtils.convertValue(workFlowRunRequestData, Map.class));
 
-        System.out.printf("运行工作流：%s", res);
+        logger.info("运行工作流：%s", res);
         return res;
 
     }

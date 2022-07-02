@@ -20,19 +20,22 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
+import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.ProjectListResponseData;
 import org.apache.dolphinscheduler.api.test.entity.ProjectListResponseTotalList;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class ProjectPage {
-
-
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
 
     public HttpResponse createProject(String sessionId, String projectName, String description, String userName) {
         Map<String, Object> params = new HashMap<>();
@@ -75,10 +78,11 @@ public final class ProjectPage {
         RequestClient requestClient = new RequestClient();
 
         HttpResponse res = requestClient.get("/projects", headers, params);
-        System.out.printf("项目 %s", res);
+
+        logger.info("项目 %s", res);
 
         for (ProjectListResponseTotalList ProjectListRes : JSONUtils.convertValue(res.body().data(), ProjectListResponseData.class).totalList()) {
-            System.out.println(ProjectListRes.code());
+            logger.info(ProjectListRes.code());
             projectCode =  ProjectListRes.code();
         }
         return projectCode;
