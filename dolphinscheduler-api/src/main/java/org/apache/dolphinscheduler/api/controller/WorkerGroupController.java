@@ -135,7 +135,7 @@ public class WorkerGroupController extends BaseController {
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = workerGroupService.queryAllGroup();
+        Map<String, Object> result = workerGroupService.queryAllGroup(loginUser);
         return returnDataList(result);
     }
 

@@ -42,7 +42,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -51,7 +51,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -138,6 +137,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -272,7 +272,7 @@ public class ProcessServiceImpl implements ProcessService {
     private K8sMapper k8sMapper;
 
     @Autowired
-    private CuringGlobalParamsService curingGlobalParamsService;
+    private CuringParamsService curingGlobalParamsService;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -373,7 +373,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * save error command, and delete original command
+     * Save error command, and delete original command. If the given command has already been moved into error command,
+     * will throw {@link SQLIntegrityConstraintViolationException ).
      *
      * @param command command
      * @param message message

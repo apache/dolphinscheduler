@@ -118,13 +118,7 @@ public class SparkTask extends AbstractYarnTask {
         args.addAll(populateSparkOptions());
 
         // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(taskExecutionContext.getParamsMap());
-        }
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
