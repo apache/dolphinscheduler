@@ -28,9 +28,7 @@ import {
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
-import Card from '@/components/card'
 import WorkerGroupModal from './components/worker-group-modal'
-import styles from './index.module.scss'
 
 const workerGroupManage = defineComponent({
   name: 'worker-group-manage',
@@ -103,19 +101,17 @@ const workerGroupManage = defineComponent({
     } = this
 
     return (
-      <div>
-        <NCard>
-          <div class={styles['search-card']}>
-            <div>
-              <NButton
-                size='small'
-                type='primary'
-                onClick={handleModalChange}
-                class='btn-create-worker-group'
-              >
-                {t('security.worker_group.create_worker_group')}
-              </NButton>
-            </div>
+      <NSpace vertical>
+        <NCard size='small'>
+          <NSpace justify='space-between'>
+            <NButton
+              size='small'
+              type='primary'
+              onClick={handleModalChange}
+              class='btn-create-worker-group'
+            >
+              {t('security.worker_group.create_worker_group')}
+            </NButton>
             <NSpace>
               <NInput
                 size='small'
@@ -133,28 +129,30 @@ const workerGroupManage = defineComponent({
                 }}
               </NButton>
             </NSpace>
-          </div>
+          </NSpace>
         </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            row-class-name='items'
-            columns={this.columns}
-            data={this.tableData}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestData}
-              onUpdatePageSize={onUpdatePageSize}
+        <NCard size='small'>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              row-class-name='items'
+              columns={this.columns}
+              data={this.tableData}
             />
-          </div>
-        </Card>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </NCard>
         <WorkerGroupModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
@@ -162,7 +160,7 @@ const workerGroupManage = defineComponent({
           onCancelModal={onCancelModal}
           onConfirmModal={onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })
