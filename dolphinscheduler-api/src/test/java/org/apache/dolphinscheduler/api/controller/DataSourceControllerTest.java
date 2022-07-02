@@ -19,13 +19,14 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceParamDTO;
 
 import java.util.HashMap;
 
@@ -48,19 +49,20 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Ignore
     @Test
     public void testCreateDataSource() throws Exception {
-        MySQLDataSourceParamDTO mysqlDatasourceParam = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParam.setName("mysql");
-        mysqlDatasourceParam.setNote("mysql data source test");
-        mysqlDatasourceParam.setHost("192.168.xxxx.xx");
-        mysqlDatasourceParam.setPort(3306);
-        mysqlDatasourceParam.setDatabase("dolphinscheduler");
-        mysqlDatasourceParam.setUserName("root");
-        mysqlDatasourceParam.setPassword("root@123");
-        mysqlDatasourceParam.setOther(new HashMap<>());
-        MvcResult mvcResult = mockMvc.perform(post("/datasources/create")
-                .header("sessionId", sessionId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONUtils.toJsonString(mysqlDatasourceParam)))
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name","mysql");
+        paramsMap.put("node","mysql data source test");
+        paramsMap.put("type","mysql");
+        paramsMap.put("host","192.168.xxxx.xx");
+        paramsMap.put("port",3306);
+        paramsMap.put("database","dolphinscheduler");
+        paramsMap.put("userName","root");
+        paramsMap.put("password","root@123");
+        paramsMap.put("other",new HashMap<>());
+        MvcResult mvcResult = mockMvc.perform(post("/datasources")
+                        .header("sessionId", sessionId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -72,22 +74,22 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Ignore
     @Test
     public void testUpdateDataSource() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
-        paramsMap.add("name","mysql");
-        paramsMap.add("node","mysql data source test");
-        paramsMap.add("type","MYSQL");
-        paramsMap.add("host","192.168.xxxx.xx");
-        paramsMap.add("port","3306");
-        paramsMap.add("principal","");
-        paramsMap.add("database","dolphinscheduler");
-        paramsMap.add("userName","root");
-        paramsMap.add("password","root@123");
-        paramsMap.add("other","");
-        MvcResult mvcResult = mockMvc.perform(post("/datasources/update")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("id",2);
+        paramsMap.put("name","mysql");
+        paramsMap.put("node","mysql data source test");
+        paramsMap.put("type","mysql");
+        paramsMap.put("host","192.168.xxxx.xx");
+        paramsMap.put("port",3306);
+        paramsMap.put("principal","");
+        paramsMap.put("database","dolphinscheduler");
+        paramsMap.put("userName","root");
+        paramsMap.put("password","root@123");
+        paramsMap.put("other",new HashMap<>());
+        MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
+                        .header("sessionId", sessionId)
+                        .content(JSONUtils.toJsonString(paramsMap)))
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -98,11 +100,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Ignore
     @Test
     public void testQueryDataSource() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
-        MvcResult mvcResult = mockMvc.perform(post("/datasources/update-ui")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/2")
+                        .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -116,8 +115,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("type","MYSQL");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -133,8 +132,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","1");
         MvcResult mvcResult = mockMvc.perform(get("/datasources")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -156,8 +155,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("password","");
         paramsMap.add("other","");
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -169,11 +168,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Ignore
     @Test
     public void testConnectionTest() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/connect-by-id")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/2/connect-test")
+                        .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -187,8 +183,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","mysql");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/verify-name")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -202,8 +198,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -217,8 +213,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                        .header("sessionId", sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -230,7 +226,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testGetKerberosStartupState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
-                .header("sessionId", sessionId))
+                        .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -242,11 +238,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Ignore
     @Test
     public void testDelete() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","16");
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/delete")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+        MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
+                        .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
