@@ -1,6 +1,6 @@
 # Quick Start
 
-* Watch Apache DolphinScheduler Quick Start Tutorile here:
+* Watch Apache DolphinScheduler Quick Start Tutorial here:
   [![image](../../../../img/video_cover/quick-use.png)](https://www.youtube.com/watch?v=nrF20hpCkug)
 
 
@@ -45,17 +45,17 @@
 * Login with regular users
   > Click on the user name in the upper right corner to "exit" and re-use the normal user login.
 
-* `Project Management - > Create Project - > Click on Project Name`
+* `Project Management -> Create Project -> Project Name`
 
 ![project](../../../../img/new_ui/dev/quick-start/project.png)
 
-* `Click Workflow Definition - > Create Workflow Definition - > Online Process Definition`
+* `Click Workflow Definition -> Create Workflow Definition-> Online Process Definition`
 
 <p align="center">
    <img src="../../../../img/process_definition_en.png" width="60%" />
  </p>
 
-* `Running Process Definition - > Click Workflow Instance - > Click Process Instance Name - > Double-click Task Node - > View Task Execution Log`
+* `Running Process Definition -> Click Workflow Instance -> Click Process Instance Name -> Double-click Task Node -> View Task Execution Log`
 
  <p align="center">
    <img src="../../../../img/log_en.png" width="60%" />

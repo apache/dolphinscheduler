@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.expand.CuringGlobalParamsService;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -49,7 +49,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -239,7 +238,7 @@ public class WorkflowExecuteRunnable implements Runnable {
     /**
      * curing global params service
      */
-    private final CuringGlobalParamsService curingGlobalParamsService;
+    private final CuringParamsService curingParamsService;
 
     /**
      * @param processInstance         processInstance
@@ -255,14 +254,14 @@ public class WorkflowExecuteRunnable implements Runnable {
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
             , StateWheelExecuteThread stateWheelExecuteThread
-            , CuringGlobalParamsService curingGlobalParamsService) {
+            , CuringParamsService curingParamsService) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
-        this.curingGlobalParamsService = curingGlobalParamsService;
+        this.curingParamsService = curingParamsService;
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 
@@ -1008,7 +1007,7 @@ public class WorkflowExecuteRunnable implements Runnable {
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
                         processInstance.setScheduleTime(complementListDate.get(0));
-                        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                        String globalParams = curingParamsService.curingGlobalParams(processInstance.getId(),
                                 processDefinition.getGlobalParamMap(),
                                 processDefinition.getGlobalParamList(),
                                 CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));
