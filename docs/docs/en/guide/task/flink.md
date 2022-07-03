@@ -28,7 +28,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 | Delayed execution time | The time (unit minute) that a task delays in execution. |
 | Timeout alarm | Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail. |
 | Program type | Support Java, Scala, Python and SQL four languages. |
-| Class of main function**: The **full path** of Main Class, the entry point of the Flink program. |
+| Class of main function | The **full path** of Main Class, the entry point of the Flink program. |
 | Main jar package | The jar package of the Flink program (upload by Resource Center). |
 | Deployment mode | Support 2 deployment modes: cluster and local. |
 | Initialization script | Script file to initialize session context. |
