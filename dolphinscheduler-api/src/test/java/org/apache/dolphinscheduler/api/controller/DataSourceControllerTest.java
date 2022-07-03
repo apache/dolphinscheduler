@@ -24,18 +24,34 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.HashMap;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -43,8 +59,9 @@ import org.springframework.util.MultiValueMap;
 /**
  * data source controller test
  */
-public class DataSourceControllerTest extends AbstractControllerTest {
+public class DataSourceControllerTest extends AbstractControllerTest{
     private static final Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
+
 
     @Ignore
     @Test
@@ -72,10 +89,12 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     }
 
     @Ignore
-    @Test
-    public void testUpdateDataSource() throws Exception {
+    @ParameterizedTest
+    @ValueSource(ints = {2})
+    public void testUpdateDataSource(int args) throws Exception {
+        setUp();
         HashMap<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("id",2);
+        paramsMap.put("id",args);
         paramsMap.put("name","mysql");
         paramsMap.put("node","mysql data source test");
         paramsMap.put("type","mysql");
@@ -86,7 +105,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("userName","root");
         paramsMap.put("password","root@123");
         paramsMap.put("other",new HashMap<>());
-        MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
+        MvcResult mvcResult = mockMvc.perform(put("/datasources/"+args)
                         .header("sessionId", sessionId)
                         .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
@@ -98,22 +117,29 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     }
 
     @Ignore
-    @Test
-    public void testQueryDataSource() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/2")
+    @ParameterizedTest
+    @ValueSource(ints = {2})
+    public void testQueryDataSource(int id) throws Exception {
+        setUp();
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id)
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
+        after();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Test
-    public void testQueryDataSourceList() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+            "type, MYSQL"
+    })
+    public void testQueryDataSourceList(String key , String dbType) throws Exception {
+        setUp();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("type","MYSQL");
+        paramsMap.add(key,dbType);
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
                         .header("sessionId", sessionId)
                         .params(paramsMap))
@@ -166,9 +192,11 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     }
 
     @Ignore
-    @Test
-    public void testConnectionTest() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/2/connect-test")
+    @ParameterizedTest
+    @ValueSource(ints = {2})
+    public void testConnectionTest(int id) throws Exception {
+        setUp();
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id+"/connect-test")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -178,11 +206,15 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Test
-    public void testVerifyDataSourceName() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+            "type, MYSQL,/datasources/verify-name"
+    })
+    public void testVerifyDataSourceName(String key , String dbType,String url) throws Exception {
+        setUp();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","mysql");
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/verify-name")
+        paramsMap.add(key,dbType);
+        MvcResult mvcResult = mockMvc.perform(get(url)
                         .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -223,9 +255,11 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Test
-    public void testGetKerberosStartupState() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
+    @ParameterizedTest
+    @ValueSource(strings = {"/datasources/kerberos-startup-state"})
+    public void testGetKerberosStartupState(String url) throws Exception {
+        setUp();
+        MvcResult mvcResult = mockMvc.perform(get(url)
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -236,9 +270,10 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     }
 
     @Ignore
-    @Test
-    public void testDelete() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
+    @ParameterizedTest
+    @ValueSource(ints = {2})
+    public void testDelete(int id) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(delete("/datasources/"+id)
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
