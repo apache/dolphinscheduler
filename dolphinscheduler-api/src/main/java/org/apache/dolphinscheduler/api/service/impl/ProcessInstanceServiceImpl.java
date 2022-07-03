@@ -560,7 +560,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime, String globalParams, int timeout, String timezone) {
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
-            schedule = DateUtils.getScheduleDate(scheduleTime);
+            schedule = DateUtils.stringToDate(scheduleTime);
         }
         processInstance.setScheduleTime(schedule);
         List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);

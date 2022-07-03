@@ -193,7 +193,7 @@ public class BaseServiceImpl implements BaseService {
         Map<String, Object> result = new HashMap<>();
         Date start = null;
         if (!StringUtils.isEmpty(startDateStr)) {
-            start = DateUtils.getScheduleDate(startDateStr);
+            start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
@@ -203,7 +203,7 @@ public class BaseServiceImpl implements BaseService {
 
         Date end = null;
         if (!StringUtils.isEmpty(endDateStr)) {
-            end = DateUtils.getScheduleDate(endDateStr);
+            end = DateUtils.stringToDate(endDateStr);
             if (Objects.isNull(end)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
