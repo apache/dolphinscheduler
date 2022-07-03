@@ -16,7 +16,7 @@
 - Tenant Code: **Tenant Code is the only user on Linux and cannot be repeated**
 - The administrator enters the `Security Center->Tenant Management` page and clicks the `Create Tenant` button to create a tenant.
 
-![create-tenant](/img/new_ui/dev/security/create-tenant.png)
+![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
 ## Create Normal User
 
@@ -28,7 +28,7 @@
 
 - The administrator enters the `Security Center -> User Management` page and clicks the `Create User` button to create a user.
 
-![create-user](/img/new_ui/dev/security/create-user.png)
+![create-user](../../../../img/new_ui/dev/security/create-user.png)
 
 > **Edit user information**
 - The administrator enters the `Security Center->User Management` page and clicks the `Edit` button to edit user information.
@@ -44,7 +44,7 @@
 
 * The administrator enters the `Security Center -> Alarm Group Management` page and clicks the `Create Alarm Group` button to create an alarm group.
 
-![create-alarmInstance](/img/new_ui/dev/security/create-alarmInstance.png)
+![create-alarmInstance](../../../../img/new_ui/dev/security/create-alarmInstance.png)
 
 ## Token Management
 
@@ -52,7 +52,7 @@ Since the back-end interface has login check, token management provides a way to
 
 - The administrator enters the `Security Center -> Token Management page`, clicks the `Create Token` button, selects the expiration time and user, clicks the `Generate Token` button, and clicks the `Submit` button, then create the selected user's token successfully.
 
-![create-token](/img/new_ui/dev/security/create-token.png)
+![create-token](../../../../img/new_ui/dev/security/create-token.png)
 
 - After a normal user logs in, click the user information in the username drop-down box, enter the token management page, select the expiration time, click the `Generate Token` button, and click the `Submit` button, then the user creates a token successfully.
 - Call example:
@@ -137,12 +137,12 @@ worker.groups=default,test
 > Add or update environment
 - The environment configuration is equivalent to the configuration in the `dolphinscheduler_env.sh` file.
 
-![create-environment](/img/new_ui/dev/security/create-environment.png)
+![create-environment](../../../../img/new_ui/dev/security/create-environment.png)
 
 > Usage environment
 - Create a task node in the workflow definition, select the worker group and the environment corresponding to the worker group. When executing the task, the Worker will execute the environment first before executing the task.
 
-![use-environment](/img/new_ui/dev/security/use-environment.png)
+![use-environment](../../../../img/new_ui/dev/security/use-environment.png)
 
 ## Namespace Management
 
@@ -152,4 +152,4 @@ worker.groups=default,test
 > Add or update namespace
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
-![create-environment](/img/new_ui/dev/security/create-namespace.png)
+![create-environment](../../../../img/new_ui/dev/security/create-namespace.png)
