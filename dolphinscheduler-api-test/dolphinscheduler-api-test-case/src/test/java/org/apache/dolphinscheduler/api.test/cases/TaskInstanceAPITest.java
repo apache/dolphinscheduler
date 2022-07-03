@@ -60,10 +60,6 @@ public class TaskInstanceAPITest {
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
     }
 
-    @AfterAll
-    public static void cleanup() {
-        logger.info("success cleanup");
-    }
 
     @Test
     @Order(1)

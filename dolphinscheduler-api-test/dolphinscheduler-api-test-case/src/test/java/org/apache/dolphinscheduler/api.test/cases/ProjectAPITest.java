@@ -57,18 +57,14 @@ public class ProjectAPITest {
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
     }
 
-    @AfterAll
-    public static void cleanup() {
-        logger.info("success cleanup");
-    }
 
     @Test
-    @Order(1)
+    @Order(99)
     public void testCreateProject() {
         ProjectPage projectPage = new ProjectPage();
 
-        HttpResponse createProjectHttpResponse = projectPage.createProject(sessionId, projectName, "123", "admin");
-        System.out.println(createProjectHttpResponse.body());
+        HttpResponse createProjectHttpResponse = projectPage.createProject(sessionId, projectName, "123", user);
+        logger.info(String.valueOf(createProjectHttpResponse.body()));
         Assertions.assertTrue(createProjectHttpResponse.body().success());
     }
 
@@ -77,7 +73,7 @@ public class ProjectAPITest {
     public void testQeuryProject() {
         ProjectPage projectPage = new ProjectPage();
 
-        String aa = projectPage.getProjectCode(sessionId, "wen");
+        String aa = projectPage.getProjectCode(sessionId, projectName);
         System.out.println(aa);
     }
 

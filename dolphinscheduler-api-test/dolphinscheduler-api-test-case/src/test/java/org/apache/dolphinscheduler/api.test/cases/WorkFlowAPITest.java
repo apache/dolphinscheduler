@@ -60,13 +60,8 @@ public class WorkFlowAPITest {
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
     }
 
-    @AfterAll
-    public static void cleanup() {
-        logger.info("success cleanup");
-    }
-
     @Test
-    @Order(1)
+    @Order(99)
     public void testCreateWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
         flow.getGenNumId(sessionId,"wen");
@@ -88,7 +83,7 @@ public class WorkFlowAPITest {
     }
 
     @Test
-    @Order(1)
+    @Order(98)
     public void testOnlineWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
         HttpResponse res = flow.onLineWorkflow(sessionId, projectName, workFlowName);
@@ -100,7 +95,7 @@ public class WorkFlowAPITest {
 
 
     @Test
-    @Order(1)
+    @Order(97)
     public void testRunWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
         HttpResponse res = flow.runWorkflow(sessionId, projectName, workFlowName);

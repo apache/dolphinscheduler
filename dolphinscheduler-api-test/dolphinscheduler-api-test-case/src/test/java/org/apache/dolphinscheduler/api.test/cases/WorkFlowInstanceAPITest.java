@@ -39,8 +39,13 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class WorkFlowInstanceAPITest {
     private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
+
     private static final String tenant = System.getProperty("user.name");
+
     private static final String projectName = "wen";
+
+    private static final String workFlowName = "shell123";
+
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
@@ -57,11 +62,6 @@ public class WorkFlowInstanceAPITest {
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
     }
 
-    @AfterAll
-    public static void cleanup() {
-        logger.info("success cleanup");
-    }
-
     @Test
     @Order(1)
     public void testQueryWorkflow() {
@@ -69,7 +69,7 @@ public class WorkFlowInstanceAPITest {
 
         flow.getGenNumId(sessionId,"wen");
 
-        HttpResponse res = flow.createWorkflow(sessionId, "wen", "shell123");
+        HttpResponse res = flow.createWorkflow(sessionId, projectName, workFlowName);
 
     }
 
