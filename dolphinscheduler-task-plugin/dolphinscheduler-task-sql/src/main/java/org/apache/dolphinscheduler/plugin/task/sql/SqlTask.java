@@ -17,17 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -39,11 +40,9 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -54,14 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SqlTask extends AbstractTaskExecutor {
 
@@ -137,20 +129,20 @@ public class SqlTask extends AbstractTaskExecutor {
                     sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
-            List<SqlBinds> mainStatementSqlBinds = SqlSplitter.split(sqlParameters.getSql(), sqlParameters.getSegmentSeparator())
+            List<String> mainStatementSqlBinds = SqlSplitter.split(sqlParameters.getSql(), sqlParameters.getSegmentSeparator())
                     .stream()
-                    .map(this::getSqlAndSqlParamsMap)
+                    .map(this::parseSql)
                     .collect(Collectors.toList());
 
-            List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
+            List<String> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
                     .orElse(new ArrayList<>())
                     .stream()
-                    .map(this::getSqlAndSqlParamsMap)
+                    .map(this::parseSql)
                     .collect(Collectors.toList());
-            List<SqlBinds> postStatementSqlBinds = Optional.ofNullable(sqlParameters.getPostStatements())
+            List<String> postStatementSqlBinds = Optional.ofNullable(sqlParameters.getPostStatements())
                     .orElse(new ArrayList<>())
                     .stream()
-                    .map(this::getSqlAndSqlParamsMap)
+                    .map(this::parseSql)
                     .collect(Collectors.toList());
 
             List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncParametersList(), logger);
@@ -170,14 +162,14 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * execute function and sql
      *
-     * @param mainStatementsBinds main statements binds
-     * @param preStatementsBinds pre statements binds
-     * @param postStatementsBinds post statements binds
+     * @param mainStatements main statements
+     * @param preStatements pre statements
+     * @param postStatements post statements
      * @param createFuncs create functions
      */
-    public void executeFuncAndSql(List<SqlBinds> mainStatementsBinds,
-                                  List<SqlBinds> preStatementsBinds,
-                                  List<SqlBinds> postStatementsBinds,
+    public void executeFuncAndSql(List<String> mainStatements,
+                                  List<String> preStatements,
+                                  List<String> postStatements,
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
         try {
@@ -190,24 +182,24 @@ public class SqlTask extends AbstractTaskExecutor {
             }
 
             // pre execute
-            executeUpdate(connection, preStatementsBinds, "pre");
+            executeUpdate(connection, preStatements, "pre");
 
             // main execute
             String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
-                result = executeQuery(connection, mainStatementsBinds.get(0), "main");
+                result = executeQuery(connection, mainStatements.get(0), "main");
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
-                String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
+                String updateResult = executeUpdate(connection, mainStatements, "main");
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
             //deal out params
             sqlParameters.dealOutParam(result);
 
             // post execute
-            executeUpdate(connection, postStatementsBinds, "post");
+            executeUpdate(connection, postStatements, "post");
         } catch (Exception e) {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
@@ -291,20 +283,20 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
-        try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
-            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            ResultSet resultSet = statement.executeQuery();
+    private String executeQuery(Connection connection, String sql, String handlerType) throws Exception {
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            logger.info("{} statement execute query, for sql: {}", handlerType, sql);
             return resultProcess(resultSet);
         }
     }
 
-    private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
+    private String executeUpdate(Connection connection, List<String> sqls, String handlerType) throws Exception {
         int result = 0;
-        for (SqlBinds sqlBind : statementsBinds) {
-            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
-                result = statement.executeUpdate();
-                logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sqlBind.getSql());
+        for (String sql : sqls) {
+            try (Statement statement = connection.createStatement()) {
+                result = statement.executeUpdate(sql);
+                logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sql);
             }
         }
         return String.valueOf(result);
@@ -450,6 +442,13 @@ public class SqlTask extends AbstractTaskExecutor {
         }
         return content;
     }
+
+    private String parseSql(String sql) {
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
+        return ParameterUtils.convertParameterPlaceholders(sql, ParamUtils.convert(paramsMap));
+    }
+
+
 
     /**
      * create function list
