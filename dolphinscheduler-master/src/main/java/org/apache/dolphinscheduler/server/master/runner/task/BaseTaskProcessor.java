@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -73,6 +74,7 @@ import org.apache.dolphinscheduler.plugin.task.k8s.K8sTaskParameters;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -81,6 +83,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +98,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import lombok.NonNull;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -112,28 +117,28 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected int maxRetryTimes;
 
-    protected int commitInterval;
+    protected long commitInterval;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    protected ProcessService processService;
 
-    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+    protected MasterConfig masterConfig;
 
-    protected TaskPluginManager taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
+    protected TaskPluginManager taskPluginManager;
+
+    protected CuringParamsService curingParamsService;
 
     protected String threadLoggerInfoName;
 
     @Override
-    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
-        if (processService == null) {
-            processService = SpringApplicationContext.getBean(ProcessService.class);
-        }
-        if (masterConfig == null) {
-            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        }
+    public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
+        processService = SpringApplicationContext.getBean(ProcessService.class);
+        masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
+        curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
-        this.commitInterval = masterConfig.getTaskCommitInterval();
+        this.commitInterval = masterConfig.getTaskCommitInterval().toMillis();
     }
 
     protected javax.sql.DataSource defaultDataSource =
@@ -245,7 +250,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public String getType() {
-        return null;
+        throw new UnsupportedOperationException("This abstract class doesn's has type");
     }
 
     @Override
@@ -301,6 +306,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
         }
 
+        Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(processInstance);
+
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        Map<String, Property> propertyMap = curingParamsService.paramParsingPreparation(taskInstance, baseParam, processInstance);
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
@@ -309,6 +318,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildResourceParametersInfo(resources)
                 .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
                 .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)
+                .buildBusinessParamsMap(businessParamsMap)
+                .buildParamInfo(propertyMap)
                 .create();
     }
 

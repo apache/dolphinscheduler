@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+package org.apache.dolphinscheduler.service.expand;
 
-.table-card {
-  margin-top: 8px;
+import org.springframework.stereotype.Component;
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+@Component
+public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholderResolverExpandService {
+
+    @Override
+    public boolean timeFunctionNeedExpand(String placeholderName) {
+        return false;
+    }
+
+    @Override
+    public String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName) {
+        return null;
+    }
 }

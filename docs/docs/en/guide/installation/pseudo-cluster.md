@@ -89,7 +89,7 @@ alertServer="localhost"
 apiServers="localhost"
 
 # DolphinScheduler installation path, it will auto-create if not exists
-installPath="~/dolphinscheduler"
+installPath=~/dolphinscheduler
 
 # Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
