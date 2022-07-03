@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.metrics;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.*;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -37,12 +36,62 @@ public class WorkerServerMetrics {
             .description("full worker submit queues count")
             .register(Metrics.globalRegistry);
 
+    private static final Counter WORKER_RESOURCE_DOWNLOAD_COUNTER =
+            Counter.builder("ds.worker.resource.download.count")
+                    .description("worker resource download count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER =
+            Counter.builder("ds.worker.resource.download.success.count")
+                    .description("worker resource download success count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Counter WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER =
+            Counter.builder("ds.worker.resource.download.failure.count")
+                    .description("worker resource download failure count")
+                    .register(Metrics.globalRegistry);
+
+    private static final Timer WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER =
+            Timer.builder("ds.worker.resource.download.duration")
+                    .publishPercentiles(0.5, 0.75, 0.95, 0.99)
+                    .publishPercentileHistogram()
+                    .description("time cost of resource download on workers")
+                    .register(Metrics.globalRegistry);
+
+    private static final DistributionSummary WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION =
+            DistributionSummary.builder("ds.worker.resource.download.size")
+            .baseUnit("KB")
+            .publishPercentiles(0.5, 0.75, 0.95, 0.99)
+            .publishPercentileHistogram()
+            .description("size of downloaded resource files on worker")
+            .register(Metrics.globalRegistry);
+
     public static void incWorkerOverloadCount() {
         WORKER_OVERLOAD_COUNTER.increment();
     }
 
     public static void incWorkerSubmitQueueIsFullCount() {
         WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+    }
+
+    public static void incWorkerResourceDownloadCount() {
+        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+    }
+
+    public static void incWorkerResourceDownloadSuccessCount() {
+        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+    }
+
+    public static void incWorkerResourceDownloadFailureCount() {
+        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+    }
+
+    public static void recordWorkerResourceDownloadTime(long milliseconds) {
+        WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
+    }
+
+    public static void recordWorkerResourceDownloadSize(double size) {
+        WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION.record(size);
     }
 
     public static void registerWorkerRunningTaskGauge(Supplier<Number> supplier) {

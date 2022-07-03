@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
@@ -273,13 +275,20 @@ public class TaskExecuteThread implements Runnable, Delayed {
     public void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
         for (Pair<String, String> fileDownload : fileDownloads) {
             try {
+                WorkerServerMetrics.incWorkerResourceDownloadCount();
                 // query the tenant code of the resource according to the name of the resource
                 String fullName = fileDownload.getLeft();
                 String tenantCode = fileDownload.getRight();
                 String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
                 logger.info("get resource file from hdfs :{}", resHdfsPath);
+                Long resourceDownloadStartTime = System.currentTimeMillis();
                 storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
+                WorkerServerMetrics.recordWorkerResourceDownloadSize(
+                        FileUtils.getFileSizeInKB(execLocalPath + File.separator + fullName));
+                WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
             } catch (Exception e) {
+                WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
                 logger.error(e.getMessage(), e);
                 throw new ServiceException(e.getMessage());
             }

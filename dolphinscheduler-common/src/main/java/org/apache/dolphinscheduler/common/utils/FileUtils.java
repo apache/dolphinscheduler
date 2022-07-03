@@ -244,4 +244,15 @@ public class FileUtils {
         }
     }
 
+    /**
+     * Get file size in KB
+     *
+     * @param filename String type of filename
+     * @return file size in KB
+     */
+    public static double getFileSizeInKB(String filename){
+        File file = new File(filename);
+        return ((double) file.length()) / 1024;
+    }
+
 }

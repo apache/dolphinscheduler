@@ -74,7 +74,7 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.task.execution.count.by.type: (counter) the number of task executions grouped by tag `task_type`
 - ds.task.running: (gauge) the number of running tasks 
 - ds.task.prepared: (gauge) the number of tasks prepared for task queue 
-- ds.task.execution.count: (histogram) the number of executed tasks  
+- ds.task.execution.count: (counter) the number of executed tasks  
 - ds.task.execution.duration: (histogram) duration of task executions
 
 
