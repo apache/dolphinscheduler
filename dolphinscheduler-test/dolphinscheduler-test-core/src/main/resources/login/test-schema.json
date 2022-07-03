@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Product",
+  "description": "A product from Acme's catalog",
+  "type": "object",
+  "properties": {
+    "message": {
+      "description": "The unique identifier for a product",
+      "type": "string"
+    }
+  },
+  "required": [ "message" ]
+}
