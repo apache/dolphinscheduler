@@ -208,12 +208,18 @@ public final class DateUtils {
      * @param date date string
      * @return yyyy-MM-dd HH:mm:ss format
      */
-    public static Date stringToDate(String date) {
+    public static @Nullable Date stringToDate(String date) {
         return parse(date, YYYY_MM_DD_HH_MM_SS, null);
     }
 
     public static ZonedDateTime stringToZoneDateTime(@Nonnull String date) {
-        return ZonedDateTime.ofInstant(stringToDate(date).toInstant(), ZoneId.systemDefault());
+        Date d = stringToDate(date);
+        if (d == null) {
+            throw new IllegalArgumentException(String.format(
+                "data: %s should be a validate data string - yyyy-MM-dd HH:mm:ss ",
+                date));
+        }
+        return ZonedDateTime.ofInstant(d.toInstant(), ZoneId.systemDefault());
     }
 
     /**
