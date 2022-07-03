@@ -160,6 +160,15 @@ public class SqlTask extends AbstractTaskExecutor {
     }
 
     /**
+     * replace placeholder with parameter
+     * @param sql
+     * @return parsed sql
+     */
+    private String parseSql(String sql) {
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        return ParameterUtils.convertParameterPlaceholders(sql, ParamUtils.convert(paramsMap));
+    }
+    /**
      * execute function and sql
      *
      * @param mainStatements main statements
