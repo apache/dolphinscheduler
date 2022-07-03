@@ -1,7 +1,7 @@
 # Security (Authorization System)
 
 - Only the administrator account in the security center has the authority to operate. It has functions such as queue management, tenant management, user management, alarm group management, worker group management, token management, etc. In the user management module, can authorize to the resources, data sources, projects, etc.
-- Administrator login, the default username and password is `admin/dolphinscheduler123`
+- Administrator login, the default username and password is `admin/dolphinscheduler123`.
 
 ## Create Queue
 
