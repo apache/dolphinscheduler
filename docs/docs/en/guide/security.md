@@ -144,6 +144,16 @@ worker.groups=default,test
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
+## Cluster Management
+
+> Add or update cluster
+- Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
+
+> Usage cluster
+- After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
+
+![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
+
 ## Namespace Management
 
 > Add or update k8s cluster
@@ -154,12 +164,4 @@ worker.groups=default,test
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
 
-## Cluster Management
 
-> Add or update cluster
-- Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
-
-> Usage cluster
-- After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
-
-![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
