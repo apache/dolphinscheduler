@@ -14,7 +14,7 @@ The resource management and file management functions are similar. The differenc
 - Package name Class name: Enter the full path of the UDF function.
 - UDF resource: Set the resource file corresponding to the created UDF function.
 
-![create-udf](/img/new_ui/dev/resource/create-udf.png)
+![create-udf](../../../../img/new_ui/dev/resource/create-udf.png)
 
 ## Example
 
@@ -22,7 +22,7 @@ The resource management and file management functions are similar. The differenc
 
 You can customize UDF functions based on actual production requirements. Write a function that adds "HelloWorld" to the end of any string. As shown below:
 
-![code-udf](/img/new_ui/dev/resource/demo/udf-demo01.png)
+![code-udf](../../../../img/new_ui/dev/resource/demo/udf-demo01.png)
 
 ### Configure the UDF function
 
@@ -39,4 +39,4 @@ Enter the workflow and define an SQL node. Set the data source type to HIVE and 
 - SQL statement: `select HwUdf("abc");` This function is used in the same way as the built-in functions, and can be accessed directly using the function name.
 - UDF function: Select the one configured for the resource center.
 
-![use-udf](/img/new_ui/dev/resource/demo/udf-demo03.png)
+![use-udf](../../../../img/new_ui/dev/resource/demo/udf-demo03.png)
