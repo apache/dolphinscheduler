@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotal
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,7 @@ public class TenantAPITest {
     }
 
     @Test
-    @Order(99)
+    @Order(1)
     public void testCreateTenant() {
         TenantPage tenantPage = new TenantPage();
 
@@ -111,4 +110,5 @@ public class TenantAPITest {
 
         Assertions.assertTrue(deleteTenantHttpResponse.body().success());
     }
+
 }

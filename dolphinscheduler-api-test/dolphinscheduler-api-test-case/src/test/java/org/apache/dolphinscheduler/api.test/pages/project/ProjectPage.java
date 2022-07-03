@@ -79,7 +79,7 @@ public final class ProjectPage {
 
         HttpResponse res = requestClient.get("/projects", headers, params);
 
-        logger.info("项目 %s", res);
+        logger.info("project %s", res);
 
         for (ProjectListResponseTotalList ProjectListRes : JSONUtils.convertValue(res.body().data(), ProjectListResponseData.class).totalList()) {
             logger.info(ProjectListRes.code());
@@ -87,8 +87,5 @@ public final class ProjectPage {
         }
         return projectCode;
     }
-
-
-
 
 }

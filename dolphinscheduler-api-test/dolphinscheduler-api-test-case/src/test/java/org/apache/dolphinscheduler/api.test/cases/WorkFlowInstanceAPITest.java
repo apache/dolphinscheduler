@@ -24,13 +24,14 @@ import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
+import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +43,13 @@ public class WorkFlowInstanceAPITest {
 
     private static final String tenant = System.getProperty("user.name");
 
-    private static final String projectName = "wen";
+    private static final String projectName = "case03_wen";
+
+    private static final String projectDesc = "123";
 
     private static final String workFlowName = "shell123";
+
+    private static final String tenantName = "admin";
 
     private static final String user = "admin";
 
@@ -57,9 +62,18 @@ public class WorkFlowInstanceAPITest {
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
+        ProjectPage projectPage = new ProjectPage();
         HttpResponse loginHttpResponse = loginPage.login(user, password);
+        TenantPage tenantPage = new TenantPage();
+        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
 
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
+        projectPage.createProject(sessionId, projectName, projectDesc, user);
+        tenantPage.createTenant(sessionId, tenantName, 1, "");
+        flow.getGenNumId(sessionId, projectName);
+        flow.createWorkflow(sessionId, projectName, workFlowName);
+        flow.onLineWorkflow(sessionId, projectName, workFlowName);
+        flow.runWorkflow(sessionId, projectName, workFlowName);
     }
 
     @Test
@@ -67,13 +81,13 @@ public class WorkFlowInstanceAPITest {
     public void testQueryWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
 
-        flow.getGenNumId(sessionId,"wen");
+        flow.getGenNumId(sessionId, projectName);
 
-        HttpResponse res = flow.createWorkflow(sessionId, projectName, workFlowName);
+        HttpResponse res = flow.queryWorkflow(sessionId, projectName, workFlowName);
+
+        logger.info("Query workflow res：%s", res);
+        Assertions.assertTrue(res.body().success());
 
     }
-
-
-
 
 }

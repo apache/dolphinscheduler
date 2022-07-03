@@ -64,4 +64,5 @@ public final class TenantPage {
 
         return requestClient.delete(String.format("/tenants/%s", tenantId), headers, null);
     }
+
 }

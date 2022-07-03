@@ -22,11 +22,7 @@ package org.apache.dolphinscheduler.api.test.pages.project;
 
 import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowCreateRequestData;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseTotalList;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseData;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowRunRequestData;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.entity.*;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.slf4j.Logger;
@@ -55,35 +51,76 @@ public final class WorkFlowDefinitionPage {
         ArrayList list = (ArrayList) res.body().data();
         genNumId = list.get(0).toString();
 
-
     }
 
 
     public HttpResponse createWorkflow(String sessionId, String projectName, String workFlowName) {
-        Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
-
         WorkFlowCreateRequestData workFlowCreateRequestData = new WorkFlowCreateRequestData();
+        TaskDefinitionRequestData taskDefinitionRequestData = new TaskDefinitionRequestData();
+        TaskRelationRequestData taskRelationRequestData = new TaskRelationRequestData();
 
-        String taskDefinitionJson = "[{\"code\":" + genNumId + ",\"delayTime\":\"0\",\"description\":\"\",\"environmentCode\":-1,\"failRetryInterval\":\"1\",\"failRetryTimes\":\"0\",\"flag\":\"YES\",\"name\":\"echo_123\",\"taskParams\":{\"localParams\":[],\"rawScript\":\"echo 123\",\"resourceList\":[]},\"taskPriority\":\"MEDIUM\",\"taskType\":\"SHELL\",\"timeout\":0,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"workerGroup\":\"default\"}]";
-        String taskRelationJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":"+ genNumId + ",\"postTaskVersion\":0,\"conditionType\":\"NONE\",\"conditionParams\":{}}]";
-        String locations = "[{\"taskCode\":" + genNumId +",\"x\":33.5,\"y\":38.5}]";
-        workFlowCreateRequestData.setTaskDefinitionJson(taskDefinitionJson);
-        workFlowCreateRequestData.setTaskRelationJson(taskRelationJson);
-        workFlowCreateRequestData.setLocations(locations);
+        TaskParamsMap taskParams = new TaskParamsMap();
+        ArrayList<Object> localParams = new ArrayList<>();
+        ArrayList<Object> resourceList = new ArrayList<>();
+        taskParams.setLocalParams(localParams);
+        taskParams.setResourceList(resourceList);
+        taskParams.setRawScript("echo 123");
+
+        taskDefinitionRequestData.setCode(genNumId);
+        taskDefinitionRequestData.setDelayTime("0");
+        taskDefinitionRequestData.setDescription("");
+        taskDefinitionRequestData.setEnvironmentCode("-1");
+        taskDefinitionRequestData.setFailRetryInterval("1");
+        taskDefinitionRequestData.setFailRetryTimes("0");
+        taskDefinitionRequestData.setFlag("YES");
+        taskDefinitionRequestData.setName("echo_123");
+        taskDefinitionRequestData.setTaskParams(taskParams);
+        taskDefinitionRequestData.setTaskPriority("MEDIUM");
+        taskDefinitionRequestData.setTaskType("SHELL");
+        taskDefinitionRequestData.setTimeout(0);
+        taskDefinitionRequestData.setTimeoutFlag("CLOSE");
+        taskDefinitionRequestData.setTimeoutNotifyStrategy("");
+        taskDefinitionRequestData.setWorkerGroup("default");
+        ArrayList<Object> taskDefinitionRequestDataList = new ArrayList<>();
+        taskDefinitionRequestDataList.add(taskDefinitionRequestData);
+
+        HashMap<String, Object> conditionParams = new HashMap();
+        taskRelationRequestData.setName("");
+        taskRelationRequestData.setPreTaskCode(0);
+        taskRelationRequestData.setPreTaskVersion(0);
+        taskRelationRequestData.setPreTaskCode(0);
+        taskRelationRequestData.setPostTaskCode(genNumId);
+        taskRelationRequestData.setConditionType("NONE");
+        taskRelationRequestData.setConditionParams(conditionParams);
+        ArrayList<Object> taskRelationRequestDataList = new ArrayList<>();
+        taskRelationRequestDataList.add(taskRelationRequestData);
+
+        HashMap<String, Object> locations = new HashMap();
+        locations.put("taskCode", genNumId);
+        locations.put("x", 33.5);
+        locations.put("y", 38.5);
+        ArrayList<Object> locationsList = new ArrayList<>();
+        locationsList.add(locations);
+
+
+        workFlowCreateRequestData.setLocations(JSONUtils.toJsonString(locationsList));
+        workFlowCreateRequestData.setTaskDefinitionJson(JSONUtils.toJsonString(taskDefinitionRequestDataList));
+        workFlowCreateRequestData.setTaskRelationJson(JSONUtils.toJsonString(taskRelationRequestDataList));
         workFlowCreateRequestData.setName(workFlowName);
         workFlowCreateRequestData.setTenantCode("admin");
         workFlowCreateRequestData.setExecutionType("PARALLEL");
         workFlowCreateRequestData.setDescription("");
         workFlowCreateRequestData.setGlobalParams("[]");
         workFlowCreateRequestData.setTimeout(0);
+
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
 
+        logger.info(String.valueOf(workFlowCreateRequestData));
         HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition", headers, JSONUtils.convertValue(workFlowCreateRequestData, Map.class));
-        logger.info("创建工作流结果：%s", res);
         return res;
     }
 
@@ -99,7 +136,6 @@ public final class WorkFlowDefinitionPage {
         String projectCode = project.getProjectCode(sessionId, projectName);
         HttpResponse res = requestClient.get("/projects/"+ projectCode + "/process-definition", headers, params);
 
-        logger.info("查询工作流结果：%s\n", res);
         for (WorkFlowResponseTotalList workFlowList : JSONUtils.convertValue(res.body().data(), WorkFlowResponseData.class).totalList()) {
             workFlowCode =  workFlowList.code();
         }
@@ -120,7 +156,6 @@ public final class WorkFlowDefinitionPage {
         String projectCode = project.getProjectCode(sessionId, projectName);
         HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition/"+workFlowCode+"/release", headers, params);
 
-        logger.info("上线工作流：%s", res);
         return res;
 
     }
@@ -155,7 +190,6 @@ public final class WorkFlowDefinitionPage {
         String projectCode = project.getProjectCode(sessionId, projectName);
         HttpResponse res = requestClient.post("/projects/"+projectCode+"/executors/start-process-instance", headers, JSONUtils.convertValue(workFlowRunRequestData, Map.class));
 
-        logger.info("运行工作流：%s", res);
         return res;
 
     }

@@ -24,9 +24,10 @@ import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
+import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,13 @@ import org.slf4j.LoggerFactory;
 public class WorkFlowAPITest {
     private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
 
-    private static final String projectName = "wen";
+    private static final String projectName = "case02_wen";
+
+    private static final String projectDesc = "123";
 
     private static final String workFlowName = "shell123";
+
+    private static final String tenantName = "admin";
 
     private static final String user = "admin";
 
@@ -50,60 +55,61 @@ public class WorkFlowAPITest {
 
     private static String sessionId = null;
 
-    private static String genNumId = null;
-
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
+        ProjectPage projectPage = new ProjectPage();
         HttpResponse loginHttpResponse = loginPage.login(user, password);
+        TenantPage tenantPage = new TenantPage();
 
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
-    }
+        projectPage.createProject(sessionId, projectName, projectDesc, user);
+        tenantPage.createTenant(sessionId, tenantName, 1, "");
 
-    @Test
-    @Order(99)
-    public void testCreateWorkflow() {
-        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
-        flow.getGenNumId(sessionId,"wen");
-        HttpResponse res = flow.createWorkflow(sessionId, projectName, workFlowName);
-        System.out.println(res);
-        System.out.println(res.body());
-        Assertions.assertTrue(res.body().success());
     }
 
     @Test
     @Order(1)
-    public void testQueryWorkflow() {
+    public void testCreateWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
-        flow.getGenNumId(sessionId,"wen");
-        HttpResponse res = flow.queryWorkflow(sessionId, projectName, workFlowName);
-        System.out.println(res);
-        System.out.println(res.body());
+        flow.getGenNumId(sessionId, projectName);
+        HttpResponse res = flow.createWorkflow(sessionId, projectName, workFlowName);
+
+        logger.info("Create workflow res：%s", res);
         Assertions.assertTrue(res.body().success());
     }
 
     @Test
-    @Order(98)
+    @Order(2)
     public void testOnlineWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
         HttpResponse res = flow.onLineWorkflow(sessionId, projectName, workFlowName);
-        System.out.println(res);
-        System.out.println(res.body());
+
+        logger.info("Online workflow res：%s", res);
         Assertions.assertTrue(res.body().success());
 
     }
 
+    @Test
+    @Order(3)
+    public void testQueryWorkflow() {
+        WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
+        flow.getGenNumId(sessionId, projectName);
+        HttpResponse res = flow.queryWorkflow(sessionId, projectName, workFlowName);
+
+        logger.info("Query workflow res：%s", res);
+        Assertions.assertTrue(res.body().success());
+    }
 
     @Test
-    @Order(97)
+    @Order(4)
     public void testRunWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
         HttpResponse res = flow.runWorkflow(sessionId, projectName, workFlowName);
-        System.out.println(res);
-        System.out.println(res.body());
+
+        logger.info("Run workflow res：%s", res);
         Assertions.assertTrue(res.body().success());
 
     }
-
 
 }

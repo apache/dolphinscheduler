@@ -75,7 +75,6 @@ public final class TaskInstancePage {
 
     }
 
-
     public HttpResponse queryTaskInstanceLog(String sessionId, String projectName, String workFlowName){
         Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
@@ -97,9 +96,5 @@ public final class TaskInstancePage {
         return res;
 
     }
-
-
-
-
 
 }

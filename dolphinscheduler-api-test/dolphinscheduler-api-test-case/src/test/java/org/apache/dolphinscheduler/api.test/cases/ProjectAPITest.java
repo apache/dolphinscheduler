@@ -21,12 +21,10 @@ package org.apache.dolphinscheduler.api.test.cases;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
+import org.apache.dolphinscheduler.api.test.entity.*;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,14 +38,15 @@ import org.slf4j.LoggerFactory;
 public class ProjectAPITest {
     private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
 
-    private static final String projectName = "wen";
+    private static final String projectName = "case01_wen";
+
+    private static final String projectDesc = "123";
 
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
 
     private static String sessionId = null;
-
 
     @BeforeAll
     public static void setup() {
@@ -57,27 +56,14 @@ public class ProjectAPITest {
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
     }
 
-
     @Test
-    @Order(99)
+    @Order(1)
     public void testCreateProject() {
         ProjectPage projectPage = new ProjectPage();
 
-        HttpResponse createProjectHttpResponse = projectPage.createProject(sessionId, projectName, "123", user);
-        logger.info(String.valueOf(createProjectHttpResponse.body()));
-        Assertions.assertTrue(createProjectHttpResponse.body().success());
+        HttpResponse res = projectPage.createProject(sessionId, projectName, projectDesc, user);
+        logger.info(String.valueOf(res.body()));
+        Assertions.assertTrue(res.body().success());
     }
-
-    @Test
-    @Order(1)
-    public void testQeuryProject() {
-        ProjectPage projectPage = new ProjectPage();
-
-        String aa = projectPage.getProjectCode(sessionId, projectName);
-        System.out.println(aa);
-    }
-
-
-
 
 }

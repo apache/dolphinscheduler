@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.TaskInstancePage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class TaskInstanceAPITest {
     private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
 
-    private static final String projectName = "wen";
+    private static final String projectName = "case03_wen";
 
     private static final String workFlowName = "shell123";
 
@@ -60,7 +59,6 @@ public class TaskInstanceAPITest {
         sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
     }
 
-
     @Test
     @Order(1)
     public void testQueryTaskInstance() {
@@ -73,15 +71,13 @@ public class TaskInstanceAPITest {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     public void testQueryTaskInstanceLog() {
         TaskInstancePage taskInstance = new TaskInstancePage();
         HttpResponse res = taskInstance.queryTaskInstanceLog(sessionId, projectName, workFlowName);
-        System.out.println(res.body());
+        logger.info(String.valueOf(res.body()));
         Assertions.assertTrue(res.body().success());
 
     }
-
-
 
 }
