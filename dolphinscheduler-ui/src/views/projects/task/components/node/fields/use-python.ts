@@ -18,7 +18,7 @@ import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources } from '.'
 import type { IJsonItem } from '../types'
 
-export function useShell(model: { [field: string]: any }): IJsonItem[] {
+export function usePython(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
   return [
@@ -32,7 +32,7 @@ export function useShell(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.script_tips')
       },
       props: {
-        language: 'shell'
+        language: 'python'
       }
     },
     useResources(),

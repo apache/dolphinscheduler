@@ -78,7 +78,7 @@ export function usePython({
       ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.usePython(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

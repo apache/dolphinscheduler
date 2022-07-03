@@ -292,6 +292,9 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'trigger'],
         required: true,
         message: t('project.node.sql_empty_tips')
+      },
+      props: {
+        language: 'sql'
       }
     },
     {
