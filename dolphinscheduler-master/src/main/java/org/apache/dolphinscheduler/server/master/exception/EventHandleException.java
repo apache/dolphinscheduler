@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
+package org.apache.dolphinscheduler.server.master.exception;
 
-import java.util.Collection;
+public class EventHandleException
+    extends Exception {
 
-/**
- * selector
- * @param <T> T
- */
-public interface Selector<T> {
+    public EventHandleException(String message) {
+        super(message);
+    }
 
-    /**
-     * select
-     * @param source source, the given source should not be empty.
-     * @return T
-     */
-    T select(Collection<T> source);
+    public EventHandleException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }

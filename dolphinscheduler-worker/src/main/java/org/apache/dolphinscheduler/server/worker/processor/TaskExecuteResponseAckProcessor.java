@@ -58,7 +58,15 @@ public class TaskExecuteResponseAckProcessor implements NettyRequestProcessor {
         if (taskExecuteResponseAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponseCache.get().removeResponseCache(taskExecuteResponseAckCommand.getTaskInstanceId());
             TaskCallbackService.remove(taskExecuteResponseAckCommand.getTaskInstanceId());
-            logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteResponseAckCommand.getTaskInstanceId());
+            if (logger.isDebugEnabled()) {
+                logger.debug("remove REMOTE_CHANNELS, task instance id:{}",
+                    taskExecuteResponseAckCommand.getTaskInstanceId());
+            }
+        } else if (taskExecuteResponseAckCommand.getStatus() == ExecutionStatus.FAILURE.getCode()) {
+            // master handle worker response error, will still retry
+        } else {
+            throw new IllegalArgumentException("Invalid task execute response ack status: "
+                + taskExecuteResponseAckCommand.getStatus());
         }
     }
 

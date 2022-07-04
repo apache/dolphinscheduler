@@ -62,7 +62,8 @@ public class StateEventProcessor implements NettyRequestProcessor {
         }
         stateEvent.setProcessInstanceId(stateEventChangeCommand.getDestProcessInstanceId());
         stateEvent.setTaskInstanceId(stateEventChangeCommand.getDestTaskInstanceId());
-        StateEventType type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
+        StateEventType
+            type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
         stateEvent.setType(type);
 
         try {

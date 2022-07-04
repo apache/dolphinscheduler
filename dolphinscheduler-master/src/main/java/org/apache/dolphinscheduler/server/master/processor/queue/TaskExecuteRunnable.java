@@ -193,6 +193,7 @@ public class TaskExecuteRunnable implements Runnable {
                 }
             }
             // if taskInstance is null (maybe deleted) or finish. retry will be meaningless . so ack success
+            // send ack to worker
             TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
             channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
         } catch (Exception e) {

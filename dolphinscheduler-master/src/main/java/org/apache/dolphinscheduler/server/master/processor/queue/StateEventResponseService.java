@@ -98,6 +98,7 @@ public class StateEventResponseService {
      */
     public void addResponse(StateEvent stateEvent) {
         try {
+            // check the event is validated
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
             logger.error("Put state event : {} error", stateEvent, e);

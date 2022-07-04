@@ -40,11 +40,11 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -70,6 +70,7 @@ import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.exception.EventHandleException;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
@@ -77,6 +78,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
@@ -286,13 +288,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         while (!this.stateEvents.isEmpty()) {
             try {
                 StateEvent stateEvent = this.stateEvents.peek();
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                    stateEvent.getTaskInstanceId());
+                // todo: check if the event belongs to the current process, if not belongs directly drop it
+                // if state handle success then will remove this state, otherwise will retry this state next time.
+                // The state should always handle success except database error.
                 if (stateEventHandler(stateEvent)) {
                     this.stateEvents.remove(stateEvent);
                 }
             } catch (Exception e) {
                 // we catch the exception here, since if the state event handle failed, the state event will still keep in the stateEvents queue.
                 logger.error("state handle error:", e);
+                // todo: we need to distinguish exception. In most of time, the state handle will not throw exception, except the database error or network error or BUG
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
@@ -330,7 +338,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return this.processInstance;
     }
 
-    private boolean stateEventHandler(StateEvent stateEvent) {
+    /**
+     * Handle the given state change event, if handle success will return true,
+     * if handle failed will return false or throw exception.
+     */
+    private boolean stateEventHandler(StateEvent stateEvent) throws EventHandleException {
         logger.info("process event: {}", stateEvent);
 
         if (!checkProcessInstance(stateEvent)) {
@@ -369,9 +381,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 break;
         }
 
-        if (result) {
-            this.stateEvents.remove(stateEvent);
-        }
         return result;
     }
 
@@ -460,9 +469,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             return true;
         }
-        logger.error("state handler error: {}", stateEvent);
-
-        return true;
+        logger.error("task state event handler error: {}", stateEvent);
+        return false;
     }
 
     private void taskFinished(TaskInstance taskInstance) {
@@ -697,13 +705,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return Optional.empty();
     }
 
-    private boolean processStateChangeHandler(StateEvent stateEvent) {
+    private boolean processStateChangeHandler(StateEvent stateEvent) throws EventHandleException {
         try {
-            logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
+            logger.info("process:{} state {} change to {}",
+                processInstance.getId(),
+                processInstance.getState(),
+                stateEvent.getExecutionStatus());
 
             if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
                 // serial wait execution type needs to wake up the waiting process
-                if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()) {
+                if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
+                    .typeIsSerialPriority()) {
                     endProcess();
                     return true;
                 }
@@ -721,16 +733,15 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             return true;
         } catch (Exception e) {
-            logger.error("process state change error:", e);
+            throw new EventHandleException("workflow state handle error", e);
         }
-        return true;
     }
 
-    private boolean processBlockHandler(StateEvent stateEvent) {
+    private boolean processBlockHandler(StateEvent stateEvent) throws EventHandleException {
         try {
             Optional<TaskInstance> taskInstanceOptional = getTaskInstance(stateEvent.getTaskInstanceId());
-            TaskInstance task = taskInstanceOptional.orElseThrow(
-                    () -> new RuntimeException("Cannot find taskInstance by taskInstanceId:" + stateEvent.getTaskInstanceId()));
+            TaskInstance task = taskInstanceOptional.orElseThrow(() -> new RuntimeException(
+                "Cannot find taskInstance by taskInstanceId:" + stateEvent.getTaskInstanceId()));
             if (!checkTaskInstanceByStateEvent(stateEvent)) {
                 logger.error("task {} is not a blocking task", task.getTaskCode());
                 return false;
@@ -738,17 +749,18 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
             BlockingParameters parameters = JSONUtils.parseObject(task.getTaskParams(), BlockingParameters.class);
             if (parameters.isAlertWhenBlocking()) {
-                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+                ProjectUser projectUser =
+                    processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
                 processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
                 logger.info("processInstance {} block alert send successful!", processInstance.getId());
             }
+            return true;
         } catch (Exception e) {
-            logger.error("sending blocking message error:", e);
+            throw new EventHandleException("workflow blocking event error", e);
         }
-        return true;
     }
 
-    private boolean processComplementData() throws Exception {
+    private boolean processComplementData() {
         if (!needComplementProcess()) {
             return false;
         }
@@ -1113,6 +1125,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             Host host = new Host(taskInstance.getHost());
             nettyExecutorManager.doExecute(host, hostUpdateCommand.convert2Command());
         } catch (Exception e) {
+            // Do we need to catch this exception?
             logger.error("notify process host update", e);
         }
     }
@@ -1710,14 +1723,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return true;
         }
 
-        try {
-            Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-            Date endTime = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-            return processInstance.getScheduleTime().equals(endTime);
-        } catch (Exception e) {
-            logger.error("complement end failed ", e);
-            return false;
-        }
+        Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+        Date endTime = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        return processInstance.getScheduleTime().equals(endTime);
     }
 
     /**
@@ -1727,17 +1735,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private void updateProcessInstanceState() {
         ExecutionStatus state = getProcessInstanceState(processInstance);
         if (processInstance.getState() != state) {
-            logger.info(
-                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
-                    processInstance.getId(), processInstance.getName(),
-                    processInstance.getState(), state,
-                    processInstance.getCommandType());
-
-            processInstance.setState(state);
-            if (state.typeIsFinished()) {
-                processInstance.setEndTime(new Date());
-            }
-            processService.updateProcessInstance(processInstance);
+            updateWorkflowInstanceStatesToDB(state);
 
             StateEvent stateEvent = new StateEvent();
             stateEvent.setExecutionStatus(processInstance.getState());
@@ -1754,18 +1752,31 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private void updateProcessInstanceState(StateEvent stateEvent) {
         ExecutionStatus state = stateEvent.getExecutionStatus();
-        if (processInstance.getState() != state) {
-            logger.info(
-                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
-                    processInstance.getId(), processInstance.getName(),
-                    processInstance.getState(), state,
-                    processInstance.getCommandType());
+        updateWorkflowInstanceStatesToDB(state);
+    }
 
-            processInstance.setState(state);
-            if (state.typeIsFinished()) {
+    private void updateWorkflowInstanceStatesToDB(ExecutionStatus newStates) {
+        ExecutionStatus originStates = processInstance.getState();
+        if (originStates != newStates) {
+            logger.info("work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
+                processInstance.getId(),
+                processInstance.getName(),
+                originStates,
+                newStates,
+                processInstance.getCommandType());
+
+            processInstance.setState(newStates);
+            if (newStates.typeIsFinished()) {
                 processInstance.setEndTime(new Date());
             }
-            processService.updateProcessInstance(processInstance);
+            try {
+                processService.updateProcessInstance(processInstance);
+            } catch (Exception ex) {
+                // recover the status
+                processInstance.setState(originStates);
+                processInstance.setEndTime(null);
+                throw ex;
+            }
         }
     }
 
@@ -1785,18 +1796,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param taskInstance task instance
      */
     private void addTaskToStandByList(TaskInstance taskInstance) {
-        try {
-            if (readyToSubmitTaskQueue.contains(taskInstance)) {
-                logger.warn("task was found in ready submit queue, task code:{}", taskInstance.getTaskCode());
-                return;
-            }
-            logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
-                    taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
-            TaskMetrics.incTaskSubmit();
-            readyToSubmitTaskQueue.put(taskInstance);
-        } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue, taskName:{}, task id:{}", taskInstance.getName(), taskInstance.getId(), e);
+        if (readyToSubmitTaskQueue.contains(taskInstance)) {
+            logger.warn("task was found in ready submit queue, task code:{}", taskInstance.getTaskCode());
+            return;
         }
+        logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
+            taskInstance.getName(),
+            taskInstance.getId(),
+            taskInstance.getTaskCode());
+        TaskMetrics.incTaskSubmit();
+        readyToSubmitTaskQueue.put(taskInstance);
     }
 
     /**
@@ -1805,13 +1814,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param taskInstance task instance
      */
     private void removeTaskFromStandbyList(TaskInstance taskInstance) {
-        try {
-            readyToSubmitTaskQueue.remove(taskInstance);
-        } catch (Exception e) {
-            logger.error("remove task instance from readyToSubmitTaskQueue error, task id:{}, Name: {}",
-                    taskInstance.getId(),
-                    taskInstance.getName(), e);
-        }
+        readyToSubmitTaskQueue.remove(taskInstance);
     }
 
     /**
