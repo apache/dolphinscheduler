@@ -32,9 +32,11 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.slf4j.Logger;
 
 
+import java.util.concurrent.TimeUnit;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @DisplayName("Tenant E2E test")
 public class TenantE2ETest extends AbstractTenantApiTest {
@@ -48,6 +50,9 @@ public class TenantE2ETest extends AbstractTenantApiTest {
     static void setupClass() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
+        driver.manage().timeouts()
+                .implicitlyWait(5, TimeUnit.SECONDS)
+                .pageLoadTimeout(5, TimeUnit.SECONDS);
         browser = new Browser(driver, "http://localhost:3000/login");
         browser.go();
         try {

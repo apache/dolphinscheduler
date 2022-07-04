@@ -30,11 +30,5 @@
 
     <artifactId>dolphinscheduler-test-core</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-apis-test</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 </project>

@@ -33,11 +33,6 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-e2e-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-test-core</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>test</scope>
