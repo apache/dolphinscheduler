@@ -2075,6 +2075,7 @@ public class ProcessServiceImpl implements ProcessService {
         cmd.setCommandParam(String.format("{\"%s\":%d}", Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
+        cmd.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         createCommand(cmd);
     }
 
