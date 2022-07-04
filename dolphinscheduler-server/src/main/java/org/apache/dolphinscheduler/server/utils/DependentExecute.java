@@ -115,16 +115,16 @@ public class DependentExecute {
                         dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode());
                 return DependResult.WAITING;
             }
-            if (!processInstance.getState().typeIsFinished()) {
-                logger.info("Wait for the dependent workflow to complete, processDefiniteCode:{}, taskCode:{}, processInstanceId:{}, processInstance state:{}",
-                        dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(), processInstance.getId(), processInstance.getState());
-                return DependResult.WAITING;
-            }
             // need to check workflow for updates, so get all task and check the task state
             if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                if (!processInstance.getState().typeIsFinished()) {
+                    logger.info("Wait for the dependent workflow to complete, processDefiniteCode:{}, taskCode:{}, processInstanceId:{}, processInstance state:{}",
+                        dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(), processInstance.getId(), processInstance.getState());
+                    return DependResult.WAITING;
+                }
                 result = dependResultByProcessInstance(processInstance, dateInterval);
             } else {
-                result = getDependTaskResult(dependentItem.getDepTaskCode(), dateInterval);
+                result = getDependTaskResult(processInstance, dependentItem.getDepTaskCode(), dateInterval);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -192,10 +192,15 @@ public class DependentExecute {
     /**
      * get depend task result
      */
-    private DependResult getDependTaskResult(long taskCode, DateInterval dateInterval) {
+    private DependResult getDependTaskResult(ProcessInstance processInstance, long taskCode, DateInterval dateInterval) {
         TaskInstance taskInstance = processService.findLastTaskInstanceInterval(taskCode, dateInterval);
         DependResult result;
         if (taskInstance == null) {
+            if (!processInstance.getState().typeIsFinished()) {
+                logger.info("Wait for the dependent workflow to complete, taskCode:{}, processInstanceId:{}, processInstance state:{}",
+                    taskCode, processInstance.getId(), processInstance.getState());
+                return DependResult.WAITING;
+            }
             TaskDefinition taskDefinition = processService.findTaskDefinitionByCode(taskCode);
             if (taskDefinition == null) {
                 logger.error("Cannot find the task definition, something error, taskCode: {}", taskCode);
