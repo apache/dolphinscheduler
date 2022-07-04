@@ -297,7 +297,7 @@ public class CronUtils {
         String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
         if (StringUtils.isNotEmpty(scheduleDates)) {
             for (String stringDate : scheduleDates.split(COMMA)) {
-                result.add(DateUtils.stringToDate(stringDate));
+                result.add(DateUtils.stringToDate(stringDate.trim()));
             }
             return result;
         }
