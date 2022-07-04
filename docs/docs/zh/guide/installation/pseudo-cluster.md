@@ -139,7 +139,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 
 ## 初始化数据库
 
-请参考 [通用配置](../howto/general-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
+请参考 [数据源配置](../howto/datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 
 ## 启动 DolphinScheduler
 

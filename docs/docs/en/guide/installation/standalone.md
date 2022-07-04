@@ -49,4 +49,4 @@ sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ## Database Configuration
 
 Standalone server use H2 database as its metadata store, it is easy and users do not need to start database before they set up server.
-But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [general-setting](../howto/general-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database
+But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database
