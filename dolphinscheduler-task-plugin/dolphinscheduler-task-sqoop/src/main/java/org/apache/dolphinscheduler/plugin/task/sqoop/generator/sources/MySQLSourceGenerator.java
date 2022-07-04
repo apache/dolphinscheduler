@@ -36,6 +36,7 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TABLE
 
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopColumnType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
@@ -89,9 +90,11 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                                 .append(SPACE).append(sourceMysqlParameter.getSrcTable());
                         }
 
-                        if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
-                            mysqlSourceSb.append(SPACE).append(COLUMNS)
-                                .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
+                        if(sourceMysqlParameter.getSrcColumnType() == SqoopColumnType.SOME_COLUMNS.getCode()){
+                            if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
+                                mysqlSourceSb.append(SPACE).append(COLUMNS)
+                                    .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
+                            }
                         }
                     } else if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
                         && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
