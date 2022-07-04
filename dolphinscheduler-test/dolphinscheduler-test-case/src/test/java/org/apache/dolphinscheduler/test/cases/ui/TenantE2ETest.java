@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
+@DisplayName("Tenant E2E test")
 public class TenantE2ETest extends AbstractTenantApiTest {
     private static final String tenant = System.getProperty("user.name");
     private static final Logger log = getLogger(TenantE2ETest.class);
