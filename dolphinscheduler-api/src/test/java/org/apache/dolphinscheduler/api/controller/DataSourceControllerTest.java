@@ -258,6 +258,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     @ParameterizedTest
     @ValueSource(ints = {2})
     public void testDelete(int id) throws Exception {
+        setUp();
         MvcResult mvcResult = mockMvc.perform(delete("/datasources/"+id)
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
