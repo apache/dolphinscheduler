@@ -1,11 +1,11 @@
 package org.apache.dolphinscheduler.test.cases.api;
 
-import org.apache.dolphinscheduler.test.apis.EndPoints;
-import org.apache.dolphinscheduler.test.apis.common.FormParam;
-import org.apache.dolphinscheduler.test.apis.login.entity.LoginResponseEntity;
-import org.apache.dolphinscheduler.test.apis.login.form.LoginFormData;
-import org.apache.dolphinscheduler.test.base.AbstractControllerTest;
-import org.apache.dolphinscheduler.test.utils.Status;
+import org.apache.dolphinscheduler.test.cases.common.AbstractApiTest;
+import org.apache.dolphinscheduler.test.endpoint.EndPoints;
+import org.apache.dolphinscheduler.test.endpoint.api.common.FormParam;
+import org.apache.dolphinscheduler.test.endpoint.api.login.entity.LoginResponseEntity;
+import org.apache.dolphinscheduler.test.endpoint.api.login.form.LoginFormData;
+import org.apache.dolphinscheduler.test.endpoint.utils.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DisplayName("User Login API interface test")
-public class LoginApiTest extends AbstractControllerTest {
+public class LoginApiTest extends AbstractApiTest {
 
     @Test
     @DisplayName("Test the correct user information to log in to the system")

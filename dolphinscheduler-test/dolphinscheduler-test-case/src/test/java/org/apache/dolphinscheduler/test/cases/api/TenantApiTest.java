@@ -1,26 +1,25 @@
 package org.apache.dolphinscheduler.test.cases.api;
 
 import com.devskiller.jfairy.Fairy;
-import org.apache.dolphinscheduler.test.apis.EndPoints;
-import org.apache.dolphinscheduler.test.apis.common.FormParam;
-import org.apache.dolphinscheduler.test.apis.common.PageParamEntity;
-import org.apache.dolphinscheduler.test.apis.configCenter.tenant.entity.TenantRequestEntity;
-import org.apache.dolphinscheduler.test.apis.configCenter.tenant.entity.TenantResponseEntity;
-import org.apache.dolphinscheduler.test.base.AbstractControllerTest;
-import org.apache.dolphinscheduler.test.utils.RestResponse;
-import org.apache.dolphinscheduler.test.utils.Result;
+import org.apache.dolphinscheduler.test.cases.common.AbstractApiTest;
+import org.apache.dolphinscheduler.test.cases.common.AbstractTenantApiTest;
+import org.apache.dolphinscheduler.test.endpoint.api.common.FormParam;
+import org.apache.dolphinscheduler.test.endpoint.api.common.PageParamEntity;
+import org.apache.dolphinscheduler.test.endpoint.api.security.tenant.TenantEndPoints;
+import org.apache.dolphinscheduler.test.endpoint.api.security.tenant.entity.TenantRequestEntity;
+import org.apache.dolphinscheduler.test.endpoint.api.security.tenant.entity.TenantResponseEntity;
+import org.apache.dolphinscheduler.test.endpoint.utils.RestResponse;
+import org.apache.dolphinscheduler.test.endpoint.utils.Result;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@DisplayName("Tenant API interface test")
-public class TenantApiTest extends AbstractControllerTest {
-    private final Fairy fairy = Fairy.create();
-    private TenantResponseEntity tenantResponseEntity = null;
 
+@DisplayName("Tenant API interface test")
+public class TenantApiTest extends AbstractTenantApiTest {
     @Test
     @Order(1)
     @DisplayName("Test the correct Tenant information to log in to the system")
@@ -29,7 +28,7 @@ public class TenantApiTest extends AbstractControllerTest {
         tenantRequestEntity.setTenantCode(fairy.person().getUsername());
         tenantRequestEntity.setQueueId(1);
         tenantRequestEntity.setDescription(fairy.person().getFullName());
-        RestResponse<Result> result = EndPoints.createTenant(request, sessionId, tenantRequestEntity);
+        RestResponse<Result> result = tenantEndPoints.createTenant(tenantRequestEntity);
         tenantResponseEntity = result.getResponse().jsonPath().getObject(FormParam.DATA.getParam(), TenantResponseEntity.class);
     }
 
@@ -40,7 +39,7 @@ public class TenantApiTest extends AbstractControllerTest {
         tenantUpdateEntity.setTenantCode(tenantResponseEntity.getTenantCode());
         tenantUpdateEntity.setQueueId(1);
         tenantUpdateEntity.setDescription(fairy.person().getMobileTelephoneNumber());
-        EndPoints.updateTenant(given().spec(reqSpec), sessionId, tenantUpdateEntity, tenantResponseEntity.getId()).isResponseSuccessful();
+        tenantEndPoints.updateTenant(tenantUpdateEntity, tenantResponseEntity.getId()).isResponseSuccessful();
     }
 
     @Test
@@ -49,13 +48,13 @@ public class TenantApiTest extends AbstractControllerTest {
         pageParamEntity.setPageNo(1);
         pageParamEntity.setPageSize(10);
         pageParamEntity.setSearchVal("");
-        EndPoints.getTenants(request, sessionId, pageParamEntity).isResponseSuccessful();
+        tenantEndPoints.getTenants(pageParamEntity).isResponseSuccessful();
     }
 
 
     @Test
     public void testQueryTenantlistAll() {
-        EndPoints.getTenantsListAll(request, sessionId).isResponseSuccessful();
+        tenantEndPoints.getTenantsListAll().isResponseSuccessful();
     }
 
     @Test
@@ -63,15 +62,15 @@ public class TenantApiTest extends AbstractControllerTest {
     public void testVerifyExistTenantCode() {
         TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
         tenantRequestEntity.setTenantCode(fairy.person().getUsername());
-        EndPoints.verifyTenantCode(request, sessionId, tenantRequestEntity).isResponseSuccessful();
+        tenantEndPoints.verifyTenantCode(tenantRequestEntity).isResponseSuccessful();
     }
 
     @Test
-    @DisplayName("Verify that the non-existent tenant returns code 1009")
+    @DisplayName("Verify that the non-existent tenant returns code 10009")
     public void testVerifyNotExistTenantCode() {
         TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
         tenantRequestEntity.setTenantCode(tenantResponseEntity.getTenantCode());
-        EndPoints.verifyTenantCode(request, sessionId, tenantRequestEntity).getResponse().then().
+        tenantEndPoints.verifyTenantCode(tenantRequestEntity).getResponse().then().
                 body(FormParam.CODE.getParam(), equalTo(10009));
     }
 
@@ -79,7 +78,7 @@ public class TenantApiTest extends AbstractControllerTest {
     @Test
     @DisplayName("delete exist tenant by tenant id")
     public void testDeleteExistTenantByCode() {
-        EndPoints.deleteTenantById(request, sessionId, tenantResponseEntity.getId()).isResponseSuccessful();
+        tenantEndPoints.deleteTenantById( tenantResponseEntity.getId()).isResponseSuccessful();
     }
 
 }

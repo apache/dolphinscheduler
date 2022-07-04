@@ -1,6 +1,7 @@
 package org.apache.dolphinscheduler.test.pages.security.tenantManage;
 
 import org.apache.dolphinscheduler.test.core.Page;
+import org.apache.dolphinscheduler.test.endpoint.api.security.tenant.entity.TenantRequestEntity;
 import org.apache.dolphinscheduler.test.pages.security.SecuritySidePage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -32,6 +33,12 @@ public class TenantManagePage extends SecuritySidePage {
         return this;
     }
 
+    public TenantManagePage create(TenantRequestEntity tenantRequestEntity) {
+        createTenantButton.click();
+        tenantForm.create(tenantRequestEntity.getTenantCode(), tenantRequestEntity.getDescription());
+        return this;
+    }
+
     @Override
     protected void onLoad(Page previousPage) {
         super.onLoad(previousPage);
@@ -40,5 +47,9 @@ public class TenantManagePage extends SecuritySidePage {
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<WebElement> getTenantList() {
+        return tenantList;
     }
 }
