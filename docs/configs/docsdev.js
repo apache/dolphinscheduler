@@ -381,6 +381,10 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
                     {
+                        title: 'Datasource Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
                         title: 'Others',
                         link: '/en-us/docs/release/faq.html',
                     }
@@ -758,6 +762,10 @@ export default {
                 children: [
                     {
                         title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '数据源设置',
                         link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
                     {

@@ -18,5 +18,5 @@
 
 ## Native Supported
 
-No, read section example in [introduction](introduction.md) to activate this datasource.
+No, read section example in [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section to activate this datasource.
 
