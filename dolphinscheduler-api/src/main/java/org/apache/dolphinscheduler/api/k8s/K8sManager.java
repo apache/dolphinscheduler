@@ -118,22 +118,6 @@ public class K8sManager {
         }
     }
 
-
-//    @EventListener
-//    public void buildApiClientAll(ApplicationReadyEvent readyEvent) throws RemotingException {
-//        List<Cluster> clusterList = clusterMapper.selectList(null);
-//        if (clusterList != null && clusterList.size() > 0) {
-//            for(Cluster item :clusterList ) {
-//                String k8sConfig = ClusterConfUtils.getK8sConfig(item.getConfig());
-//                if(k8sConfig!=null)
-//                {
-//                    DefaultKubernetesClient client = getClient(k8sConfig);
-//                    clientMap.put(item.getName(), client);
-//                }
-//            }
-//        }
-//    }
-
     private DefaultKubernetesClient getClient(String configYaml) throws RemotingException {
         try {
             Config config = Config.fromKubeconfig(configYaml);

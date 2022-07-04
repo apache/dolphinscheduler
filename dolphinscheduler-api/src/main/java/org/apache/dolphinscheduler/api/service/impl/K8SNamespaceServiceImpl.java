@@ -450,11 +450,4 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
         return resultList;
     }
-
-
-    private void setClusterName()
-    {
-
-    }
-
 }
