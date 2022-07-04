@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master;
+package org.apache.dolphinscheduler.server.master.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -35,9 +36,8 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -70,7 +70,7 @@ import org.springframework.context.ApplicationContext;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({WorkflowExecuteRunnable.class})
-public class WorkflowExecuteTaskTest {
+public class WorkflowExecuteRunnableTest {
 
     private WorkflowExecuteRunnable workflowExecuteThread;
 
@@ -113,7 +113,10 @@ public class WorkflowExecuteTaskTest {
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
         stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, null, null, config, stateWheelExecuteThread));
+        NettyExecutorManager nettyExecutorManager = mock(NettyExecutorManager.class);
+        ProcessAlertManager processAlertManager = mock(ProcessAlertManager.class);
+        workflowExecuteThread =
+            PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, nettyExecutorManager, processAlertManager, config, stateWheelExecuteThread));
         // prepareProcess init dag
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
@@ -154,9 +157,9 @@ public class WorkflowExecuteTaskTest {
                     Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(), taskInstance4.getId()))
             ).thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
             Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
-            Method method = masterExecThreadClass.getDeclaredMethod("getStartTaskInstanceList", String.class);
+            Method method = masterExecThreadClass.getDeclaredMethod("getRecoverTaskInstanceList", String.class);
             method.setAccessible(true);
-            List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
+            List<TaskInstance> taskInstances = workflowExecuteThread.getRecoverTaskInstanceList(JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
 
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1");
