@@ -92,6 +92,7 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
     public static final String REGISTRY_SERVERS = "registry.servers";
+    public static final String FOLDER_SEPARATOR = "/";
 
     /**
      * fs.defaultFS
