@@ -42,13 +42,13 @@ Click [here](https://docs.conda.io/en/latest/) for more information about `conda
 └── ssl
 ```   
 
-> NOTE: Please follow the `conda pack` instructions above strictly, and DO NOT modify `bin/activate`.
+> NOTICE: Please follow the `conda pack` instructions above strictly, and DO NOT modify `bin/activate`.
 > `Jupyter Task Plugin` uses `source` command to activate your packed conda environment.
 > If you are concerned about using `source`, choose other options to manage your python dependency.   
 
 ## Create Task
 
-- Click `Project Management-Project Name-Workflow Definition`, and click the "`Create Workflow`" button to enter the DAG editing page.
+- Click `Project Management-Project Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag <img src="../../../../img/tasks/icons/jupyter.png" width="15"/> from the toolbar to the canvas.
 
 ## Task Parameters
