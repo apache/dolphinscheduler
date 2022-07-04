@@ -4,7 +4,7 @@
 
 我们这里以 MySQL 为例来说明如何配置外部数据库：
 
-* 首先，参照 [通用配置](general-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
+* 首先，参照 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 * 在你的命令行或者修改 bin/env/dolphinscheduler_env.sh 设定下列环境变量，将 `{user}` 和 `{password}` 改为你数据库的用户名和密码
 
 ```shell
@@ -14,7 +14,7 @@ export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```
 
-* 将mysql-connector-java驱动加到`./standalone-server/libs/standalone-server/`目录下, 下载方法见 [通用配置](general-setting.md) `伪分布式/分布式安装初始化数据库` 一栏
+* 将mysql-connector-java驱动加到`./standalone-server/libs/standalone-server/`目录下, 下载方法见 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 一栏
 * 启动standalone-server，此时你已经连接上mysql，重启或者停止standalone-server并不会清空您数据库里的数据
 
 ## 伪分布式/分布式安装初始化数据库

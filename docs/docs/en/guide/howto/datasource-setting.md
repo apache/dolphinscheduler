@@ -4,7 +4,7 @@
 
 We here use MySQL as an example to illustrate how to configure an external database:
 
-* First of all, follow the instructions in [general-setting](general-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
+* First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 * Set the following environment variables in your terminal or modify the `bin/env/dolphinscheduler_env.sh` with your database username and password for `{user}` and `{password}`:
 
 ```shell
