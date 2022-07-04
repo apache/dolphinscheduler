@@ -6,7 +6,7 @@ SQL task type used to connect to databases and execute SQL.
 
 ## Create DataSource
 
-Refer to [DataSource](../datasource/introduction.md)
+Refer to [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section
 
 ## Create Task
 
