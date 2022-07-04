@@ -169,6 +169,10 @@ export default {
                                 title: 'DVC',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dvc.html',
                             },
+                            {
+                                title: 'Dinky',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
+                            },
                         ],
                     },
                     {
@@ -553,6 +557,10 @@ export default {
                             {
                                 title: 'DVC',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dvc.html',
+                            },
+                            {
+                                title: 'Dinky',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
                         ],
                     },
