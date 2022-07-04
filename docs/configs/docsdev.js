@@ -54,7 +54,7 @@ export default {
                 title: 'Introduction to Functions',
                 children: [
                     {
-                        title: 'Workflow Overview',
+                        title: 'Application Homepage',
                         link: '/en-us/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -164,6 +164,10 @@ export default {
                             {
                                 title: 'Openmldb',
                                 link: '/en-us/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dvc.html',
                             },
                         ],
                     },
@@ -280,11 +284,11 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: 'How-To',
+                        title: 'Metrics',
                         children: [
                             {
-                                title: 'General Setting',
-                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                                title: 'Metrics',
+                                link: '/en-us/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
@@ -363,15 +367,27 @@ export default {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
                     },
+                    {
+                        title: 'Health Check',
+                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
                 ],
             },
             {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
-                        link: '/en-us/docs/release/faq.html',
+                        title: 'General Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
+                    {
+                        title: 'Datasource Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
+                        title: 'Others',
+                        link: '/en-us/docs/release/faq.html',
+                    }
                 ],
             },
             {
@@ -422,7 +438,7 @@ export default {
                 title: '功能介绍',
                 children: [
                     {
-                        title: '指标总览',
+                        title: '应用首页',
                         link: '/zh-cn/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -532,6 +548,10 @@ export default {
                             {
                                 title: 'Openmldb',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dvc.html',
                             },
                         ],
                     },
@@ -648,11 +668,11 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: '常用指引',
+                        title: '指标相关',
                         children: [
                             {
-                                title: '通用设置',
-                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                                title: '指标',
+                                link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
@@ -731,13 +751,25 @@ export default {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
                     },
+                    {
+                        title: '健康检查',
+                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                    },
                 ],
             },
             {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
+                        title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '数据源设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '其他',
                         link: '/zh-cn/docs/release/faq.html',
                     },
                 ],

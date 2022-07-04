@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.time.Duration;
 import java.util.regex.Pattern;
 
 /**
@@ -380,6 +381,8 @@ public final class Constants {
      */
     public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
 
+    public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
+
     /**
      * one second mils
      */
@@ -620,28 +623,31 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
+    public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
+
     /**
      * task log info format
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITING_THREAD.ordinal(),
-            ExecutionStatus.WAITING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[] {
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.DELAY_EXECUTION.ordinal(),
+        ExecutionStatus.READY_PAUSE.ordinal(),
+        ExecutionStatus.READY_STOP.ordinal(),
+        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+        ExecutionStatus.WAITING_THREAD.ordinal(),
+        ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
-    public static final int[] RUNNING_PROCESS_STATE = new int[]{
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.SERIAL_WAIT.ordinal()
+    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.SERIAL_WAIT.ordinal()
     };
 
     /**
@@ -825,4 +831,6 @@ public final class Constants {
     public static final int USER_PASSWORD_MAX_LENGTH = 20;
 
     public static final int USER_PASSWORD_MIN_LENGTH = 2;
+
+    public static final String FUNCTION_START_WITH = "$";
 }

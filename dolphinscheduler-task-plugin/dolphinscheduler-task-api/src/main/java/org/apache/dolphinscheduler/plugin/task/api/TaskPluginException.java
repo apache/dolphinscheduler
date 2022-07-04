@@ -15,18 +15,11 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+package org.apache.dolphinscheduler.plugin.task.api;
 
-.table-card {
-  margin-top: 8px;
+public class TaskPluginException extends RuntimeException {
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+    public TaskPluginException(String message) {
+        super(message);
+    }
 }

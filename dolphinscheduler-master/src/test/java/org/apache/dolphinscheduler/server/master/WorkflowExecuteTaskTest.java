@@ -26,6 +26,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -37,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -86,6 +86,8 @@ public class WorkflowExecuteTaskTest {
 
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+    private CuringParamsService curingGlobalParamsService;
+
     @Before
     public void init() throws Exception {
         applicationContext = mock(ApplicationContext.class);
@@ -113,7 +115,8 @@ public class WorkflowExecuteTaskTest {
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
         stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, null, null, config, stateWheelExecuteThread));
+        curingGlobalParamsService = mock(CuringParamsService.class);
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, null, null, config, stateWheelExecuteThread, curingGlobalParamsService));
         // prepareProcess init dag
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);

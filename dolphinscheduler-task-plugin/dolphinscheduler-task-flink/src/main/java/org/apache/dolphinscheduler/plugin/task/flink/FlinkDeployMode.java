@@ -15,29 +15,18 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+package org.apache.dolphinscheduler.plugin.task.flink;
 
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    button {
-      margin-left: 10px;
-    }
-  }
-}
-
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+/**
+ * Flink deploy mode
+ */
+public enum FlinkDeployMode {
+    @JsonProperty("local")
+    LOCAL,
+    @JsonProperty("cluster")
+    CLUSTER,
+    @JsonProperty("application")
+    APPLICATION
 }

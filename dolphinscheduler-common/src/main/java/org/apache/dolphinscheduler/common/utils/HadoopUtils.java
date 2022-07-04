@@ -129,21 +129,25 @@ public class HadoopUtils implements Closeable, StorageOperate {
             }
 
             String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
+
+            if (StringUtils.isBlank(defaultFS)){
+                defaultFS= PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+            }
+
             //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
-            if (defaultFS.startsWith("file")) {
-                String defaultFSProp = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
-                if (StringUtils.isNotBlank(defaultFSProp)) {
-                    Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
-                    configuration.set(Constants.FS_DEFAULT_FS, defaultFSProp);
-                    fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
-                } else {
-                    logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
-                    throw new NullPointerException(
-                            String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
-                    );
-                }
+            if (StringUtils.isNotBlank(defaultFS)) {
+                Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
+                configuration.set(Constants.FS_DEFAULT_FS, defaultFS);
+                fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {
+                logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
+                throw new NullPointerException(
+                        String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
+                );
+            }
+
+            if (!defaultFS.startsWith("file")) {
                 logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS, defaultFS);
             }
 
@@ -194,9 +198,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
         if (StringUtils.isBlank(appUrl)) {
             throw new BaseException("yarn application url generation failed");
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
-        }
+        logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         return String.format(appUrl, HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE, applicationId);
     }
 
@@ -447,9 +449,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
         String result;
         String applicationUrl = getApplicationUrl(applicationId);
-        if (logger.isDebugEnabled()) {
-            logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
-        }
+        logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
 
         String responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
@@ -462,9 +462,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            if (logger.isDebugEnabled()) {
-                logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
-            }
+            logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
             responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
 
             if (null != responseContent) {

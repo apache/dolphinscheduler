@@ -30,7 +30,7 @@ public final class MasterServerMetrics {
      * Used to measure the master server is overload.
      */
     private static final Counter MASTER_OVERLOAD_COUNTER =
-            Counter.builder("dolphinscheduler_master_overload_count")
+            Counter.builder("ds.master.overload.count")
                     .description("Master server overload count")
                     .register(Metrics.globalRegistry);
 
@@ -38,7 +38,7 @@ public final class MasterServerMetrics {
      * Used to measure the number of process command consumed by master.
      */
     private static final Counter MASTER_CONSUME_COMMAND_COUNTER =
-            Counter.builder("dolphinscheduler_master_consume_command_count")
+            Counter.builder("ds.master.consume.command.count")
                     .description("Master server consume command count")
                     .register(Metrics.globalRegistry);
 

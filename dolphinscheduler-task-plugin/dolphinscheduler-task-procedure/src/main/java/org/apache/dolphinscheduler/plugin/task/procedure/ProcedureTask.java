@@ -103,7 +103,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
             // get jdbc connection
             connection = DataSourceClientManager.getInstance().getDataSource(dbType, connectionParam).getConnection();
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);
             // call method
             stmt = connection.prepareCall(proceduerSql);

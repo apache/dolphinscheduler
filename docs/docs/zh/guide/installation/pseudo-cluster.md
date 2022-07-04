@@ -87,7 +87,7 @@ alertServer="localhost"
 apiServers="localhost"
 
 # DolphinScheduler installation path, it will auto-create if not exists
-installPath="~/dolphinscheduler"
+installPath=~/dolphinscheduler
 
 # Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
@@ -139,52 +139,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 
 ## 初始化数据库
 
-DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreSQL 和 MySQL，如果使用 MySQL 则需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的 lib目录下（`tools/libs/`）。下面以 MySQL 为例，说明如何初始化数据库
-
-对于mysql 5.6 / 5.7：
-
-```shell
-mysql -uroot -p
-
-mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-# 修改 {user} 和 {password} 为你希望的用户名和密码
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
-
-mysql> flush privileges;
-```
-
-对于mysql 8：
-
-```shell
-mysql -uroot -p
-
-mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-# 修改 {user} 和 {password} 为你希望的用户名和密码
-mysql> CREATE USER '{user}'@'%' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
-mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
-mysql> FLUSH PRIVILEGES;
-```
-
-然后修改`./bin/env/dolphinscheduler_env.sh`，将username和password改成你在上一步中设置的用户名{user}和密码{password}
-
-```shell
-export DATABASE=${DATABASE:-mysql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
-export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
-```  
-
-完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
-
-```shell
-sh tools/bin/upgrade-schema.sh
-```
+请参考 [数据源配置](../howto/datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 
 ## 启动 DolphinScheduler
 
@@ -236,5 +191,4 @@ sh ./bin/dolphinscheduler-daemon.sh stop alert-server
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
-[mysql]: https://downloads.MySQL.com/archives/c-j/
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597

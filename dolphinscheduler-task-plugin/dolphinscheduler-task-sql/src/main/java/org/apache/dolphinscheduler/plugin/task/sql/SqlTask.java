@@ -162,7 +162,7 @@ public class SqlTask extends AbstractTaskExecutor {
 
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("sql task error: {}", e.toString());
+            logger.error("sql task error", e);
             throw e;
         }
     }
@@ -405,7 +405,7 @@ public class SqlTask extends AbstractTaskExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
