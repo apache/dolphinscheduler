@@ -117,9 +117,14 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 ![mlflow-models-docker-compose](../../../../img/tasks/demo/mlflow-models-docker-compose.png)
 
+| **Parameter** | **Description** |
+| ------- | ---------- |
+| Max Cpu Limit | For example, `1.0` or `0.5`, the same as docker compose. |
+| Max Memory Limit | For example `1G` or `500M`, the same as docker compose. |
+
 ## Environment to Prepare
 
-### Conda environment
+### Conda Environment
 
 You need to enter the admin account to configure a conda environment variable（Please
 install [anaconda](https://docs.continuum.io/anaconda/install/)
