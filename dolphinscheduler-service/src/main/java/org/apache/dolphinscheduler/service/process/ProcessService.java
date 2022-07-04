@@ -81,7 +81,7 @@ public interface ProcessService {
 
     ProcessDefinition findProcessDefineById(int processDefinitionId);
 
-    ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version);
+    ProcessDefinition findProcessDefinition(Long processDefinitionCode, int processDefinitionVersion);
 
     ProcessDefinition findProcessDefinitionByCode(Long processDefinitionCode);
 

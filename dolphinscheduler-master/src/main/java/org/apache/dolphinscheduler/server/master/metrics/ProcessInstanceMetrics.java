@@ -90,6 +90,12 @@ public final class ProcessInstanceMetrics {
             .register(Metrics.globalRegistry);
     }
 
+    public static synchronized void registerProcessInstanceResubmitGauge(Supplier<Number> function) {
+        Gauge.builder("ds.workflow.instance.resubmit", function)
+            .description("The current process instance need to resubmit count")
+            .register(Metrics.globalRegistry);
+    }
+
     public static void incProcessInstanceSubmit() {
         PROCESS_INSTANCE_SUBMIT_COUNTER.increment();
     }
