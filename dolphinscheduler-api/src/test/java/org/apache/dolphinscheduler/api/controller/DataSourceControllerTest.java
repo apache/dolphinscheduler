@@ -44,13 +44,13 @@ import org.springframework.util.MultiValueMap;
 /**
  * data source controller test
  */
-public class DataSourceControllerTest extends AbstractControllerTest{
+ class DataSourceControllerTest extends AbstractControllerTest{
     private static final Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
 
 
-    @Ignore
+    @Ignore("unknown yourself connection information")
     @Test
-    public void testCreateDataSource() throws Exception {
+    void testCreateDataSource() throws Exception {
         HashMap<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("name","mysql");
         paramsMap.put("node","mysql data source test");
@@ -73,10 +73,10 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
+    @Ignore("unknown yourself connection information")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    public void testUpdateDataSource(int args) throws Exception {
+    void testUpdateDataSource(int args) throws Exception {
         setUp();
         HashMap<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("id",args);
@@ -101,10 +101,10 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
+    @Ignore("unknown you datasources id")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    public void testQueryDataSource(int id) throws Exception {
+    void testQueryDataSource(int id) throws Exception {
         setUp();
         MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id)
                         .header("sessionId", sessionId))
@@ -121,7 +121,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     @CsvSource({
             "type, MYSQL"
     })
-    public void testQueryDataSourceList(String key , String dbType) throws Exception {
+    void testQueryDataSourceList(String key , String dbType) throws Exception {
         setUp();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
@@ -137,7 +137,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void testQueryDataSourceListPaging() throws Exception {
+    void testQueryDataSourceListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("searchVal","mysql");
         paramsMap.add("pageNo","1");
@@ -153,9 +153,9 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
+    @Ignore("unknown yourself connection information")
     @Test
-    public void testConnectDataSource() throws Exception {
+    void testConnectDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","hive data source");
         paramsMap.add("type","HIVE");
@@ -176,10 +176,10 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
+    @Ignore("unknown your datasource id")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    public void testConnectionTest(int id) throws Exception {
+    void testConnectionTest(int id) throws Exception {
         setUp();
         MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id+"/connect-test")
                         .header("sessionId", sessionId))
@@ -195,7 +195,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     @CsvSource({
             "type, MYSQL,/datasources/verify-name"
     })
-    public void testVerifyDataSourceName(String key , String dbType,String url) throws Exception {
+    void testVerifyDataSourceName(String key , String dbType,String url) throws Exception {
         setUp();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
@@ -211,7 +211,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void testAuthedDatasource() throws Exception {
+    void testAuthedDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
@@ -226,7 +226,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void testUnauthDatasource() throws Exception {
+    void testUnauthDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")
@@ -242,7 +242,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
 
     @ParameterizedTest
     @ValueSource(strings = {"/datasources/kerberos-startup-state"})
-    public void testGetKerberosStartupState(String url) throws Exception {
+    void testGetKerberosStartupState(String url) throws Exception {
         setUp();
         MvcResult mvcResult = mockMvc.perform(get(url)
                         .header("sessionId", sessionId))
@@ -254,10 +254,10 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
+    @Ignore("unknown your datasource id")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    public void testDelete(int id) throws Exception {
+    void testDelete(int id) throws Exception {
         setUp();
         MvcResult mvcResult = mockMvc.perform(delete("/datasources/"+id)
                         .header("sessionId", sessionId))
