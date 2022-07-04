@@ -44,7 +44,7 @@
         <foreach collection="states" item="i" open="(" close=")" separator=",">
             #{i}
         </foreach>
-        order by process_instance_priority, id asc
+        order by id asc
     </select>
     <select id="queryNeedFailoverProcessInstanceHost" resultType="String">
         select distinct host
