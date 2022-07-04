@@ -2,6 +2,7 @@ package org.apache.dolphinscheduler.test.core;
 
 import org.apache.dolphinscheduler.test.core.exception.PageInstanceNotInitializedException;
 import org.apache.dolphinscheduler.test.core.js.JavascriptInterface;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -107,6 +108,10 @@ public class Page extends LoadableComponent<Page> {
 
     public WebElement waitFor(Function<WebDriver, WebElement> isTrue) {
         return this.waitingSupport.until(isTrue);
+    }
+
+    public WebElement withDialog(By by) {
+        return getBrowser().getDriver().findElement(by);
     }
 
     @Override

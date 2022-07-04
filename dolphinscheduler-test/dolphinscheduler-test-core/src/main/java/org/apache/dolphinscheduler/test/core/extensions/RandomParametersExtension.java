@@ -1,12 +1,20 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v2.0 which
- * accompanies this distribution and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.test.core.extensions;
 
 import java.lang.annotation.ElementType;
@@ -21,20 +29,6 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-/**
- * {@code RandomParametersExtension} showcases the {@link ParameterResolver}
- * extension API of JUnit 5 by providing injection support for random values at the
- * method parameter level.
- *
- * <p>For real world use cases for this and other extension points, check out
- * the extensions provided by the Spring and Mockito projects among others.
- *
- * <p>Please refer to the
- * <a href="https://github.com/junit-team/junit5/wiki/Third-party-Extensions">
- * Third-party Extensions wiki page</a> for additional references.
- *
- * @since 5.2
- */
 public class RandomParametersExtension implements ParameterResolver {
 
     @Retention(RetentionPolicy.RUNTIME)

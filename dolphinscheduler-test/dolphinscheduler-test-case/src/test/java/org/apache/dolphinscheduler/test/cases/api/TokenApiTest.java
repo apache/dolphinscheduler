@@ -16,26 +16,13 @@
  */
 
 
-package org.apache.dolphinscheduler.test.endpoint.api.login.entity;
-import org.apache.dolphinscheduler.test.endpoint.base.AbstractBaseEntity;
+package org.apache.dolphinscheduler.test.cases.api;
 
-public class LoginRequestEntity extends AbstractBaseEntity {
-    String userName;
-    String userPassword;
+import org.apache.dolphinscheduler.test.cases.common.AbstractApiTest;
+import org.junit.jupiter.api.Test;
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
+public class TokenApiTest extends AbstractApiTest {
+    @Test
+    public void testCreateToken() {
     }
 }

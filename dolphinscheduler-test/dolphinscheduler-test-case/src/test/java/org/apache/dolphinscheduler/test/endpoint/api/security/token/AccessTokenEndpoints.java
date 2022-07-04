@@ -16,26 +16,8 @@
  */
 
 
-package org.apache.dolphinscheduler.test.endpoint.api.login.entity;
-import org.apache.dolphinscheduler.test.endpoint.base.AbstractBaseEntity;
+package org.apache.dolphinscheduler.test.endpoint.api.security.token;
 
-public class LoginRequestEntity extends AbstractBaseEntity {
-    String userName;
-    String userPassword;
+public class AccessTokenEndpoints {
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
-    }
 }

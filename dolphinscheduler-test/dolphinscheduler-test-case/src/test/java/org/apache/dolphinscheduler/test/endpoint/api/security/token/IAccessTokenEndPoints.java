@@ -15,27 +15,19 @@
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.test.endpoint.api.security.token;
 
-package org.apache.dolphinscheduler.test.endpoint.api.login.entity;
-import org.apache.dolphinscheduler.test.endpoint.base.AbstractBaseEntity;
+import org.apache.dolphinscheduler.test.endpoint.utils.RestResponse;
+import org.apache.dolphinscheduler.test.endpoint.utils.Result;
 
-public class LoginRequestEntity extends AbstractBaseEntity {
-    String userName;
-    String userPassword;
+public interface IAccessTokenEndPoints {
+    RestResponse<Result> createToken();
 
-    public String getUserName() {
-        return userName;
-    }
+    RestResponse<Result> generateToken();
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+    RestResponse<Result> getAccessTokenList();
 
-    public String getUserPassword() {
-        return userPassword;
-    }
+    RestResponse<Result> getAccessTokenByUserId(int UserId);
 
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
-    }
+    RestResponse<Result> deleteAccessTokenById(int id);
 }

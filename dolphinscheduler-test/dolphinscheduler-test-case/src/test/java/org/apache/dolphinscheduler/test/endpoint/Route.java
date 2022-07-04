@@ -22,7 +22,21 @@ public class Route {
         return "/tenants/verify-code";
     }
 
+    public static String accessTokens() {
+        return "/access-tokens";
+    }
 
+    public static String accessTokens(int id) {
+        return "/access-tokens";
+    }
+
+    public static String accessTokenByUser(int userId) {
+        return accessTokens() + "/user/" + String.valueOf(userId);
+    }
+
+    public static String generateAccessToken() {
+        return accessTokens() + "/generate";
+    }
 
 
 }
