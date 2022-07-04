@@ -4,7 +4,7 @@ Condition is a conditional node, that determines which downstream task should ru
 
 ## Create Task
 
-- Click `Project Management -> Project Name -> Workflow Definition`, and click the "`Create Workflow`" button to enter the DAG editing page.
+- Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag from the toolbar <img src="../../../../img/conditions.png" width="20"/> task node to canvas.
 
 ## Task Parameters

@@ -6,7 +6,7 @@ Amazon EMR task type, for creating EMR clusters on AWS and running computing tas
 
 ## Create Task
 
-* Click `Project Management -> Project Name -> Workflow Definition`, click the "`Create Workflow`" button to enter the DAG editing page.
+* Click `Project Management -> Project Name -> Workflow Definition`, click the `Create Workflow` button to enter the DAG editing page.
 * Drag `AmazonEMR` task from the toolbar to the artboard to complete the creation.
 
 ## Task Parameters
