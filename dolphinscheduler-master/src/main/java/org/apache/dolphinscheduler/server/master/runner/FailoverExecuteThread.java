@@ -67,7 +67,7 @@ public class FailoverExecuteThread extends BaseDaemonThread {
             } catch (Exception e) {
                 logger.error("Master failover thread execute error", e);
             } finally {
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
+                ThreadUtils.sleep(masterConfig.getFailoverInterval().toMillis());
             }
         }
     }

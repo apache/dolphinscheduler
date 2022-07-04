@@ -233,11 +233,6 @@ public final class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public Duration getSessionTimeout() {
-        return properties.getSessionTimeout();
-    }
-
-    @Override
     public void close() {
         treeCacheMap.values().forEach(CloseableUtils::closeQuietly);
         CloseableUtils.closeQuietly(client);
