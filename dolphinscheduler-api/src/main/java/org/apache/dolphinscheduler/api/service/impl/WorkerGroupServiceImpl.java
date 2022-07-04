@@ -270,7 +270,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         // worker groups from database
         List<WorkerGroup> workerGroups;
         if (ids != null) {
-            workerGroups = ids.isEmpty() ? Collections.emptyList() : workerGroupMapper.selectBatchIds(ids);
+            workerGroups = ids.isEmpty() ? new ArrayList<>() : workerGroupMapper.selectBatchIds(ids);
         } else {
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
