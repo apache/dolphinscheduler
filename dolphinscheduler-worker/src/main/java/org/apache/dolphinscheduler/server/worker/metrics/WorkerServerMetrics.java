@@ -75,16 +75,14 @@ public class WorkerServerMetrics {
     }
 
     public static void incWorkerResourceDownloadCount() {
-        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+        WORKER_RESOURCE_DOWNLOAD_COUNTER.increment();
     }
 
     public static void incWorkerResourceDownloadSuccessCount() {
-        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+        WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER.increment();
     }
 
-    public static void incWorkerResourceDownloadFailureCount() {
-        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
-    }
+    public static void incWorkerResourceDownloadFailureCount() { WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER.increment(); }
 
     public static void recordWorkerResourceDownloadTime(long milliseconds) {
         WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
