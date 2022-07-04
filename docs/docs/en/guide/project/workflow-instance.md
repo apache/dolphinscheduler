@@ -2,7 +2,7 @@
 
 ## View Workflow Instance
 
-- Click Project Management -> Workflow -> Workflow Instance, enter the Workflow Instance page, as shown in the figure below:
+- Click `Project Management -> Workflow -> Workflow Instance`, enter the Workflow Instance page, as shown in the figure below:
 
 ![workflow-instance](../../../../img/new_ui/dev/project/workflow-instance.png)
 
@@ -22,21 +22,21 @@
 
 ## View Task History
 
-- Click Project Management -> Workflow -> Workflow Instance, enter the workflow instance page, and click the workflow name to enter the workflow DAG page;
-- Double-click the task node, as shown in the figure below, click "View History" to jump to the task instance page, and display a list of task instances running by the workflow instance
+- Click `Project Management -> Workflow -> Workflow Instance`, enter the workflow instance page, and click the workflow name to enter the workflow DAG page;
+- Double-click the task node, as shown in the figure below, click `View History` to jump to the task instance page, and display a list of task instances running by the workflow instance.
 
 ![instance-history](../../../../img/new_ui/dev/project/instance-history.png)
 
 ## View Operation Parameters
 
-- Click Project Management -> Workflow -> Workflow Instance, enter the workflow instance page, and click the workflow name to enter the workflow DAG page;
+- Click `Project Management -> Workflow -> Workflow Instance`, enter the workflow instance page, and click the workflow name to enter the workflow DAG page;
 - Click the icon in the upper left corner <img src="../../../../img/run_params_button.png" width="35"/>，View the startup parameters of the workflow instance; click the icon <img src="../../../../img/global_param.png" width="35"/>，View the global and local parameters of the workflow instance, as shown in the following figure:
 
 ![instance-parameter](../../../../img/new_ui/dev/project/instance-parameter.png)
 
 ## Workflow Instance Operation Function
 
-Click Project Management -> Workflow -> Workflow Instance, enter the workflow instance page, as shown in the figure below:
+Click `Project Management -> Workflow -> Workflow Instance`, enter the workflow instance page, as shown in the figure below:
 
 ![workflow-instance](../../../../img/new_ui/dev/project/workflow-instance.png)
 
