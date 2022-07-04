@@ -57,13 +57,13 @@ public final class ScriptSender {
         File shellScriptFile = new File(scriptPath);
         //validate existence
         if (!shellScriptFile.exists()) {
-            log.error("shell script not exist : {}", scriptPath);
+            logger.error("shell script not exist : {}", scriptPath);
             alertResult.setMessage("shell script not exist : " + scriptPath);
             return alertResult;
         }
         //validate is file
         if (!shellScriptFile.isFile()) {
-            log.error("shell script is not a file : {}", scriptPath);
+            logger.error("shell script is not a file : {}", scriptPath);
             alertResult.setMessage("shell script is not a file : " + scriptPath);
             return alertResult;
         }
