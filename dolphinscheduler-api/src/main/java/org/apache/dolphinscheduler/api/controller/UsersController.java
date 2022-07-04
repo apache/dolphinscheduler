@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
@@ -330,6 +331,31 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userId") int userId,
                                @RequestParam(value = "udfIds") String udfIds) {
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, userId, udfIds);
+        return returnDataList(result);
+    }
+
+
+    /**
+     * grant namespace
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param namespaceIds namespace id array
+     * @return grant result code
+     */
+    @ApiOperation(value = "grantNamespace", notes = "GRANT_NAMESPACE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "namespaceIds", value = "NAMESPACE_IDS", required = true, type = "String")
+    })
+    @PostMapping(value = "/grant-namespace")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_K8S_NAMESPACE_ERROR)
+    @AccessLogAnnotation
+    public Result grantNamespace(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam(value = "userId") int userId,
+                                 @RequestParam(value = "namespaceIds") String namespaceIds) {
+        Map<String, Object> result = usersService.grantNamespaces(loginUser, userId, namespaceIds);
         return returnDataList(result);
     }
 

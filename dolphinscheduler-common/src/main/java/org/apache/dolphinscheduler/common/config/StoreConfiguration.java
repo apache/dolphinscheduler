@@ -25,7 +25,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
+import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 
 
 /**

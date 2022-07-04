@@ -86,7 +86,7 @@ public class StateEventCallbackService {
         return null;
     }
 
-    public int pause(int ntries) {
+    public long pause(int ntries) {
         return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
     }
 
@@ -117,6 +117,14 @@ public class StateEventCallbackService {
     public void sendResult(String address, int port, Command command) {
         logger.info("send result, host:{}, command:{}", address, command.toString());
         Host host = new Host(address, port);
+        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
+        if (nettyRemoteChannel != null) {
+            nettyRemoteChannel.writeAndFlush(command);
+        }
+    }
+
+    public void sendResult(Host host, Command command) {
+        logger.info("send result, host:{}, command:{}", host.getAddress(), command.toString());
         NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
         if (nettyRemoteChannel != null) {
             nettyRemoteChannel.writeAndFlush(command);

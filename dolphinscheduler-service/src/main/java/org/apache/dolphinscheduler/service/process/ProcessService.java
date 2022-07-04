@@ -52,16 +52,16 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.slf4j.Logger;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.transaction.annotation.Transactional;
+
 public interface ProcessService {
     @Transactional
-    ProcessInstance handleCommand(Logger logger, String host, Command command);
+    ProcessInstance handleCommand(String host, Command command);
 
     void moveToErrorCommand(Command command, String message);
 
@@ -81,7 +81,7 @@ public interface ProcessService {
 
     ProcessDefinition findProcessDefineById(int processDefinitionId);
 
-    ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version);
+    ProcessDefinition findProcessDefinition(Long processDefinitionCode, int processDefinitionVersion);
 
     ProcessDefinition findProcessDefinitionByCode(Long processDefinitionCode);
 
@@ -103,7 +103,7 @@ public interface ProcessService {
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, int commitInterval);
+    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval);
 
     @Transactional(rollbackFor = Exception.class)
     TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
@@ -160,8 +160,6 @@ public interface ProcessService {
     int updateProcessInstance(ProcessInstance processInstance);
 
     void changeOutParam(TaskInstance taskInstance);
-
-    List<String> convertIntListToString(List<Integer> intList);
 
     Schedule querySchedule(int id);
 
@@ -295,5 +293,7 @@ public interface ProcessService {
     void sendStartTask2Master(ProcessInstance processInstance, int taskId,
                               org.apache.dolphinscheduler.remote.command.CommandType taskType);
 
-    ProcessInstance loadNextProcess4Serial(long code, int state);
+    ProcessInstance loadNextProcess4Serial(long code, int state, int id);
+
+    public String findConfigYamlByName(String clusterName) ;
 }

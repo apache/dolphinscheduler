@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
@@ -100,6 +99,11 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean resubmitTask() {
+        return true;
+    }
+
+    @Override
     protected boolean dispatchTask() {
         return true;
     }
@@ -111,8 +115,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
-        logger.info("dependent task {} timeout, strategy {} ",
-                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+        logger.info("dependent taskInstanceId: {} timeout, taskName: {}, strategy: {} ",
+                taskInstance.getId(), taskInstance.getName(), taskTimeoutStrategy.getDescp());
         result = DependResult.FAILED;
         endTask();
         return true;
@@ -161,7 +165,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
                     //save depend result to log
-                    logger.info("dependent item complete {} {},{}", DEPENDENT_SPLIT, entry.getKey(), entry.getValue());
+                    logger.info("dependent item complete, task: {}, result: {}", entry.getKey(), entry.getValue());
                 }
             }
             if (!dependentExecute.finish(dependentDate)) {
@@ -183,7 +187,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             dependResultList.add(dependResult);
         }
         result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
-        logger.info("dependent task completed, dependent result:{}", result);
+        logger.info("dependent task completed, dependent result: {}", result);
         return result;
     }
 

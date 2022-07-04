@@ -15,44 +15,87 @@ This document only describes DolphinScheduler configurations and other topics ar
 [Note: the DolphinScheduler (hereinafter called the ‘DS’) .]
 
 ```
-├─bin                               DS application commands directory
-│  ├─dolphinscheduler-daemon.sh         startup or shutdown DS application 
-│  ├─start-all.sh                       startup all DS services with configurations
-│  ├─stop-all.sh                        shutdown all DS services with configurations
-├─conf                              configurations directory
-│  ├─application-api.properties         API-service config properties
-│  ├─datasource.properties              datasource config properties
-│  ├─zookeeper.properties               ZooKeeper config properties
-│  ├─master.properties                  master-service config properties
-│  ├─worker.properties                  worker-service config properties
-│  ├─quartz.properties                  quartz config properties
-│  ├─common.properties                  common-service [storage] config properties
-│  ├─alert.properties                   alert-service config properties
-│  ├─config                             environment variables config directory
-│      ├─install_config.conf                DS environment variables configuration script [install or start DS]
-│  ├─env                                load environment variables configs script directory
-│      ├─dolphinscheduler_env.sh            load environment variables configs [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-│  ├─org                                mybatis mapper files directory
-│  ├─i18n                               i18n configs directory
-│  ├─logback-api.xml                    API-service log config
-│  ├─logback-master.xml                 master-service log config
-│  ├─logback-worker.xml                 worker-service log config
-│  ├─logback-alert.xml                  alert-service log config
-├─sql                                   .sql files to create or upgrade DS metadata
-│  ├─create                             create SQL scripts directory
-│  ├─upgrade                            upgrade SQL scripts directory
-│  ├─dolphinscheduler_postgre.sql       PostgreSQL database init script
-│  ├─dolphinscheduler_mysql.sql         MySQL database init script
-│  ├─soft_version                       current DS version-id file
-├─script                            DS services deployment, database create or upgrade scripts directory
-│  ├─create-dolphinscheduler.sh         DS database init script
-│  ├─upgrade-dolphinscheduler.sh        DS database upgrade script
-│  ├─monitor-server.sh                  DS monitor-server start script       
-│  ├─scp-hosts.sh                       transfer installation files script                                     
-│  ├─remove-zk-node.sh                  cleanup ZooKeeper caches script       
-├─ui                                front-end web resources directory
-├─lib                               DS .jar dependencies directory
-├─install.sh                        auto-setup DS services script
+├── LICENSE
+│
+├── NOTICE
+│
+├── licenses                                    directory of licenses
+│
+├── bin                                         directory of DolphinScheduler application commands, configrations scripts 
+│   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
+│   ├── env                                     directory of scripts to load environment variables
+│   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
+│   │   └── install_env.sh                      script to export environment variables for DolphinScheduler installation when you use scripts `install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`
+│   ├── install.sh                              script to auto-setup services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
+│   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches 
+│   ├── scp-hosts.sh                            script to copy installation files to target hosts 
+│   ├── start-all.sh                            script to start all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
+│   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
+│   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
+│
+├── alert-server                                directory of DolphinScheduler alert-server commands, configrations scripts and libs
+│   ├── bin
+│   │   └── start.sh                            script to start DolphinScheduler alert-server
+│   ├── conf
+│   │   ├── application.yaml                    configurations of alert-server
+│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc. 
+│   │   ├── dolphinscheduler_env.sh             script to load environment variables for alert-server
+│   │   └── logback-spring.xml                  configurations of alert-service log
+│   └── libs                                    directory of alert-server libs
+│
+├── api-server                                  directory of DolphinScheduler api-server commands, configrations scripts and libs
+│   ├── bin
+│   │   └── start.sh                            script to start DolphinScheduler api-server
+│   ├── conf
+│   │   ├── application.yaml                    configurations of api-server
+│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
+│   │   ├── dolphinscheduler_env.sh             script to load environment variables for api-server
+│   │   └── logback-spring.xml                  configurations of api-service log
+│   ├── libs                                    directory of api-server libs
+│   └── ui                                      directory of api-server related front-end web resources 
+│
+├── master-server                               directory of DolphinScheduler master-server commands, configrations scripts and libs
+│   ├── bin                                
+│   │   └── start.sh                            script to start DolphinScheduler master-server
+│   ├── conf
+│   │   ├── application.yaml                    configurations of master-server
+│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
+│   │   ├── dolphinscheduler_env.sh             script to load environment variables for master-server
+│   │   └── logback-spring.xml                  configurations of master-service log
+│   └── libs                                    directory of master-server libs
+│
+├── standalone-server                           directory of DolphinScheduler standalone-server commands, configrations scripts and libs
+│   ├── bin
+│   │   └── start.sh                            script to start DolphinScheduler standalone-server
+│   ├── conf
+│   │   ├── application.yaml                    configurations of standalone-server
+│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
+│   │   ├── dolphinscheduler_env.sh             script to load environment variables for standalone-server
+│   │   ├── logback-spring.xml                  configurations of standalone-service log
+│   │   └── sql                                 .sql files to create or upgrade DolphinScheduler metadata
+│   ├── libs                                    directory of standalone-server libs
+│   └── ui                                      directory of standalone-server related front-end web resources
+│       
+├── tools                                       directory of DolphinScheduler metadata tools commands, configrations scripts and libs
+│   ├── bin
+│   │   └── upgrade-schema.sh                   script to initialize or upgrade DolphinScheduler metadata
+│   ├── conf
+│   │   ├── application.yaml                    configurations of tools
+│   │   └── common.properties                   configurations of common-service like storage, credentials, etc.
+│   ├── libs                                    directory of tool libs
+│   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
+│     
+├── worker-server                               directory of DolphinScheduler worker-server commands, configrations scripts and libs
+│       ├── bin
+│       │   └── start.sh                        script to start DolphinScheduler worker-server
+│       ├── conf
+│       │   ├── application.yaml                configurations of worker-server
+│       │   ├── common.properties               configurations of common-service like storage, credentials, etc.
+│       │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
+│       │   └── logback-spring.xml              configurations of worker-service log
+│       └── libs                                directory of worker-server libs
+│
+└── ui                                          directory of front-end web resources
 ```
 
 ## Configurations in Details
@@ -139,26 +182,28 @@ zookeeper.retry.maxtime|10| maximum retry times
 ### common.properties [hadoop、s3、yarn config properties]
 
 Currently, common.properties mainly configures Hadoop,s3a related configurations.
-|Parameters | Default value| Description|
+| Parameters | Default value | Description |
 |--|--|--|
-data.basedir.path|/tmp/dolphinscheduler| local directory used to store temp files
-resource.storage.type|NONE| type of resource files: HDFS, S3, NONE
-resource.upload.path|/dolphinscheduler| storage path of resource files
-hadoop.security.authentication.startup.state|false| whether hadoop grant kerberos permission
-java.security.krb5.conf.path|/opt/krb5.conf|kerberos config directory
-login.user.keytab.username|hdfs-mycluster@ESZ.COM|kerberos username
-login.user.keytab.path|/opt/hdfs.headless.keytab|kerberos user keytab
-kerberos.expire.time|2|kerberos expire time,integer,the unit is hour
-resource.view.suffixs| txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties| file types supported by resource center
-hdfs.root.user|hdfs| configure users with corresponding permissions if storage type is HDFS
-fs.defaultFS|hdfs://mycluster:8020|If resource.storage.type=S3, then the request url would be similar to 's3a://dolphinscheduler'. Otherwise if resource.storage.type=HDFS and hadoop supports HA, copy core-site.xml and hdfs-site.xml into 'conf' directory
-fs.s3a.endpoint||s3 endpoint url
-fs.s3a.access.key||s3 access key
-fs.s3a.secret.key||s3 secret key
-yarn.resourcemanager.ha.rm.ids||specify the yarn resourcemanager url. if resourcemanager supports HA, input HA IP addresses (separated by comma), or input null for standalone
-yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode
-dolphinscheduler.env.path|env/dolphinscheduler_env.sh|load environment variables configs [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-development.state|false| specify whether in development state
+data.basedir.path | /tmp/dolphinscheduler | local directory used to store temp files
+resource.storage.type | NONE | type of resource files: HDFS, S3, NONE
+resource.storage.upload.base.path | /dolphinscheduler | storage path of resource files
+resource.aws.access.key.id | minioadmin | access key id of S3
+resource.aws.secret.access.key | minioadmin | secret access key of S3
+resource.aws.region |us-east-1 | region of S3
+resource.aws.s3.bucket.name | dolphinscheduler | bucket name of S3
+resource.aws.s3.endpoint | http://minio:9000 | endpoint of S3
+resource.hdfs.root.user | hdfs | configure users with corresponding permissions if storage type is HDFS
+resource.hdfs.fs.defaultFS | hdfs://mycluster:8020 | If resource.storage.type=S3, then the request url would be similar to 's3a://dolphinscheduler'. Otherwise if resource.storage.type=HDFS and hadoop supports HA, copy core-site.xml and hdfs-site.xml into 'conf' directory
+hadoop.security.authentication.startup.state | false | whether hadoop grant kerberos permission
+java.security.krb5.conf.path | /opt/krb5.conf | kerberos config directory
+login.user.keytab.username | hdfs-mycluster@ESZ.COM | kerberos username
+login.user.keytab.path | /opt/hdfs.headless.keytab | kerberos user keytab
+kerberos.expire.time | 2 | kerberos expire time,integer,the unit is hour
+yarn.resourcemanager.ha.rm.ids |  | specify the yarn resourcemanager url. if resourcemanager supports HA, input HA IP addresses (separated by comma), or input null for standalone
+yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode
+dolphinscheduler.env.path | env/dolphinscheduler_env.sh | load environment variables configs [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
+development.state | false | specify whether in development state
+task.resource.limit.state | false | specify whether in resource limit state
 
 
 ### application-api.properties [API-service log config]
@@ -175,7 +220,19 @@ spring.messages.encoding|UTF-8| message encoding
 spring.jackson.time-zone|GMT+8| time zone
 spring.messages.basename|i18n/messages| i18n config
 security.authentication.type|PASSWORD| authentication type
-
+security.authentication.ldap.user.admin|read-only-admin|admin user account when you log-in with LDAP
+security.authentication.ldap.urls|ldap://ldap.forumsys.com:389/|LDAP urls
+security.authentication.ldap.base-dn|dc=example,dc=com|LDAP base dn
+security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP username
+security.authentication.ldap.password|password|LDAP password
+security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute 
+security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute
+security.authentication.ldap.user.not-exist-action|CREATE|action when LDAP user is not exist. Default CREATE: automatically create user when user not exist, DENY: deny log-in when user not exist
+traffic.control.global.switch|false|traffic control global switch
+traffic.control.max-global-qps-rate|300|global max request number per second
+traffic.control.tenant-switch|false|traffic control tenant switch
+traffic.control.default-tenant-qps-rate|10|default tenant max request number per second
+traffic.control.customize-tenant-qps-rate||customize tenant max request number per second
 
 ### master.properties [master-service log config]
 
@@ -203,7 +260,8 @@ worker.heartbeat.interval|10|worker-service heartbeat interval, the unit is seco
 worker.max.cpuload.avg|-1|worker max CPU load avg, only higher than the system CPU load average, worker server can be dispatched tasks. default value -1: the number of CPU cores * 2
 worker.reserved.memory|0.3|worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
 worker.groups|default|worker groups separated by comma, e.g., 'worker.groups=default,test' <br> worker will join corresponding group according to this config when startup
-
+worker.tenant.auto.create|true|tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+worker.tenant.distributed.user|false|Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
 
 ### alert.properties [alert-service log config]
 
@@ -397,21 +455,40 @@ apiServers="ds1"
 
 ### dolphinscheduler_env.sh [load environment variables configs]
 
-When using shell to commit tasks, DS will load environment variables inside dolphinscheduler_env.sh into the host.
-Types of tasks involved are: Shell, Python, Spark, Flink, DataX, etc.
+When using shell to commit tasks, DolphinScheduler will export environment variables from `bin/env/dolphinscheduler_env.sh`. The
+mainly configuration including `JAVA_HOME`, mata database, registry center, and task configuration.
+
 ```bash
-export HADOOP_HOME=/opt/soft/hadoop
-export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop
-export SPARK_HOME1=/opt/soft/spark1
-export SPARK_HOME2=/opt/soft/spark2
-export PYTHON_HOME=/opt/soft/python
-export JAVA_HOME=/opt/soft/java
-export HIVE_HOME=/opt/soft/hive
-export FLINK_HOME=/opt/soft/flink
-export DATAX_HOME=/opt/soft/datax/bin/datax.py
+# JAVA_HOME, will use it to start DolphinScheduler server
+export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH:$FLINK_HOME/bin:$DATAX_HOME:$PATH
+# Database related configuration, set database type, username and password
+export DATABASE=${DATABASE:-postgresql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL
+export SPRING_DATASOURCE_USERNAME
+export SPRING_DATASOURCE_PASSWORD
 
+# DolphinScheduler server related configuration
+export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
+export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
+export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
+
+# Registry center configuration, determines the type and link of the registry center
+export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
+export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
+
+# Tasks related configurations, need to change the configuration if you use the related tasks.
+export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
+export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
+export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
+export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
+export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ### Services logback configs

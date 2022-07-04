@@ -9,50 +9,90 @@
 本文主要讲述dolphinscheduler的配置文件.其他部分先不做赘述.
 
 [注:以下 dolphinscheduler 简称为DS.]
-```
-
-├─bin                               DS命令存放目录
-│  ├─dolphinscheduler-daemon.sh         启动/关闭DS服务脚本
-│  ├─start-all.sh                       根据配置文件启动所有DS服务
-│  ├─stop-all.sh                        根据配置文件关闭所有DS服务
-├─conf                              配置文件目录
-│  ├─application-api.properties         api服务配置文件
-│  ├─datasource.properties              数据库配置文件
-│  ├─zookeeper.properties               zookeeper配置文件
-│  ├─master.properties                  master服务配置文件
-│  ├─worker.properties                  worker服务配置文件
-│  ├─quartz.properties                  quartz服务配置文件
-│  ├─common.properties                  公共服务[存储]配置文件
-│  ├─alert.properties                   alert服务配置文件
-│  ├─config                             环境变量配置文件夹
-│      ├─install_config.conf                DS环境变量配置脚本[用于DS安装/启动]
-│  ├─env                                运行脚本环境变量配置目录
-│      ├─dolphinscheduler_env.sh            运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-│  ├─org                                mybatis mapper文件目录
-│  ├─i18n                               i18n配置文件目录
-│  ├─logback-api.xml                    api服务日志配置文件
-│  ├─logback-master.xml                 master服务日志配置文件
-│  ├─logback-worker.xml                 worker服务日志配置文件
-│  ├─logback-alert.xml                  alert服务日志配置文件
-├─sql                               DS的元数据创建升级sql文件
-│  ├─create                             创建SQL脚本目录
-│  ├─upgrade                            升级SQL脚本目录
-│  ├─dolphinscheduler_postgre.sql       postgre数据库初始化脚本
-│  ├─dolphinscheduler_mysql.sql         mysql数据库初始化脚本
-│  ├─soft_version                       当前DS版本标识文件
-├─script                            DS服务部署,数据库创建/升级脚本目录
-│  ├─create-dolphinscheduler.sh         DS数据库初始化脚本      
-│  ├─upgrade-dolphinscheduler.sh        DS数据库升级脚本                
-│  ├─monitor-server.sh                  DS服务监控启动脚本               
-│  ├─scp-hosts.sh                       安装文件传输脚本                                                    
-│  ├─remove-zk-node.sh                  清理zookeeper缓存文件脚本       
-├─ui                                前端WEB资源目录
-├─lib                               DS依赖的jar存放目录
-├─install.sh                        自动安装DS服务脚本
-
 
 ```
-
+├── LICENSE
+│
+├── NOTICE
+│
+├── licenses                                    licenses存放目录
+│
+├── bin                                         DolphinScheduler命令和环境变量配置存放目录 
+│   ├── dolphinscheduler-daemon.sh              启动/关闭DolphinScheduler服务脚本
+│   ├── env                                     环境变量配置存放目录
+│   │   ├── dolphinscheduler_env.sh             当使用`dolphinscheduler-daemon.sh`脚本起停服务时，运行此脚本加载环境变量配置文件 [如：JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] 
+│   │   └── install_env.sh                      当使用`install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`脚本时，运行此脚本为DolphinScheduler安装加载环境变量配置 
+│   ├── install.sh                              当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本自动安装服务  
+│   ├── remove-zk-node.sh                       清理zookeeper缓存文件脚本 
+│   ├── scp-hosts.sh                            安装文件传输脚本
+│   ├── start-all.sh                            当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本启动所有服务
+│   ├── status-all.sh                           当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本获取所有服务状态
+│   └── stop-all.sh                             当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本终止所有服务
+│
+├── alert-server                                DolphinScheduler alert-server命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── start.sh                            DolphinScheduler alert-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    alert-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件 
+│   │   ├── dolphinscheduler_env.sh             alert-server环境变量配置加载脚本
+│   │   └── logback-spring.xml                  alert-service日志配置文件
+│   └── libs                                    alert-server依赖jar包存放目录
+│
+├── api-server                                  DolphinScheduler api-server命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── start.sh                            DolphinScheduler api-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    api-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh             api-server环境变量配置加载脚本
+│   │   └── logback-spring.xml                  api-service日志配置文件
+│   ├── libs                                    api-server依赖jar包存放目录
+│   └── ui                                      api-server相关前端WEB资源存放目录 
+│
+├── master-server                               DolphinScheduler master-server命令、配置和依赖存放目录
+│   ├── bin                                
+│   │   └── start.sh                            DolphinScheduler master-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    master-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh             master-server环境变量配置加载脚本
+│   │   └── logback-spring.xml                  master-service日志配置文件
+│   └── libs                                    master-server依赖jar包存放目录
+│
+├── standalone-server                           DolphinScheduler standalone-server命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── start.sh                            DolphinScheduler standalone-server启动脚本
+│   ├── conf
+│   │   ├── application.yaml                    standalone-server配置文件
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh             standalone-server环境变量配置加载脚本
+│   │   ├── logback-spring.xml                  standalone-service日志配置文件
+│   │   └── sql                                 DolphinScheduler元数据创建/升级sql文件
+│   ├── libs                                    standalone-server依赖jar包存放目录
+│   └── ui                                      standalone-server相关前端WEB资源存放目录
+│       
+├── tools                                       DolphinScheduler元数据工具命令、配置和依赖存放目录
+│   ├── bin
+│   │   └── upgrade-schema.sh                   DolphinScheduler元数据创建/升级脚本
+│   ├── conf
+│   │   ├── application.yaml                    元数据工具配置文件
+│   │   └── common.properties                   公共服务（存储等信息）配置文件
+│   ├── libs                                    元数据工具依赖jar包存放目录
+│   └── sql                                     DolphinScheduler元数据创建/升级sql文件
+│     
+├── worker-server                               DolphinScheduler worker-server命令、配置和依赖存放目录
+│       ├── bin
+│       │   └── start.sh                        DolphinScheduler worker-server启动脚本
+│       ├── conf
+│       │   ├── application.yaml                worker-server配置文件
+│       │   ├── common.properties               公共服务（存储等信息）配置文件
+│       │   ├── dolphinscheduler_env.sh         worker-server环境变量配置加载脚本
+│       │   └── logback-spring.xml              worker-service日志配置文件
+│       └── libs                                worker-server依赖jar包存放目录
+│
+└── ui                                          前端WEB资源目录
+```
 
 # 配置文件详解
 
@@ -134,26 +174,28 @@ zookeeper.retry.maxtime|10|最大重试次数
 
 ## 4.common.properties [hadoop、s3、yarn配置]
 common.properties配置文件目前主要是配置hadoop/s3a相关的配置. 
-|参数 |默认值| 描述| 
+| 参数 | 默认值 | 描述 |
 |--|--|--|
-data.basedir.path|/tmp/dolphinscheduler|本地工作目录,用于存放临时文件
-resource.storage.type|NONE|资源文件存储类型: HDFS,S3,NONE
-resource.upload.path|/dolphinscheduler|资源文件存储路径
-hadoop.security.authentication.startup.state|false|hadoop是否开启kerberos权限
-java.security.krb5.conf.path|/opt/krb5.conf|kerberos配置目录
-login.user.keytab.username|hdfs-mycluster@ESZ.COM|kerberos登录用户
-login.user.keytab.path|/opt/hdfs.headless.keytab|kerberos登录用户keytab
-kerberos.expire.time|2|kerberos过期时间,整数,单位为小时
-resource.view.suffixs| txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties|资源中心支持的文件格式
-hdfs.root.user|hdfs|如果存储类型为HDFS,需要配置拥有对应操作权限的用户
-fs.defaultFS|hdfs://mycluster:8020|请求地址如果resource.storage.type=S3,该值类似为: s3a://dolphinscheduler. 如果resource.storage.type=HDFS, 如果 hadoop 配置了 HA,需要复制core-site.xml 和 hdfs-site.xml 文件到conf目录
-fs.s3a.endpoint||s3 endpoint地址
-fs.s3a.access.key||s3 access key
-fs.s3a.secret.key||s3 secret key
-yarn.resourcemanager.ha.rm.ids||yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可
-yarn.application.status.address|http://ds1:8088/ws/v1/cluster/apps/%s|如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname
-dolphinscheduler.env.path|env/dolphinscheduler_env.sh|运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-development.state|false|是否处于开发模式
+data.basedir.path | /tmp/dolphinscheduler | 本地工作目录,用于存放临时文件
+resource.storage.type | NONE | 资源文件存储类型: HDFS,S3,NONE
+resource.storage.upload.base.path | /dolphinscheduler | 资源文件存储路径
+resource.aws.access.key.id | minioadmin | S3 access key
+resource.aws.secret.access.key | minioadmin | S3 secret access key
+resource.aws.region | us-east-1 | S3 区域
+resource.aws.s3.bucket.name | dolphinscheduler | S3 存储桶名称
+resource.aws.s3.endpoint | http://minio:9000 | s3 endpoint地址
+resource.hdfs.root.user | hdfs | 如果存储类型为HDFS,需要配置拥有对应操作权限的用户
+resource.hdfs.fs.defaultFS | hdfs://mycluster:8020 | 请求地址如果resource.storage.type=S3,该值类似为: s3a://dolphinscheduler. 如果resource.storage.type=HDFS, 如果 hadoop 配置了 HA,需要复制core-site.xml 和 hdfs-site.xml 文件到conf目录
+hadoop.security.authentication.startup.state | false | hadoop是否开启kerberos权限
+java.security.krb5.conf.path | /opt/krb5.conf | kerberos配置目录
+login.user.keytab.username | hdfs-mycluster@ESZ.COM | kerberos登录用户
+login.user.keytab.path | /opt/hdfs.headless.keytab | kerberos登录用户keytab
+kerberos.expire.time | 2 | kerberos过期时间,整数,单位为小时
+yarn.resourcemanager.ha.rm.ids |  | yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可
+yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | 如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname
+dolphinscheduler.env.path | env/dolphinscheduler_env.sh | 运行脚本加载环境变量配置文件[如: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
+development.state | false | 是否处于开发模式
+task.resource.limit.state | false | 是否启用资源限制模式
 
 
 ## 5.application-api.properties [API服务配置]
@@ -169,7 +211,19 @@ spring.messages.encoding|UTF-8|请求编码
 spring.jackson.time-zone|GMT+8|设置时区
 spring.messages.basename|i18n/messages|i18n配置
 security.authentication.type|PASSWORD|权限校验类型
-
+security.authentication.ldap.user.admin|read-only-admin|LDAP登陆时，系统管理员账号
+security.authentication.ldap.urls|ldap://ldap.forumsys.com:389/|LDAP urls
+security.authentication.ldap.base-dn|dc=example,dc=com|LDAP base dn
+security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP账号
+security.authentication.ldap.password|password|LDAP密码
+security.authentication.ldap.user.identity-attribute|uid|LDAP用户身份标识字段名
+security.authentication.ldap.user.email-attribute|mail|LDAP邮箱字段名
+security.authentication.ldap.user.not-exist-action|CREATE|当LDAP用户不存在时执行的操作。CREATE：当用户不存在时自动新建用户, DENY：当用户不存在时拒绝登陆
+traffic.control.global.switch|false|流量控制全局开关
+traffic.control.max-global-qps-rate|300|全局最大请求数/秒
+traffic.control.tenant-switch|false|流量控制租户开关
+traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制
+traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制
 
 ## 6.master.properties [Master服务配置]
 |参数 |默认值| 描述| 
@@ -195,6 +249,8 @@ worker.heartbeat.interval|10|worker心跳间隔,单位为秒
 worker.max.cpuload.avg|-1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为-1: cpu cores * 2
 worker.reserved.memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务,单位为G
 worker.groups|default|worker分组配置,逗号分隔,例如'worker.groups=default,test' <br> worker启动时会根据该配置自动加入对应的分组
+worker.tenant.auto.create|true|租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。
+worker.tenant.distributed.user|false|使用场景为分布式用户例如使用FreeIpa创建的用户存于LDAP中.该参数只适用于Linux,当该参数为true时worker.tenant.auto.create将不生效,不会自动去创建租户
 
 
 ## 8.alert.properties [Alert 告警服务配置]
@@ -340,7 +396,7 @@ singleYarnIp="yarnIp1"
 resourceUploadPath="/dolphinscheduler"
 
 
-# HDFS/S3  操作用户
+# HDFS/S3  操作用户 
 hdfsRootUser="hdfs"
 
 # 以下为 kerberos 配置
@@ -380,21 +436,41 @@ apiServers="ds1"
 ```
 
 ## 11.dolphinscheduler_env.sh [环境变量配置]
-通过类似shell方式提交任务的的时候,会加载该配置文件中的环境变量到主机中.
-涉及到的任务类型有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等
+
+通过类似shell方式提交任务的的时候,会加载该配置文件中的环境变量到主机中. 涉及到的 `JAVA_HOME`、元数据库、注册中心和任务类型配置，其中任务
+类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等
+
 ```bash
-export HADOOP_HOME=/opt/soft/hadoop
-export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop
-export SPARK_HOME1=/opt/soft/spark1
-export SPARK_HOME2=/opt/soft/spark2
-export PYTHON_HOME=/opt/soft/python
-export JAVA_HOME=/opt/soft/java
-export HIVE_HOME=/opt/soft/hive
-export FLINK_HOME=/opt/soft/flink
-export DATAX_HOME=/opt/soft/datax/bin/datax.py
+# JAVA_HOME, will use it to start DolphinScheduler server
+export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH:$FLINK_HOME/bin:$DATAX_HOME:$PATH
+# Database related configuration, set database type, username and password
+export DATABASE=${DATABASE:-postgresql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL
+export SPRING_DATASOURCE_USERNAME
+export SPRING_DATASOURCE_PASSWORD
 
+# DolphinScheduler server related configuration
+export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
+export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
+export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
+
+# Registry center configuration, determines the type and link of the registry center
+export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
+export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
+
+# Tasks related configurations, need to change the configuration if you use the related tasks.
+export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
+export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
+export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
+export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
+export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ## 12.各服务日志配置文件

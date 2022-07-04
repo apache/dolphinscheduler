@@ -36,14 +36,7 @@ import java.util.Map;
 public class FlinkTask extends AbstractYarnTask {
 
     /**
-     *  flink command
-     *  usage: flink run [OPTIONS] <jar-file> <arguments>
-     */
-    private static final String FLINK_COMMAND = "flink";
-    private static final String FLINK_RUN = "run";
-
-    /**
-     *  flink parameters
+     * flink parameters
      */
     private FlinkParameters flinkParameters;
 
@@ -59,7 +52,6 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-
         logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
@@ -70,51 +62,28 @@ public class FlinkTask extends AbstractYarnTask {
         flinkParameters.setQueue(taskExecutionContext.getQueue());
         setMainJarName();
 
-        if (StringUtils.isNotEmpty(flinkParameters.getMainArgs())) {
-            String args = flinkParameters.getMainArgs();
-
-            // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
-            if (MapUtils.isEmpty(paramsMap)) {
-                paramsMap = new HashMap<>();
-            }
-            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-                paramsMap.putAll(taskExecutionContext.getParamsMap());
-            }
-
-            logger.info("param Map : {}", paramsMap);
-            args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
-            logger.info("param args : {}", args);
-            flinkParameters.setMainArgs(args);
-        }
+        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
 
     /**
      * create command
+     *
      * @return command
      */
     @Override
     protected String buildCommand() {
-        // flink run [OPTIONS] <jar-file> <arguments>
-        List<String> args = new ArrayList<>();
-
-        args.add(FLINK_COMMAND);
-        args.add(FLINK_RUN);
-        logger.info("flink task args : {}", args);
-        // other parameters
-        args.addAll(FlinkArgsUtils.buildArgs(flinkParameters));
+        // flink run/run-application [OPTIONS] <jar-file> <arguments>
+        List<String> args = FlinkArgsUtils.buildCommandLine(taskExecutionContext, flinkParameters);
 
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
         logger.info("flink task command : {}", command);
-
         return command;
     }
 
     @Override
     protected void setMainJarName() {
-        // main jar
         ResourceInfo mainJar = flinkParameters.getMainJar();
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);

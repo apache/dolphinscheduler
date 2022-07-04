@@ -51,31 +51,10 @@ export default {
                 ],
             },
             {
-                title: 'Installation',
-                children: [
-                    {
-                        title: 'Standalone Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/standalone.html',
-                    },
-                    {
-                        title: 'Pseudo Cluster Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
-                    },
-                    {
-                        title: 'Cluster Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/cluster.html',
-                    },
-                    {
-                        title: 'Kubernetes Deployment',
-                        link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
-                    },
-                ],
-            },
-            {
                 title: 'Introduction to Functions',
                 children: [
                     {
-                        title: 'Workflow Overview',
+                        title: 'Application Homepage',
                         link: '/en-us/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -166,6 +145,30 @@ export default {
                                 title: 'Amazon EMR',
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
                             },
+                            {
+                                title: 'Apache Zeppelin',
+                                link: '/en-us/docs/dev/user_doc/guide/task/zeppelin.html',
+                            },
+                            {
+                                title: 'Jupyter',
+                                link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
+                            },
+                            {
+                                title: 'Kubernetes',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
+                            {
+                                title: 'Openmldb',
+                                link: '/en-us/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dvc.html',
+                            },
                         ],
                     },
                     {
@@ -241,11 +244,36 @@ export default {
                                 title: 'Enterprise Webexteams',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: 'Script',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
+                            },
                         ],
                     },
                     {
                         title: 'Resource',
-                        link: '/en-us/docs/dev/user_doc/guide/resource.html',
+                        children: [
+                            {
+                                title: 'Configuration',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/configuration.html'
+                            },
+                            {
+                                title: 'File Manage',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/file-manage.html'
+                            },
+                            {
+                                title: 'UDF Manage',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/udf-manage.html'
+                            },
+                            {
+                                title: 'Task Group Manage',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/task-group.html'
+                            },
+                        ],
                     },
                     {
                         title: 'Monitor',
@@ -256,21 +284,17 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: 'How-To',
+                        title: 'Metrics',
                         children: [
                             {
-                                title: 'General Setting',
-                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                                title: 'Metrics',
+                                link: '/en-us/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
                     {
-                        title: 'Open API',
-                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
-                    },
-                    {
-                        title: 'Flink',
-                        link: '/en-us/docs/dev/user_doc/guide/flink-call.html',
+                        title: 'Data Quality',
+                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: 'Upgrade',
@@ -279,6 +303,27 @@ export default {
                     {
                         title: 'Expansion and Reduction',
                         link: '/en-us/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                ],
+            },
+            {
+                title: 'Installation',
+                children: [
+                    {
+                        title: 'Standalone Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/standalone.html',
+                    },
+                    {
+                        title: 'Pseudo Cluster Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
+                    },
+                    {
+                        title: 'Cluster Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/cluster.html',
+                    },
+                    {
+                        title: 'Kubernetes Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -312,12 +357,37 @@ export default {
                 ],
             },
             {
+                title: 'API',
+                children: [
+                    {
+                        title: 'Open API',
+                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
+                    },
+                    {
+                        title: 'PyDolphinScheduler',
+                        link: '/python/index.html',
+                    },
+                    {
+                        title: 'Health Check',
+                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
-                        link: '/en-us/docs/release/faq.html',
+                        title: 'General Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
+                    {
+                        title: 'Datasource Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
+                        title: 'Others',
+                        link: '/en-us/docs/release/faq.html',
+                    }
                 ],
             },
             {
@@ -365,31 +435,10 @@ export default {
                 ],
             },
             {
-                title: '部署指南',
-                children: [
-                    {
-                        title: '单机部署(Standalone)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/standalone.html',
-                    },
-                    {
-                        title: '伪集群部署(Pseudo-Cluster)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
-                    },
-                    {
-                        title: '集群部署(Cluster)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/cluster.html',
-                    },
-                    {
-                        title: 'Kubernetes部署(Kubernetes)',
-                        link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
-                    },
-                ],
-            },
-            {
                 title: '功能介绍',
                 children: [
                     {
-                        title: '指标总览',
+                        title: '应用首页',
                         link: '/zh-cn/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -480,6 +529,30 @@ export default {
                                 title: 'Amazon EMR',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
                             },
+                            {
+                                title: 'Apache Zeppelin',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/zeppelin.html',
+                            },
+                            {
+                                title: 'Jupyter',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
+                            },
+                            {
+                                title: 'Kubernetes',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
+                            },
+                            {
+                                title: 'MLflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
+                            {
+                                title: 'Openmldb',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dvc.html',
+                            },
                         ],
                     },
                     {
@@ -555,11 +628,36 @@ export default {
                                 title: 'Webexteams',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/enterprise-webexteams.html',
                             },
+                            {
+                                title: '脚本告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/script.html',
+                            },
+                            {
+                                title: 'Http告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/http.html',
+                            },
                         ],
                     },
                     {
                         title: '资源中心',
-                        link: '/zh-cn/docs/dev/user_doc/guide/resource.html',
+                        children: [
+                            {
+                                title: '配置详情',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/configuration.html'
+                            },
+                            {
+                                title: '文件管理',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/file-manage.html'
+                            },
+                            {
+                                title: 'UDF 管理',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/udf-manage.html'
+                            },
+                            {
+                                title: '任务组管理',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/task-group.html'
+                            },
+                        ],
                     },
                     {
                         title: '监控中心',
@@ -570,21 +668,17 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: '常见操作',
+                        title: '指标相关',
                         children: [
                             {
-                                title: '通用设置',
-                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                                title: '指标',
+                                link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
                     {
-                        title: 'API调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
-                    },
-                    {
-                        title: 'Flink调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/flink-call.html',
+                        title: '数据质量',
+                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: '升级',
@@ -593,6 +687,27 @@ export default {
                     {
                         title: '扩/缩容',
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                ],
+            },
+            {
+                title: '部署指南',
+                children: [
+                    {
+                        title: '单机部署(Standalone)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/standalone.html',
+                    },
+                    {
+                        title: '伪集群部署(Pseudo-Cluster)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/pseudo-cluster.html',
+                    },
+                    {
+                        title: '集群部署(Cluster)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/cluster.html',
+                    },
+                    {
+                        title: 'Kubernetes部署(Kubernetes)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                 ],
             },
@@ -626,10 +741,35 @@ export default {
                 ],
             },
             {
+                title: 'API',
+                children: [
+                    {
+                        title: 'API调用',
+                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
+                    },
+                    {
+                        title: 'PyDolphinScheduler',
+                        link: '/python/index.html',
+                    },
+                    {
+                        title: '健康检查',
+                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
+                        title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '数据源设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '其他',
                         link: '/zh-cn/docs/release/faq.html',
                     },
                 ],

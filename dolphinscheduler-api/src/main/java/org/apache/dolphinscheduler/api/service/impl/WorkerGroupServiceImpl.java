@@ -17,12 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -31,10 +37,11 @@ import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +86,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
         if (StringUtils.isEmpty(name)) {
@@ -116,6 +124,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
+            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
         }
         putMsg(result, Status.SUCCESS);
         return result;
@@ -182,12 +191,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
-            return result;
+        List<WorkerGroup> workerGroups = new ArrayList<>();
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            workerGroups = getWorkerGroups(true);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            if (!ids.isEmpty()) {
+                workerGroups = workerGroupMapper.selectBatchIds(ids);
+            }
         }
-
-        List<WorkerGroup> workerGroups = getWorkerGroups(true);
         List<WorkerGroup> resultDataList = new ArrayList<>();
         int total = 0;
 
@@ -224,12 +236,24 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     /**
      * query all worker group
      *
+     * @param loginUser
      * @return all worker group list
      */
     @Override
-    public Map<String, Object> queryAllGroup() {
+    public Map<String, Object> queryAllGroup(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        List<WorkerGroup> workerGroups = getWorkerGroups(false);
+        List<WorkerGroup> workerGroups;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            workerGroups = getWorkerGroups(false);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            workerGroups = workerGroupMapper.selectBatchIds(ids);
+        }
         List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
@@ -286,9 +310,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                String[] rv = registeredValue.split(Constants.COMMA);
-                wg.setCreateTime(new Date(Long.parseLong(rv[6])));
-                wg.setUpdateTime(new Date(Long.parseLong(rv[7])));
+                HeartBeat heartBeat = HeartBeat.decodeHeartBeat(registeredValue);
+                wg.setCreateTime(new Date(heartBeat.getStartupTime()));
+                wg.setUpdateTime(new Date(heartBeat.getReportTime()));
                 wg.setSystemDefault(true);
             }
             workerGroups.add(wg);
@@ -306,7 +330,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP,WORKER_GROUP_DELETE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);

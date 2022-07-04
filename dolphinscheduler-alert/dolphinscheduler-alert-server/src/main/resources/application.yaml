@@ -48,6 +48,15 @@ management:
     web:
       exposure:
         include: '*'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+  health:
+    db:
+      enabled: true
+    defaults:
+      enabled: false
   metrics:
     tags:
       application: ${spring.application.name}
@@ -66,5 +75,4 @@ spring:
     activate:
       on-profile: mysql
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver

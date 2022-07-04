@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -43,7 +43,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ITaskProcessor.class)
 public class CommonTaskProcessor extends BaseTaskProcessor {
 
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue<TaskPriority> taskUpdateQueue;
 
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
@@ -61,7 +61,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                     taskInstance.getName(),
                     taskGroupId,
                     taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskInstancePriority().getCode());
+                    taskInstance.getTaskGroupPriority());
             if (!acquireTaskGroup) {
                 logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
                 return true;
@@ -69,6 +69,15 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         }
         dispatchTask();
         return true;
+    }
+
+    @Override
+    protected boolean resubmitTask() {
+        if (this.taskInstance == null) {
+            return false;
+        }
+        setTaskExecutionLogger();
+        return dispatchTask();
     }
 
     @Override
@@ -101,7 +110,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 this.initQueue();
             }
             if (taskInstance.getState().typeIsFinished()) {
-                logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                logger.info("submit task , but task [{}] state [{}] is already  finished. ", taskInstance.getName(), taskInstance.getState());
                 return true;
             }
             // task cannot be submitted because its execution state is RUNNING or DELAY.
@@ -110,17 +119,22 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
-            logger.info("task ready to submit: {}", taskInstance);
+            logger.info("task ready to submit: taskInstanceId: {}", taskInstance.getId());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
-                    taskInstance.getId(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+                    taskInstance.getId(), taskInstance.getTaskGroupPriority(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
+            if (taskExecutionContext == null) {
+                logger.error("task get taskExecutionContext fail: {}", taskInstance);
+                return false;
+            }
+
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
-            logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
+            logger.info("Master submit task to priority queue success, taskInstanceId : {}", taskInstance.getId());
             return true;
         } catch (Exception e) {
             logger.error("submit task error", e);

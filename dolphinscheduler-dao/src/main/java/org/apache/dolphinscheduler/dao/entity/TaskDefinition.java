@@ -25,13 +25,12 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import org.apache.commons.lang.StringUtils;
-
+import org.apache.commons.collections4.CollectionUtils;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -41,6 +40,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Strings;
 
 /**
  * task definition
@@ -201,6 +201,16 @@ public class TaskDefinition {
      */
     private int taskGroupPriority;
 
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
+
     public TaskDefinition() {
     }
 
@@ -307,11 +317,19 @@ public class TaskDefinition {
     }
 
     public Map<String, String> getTaskParamMap() {
-        if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
+        if (taskParamMap == null && !Strings.isNullOrEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
-            if (localParams != null) {
+
+            //If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
+            if (localParams != null && !localParams.isNull()) {
                 List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
-                taskParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+
+                if (CollectionUtils.isNotEmpty(propList)) {
+                    taskParamMap = new HashMap<>();
+                    for (Property property : propList) {
+                        taskParamMap.put(property.getProp(), property.getValue());
+                    }
+                }
             }
         }
         return taskParamMap;
@@ -449,6 +467,22 @@ public class TaskDefinition {
         this.environmentCode = environmentCode;
     }
 
+    public Integer getCpuQuota() {
+        return cpuQuota == null ? -1 : cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax == null ? -1 : memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -469,11 +503,13 @@ public class TaskDefinition {
             && timeoutFlag == that.timeoutFlag
             && timeoutNotifyStrategy == that.timeoutNotifyStrategy
             && (Objects.equals(resourceIds, that.resourceIds)
-            || (StringUtils.EMPTY.equals(resourceIds) && that.resourceIds == null)
-            || (StringUtils.EMPTY.equals(that.resourceIds) && resourceIds == null))
+            || ("".equals(resourceIds) && that.resourceIds == null)
+            || ("".equals(that.resourceIds) && resourceIds == null))
             && environmentCode == that.environmentCode
             && taskGroupId == that.taskGroupId
-            && taskGroupPriority == that.taskGroupPriority;
+            && taskGroupPriority == that.taskGroupPriority
+            && Objects.equals(cpuQuota, that.cpuQuota)
+            && Objects.equals(memoryMax, that.memoryMax);
     }
 
     @Override
@@ -505,6 +541,8 @@ public class TaskDefinition {
                 + ", timeout=" + timeout
                 + ", delayTime=" + delayTime
                 + ", resourceIds='" + resourceIds + '\''
+                + ", cpuQuota=" + cpuQuota
+                + ", memoryMax=" + memoryMax
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

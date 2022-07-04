@@ -42,4 +42,14 @@
         <module>dolphinscheduler-datasource-all</module>
         <module>dolphinscheduler-datasource-redshift</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-datasource-hive</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

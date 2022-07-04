@@ -24,7 +24,8 @@ A：DolphinScheduler 由 5 个服务组成，MasterServer、WorkerServer、ApiSe
 
 ## Q：系统支持哪些邮箱？
 
-A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在 alert.properties 中选择性配置
+A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在dolphinscheduler的ui中进行配置：
+[如何配置邮箱告警](../zh/guide/alert/email.md)。
 
 ---
 
@@ -117,7 +118,7 @@ A：  	   1，如果替换变量中包含特殊字符，**请用 \ 转移符进�
 
 ​	    4，monitorServerState="false"，服务监控脚本是否启动，默认是不启动服务监控脚本的。**如果启动服务监控脚本，则每 5 分钟定时来监控 master 和 worker 的服务是否 down 机，如果 down 机则会自动重启**
 
-​	    5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到conf根目录下
+​	    5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 resource.hdfs.fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到conf根目录下
 
 ​	注意：**1.0.x 版本是不会自动创建 hdfs 根目录的，需要自行创建，并且需要部署用户有hdfs的操作权限**
 
@@ -203,7 +204,7 @@ A： 1，在 **流程定义列表**，点击 **启动** 按钮
 
 ## Q：Python 任务设置 Python 版本
 
-A：  只需要修改 conf/env/dolphinscheduler_env.sh 中的 PYTHON_HOME
+A：  只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_HOME
 
 ```
 export PYTHON_HOME=/bin/python
@@ -290,10 +291,9 @@ A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/do
 
 ​	3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
 
-​	4，到 bin 下，启动 worker server 和 logger server
+​	4，到 bin 下，启动 worker server
 ```
         ./dolphinscheduler-daemon.sh start worker-server
-        ./dolphinscheduler-daemon.sh start logger-server
 ```
 
 ---
@@ -539,7 +539,7 @@ master 服务、worker 服务在 zookeeper 注册时，会以 ip:port 的形式�
 如果 ip 地址获取错误，请检查网络信息，如 Linux 系统通过 `ifconfig` 命令查看网络信息，以下图为例：
 
 <p align="center">
-  <img src="/img/network/network_config.png" width="60%" />
+  <img src="../../img/network/network_config.png" width="60%" />
 </p>
 
 可以使用 dolphinscheduler 提供的三种策略，获取可用 ip：
@@ -582,7 +582,7 @@ A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EM
    
    2. 将 `conf/common.properties` 中的 `yarn.application.status.address` 修改为当前集群的 Yarn 的信息
    
-   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 和 `bin/dolphinscheduler-daemon.sh start logger-server` 分别启动 worker-server 和 logger-server
+   3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 启动 worker-server
 
 ---
 
@@ -682,5 +682,13 @@ update t_ds_version set version='2.0.1';
 ```
 
 ---
+
+## Q：在二进制分发包中找不到 python-gateway-server 文件夹
+
+A：在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server 中，当您启动 api server 后，Python gateway server 将启动。
+如果您不想在 api server 启动的时候启动 Python gateway server，您可以修改 api server 中的配置文件 `api-server/conf/application.yaml`
+并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
+
+--- 
 
 我们会持续收集更多的 FAQ。

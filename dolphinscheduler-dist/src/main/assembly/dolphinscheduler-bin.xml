@@ -17,7 +17,8 @@
 
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">    <id>bin</id>
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+    <id>bin</id>
     <formats>
         <format>tar.gz</format>
     </formats>
@@ -43,11 +44,6 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
             <outputDirectory>worker-server</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-log-server/target/logger-server</directory>
-            <outputDirectory>logger-server</outputDirectory>
         </fileSet>
 
         <fileSet>
@@ -79,7 +75,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui-next/dist</directory>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
 

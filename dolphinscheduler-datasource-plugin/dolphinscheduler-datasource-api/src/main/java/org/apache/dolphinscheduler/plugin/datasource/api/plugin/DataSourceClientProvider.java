@@ -17,25 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DataSourceClientProvider {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
-    private static final Map<String, DataSourceClient> uniqueId2dataSourceClientMap = new ConcurrentHashMap<>();
-
+    private static long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
+    private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(duration, TimeUnit.HOURS)
+            .maximumSize(100)
+            .build();
     private DataSourcePluginManager dataSourcePluginManager;
 
     private DataSourceClientProvider() {
@@ -50,12 +58,12 @@ public class DataSourceClientProvider {
         return DataSourceClientProviderHolder.INSTANCE;
     }
 
-    public Connection getConnection(DbType dbType, ConnectionParam connectionParam) {
+    public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
 
-        DataSourceClient dataSourceClient = uniqueId2dataSourceClientMap.computeIfAbsent(datasourceUniqueId, $ -> {
+        DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
             DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
             if (null == dataSourceChannel) {

@@ -21,11 +21,13 @@ import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -40,21 +42,25 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 /**
  * task scheduler thread
@@ -70,14 +76,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * task instance
      */
     private TaskExecutionContext taskExecutionContext;
-
-    public StorageOperate getStorageOperate() {
-        return storageOperate;
-    }
-
-    public void setStorageOperate(StorageOperate storageOperate) {
-        this.storageOperate = storageOperate;
-    }
 
     private StorageOperate storageOperate;
 
@@ -102,24 +100,28 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param taskCallbackService taskCallbackService
+     * @param taskCallbackService  taskCallbackService
      */
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
-                             AlertClientService alertClientService) {
+                             AlertClientService alertClientService,
+                             StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
+        this.storageOperate = storageOperate;
     }
 
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
                              AlertClientService alertClientService,
-                             TaskPluginManager taskPluginManager) {
+                             TaskPluginManager taskPluginManager,
+                             StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
+        this.storageOperate = storageOperate;
     }
 
     @Override
@@ -130,10 +132,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setEndTime(new Date());
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Task dry run success",
+                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             return;
         }
-
         try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
@@ -145,16 +149,16 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskCallbackService.sendTaskExecuteRunningCommand(taskExecutionContext);
 
             // copy hdfs/minio file to local
-            downloadResource(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources(), logger);
+            List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources());
+            if (!fileDownloads.isEmpty()) {
+                downloadResource(taskExecutionContext.getExecutePath(), logger, fileDownloads);
+            }
 
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
-            taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
             taskExecutionContext.setTaskAppId(String.format("%s_%s",
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
-
-            preBuildBusinessParams();
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
@@ -203,6 +207,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
             clearTaskExecPath();
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
@@ -221,7 +226,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             // get exec dir
             String execLocalPath = taskExecutionContext.getExecutePath();
 
-            if (StringUtils.isEmpty(execLocalPath)) {
+            if (Strings.isNullOrEmpty(execLocalPath)) {
                 logger.warn("task: {} exec local path is empty.", taskExecutionContext.getTaskName());
                 return;
             }
@@ -235,26 +240,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
                 logger.info("exec local path: {} cleared.", execLocalPath);
             } catch (IOException e) {
-                logger.error("delete exec dir failed : {}", e.getMessage(), e);
+                if (e instanceof NoSuchFileException) {
+                    // this is expected
+                } else {
+                    logger.error("Delete exec dir failed.", e);
+                }
             }
         }
-    }
-
-    /**
-     * get global paras map
-     *
-     * @return map
-     */
-    private Map<String, String> getGlobalParamsMap() {
-        Map<String, String> globalParamsMap = new HashMap<>(16);
-
-        // global params string
-        String globalParamsStr = taskExecutionContext.getGlobalParams();
-        if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
-            globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
-        }
-        return globalParamsMap;
     }
 
     /**
@@ -266,7 +258,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 task.cancelApplication(true);
                 ProcessUtils.killYarnJob(taskExecutionContext);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("Kill task failed", e);
             }
         }
     }
@@ -275,34 +267,50 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * download resource file
      *
      * @param execLocalPath execLocalPath
-     * @param projectRes projectRes
+     * @param fileDownloads projectRes
      * @param logger logger
      */
-    private void downloadResource(String execLocalPath, Map<String, String> projectRes, Logger logger) {
-        if (MapUtils.isEmpty(projectRes)) {
-            return;
+    public void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
+        for (Pair<String, String> fileDownload : fileDownloads) {
+            try {
+                // query the tenant code of the resource according to the name of the resource
+                String fullName = fileDownload.getLeft();
+                String tenantCode = fileDownload.getRight();
+                String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
+                logger.info("get resource file from hdfs :{}", resHdfsPath);
+                storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new ServiceException(e.getMessage());
+            }
         }
+    }
 
-        Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
-
-        for (Map.Entry<String, String> resource : resEntries) {
-            String fullName = resource.getKey();
-            String tenantCode = resource.getValue();
-            File resFile = new File(execLocalPath, fullName);
-            if (!resFile.exists()) {
-                try {
-                    // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
-                    logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    throw new ServiceException(e.getMessage());
-                }
+    /**
+     * download resource check
+     *
+     * @param execLocalPath
+     * @param projectRes
+     * @return
+     */
+    public List<Pair<String, String>> downloadCheck(String execLocalPath, Map<String, String> projectRes) {
+        if (MapUtils.isEmpty(projectRes)) {
+            return Collections.emptyList();
+        }
+        List<Pair<String, String>> downloadFile = new ArrayList<>();
+        projectRes.forEach((key, value) -> {
+            File resFile = new File(execLocalPath, key);
+            boolean notExist = !resFile.exists();
+            if (notExist) {
+                downloadFile.add(Pair.of(key, value));
             } else {
                 logger.info("file : {} exists ", resFile.getName());
             }
+        });
+        if (!downloadFile.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
+            throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
         }
+        return downloadFile;
     }
 
     /**
@@ -328,17 +336,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
     }
 
-    private void preBuildBusinessParams() {
-        Map<String, Property> paramsMap = new HashMap<>();
-        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-        if (taskExecutionContext.getScheduleTime() != null) {
-            Date date = taskExecutionContext.getScheduleTime();
-            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME, null);
-            Property p = new Property();
-            p.setValue(dateTime);
-            p.setProp(Constants.PARAMETER_DATETIME);
-            paramsMap.put(Constants.PARAMETER_DATETIME, p);
-        }
-        taskExecutionContext.setParamsMap(paramsMap);
+    public AbstractTask getTask() {
+        return task;
     }
 }

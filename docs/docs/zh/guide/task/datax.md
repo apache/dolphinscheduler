@@ -7,7 +7,7 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 ## 创建任务
 
 - 点击项目管理 -> 项目名称 -> 工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
-- 拖动工具栏的<img src="/img/tasks/icons/datax.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的<img src="../../../../img/tasks/icons/datax.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
 
@@ -19,6 +19,8 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 - 环境名称：配置运行脚本的环境。
 - 失败重试次数：任务失败重新提交的次数。
 - 失败重试间隔：任务失败重新提交任务的时间间隔，以分为单位。
+- Cpu 配额: 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
+- 最大内存：为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制
 - 延时执行时间：任务延迟执行的时间，以分为单位。
 - 超时警告：勾选超时警告、超时失败，当任务超过“超时时长”后，会发送告警邮件并且任务执行失败。
 - 自定义模板：当默认提供的数据源不满足所需要求的时，可自定义 datax 节点的 json 配置文件内容。
@@ -42,18 +44,22 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
 若生产环境中要是使用到 DataX 任务类型，则需要先配置好所需的环境。配置文件如下：`/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
 
-![datax_task01](/img/tasks/demo/datax_task01.png)
+![datax_task01](../../../../img/tasks/demo/datax_task01.png)
 
-  <p align="center">
-   <img src="/img/datax_edit.png" width="80%" />
-  </p>
+当环境配置完成之后，需要重启 DolphinScheduler。
 
-- 自定义模板：打开自定义模板开关时，可以自定义datax节点的json配置文件内容（适用于控件配置不满足需求时）
-- 数据源：选择抽取数据的数据源
-- sql语句：目标库抽取数据的sql语句，节点执行时自动解析sql查询列名，映射为目标表同步列名，源表和目标表列名不一致时，可以通过列别名（as）转换
-- 目标库：选择数据同步的目标库
-- 目标表：数据同步的目标表名
-- 前置sql:前置sql在sql语句之前执行（目标库执行）。
-- 后置sql:后置sql在sql语句之后执行（目标库执行）。
-- json：datax同步的json配置文件
-- 自定义参数：SQL任务类型，而存储过程是自定义参数顺序的给方法设置值自定义参数类型和数据类型同存储过程任务类型一样。区别在于SQL任务类型自定义参数会替换sql语句中${变量}。
+### 配置 DataX 任务节点
+
+由于默认的的数据源中并不包含从 Hive 中读取数据，所以需要自定义 json，可参考：[HDFS Writer](https://github.com/alibaba/DataX/blob/master/hdfswriter/doc/hdfswriter.md)。其中需要注意的是 HDFS 路径上存在分区目录，在实际情况导入数据时，分区建议进行传参，即使用自定义参数。
+
+在编写好所需的 json 之后，可按照下图步骤进行配置节点内容。
+
+![datax_task02](../../../../img/tasks/demo/datax_task02.png)
+
+### 查看运行结果
+
+![datax_task03](../../../../img/tasks/demo/datax_task03.png)
+
+## 注意事项：
+
+若默认提供的数据源不满足需求，可在自定义模板选项中，根据实际使用环境来配置 DataX 的 writer 和 reader，可参考：https://github.com/alibaba/DataX

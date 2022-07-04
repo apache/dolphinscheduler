@@ -41,8 +41,7 @@ workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
 do
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupName)
+  workerNames+=($worker)
 done
 
 StateRunning="Running"
@@ -55,7 +54,7 @@ do
 done
 
 # 2.worker server check state
-for worker in ${!workersGroupMap[*]}
+for worker in ${workerNames[@]}
 do
   workerState=`ssh -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status worker-server;"`
   echo "$worker  $workerState"
