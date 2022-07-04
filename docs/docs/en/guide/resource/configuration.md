@@ -66,6 +66,9 @@ resource.hdfs.root.user=root
 # if resource.storage.type=HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
 resource.hdfs.fs.defaultFS=hdfs://localhost:8020
 
+#If you need to connect to Metastore, please fill in the Hadoop configuration file path
+hadoop.configuration.resources=/etc/hive-site.xml,/etc/core-site.xml,/etc/hive-site.xml
+
 # whether to startup kerberos
 hadoop.security.authentication.startup.state=false
 

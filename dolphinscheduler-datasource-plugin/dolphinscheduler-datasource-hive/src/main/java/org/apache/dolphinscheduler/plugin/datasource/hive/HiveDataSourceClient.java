@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.exception.DataSourceException;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.hive.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -88,7 +89,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         logger.info("Create Configuration for hive configuration.");
-        this.hadoopConf = createHadoopConf();
+        this.hadoopConf = createHadoopConf(baseConnectionParam);
         logger.info("Create Configuration success.");
 
         logger.info("Create UserGroupInformation.");
@@ -96,7 +97,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("Create ugi success.");
 
         if (baseConnectionParam.getConnMetaStore()) {
-            this.metaStoreClientPool = new MetaStoreClientPool(5, 2, getHadoopConf());
+            this.metaStoreClientPool = new MetaStoreClientPool(5, 2, hadoopConf);
             logger.info("Create HiveMetaStore success.");
         }
 
@@ -175,8 +176,11 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         }
     }
 
-    protected Configuration createHadoopConf() {
-        Configuration hadoopConf = new Configuration();
+    protected Configuration createHadoopConf(BaseConnectionParam connectionParam) {
+        Configuration hadoopConf = CommonUtils.getHadoopConfFromResources(connectionParam);
+
+        hadoopConf.set("hive.metastore.client.connect.retry.delay", "1");
+        hadoopConf.set("hive.metastore.connect.retries", "1");
         hadoopConf.setBoolean("ipc.client.fallback-to-simple-auth-allowed", true);
         return hadoopConf;
     }
