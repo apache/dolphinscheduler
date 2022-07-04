@@ -17,15 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.ConditionType;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
@@ -37,12 +34,10 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
-import javax.sql.DataSource;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -51,8 +46,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class UpgradeDao {
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
@@ -148,6 +161,21 @@ public abstract class UpgradeDao {
     public void upgradeDolphinSchedulerTo200(String schemaDir) {
         processDefinitionJsonSplit();
         upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl_post.sql");
+    }
+
+    /**
+     * upgrade DolphinScheduler to 2.0.6
+     */
+    public void upgradeDolphinSchedulerResourceFileSize() {
+        ResourceDao resourceDao = new ResourceDao();
+        try {
+            // update the size of the folder that is the type of file.
+            resourceDao.updateResourceFolderSizeByFileType(dataSource.getConnection(), 0);
+            // update the size of the folder that is the type of udf.
+            resourceDao.updateResourceFolderSizeByFileType(dataSource.getConnection(), 1);
+        } catch (Exception ex) {
+            logger.error("Failed to upgrade because of failing to update the folder's size of resource files.");
+        }
     }
 
     /**
@@ -343,7 +371,6 @@ public abstract class UpgradeDao {
             ConnectionUtils.releaseResource(pstmt, conn);
         }
     }
-
 
     /**
      * update version
