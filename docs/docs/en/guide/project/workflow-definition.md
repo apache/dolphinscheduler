@@ -2,7 +2,7 @@
 
 ## Create workflow definition
 
-- Click `Project Management -> Workflow -> Workflow Definition`, enter the `Workflow Definition` page, and click the "`Create Workflow`" button to enter the **workflow DAG edit** page, as shown in the following figure:
+- Click `Project Management -> Workflow -> Workflow Definition`, enter the `Workflow Definition` page, and click the `Create Workflow` button to enter the **workflow DAG edit** page, as shown in the following figure:
 
   ![workflow-dag](../../../../img/new_ui/dev/project/workflow-dag.png)
 
@@ -12,13 +12,13 @@
 
 - **Add parameter settings for shell task:**
 
-1. Fill in the "`Node Name`", "`Description`" and "`Script`" fields;
+1. Fill in the `Node Name`, `Description` and `Script` fields;
 2. Check “`Normal`” for “`Run Flag`”. If “`Prohibit Execution`” is checked, the task will not execute when the workflow runs;
-3. Select "`Task Priority`": when the number of worker threads is insufficient, high priority tasks will execute first in the execution queue, and tasks with the same priority will execute in the order of first in, first out;
+3. Select `Task Priority`: when the number of worker threads is insufficient, high priority tasks will execute first in the execution queue, and tasks with the same priority will execute in the order of first in, first out;
 4. Timeout alarm (optional): check the timeout alarm, timeout failure, and fill in the "timeout period". When the task execution time exceeds **timeout period**, an alert email will send and the task timeout fails;
 5. Resources (optional). Resources are files create or upload in the `Resource Center -> File Management` page. For example, the file name is `test.sh`, and the command to call the resource in the script is `sh test.sh`;
 6. Customize parameters (optional);
-7. Click the "`Confirm Add`" button to save the task settings.
+7. Click the `Confirm Add` button to save the task settings.
 
 - **Set dependencies between tasks:** Click the plus sign on the right of the task node to connect the task; as shown in the figure below, task Node_B and task Node_C execute in parallel, When task Node_A finished execution, tasks Node_B and Node_C will execute simultaneously.
 
@@ -28,7 +28,7 @@
 
   ![workflow-delete](../../../../img/new_ui/dev/project/workflow-delete.png)
 
-- **Save workflow definition:** Click the "`Save`" button, and the "Set DAG chart name" window pops up, as shown in the figure below. Enter the workflow definition name, workflow definition description, and set global parameters (optional, refer to [global parameters](../parameter/global.md)), click the "`Add`" button to finish workflow definition creation.
+- **Save workflow definition:** Click the `Save` button, and the "Set DAG chart name" window pops up, as shown in the figure below. Enter the workflow definition name, workflow definition description, and set global parameters (optional, refer to [global parameters](../parameter/global.md)), click the `Add` button to finish workflow definition creation.
 
   ![workflow-save](../../../../img/new_ui/dev/project/workflow-save.png)
 
@@ -60,7 +60,7 @@ The following are the operation functions of the workflow definition list:
 
 ![workflow-online](../../../../img/new_ui/dev/project/workflow-online.png)
 
-- Click the "`Run`" button to pop up the startup parameter setting window, as shown in the figure below, set the startup parameters, click the "`Run`" button in the pop-up box, the workflow starts running, and the workflow instance page generates a workflow instance.
+- Click the `Run` button to pop up the startup parameter setting window, as shown in the figure below, set the startup parameters, click the `Run` button in the pop-up box, the workflow starts running, and the workflow instance page generates a workflow instance.
 
 ![workflow-run](../../../../img/new_ui/dev/project/workflow-run.png)
  
@@ -94,7 +94,7 @@ The following are the operation functions of the workflow definition list:
 
 ## Run the task alone
 
-- Right-click the task and click the "`Start`" button (only online tasks can be clicked to run).
+- Right-click the task and click the `Start` button (only online tasks can be clicked to run).
 
 ![workflow-task-run](../../../../img/new_ui/dev/project/workflow-task-run.png)
 
@@ -115,10 +115,10 @@ The following are the operation functions of the workflow definition list:
 
 - Failure strategy, notification strategy, process priority, worker group, notification group, recipient, and CC are the same as workflow running parameters.
 - Click the "Create" button to create the timing. Now the timing status is "**Offline**" and the timing needs to be **Online** to make effect.
-- Timing online: Click the "`Timing Management`" button <img src="../../../../img/timeManagement.png" width="35"/>, enter the timing management page, click the "`online`" button, the timing status will change to "`online`", as shown in the below figure, the workflow makes effect regularly.
+- Timing online: Click the `Timing Management` button <img src="../../../../img/timeManagement.png" width="35"/>, enter the timing management page, click the `online` button, the timing status will change to `online`, as shown in the below figure, the workflow makes effect regularly.
 
   ![workflow-time03](../../../../img/new_ui/dev/project/workflow-time03.png)
 
 ## Import Workflow
 
-Click `Project Management -> Workflow -> Workflow Definition` to enter the workflow definition page, click the "`Import Workflow`" button to import the local workflow file, the workflow definition list displays the imported workflow and the status is offline.
+Click `Project Management -> Workflow -> Workflow Definition` to enter the workflow definition page, click the `Import Workflow` button to import the local workflow file, the workflow definition list displays the imported workflow and the status is offline.

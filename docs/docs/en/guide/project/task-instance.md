@@ -4,6 +4,6 @@
 
 ![task-instance](../../../../img/new_ui/dev/project/task-instance.png)
 
-- View log：Click the "`View Log`" button in the operation column to view task execution log.
+- View log：Click the `View Log` button in the operation column to view task execution log.
 
 ![task-log](../../../../img/new_ui/dev/project/task-log.png)

@@ -23,7 +23,7 @@
 ## View Task History
 
 - Click `Project Management -> Workflow -> Workflow Instance`, enter the workflow instance page, and click the workflow name to enter the workflow DAG page;
-- Double-click the task node, as shown in the figure below, click "`View History`" to jump to the task instance page, and display a list of task instances running by the workflow instance.
+- Double-click the task node, as shown in the figure below, click `View History` to jump to the task instance page, and display a list of task instances running by the workflow instance.
 
 ![instance-history](../../../../img/new_ui/dev/project/instance-history.png)
 
