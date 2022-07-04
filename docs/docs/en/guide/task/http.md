@@ -6,7 +6,7 @@ This node is used to perform http type tasks such as the common POST and GET req
 
 ## Create Task
 
--  Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
+-  Click `Project Management -> Project Name -> Workflow Definition`, and click the "`Create Workflow`" button to enter the DAG editing page.
 - Drag the <img src="../../../../img/tasks/icons/http.png" width="15"/> from the toolbar to the drawing board.
 
 ## Task Parameters

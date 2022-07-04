@@ -65,8 +65,7 @@ The MLflow plugin currently supports and will support the following:
 | Model Name | The registered model name is added to the original model version and registered as Production. |
 | Data Path | The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder（In the suggested way, users should build their own test sets for model evaluation. |
 | Parameters | Parameter when initializing the algorithm/AutoML model, which can be empty. For example, parameters `"time_budget=30;estimator_list=['lgbm']"` for flaml 。The convention will be passed with '; ' shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. <ul><li>[Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression)</li><li>[SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html?highlight=svc#sklearn.svm.SVC)</li><li>[lightgbm](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier)</li><li>[xgboost](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBClassifier)</li></ul> |
-| Algorithm |The selected algorithm currently supports `LR`, `SVM`, `LightGBM` and `XGboost` based
-  on [scikit-learn](https://scikit-learn.org/) form. |
+| Algorithm |The selected algorithm currently supports `LR`, `SVM`, `LightGBM` and `XGboost` based on [scikit-learn](https://scikit-learn.org/) form. |
 | Parameter Search Space | Parameter search space when running the corresponding algorithm, which can be empty. For example, the parameter `max_depth=[5, 10];n_estimators=[100, 200]` for lightgbm 。The convention will be passed with '; 'shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. |
 
 #### AutoML
@@ -102,7 +101,7 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 | **Parameter** | **Description** |
 | ------- | ---------- |
-| Model-URI | Model-URI of MLflow , support `models:/<model_name>/suffix` format and `runs:/` format. See https://mlflow.org/docs/latest/tracking. |html#artifact-stores.
+| Model-URI | Model-URI of MLflow , support `models:/<model_name>/suffix` format and `runs:/` format. See https://mlflow.org/docs/latest/tracking.html#artifact-stores |
 | Port | The port to listen on. |
 
 
@@ -125,7 +124,7 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 ## Environment to Prepare
 
-### Conda environment
+### Conda Environment
 
 You need to enter the admin account to configure a conda environment variable（Please
 install [anaconda](https://docs.continuum.io/anaconda/install/)
