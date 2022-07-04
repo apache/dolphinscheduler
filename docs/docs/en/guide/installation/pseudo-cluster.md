@@ -142,52 +142,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 
 ## Initialize the Database
 
-DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the lib directory of DolphinScheduler, which is `tools/libs/`. Let's take MySQL as an example for how to initialize the database:
-
-For mysql 5.6 / 5.7
-
-```shell
-mysql -uroot -p
-
-mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-# Replace {user} and {password} with your username and password
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
-
-mysql> flush privileges;
-```
-
-For mysql 8:
-
-```shell
-mysql -uroot -p
-
-mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-# Replace {user} and {password} with your username and password
-mysql> CREATE USER '{user}'@'%' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
-mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
-mysql> FLUSH PRIVILEGES;
-``` 
-
-Then, modify `./bin/env/dolphinscheduler_env.sh` to use mysql, change {user} and {password} to what you set in the previous step.
-
-```shell
-export DATABASE=${DATABASE:-mysql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
-export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
-```
-
-After the above steps done you would create a new database for DolphinScheduler, then run the Shell script to init database:
-
-```shell
-sh tools/bin/upgrade-schema.sh
-```
+Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 
 ## Start DolphinScheduler
 
@@ -241,5 +196,4 @@ sh ./bin/dolphinscheduler-daemon.sh stop alert-server
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
-[mysql]: https://downloads.MySQL.com/archives/c-j/
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597
