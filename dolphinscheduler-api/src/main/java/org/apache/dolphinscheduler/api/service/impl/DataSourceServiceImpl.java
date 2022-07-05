@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +100,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return create result code
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
         DataSourceUtils.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
@@ -138,6 +140,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         } catch (DuplicateKeyException ex) {
             logger.error("Create datasource error.", ex);
             putMsg(result, Status.DATASOURCE_EXIST);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
         }
 
         return result;
@@ -305,14 +309,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList = null;
-        
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_UPDATE)){
-            datasourceList = dataSourceMapper.queryDataSourceByType(UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), type);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
         }
-
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

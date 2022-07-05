@@ -351,6 +351,9 @@ interface ITaskParams {
   dvcMessage?: string
   dvcLoadSaveDataPath?: string
   dvcStoreUrl?: string
+  address?: string
+  taskId?: string
+  online?: boolean
 }
 
 interface INodeData

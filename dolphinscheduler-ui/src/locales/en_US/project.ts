@@ -711,6 +711,11 @@ export default {
     custom_config: 'Custom Config',
     engine: 'engine',
     engine_tips: 'Please select engine',
-    run_mode: 'Run Mode'
+    run_mode: 'Run Mode',
+    dinky_address: 'Dinky address',
+    dinky_address_tips: 'Please enter the url of your dinky',
+    dinky_task_id: 'Dinky task id',
+    dinky_task_id_tips: 'Please enter the task id of your dinky',
+    dinky_online: 'Online task'
   }
 }

@@ -697,6 +697,11 @@ export default {
     custom_config: '自定义配置',
     engine: '引擎',
     engine_tips: '请选择引擎',
-    run_mode: '运行模式'
+    run_mode: '运行模式',
+    dinky_address: 'dinky 地址',
+    dinky_address_tips: '请输入 Dinky 地址',
+    dinky_task_id: 'dinky 作业ID',
+    dinky_task_id_tips: '请输入作业 ID',
+    dinky_online: '是否上线作业'
   }
 }
