@@ -59,6 +59,7 @@ extensions = [
     "sphinx_click.ext",
     # Add inline tabbed content
     "sphinx_inline_tabs",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
