@@ -318,7 +318,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return Queue object
      */
     @Override
-    public Queue crtQueueIfNotExists(String queue, String queueName) {
+    public Queue createQueueIfNotExists(String queue, String queueName) {
         Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
         if (!queueValidator.isPresent()) {
             Queue queueObj = new Queue();

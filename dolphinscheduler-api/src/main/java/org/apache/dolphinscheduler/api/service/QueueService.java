@@ -86,6 +86,6 @@ public interface QueueService {
      * @param queueName queue name
      * @return Queue object
      */
-    Queue crtQueueIfNotExists(String queue, String queueName);
+    Queue createQueueIfNotExists(String queue, String queueName);
 
 }

@@ -113,5 +113,5 @@ public interface TenantService {
      * @param queueName The name of queue which current tenant belong
      * @return Tenant object
      */
-    Tenant crtTenantIfNotExists(String tenantCode, String desc, String queue, String queueName);
+    Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName);
 }

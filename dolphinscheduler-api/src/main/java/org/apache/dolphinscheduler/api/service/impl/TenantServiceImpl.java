@@ -47,7 +47,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -386,7 +385,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return Tenant object
      */
     @Override
-    public Tenant crtTenantIfNotExists(String tenantCode, String desc, String queue, String queueName) {
+    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName) {
         if (checkTenantExists(tenantCode)) {
             return tenantMapper.queryByTenantCode(tenantCode);
         }
@@ -396,7 +395,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             Map<String, Object> validator = tenantValidator.get();
             throw new IllegalArgumentException((String) validator.get(Constants.MSG));
         }
-        Queue newQueue = queueService.crtQueueIfNotExists(queue, queueName);
+        Queue newQueue = queueService.createQueueIfNotExists(queue, queueName);
 
         Tenant tenant = new Tenant();
         Date now = new Date();
