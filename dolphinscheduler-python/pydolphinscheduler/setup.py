@@ -52,6 +52,7 @@ doc = [
     "sphinx_rtd_theme>=1.0",
     "sphinx-click>=3.0",
     "sphinx-inline-tabs",
+    "sphinx-copybutton>=0.4.0",
 ]
 
 test = [
