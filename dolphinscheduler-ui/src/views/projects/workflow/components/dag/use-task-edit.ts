@@ -174,7 +174,8 @@ export function useTaskEdit(options: Options) {
             ...taskDef,
             version: task.version,
             code: task.code,
-            taskType: currTask.value.taskType
+            taskType: currTask.value.taskType,
+            id: task.id
           }
         }
         return task
