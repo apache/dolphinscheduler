@@ -77,6 +77,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return create result code
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
