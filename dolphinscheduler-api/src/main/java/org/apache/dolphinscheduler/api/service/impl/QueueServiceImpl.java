@@ -65,6 +65,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * Valid both queue and queueName when we want to create or update queue object
+     *
+     * @param queue queue value
+     * @param queueName queue name
+     * @return Optional of Status map
+     */
     private Optional<Map<String, Object>> queueValid(String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(queue) || StringUtils.isEmpty(queueName)) {
@@ -306,6 +313,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      *
      * ONLY for python gateway server, and should not use this in web ui function
      *
+     * @param queue queue value
      * @param queueName queue name
      * @return Queue object
      */

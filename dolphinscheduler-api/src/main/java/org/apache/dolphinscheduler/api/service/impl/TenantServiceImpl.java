@@ -85,10 +85,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Autowired(required = false)
     private StorageOperate storageOperate;
 
+    /**
+     * Valid tenantCode when we want to create or update tenant object
+     *
+     * @param tenantCode Tenant code of tenant object
+     * @return Optional of Status map
+     */
     private Optional<Map<String, Object>> tenantCodeValid(String tenantCode) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(tenantCode)) {
-            putMsg(result, Status.TENANT_CODE_IS_EMPTY);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
             return Optional.of(result);
         } else if (StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH) {
             putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
