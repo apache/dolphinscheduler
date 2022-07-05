@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.HashMap;
 
 import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -44,10 +46,18 @@ import org.springframework.util.MultiValueMap;
 /**
  * data source controller test
  */
- class DataSourceControllerTest extends AbstractControllerTest{
+ public class DataSourceControllerTest extends AbstractControllerTest{
     private static final Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
 
+    @BeforeEach
+    public void initSetUp(){
+        setUp();
+    }
 
+    @AfterEach
+    public void afterEach() throws Exception {
+       after();
+    }
     @Ignore("unknown yourself connection information")
     @Test
     void testCreateDataSource() throws Exception {
@@ -77,7 +87,6 @@ import org.springframework.util.MultiValueMap;
     @ParameterizedTest
     @ValueSource(ints = {2})
     void testUpdateDataSource(int args) throws Exception {
-        setUp();
         HashMap<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("id",args);
         paramsMap.put("name","mysql");
@@ -105,13 +114,11 @@ import org.springframework.util.MultiValueMap;
     @ParameterizedTest
     @ValueSource(ints = {2})
     void testQueryDataSource(int id) throws Exception {
-        setUp();
         MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id)
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        after();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -122,7 +129,6 @@ import org.springframework.util.MultiValueMap;
             "type, MYSQL"
     })
     void testQueryDataSourceList(String key , String dbType) throws Exception {
-        setUp();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
@@ -180,7 +186,6 @@ import org.springframework.util.MultiValueMap;
     @ParameterizedTest
     @ValueSource(ints = {2})
     void testConnectionTest(int id) throws Exception {
-        setUp();
         MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id+"/connect-test")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
@@ -193,13 +198,12 @@ import org.springframework.util.MultiValueMap;
 
     @ParameterizedTest
     @CsvSource({
-            "type, MYSQL,/datasources/verify-name"
+            "type, MYSQL"
     })
-    void testVerifyDataSourceName(String key , String dbType,String url) throws Exception {
-        setUp();
+    void testVerifyDataSourceName(String key , String dbType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
-        MvcResult mvcResult = mockMvc.perform(get(url)
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/verify-name")
                         .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -240,11 +244,9 @@ import org.springframework.util.MultiValueMap;
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"/datasources/kerberos-startup-state"})
+    @Test
     void testGetKerberosStartupState(String url) throws Exception {
-        setUp();
-        MvcResult mvcResult = mockMvc.perform(get(url)
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -255,11 +257,9 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Ignore("unknown your datasource id")
-    @ParameterizedTest
-    @ValueSource(ints = {2})
-    void testDelete(int id) throws Exception {
-        setUp();
-        MvcResult mvcResult = mockMvc.perform(delete("/datasources/"+id)
+    @Test
+    void testDelete() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
