@@ -39,7 +39,7 @@ export JAVA_HOME=$JAVA_HOME
 export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
 export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/api-server/libs/*
 
-export DOLPHINSCHEDULER_OPTS="-Xmx1g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
+export DOLPHINSCHEDULER_OPTS="-Xmx1g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
 export STOP_TIMEOUT=5
 
 CLASS=org.apache.zookeeper.ZooKeeperMain
