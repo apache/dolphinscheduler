@@ -37,6 +37,8 @@ import org.apache.hadoop.util.ThreadUtil;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
