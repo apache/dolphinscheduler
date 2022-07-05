@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class TaskInstancePage {
-    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskInstancePage.class);
     private static String taskState = null;
     private static Integer taskInstanceId = null;
 

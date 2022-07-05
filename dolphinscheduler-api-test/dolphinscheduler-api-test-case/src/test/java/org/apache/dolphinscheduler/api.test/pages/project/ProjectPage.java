@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class ProjectPage {
-    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProjectPage.class);
 
     public HttpResponse createProject(String sessionId, String projectName, String description, String userName) {
         Map<String, Object> params = new HashMap<>();

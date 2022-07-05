@@ -22,7 +22,14 @@ package org.apache.dolphinscheduler.api.test.pages.project;
 
 import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
-import org.apache.dolphinscheduler.api.test.entity.*;
+import org.apache.dolphinscheduler.api.test.entity.TaskParamsMap;
+import org.apache.dolphinscheduler.api.test.entity.TaskDefinitionRequestData;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowRunRequestData;
+import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowCreateRequestData;
+import org.apache.dolphinscheduler.api.test.entity.TaskRelationRequestData;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseData;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseTotalList;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.slf4j.Logger;
@@ -36,7 +43,7 @@ import java.util.Map;
 public final class WorkFlowDefinitionPage {
     private static String genNumId = null;
     private static String workFlowCode = null;
-    private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkFlowDefinitionPage.class);
 
     public void getGenNumId(String sessionId, String projectName) {
 

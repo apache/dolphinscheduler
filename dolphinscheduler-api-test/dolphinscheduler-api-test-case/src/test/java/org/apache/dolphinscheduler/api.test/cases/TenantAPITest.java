@@ -45,7 +45,7 @@ public class TenantAPITest {
 
     private static final String user = "admin";
 
-    private static final String tenantName = "admin";
+    private static final String tenantName = "admin1";
 
     private static final String password = "dolphinscheduler123";
 
@@ -76,39 +76,9 @@ public class TenantAPITest {
     public void testDuplicateCreateTenant() {
         TenantPage tenantPage = new TenantPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
+        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenantName, 1, "");
 
         Assertions.assertFalse(createTenantHttpResponse.body().success());
-    }
-
-    @Test
-    @Order(5)
-    public void testGetTenantListPaging() {
-        TenantPage tenantPage = new TenantPage();
-
-        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
-        boolean result = false;
-
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.body().data(), TenantListPagingResponseData.class).totalList()) {
-            if (tenantListPagingResponseTotalList.tenantCode().equals(tenant)) {
-                result = true;
-                existTenantId = tenantListPagingResponseTotalList.id();
-                break;
-            }
-        }
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
-        Assertions.assertTrue(result);
-    }
-
-    @Test
-    @Order(10)
-    public void testDeleteTenant() {
-        TenantPage tenantPage = new TenantPage();
-
-        HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
-
-        Assertions.assertTrue(deleteTenantHttpResponse.body().success());
     }
 
 }
