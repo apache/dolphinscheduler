@@ -834,5 +834,5 @@ public final class Constants {
 
     public static final String FUNCTION_START_WITH = "$";
 
-    public static final Integer DEFAULT_TENANT_ID = 1;
+    public static final Integer DEFAULT_QUEUE_ID = 1;
 }
