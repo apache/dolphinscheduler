@@ -258,8 +258,8 @@ export default {
                         title: 'Resource',
                         children: [
                             {
-                                title: 'Resources',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/resources_introduction.html'
+                                title: 'Introduction',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/intro.html'
                             },
                             {
                                 title: 'Configuration',
@@ -646,6 +646,10 @@ export default {
                     {
                         title: '资源中心',
                         children: [
+                            {
+                                title: '简介',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/intro.html'
+                            },
                             {
                                 title: '配置详情',
                                 link: '/zh-cn/docs/dev/user_doc/guide/resource/configuration.html'

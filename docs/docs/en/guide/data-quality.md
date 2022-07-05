@@ -13,6 +13,7 @@ The execution flow of the data quality task is as follows:
 - Add config : `<server-name>/conf/common.properties`
 
 ```properties
+# Change to specific version if you not use dev branch
 data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 ```
 
@@ -54,7 +55,7 @@ The goal of the null value check is to check the number of empty rows in the spe
 
 ### Interface Operation Guide
 
-![dataquality_null_check](/img/tasks/demo/null_check.png)
+![dataquality_null_check](../../../img/tasks/demo/null_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -75,7 +76,7 @@ The timeliness check is used to check whether the data is processed within the e
 
 ### Interface Operation Guide
 
-![dataquality_timeliness_check](/img/tasks/demo/timeliness_check.png)
+![dataquality_timeliness_check](../../../img/tasks/demo/timeliness_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -100,7 +101,7 @@ The goal of field length verification is to check whether the length of the sele
 
 ### Interface Operation Guide
 
-![dataquality_length_check](/img/tasks/demo/field_length_check.png)
+![dataquality_length_check](../../../img/tasks/demo/field_length_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -124,7 +125,7 @@ The goal of the uniqueness check is to check whether the field is duplicated. It
 
 ### Interface Operation Guide
 
-![dataquality_uniqueness_check](/img/tasks/demo/uniqueness_check.png)
+![dataquality_uniqueness_check](../../../img/tasks/demo/uniqueness_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -146,7 +147,7 @@ The goal of regular expression verification is to check whether the format of th
 
 ### Interface Operation Guide
 
-![dataquality_regex_check](/img/tasks/demo/regexp_check.png)
+![dataquality_regex_check](../../../img/tasks/demo/regexp_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -168,7 +169,7 @@ The goal of enumeration value verification is to check whether the value of a fi
 
 ### Interface Operation Guide
 
-![dataquality_enum_check](/img/tasks/demo/enumeration_check.png)
+![dataquality_enum_check](../../../img/tasks/demo/enumeration_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -191,7 +192,7 @@ The goal of table row number verification is to check whether the number of rows
 
 ### Interface Operation Guide
 
-![dataquality_count_check](/img/tasks/demo/table_count_check.png)
+![dataquality_count_check](../../../img/tasks/demo/table_count_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -210,7 +211,7 @@ The goal of table row number verification is to check whether the number of rows
 
 ### Interface Operation Guide
 
-![dataquality_custom_sql_check](/img/tasks/demo/custom_sql_check.png)
+![dataquality_custom_sql_check](../../../img/tasks/demo/custom_sql_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -247,7 +248,7 @@ If you compare the data in c1 and c21, the tables test1 and test2 are exactly th
 
 ### Interface Operation Guide
 
-![dataquality_multi_table_accuracy_check](/img/tasks/demo/multi_table_accuracy_check.png)
+![dataquality_multi_table_accuracy_check](../../../img/tasks/demo/multi_table_accuracy_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -271,7 +272,7 @@ Two-table value comparison allows users to customize different SQL statistics fo
 
 ### Interface Operation Guide
 
-![dataquality_multi_table_comparison_check](/img/tasks/demo/multi_table_comparison_check.png)
+![dataquality_multi_table_comparison_check](../../../img/tasks/demo/multi_table_comparison_check.png)
 
 | **Parameter** | **Description** |
 | ----- | ---- |
@@ -291,14 +292,14 @@ Two-table value comparison allows users to customize different SQL statistics fo
 
 ## Task result view
 
-![dataquality_result](/img/tasks/demo/result.png)
+![dataquality_result](../../../img/tasks/demo/result.png)
 
 ## Rule View
 
 ### List of rules
 
-![dataquality_rule_list](/img/tasks/demo/rule_list.png)
+![dataquality_rule_list](../../../img/tasks/demo/rule_list.png)
 
 ### Rules Details
 
-![dataquality_rule_detail](/img/tasks/demo/rule_detail.png)
+![dataquality_rule_detail](../../../img/tasks/demo/rule_detail.png)

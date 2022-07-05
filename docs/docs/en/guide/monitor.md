@@ -8,25 +8,25 @@
 
 - Mainly related to master information.
 
-![master](/img/new_ui/dev/monitor/master.png)
+![master](../../../img/new_ui/dev/monitor/master.png)
 
 ### Worker Server
 
 - Mainly related to worker information.
 
-![worker](/img/new_ui/dev/monitor/worker.png)
+![worker](../../../img/new_ui/dev/monitor/worker.png)
 
 ### Database
 
 - Mainly the health status of the DB.
 
-![db](/img/new_ui/dev/monitor/db.png)
+![db](../../../img/new_ui/dev/monitor/db.png)
 
 ## Statistics Management
 
 ### Statistics
 
-![statistics](/img/new_ui/dev/monitor/statistics.png)
+![statistics](../../../img/new_ui/dev/monitor/statistics.png)
 
 | **Parameter** | **Description** |
 | ----- | ----- |
@@ -40,4 +40,4 @@
 The audit log provides information about who accesses the system and the operations made to the system and record related
 time, which strengthen the security of the system and maintenance.
 
-![audit-log](/img/new_ui/dev/monitor/audit-log.jpg)
+![audit-log](../../../img/new_ui/dev/monitor/audit-log.jpg)
