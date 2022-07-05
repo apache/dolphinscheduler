@@ -10,6 +10,7 @@ The resource management and file management functions are similar. The differenc
 
 > Click "`Create UDF Function`", enter the UDF function parameters, select the UDF resource, and click "`Submit`" to create the UDF function.
 > Currently, only supports temporary UDF functions of `HIVE`.
+
 - UDF function name: Enter the name of the UDF function.
 - Package name Class name: Enter the full path of the UDF function.
 - UDF resource: Set the resource file corresponding to the created UDF function.
@@ -28,7 +29,7 @@ You can customize UDF functions based on actual production requirements. Write a
 
 Before configuring the UDF function, upload the jar package of the UDF function through resource management. Then enter function management and configure related information. As shown below:
 
-![conf-udf](/img/new_ui/dev/resource/demo/udf-demo02.png)
+![conf-udf](../../../../img/new_ui/dev/resource/demo/udf-demo02.png)
 
 ### Use UDF functions
 

@@ -31,10 +31,12 @@
 ![create-user](../../../img/new_ui/dev/security/create-user.png)
 
 > **Edit user information**
+
 - The administrator enters the `Security Center->User Management` page and clicks the `Edit` button to edit user information.
 - After a normal user logs in, click the user information in the username drop-down box to enter the user information page, and click the `Edit` button to edit the user information.
 
 > **Modify user password**
+
 - The administrator enters the `Security Center->User Management` page and clicks the `Edit` button. When editing user information, enter the new password to modify the user password.
 - After a normal user logs in, click the user information in the username drop-down box to enter the password modification page, enter the password and confirm the password and click the `Edit` button, then the password modification is a success.
 
@@ -117,6 +119,7 @@ Each worker node will belong to its own worker group, and the default group is "
 When executing a task, the task can be assigned to the specified worker group, and the task will be executed by the worker node in the group.
 
 > Add or update worker group
+
 - Open the `conf/worker.properties` configuration file on the worker node where you want to configure the groups and modify the `worker.groups` parameter.
 - The `worker.groups` parameter is followed by the name of the group corresponding to the worker node, which is `default`.
 - If the worker node corresponds to more than one group, they are separated by commas.
@@ -135,6 +138,7 @@ worker.groups=default,test
 * When executing a task, the task can be assigned to the specified worker group, and select the corresponding environment according to the worker group. Finally, the worker node executes the environment first and then executes the task.
 
 > Add or update environment
+
 - The environment configuration is equivalent to the configuration in the `dolphinscheduler_env.sh` file.
 
 ![create-environment](../../../img/new_ui/dev/security/create-environment.png)
@@ -157,9 +161,11 @@ worker.groups=default,test
 ## Namespace Management
 
 > Add or update k8s cluster
+
 - First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database, which will be configured later by the web page.
 
 > Add or update namespace
+
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)

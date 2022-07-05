@@ -4,37 +4,50 @@ When third party jars are used in the scheduling process or user defined scripts
 
 ![file-manage](../../../../img/new_ui/dev/resource/file-manage.png)
 
-> **Note:**
+> **_Note:_**
 >
-> * When you manage files as `admin`, remember to set up `tenant` for `admin` first.
+> * When you manage files as `admin`, remember to set up `tenant` for `admin` first. 
 
-- Create a file
-  > The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql properties.
-![create-file](/img/new_ui/dev/resource/create-file.png)
+## Basic Operations
 
-- Upload files
+### Create a File
 
-> Upload file: Click the "`Upload File`" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
+The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
+
+![create-file](../../../../img/new_ui/dev/resource/create-file.png)
+
+### Upload Files
+
+Click the "Upload File" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
+
 ![upload-file](../../../../img/new_ui/dev/resource/upload-file.png)
 
-- File view
+### View File Content
 
-> For the files that can be viewed, click the file name to view the file details.
+ For the files that can be viewed, click the file name to view the file details.
+
 ![file_detail](../../../../img/tasks/demo/file_detail.png)
 
-- Download file
+### Download file
 
-> Click the "`Download`" button in the file list to download the file or click the "`Download`" button in the upper right corner of the file details to download the file.
-- File rename
+> Click the "Download" button in the file list to download the file or click the "Download" button in the upper right corner of the file details to download the file.
+
+### Rename File
 
 ![rename-file](../../../../img/new_ui/dev/resource/rename-file.png)
 
-- Delete
-  > File list -> Click the "`Delete`" button to delete the specified file.
-- Re-upload file
+### Delete File
 
-  > Re-upload file: Click the "`Re-upload File`" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
+File list -> Click the "Delete" button to delete the specified file.
+
+### Re-upload file
+
+Click the "Re-upload File" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
+
 ![reuplod_file](../../../../img/reupload_file_en.png)
+
+> Note: File name or source name of your local file can not contain specific characters like `.` or `/` when you trying to
+> upload, create or rename file in resource center.
 
 ## Example
 
