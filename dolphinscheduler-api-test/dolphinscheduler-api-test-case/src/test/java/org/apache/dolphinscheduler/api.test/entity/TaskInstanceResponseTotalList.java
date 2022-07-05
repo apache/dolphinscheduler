@@ -130,6 +130,4 @@ public class TaskInstanceResponseTotalList {
 
     private String workerGroup;
 
-
-
 }

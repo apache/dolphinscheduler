@@ -23,39 +23,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.util.ArrayList;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class TaskParamsMap {
-    private ArrayList localParams;
+    public ArrayList localParams;
 
-    private String rawScript;
+    public String rawScript;
 
-    private ArrayList resourceList;
+    public ArrayList resourceList;
 
-    public ArrayList getLocalParams() {
-        return localParams;
-    }
-
-    public String getRawScript() {
-        return rawScript;
-    }
-
-    public ArrayList getResourceList() {
-        return resourceList;
-    }
-
-    public void setLocalParams(ArrayList localParams) {
-        this.localParams = localParams;
-    }
-
-    public void setRawScript(String rawScript) {
-        this.rawScript = rawScript;
-    }
-
-    public void setResourceList(ArrayList resourceList) {
-        this.resourceList = resourceList;
-    }
 }

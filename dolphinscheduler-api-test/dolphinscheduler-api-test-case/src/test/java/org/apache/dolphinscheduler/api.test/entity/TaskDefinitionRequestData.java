@@ -23,159 +23,39 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class TaskDefinitionRequestData {
-    private String code;
+    public String code;
 
-    private String delayTime;
+    public String delayTime;
 
-    private String description;
+    public String description;
 
-    private String environmentCode;
+    public String environmentCode;
 
-    private String failRetryInterval;
+    public String failRetryInterval;
 
-    private String failRetryTimes;
+    public String failRetryTimes;
 
-    private String flag;
+    public String flag;
 
-    private String name;
+    public String name;
 
-    private TaskParamsMap taskParams;
+    public TaskParamsMap taskParams;
 
-    private String taskPriority;
+    public String taskPriority;
 
-    private String taskType;
+    public String taskType;
 
-    private Integer timeout;
+    public Integer timeout;
 
-    private String timeoutFlag;
+    public String timeoutFlag;
 
-    private String timeoutNotifyStrategy;
+    public String timeoutNotifyStrategy;
 
-    private String workerGroup;
+    public String workerGroup;
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public void setDelayTime(String delayTime) {
-        this.delayTime = delayTime;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setEnvironmentCode(String environmentCode) {
-        this.environmentCode = environmentCode;
-    }
-
-    public void setFailRetryInterval(String failRetryInterval) {
-        this.failRetryInterval = failRetryInterval;
-    }
-
-    public void setFailRetryTimes(String failRetryTimes) {
-        this.failRetryTimes = failRetryTimes;
-    }
-
-    public void setFlag(String flag) {
-        this.flag = flag;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setTaskParams(TaskParamsMap taskParams) {
-        this.taskParams = taskParams;
-    }
-
-    public void setTaskPriority(String taskPriority) {
-        this.taskPriority = taskPriority;
-    }
-
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
-    }
-
-    public void setTimeout(Integer timeout) {
-        this.timeout = timeout;
-    }
-
-    public void setTimeoutFlag(String timeoutFlag) {
-        this.timeoutFlag = timeoutFlag;
-    }
-
-    public void setTimeoutNotifyStrategy(String timeoutNotifyStrategy) {
-        this.timeoutNotifyStrategy = timeoutNotifyStrategy;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getDelayTime() {
-        return delayTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getEnvironmentCode() {
-        return environmentCode;
-    }
-
-    public String getFailRetryInterval() {
-        return failRetryInterval;
-    }
-
-    public String getFailRetryTimes() {
-        return failRetryTimes;
-    }
-
-    public String getFlag() {
-        return flag;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TaskParamsMap getTaskParams() {
-        return taskParams;
-    }
-
-    public String getTaskPriority() {
-        return taskPriority;
-    }
-
-    public String getTaskType() {
-        return taskType;
-    }
-
-    public Integer getTimeout() {
-        return timeout;
-    }
-
-    public String getTimeoutFlag() {
-        return timeoutFlag;
-    }
-
-    public String getTimeoutNotifyStrategy() {
-        return timeoutNotifyStrategy;
-    }
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
 }

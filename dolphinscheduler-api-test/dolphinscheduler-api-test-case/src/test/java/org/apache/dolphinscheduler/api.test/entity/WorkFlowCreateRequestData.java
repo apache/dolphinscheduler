@@ -23,100 +23,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class WorkFlowCreateRequestData {
 
-    String taskDefinitionJson;
+    public String taskDefinitionJson;
 
-    String taskRelationJson;
+    public String taskRelationJson;
 
-    String locations;
+    public String locations;
 
-    String name;
+    public String name;
 
-    String tenantCode;
+    public String tenantCode;
 
-    String executionType;
+    public String executionType;
 
-    String description;
+    public String description;
 
-    String globalParams;
+    public String globalParams;
 
-    Integer timeout;
+    public Integer timeout;
 
-    public void setTaskDefinitionJson(String taskDefinitionJson) {
-        this.taskDefinitionJson = taskDefinitionJson;
-    }
-
-    public void setTaskRelationJson(String taskRelationJson) {
-        this.taskRelationJson = taskRelationJson;
-    }
-
-    public void setLocations(String locations) {
-        this.locations = locations;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setTenantCode(String tenantCode) {
-        this.tenantCode = tenantCode;
-    }
-
-    public void setExecutionType(String executionType) {
-        this.executionType = executionType;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setGlobalParams(String globalParams) {
-        this.globalParams = globalParams;
-    }
-
-    public void setTimeout(Integer timeout) {
-        this.timeout = timeout;
-    }
-
-    public String getTaskDefinitionJson() {
-        return taskDefinitionJson;
-    }
-
-    public String getTaskRelationJson() {
-        return taskRelationJson;
-    }
-
-    public String getLocations() {
-        return locations;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public String getExecutionType() {
-        return executionType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getGlobalParams() {
-        return globalParams;
-    }
-
-    public Integer getTimeout() {
-        return timeout;
-    }
 }

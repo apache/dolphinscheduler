@@ -29,73 +29,18 @@ import java.util.Map;
 @NoArgsConstructor
 @Data
 public class TaskRelationRequestData {
-    private String name;
+    public String name;
 
-    private Integer preTaskCode;
+    public Integer preTaskCode;
 
-    private Integer preTaskVersion;
+    public Integer preTaskVersion;
 
-    private String postTaskCode;
+    public String postTaskCode;
 
-    private Integer postTaskVersion;
+    public Integer postTaskVersion;
 
-    private String conditionType;
+    public String conditionType;
 
-    private Map conditionParams;
+    public Map conditionParams;
 
-    public String getName() {
-        return name;
-    }
-
-    public Integer getPreTaskCode() {
-        return preTaskCode;
-    }
-
-    public Integer getPreTaskVersion() {
-        return preTaskVersion;
-    }
-
-    public String getPostTaskCode() {
-        return postTaskCode;
-    }
-
-    public Integer getPostTaskVersion() {
-        return postTaskVersion;
-    }
-
-    public String getConditionType() {
-        return conditionType;
-    }
-
-    public Map getConditionParams() {
-        return conditionParams;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPreTaskCode(Integer preTaskCode) {
-        this.preTaskCode = preTaskCode;
-    }
-
-    public void setPreTaskVersion(Integer preTaskVersion) {
-        this.preTaskVersion = preTaskVersion;
-    }
-
-    public void setPostTaskCode(String postTaskCode) {
-        this.postTaskCode = postTaskCode;
-    }
-
-    public void setPostTaskVersion(Integer postTaskVersion) {
-        this.postTaskVersion = postTaskVersion;
-    }
-
-    public void setConditionType(String conditionType) {
-        this.conditionType = conditionType;
-    }
-
-    public void setConditionParams(Map conditionParams) {
-        this.conditionParams = conditionParams;
-    }
 }

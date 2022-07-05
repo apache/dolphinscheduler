@@ -20,7 +20,6 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
-import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.TaskParamsMap;
 import org.apache.dolphinscheduler.api.test.entity.TaskDefinitionRequestData;
@@ -70,36 +69,45 @@ public final class WorkFlowDefinitionPage {
         TaskParamsMap taskParams = new TaskParamsMap();
         ArrayList<Object> localParams = new ArrayList<>();
         ArrayList<Object> resourceList = new ArrayList<>();
-        taskParams.setLocalParams(localParams);
-        taskParams.setResourceList(resourceList);
-        taskParams.setRawScript("echo 123");
+        taskParams.localParams(localParams);
+        taskParams.resourceList(resourceList);
+        taskParams.rawScript("echo 123");
 
-        taskDefinitionRequestData.setCode(genNumId);
-        taskDefinitionRequestData.setDelayTime("0");
-        taskDefinitionRequestData.setDescription("");
-        taskDefinitionRequestData.setEnvironmentCode("-1");
-        taskDefinitionRequestData.setFailRetryInterval("1");
-        taskDefinitionRequestData.setFailRetryTimes("0");
-        taskDefinitionRequestData.setFlag("YES");
-        taskDefinitionRequestData.setName("echo_123");
-        taskDefinitionRequestData.setTaskParams(taskParams);
-        taskDefinitionRequestData.setTaskPriority("MEDIUM");
-        taskDefinitionRequestData.setTaskType("SHELL");
-        taskDefinitionRequestData.setTimeout(0);
-        taskDefinitionRequestData.setTimeoutFlag("CLOSE");
-        taskDefinitionRequestData.setTimeoutNotifyStrategy("");
-        taskDefinitionRequestData.setWorkerGroup("default");
+        taskDefinitionRequestData.code(genNumId);
+        taskDefinitionRequestData.delayTime("0");
+        taskDefinitionRequestData.description("");
+        taskDefinitionRequestData.environmentCode("-1");
+        taskDefinitionRequestData.failRetryInterval("1");
+        taskDefinitionRequestData.failRetryTimes("0");
+        taskDefinitionRequestData.flag("YES");
+        taskDefinitionRequestData.name("echo_123");
+        taskDefinitionRequestData.taskParams(taskParams);
+        taskDefinitionRequestData.taskPriority("MEDIUM");
+        taskDefinitionRequestData.taskType("SHELL");
+        taskDefinitionRequestData.timeout(0);
+        taskDefinitionRequestData.timeoutFlag("CLOSE");
+        taskDefinitionRequestData.timeoutNotifyStrategy("");
+        taskDefinitionRequestData.workerGroup("default");
+
         ArrayList<Object> taskDefinitionRequestDataList = new ArrayList<>();
         taskDefinitionRequestDataList.add(taskDefinitionRequestData);
 
+        logger.info("taskDefinitionRequestData：aaaa: %s");
+        logger.info(String.valueOf(taskDefinitionRequestData));
+        logger.info(String.valueOf(taskDefinitionRequestData.getClass()));
+        logger.info(String.valueOf(taskDefinitionRequestDataList));
+        logger.info(String.valueOf(taskDefinitionRequestDataList.getClass()));
+        logger.info("taskDefinitionRequestData：bbbb: %s");
+
         HashMap<String, Object> conditionParams = new HashMap();
-        taskRelationRequestData.setName("");
-        taskRelationRequestData.setPreTaskCode(0);
-        taskRelationRequestData.setPreTaskVersion(0);
-        taskRelationRequestData.setPreTaskCode(0);
-        taskRelationRequestData.setPostTaskCode(genNumId);
-        taskRelationRequestData.setConditionType("NONE");
-        taskRelationRequestData.setConditionParams(conditionParams);
+
+        taskRelationRequestData.name("");
+        taskRelationRequestData.preTaskCode(0);
+        taskRelationRequestData.preTaskVersion(0);
+        taskRelationRequestData.preTaskCode(0);
+        taskRelationRequestData.postTaskCode(genNumId);
+        taskRelationRequestData.conditionType("NONE");
+        taskRelationRequestData.conditionParams(conditionParams);
         ArrayList<Object> taskRelationRequestDataList = new ArrayList<>();
         taskRelationRequestDataList.add(taskRelationRequestData);
 
@@ -110,16 +118,15 @@ public final class WorkFlowDefinitionPage {
         ArrayList<Object> locationsList = new ArrayList<>();
         locationsList.add(locations);
 
-
-        workFlowCreateRequestData.setLocations(JSONUtils.toJsonString(locationsList));
-        workFlowCreateRequestData.setTaskDefinitionJson(JSONUtils.toJsonString(taskDefinitionRequestDataList));
-        workFlowCreateRequestData.setTaskRelationJson(JSONUtils.toJsonString(taskRelationRequestDataList));
-        workFlowCreateRequestData.setName(workFlowName);
-        workFlowCreateRequestData.setTenantCode("admin");
-        workFlowCreateRequestData.setExecutionType("PARALLEL");
-        workFlowCreateRequestData.setDescription("");
-        workFlowCreateRequestData.setGlobalParams("[]");
-        workFlowCreateRequestData.setTimeout(0);
+        workFlowCreateRequestData.locations(JSONUtils.toJsonString(locationsList));
+        workFlowCreateRequestData.taskDefinitionJson(JSONUtils.toJsonString(taskDefinitionRequestDataList));
+        workFlowCreateRequestData.taskRelationJson(JSONUtils.toJsonString(taskRelationRequestDataList));
+        workFlowCreateRequestData.name(workFlowName);
+        workFlowCreateRequestData.tenantCode("admin");
+        workFlowCreateRequestData.executionType("PARALLEL");
+        workFlowCreateRequestData.description("");
+        workFlowCreateRequestData.globalParams("[]");
+        workFlowCreateRequestData.timeout(0);
 
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
@@ -174,23 +181,24 @@ public final class WorkFlowDefinitionPage {
         Map<String, String> headers = new HashMap<>();
 
         WorkFlowRunRequestData workFlowRunRequestData = new WorkFlowRunRequestData();
-        workFlowRunRequestData.setProcessDefinitionCode(workFlowCode);
-        workFlowRunRequestData.setStartEndTime("2022-06-25T16:00:00.000Z");
-        workFlowRunRequestData.setScheduleTime("2022-06-26 00:00:00,2022-06-26 00:00:00");
-        workFlowRunRequestData.setFailureStrategy("CONTINUE");
-        workFlowRunRequestData.setWarningType("NONE");
-        workFlowRunRequestData.setWarningGroupId("");
-        workFlowRunRequestData.setExecType("START_PROCESS");
-        workFlowRunRequestData.setStartNodeList("");
-        workFlowRunRequestData.setTaskDependType("TASK_POST");
-        workFlowRunRequestData.setDependentMode("OFF_MODE");
-        workFlowRunRequestData.setRunMode("RUN_MODE_SERIAL");
-        workFlowRunRequestData.setProcessInstancePriority("MEDIUM");
-        workFlowRunRequestData.setWorkerGroup("default");
-        workFlowRunRequestData.setEnvironmentCode("");
-        workFlowRunRequestData.setStartParams("");
-        workFlowRunRequestData.setExpectedParallelismNumber("");
-        workFlowRunRequestData.setDryRun(0);
+
+        workFlowRunRequestData.processDefinitionCode(workFlowCode);
+        workFlowRunRequestData.startEndTime("2022-06-25T16:00:00.000Z");
+        workFlowRunRequestData.scheduleTime("2022-06-26 00:00:00,2022-06-26 00:00:00");
+        workFlowRunRequestData.failureStrategy("CONTINUE");
+        workFlowRunRequestData.warningType("NONE");
+        workFlowRunRequestData.warningGroupId("");
+        workFlowRunRequestData.execType("START_PROCESS");
+        workFlowRunRequestData.startNodeList("");
+        workFlowRunRequestData.taskDependType("TASK_POST");
+        workFlowRunRequestData.dependentMode("OFF_MODE");
+        workFlowRunRequestData.runMode("RUN_MODE_SERIAL");
+        workFlowRunRequestData.processInstancePriority("MEDIUM");
+        workFlowRunRequestData.workerGroup("default");
+        workFlowRunRequestData.environmentCode("");
+        workFlowRunRequestData.startParams("");
+        workFlowRunRequestData.expectedParallelismNumber("");
+        workFlowRunRequestData.dryRun(0);
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
@@ -200,7 +208,5 @@ public final class WorkFlowDefinitionPage {
         return res;
 
     }
-
-
 
 }
