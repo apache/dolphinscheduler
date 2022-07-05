@@ -133,7 +133,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-        resourcePermissionCheckService.postHandle(AuthorizationType.TENANT, loginUser.getId(), Arrays.asList(tenant.getId()), logger);
+        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()), logger);
         result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
         return result;

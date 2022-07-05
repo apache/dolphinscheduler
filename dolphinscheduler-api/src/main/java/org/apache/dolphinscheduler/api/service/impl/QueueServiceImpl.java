@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
@@ -122,6 +123,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return create result
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
@@ -160,7 +162,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.insert(queueObj);
         result.put(Constants.DATA_LIST, queueObj);
         putMsg(result, Status.SUCCESS);
-        resourcePermissionCheckService.postHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
+        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
         return result;
     }
 
