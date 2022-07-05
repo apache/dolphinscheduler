@@ -2,9 +2,9 @@
 
 The task group is mainly used to control the concurrency of task instances and is designed to control the pressure of other resources (it can also control the pressure of the Hadoop cluster, the cluster will have queue control it). When creating a new task definition, you can configure the corresponding task group and configure the priority of the task running in the task group. 
 
-### Task Group Configuration 
+## Task Group Configuration 
 
-#### Create Task Group 
+### Create Task Group 
 
 ![create-taskGroup](../../../../img/new_ui/dev/resource/create-taskGroup.png)
 
@@ -20,7 +20,7 @@ You need to enter the information inside the picture:
 
 - Resource pool size: The maximum number of concurrent task instances allowed.
 
-#### View Task Group Queue 
+### View Task Group Queue 
 
 ![view-queue](../../../../img/new_ui/dev/resource/view-queue.png) 
 
@@ -28,7 +28,7 @@ Click the button to view task group usage information:
 
 ![view-queue](../../../../img/new_ui/dev/resource/view-groupQueue.png) 
 
-#### Use of Task Groups 
+### Use of Task Groups 
 
 **Note**: The usage of task groups is applicable to tasks executed by workers, such as [switch] nodes, [condition] nodes, [sub_process] and other node types executed by the master are not controlled by the task group. Let's take the shell node as an example: 
 
@@ -40,13 +40,13 @@ Regarding the configuration of the task group, all you need to do is to configur
 
 - Priority: When there is a waiting resource, the task with high priority will be distributed to the worker by the master first. The larger the value of this part, the higher the priority. 
 
-### Implementation Logic of Task Group 
+## Implementation Logic of Task Group 
 
-#### Get Task Group Resources: 
+### Get Task Group Resources
 
 The master judges whether the task is configured with a task group when distributing the task. If the task is not configured, it is normally thrown to the worker to run; if a task group is configured, it checks whether the remaining size of the task group resource pool meets the current task operation before throwing it to the worker for execution. , if the resource pool -1 is satisfied, continue to run; if not, exit the task distribution and wait for other tasks to wake up. 
 
-#### Release and Wake Up: 
+### Release and Wake Up
 
 When the task that has occupied the task group resource is finished, the task group resource will be released. After the release, it will check whether there is a task waiting in the current task group. If there is, mark the task with the best priority to run, and create a new executable event. The event stores the task ID that is marked to acquire the resource, and then the task obtains the task group resource and run. 
 
