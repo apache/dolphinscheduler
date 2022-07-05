@@ -692,6 +692,11 @@ export default {
     please_enter_filter_expression: '请输入源表过滤条件',
     please_enter_column_only_single_column_is_supported: '请选择源表检测列',
     please_enter_threshold_number_is_needed: '请输入阈值',
-    please_enter_comparison_title: '请选择期望值类型'
+    please_enter_comparison_title: '请选择期望值类型',
+    dinky_address: 'dinky 地址',
+    dinky_address_tips: '请输入 Dinky 地址',
+    dinky_task_id: 'dinky 作业ID',
+    dinky_task_id_tips: '请输入作业 ID',
+    dinky_online: '是否上线作业'
   }
 }
