@@ -88,6 +88,26 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     }
 
     /**
+     * Insert one single new Queue record to database
+     *
+     * @param queue queue value
+     * @param queueName queue name
+     * @return Queue
+     */
+    private Queue createObjToDB(String queue, String queueName) {
+        Queue queueObj = new Queue();
+        Date now = new Date();
+
+        queueObj.setQueue(queue);
+        queueObj.setQueueName(queueName);
+        queueObj.setCreateTime(now);
+        queueObj.setUpdateTime(now);
+        // save
+        queueMapper.insert(queueObj);
+        return queueObj;
+    }
+
+    /**
      * query queue list
      *
      * @param loginUser login user
@@ -159,18 +179,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return queueValidator.get();
         }
 
-        Queue queueObj = new Queue();
-        Date now = new Date();
-
-        queueObj.setQueue(queue);
-        queueObj.setQueueName(queueName);
-        queueObj.setCreateTime(now);
-        queueObj.setUpdateTime(now);
-
-        queueMapper.insert(queueObj);
-        result.put(Constants.DATA_LIST, queueObj);
+        Queue newQueue = createObjToDB(queue, queueName);
+        result.put(Constants.DATA_LIST, newQueue);
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
+        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(newQueue.getId()), logger);
         return result;
     }
 
@@ -321,16 +333,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Queue createQueueIfNotExists(String queue, String queueName) {
         Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
         if (!queueValidator.isPresent()) {
-            Queue queueObj = new Queue();
-            Date now = new Date();
-
-            queueObj.setQueue(queueName);
-            queueObj.setQueueName(queueName);
-            queueObj.setCreateTime(now);
-            queueObj.setUpdateTime(now);
-
-            queueMapper.insert(queueObj);
-            return queueObj;
+            return createObjToDB(queue, queueName);
         }
         return queueMapper.queryQueueName(queue, queueName);
     };

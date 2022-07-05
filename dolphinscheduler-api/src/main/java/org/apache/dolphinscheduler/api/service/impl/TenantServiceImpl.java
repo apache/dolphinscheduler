@@ -109,6 +109,28 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     }
 
     /**
+     * Insert one single new Tenant record to database
+     *
+     * @param tenantCode new Tenant object tenant code
+     * @param desc new Tenant object description
+     * @param queueId The Queue id of new Tenant object
+     * @return Tenant
+     */
+    private Tenant createObjToDB(String tenantCode, String desc, int queueId) {
+        Tenant tenant = new Tenant();
+        Date now = new Date();
+
+        tenant.setTenantCode(tenantCode);
+        tenant.setQueueId(queueId);
+        tenant.setDescription(desc);
+        tenant.setCreateTime(now);
+        tenant.setUpdateTime(now);
+        // save
+        tenantMapper.insert(tenant);
+        return tenant;
+    }
+
+    /**
      * create tenant
      *
      * @param loginUser login user
@@ -136,22 +158,13 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return tenantValidator.get();
         }
 
-        Tenant tenant = new Tenant();
-        Date now = new Date();
-        tenant.setTenantCode(tenantCode);
-        tenant.setQueueId(queueId);
-        tenant.setDescription(desc);
-        tenant.setCreateTime(now);
-        tenant.setUpdateTime(now);
-        // save
-        tenantMapper.insert(tenant);
-
+        Tenant newTenant = createObjToDB(tenantCode, desc, queueId);
         // if storage startup
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()), logger);
-        result.put(Constants.DATA_LIST, tenant);
+        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(newTenant.getId()), logger);
+        result.put(Constants.DATA_LIST, newTenant);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -396,17 +409,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new IllegalArgumentException((String) validator.get(Constants.MSG));
         }
         Queue newQueue = queueService.createQueueIfNotExists(queue, queueName);
-
-        Tenant tenant = new Tenant();
-        Date now = new Date();
-        tenant.setTenantCode(tenantCode);
-        tenant.setQueueId(newQueue.getId());
-        tenant.setDescription(desc);
-        tenant.setCreateTime(now);
-        tenant.setUpdateTime(now);
-
-        // save
-        tenantMapper.insert(tenant);
-        return tenant;
+        return createObjToDB(tenantCode, desc, newQueue.getId());
     };
 }
