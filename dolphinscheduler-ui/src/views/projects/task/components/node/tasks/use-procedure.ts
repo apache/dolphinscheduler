@@ -71,7 +71,7 @@ export function useProcedure({
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
-      Fields.useWorkerGroup(),
+      Fields.useWorkerGroup(model),
       Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),

@@ -72,7 +72,7 @@ export function useDependent({
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
-      Fields.useWorkerGroup(),
+      Fields.useWorkerGroup(model),
       Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),

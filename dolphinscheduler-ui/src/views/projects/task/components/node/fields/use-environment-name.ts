@@ -22,14 +22,13 @@ import type { IEnvironmentNameOption, IJsonItem } from '../types'
 
 export function useEnvironmentName(
   model: { [field: string]: any },
-  isCreate: boolean
+  unusedIsCreate: boolean
 ): IJsonItem {
   const { t } = useI18n()
 
   let environmentList = [] as IEnvironmentNameOption[]
   const options = ref([] as IEnvironmentNameOption[])
   const loading = ref(false)
-  const value = ref()
 
   const getEnvironmentList = async () => {
     if (loading.value) return
@@ -53,16 +52,6 @@ export function useEnvironmentName(
     if (!option?.workerGroups?.length) return false
     return option.workerGroups.indexOf(model.workerGroup) !== -1
   }
-
-  watch(
-    () => options.value.length,
-    () => {
-      if (isCreate && options.value.length === 1 && !value.value) {
-        model.environmentCode = options.value[0].value
-      }
-      if (options.value.length === 0) model.environmentCode = null
-    }
-  )
 
   watch(
     () => model.workerGroup,

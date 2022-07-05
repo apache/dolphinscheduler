@@ -19,8 +19,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import type { IJsonItem } from '../types'
-
-export function useWorkerGroup(): IJsonItem {
+export function useWorkerGroup(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
@@ -34,6 +33,8 @@ export function useWorkerGroup(): IJsonItem {
     loading.value = false
   }
 
+  const resetEnvironment = () => (model.environmentCode = null)
+
   onMounted(() => {
     getWorkerGroups()
   })
@@ -43,7 +44,8 @@ export function useWorkerGroup(): IJsonItem {
     span: 12,
     name: t('project.node.worker_group'),
     props: {
-      loading: loading
+      loading: loading,
+      'on-update:value': () => resetEnvironment()
     },
     options: options,
     validate: {
