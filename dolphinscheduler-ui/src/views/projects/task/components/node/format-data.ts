@@ -360,7 +360,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DVC') {
-
     taskParams.dvcTaskType = data.dvcTaskType
     taskParams.dvcRepository = data.dvcRepository
     taskParams.dvcVersion = data.dvcVersion
@@ -368,6 +367,12 @@ export function formatParams(data: INodeData): {
     taskParams.dvcMessage = data.dvcMessage
     taskParams.dvcLoadSaveDataPath = data.dvcLoadSaveDataPath
     taskParams.dvcStoreUrl = data.dvcStoreUrl
+  }
+
+  if (data.taskType === 'DINKY') {
+    taskParams.address = data.address
+    taskParams.taskId = data.taskId
+    taskParams.online = data.online
   }
 
   if (data.taskType === 'OPENMLDB') {

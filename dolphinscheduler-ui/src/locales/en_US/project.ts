@@ -706,6 +706,11 @@ export default {
       'Please select column, only single column is supported',
     please_enter_threshold_number_is_needed:
       'Please enter threshold number is needed',
-    please_enter_comparison_title: 'please select comparison title'
+    please_enter_comparison_title: 'please select comparison title',
+    dinky_address: 'Dinky address',
+    dinky_address_tips: 'Please enter the url of your dinky',
+    dinky_task_id: 'Dinky task id',
+    dinky_task_id_tips: 'Please enter the task id of your dinky',
+    dinky_online: 'Online task'
   }
 }
