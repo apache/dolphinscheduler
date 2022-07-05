@@ -90,7 +90,9 @@ public class MlflowConstants {
 
     public static final String DOCKER_RREMOVE_CONTAINER = "docker rm -f %s";
 
-    public static final String DOCKER_RUN = "docker run --name=%s -p=%s:8080 %s";
+    public static final String DOCKER_RUN = "docker run -d --name=%s -p=%s:8080 " +
+            "--health-cmd \"curl --fail http://127.0.0.1:8080/ping || exit 1\" --health-interval 5s --health-retries 20" +
+            " %s";
 
     public static final String DOCKER_COMPOSE_RUN = "docker-compose up -d";
 
@@ -100,10 +102,10 @@ public class MlflowConstants {
             "export DS_TASK_MLFLOW_CPU_LIMIT=%s\n" +
             "export DS_TASK_MLFLOW_MEMORY_LIMIT=%s";
 
-    public static final String DOCKER_HEALTH_CHECK_COMMAND = "for i in $(seq 1 300); " +
-            "do " +
-            "[ $(docker inspect --format \"{{json .State.Health.Status }}\" %s) = '\"healthy\"' ] " +
-            "&& exit 0  && break;sleep 1; " +
-            "done; docker-compose down; exit 1";
 
+    public static final String DOCKER_HEALTH_CHECK = "docker inspect --format \"{{json .State.Health.Status }}\" %s";
+
+    public static final int DOCKER_HEALTH_CHECK_TIMEOUT = 20;
+
+    public static final int DOCKER_HEALTH_CHECK_INTERVAL = 5000;
 }

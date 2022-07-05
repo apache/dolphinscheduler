@@ -286,4 +286,8 @@ public class MlflowParameters extends AbstractParameters {
         return containerName;
     }
 
+    public boolean getIsDeployDocker(){
+        return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER) || deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
+    }
+
 };
