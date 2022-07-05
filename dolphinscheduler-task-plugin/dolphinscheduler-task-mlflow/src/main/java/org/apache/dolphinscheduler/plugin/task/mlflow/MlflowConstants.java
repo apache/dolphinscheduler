@@ -106,4 +106,6 @@ public class MlflowConstants {
     public static final String DOCKER_HEALTH_CHECK = "docker inspect --format \"{{json .State.Health.Status }}\" %s";
 
     public static final int DOCKER_HEALTH_CHECK_TIMEOUT = 20;
+
+    public static final int DOCKER_HEALTH_CHECK_INTERVAL = 5000;
 }

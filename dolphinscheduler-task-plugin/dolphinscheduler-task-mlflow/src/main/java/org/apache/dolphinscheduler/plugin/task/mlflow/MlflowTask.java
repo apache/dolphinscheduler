@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -224,8 +225,8 @@ public class MlflowTask extends AbstractTaskExecutor {
                 logger.info("container is healthy");
                 return exitCode;
             }else {
-                logger.info("The health check has been running for {} seconds", x * 5);
-                Thread.sleep(5000);
+                logger.info("The health check has been running for {} seconds", x * MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL / 1000);
+                ThreadUtils.sleep(MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL);
             }
         }
 
