@@ -2,20 +2,18 @@
 
 The resource management and file management functions are similar. The difference is that the resource management is the UDF upload function, and the file management uploads the user programs, scripts and configuration files. Operation function: rename, download, delete.
 
-- Upload UDF resources
+- Upload UDF resources: Same as uploading files.
 
-> Same as uploading files.
-
-### Function Management
+## Function Management
 
 - Create UDF function
 
-> Click "Create UDF Function", enter the UDF function parameters, select the UDF resource, and click "Submit" to create the UDF function.
-> Currently, only supports temporary UDF functions of Hive.
+> Click "`Create UDF Function`", enter the UDF function parameters, select the UDF resource, and click `Submit` to create the UDF function.
+> Currently, only supports temporary UDF functions of `HIVE`.
 
-- UDF function name: enter the name of the UDF function.
-- Package name Class name: enter the full path of the UDF function.
-- UDF resource: set the resource file corresponding to the created UDF function.
+- UDF function name: Enter the name of the UDF function.
+- Package name Class name: Enter the full path of the UDF function.
+- UDF resource: Set the resource file corresponding to the created UDF function.
 
 ![create-udf](../../../../img/new_ui/dev/resource/create-udf.png)
 
