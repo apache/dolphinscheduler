@@ -352,6 +352,7 @@ export default {
     init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
     resources_tips: 'Please select resources',
+    resources_limit_tips: 'Please select again, resource limit:',
     non_resources_tips: 'Please delete all non-existent resources',
     useless_resources_tips: 'Unauthorized or deleted resources',
     custom_parameters: 'Custom Parameters',
@@ -707,6 +708,10 @@ export default {
     please_enter_threshold_number_is_needed:
       'Please enter threshold number is needed',
     please_enter_comparison_title: 'please select comparison title',
+    custom_config: 'Custom Config',
+    engine: 'engine',
+    engine_tips: 'Please select engine',
+    run_mode: 'Run Mode',
     dinky_address: 'Dinky address',
     dinky_address_tips: 'Please enter the url of your dinky',
     dinky_task_id: 'Dinky task id',

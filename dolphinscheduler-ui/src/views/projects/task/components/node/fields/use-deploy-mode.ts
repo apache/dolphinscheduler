@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, watchEffect } from 'vue'
+import { Ref, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem, IOption } from '../types'
 
 export function useDeployMode(
-  span = 24,
+  span: number | Ref<number> = 24,
   showClient = ref(true),
   showCluster = ref(true)
 ): IJsonItem {
@@ -44,7 +44,7 @@ export function useDeployMode(
     field: 'deployMode',
     name: t('project.node.deploy_mode'),
     options: deployModeOptions,
-    span
+    span: span
   }
 }
 

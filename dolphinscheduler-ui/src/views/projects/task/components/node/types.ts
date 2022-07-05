@@ -272,6 +272,7 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  masterUrl?: string
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
@@ -341,6 +342,8 @@ interface ITaskParams {
   zk?: string
   zkPath?: string
   executeMode?: string
+  useCustom?: boolean
+  runMode?: string
   dvcTaskType?: string
   dvcRepository?: string
   dvcVersion?: string
@@ -397,7 +400,6 @@ interface INodeData
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
-  masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
   definition?: object
