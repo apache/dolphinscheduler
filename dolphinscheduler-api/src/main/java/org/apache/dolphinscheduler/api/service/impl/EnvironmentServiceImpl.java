@@ -92,8 +92,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param desc environment desc
      * @param workerGroups worker groups
      */
-    @Transactional(rollbackFor = RuntimeException.class)
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ENVIRONMENT, ENVIRONMENT_CREATE)) {

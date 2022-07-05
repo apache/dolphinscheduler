@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -94,12 +95,10 @@ public class QueueMapperTest extends BaseDaoTest {
         Queue queue = insertOne();
         Page<Queue> page = new Page(1,3);
 
-        IPage<Queue> queueIPage= queueMapper.queryQueuePaging(page,
-                null);
+        IPage<Queue> queueIPage= queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), null);
         Assert.assertNotEquals(queueIPage.getTotal(), 0);
 
-        queueIPage= queueMapper.queryQueuePaging(page,
-                queue.getQueueName());
+        queueIPage= queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), queue.getQueueName());
         Assert.assertNotEquals(queueIPage.getTotal(), 0);
     }
 

@@ -110,7 +110,7 @@ public class QueueServiceTest {
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, getLoginUser().getId(), queueServiceImplLogger)).thenReturn(ids);
-        Mockito.when(queueMapper.queryQueuePaging(Mockito.any(Page.class), Mockito.eq(queueName))).thenReturn(page);
+        Mockito.when(queueMapper.queryQueuePaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq(queueName))).thenReturn(page);
         Result result = queueService.queryList(getLoginUser(), queueName, 1, 10);
         logger.info(result.toString());
         PageInfo<Queue> pageInfo = (PageInfo<Queue>) result.getData();
