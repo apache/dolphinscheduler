@@ -8,7 +8,7 @@ The resource management and file management functions are similar. The differenc
 
 - Create UDF function
 
-> Click "`Create UDF Function`", enter the UDF function parameters, select the UDF resource, and click "`Submit`" to create the UDF function.
+> Click "`Create UDF Function`", enter the UDF function parameters, select the UDF resource, and click `Submit` to create the UDF function.
 > Currently, only supports temporary UDF functions of `HIVE`.
 
 - UDF function name: Enter the name of the UDF function.
