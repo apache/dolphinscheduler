@@ -22,16 +22,15 @@ import {
   NIcon,
   NDataTable,
   NPagination,
-  NSpace
+  NSpace,
+  NCard
 } from 'naive-ui'
-import Card from '@/components/card'
 import DetailModal from './detail'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useUserInfo } from './use-userinfo'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
-import styles from './index.module.scss'
 import type { IRecord } from './types'
 
 const AlarmInstanceManage = defineComponent({
@@ -109,51 +108,52 @@ const AlarmInstanceManage = defineComponent({
     } = this
 
     return (
-      <>
-        <Card title=''>
+      <NSpace vertical>
+        <NCard size='small'>
           {{
             default: () => (
-              <div class={styles['conditions']}>
+              <NSpace justify='space-between'>
                 {IS_ADMIN && (
-                  <NButton onClick={onCreate} type='primary'>
+                  <NButton onClick={onCreate} type='primary' size='small'>
                     {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
                 )}
                 <NSpace
-                  class={styles['conditions-search']}
                   justify='end'
                   wrap={false}
                 >
-                  <div class={styles['conditions-search-input']}>
-                    <NInput
-                      v-model={[this.searchVal, 'value']}
-                      placeholder={`${t(
-                        'security.alarm_instance.search_input_tips'
-                      )}`}
-                    />
-                  </div>
-                  <NButton type='primary' onClick={onUpdatedList}>
+                  <NInput
+                    v-model={[this.searchVal, 'value']}
+                    size='small'
+                    placeholder={`${t(
+                      'security.alarm_instance.search_input_tips'
+                    )}`}
+                  />
+                  <NButton type='primary' size='small' onClick={onUpdatedList}>
                     <NIcon>
                       <SearchOutlined />
                     </NIcon>
                   </NButton>
                 </NSpace>
-              </div>
+              </NSpace>
             )
           }}
-        </Card>
-        <Card title='' class={styles['mt-8']}>
-          <NDataTable columns={columns} data={list} loading={loading} striped />
-          <NPagination
-            page={page}
-            page-size={pageSize}
-            item-count={itemCount}
-            show-quick-jumper
-            class={styles['pagination']}
-            on-update:page={changePage}
-            on-update:page-size={changePageSize}
-          />
-        </Card>
+        </NCard>
+        <NCard size='small'>
+          <NSpace vertical>
+            <NDataTable columns={columns} data={list} loading={loading} striped />
+            <NSpace justify='center'>
+              <NPagination
+                page={page}
+                page-size={pageSize}
+                item-count={itemCount}
+                show-quick-jumper
+                on-update:page={changePage}
+                on-update:page-size={changePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </NCard>
         {IS_ADMIN && (
           <DetailModal
             show={showDetailModal}
@@ -162,7 +162,7 @@ const AlarmInstanceManage = defineComponent({
             onUpdate={onUpdatedList}
           />
         )}
-      </>
+      </NSpace>
     )
   }
 })
