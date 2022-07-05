@@ -65,7 +65,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 @PrepareForTest({PropertyUtils.class})
 public class TenantServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
-    private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
     private static final Logger tenantServiceImplLogger = LoggerFactory.getLogger(TenantServiceImpl.class);
 
     @InjectMocks
@@ -84,12 +83,10 @@ public class TenantServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private StorageOperate storageOperate;
-
-    @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
     private static final String tenantCode = "hayden";
+
 
     @Test
     public void testCreateTenant() {
@@ -98,28 +95,46 @@ public class TenantServiceTest {
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, loginUser.getId(), TENANT_CREATE , baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
+        Map<String, Object> result;
         try {
-            //check tenantCode
-            Map<String, Object> result =
-                    tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
-            logger.info(result.toString());
+            //check exist
+            result = tenantService.createTenant(loginUser, "", 1, "TenantServiceTest");
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //check tenant code too long
+            String longStr = "this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string";
+            result = tenantService.createTenant(loginUser, longStr, 1, "TenantServiceTest");
+            Assert.assertEquals(Status.TENANT_FULL_NAME_TOO_LONG_ERROR, result.get(Constants.STATUS));
+
+            //check tenant code invalid
+            result = tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
-            logger.info(result.toString());
             Assert.assertEquals(Status.OS_TENANT_CODE_EXIST, result.get(Constants.STATUS));
 
             // success
             result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
-            logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
-            logger.error("create tenant error", e);
-            Assert.fail();
+            Assert.fail("create tenant error");
         }
     }
+
+    @Test
+    public void testCreateTenantError() {
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        // tenantCode not exist
+        Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+
+        // tenantCode  exist
+        result = tenantService.verifyTenantCode(getTenant().getTenantCode());
+        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
+    }
+
 
     @Test
     @SuppressWarnings("unchecked")
@@ -134,7 +149,6 @@ public class TenantServiceTest {
         Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq("TenantServiceTest")))
         .thenReturn(page);
         Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
-        logger.info(result.toString());
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
@@ -150,15 +164,12 @@ public class TenantServiceTest {
             // id not exist
             Map<String, Object> result =
                     tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, "desc");
-            logger.info(result.toString());
             // success
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
             result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, "desc");
-            logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
-            logger.error("update tenant error", e);
-            Assert.fail();
+            Assert.fail("update tenant error");
         }
 
     }
@@ -176,34 +187,28 @@ public class TenantServiceTest {
         try {
             //TENANT_NOT_EXIST
             Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(), 12);
-            logger.info(result.toString());
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
 
             //DELETE_TENANT_BY_ID_FAIL
             result = tenantService.deleteTenantById(getLoginUser(), 1);
-            logger.info(result.toString());
             Assert.assertEquals(Status.DELETE_TENANT_BY_ID_FAIL, result.get(Constants.STATUS));
 
             //DELETE_TENANT_BY_ID_FAIL_DEFINES
             Mockito.when(tenantMapper.queryById(2)).thenReturn(getTenant(2));
             result = tenantService.deleteTenantById(getLoginUser(), 2);
-            logger.info(result.toString());
             Assert.assertEquals(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, result.get(Constants.STATUS));
 
             //DELETE_TENANT_BY_ID_FAIL_USERS
             Mockito.when(tenantMapper.queryById(3)).thenReturn(getTenant(3));
             result = tenantService.deleteTenantById(getLoginUser(), 3);
-            logger.info(result.toString());
             Assert.assertEquals(Status.DELETE_TENANT_BY_ID_FAIL_USERS, result.get(Constants.STATUS));
 
             // success
             Mockito.when(tenantMapper.queryById(4)).thenReturn(getTenant(4));
             result = tenantService.deleteTenantById(getLoginUser(), 4);
-            logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
-            logger.error("delete tenant error", e);
-            Assert.fail();
+            Assert.fail("delete tenant error");
         }
     }
 
@@ -213,8 +218,8 @@ public class TenantServiceTest {
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         // tenantCode not exist
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
-        logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+
         // tenantCode  exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
         Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
