@@ -28,13 +28,17 @@ export default {
                         link: '/en-us/docs/dev/user_doc/about/introduction.html',
                     },
                     {
+                        title: 'Features',
+                        link: '/en-us/docs/dev/user_doc/about/feature.html',
+                    },
+                    {
                         title: 'Hardware Environment',
                         link: '/en-us/docs/dev/user_doc/about/hardware.html',
                     },
                     {
                         title: 'Glossary',
                         link: '/en-us/docs/dev/user_doc/about/glossary.html',
-                    },
+                    }
                 ],
             },
             {
@@ -414,6 +418,10 @@ export default {
                     {
                         title: '简介',
                         link: '/zh-cn/docs/dev/user_doc/about/introduction.html',
+                    },
+                    {
+                        title: '特性',
+                        link: '/zh-cn/docs/dev/user_doc/about/feature.html',
                     },
                     {
                         title: '建议配置',
