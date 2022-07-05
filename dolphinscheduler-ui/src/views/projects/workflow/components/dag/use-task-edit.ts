@@ -29,7 +29,6 @@ import type {
   EditWorkflowDefinition
 } from './types'
 
-
 interface Options {
   graph: Ref<Graph | undefined>
   definition: Ref<WorkflowDefinition | undefined>
@@ -175,7 +174,8 @@ export function useTaskEdit(options: Options) {
             ...taskDef,
             version: task.version,
             code: task.code,
-            taskType: currTask.value.taskType
+            taskType: currTask.value.taskType,
+            id: task.id
           }
         }
         return task
