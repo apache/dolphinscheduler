@@ -15,16 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.exception;
+package org.apache.dolphinscheduler.server.master.event;
 
-public class EventHandleException
-    extends Exception {
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
-    public EventHandleException(String message) {
-        super(message);
-    }
+import io.netty.channel.Channel;
+import lombok.Data;
 
-    public EventHandleException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
+/**
+ * state event
+ */
+@Data
+public class StateEvent {
+
+    /**
+     * origin_pid-origin_task_id-process_instance_id-task_instance_id
+     */
+    private String key;
+
+    private StateEventType type;
+
+    private ExecutionStatus executionStatus;
+
+    private int taskInstanceId;
+
+    private long taskCode;
+
+    private int processInstanceId;
+
+    private String context;
+
+    private Channel channel;
+
 }
