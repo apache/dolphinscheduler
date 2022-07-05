@@ -103,6 +103,11 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 - ds.worker.overload.count: (counter) the number of times the worker overloaded
 - ds.worker.full.submit.queue.count: (counter) the number of times the worker's submit queue being full
+- ds.worker.resource.download.count: (counter) the number of downloaded resource files on workers
+- ds.worker.resource.download.success.count: (counter) the number of successfully downloaded resource files on workers
+- ds.worker.resource.download.failure.count: (counter) the number of resource download failures on workers
+- ds.worker.resource.download.duration: (histogram) the time cost of resource download on workers
+- ds.worker.resource.download.size: (histogram) the sizes of downloaded resource files on workers (KB)
 
 ### Api Server Metrics
 
