@@ -146,6 +146,10 @@ export default {
                                 link: '/en-us/docs/3.0.0/user_doc/guide/task/switch.html',
                             },
                             {
+                                title: 'SeaTunnel',
+                                link: '/en-us/docs/dev/user_doc/guide/task/seatunnel.html',
+                            },
+                            {
                                 title: 'Amazon EMR',
                                 link: '/en-us/docs/3.0.0/user_doc/guide/task/emr.html',
                             },
@@ -702,6 +706,10 @@ export default {
                             {
                                 title: 'Switch',
                                 link: '/zh-cn/docs/3.0.0/user_doc/guide/task/switch.html',
+                            },
+                            {
+                                title: 'SeaTunnel',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/seatunnel.html',
                             },
                             {
                                 title: 'Amazon EMR',

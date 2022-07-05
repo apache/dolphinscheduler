@@ -272,6 +272,7 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  masterUrl?: string
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
@@ -306,6 +307,45 @@ interface ITaskParams {
   udfs?: string
   connParams?: string
   targetJobName?: string
+  cluster?: string
+  namespace?: string
+  clusterNamespace?: string
+  minCpuCores?: string
+  minMemorySpace?: string
+  image?: string
+  algorithm?: string
+  params?: string
+  searchParams?: string
+  dataPath?: string
+  experimentName?: string
+  modelName?: string
+  mlflowTrackingUri?: string
+  mlflowJobType?: string
+  automlTool?: string
+  registerModel?: boolean
+  mlflowTaskType?: string
+  mlflowProjectRepository?: string
+  mlflowProjectVersion?: string
+  deployType?: string
+  deployPort?: string
+  deployModelKey?: string
+  cpuLimit?: string
+  memoryLimit?: string
+  zk?: string
+  zkPath?: string
+  executeMode?: string
+  useCustom?: boolean
+  runMode?: string
+  dvcTaskType?: string
+  dvcRepository?: string
+  dvcVersion?: string
+  dvcDataLocation?: string
+  dvcMessage?: string
+  dvcLoadSaveDataPath?: string
+  dvcStoreUrl?: string
+  address?: string
+  taskId?: string
+  online?: boolean
 }
 
 interface INodeData
@@ -350,7 +390,6 @@ interface INodeData
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
-  masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
   definition?: object
