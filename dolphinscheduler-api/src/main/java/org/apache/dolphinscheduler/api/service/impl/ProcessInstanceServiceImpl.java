@@ -452,7 +452,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param tenantCode tenantCode
      * @return update result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId, String taskRelationJson,
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine, String globalParams,
@@ -619,7 +619,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteProcessInstanceById(User loginUser, long projectCode, Integer processInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project

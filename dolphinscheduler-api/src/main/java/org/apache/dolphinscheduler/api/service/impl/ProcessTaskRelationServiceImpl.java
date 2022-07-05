@@ -96,7 +96,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param postTaskCode          postTaskCode
      * @return create result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> createProcessTaskRelation(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -187,7 +187,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param taskCode              the post task code
      * @return delete result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -267,7 +267,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param taskCode     the post task code
      * @return delete result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteUpstreamRelation(User loginUser, long projectCode, String preTaskCodes, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -339,7 +339,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param taskCode      the pre task code
      * @return delete result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteDownstreamRelation(User loginUser, long projectCode, String postTaskCodes, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -457,7 +457,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param postTaskCode          post task code
      * @return delete result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode) {
         Project project = projectMapper.queryByCode(projectCode);

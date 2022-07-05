@@ -91,7 +91,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
                                             int queueId,
@@ -242,7 +242,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
 

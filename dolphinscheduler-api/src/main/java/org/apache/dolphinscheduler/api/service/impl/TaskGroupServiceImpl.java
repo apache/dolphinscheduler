@@ -79,7 +79,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
 
