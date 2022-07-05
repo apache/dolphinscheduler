@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -63,6 +64,21 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     @Autowired
     private UserMapper userMapper;
+
+    private Optional<Map<String, Object>> queueValid(String queue, String queueName) {
+        Map<String, Object> result = new HashMap<>();
+        if (StringUtils.isEmpty(queue) || StringUtils.isEmpty(queueName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            return Optional.of(result);
+        } else if (checkQueueExist(queue)) {
+            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
+            return Optional.of(result);
+        } else if (checkQueueNameExist(queueName)) {
+            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
 
     /**
      * query queue list
@@ -131,24 +147,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return result;
         }
 
-        if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
-            return result;
-        }
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        if (checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return result;
-        }
-
-        if (checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-            return result;
+        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
+        if (queueValidator.isPresent()) {
+            return queueValidator.get();
         }
 
         Queue queueObj = new Queue();
@@ -191,6 +192,11 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (StringUtils.isEmpty(queueName)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
             return result;
+        }
+
+        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
+        if (queueValidator.isPresent()) {
+            return queueValidator.get();
         }
 
         Queue queueObj = queueMapper.selectById(id);
@@ -249,52 +255,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result<Object> verifyQueue(String queue, String queueName) {
         Result<Object> result = new Result<>();
 
-        if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
+        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
+        if (queueValidator.isPresent()) {
+            Map<String, Object> validator = queueValidator.get();
+            putMsg(result, validator);
             return result;
         }
 
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        if (checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return result;
-        }
-
-        if (checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-            return result;
-        }
-
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * query queue by queueName
-     *
-     * @param queueName queue name
-     * @return queue object for provide queue name
-     */
-    @Override
-    public Map<String, Object> queryQueueName(String queueName) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        if (!checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NOT_EXIST, queueName);
-            return result;
-        }
-
-        List<Queue> queueList = queueMapper.queryQueueName(queueName);
-        result.put(Constants.DATA_LIST, queueList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -333,5 +300,31 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
         return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
     }
+
+    /**
+     * Make sure queue with given name exists, and create the queue if not exists
+     *
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param queueName queue name
+     * @return Queue object
+     */
+    @Override
+    public Queue crtQueueIfNotExists(String queue, String queueName) {
+        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
+        if (!queueValidator.isPresent()) {
+            Queue queueObj = new Queue();
+            Date now = new Date();
+
+            queueObj.setQueue(queueName);
+            queueObj.setQueueName(queueName);
+            queueObj.setCreateTime(now);
+            queueObj.setUpdateTime(now);
+
+            queueMapper.insert(queueObj);
+            return queueObj;
+        }
+        return queueMapper.queryQueueName(queue, queueName);
+    };
 
 }

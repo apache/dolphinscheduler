@@ -22,17 +22,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -52,6 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
@@ -77,8 +79,29 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private QueueService queueService;
+
     @Autowired(required = false)
     private StorageOperate storageOperate;
+
+    private Optional<Map<String, Object>> tenantCodeValid(String tenantCode) {
+        Map<String, Object> result = new HashMap<>();
+        if (StringUtils.isEmpty(tenantCode)) {
+            putMsg(result, Status.TENANT_CODE_IS_EMPTY);
+            return Optional.of(result);
+        } else if (StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH) {
+            putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
+            return Optional.of(result);
+        } else if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
+            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
+            return Optional.of(result);
+        } else if (checkTenantExists(tenantCode)) {
+            putMsg(result, Status.OS_TENANT_CODE_EXIST);
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
 
     /**
      * create tenant
@@ -103,20 +126,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
-        if(StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH){
-            putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
-            return result;
-        }
-
-        if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
-            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
-            return result;
-        }
-
-
-        if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
-            return result;
+        Optional<Map<String, Object>> tenantValidator = tenantCodeValid(tenantCode);
+        if (tenantValidator.isPresent()) {
+            return tenantValidator.get();
         }
 
         Tenant tenant = new Tenant();
@@ -199,20 +211,17 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
+        Optional<Map<String, Object>> tenantValidator = tenantCodeValid(tenantCode);
+        if (tenantValidator.isPresent()) {
+            return tenantValidator.get();
+        }
+
         // updateProcessInstance tenant
         /**
          * if the tenant code is modified, the original resource needs to be copied to the new tenant.
          */
-        if (!tenant.getTenantCode().equals(tenantCode)) {
-            if (checkTenantExists(tenantCode)) {
-                // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState()) {
-                    storageOperate.createTenantDirIfNotExists(tenantCode);
-                }
-            } else {
-                putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
-                return result;
-            }
+        if (!tenant.getTenantCode().equals(tenantCode) && PropertyUtils.getResUploadStartupState()) {
+            storageOperate.createTenantDirIfNotExists(tenantCode);
         }
 
         Date now = new Date();
@@ -337,8 +346,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param tenantCode tenant code
      * @return ture if the tenant code exists, otherwise return false
      */
-    @Override
-    public boolean checkTenantExists(String tenantCode) {
+    private boolean checkTenantExists(String tenantCode) {
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
         return Boolean.TRUE.equals(existTenant);
     }
@@ -359,4 +367,41 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
         return result;
     }
+
+    /**
+     * Make sure tenant with given name exists, and create the tenant if not exists
+     *
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param tenantCode tenant code
+     * @param desc The description of tenant object
+     * @param queue The value of queue which current tenant belong
+     * @param queueName The name of queue which current tenant belong
+     * @return Tenant object
+     */
+    @Override
+    public Tenant crtTenantIfNotExists(String tenantCode, String desc, String queue, String queueName) {
+        if (checkTenantExists(tenantCode)) {
+            return tenantMapper.queryByTenantCode(tenantCode);
+        }
+
+        Optional<Map<String, Object>> tenantValidator = tenantCodeValid(tenantCode);
+        if (tenantValidator.isPresent()) {
+            Map<String, Object> validator = tenantValidator.get();
+            throw new IllegalArgumentException((String) validator.get(Constants.MSG));
+        }
+        Queue newQueue = queueService.crtQueueIfNotExists(queue, queueName);
+
+        Tenant tenant = new Tenant();
+        Date now = new Date();
+        tenant.setTenantCode(tenantCode);
+        tenant.setQueueId(newQueue.getId());
+        tenant.setDescription(desc);
+        tenant.setCreateTime(now);
+        tenant.setUpdateTime(now);
+
+        // save
+        tenantMapper.insert(tenant);
+        return tenant;
+    };
 }

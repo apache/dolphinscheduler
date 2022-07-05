@@ -34,8 +34,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +115,24 @@ public class BaseServiceImpl implements BaseService {
         result.setCode(status.getCode());
         if (statusParams != null && statusParams.length > 0) {
             result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
+        }
+    }
+
+    /**
+     * put Map object with both status and message to result object
+     *
+     * @param result result code
+     * @param mapObj Map object contain status and message.
+     */
+    @Override
+    public void putMsg(Result<Object> result, Map<String, Object> mapObj) {
+        Status status = (Status) mapObj.get(Constants.STATUS);
+        String msg = (String) mapObj.get(Constants.MSG);
+        result.setCode(status.getCode());
+        if (StringUtils.isNotEmpty(msg)) {
+            result.setMsg(msg);
         } else {
             result.setMsg(status.getMsg());
         }
