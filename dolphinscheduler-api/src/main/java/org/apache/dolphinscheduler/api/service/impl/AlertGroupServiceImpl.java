@@ -160,7 +160,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -192,8 +192,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         } catch (DuplicateKeyException ex) {
             logger.error("Create alert group error.", ex);
             putMsg(result, Status.ALERT_GROUP_EXIST);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
         }
 
         return result;
@@ -253,7 +251,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);

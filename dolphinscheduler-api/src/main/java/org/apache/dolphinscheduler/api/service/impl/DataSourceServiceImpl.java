@@ -100,7 +100,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
         DataSourceUtils.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
@@ -140,8 +140,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         } catch (DuplicateKeyException ex) {
             logger.error("Create datasource error.", ex);
             putMsg(result, Status.DATASOURCE_EXIST);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
         }
 
         return result;
@@ -396,7 +394,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Result<Object> delete(User loginUser, int datasourceId) {
         Result<Object> result = new Result<>();
         try {

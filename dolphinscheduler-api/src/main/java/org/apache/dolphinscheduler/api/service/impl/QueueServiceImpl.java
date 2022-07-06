@@ -123,7 +123,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return create result
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
