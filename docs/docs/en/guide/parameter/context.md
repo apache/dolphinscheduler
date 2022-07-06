@@ -81,7 +81,7 @@ But the output value 66 only shows in the Node_A, the reason is that the directi
 
 Step 1: Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
 
-<img src="../../../../img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
+![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
 Step 2: After adding an HTTP task type node, accept the parameters passed upstream. This time just add it in the Request Parameters section,
 
