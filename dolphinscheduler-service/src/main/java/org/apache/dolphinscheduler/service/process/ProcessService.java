@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
@@ -61,7 +62,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
     @Transactional
-    ProcessInstance handleCommand(String host, Command command);
+    ProcessInstance handleCommand(String host, Command command) throws CronParseException;
 
     void moveToErrorCommand(Command command, String message);
 
