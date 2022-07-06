@@ -429,4 +429,12 @@ public class DateUtils {
         }
         return TimeZone.getTimeZone(timezoneId);
     }
+
+    /**
+     * get timestamp in String
+     * PowerMock 2.0.9 fails to mock System.currentTimeMillis(), this method helps in UT
+     */
+    public static String getTimestampString() {
+        return String.valueOf(System.currentTimeMillis());
+    }
 }
