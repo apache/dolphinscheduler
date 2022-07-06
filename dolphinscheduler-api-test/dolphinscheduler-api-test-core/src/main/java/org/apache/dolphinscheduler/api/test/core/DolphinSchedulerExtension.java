@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -63,17 +62,17 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
-                                       .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
-                                       .filter(Objects::nonNull)
-                                       .map(URL::getPath)
-                                       .map(File::new)
-                                       .collect(Collectors.toList());
+            .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
+            .filter(Objects::nonNull)
+            .map(URL::getPath)
+            .map(File::new)
+            .collect(Collectors.toList());
 
         compose = new DockerComposeContainer<>(files)
-                .withPull(true)
-                .withTailChildContainers(true)
-                .withLogConsumer(SERVICE_NAME, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
-                .waitingFor(SERVICE_NAME, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
+            .withPull(true)
+            .withTailChildContainers(true)
+            .withLogConsumer(SERVICE_NAME, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+            .waitingFor(SERVICE_NAME, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
 
         return compose;
     }
