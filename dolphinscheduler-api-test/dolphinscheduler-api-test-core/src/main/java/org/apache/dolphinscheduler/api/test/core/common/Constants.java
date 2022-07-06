@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.core;
+package org.apache.dolphinscheduler.api.test.core.common;
 
 import lombok.experimental.UtilityClass;
 
@@ -26,6 +26,12 @@ public final class Constants {
      * backend api url
      */
     public static final String DOLPHINSCHEDULER_API_URL = "http://0.0.0.0:12345/dolphinscheduler";
+
+    public static final String DOLPHINSCHEDULER_BASE_URL = "http://0.0.0.0";
+
+    public static final String DOLPHINSCHEDULER_BASE_PATH = "/dolphinscheduler";
+
+    public static final int DOLPHINSCHEDULER_API_PORT = 12345;
 
     /**
      * backend api request header's content type

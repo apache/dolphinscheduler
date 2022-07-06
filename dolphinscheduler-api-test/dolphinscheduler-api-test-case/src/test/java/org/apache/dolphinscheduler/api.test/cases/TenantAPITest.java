@@ -19,13 +19,13 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
-import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
+import org.apache.dolphinscheduler.api.test.core.extensions.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
 import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
-import org.apache.dolphinscheduler.api.test.pages.LoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
+import org.apache.dolphinscheduler.api.test.pages.login.LoginPage;
+import org.apache.dolphinscheduler.api.test.pages.security.TenantPageAPI;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 
 import org.junit.jupiter.api.AfterAll;
@@ -65,7 +65,7 @@ public class TenantAPITest {
     @Test
     @Order(1)
     public void testCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
+        TenantPageAPI tenantPage = new TenantPageAPI();
 
         HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
 
@@ -75,7 +75,7 @@ public class TenantAPITest {
     @Test
     @Order(2)
     public void testDuplicateCreateTenant() {
-        TenantPage tenantPage = new TenantPage();
+        TenantPageAPI tenantPage = new TenantPageAPI();
 
         HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
 
@@ -85,7 +85,7 @@ public class TenantAPITest {
     @Test
     @Order(5)
     public void testGetTenantListPaging() {
-        TenantPage tenantPage = new TenantPage();
+        TenantPageAPI tenantPage = new TenantPageAPI();
 
         HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
         boolean result = false;
@@ -105,7 +105,7 @@ public class TenantAPITest {
     @Test
     @Order(10)
     public void testDeleteTenant() {
-        TenantPage tenantPage = new TenantPage();
+        TenantPageAPI tenantPage = new TenantPageAPI();
 
         HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
 
