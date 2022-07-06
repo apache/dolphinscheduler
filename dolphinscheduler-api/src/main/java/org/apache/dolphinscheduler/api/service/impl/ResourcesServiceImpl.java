@@ -134,7 +134,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return create directory result
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> createDirectory(User loginUser,
                                           String name,
                                           String description,
@@ -214,7 +214,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> createResource(User loginUser,
                                          String name,
                                          String desc,
@@ -343,7 +343,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return update result code
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> updateResource(User loginUser,
                                          int resourceId,
                                          String name,
@@ -778,7 +778,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @throws IOException exception
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> delete(User loginUser, int resourceId) throws IOException {
         // get resource by id
         Result<Object> resultCheck = new Result<>();
@@ -1059,7 +1059,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content, int pid, String currentDir) {
         Result<Object> result = new Result<>();
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE);
@@ -1172,7 +1172,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return update result cod
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> updateResourceContent(User loginUser, int resourceId, String content) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {

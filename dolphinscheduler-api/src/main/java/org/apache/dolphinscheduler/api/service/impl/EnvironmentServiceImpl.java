@@ -92,7 +92,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param workerGroups worker groups
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ENVIRONMENT, ENVIRONMENT_CREATE)) {
@@ -302,7 +302,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param loginUser login user
      * @param code environment code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code) {
         Map<String, Object> result = new HashMap<>();
@@ -341,7 +341,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param desc environment desc
      * @param workerGroups worker groups
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();

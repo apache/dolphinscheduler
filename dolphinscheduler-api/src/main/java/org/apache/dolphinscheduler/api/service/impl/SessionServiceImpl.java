@@ -85,7 +85,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * @return session string
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public String createSession(User user, String ip) {
         Session session = null;
 

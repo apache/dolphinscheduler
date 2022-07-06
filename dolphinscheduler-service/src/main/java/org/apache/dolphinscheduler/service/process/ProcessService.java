@@ -105,7 +105,7 @@ public interface ProcessService {
 
     TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, int commitInterval);
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
@@ -173,7 +173,7 @@ public interface ProcessService {
 
     List<String> queryNeedFailoverProcessInstanceHost();
 
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     void processNeedFailoverProcessInstances(ProcessInstance processInstance);
 
     List<TaskInstance> queryNeedFailoverTaskInstances(String host);

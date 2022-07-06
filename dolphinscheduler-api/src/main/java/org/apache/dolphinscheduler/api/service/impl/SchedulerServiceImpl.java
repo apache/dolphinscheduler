@@ -117,7 +117,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> insertSchedule(User loginUser,
                                               long projectCode,
                                               long processDefineCode,
@@ -218,7 +218,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return update result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> updateSchedule(User loginUser,
                                               long projectCode,
                                               Integer id,
@@ -268,7 +268,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return publish result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> setScheduleState(User loginUser,
                                                 long projectCode,
                                                 Integer id,
