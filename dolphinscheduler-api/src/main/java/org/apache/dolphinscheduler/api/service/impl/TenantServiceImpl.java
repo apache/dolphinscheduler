@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -52,7 +53,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
@@ -90,22 +90,17 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param tenantCode Tenant code of tenant object
      * @return Optional of Status map
      */
-    private Optional<Map<String, Object>> tenantCodeValid(String tenantCode) {
+    private void tenantCodeValid(String tenantCode) throws ServiceException {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(tenantCode)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
-            return Optional.of(result);
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
         } else if (StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH) {
-            putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
-            return Optional.of(result);
+            throw new ServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
         } else if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
-            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
-            return Optional.of(result);
+            throw new ServiceException(Status.CHECK_OS_TENANT_CODE_ERROR);
         } else if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.OS_TENANT_CODE_EXIST);
-            return Optional.of(result);
+            throw new ServiceException(Status.OS_TENANT_CODE_EXIST);
         }
-        return Optional.empty();
     }
 
     /**
@@ -153,10 +148,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
-        Optional<Map<String, Object>> tenantValidator = tenantCodeValid(tenantCode);
-        if (tenantValidator.isPresent()) {
-            return tenantValidator.get();
-        }
+        tenantCodeValid(tenantCode);
 
         Tenant newTenant = createObjToDB(tenantCode, desc, queueId);
         // if storage startup
@@ -229,10 +221,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
-        Optional<Map<String, Object>> tenantValidator = tenantCodeValid(tenantCode);
-        if (tenantValidator.isPresent()) {
-            return tenantValidator.get();
-        }
+        tenantCodeValid(tenantCode);
 
         // updateProcessInstance tenant
         /**
@@ -403,11 +392,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return tenantMapper.queryByTenantCode(tenantCode);
         }
 
-        Optional<Map<String, Object>> tenantValidator = tenantCodeValid(tenantCode);
-        if (tenantValidator.isPresent()) {
-            Map<String, Object> validator = tenantValidator.get();
-            throw new IllegalArgumentException((String) validator.get(Constants.MSG));
-        }
+        tenantCodeValid(tenantCode);
         Queue newQueue = queueService.createQueueIfNotExists(queue, queueName);
         return createObjToDB(tenantCode, desc, newQueue.getId());
     };

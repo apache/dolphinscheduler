@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -39,7 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -70,21 +71,15 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      *
      * @param queue queue value
      * @param queueName queue name
-     * @return Optional of Status map
      */
-    private Optional<Map<String, Object>> queueValid(String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
+    private void queueValid(String queue, String queueName) throws ServiceException {
         if (StringUtils.isEmpty(queue) || StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
-            return Optional.of(result);
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
         } else if (checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-            return Optional.of(result);
+            throw new ServiceException(Status.QUEUE_VALUE_EXIST, queue);
         } else if (checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return Optional.of(result);
+            throw new ServiceException(Status.QUEUE_VALUE_EXIST, queueName);
         }
-        return Optional.empty();
     }
 
     /**
@@ -173,11 +168,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
-        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
-        if (queueValidator.isPresent()) {
-            return queueValidator.get();
-        }
+        queueValid(queue, queueName);
 
         Queue newQueue = createObjToDB(queue, queueName);
         result.put(Constants.DATA_LIST, newQueue);
@@ -203,20 +194,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return result;
         }
 
-        if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
-            return result;
-        }
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
-        if (queueValidator.isPresent()) {
-            return queueValidator.get();
-        }
+        queueValid(queue, queueName);
 
         Queue queueObj = queueMapper.selectById(id);
         if (queueObj == null) {
@@ -273,13 +251,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Result<Object> verifyQueue(String queue, String queueName) {
         Result<Object> result = new Result<>();
-
-        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
-        if (queueValidator.isPresent()) {
-            Map<String, Object> validator = queueValidator.get();
-            putMsg(result, validator);
-            return result;
-        }
+        queueValid(queue, queueName);
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -331,11 +303,12 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     @Override
     public Queue createQueueIfNotExists(String queue, String queueName) {
-        Optional<Map<String, Object>> queueValidator = queueValid(queue, queueName);
-        if (!queueValidator.isPresent()) {
+        queueValid(queue, queueName);
+        Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
+        if (Objects.isNull(existsQueue)) {
             return createObjToDB(queue, queueName);
         }
-        return queueMapper.queryQueueName(queue, queueName);
+        return existsQueue;
     };
 
 }
