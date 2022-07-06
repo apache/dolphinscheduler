@@ -65,6 +65,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
@@ -116,7 +117,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProcessService processService;
 
     @Autowired
-    StateEventCallbackService stateEventCallbackService;
+    private StateEventCallbackService stateEventCallbackService;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -467,13 +468,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // determine whether the process is normal
         if (update > 0) {
-            String host = processInstance.getHost();
-            String address = host.split(":")[0];
-            int port = Integer.parseInt(host.split(":")[1]);
+            // directly send the process instance state change event to target master, not guarantee the event send success
             StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                     processInstance.getId(), 0, processInstance.getState(), processInstance.getId(), 0
             );
-            stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+            Host host = new Host(processInstance.getHost());
+            stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
@@ -737,7 +737,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
-                    
+
                     // Distribute the number of tasks equally to each command.
                     // The last command with insufficient quantity will be assigned to the remaining tasks.
                     int itemsPerCommand = (listDateSize / createCount);

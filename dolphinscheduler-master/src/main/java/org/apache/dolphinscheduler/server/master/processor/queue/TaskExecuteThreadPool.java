@@ -82,18 +82,13 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             logger.warn("Cannot find workflowExecuteThread from cacheManager, event: {}", taskEvent);
             return;
         }
-        if (!taskExecuteThreadMap.containsKey(taskEvent.getProcessInstanceId())) {
-            TaskExecuteRunnable taskExecuteThread = new TaskExecuteRunnable(
-                    taskEvent.getProcessInstanceId(),
-                    processService, workflowExecuteThreadPool,
-                    processInstanceExecCacheManager,
-                    dataQualityResultOperator);
-            taskExecuteThreadMap.put(taskEvent.getProcessInstanceId(), taskExecuteThread);
-        }
-        TaskExecuteRunnable taskExecuteRunnable= taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
-        if (taskExecuteRunnable != null) {
-            taskExecuteRunnable.addEvent(taskEvent);
-        }
+        TaskExecuteRunnable taskExecuteRunnable = taskExecuteThreadMap.computeIfAbsent(taskEvent.getProcessInstanceId(),
+            (processInstanceId) -> new TaskExecuteRunnable(processInstanceId,
+                processService,
+                workflowExecuteThreadPool,
+                processInstanceExecCacheManager,
+                dataQualityResultOperator));
+        taskExecuteRunnable.addEvent(taskEvent);
     }
 
     public void eventHandler() {
@@ -103,7 +98,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     public void executeEvent(TaskExecuteRunnable taskExecuteThread) {
-        if (taskExecuteThread.eventSize() == 0) {
+        if (taskExecuteThread.isEmpty()) {
             return;
         }
         if (multiThreadFilterMap.containsKey(taskExecuteThread.getKey())) {
