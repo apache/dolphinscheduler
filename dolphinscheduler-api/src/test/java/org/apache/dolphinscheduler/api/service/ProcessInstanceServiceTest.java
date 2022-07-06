@@ -171,8 +171,8 @@ public class ProcessInstanceServiceTest {
             "192.168.xx.xx", "",1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) proejctAuthFailRes.getCode());
 
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
         ProcessInstance processInstance = getProcessInstance();
         List<ProcessInstance> processInstanceList = new ArrayList<>();
         Page<ProcessInstance> pageReturn = new Page<>(1, 10);
@@ -246,8 +246,8 @@ public class ProcessInstanceServiceTest {
         int size = 10;
         String startTime = "2020-01-01 00:00:00";
         String endTime = "2020-08-02 00:00:00";
-        Date start = DateUtils.getScheduleDate(startTime);
-        Date end = DateUtils.getScheduleDate(endTime);
+        Date start = DateUtils.stringToDate(startTime);
+        Date end = DateUtils.stringToDate(endTime);
 
         //project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);

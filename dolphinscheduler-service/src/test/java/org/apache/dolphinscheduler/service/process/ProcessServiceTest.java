@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -284,7 +285,7 @@ public class ProcessServiceTest {
     }
 
     @Test
-    public void testHandleCommand() {
+    public void testHandleCommand() throws CronParseException {
 
         //cannot construct process instance, return null;
         String host = "127.0.0.1";
@@ -461,7 +462,7 @@ public class ProcessServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testDeleteNotExistCommand() {
+    public void testDeleteNotExistCommand() throws CronParseException {
         String host = "127.0.0.1";
         int definitionVersion = 1;
         long definitionCode = 123;
