@@ -83,7 +83,7 @@ Node_mysql 运行结果如下：
 
 第一步:拖一个http类型的任务，在自定义参数中KEY的位置填写body ,在IN/OUT的部分选择OUT,在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
 
-<img src="../../../../img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
+![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
 第二步:在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了，
 
