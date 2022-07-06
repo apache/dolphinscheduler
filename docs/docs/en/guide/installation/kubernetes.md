@@ -199,7 +199,10 @@ FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.0.0-be
 # For example
 # FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:3.0.0-beta-2
 
-COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
+# Attention Please, If the build is dolphinscheduler-tools image
+# You need to change the following line to: COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
+# The other services don't need any changes
+COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
 ```
 
 3. Build a new docker image including MySQL driver:
@@ -248,10 +251,10 @@ FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.0.0-be
 # FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.0.0-beta-2
 
 # If you want to support MySQL Datasource
-COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
+COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
 
 # If you want to support Oracle Datasource
-COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/libs
 ```
 
 3. Build a new docker image including MySQL or Oracle driver:
