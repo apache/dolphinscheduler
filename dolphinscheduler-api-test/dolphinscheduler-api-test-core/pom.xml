@@ -47,6 +47,26 @@
                         <version>8.45</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <consoleOutput>true</consoleOutput>
+                    <encoding>UTF-8</encoding>
+                    <configLocation>style/checkstyle.xml</configLocation>
+                    <failOnViolation>true</failOnViolation>
+                    <violationSeverity>warning</violationSeverity>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
+                    <excludes>**\/generated-sources\/</excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
