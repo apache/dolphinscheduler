@@ -15,20 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
+package org.apache.dolphinscheduler.server.master.event;
 
-import java.util.Collection;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+
+import io.netty.channel.Channel;
+import lombok.Data;
 
 /**
- * selector
- * @param <T> T
+ * state event
  */
-public interface Selector<T> {
+@Data
+public class StateEvent {
 
     /**
-     * select
-     * @param source source, the given source should not be empty.
-     * @return T
+     * origin_pid-origin_task_id-process_instance_id-task_instance_id
      */
-    T select(Collection<T> source);
+    private String key;
+
+    private StateEventType type;
+
+    private ExecutionStatus executionStatus;
+
+    private int taskInstanceId;
+
+    private long taskCode;
+
+    private int processInstanceId;
+
+    private String context;
+
+    private Channel channel;
+
 }

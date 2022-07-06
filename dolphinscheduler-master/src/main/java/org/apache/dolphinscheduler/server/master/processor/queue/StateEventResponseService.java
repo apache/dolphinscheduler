@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -98,6 +98,7 @@ public class StateEventResponseService {
      */
     public void addResponse(StateEvent stateEvent) {
         try {
+            // check the event is validated
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
             logger.error("Put state event : {} error", stateEvent, e);

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -193,6 +193,7 @@ public class TaskExecuteRunnable implements Runnable {
                 }
             }
             // if taskInstance is null (maybe deleted) or finish. retry will be meaningless . so ack success
+            // send ack to worker
             TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
             channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
         } catch (Exception e) {

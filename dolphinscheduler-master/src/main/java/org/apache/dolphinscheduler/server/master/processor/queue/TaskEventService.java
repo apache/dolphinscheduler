@@ -63,11 +63,15 @@ public class TaskEventService {
 
     @PostConstruct
     public void start() {
-        this.taskEventThread = new TaskEventThread();
+        this.taskEventThread = new TaskEventDispatchThread();
+        logger.info("TaskEvent dispatch thread starting");
         this.taskEventThread.start();
+        logger.info("TaskEvent dispatch thread started");
 
         this.taskEventHandlerThread = new TaskEventHandlerThread();
+        logger.info("TaskEvent handle thread staring");
         this.taskEventHandlerThread.start();
+        logger.info("TaskEvent handle thread started");
     }
 
     @PreDestroy
@@ -94,14 +98,14 @@ public class TaskEventService {
      * @param taskEvent taskEvent
      */
     public void addEvent(TaskEvent taskEvent) {
-        taskExecuteThreadPool.submitTaskEvent(taskEvent);
+        eventQueue.add(taskEvent);
     }
 
     /**
-     * task worker thread
+     * Dispatch event to target task runnable.
      */
-    class TaskEventThread extends BaseDaemonThread {
-        protected TaskEventThread() {
+    class TaskEventDispatchThread extends BaseDaemonThread {
+        protected TaskEventDispatchThread() {
             super("TaskEventLoopThread");
         }
 
@@ -109,7 +113,7 @@ public class TaskEventService {
         public void run() {
             while (Stopper.isRunning()) {
                 try {
-                    // if not task , blocking here
+                    // if not task event, blocking here
                     TaskEvent taskEvent = eventQueue.take();
                     taskExecuteThreadPool.submitTaskEvent(taskEvent);
                 } catch (InterruptedException e) {
@@ -141,6 +145,7 @@ public class TaskEventService {
                     TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    logger.warn("TaskEvent handle thread interrupted, will return this loop");
                     break;
                 } catch (Exception e) {
                     logger.error("event handler thread error", e);

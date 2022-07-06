@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
+package org.apache.dolphinscheduler.server.master.event;
 
-import java.util.Collection;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
-/**
- * selector
- * @param <T> T
- */
-public interface Selector<T> {
+import com.google.auto.service.AutoService;
 
-    /**
-     * select
-     * @param source source, the given source should not be empty.
-     * @return T
-     */
-    T select(Collection<T> source);
+@AutoService(StateEventHandler.class)
+public class TaskWaitTaskGroupStateHandler implements StateEventHandler {
+    @Override
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent) {
+        return workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent);
+    }
+
+    @Override
+    public StateEventType getEventType() {
+        return StateEventType.WAIT_TASK_GROUP;
+    }
 }

@@ -40,10 +40,9 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
      * put task takePriorityInfo
      *
      * @param taskPriorityInfo takePriorityInfo
-     * @throws TaskPriorityQueueException
      */
     @Override
-    public void put(TaskPriority taskPriorityInfo) throws TaskPriorityQueueException {
+    public void put(TaskPriority taskPriorityInfo) {
         queue.put(taskPriorityInfo);
     }
 

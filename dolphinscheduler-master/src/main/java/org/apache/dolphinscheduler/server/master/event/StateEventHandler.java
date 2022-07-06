@@ -15,36 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.server.master.event;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
-import io.netty.channel.Channel;
-import lombok.Data;
-
-/**
- * state event
- */
-@Data
-public class StateEvent {
+public interface StateEventHandler {
 
     /**
-     * origin_pid-origin_task_id-process_instance_id-task_instance_id
+     * Handle a event, if handle success will reture true, else return false
+     *
+     * @param stateEvent given state event.
+     * @throws StateEventHandleException this exception means it can be recovered.
+     * @throws StateEventHandleError     this exception means it cannot be recovered, so the event need to drop.
      */
-    private String key;
+    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
+        throws StateEventHandleException, StateEventHandleError;
 
-    private StateEventType type;
-
-    private ExecutionStatus executionStatus;
-
-    private int taskInstanceId;
-
-    private long taskCode;
-
-    private int processInstanceId;
-
-    private String context;
-
-    private Channel channel;
-
+    StateEventType getEventType();
 }

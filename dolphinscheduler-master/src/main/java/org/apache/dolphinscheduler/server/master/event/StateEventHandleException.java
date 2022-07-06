@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
-
-import java.util.Collection;
+package org.apache.dolphinscheduler.server.master.event;
 
 /**
- * selector
- * @param <T> T
+ * This exception represent the exception can be recovered, when we get this exception, we will retry the event.
  */
-public interface Selector<T> {
+public class StateEventHandleException extends Exception {
 
-    /**
-     * select
-     * @param source source, the given source should not be empty.
-     * @return T
-     */
-    T select(Collection<T> source);
+    public StateEventHandleException(String message) {
+        super(message);
+    }
+
+    public StateEventHandleException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }

@@ -116,7 +116,9 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     @PostConstruct
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
+        logger.info("Task priority queue consume thread staring");
         super.start();
+        logger.info("Task priority queue consume thread started");
     }
 
     @Override

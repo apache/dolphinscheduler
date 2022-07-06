@@ -121,7 +121,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProcessService processService;
 
     @Autowired
-    StateEventCallbackService stateEventCallbackService;
+    private StateEventCallbackService stateEventCallbackService;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -500,6 +500,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // determine whether the process is normal
         if (update > 0) {
+            // directly send the process instance state change event to target master, not guarantee the event send success
             StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                     processInstance.getId(), 0, processInstance.getState(), processInstance.getId(), 0
             );
