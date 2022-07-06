@@ -93,4 +93,4 @@ The configuration is complete
 ![httpParam-3](../../../../img/httpParam/httpParam-3.png)
 
 Step 3: You can write a test interface to test whether our parameters are passed successfully.
-<img src="../../../../img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />
+![httpParam-4](../../../../img/httpParam/httpParam-4.png)
