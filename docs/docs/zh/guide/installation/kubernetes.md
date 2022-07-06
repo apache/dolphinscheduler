@@ -197,10 +197,13 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 
 ```
 FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
-# For example
+# 例如
 # FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
 
-COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
+# 注意，如果构建的是dolphinscheduler-tools镜像
+# 需要将下面一行修改为COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
+# 其他服务保持不变即可
+COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
 ```
 
 3. 构建一个包含 MySQL 驱动包的新镜像:
@@ -245,14 +248,14 @@ externalDatabase:
 
 ```
 FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
-# For example
+# 例如
 # FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
 
-# If you want to support MySQL Datasource
-COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/lib
+# 如果你想支持 MySQL 数据源
+COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
 
-# If you want to support Oracle Datasource
-COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+# 如果你想支持 Oracle 数据源
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/libs
 ```
 
 3. 构建一个包含 MySQL 或者 Oracle 驱动包的新镜像:
