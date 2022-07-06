@@ -19,14 +19,14 @@
 
 package org.apache.dolphinscheduler.api.test.pages.security;
 
-import org.apache.dolphinscheduler.api.test.core.Constants;
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public final class TenantPage {
+public final class TenantPageAPI {
     public HttpResponse createTenant(String sessionId, String tenant, Integer queueId, String description) {
         Map<String, Object> params = new HashMap<>();
         params.put("tenantCode", tenant);

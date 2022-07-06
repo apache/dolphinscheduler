@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.core;
+package org.apache.dolphinscheduler.api.test.core.extensions;
 
 import java.io.File;
 import java.net.URL;
@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -36,7 +37,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback {
+public final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback {
     private final boolean localMode = Objects.equals(System.getProperty("local"), "true");
 
     private final String serviceName = "dolphinscheduler_1";

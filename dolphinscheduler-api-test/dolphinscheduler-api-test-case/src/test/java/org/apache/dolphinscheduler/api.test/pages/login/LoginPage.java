@@ -17,25 +17,23 @@
  * under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.core;
+package org.apache.dolphinscheduler.api.test.pages.login;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import java.util.HashMap;
+import java.util.Map;
 
-@Inherited
-@Testcontainers
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@TestMethodOrder(OrderAnnotation.class)
-@ExtendWith(DolphinSchedulerExtension.class)
-public @interface DolphinScheduler {
-    String[] composeFiles();
+public final class LoginPage {
+    public HttpResponse login(String username, String password) {
+        Map<String, Object> params = new HashMap<>();
+
+        params.put("userName", username);
+        params.put("userPassword", password);
+
+        RequestClient requestClient = new RequestClient();
+
+        return requestClient.post("/login", null, params);
+    }
 }
