@@ -95,4 +95,4 @@ Node_mysql 运行结果如下：
 <img src="../../../../img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
 
 第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。
-<img src="../../../../img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />
+![httpParam-4](../../../../img/httpParam/httpParam-4.png)
