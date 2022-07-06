@@ -1188,7 +1188,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return update result cod
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Result<Object> updateResourceContent(int resourceId, String content) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {

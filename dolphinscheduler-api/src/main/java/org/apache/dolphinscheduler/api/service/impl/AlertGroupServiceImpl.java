@@ -137,6 +137,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return create result code
      */
     @Override
+    @Transactional
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -224,7 +225,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);

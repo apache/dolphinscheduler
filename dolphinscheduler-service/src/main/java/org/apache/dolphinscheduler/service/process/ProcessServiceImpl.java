@@ -1270,7 +1270,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return task instance
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
         logger.info("Start save taskInstance to database : {}, processInstance id:{}, state: {}",
                     taskInstance.getName(),
@@ -2044,7 +2044,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param processInstance processInstance
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance) {
         //1 update processInstance host is null
         processInstance.setHost(Constants.NULL);

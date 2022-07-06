@@ -78,6 +78,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return create result code
      */
     @Override
+    @Transactional
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
@@ -304,7 +305,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Result<Object> delete(int id) {
         Result<Object> result = new Result<>();
         udfFuncMapper.deleteById(id);

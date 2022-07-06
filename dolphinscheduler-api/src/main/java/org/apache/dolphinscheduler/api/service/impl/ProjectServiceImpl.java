@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +76,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return returns an error if it exists
      */
     @Override
+    @Transactional
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
         Map<String, Object> result = new HashMap<>();
