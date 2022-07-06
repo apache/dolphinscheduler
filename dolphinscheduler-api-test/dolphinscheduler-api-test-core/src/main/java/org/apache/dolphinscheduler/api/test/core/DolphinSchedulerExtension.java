@@ -37,15 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback {
-    private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
+    private final boolean localMode = Objects.equals(System.getProperty("local"), "true");
 
-    private final String SERVICE_NAME = "dolphinscheduler_1";
+    private final String serviceName = "dolphinscheduler_1";
 
     private DockerComposeContainer<?> compose;
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        if (!LOCAL_MODE) {
+        if (!localMode) {
             compose = createDockerCompose(context);
             compose.start();
         }
@@ -71,8 +71,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)
-            .withLogConsumer(SERVICE_NAME, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
-            .waitingFor(SERVICE_NAME, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
+            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
 
         return compose;
     }

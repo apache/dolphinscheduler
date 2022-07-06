@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.apache.dolphinscheduler.api.test.core.Constants;
 
@@ -69,13 +70,9 @@ public class JSONUtils {
     /**
      * can use static singleton, inject: just make sure to reuse!
      */
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-        .setTimeZone(TimeZone.getDefault())
-        .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
+    private static final ObjectMapper objectMapper =
+        new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false).configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true).setTimeZone(TimeZone.getDefault()).setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");

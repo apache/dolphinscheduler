@@ -120,7 +120,6 @@ public class RequestClient {
 
         Response response = this.httpClient.newCall(request).execute();
 
-
         int responseCode = response.code();
         HttpResponseBody responseData = null;
         if (response.body() != null) {
@@ -155,7 +154,6 @@ public class RequestClient {
             .build();
 
         Response response = this.httpClient.newCall(request).execute();
-
 
         int responseCode = response.code();
         HttpResponseBody responseData = null;
