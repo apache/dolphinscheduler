@@ -90,6 +90,10 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
           - name: Project
             class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
+          - name: WorkFlow
+              class: org.apache.dolphinscheduler.api.test.cases.WorkFlowAPITest
+          - name: WorkFlowInstance
+              class: org.apache.dolphinscheduler.api.test.cases.WorkFlowInstanceAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

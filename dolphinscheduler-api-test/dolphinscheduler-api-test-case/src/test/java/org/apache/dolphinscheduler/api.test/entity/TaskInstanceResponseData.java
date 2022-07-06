@@ -41,6 +41,4 @@ public class TaskInstanceResponseData {
     private List<TaskInstanceResponseTotalList> totalList;
 
     private Integer totalPage;
-
-
 }

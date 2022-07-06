@@ -29,8 +29,6 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ProjectListResponseData {
-
-
     private Integer currentPage;
 
     private Integer pageSize;

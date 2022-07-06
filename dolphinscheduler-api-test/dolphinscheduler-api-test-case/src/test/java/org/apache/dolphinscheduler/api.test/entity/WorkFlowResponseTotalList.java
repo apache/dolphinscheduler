@@ -79,6 +79,4 @@ public class WorkFlowResponseTotalList {
     private Integer version;
 
     private Integer warningGroupId;
-
-
 }

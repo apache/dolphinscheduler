@@ -21,7 +21,8 @@ package org.apache.dolphinscheduler.api.test.cases;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
-import org.apache.dolphinscheduler.api.test.entity.*;
+import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
