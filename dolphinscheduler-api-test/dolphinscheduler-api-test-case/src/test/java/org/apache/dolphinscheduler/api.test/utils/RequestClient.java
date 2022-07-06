@@ -19,11 +19,14 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.testcontainers.shaded.okhttp3.FormBody;
 import org.testcontainers.shaded.okhttp3.Headers;
 import org.testcontainers.shaded.okhttp3.MediaType;
@@ -32,9 +35,8 @@ import org.testcontainers.shaded.okhttp3.Request;
 import org.testcontainers.shaded.okhttp3.RequestBody;
 import org.testcontainers.shaded.okhttp3.Response;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RequestClient {
@@ -56,10 +58,10 @@ public class RequestClient {
 
         LOGGER.info("GET request to {}, Headers: {}", requestUrl, headersBuilder);
         Request request = new Request.Builder()
-                .url(requestUrl)
-                .headers(headersBuilder)
-                .get()
-                .build();
+            .url(requestUrl)
+            .headers(headersBuilder)
+            .get()
+            .build();
 
         Response response = this.httpClient.newCall(request).execute();
 
@@ -111,13 +113,12 @@ public class RequestClient {
 
         LOGGER.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
-                .headers(headersBuilder)
-                .url(requestUrl)
-                .post(requestBody)
-                .build();
+            .headers(headersBuilder)
+            .url(requestUrl)
+            .post(requestBody)
+            .build();
 
         Response response = this.httpClient.newCall(request).execute();
-
 
         int responseCode = response.code();
         HttpResponseBody responseData = null;
@@ -147,13 +148,12 @@ public class RequestClient {
 
         LOGGER.info("DELETE request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
-                .headers(headersBuilder)
-                .url(requestUrl)
-                .delete()
-                .build();
+            .headers(headersBuilder)
+            .url(requestUrl)
+            .delete()
+            .build();
 
         Response response = this.httpClient.newCall(request).execute();
-
 
         int responseCode = response.code();
         HttpResponseBody responseData = null;

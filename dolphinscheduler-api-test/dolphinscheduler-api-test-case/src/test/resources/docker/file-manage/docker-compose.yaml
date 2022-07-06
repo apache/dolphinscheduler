@@ -53,7 +53,7 @@ services:
       MINIO_ROOT_USER: accessKey123
       MINIO_ROOT_PASSWORD: secretKey123
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 5s
       timeout: 120s
       retries: 120

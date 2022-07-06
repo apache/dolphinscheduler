@@ -52,7 +52,7 @@ services:
     networks:
       - e2e
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
+      test: [ "CMD", "wget", "--spider", "-q", "localhost:8123/ping" ]
       interval: 5s
       timeout: 60s
       retries: 120
