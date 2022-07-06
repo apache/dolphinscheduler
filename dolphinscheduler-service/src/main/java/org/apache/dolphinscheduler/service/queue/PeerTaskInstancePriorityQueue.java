@@ -51,10 +51,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * put task instance to priority queue
      *
      * @param taskInstance taskInstance
-     * @throws TaskPriorityQueueException
      */
     @Override
-    public void put(TaskInstance taskInstance) throws TaskPriorityQueueException {
+    public void put(TaskInstance taskInstance) {
         Preconditions.checkNotNull(taskInstance);
         queue.add(taskInstance);
         taskInstanceIdentifySet.add(getTaskInstanceIdentify(taskInstance));

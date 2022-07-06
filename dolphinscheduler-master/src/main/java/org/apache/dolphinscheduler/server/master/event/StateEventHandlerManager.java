@@ -15,20 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
+package org.apache.dolphinscheduler.server.master.event;
 
-import java.util.Collection;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
 
-/**
- * selector
- * @param <T> T
- */
-public interface Selector<T> {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
-    /**
-     * select
-     * @param source source, the given source should not be empty.
-     * @return T
-     */
-    T select(Collection<T> source);
+public class StateEventHandlerManager {
+
+    private static final Map<StateEventType, StateEventHandler> stateEventHandlerMap = new HashMap<>();
+
+    static {
+        ServiceLoader.load(StateEventHandler.class)
+            .forEach(stateEventHandler -> stateEventHandlerMap.put(stateEventHandler.getEventType(),
+                stateEventHandler));
+    }
+
+    public static Optional<StateEventHandler> getStateEventHandler(StateEventType stateEventType) {
+        return Optional.ofNullable(stateEventHandlerMap.get(stateEventType));
+    }
+
 }
