@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -152,6 +153,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private CuringParamsService curingGlobalParamsService;
 
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime
@@ -448,7 +452,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param tenantCode tenantCode
      * @return update result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId, String taskRelationJson,
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine, String globalParams,
@@ -556,12 +560,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime, String globalParams, int timeout, String timezone) {
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
-            schedule = DateUtils.getScheduleDate(scheduleTime);
+            schedule = DateUtils.stringToDate(scheduleTime);
         }
         processInstance.setScheduleTime(schedule);
         List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);
         Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
-        globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, processInstance.getCmdTypeIfComplement(), schedule, timezone);
+        globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(), globalParamMap, globalParamList, processInstance.getCmdTypeIfComplement(), schedule, timezone);
         processInstance.setTimeout(timeout);
         processInstance.setTenantCode(tenantCode);
         processInstance.setGlobalParams(globalParams);
@@ -615,7 +619,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteProcessInstanceById(User loginUser, long projectCode, Integer processInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
@@ -33,11 +33,10 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 
-import org.apache.commons.lang3.ThreadUtils;
-
-import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,24 +58,24 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     private static final Logger logger = LoggerFactory.getLogger(StateWheelExecuteThread.class);
 
     /**
-     * process timeout check list
+     * ProcessInstance timeout check list, element is the processInstanceId.
      */
-    private ConcurrentLinkedQueue<Integer> processInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Integer> processInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
 
     /**
      * task time out check list
      */
-    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceTimeoutCheckList = new ConcurrentLinkedQueue<>();
 
     /**
      * task retry check list
      */
-    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceRetryCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceRetryCheckList = new ConcurrentLinkedQueue<>();
 
     /**
      * task state check list
      */
-    private ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceStateCheckList = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceStateCheckList = new ConcurrentLinkedQueue<>();
 
     @Autowired
     private MasterConfig masterConfig;
@@ -91,9 +90,14 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         super("StateWheelExecuteThread");
     }
 
+    @PostConstruct
+    public void startWheelThread() {
+        super.start();
+    }
+
     @Override
     public void run() {
-        Duration checkInterval = Duration.ofMillis(masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
+        final long checkInterval = masterConfig.getStateWheelInterval().toMillis();
         while (Stopper.isRunning()) {
             try {
                 checkTask4Timeout();
@@ -104,9 +108,11 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 logger.error("state wheel thread check error:", e);
             }
             try {
-                ThreadUtils.sleep(checkInterval);
+                Thread.sleep(checkInterval);
             } catch (InterruptedException e) {
-                logger.error("state wheel thread sleep error", e);
+                logger.error("state wheel thread sleep error, will close the loop", e);
+                Thread.currentThread().interrupt();
+                break;
             }
         }
     }
@@ -116,8 +122,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         logger.info("Success add workflow instance into timeout check list");
     }
 
-    public void removeProcess4TimeoutCheck(ProcessInstance processInstance) {
-        boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstance.getId());
+    public void removeProcess4TimeoutCheck(int processInstanceId) {
+        boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstanceId);
         if (removeFlag) {
             logger.info("Success remove workflow instance from timeout check list");
         } else {

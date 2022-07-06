@@ -18,39 +18,23 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.io.Serializable;
 
-/**
- *  execute task request command
- */
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskExecuteRequestCommand implements Serializable {
 
-    /**
-     *  task execution context
-     */
-    private String taskExecutionContext;
+    private static final long serialVersionUID = -1L;
 
-    public String getTaskExecutionContext() {
-        return taskExecutionContext;
-    }
+    private TaskExecutionContext taskExecutionContext;
 
-    public void setTaskExecutionContext(String taskExecutionContext) {
-        this.taskExecutionContext = taskExecutionContext;
-    }
-
-    public TaskExecuteRequestCommand() {
-    }
-
-    public TaskExecuteRequestCommand(String taskExecutionContext) {
-        this.taskExecutionContext = taskExecutionContext;
-    }
-
-    /**
-     *  package request command
-     *
-     * @return command
-     */
     public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
@@ -59,10 +43,4 @@ public class TaskExecuteRequestCommand implements Serializable {
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "TaskExecuteRequestCommand{"
-                + "taskExecutionContext='" + taskExecutionContext + '\''
-                + '}';
-    }
 }

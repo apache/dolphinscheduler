@@ -116,7 +116,9 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     @PostConstruct
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
+        logger.info("Task priority queue consume thread staring");
         super.start();
+        logger.info("Task priority queue consume thread started");
     }
 
     @Override
@@ -131,9 +133,8 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
-                    // If there are tasks in a cycle that cannot find the worker group,
-                    // sleep for 1 second
-                    if (taskPriorityQueue.size() <= failedDispatchTasks.size()) {
+                    // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
+                    if (fetchTaskNum == failedDispatchTasks.size()) {
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
@@ -218,8 +219,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
         return requestCommand.convert2Command();
     }
 

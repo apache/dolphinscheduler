@@ -64,16 +64,26 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     /**
      * query alert group list
      *
+     * @param loginUser
      * @return alert group list
      */
     @Override
-    public Map<String, Object> queryAlertgroup() {
-
+    public Map<String, Object> queryAlertgroup(User loginUser) {
         HashMap<String, Object> result = new HashMap<>();
-        List<AlertGroup> alertGroups = alertGroupMapper.queryAllGroupList();
+        List<AlertGroup> alertGroups;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            alertGroups = alertGroupMapper.queryAllGroupList();
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            alertGroups = alertGroupMapper.selectBatchIds(ids);
+        }
         result.put(Constants.DATA_LIST, alertGroups);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -150,6 +160,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return create result code
      */
     @Override
+    @Transactional
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -240,7 +251,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);

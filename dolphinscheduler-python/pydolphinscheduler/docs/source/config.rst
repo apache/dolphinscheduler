@@ -47,10 +47,10 @@ how to change them by Bash.
 .. code-block:: bash
 
    # Modify Java Gateway Address
-   $ export PYDS_JAVA_GATEWAY_ADDRESS="192.168.1.1"
+   export PYDS_JAVA_GATEWAY_ADDRESS="192.168.1.1"
 
    # Modify Workflow Default User
-   $ export PYDS_WORKFLOW_USER="custom-user"
+   export PYDS_WORKFLOW_USER="custom-user"
 
 After executing the commands above, both ``PYDS_JAVA_GATEWAY_ADDRESS`` and ``PYDS_WORKFLOW_USER`` will be changed.
 The next time you execute and submit your workflow, it will submit to host `192.168.1.1`, and with workflow's user
@@ -136,15 +136,15 @@ integrated built-in configurations in its package, but you could also export it 
 
 .. code-block:: bash
 
-    $ pydolphinscheduler config --init
+   pydolphinscheduler config --init
 
 And it will create a new YAML file in the path `~/pydolphinscheduler/config.yaml` by default. If you want to export
 it to another path, you should set `PYDS_HOME` before you run command :code:`pydolphinscheduler config --init`.
 
 .. code-block:: bash
 
-    $ export PYDS_HOME=<CUSTOM_PATH>
-    $ pydolphinscheduler config --init
+    export PYDS_HOME=<CUSTOM_PATH>
+    pydolphinscheduler config --init
 
 After that, your configuration file will export into `<CUSTOM_PATH>/config.yaml` instead of the default path.
 
@@ -161,36 +161,37 @@ node of the configuration but could get the parent configuration, there are simp
 
 .. code-block:: bash
 
-    # Get single configuration in the leaf node
-    $ pydolphinscheduler config --get java_gateway.address
-    The configuration query as below:
+   # Get single configuration in the leaf node,
+   # The output look like below:
+   # java_gateway.address = 127.0.0.1
+   pydolphinscheduler config --get java_gateway.address
 
-    java_gateway.address = 127.0.0.1
+   # Get multiple configuration in the leaf node,
+   # The output look like below:
+   # java_gateway.address = 127.0.0.1
+   # java_gateway.port = 25333
+   pydolphinscheduler config --get java_gateway.address --get java_gateway.port
 
-    # Get multiple configuration in the leaf node
-    $ pydolphinscheduler config --get java_gateway.address --get java_gateway.port
-    The configuration query as below:
 
-    java_gateway.address = 127.0.0.1
-    java_gateway.port = 25333
+   # Get parent configuration which contain multiple leaf nodes,
+   # The output look like below:
+   # java_gateway = ordereddict([('address', '127.0.0.1'), ('port', 25333), ('auto_convert', True)])
+   pydolphinscheduler config --get java_gateway
 
-    # Get parent configuration which contain multiple leaf nodes
-    $ pydolphinscheduler config --get java_gateway
-    The configuration query as below:
+   # Set single configuration,
+   # The output look like below:
+   # Set configuration done.
+   pydolphinscheduler config --set java_gateway.address 192.168.1.1
 
-    java_gateway = ordereddict([('address', '127.0.0.1'), ('port', 25333), ('auto_convert', True)])
+   # Set multiple configuration
+   # The output look like below:
+   # Set configuration done.
+   pydolphinscheduler config --set java_gateway.address 192.168.1.1 --set java_gateway.port 25334
 
-    # Set single configuration
-    $ pydolphinscheduler config --set java_gateway.address 192.168.1.1
-    Set configuration done.
-
-    # Set multiple configuration
-    $ pydolphinscheduler config --set java_gateway.address 192.168.1.1 --set java_gateway.port 25334
-    Set configuration done.
-
-    # Set configuration not in leaf node will fail
-    $ pydolphinscheduler config --set java_gateway 192.168.1.1,25334,True
-    Raise error.
+   # Set configuration not in leaf node will fail
+   # The output look like below:
+   # Raise error.
+   pydolphinscheduler config --set java_gateway 192.168.1.1,25334,True
 
 For more information about our CLI, you could see document :doc:`cli`.
 

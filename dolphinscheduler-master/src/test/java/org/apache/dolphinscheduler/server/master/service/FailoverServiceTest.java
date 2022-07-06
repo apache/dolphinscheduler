@@ -18,20 +18,22 @@
 package org.apache.dolphinscheduler.server.master.service;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -45,7 +47,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -63,7 +64,6 @@ import com.google.common.collect.Lists;
 @PrepareForTest({RegistryClient.class})
 @PowerMockIgnore({"javax.management.*"})
 public class FailoverServiceTest {
-    @InjectMocks
     private FailoverService failoverService;
 
     @Mock
@@ -77,6 +77,9 @@ public class FailoverServiceTest {
 
     @Mock
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+
+    @Mock
+    private ProcessInstanceExecCacheManager cacheManager;
 
     private static int masterPort = 5678;
     private static int workerPort = 1234;
@@ -95,6 +98,7 @@ public class FailoverServiceTest {
         springApplicationContext.setApplicationContext(applicationContext);
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
+        failoverService = new FailoverService(registryClient, masterConfig, processService, workflowExecuteThreadPool, cacheManager);
 
         testMasterHost = failoverService.getLocalAddress();
         String ip = testMasterHost.split(":")[0];
@@ -182,7 +186,16 @@ public class FailoverServiceTest {
 
     @Test
     public void failoverWorkTest() {
+        workerTaskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        WorkflowExecuteRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecuteRunnable.class);
+        Mockito.when(workflowExecuteRunnable.getAllTaskInstances()).thenReturn(Lists.newArrayList(workerTaskInstance));
+        Mockito.when(workflowExecuteRunnable.getProcessInstance()).thenReturn(processInstance);
+
+        Mockito.when(cacheManager.getAll()).thenReturn(Lists.newArrayList(workflowExecuteRunnable));
+        Mockito.when(cacheManager.getByProcessInstanceId(Mockito.anyInt())).thenReturn(workflowExecuteRunnable);
+
+
         failoverService.failoverServerWhenDown(testWorkerHost, NodeType.WORKER);
-        Assert.assertEquals(workerTaskInstance.getState(), ExecutionStatus.NEED_FAULT_TOLERANCE);
+        Assert.assertEquals(ExecutionStatus.NEED_FAULT_TOLERANCE, workerTaskInstance.getState());
     }
 }

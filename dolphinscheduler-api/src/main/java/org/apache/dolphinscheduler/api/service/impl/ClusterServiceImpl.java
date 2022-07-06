@@ -68,7 +68,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      * @param config    cluster config
      * @param desc      cluster desc
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> createCluster(User loginUser, String name, String config, String desc) {
         Map<String, Object> result = new HashMap<>();
@@ -229,7 +229,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      * @param loginUser login user
      * @param code      cluster code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteClusterByCode(User loginUser, Long code) {
         Map<String, Object> result = new HashMap<>();
@@ -256,7 +256,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      * @param config    cluster config
      * @param desc      cluster desc
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateClusterByCode(User loginUser, Long code, String name, String config, String desc) {
         Map<String, Object> result = new HashMap<>();

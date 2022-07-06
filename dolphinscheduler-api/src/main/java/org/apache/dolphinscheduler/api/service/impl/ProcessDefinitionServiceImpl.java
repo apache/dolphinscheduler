@@ -220,7 +220,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> createProcessDefinition(User loginUser,
                                                        long projectCode,
                                                        String name,
@@ -547,7 +547,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return update result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> updateProcessDefinition(User loginUser,
                                                        long projectCode,
                                                        String name,
@@ -707,7 +707,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteProcessDefinitionByCode(User loginUser, long projectCode, long code) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -778,7 +778,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return release result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -918,7 +918,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return import process
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> importProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         String dagDataScheduleJson = FileUtils.file2String(file);
@@ -942,7 +942,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
@@ -1687,7 +1687,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param targetProjectCode targetProjectCode
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> batchMoveProcessDefinition(User loginUser,
                                                           long projectCode,
                                                           String codes,
@@ -1788,6 +1788,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setId(0);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                final Date date = new Date();
+                processDefinition.setCreateTime(date);
+                processDefinition.setUpdateTime(date);
+                processDefinition.setReleaseState(ReleaseState.OFFLINE);
                 if (StringUtils.isNotBlank(processDefinition.getLocations())) {
                     ArrayNode jsonNodes = JSONUtils.parseArray(processDefinition.getLocations());
                     for (int i = 0; i < jsonNodes.size(); i++) {
@@ -1827,7 +1831,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return switch process definition version result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, long code, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -1922,7 +1926,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteProcessDefinitionVersion(User loginUser, long projectCode, long code, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -1965,7 +1969,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return process definition code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> createEmptyProcessDefinition(User loginUser,
                                                             long projectCode,
                                                             String name,
@@ -2092,7 +2096,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return update result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> updateProcessDefinitionBasicInfo(User loginUser,
                                                                 long projectCode,
                                                                 String name,
@@ -2208,7 +2212,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param releaseState releaseState
      * @return update result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> releaseWorkflowAndSchedule(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);

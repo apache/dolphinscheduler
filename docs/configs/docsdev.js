@@ -28,13 +28,17 @@ export default {
                         link: '/en-us/docs/dev/user_doc/about/introduction.html',
                     },
                     {
+                        title: 'Features',
+                        link: '/en-us/docs/dev/user_doc/about/feature.html',
+                    },
+                    {
                         title: 'Hardware Environment',
                         link: '/en-us/docs/dev/user_doc/about/hardware.html',
                     },
                     {
                         title: 'Glossary',
                         link: '/en-us/docs/dev/user_doc/about/glossary.html',
-                    },
+                    }
                 ],
             },
             {
@@ -142,6 +146,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/switch.html',
                             },
                             {
+                                title: 'SeaTunnel',
+                                link: '/en-us/docs/dev/user_doc/guide/task/seatunnel.html',
+                            },
+                            {
                                 title: 'Amazon EMR',
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
                             },
@@ -168,6 +176,10 @@ export default {
                             {
                                 title: 'DVC',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dvc.html',
+                            },
+                            {
+                                title: 'Dinky',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
                         ],
                     },
@@ -258,6 +270,10 @@ export default {
                         title: 'Resource',
                         children: [
                             {
+                                title: 'Introduction',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/intro.html'
+                            },
+                            {
                                 title: 'Configuration',
                                 link: '/en-us/docs/dev/user_doc/guide/resource/configuration.html'
                             },
@@ -289,15 +305,6 @@ export default {
                             {
                                 title: 'Metrics',
                                 link: '/en-us/docs/dev/user_doc/guide/metrics/metrics.html',
-                            }
-                        ],
-                    },
-                    {
-                        title: 'How-To',
-                        children: [
-                            {
-                                title: 'General Setting',
-                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                             }
                         ],
                     },
@@ -386,9 +393,17 @@ export default {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
-                        link: '/en-us/docs/release/faq.html',
+                        title: 'General Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
+                    {
+                        title: 'Datasource Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
+                        title: 'Others',
+                        link: '/en-us/docs/release/faq.html',
+                    }
                 ],
             },
             {
@@ -411,6 +426,10 @@ export default {
                     {
                         title: '简介',
                         link: '/zh-cn/docs/dev/user_doc/about/introduction.html',
+                    },
+                    {
+                        title: '特性',
+                        link: '/zh-cn/docs/dev/user_doc/about/feature.html',
                     },
                     {
                         title: '建议配置',
@@ -527,6 +546,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/switch.html',
                             },
                             {
+                                title: 'SeaTunnel',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/seatunnel.html',
+                            },
+                            {
                                 title: 'Amazon EMR',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
                             },
@@ -553,6 +576,10 @@ export default {
                             {
                                 title: 'DVC',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dvc.html',
+                            },
+                            {
+                                title: 'Dinky',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
                         ],
                     },
@@ -643,6 +670,10 @@ export default {
                         title: '资源中心',
                         children: [
                             {
+                                title: '简介',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/intro.html'
+                            },
+                            {
                                 title: '配置详情',
                                 link: '/zh-cn/docs/dev/user_doc/guide/resource/configuration.html'
                             },
@@ -674,15 +705,6 @@ export default {
                             {
                                 title: '指标',
                                 link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
-                            }
-                        ],
-                    },
-                    {
-                        title: '常用指引',
-                        children: [
-                            {
-                                title: '通用设置',
-                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
                             }
                         ],
                     },
@@ -771,7 +793,15 @@ export default {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
+                        title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '数据源设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '其他',
                         link: '/zh-cn/docs/release/faq.html',
                     },
                 ],

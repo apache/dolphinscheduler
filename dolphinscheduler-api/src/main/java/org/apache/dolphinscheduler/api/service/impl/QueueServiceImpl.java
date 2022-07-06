@@ -17,22 +17,26 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
-import org.apache.commons.lang3.StringUtils;
-
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,11 +45,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
 
 /**
  * queue service impl
@@ -71,15 +74,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
-        if (ids.isEmpty()) {
-            result.put(Constants.DATA_LIST, Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
-            return result;
+        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
+            ids = ids.isEmpty() ? new HashSet<>() : ids;
+            ids.add(Constants.DEFAULT_QUEUE_ID);
         }
         List<Queue> queueList = queueMapper.selectBatchIds(ids);
         result.put(Constants.DATA_LIST, queueList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -103,7 +104,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return result;
         }
         Page<Queue> page = new Page<>(pageNo, pageSize);
-        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
+        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
         Integer count = (int) queueList.getTotal();
         pageInfo.setTotal(count);
         pageInfo.setTotalList(queueList.getRecords());
@@ -122,6 +123,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return create result
      */
     @Override
+    @Transactional
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
@@ -160,7 +162,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.insert(queueObj);
         result.put(Constants.DATA_LIST, queueObj);
         putMsg(result, Status.SUCCESS);
-
+        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
         return result;
     }
 

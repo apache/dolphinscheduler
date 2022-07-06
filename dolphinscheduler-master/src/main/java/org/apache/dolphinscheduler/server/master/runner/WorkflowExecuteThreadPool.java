@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Map;
@@ -51,7 +50,7 @@ import com.google.common.base.Strings;
 import lombok.NonNull;
 
 /**
- * Used to execute {@link WorkflowExecuteRunnable}, when
+ * Used to execute {@link WorkflowExecuteRunnable}.
  */
 @Component
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
@@ -100,14 +99,6 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     /**
-     * Start the given workflow.
-     */
-    public void startWorkflow(WorkflowExecuteRunnable workflowExecuteThread) {
-        ProcessInstanceMetrics.incProcessInstanceSubmit();
-        submit(workflowExecuteThread);
-    }
-
-    /**
      * Handle the events belong to the given workflow.
      */
     public void executeEvent(final WorkflowExecuteRunnable workflowExecuteThread) {
@@ -138,7 +129,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                 try {
                     LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish()) {
-                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance());
+                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                         logger.info("Workflow instance is finished.");

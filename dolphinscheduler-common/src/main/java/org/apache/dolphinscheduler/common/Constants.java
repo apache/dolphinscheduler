@@ -831,4 +831,8 @@ public final class Constants {
     public static final int USER_PASSWORD_MAX_LENGTH = 20;
 
     public static final int USER_PASSWORD_MIN_LENGTH = 2;
+
+    public static final String FUNCTION_START_WITH = "$";
+
+    public static final Integer DEFAULT_QUEUE_ID = 1;
 }

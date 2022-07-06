@@ -39,8 +39,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +79,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
+    @Transactional
     public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
 
@@ -104,6 +107,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         taskGroup.setCreateTime(new Date());
         taskGroup.setUpdateTime(new Date());
         if (taskGroupMapper.insert(taskGroup) > 0) {
+            permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(), Collections.singletonList(taskGroup.getId()),logger);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
