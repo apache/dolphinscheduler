@@ -16,56 +16,44 @@
 */
 
 -- uc_dolphin_T_t_ds_worker_group_A_ip_list
-delimiter
-d//
-CREATE
-OR REPLACE FUNCTION uc_dolphin_T_t_ds_worker_group_A_ip_list() RETURNS void AS $$
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_worker_group_A_ip_list() RETURNS void AS $$
 BEGIN
-    IF
-EXISTS (SELECT 1 FROM information_schema.COLUMNS
+    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
         WHERE TABLE_NAME='t_ds_worker_group'
         AND COLUMN_NAME ='ip_list')
     THEN
-ALTER TABLE t_ds_worker_group RENAME ip_list TO addr_list;
-ALTER TABLE t_ds_worker_group ALTER COLUMN addr_list type text;
-ALTER TABLE t_ds_worker_group ALTER COLUMN name type varchar(255), ALTER COLUMN name SET NOT NULL;
-ALTER TABLE t_ds_worker_group
-    ADD CONSTRAINT name_unique UNIQUE (name);
-END IF;
+        ALTER TABLE t_ds_worker_group RENAME ip_list TO addr_list;
+        ALTER TABLE t_ds_worker_group ALTER COLUMN addr_list type text;
+        ALTER TABLE t_ds_worker_group ALTER COLUMN name type varchar(255), ALTER COLUMN name SET NOT NULL;
+        ALTER TABLE t_ds_worker_group ADD CONSTRAINT name_unique UNIQUE (name);
+    END IF;
 END;
-$$
-LANGUAGE plpgsql;
-d
-//
+$$ LANGUAGE plpgsql;
+d//
 
 delimiter ;
 SELECT uc_dolphin_T_t_ds_worker_group_A_ip_list();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_worker_group_A_ip_list();
 
 -- uc_dolphin_T_qrtz_fired_triggers_A_entry_id
-delimiter
-d//
-CREATE
-OR REPLACE FUNCTION uc_dolphin_T_qrtz_fired_triggers_A_entry_id() RETURNS void AS $$
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_qrtz_fired_triggers_A_entry_id() RETURNS void AS $$
 BEGIN
-    IF
-EXISTS (SELECT 1 FROM information_schema.COLUMNS
+    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
         WHERE TABLE_NAME='qrtz_fired_triggers'
         AND COLUMN_NAME ='entry_id')
     THEN
-ALTER TABLE qrtz_fired_triggers ALTER COLUMN entry_id type varchar(200);
-END IF;
+        ALTER TABLE qrtz_fired_triggers ALTER COLUMN entry_id type varchar(200);
+    END IF;
 END;
-$$
-LANGUAGE plpgsql;
-d
-//
+$$ LANGUAGE plpgsql;
+d//
 
 delimiter ;
 SELECT uc_dolphin_T_qrtz_fired_triggers_A_entry_id();
 DROP FUNCTION IF EXISTS uc_dolphin_T_qrtz_fired_triggers_A_entry_id();
 
 -- Add foreign key constraints for t_ds_task_instance --
-delimiter;
-ALTER TABLE t_ds_task_instance
-    ADD CONSTRAINT foreign_key_instance_id FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE;
+delimiter ;
+ALTER TABLE t_ds_task_instance ADD CONSTRAINT foreign_key_instance_id  FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE;

@@ -14,6 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-UPDATE t_ds_user
-SET phone = ''
-WHERE phone = 'xx';
+UPDATE t_ds_user SET phone = '' WHERE phone = 'xx';

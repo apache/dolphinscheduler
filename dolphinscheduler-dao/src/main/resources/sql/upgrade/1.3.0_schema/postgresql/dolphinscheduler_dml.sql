@@ -14,27 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-UPDATE t_ds_resources
-SET pid= -1,
-    is_directory= false
-WHERE pid IS NULL;
-UPDATE t_ds_resources
-SET full_name = concat('/', alias)
-WHERE pid = -1
-  and full_name IS NULL;
-UPDATE QRTZ_JOB_DETAILS
-SET JOB_CLASS_NAME='org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob'
-WHERE JOB_CLASS_NAME = 'org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob';
-UPDATE t_ds_process_instance instance
-SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE instance.worker_group = CONCAT(id, '')), 'default');
-UPDATE t_ds_task_instance instance
-SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE instance.worker_group = CONCAT(id, '')), 'default');
-UPDATE t_ds_schedules schedule
-SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE schedule.worker_group = CONCAT(id, '')), 'default');
-UPDATE t_ds_command command
-SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE command.worker_group = CONCAT(id, '')), 'default');
-UPDATE t_ds_error_command command
-SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE command.worker_group = CONCAT(id, '')), 'default');
-UPDATE t_ds_user
-SET phone = ''
-WHERE phone = 'xx';
+UPDATE t_ds_resources SET pid=-1,is_directory=false WHERE pid IS NULL;
+UPDATE t_ds_resources SET full_name = concat('/',alias) WHERE pid=-1 and full_name IS NULL;
+UPDATE QRTZ_JOB_DETAILS SET JOB_CLASS_NAME='org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob' WHERE JOB_CLASS_NAME='org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob';
+UPDATE t_ds_process_instance instance SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE instance.worker_group=CONCAT(id,'')),'default');
+UPDATE t_ds_task_instance instance SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE instance.worker_group=CONCAT(id,'')),'default');
+UPDATE t_ds_schedules schedule SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE schedule.worker_group=CONCAT(id,'')),'default');
+UPDATE t_ds_command command SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE command.worker_group=CONCAT(id,'')),'default');
+UPDATE t_ds_error_command command SET worker_group=COALESCE((SELECT name from t_ds_worker_group WHERE command.worker_group=CONCAT(id,'')),'default');
+UPDATE t_ds_user SET phone = '' WHERE phone = 'xx';

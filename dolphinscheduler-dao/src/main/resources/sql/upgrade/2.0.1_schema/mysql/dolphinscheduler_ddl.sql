@@ -15,9 +15,7 @@
  * limitations under the License.
 */
 
-SET
-sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
 alter table t_ds_process_instance drop KEY `start_time_index`;
-alter table t_ds_process_instance
-    add KEY `start_time_index` (`start_time`,`end_time`) USING BTREE;
+alter table t_ds_process_instance add KEY `start_time_index` (`start_time`,`end_time`) USING BTREE;

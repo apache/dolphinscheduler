@@ -15,5 +15,4 @@
  * limitations under the License.
 */
 
-INSERT INTO `t_escheduler_version` (`version`)
-VALUES ('1.0.2');
+INSERT INTO `t_escheduler_version` (`version`) VALUES ('1.0.2');

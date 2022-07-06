@@ -16,24 +16,18 @@
 */
 
 --  add t_ds_resources_un
-delimiter
-d//
-CREATE
-OR REPLACE FUNCTION uc_dolphin_T_t_ds_resources_un() RETURNS void AS $$
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_resources_un() RETURNS void AS $$
 BEGIN
-    IF
-NOT EXISTS (SELECT 1 FROM information_schema.KEY_COLUMN_USAGE
+    IF NOT EXISTS (SELECT 1 FROM information_schema.KEY_COLUMN_USAGE
         WHERE  TABLE_NAME = 't_ds_resources'
         AND CONSTRAINT_NAME = 't_ds_resources_un')
     THEN
-ALTER TABLE t_ds_resources
-    ADD CONSTRAINT t_ds_resources_un UNIQUE (full_name, "type");
-END IF;
+        ALTER TABLE t_ds_resources ADD CONSTRAINT t_ds_resources_un UNIQUE (full_name,"type");
+    END IF;
 END;
-$$
-LANGUAGE plpgsql;
-d
-//
+$$ LANGUAGE plpgsql;
+d//
 
 delimiter ;
 SELECT uc_dolphin_T_t_ds_resources_un();

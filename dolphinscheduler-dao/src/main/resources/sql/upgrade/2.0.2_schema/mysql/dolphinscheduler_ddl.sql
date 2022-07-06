@@ -15,28 +15,23 @@
  * limitations under the License.
 */
 
-SET
-sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
 -- uc_dolphin_T_t_ds_process_instance_A_restart_time
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_restart_time;
-delimiter
-d//
+delimiter d//
 CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_restart_time()
-BEGIN
-       IF
-NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_process_instance'
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='restart_time')
    THEN
-ALTER TABLE t_ds_process_instance
-    ADD COLUMN `restart_time` datetime DEFAULT NULL COMMENT 'process instance restart time';
-END IF;
-END;
+         ALTER TABLE t_ds_process_instance ADD COLUMN `restart_time` datetime DEFAULT NULL COMMENT 'process instance restart time';
+       END IF;
+ END;
 
-d
-//
+d//
 
 delimiter ;
 CALL uc_dolphin_T_t_ds_process_instance_A_restart_time();
