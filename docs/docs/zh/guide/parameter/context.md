@@ -87,7 +87,7 @@ Node_mysql 运行结果如下：
 
 第二步:在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了，
 
-<img src="../../../../img/httpParam/httpParam-2.png" alt="httpParam-2.png" style="zoom:50%;" />
+![httpParam-2](../../../../img/httpParam/httpParam-2.png)
 
 参数名可以写任意，可以body也可以是别的，类型选择parameter,value的取值一定是你上一个节点设置输出的key,如:我上一个节点设置的输出key是body，那我下一个节点就要这样取值${body}
 
