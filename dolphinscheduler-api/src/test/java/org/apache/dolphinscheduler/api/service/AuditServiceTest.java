@@ -61,8 +61,8 @@ public class AuditServiceTest {
 
     @Test
     public void testQueryLogListPaging() {
-        Date start = DateUtils.getScheduleDate("2020-11-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-11-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-11-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-11-02 00:00:00");
 
         IPage<AuditLog> page = new Page<>(1, 10);
         page.setRecords(getLists());

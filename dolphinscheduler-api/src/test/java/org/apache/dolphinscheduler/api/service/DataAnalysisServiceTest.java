@@ -17,9 +17,16 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
@@ -39,7 +46,16 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,21 +68,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 
 /**
  * data analysis service test
@@ -142,10 +143,14 @@ public class DataAnalysisServiceTest {
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         //SUCCESS
-        Mockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
+        Mockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(DateUtils.stringToDate(startDate),
+            DateUtils.stringToDate(endDate),
+            new Long[] {1L})).thenReturn(getTaskInstanceStateCounts());
         Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), (Map<String, Object>)Mockito.any(),Mockito.any())).thenReturn(true);
+        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(),
+            Mockito.any(),
+            (Map<String, Object>) Mockito.any(),
+            Mockito.any())).thenReturn(true);
 
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -236,18 +241,22 @@ public class DataAnalysisServiceTest {
         //checkProject false
         Map<String, Object> failResult = new HashMap<>();
         putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
-        Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(),any())).thenReturn(failResult);
+        Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(), any())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
-        Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(),any())).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(), any())).thenReturn(result);
 
         //SUCCESS
-        Mockito.when(processInstanceMapper.countInstanceStateByProjectCodes(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), (Map<String, Object>)Mockito.any(),Mockito.any())).thenReturn(true);
+        Mockito.when(processInstanceMapper.countInstanceStateByProjectCodes(DateUtils.stringToDate(startDate),
+            DateUtils.stringToDate(endDate),
+            new Long[] {1L})).thenReturn(getTaskInstanceStateCounts());
+        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(),
+            Mockito.any(),
+            (Map<String, Object>) Mockito.any(),
+            Mockito.any())).thenReturn(true);
 
         result = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

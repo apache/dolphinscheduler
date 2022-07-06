@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.corn;
+package org.apache.dolphinscheduler.service.cron;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 
