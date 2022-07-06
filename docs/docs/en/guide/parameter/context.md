@@ -90,7 +90,7 @@ Step 2: After adding an HTTP task type node, accept the parameters passed upstre
 It can be anything, it can be body, it can be anything, parameter,value, it must be the key that you pass upstream. In this case, the key that you pass upstream is body, so we use ${body}
 
 The configuration is complete
-<img src="../../../../img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
+![httpParam-3](../../../../img/httpParam/httpParam-3.png)
 
 Step 3: You can write a test interface to test whether our parameters are passed successfully.
 <img src="../../../../img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />
