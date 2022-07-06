@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.test.pages;
 
 public class Route {
+    private static final String SEPARATE = "/";
 
     public static String login() {
         return "/login";
@@ -59,5 +60,55 @@ public class Route {
         return accessTokens() + "/generate";
     }
 
+    public static String projects() {
+        return "/projects";
+    }
+
+    public static String authProject(int userId) {
+        return projects() + "/authed-project";
+    }
+
+
+    public static String authUserByProjectCode(int projectCode) {
+        return projects() + "/authed-user";
+    }
+
+
+    public static String queryProjectCreatedAndAuthorizedByUser() {
+        return projects() + "/created-and-authed";
+    }
+
+    public static String queryAllProjectList() {
+        return projects() + "/list";
+    }
+
+    public static String queryUnauthorizedProject(int userId) {
+        return projects() + "/unauth-project";
+    }
+
+
+    public static String queryProjectByCode(int code) {
+        return projects() + "/code";
+    }
+
+    public static String saveWorkFlowRelation(int projectCode) {
+        return projects() + SEPARATE + projectCode + SEPARATE + "process-task-relation";
+    }
+
+    public static String deleteWorkFlowEdge(int projectCode, int processDefinitionCode, int preTaskCode, int postTaskCode) {
+        return saveWorkFlowRelation(projectCode) + SEPARATE + processDefinitionCode + SEPARATE + preTaskCode + SEPARATE + postTaskCode;
+    }
+
+    public static String deleteWorkFlowRelation(int projectCode, int taskCode) {
+        return saveWorkFlowRelation(projectCode) + SEPARATE + "process-task-relation" + SEPARATE + taskCode;
+    }
+
+    public static String queryWorkFlowDownstreamRelation(int projectCode, int taskCode) {
+        return deleteWorkFlowRelation(projectCode, taskCode) + SEPARATE + "/downstream";
+    }
+
+    public static String queryWorkFlowUpstreamRelation(int projectCode, int taskCode) {
+        return deleteWorkFlowRelation(projectCode, taskCode) + SEPARATE + "/upstream";
+    }
 
 }
