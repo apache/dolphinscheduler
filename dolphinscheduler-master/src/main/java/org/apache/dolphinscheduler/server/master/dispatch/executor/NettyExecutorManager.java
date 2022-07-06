@@ -116,6 +116,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
             try {
                 doExecute(host, command);
                 success = true;
+                context.setHost(host);
             } catch (ExecuteException ex) {
                 logger.error(String.format("execute command : %s error", command), ex);
                 try {
