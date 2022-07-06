@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.test.core;
 
 import lombok.experimental.UtilityClass;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 @UtilityClass
 public final class Constants {
 
