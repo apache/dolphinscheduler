@@ -24,6 +24,16 @@ public class JupyterConstants {
     }
 
     /**
+     * execution flag, ignore errors and keep executing till the end
+     */
+    public static final String EXECUTION_FLAG = "set +e";
+
+    /**
+     * new line symbol
+     */
+    public static final String NEW_LINE_SYMBOL = "\n";
+
+    /**
      * conda init
      */
     public static final String CONDA_INIT = "source";
@@ -41,9 +51,26 @@ public class JupyterConstants {
             "source jupyter_env/bin/activate";
 
     /**
+     * create and activate tmp conda env from txt
+     */
+    public static final String CREATE_ENV_FROM_TXT = "conda create -n jupyter-tmp-env-%s -y && " +
+            "conda activate jupyter-tmp-env-%s && " +
+            "pip install -r %s";
+
+    /**
+     * remove tmp conda env
+     */
+    public static final String REMOVE_ENV = "conda deactivate && conda remove --name jupyter-tmp-env-%s --all -y";
+
+    /**
      * file suffix tar.gz
      */
     public static final String TAR_SUFFIX = ".tar.gz";
+
+    /**
+     * file suffix .txt
+     */
+    public static final String TXT_SUFFIX = ".txt";
 
     /**
      * jointer to combine two command
