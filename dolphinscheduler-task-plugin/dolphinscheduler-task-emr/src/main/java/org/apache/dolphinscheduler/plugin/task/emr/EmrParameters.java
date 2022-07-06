@@ -24,6 +24,11 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class EmrParameters extends AbstractParameters {
 
     /**
@@ -60,30 +65,6 @@ public class EmrParameters extends AbstractParameters {
     public List<ResourceInfo> getResourceFilesList() {
         return Collections.emptyList();
 
-    }
-
-    public ProgramType getProgramType() {
-        return programType;
-    }
-
-    public void setProgramType(ProgramType programType) {
-        this.programType = programType;
-    }
-
-    public String getJobFlowDefineJson() {
-        return jobFlowDefineJson;
-    }
-
-    public void setJobFlowDefineJson(String jobFlowDefineJson) {
-        this.jobFlowDefineJson = jobFlowDefineJson;
-    }
-
-    public String getStepsDefineJson() {
-        return stepsDefineJson;
-    }
-
-    public void setStepsDefineJson(String stepsDefineJson) {
-        this.stepsDefineJson = stepsDefineJson;
     }
 
     @Override

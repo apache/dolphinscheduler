@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.emr;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -57,8 +58,7 @@ import com.amazonaws.services.elasticmapreduce.model.StepStatus;
 /**
  * EmrAddStepsTask Test
  *
- * @author zhaoguodong
- * @since v3.0.0
+ * @since v3.1.0
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({

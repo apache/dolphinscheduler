@@ -40,7 +40,6 @@ import com.google.common.collect.Sets;
 /**
  * AddJobFlowSteps task executor
  *
- * @author zhaoguodong
  * @since v3.1.0
  */
 public class EmrAddStepsTask extends AbstractEmrTask {

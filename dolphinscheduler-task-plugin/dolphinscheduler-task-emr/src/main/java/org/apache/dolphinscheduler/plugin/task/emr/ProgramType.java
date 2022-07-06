@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.emr;
 /**
  * emr program type
  *
- * @author zhaoguodong
  * @since v3.1.0
  */
 public enum ProgramType {

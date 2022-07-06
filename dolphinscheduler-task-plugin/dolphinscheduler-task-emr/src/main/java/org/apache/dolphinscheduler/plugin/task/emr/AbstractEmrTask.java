@@ -42,7 +42,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 /**
  * ERM Task abstract base class
  *
- * @author zhaoguodong
  * @since v3.1.0
  */
 public abstract class AbstractEmrTask extends AbstractTaskExecutor {
