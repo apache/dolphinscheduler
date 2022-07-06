@@ -50,9 +50,9 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     /**
      * constructor
      *
-     * @param logHandler logHandler
+     * @param logHandler  logHandler
      * @param taskRequest taskRequest
-     * @param logger logger
+     * @param logger      logger
      */
     public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                 TaskExecutionContext taskRequest,
@@ -68,9 +68,9 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     protected String buildCommandFilePath() {
         // command file
         return String.format("%s/%s.%s"
-                , taskRequest.getExecutePath()
-                , taskRequest.getTaskAppId()
-                , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
+            , taskRequest.getExecutePath()
+            , taskRequest.getTaskAppId()
+            , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
     }
 
     /**
@@ -83,7 +83,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
         logger.info("tenantCode user:{}, task dir:{}", taskRequest.getTenantCode(),
-                taskRequest.getTaskAppId());
+            taskRequest.getTaskAppId());
 
         // create if non existence
         if (!Files.exists(Paths.get(commandFile))) {

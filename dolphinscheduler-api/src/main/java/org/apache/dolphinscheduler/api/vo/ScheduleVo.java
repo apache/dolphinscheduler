@@ -119,7 +119,7 @@ public class ScheduleVo {
     private Priority processInstancePriority;
 
     /**
-     *  worker group
+     * worker group
      */
     private String workerGroup;
 

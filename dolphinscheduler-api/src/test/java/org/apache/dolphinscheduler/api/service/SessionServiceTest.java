@@ -67,7 +67,7 @@ public class SessionServiceTest {
     }
 
     @After
-    public void after(){
+    public void after() {
     }
 
     /**
@@ -79,23 +79,23 @@ public class SessionServiceTest {
         Mockito.when(sessionMapper.selectById(sessionId)).thenReturn(getSession());
         // get sessionId from  header
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
-        mockHttpServletRequest.addHeader(Constants.SESSION_ID,sessionId);
-        mockHttpServletRequest.addHeader("HTTP_X_FORWARDED_FOR","127.0.0.1");
+        mockHttpServletRequest.addHeader(Constants.SESSION_ID, sessionId);
+        mockHttpServletRequest.addHeader("HTTP_X_FORWARDED_FOR", "127.0.0.1");
         //query
         Session session = sessionService.getSession(mockHttpServletRequest);
         Assert.assertNotNull(session);
-        logger.info("session ip {}",session.getIp());
+        logger.info("session ip {}", session.getIp());
 
         // get sessionId from cookie
         mockHttpServletRequest = new MockHttpServletRequest();
-        mockHttpServletRequest.addHeader("HTTP_X_FORWARDED_FOR","127.0.0.1");
-        MockCookie mockCookie = new MockCookie(Constants.SESSION_ID,sessionId);
+        mockHttpServletRequest.addHeader("HTTP_X_FORWARDED_FOR", "127.0.0.1");
+        MockCookie mockCookie = new MockCookie(Constants.SESSION_ID, sessionId);
         mockHttpServletRequest.setCookies(mockCookie);
         //query
         session = sessionService.getSession(mockHttpServletRequest);
         Assert.assertNotNull(session);
-        logger.info("session ip {}",session.getIp());
-        Assert.assertEquals(session.getIp(),"127.0.0.1");
+        logger.info("session ip {}", session.getIp());
+        Assert.assertEquals(session.getIp(), "127.0.0.1");
     }
 
     /**
@@ -124,9 +124,9 @@ public class SessionServiceTest {
         User user = new User();
         user.setId(userId);
 
-        Mockito.when(sessionMapper.queryByUserIdAndIp(userId,ip)).thenReturn(getSession());
+        Mockito.when(sessionMapper.queryByUserIdAndIp(userId, ip)).thenReturn(getSession());
 
-        sessionService.signOut(ip,user);
+        sessionService.signOut(ip, user);
 
     }
 

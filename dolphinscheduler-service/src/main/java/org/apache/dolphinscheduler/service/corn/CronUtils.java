@@ -122,8 +122,8 @@ public class CronUtils {
     /**
      * gets all scheduled times for a period of time based on not self dependency
      *
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param startTime      startTime
+     * @param endTime        endTime
      * @param cronExpression cronExpression
      * @return date list
      */
@@ -144,10 +144,10 @@ public class CronUtils {
     /**
      * gets expect scheduled times for a period of time based on self dependency
      *
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param startTime      startTime
+     * @param endTime        endTime
      * @param cronExpression cronExpression
-     * @param fireTimes fireTimes
+     * @param fireTimes      fireTimes
      * @return date list
      */
     public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression, int fireTimes) {
@@ -167,8 +167,8 @@ public class CronUtils {
     /**
      * gets all scheduled times for a period of time based on self dependency
      *
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param startTime      startTime
+     * @param endTime        endTime
      * @param cronExpression cronExpression
      * @return date list
      */
@@ -218,8 +218,8 @@ public class CronUtils {
      * gets all scheduled times for a period of time based on self dependency
      *
      * @param startTime startTime
-     * @param endTime endTime
-     * @param cron cron
+     * @param endTime   endTime
+     * @param cron      cron
      * @return date list
      */
     public static List<Date> getSelfFireDateList(Date startTime, Date endTime, String cron) {
@@ -289,8 +289,9 @@ public class CronUtils {
 
     /**
      * get Schedule Date
+     *
      * @param param
-     * @return  date list
+     * @return date list
      */
     public static List<Date> getSelfScheduleDateList(Map<String, String> param) {
         List<Date> result = new ArrayList<>();

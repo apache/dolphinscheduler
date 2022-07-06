@@ -153,7 +153,7 @@ public class CollectionUtils {
      * Only those elements present in the collection will appear as
      * keys in the map.
      *
-     * @param <O> the type of object in the returned {@link Map}. This is a super type of O
+     * @param <O>  the type of object in the returned {@link Map}. This is a super type of O
      * @param coll the collection to get the cardinality map for, must not be null
      * @return the populated cardinality map
      */

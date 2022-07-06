@@ -20,8 +20,6 @@
 
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
-import lombok.Getter;
-
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
@@ -34,6 +32,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+
+import lombok.Getter;
 
 @Getter
 public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
@@ -102,7 +102,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         return this;
     }
 
-    public UdfManagePage rename(String currentName, String AfterName) {
+    public UdfManagePage rename(String currentName, String afterName) {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
@@ -113,7 +113,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
             .click();
 
         renameDirectoryBox().inputName().clear();
-        renameDirectoryBox().inputName().sendKeys(AfterName);
+        renameDirectoryBox().inputName().sendKeys(afterName);
         renameDirectoryBox().buttonSubmit().click();
 
         return this;
@@ -141,14 +141,14 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-directory-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-directory-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputName;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
@@ -166,8 +166,8 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "btn-upload"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "btn-upload"),
+            @FindBy(tagName = "input"),
         })
         private WebElement buttonUpload;
 
@@ -185,14 +185,14 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-directory-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-directory-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputDirectoryName;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 

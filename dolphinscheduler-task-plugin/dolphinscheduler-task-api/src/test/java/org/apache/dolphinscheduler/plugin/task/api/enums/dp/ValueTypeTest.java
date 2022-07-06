@@ -35,7 +35,7 @@ public class ValueTypeTest {
         assertEquals(2, ValueType.NUMBER.getCode());
         assertEquals(3, ValueType.LIKE_SQL.getCode());
     }
- 
+
     @Test
     public void testGetDescription() {
         assertEquals("string", ValueType.STRING.getDescription());

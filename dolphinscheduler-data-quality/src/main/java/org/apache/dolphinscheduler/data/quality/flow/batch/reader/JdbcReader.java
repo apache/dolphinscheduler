@@ -75,18 +75,18 @@ public class JdbcReader implements BatchReader {
     private DataFrameReader jdbcReader(SparkSession sparkSession) {
 
         DataFrameReader reader = sparkSession.read()
-                .format(JDBC)
-                .option(URL, config.getString(URL))
-                .option(DB_TABLE, config.getString(TABLE))
-                .option(USER, config.getString(USER))
-                .option(PASSWORD, config.getString(PASSWORD))
-                .option(DRIVER, config.getString(DRIVER));
+            .format(JDBC)
+            .option(URL, config.getString(URL))
+            .option(DB_TABLE, config.getString(TABLE))
+            .option(USER, config.getString(USER))
+            .option(PASSWORD, config.getString(PASSWORD))
+            .option(DRIVER, config.getString(DRIVER));
 
         Config jdbcConfig = ConfigUtils.extractSubConfig(config, JDBC + DOTS, false);
 
         if (!config.isEmpty()) {
-            Map<String,String> optionMap = new HashMap<>(16);
-            jdbcConfig.entrySet().forEach(x -> optionMap.put(x.getKey(),String.valueOf(x.getValue())));
+            Map<String, String> optionMap = new HashMap<>(16);
+            jdbcConfig.entrySet().forEach(x -> optionMap.put(x.getKey(), String.valueOf(x.getValue())));
             reader.options(optionMap);
         }
 

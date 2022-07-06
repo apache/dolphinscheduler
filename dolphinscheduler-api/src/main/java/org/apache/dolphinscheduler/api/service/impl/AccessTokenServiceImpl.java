@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -33,6 +34,8 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * access token service impl
@@ -61,8 +65,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return token list for page number and page size
      */
     @Override
@@ -86,7 +90,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * query access token for specified user
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return token list for specified user
      */
     @Override
@@ -110,9 +114,9 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * create token
      *
      * @param loginUser
-     * @param userId token for user
+     * @param userId     token for user
      * @param expireTime token expire time
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
     @SuppressWarnings("checkstyle:WhitespaceAround")
@@ -121,7 +125,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
 
         // 1. check permission
-        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
+        if (!(canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -163,14 +167,14 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * generate token
      *
      * @param loginUser
-     * @param userId token for user
+     * @param userId     token for user
      * @param expireTime token expire time
      * @return token string
      */
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
+        if (!(canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -184,7 +188,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * delete access token
      *
      * @param loginUser login user
-     * @param id token id
+     * @param id        token id
      * @return delete result code
      */
     @Override
@@ -198,7 +202,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
-        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {id}, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -211,10 +215,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * update token by id
      *
-     * @param id token id
-     * @param userId token for user
+     * @param id         token id
+     * @param userId     token for user
      * @param expireTime token expire time
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return updated access token entity
      */
     @Override
@@ -222,7 +226,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {id}, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

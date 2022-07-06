@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,11 +33,6 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -55,20 +53,20 @@ public class JupyterTaskTest {
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
         jupyterTask.init();
         Assert.assertEquals(jupyterTask.buildCommand(),
-            "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                "conda activate jupyter-lab && " +
-                "papermill " +
-                "/test/input_note.ipynb " +
-                "/test/output_note.ipynb " +
-                "--parameters city Shanghai " +
-                "--parameters factor 0.01 " +
-                "--kernel python3 " +
-                "--engine default_engine " +
-                "--execution-timeout 10 " +
-                "--start-timeout 3 " +
-                "--version " +
-                "--inject-paths " +
-                "--progress-bar");
+            "source /opt/anaconda3/etc/profile.d/conda.sh && "
+                + "conda activate jupyter-lab && "
+                + "papermill "
+                + "/test/input_note.ipynb "
+                + "/test/output_note.ipynb "
+                + "--parameters city Shanghai "
+                + "--parameters factor 0.01 "
+                + "--kernel python3 "
+                + "--engine default_engine "
+                + "--execution-timeout 10 "
+                + "--start-timeout 3 "
+                + "--version "
+                + "--inject-paths "
+                + "--progress-bar");
     }
 
     @Test
@@ -81,22 +79,22 @@ public class JupyterTaskTest {
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
         jupyterTask.init();
         Assert.assertEquals(jupyterTask.buildCommand(),
-                "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                        "mkdir jupyter_env && " +
-                        "tar -xzf jupyter.tar.gz -C jupyter_env && " +
-                        "source jupyter_env/bin/activate && " +
-                        "papermill " +
-                        "/test/input_note.ipynb " +
-                        "/test/output_note.ipynb " +
-                        "--parameters city Shanghai " +
-                        "--parameters factor 0.01 " +
-                        "--kernel python3 " +
-                        "--engine default_engine " +
-                        "--execution-timeout 10 " +
-                        "--start-timeout 3 " +
-                        "--version " +
-                        "--inject-paths " +
-                        "--progress-bar");
+            "source /opt/anaconda3/etc/profile.d/conda.sh && "
+                + "mkdir jupyter_env && "
+                + "tar -xzf jupyter.tar.gz -C jupyter_env && "
+                + "source jupyter_env/bin/activate && "
+                + "papermill "
+                + "/test/input_note.ipynb "
+                + "/test/output_note.ipynb "
+                + "--parameters city Shanghai "
+                + "--parameters factor 0.01 "
+                + "--kernel python3 "
+                + "--engine default_engine "
+                + "--execution-timeout 10 "
+                + "--start-timeout 3 "
+                + "--version "
+                + "--inject-paths "
+                + "--progress-bar");
     }
 
     private String buildJupyterCommandWithLocalEnv() {

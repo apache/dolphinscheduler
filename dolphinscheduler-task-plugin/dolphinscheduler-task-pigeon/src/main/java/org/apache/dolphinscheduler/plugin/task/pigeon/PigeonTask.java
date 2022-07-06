@@ -142,7 +142,7 @@ public class PigeonTask extends AbstractTaskExecutor {
 
             long costTime = System.currentTimeMillis() - startTime;
             logger.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
-                    targetJobName, taskId, costTime, (execState == ExecResult.SUCCESS) ? "'success'" : "'failure'");
+                targetJobName, taskId, costTime, (execState == ExecResult.SUCCESS) ? "'success'" : "'failure'");
             setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS : TaskConstants.EXIT_CODE_FAILURE);
         } catch (Exception e) {
             logger.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);

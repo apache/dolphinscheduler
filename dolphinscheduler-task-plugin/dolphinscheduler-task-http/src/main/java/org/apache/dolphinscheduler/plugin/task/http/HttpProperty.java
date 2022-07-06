@@ -26,7 +26,7 @@ public class HttpProperty {
     private String prop;
 
     /**
-     *  httpParametersType
+     * httpParametersType
      */
     private HttpParametersType httpParametersType;
 
@@ -102,7 +102,7 @@ public class HttpProperty {
         }
         HttpProperty property = (HttpProperty) o;
         return Objects.equals(prop, property.prop)
-                && Objects.equals(value, property.value);
+            && Objects.equals(value, property.value);
     }
 
     @Override
@@ -113,10 +113,10 @@ public class HttpProperty {
     @Override
     public String toString() {
         return "HttpProperty{"
-                + "prop='" + prop + '\''
-                + ", httpParametersType=" + httpParametersType
-                + ", value='" + value + '\''
-                + '}';
+            + "prop='" + prop + '\''
+            + ", httpParametersType=" + httpParametersType
+            + ", value='" + value + '\''
+            + '}';
     }
 
 }

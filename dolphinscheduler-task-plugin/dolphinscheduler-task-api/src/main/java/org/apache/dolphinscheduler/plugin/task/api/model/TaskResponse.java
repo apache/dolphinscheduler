@@ -47,7 +47,6 @@ public class TaskResponse {
     private Process process;
 
 
-
     /**
      * cancel
      */

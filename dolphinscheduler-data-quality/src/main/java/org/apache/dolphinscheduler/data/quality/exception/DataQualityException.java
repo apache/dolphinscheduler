@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.data.quality.exception;
 
 /**
- *  data quality exception
+ * data quality exception
  */
 public class DataQualityException extends Exception {
 
@@ -29,7 +29,7 @@ public class DataQualityException extends Exception {
     /**
      * Construct a new runtime exception with the detail message
      *
-     * @param   message  detail message
+     * @param message detail message
      */
     public DataQualityException(String message) {
         super(message);
@@ -38,9 +38,9 @@ public class DataQualityException extends Exception {
     /**
      * Construct a new runtime exception with the detail message and cause
      *
-     * @param  message the detail message
-     * @param  cause the cause
-     * @since  1.4
+     * @param message the detail message
+     * @param cause   the cause
+     * @since 1.4
      */
     public DataQualityException(String message, Throwable cause) {
         super(message, cause);
@@ -49,7 +49,7 @@ public class DataQualityException extends Exception {
     /**
      * Construct a new runtime exception with throwable
      *
-     * @param  cause the cause
+     * @param cause the cause
      */
     public DataQualityException(Throwable cause) {
         super(cause);

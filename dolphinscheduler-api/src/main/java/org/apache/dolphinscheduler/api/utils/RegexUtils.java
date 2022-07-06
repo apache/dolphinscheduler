@@ -33,6 +33,7 @@ public class RegexUtils {
 
     /**
      * check if the input is a valid linux username
+     *
      * @param str input
      * @return boolean
      */

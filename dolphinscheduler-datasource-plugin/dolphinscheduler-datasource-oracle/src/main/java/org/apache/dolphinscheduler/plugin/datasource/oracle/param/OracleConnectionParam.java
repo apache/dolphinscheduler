@@ -34,16 +34,16 @@ public class OracleConnectionParam extends BaseConnectionParam {
     @Override
     public String toString() {
         return "OracleConnectionParam{"
-                + "user='" + user + '\''
-                + ", password='" + password + '\''
-                + ", address='" + address + '\''
-                + ", database='" + database + '\''
-                + ", jdbcUrl='" + jdbcUrl + '\''
-                + ", driverLocation='" + driverLocation + '\''
-                + ", driverClassName='" + driverClassName + '\''
-                + ", validationQuery='" + validationQuery + '\''
-                + ", other='" + other + '\''
-                + ", connectType=" + connectType
-                + '}';
+            + "user='" + user + '\''
+            + ", password='" + password + '\''
+            + ", address='" + address + '\''
+            + ", database='" + database + '\''
+            + ", jdbcUrl='" + jdbcUrl + '\''
+            + ", driverLocation='" + driverLocation + '\''
+            + ", driverClassName='" + driverClassName + '\''
+            + ", validationQuery='" + validationQuery + '\''
+            + ", other='" + other + '\''
+            + ", connectType=" + connectType
+            + '}';
     }
 }

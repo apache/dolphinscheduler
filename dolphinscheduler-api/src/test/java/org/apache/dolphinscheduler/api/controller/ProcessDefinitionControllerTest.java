@@ -17,14 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -37,6 +29,15 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,8 +74,8 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testCreateProcessDefinition() {
         String relationJson = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
-                + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
-                + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
+            + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+            + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
         String taskDefinitionJson = "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
             + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
             + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
@@ -94,10 +95,10 @@ public class ProcessDefinitionControllerTest {
         result.put(Constants.DATA_LIST, 1);
 
         Mockito.when(processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson,"", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
+            locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
 
         Result response = processDefinitionController.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson,"", ProcessExecutionTypeEnum.PARALLEL);
+            locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -157,10 +158,10 @@ public class ProcessDefinitionControllerTest {
         result.put("processDefinitionId", 1);
 
         Mockito.when(processDefinitionService.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
+            locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
 
         Result response = processDefinitionController.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL, ReleaseState.OFFLINE);
+            locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -340,7 +341,7 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.viewTree(user,projectCode, processId, limit)).thenReturn(result);
+        Mockito.when(processDefinitionService.viewTree(user, projectCode, processId, limit)).thenReturn(result);
         Result response = processDefinitionController.viewTree(user, projectCode, processId, limit);
 
         Assert.assertTrue(response != null && response.isSuccess());
@@ -386,13 +387,13 @@ public class ProcessDefinitionControllerTest {
                 , 1
                 , 10
                 , 1))
-                .thenReturn(resultMap);
+            .thenReturn(resultMap);
         Result result = processDefinitionController.queryProcessDefinitionVersions(
-                user
-                , projectCode
-                , 1
-                , 10
-                , 1);
+            user
+            , projectCode
+            , 1
+            , 10
+            , 1);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
@@ -414,9 +415,9 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
         Mockito.when(processDefinitionService.deleteProcessDefinitionVersion(
-                user, projectCode, 1, 10)).thenReturn(resultMap);
+            user, projectCode, 1, 10)).thenReturn(resultMap);
         Result result = processDefinitionController.deleteProcessDefinitionVersion(
-                user, projectCode, 1, 10);
+            user, projectCode, 1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 

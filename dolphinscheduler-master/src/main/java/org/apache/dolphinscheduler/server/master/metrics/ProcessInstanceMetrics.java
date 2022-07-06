@@ -52,19 +52,19 @@ public final class ProcessInstanceMetrics {
             .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_FINISH_COUNTER =
-            Counter.builder("ds.workflow.instance.finish.count")
-                    .description("Process instance finish total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.workflow.instance.finish.count")
+            .description("Process instance finish total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_SUCCESS_COUNTER =
-            Counter.builder("ds.workflow.instance.success.count")
-                    .description("Process instance success total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.workflow.instance.success.count")
+            .description("Process instance success total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_FAILURE_COUNTER =
-            Counter.builder("ds.workflow.instance.failure.count")
-                    .description("Process instance failure total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.workflow.instance.failure.count")
+            .description("Process instance failure total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter PROCESS_INSTANCE_STOP_COUNTER =
         Counter.builder("ds.workflow.instance.stop.count")

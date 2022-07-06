@@ -40,8 +40,8 @@ public class ProcessDefinitionDaoTest {
 
     @Test
     public void testUpdateProcessDefinitionJson() {
-        Map<Integer,String> processDefinitionJsonMap = new HashMap<>();
-        processDefinitionJsonMap.put(1,"test");
+        Map<Integer, String> processDefinitionJsonMap = new HashMap<>();
+        processDefinitionJsonMap.put(1, "test");
         //processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),processDefinitionJsonMap);
     }
 
@@ -52,6 +52,6 @@ public class ProcessDefinitionDaoTest {
 
     @Test(expected = Exception.class)
     public void testUpdateProcessDefinitionJsonException() {
-        processDefinitionDao.updateProcessDefinitionJson(null,null);
+        processDefinitionDao.updateProcessDefinitionJson(null, null);
     }
 }

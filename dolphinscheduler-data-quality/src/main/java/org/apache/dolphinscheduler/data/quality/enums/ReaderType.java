@@ -29,7 +29,7 @@ public enum ReaderType {
     HIVE;
 
     public static ReaderType getType(String name) {
-        for (ReaderType type: ReaderType.values()) {
+        for (ReaderType type : ReaderType.values()) {
             if (type.name().equalsIgnoreCase(name)) {
                 return type;
             }

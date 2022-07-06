@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
 import static java.util.Objects.requireNonNull;
@@ -21,7 +22,11 @@ import static java.util.Objects.requireNonNull;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Utility class for working with Strings that have placeholder values in them. A placeholder takes the form
@@ -56,16 +61,15 @@ public class PropertyPlaceholderHelper {
 
     private final boolean ignoreUnresolvablePlaceholders;
 
-
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
      *
-     * @param placeholderPrefix the prefix that denotes the start of a placeholder
-     * @param placeholderSuffix the suffix that denotes the end of a placeholder
-     * @param valueSeparator the separating character between the placeholder variable
-     * and the associated default value, if any
+     * @param placeholderPrefix              the prefix that denotes the start of a placeholder
+     * @param placeholderSuffix              the suffix that denotes the end of a placeholder
+     * @param valueSeparator                 the separating character between the placeholder variable
+     *                                       and the associated default value, if any
      * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-     * be ignored ({@code true}) or cause an exception ({@code false})
+     *                                       be ignored ({@code true}) or cause an exception ({@code false})
      */
     public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix,
                                      String valueSeparator, boolean ignoreUnresolvablePlaceholders) {
@@ -84,12 +88,11 @@ public class PropertyPlaceholderHelper {
         this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
     }
 
-
     /**
      * Replaces all placeholders of format {@code ${name}} with the value returned
      * from the supplied {@link PlaceholderResolver}.
      *
-     * @param value the value containing the placeholders to be replaced
+     * @param value               the value containing the placeholders to be replaced
      * @param placeholderResolver the {@code PlaceholderResolver} to use for replacement
      * @return the supplied value with placeholders replaced inline
      */
@@ -141,8 +144,8 @@ public class PropertyPlaceholderHelper {
                     // Proceed with unprocessed value.
                     startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
                 } else {
-                    throw new IllegalArgumentException("Could not resolve placeholder '" +
-                        placeholder + "'" + " in value \"" + value + "\"");
+                    throw new IllegalArgumentException("Could not resolve placeholder '"
+                        + placeholder + "'" + " in value \"" + value + "\"");
                 }
                 visitedPlaceholders.remove(originalPlaceholder);
             } else {
@@ -174,7 +177,6 @@ public class PropertyPlaceholderHelper {
         return -1;
     }
 
-
     /**
      * Strategy interface used to resolve replacement values for placeholders contained in Strings.
      */
@@ -193,8 +195,8 @@ public class PropertyPlaceholderHelper {
      * Test whether the given string matches the given substring
      * at the given index.
      *
-     * @param str the original string (or StringBuilder)
-     * @param index the index in the original string to start matching against
+     * @param str       the original string (or StringBuilder)
+     * @param index     the index in the original string to start matching against
      * @param substring the substring to match at the given index
      * @return whether the given string matches the given substring
      */

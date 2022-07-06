@@ -115,7 +115,7 @@ public class MasterRegistryClient {
     /**
      * remove master node path
      *
-     * @param path node path
+     * @param path     node path
      * @param nodeType node type
      * @param failover is failover
      */
@@ -189,11 +189,11 @@ public class MasterRegistryClient {
         String localNodePath = getCurrentNodePath();
         Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                masterConfig.getMaxCpuLoadAvg(),
-                masterConfig.getReservedMemory(),
-                Sets.newHashSet(localNodePath),
-                Constants.MASTER_TYPE,
-                registryClient);
+            masterConfig.getMaxCpuLoadAvg(),
+            masterConfig.getReservedMemory(),
+            Sets.newHashSet(localNodePath),
+            Constants.MASTER_TYPE,
+            registryClient);
 
         // remove before persist
         registryClient.remove(localNodePath);

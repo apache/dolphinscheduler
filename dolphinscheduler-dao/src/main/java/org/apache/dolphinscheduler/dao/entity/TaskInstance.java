@@ -579,9 +579,9 @@ public class TaskInstance implements Serializable {
     public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
-                || this.getState().typeIsSuccess()
-                || this.getState().typeIsCancel()
-                || (this.getState().typeIsFailure() && !taskCanRetry());
+            || this.getState().typeIsSuccess()
+            || this.getState().typeIsCancel()
+            || (this.getState().typeIsFailure() && !taskCanRetry());
     }
 
     public Map<String, String> getResources() {
@@ -689,43 +689,43 @@ public class TaskInstance implements Serializable {
     @Override
     public String toString() {
         return "TaskInstance{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", taskType='" + taskType + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", processInstanceName='" + processInstanceName + '\''
-                + ", state=" + state
-                + ", firstSubmitTime=" + firstSubmitTime
-                + ", submitTime=" + submitTime
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", host='" + host + '\''
-                + ", executePath='" + executePath + '\''
-                + ", logPath='" + logPath + '\''
-                + ", retryTimes=" + retryTimes
-                + ", alertFlag=" + alertFlag
-                + ", processInstance=" + processInstance
-                + ", processDefine=" + processDefine
-                + ", pid=" + pid
-                + ", appLink='" + appLink + '\''
-                + ", flag=" + flag
-                + ", dependency='" + dependency + '\''
-                + ", duration=" + duration
-                + ", maxRetryTimes=" + maxRetryTimes
-                + ", retryInterval=" + retryInterval
-                + ", taskInstancePriority=" + taskInstancePriority
-                + ", processInstancePriority=" + processInstancePriority
-                + ", dependentResult='" + dependentResult + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode=" + environmentCode
-                + ", environmentConfig='" + environmentConfig + '\''
-                + ", executorId=" + executorId
-                + ", executorName='" + executorName + '\''
-                + ", delayTime=" + delayTime
-                + ", dryRun=" + dryRun
-                + ", taskGroupId=" + taskGroupId
-                + ", taskGroupPriority=" + taskGroupPriority
-                + '}';
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", taskType='" + taskType + '\''
+            + ", processInstanceId=" + processInstanceId
+            + ", processInstanceName='" + processInstanceName + '\''
+            + ", state=" + state
+            + ", firstSubmitTime=" + firstSubmitTime
+            + ", submitTime=" + submitTime
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", host='" + host + '\''
+            + ", executePath='" + executePath + '\''
+            + ", logPath='" + logPath + '\''
+            + ", retryTimes=" + retryTimes
+            + ", alertFlag=" + alertFlag
+            + ", processInstance=" + processInstance
+            + ", processDefine=" + processDefine
+            + ", pid=" + pid
+            + ", appLink='" + appLink + '\''
+            + ", flag=" + flag
+            + ", dependency='" + dependency + '\''
+            + ", duration=" + duration
+            + ", maxRetryTimes=" + maxRetryTimes
+            + ", retryInterval=" + retryInterval
+            + ", taskInstancePriority=" + taskInstancePriority
+            + ", processInstancePriority=" + processInstancePriority
+            + ", dependentResult='" + dependentResult + '\''
+            + ", workerGroup='" + workerGroup + '\''
+            + ", environmentCode=" + environmentCode
+            + ", environmentConfig='" + environmentConfig + '\''
+            + ", executorId=" + executorId
+            + ", executorName='" + executorName + '\''
+            + ", delayTime=" + delayTime
+            + ", dryRun=" + dryRun
+            + ", taskGroupId=" + taskGroupId
+            + ", taskGroupPriority=" + taskGroupPriority
+            + '}';
     }
 
     public long getTaskCode() {

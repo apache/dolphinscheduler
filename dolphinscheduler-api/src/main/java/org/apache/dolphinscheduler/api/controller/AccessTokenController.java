@@ -68,10 +68,10 @@ public class AccessTokenController extends BaseController {
     /**
      * create token
      *
-     * @param loginUser login user
-     * @param userId token for user id
+     * @param loginUser  login user
+     * @param userId     token for user id
      * @param expireTime expire time for the token
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return create result state code
      */
     @ApiOperation(value = "createToken", notes = "CREATE_TOKEN_NOTES")
@@ -95,8 +95,8 @@ public class AccessTokenController extends BaseController {
     /**
      * generate token string
      *
-     * @param loginUser login user
-     * @param userId token for user
+     * @param loginUser  login user
+     * @param userId     token for user
      * @param expireTime expire time
      * @return token string
      */
@@ -116,9 +116,9 @@ public class AccessTokenController extends BaseController {
      * query access token list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return token list of page number and page size
      */
     @ApiOperation(value = "queryAccessTokenList", notes = "QUERY_ACCESS_TOKEN_LIST_NOTES")
@@ -149,7 +149,7 @@ public class AccessTokenController extends BaseController {
      * query access token for specified user
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return token list for specified user
      */
     @ApiOperation(value = "queryAccessTokenByUser", notes = "QUERY_ACCESS_TOKEN_BY_USER_NOTES")
@@ -161,7 +161,7 @@ public class AccessTokenController extends BaseController {
     @ApiException(QUERY_ACCESSTOKEN_BY_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAccessTokenByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @PathVariable("userId") Integer userId) {
+                                         @PathVariable("userId") Integer userId) {
         Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(loginUser, userId);
         return this.returnDataList(result);
     }
@@ -170,7 +170,7 @@ public class AccessTokenController extends BaseController {
      * delete access token by id
      *
      * @param loginUser login user
-     * @param id token id
+     * @param id        token id
      * @return delete result code
      */
     @ApiIgnore
@@ -188,11 +188,11 @@ public class AccessTokenController extends BaseController {
     /**
      * update token
      *
-     * @param loginUser login user
-     * @param id token id
-     * @param userId token for user
+     * @param loginUser  login user
+     * @param id         token id
+     * @param userId     token for user
      * @param expireTime token expire time
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return updated access token entity
      */
     @ApiOperation(value = "updateToken", notes = "UPDATE_TOKEN_NOTES")

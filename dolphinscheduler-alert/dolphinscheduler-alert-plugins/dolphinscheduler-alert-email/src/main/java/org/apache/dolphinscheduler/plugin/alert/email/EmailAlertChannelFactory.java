@@ -49,72 +49,72 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam receivesParam = InputParam.newBuilder(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS, MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS)
-                                             .setPlaceholder("please input receives")
-                                             .addValidate(Validate.newBuilder()
-                                                                  .setRequired(true)
-                                                                  .build())
-                                             .build();
+            .setPlaceholder("please input receives")
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         InputParam receiveCcsParam = InputParam.newBuilder(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS, MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERCCS)
-                                               .build();
+            .build();
 
         InputParam mailSmtpHost = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_HOST, MailParamsConstants.MAIL_SMTP_HOST)
-                                            .addValidate(Validate.newBuilder().setRequired(true).build())
-                                            .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         InputParam mailSmtpPort = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_PORT, MailParamsConstants.MAIL_SMTP_PORT)
-                                            .setValue("25")
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
+            .setValue("25")
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         InputParam mailSender = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SENDER, MailParamsConstants.MAIL_SENDER)
-                                          .addValidate(Validate.newBuilder().setRequired(true).build())
-                                          .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         RadioParam enableSmtpAuth = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_AUTH, MailParamsConstants.MAIL_SMTP_AUTH)
-                                              .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
-                                              .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
-                                              .setValue(STRING_TRUE)
-                                              .addValidate(Validate.newBuilder().setRequired(true).build())
-                                              .build();
+            .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+            .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+            .setValue(STRING_TRUE)
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         InputParam mailUser = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_USER, MailParamsConstants.MAIL_USER)
-                                        .setPlaceholder("if enable use authentication, you need input user")
-                                        .build();
+            .setPlaceholder("if enable use authentication, you need input user")
+            .build();
 
         PasswordParam mailPassword = PasswordParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
-                                                  .setPlaceholder("if enable use authentication, you need input password")
-                                                  .build();
+            .setPlaceholder("if enable use authentication, you need input password")
+            .build();
 
         RadioParam enableTls = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE, MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE)
-                                         .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
-                                         .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
-                                         .setValue(STRING_FALSE)
-                                         .addValidate(Validate.newBuilder().setRequired(true).build())
-                                         .build();
+            .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+            .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+            .setValue(STRING_FALSE)
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         RadioParam enableSsl = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE, MailParamsConstants.MAIL_SMTP_SSL_ENABLE)
-                                         .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
-                                         .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
-                                         .setValue(STRING_FALSE)
-                                         .addValidate(Validate.newBuilder().setRequired(true).build())
-                                         .build();
+            .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+            .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+            .setValue(STRING_FALSE)
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         InputParam sslTrust = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST, MailParamsConstants.MAIL_SMTP_SSL_TRUST)
-                                        .setValue("*")
-                                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                                        .build();
+            .setValue("*")
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, AlertConstants.SHOW_TYPE)
-                                        .addParamsOptions(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false))
-                                        .addParamsOptions(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false))
-                                        .addParamsOptions(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false))
-                                        .addParamsOptions(new ParamsOptions(ShowType.TABLE_ATTACHMENT.getDescp(), ShowType.TABLE_ATTACHMENT.getDescp(), false))
-                                        .setValue(ShowType.TABLE.getDescp())
-                                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                                        .build();
+            .addParamsOptions(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false))
+            .addParamsOptions(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false))
+            .addParamsOptions(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false))
+            .addParamsOptions(new ParamsOptions(ShowType.TABLE_ATTACHMENT.getDescp(), ShowType.TABLE_ATTACHMENT.getDescp(), false))
+            .setValue(ShowType.TABLE.getDescp())
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         paramsList.add(receivesParam);
         paramsList.add(receiveCcsParam);

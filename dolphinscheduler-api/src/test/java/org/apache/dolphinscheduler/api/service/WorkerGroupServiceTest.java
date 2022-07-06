@@ -67,7 +67,7 @@ public class WorkerGroupServiceTest {
     private User loginUSer;
 
     @Before
-    public void init(){
+    public void init() {
         loginUSer = new User();
         loginUSer.setUserType(UserType.ADMIN_USER);
     }

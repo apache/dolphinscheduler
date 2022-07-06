@@ -134,7 +134,7 @@ public final class MailSender {
     /**
      * send mail to receivers
      *
-     * @param title title
+     * @param title   title
      * @param content content
      */
     public AlertResult sendMails(String title, String content) {
@@ -144,10 +144,10 @@ public final class MailSender {
     /**
      * send mail
      *
-     * @param receivers receivers
+     * @param receivers   receivers
      * @param receiverCcs receiverCcs
-     * @param title title
-     * @param content content
+     * @param title       title
+     * @param content     content
      */
     public AlertResult sendMails(List<String> receivers, List<String> receiverCcs, String title, String content) {
         AlertResult alertResult = new AlertResult();

@@ -25,17 +25,17 @@ public class SparkDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
     @Override
     public String toString() {
         return "SparkDataSourceParamDTO{"
-                + "host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", principal='" + principal + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", other='" + other + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
-                + '}';
+            + "host='" + host + '\''
+            + ", port=" + port
+            + ", database='" + database + '\''
+            + ", principal='" + principal + '\''
+            + ", userName='" + userName + '\''
+            + ", password='" + password + '\''
+            + ", other='" + other + '\''
+            + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
+            + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
+            + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
+            + '}';
     }
 
     @Override

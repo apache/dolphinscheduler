@@ -17,11 +17,15 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -29,9 +33,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import lombok.Getter;
 
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
@@ -39,20 +41,20 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     private WebElement buttonCreateProcess;
 
     @FindBys({
-            @FindBy(className = "btn-selected"),
-            @FindBy(className = "n-checkbox"),
+        @FindBy(className = "btn-selected"),
+        @FindBy(className = "n-checkbox"),
     })
     private WebElement checkBoxSelectAll;
 
     @FindBys({
-            @FindBy(className = "btn-delete-all"),
-            @FindBy(className = "n-button__content"),
+        @FindBy(className = "btn-delete-all"),
+        @FindBy(className = "n-button__content"),
     })
     private WebElement buttonDeleteAll;
 
     @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -97,10 +99,10 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
     public WorkflowDefinitionTab cancelPublishAll() {
         List<WebElement> cancelButtons = workflowList()
-                .stream()
-                .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
-                .filter(WebElement::isDisplayed)
-                .collect(Collectors.toList());
+            .stream()
+            .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
+            .filter(WebElement::isDisplayed)
+            .collect(Collectors.toList());
 
         for (WebElement cancelButton : cancelButtons) {
             cancelButton.click();

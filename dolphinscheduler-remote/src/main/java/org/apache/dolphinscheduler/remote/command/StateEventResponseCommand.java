@@ -70,9 +70,9 @@ public class StateEventResponseCommand implements Serializable {
     @Override
     public String toString() {
         return "StateEventResponseCommand{"
-                + "key=" + key
-                + ", status=" + status
-                + '}';
+            + "key=" + key
+            + ", status=" + status
+            + '}';
     }
 
 }

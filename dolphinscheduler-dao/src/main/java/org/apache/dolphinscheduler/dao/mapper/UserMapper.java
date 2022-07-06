@@ -175,12 +175,12 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * list authorized User
+     *
      * @param userId
      * @param resourcesIds
      * @param <T>
      * @return
      */
-    <T> List<User> listAuthorizedUsersList (@Param("userId") int userId, @Param("resourcesIds")T[] resourcesIds);
-
+    <T> List<User> listAuthorizedUsersList(@Param("userId") int userId, @Param("resourcesIds") T[] resourcesIds);
 
 }

@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
@@ -52,12 +52,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement
 @ComponentScan(basePackages = "org.apache.dolphinscheduler",
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                        "org.apache.dolphinscheduler.service.process.*",
-                        "org.apache.dolphinscheduler.service.queue.*",
-                })
-        }
+    excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+            "org.apache.dolphinscheduler.service.process.*",
+            "org.apache.dolphinscheduler.service.queue.*",
+        })
+    }
 )
 public class WorkerServer implements IStoppable {
 

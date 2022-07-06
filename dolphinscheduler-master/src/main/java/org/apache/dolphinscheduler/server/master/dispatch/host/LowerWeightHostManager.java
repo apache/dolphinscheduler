@@ -94,7 +94,6 @@ public class LowerWeightHostManager extends CommonHostManager {
         throw new UnsupportedOperationException("not support");
     }
 
-
     private class WorkerWeightListener implements WorkerInfoChangeListener {
         @Override
         public void notify(Map<String, Set<String>> workerGroups, Map<String, String> workerNodeInfo) {
@@ -142,20 +141,19 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
         if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
             logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
-                    addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
+                addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
             return Optional.empty();
         }
         if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
             logger.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
-                    addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
+                addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
             return Optional.empty();
         }
         return Optional.of(
-                new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
-                        heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
-                        heartBeat.getWorkerWaitingTaskCount(), heartBeat.getStartupTime()));
+            new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
+                heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
+                heartBeat.getWorkerWaitingTaskCount(), heartBeat.getStartupTime()));
     }
-
 
     private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
         lock.lock();

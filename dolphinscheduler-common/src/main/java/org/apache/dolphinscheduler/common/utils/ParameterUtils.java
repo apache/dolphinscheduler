@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -29,10 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,7 +108,6 @@ public class ParameterUtils {
         if (templateStr == null) {
             return null;
         }
-
 
         StringBuffer newValue = new StringBuffer(templateStr.length());
 

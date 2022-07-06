@@ -104,7 +104,9 @@
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mv dist/apache-dolphinscheduler-*.tar.gz dist/apache-dolphinscheduler-python-${project.version}.tar.gz</argument>
+                                        <argument>mv dist/apache-dolphinscheduler-*.tar.gz
+                                            dist/apache-dolphinscheduler-python-${project.version}.tar.gz
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -119,7 +121,9 @@
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mv dist/apache_dolphinscheduler-*py3-none-any.whl dist/apache_dolphinscheduler-python-${project.version}-py3-none-any.whl</argument>
+                                        <argument>mv dist/apache_dolphinscheduler-*py3-none-any.whl
+                                            dist/apache_dolphinscheduler-python-${project.version}-py3-none-any.whl
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -136,7 +140,8 @@
                                     <arguments>
                                         <argument>-c</argument>
                                         <!-- We use `bash -c` here cause plugin exec-maven-plugin do not support wildcard-->
-                                        <argument>gpg --armor --detach-sign --digest-algo=SHA512 dist/*.tar.gz</argument>
+                                        <argument>gpg --armor --detach-sign --digest-algo=SHA512 dist/*.tar.gz
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>

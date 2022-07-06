@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
+package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
 import org.apache.dolphinscheduler.api.dto.resources.Directory;
 import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * resource tree visitor
  */
-public class ResourceTreeVisitor implements Visitor{
+public class ResourceTreeVisitor implements Visitor {
 
     /**
      * resource list
@@ -40,6 +40,7 @@ public class ResourceTreeVisitor implements Visitor{
 
     /**
      * constructor
+     *
      * @param resourceList resource list
      */
     public ResourceTreeVisitor(List<Resource> resourceList) {
@@ -48,6 +49,7 @@ public class ResourceTreeVisitor implements Visitor{
 
     /**
      * visit
+     *
      * @return resoruce component
      */
     @Override
@@ -55,10 +57,10 @@ public class ResourceTreeVisitor implements Visitor{
         ResourceComponent rootDirectory = new Directory();
         for (Resource resource : resourceList) {
             // judge whether is root node
-            if (rootNode(resource)){
+            if (rootNode(resource)) {
                 ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 rootDirectory.add(tempResourceComponent);
-                tempResourceComponent.setChildren(setChildren(tempResourceComponent.getId(),resourceList));
+                tempResourceComponent.setChildren(setChildren(tempResourceComponent.getId(), resourceList));
             }
         }
         return rootDirectory;
@@ -66,22 +68,23 @@ public class ResourceTreeVisitor implements Visitor{
 
     /**
      * set children
-     * @param id    id
-     * @param list  resource list
+     *
+     * @param id   id
+     * @param list resource list
      * @return resource component list
      */
-    public static List<ResourceComponent> setChildren(int id, List<Resource> list ){
+    public static List<ResourceComponent> setChildren(int id, List<Resource> list) {
         List<ResourceComponent> childList = new ArrayList<>();
         for (Resource resource : list) {
-            if (id == resource.getPid()){
+            if (id == resource.getPid()) {
                 ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 childList.add(tempResourceComponent);
             }
         }
         for (ResourceComponent resourceComponent : childList) {
-            resourceComponent.setChildren(setChildren(resourceComponent.getId(),list));
+            resourceComponent.setChildren(setChildren(resourceComponent.getId(), list));
         }
-        if (childList.size()==0){
+        if (childList.size() == 0) {
             return new ArrayList<>();
         }
         return childList;
@@ -89,13 +92,14 @@ public class ResourceTreeVisitor implements Visitor{
 
     /**
      * Determine whether it is the root node
+     *
      * @param resource resource
      * @return true if it is the root node
      */
     public boolean rootNode(Resource resource) {
 
         boolean isRootNode = true;
-        if(resource.getPid() != -1 ){
+        if (resource.getPid() != -1) {
             for (Resource parent : resourceList) {
                 if (resource.getPid() == parent.getId()) {
                     isRootNode = false;
@@ -108,22 +112,23 @@ public class ResourceTreeVisitor implements Visitor{
 
     /**
      * get resource component by resource
+     *
      * @param resource resource
      * @return resource component
      */
     private static ResourceComponent getResourceComponent(Resource resource) {
         ResourceComponent tempResourceComponent;
-        if(resource.isDirectory()){
+        if (resource.isDirectory()) {
             tempResourceComponent = new Directory();
-        }else{
+        } else {
             tempResourceComponent = new FileLeaf();
         }
-        
+
         tempResourceComponent.setName(resource.getAlias());
-        tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
+        tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/", ""));
         tempResourceComponent.setId(resource.getId());
         tempResourceComponent.setPid(resource.getPid());
-        tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
+        tempResourceComponent.setIdValue(resource.getId(), resource.isDirectory());
         tempResourceComponent.setDescription(resource.getDescription());
         tempResourceComponent.setType(resource.getType());
         return tempResourceComponent;

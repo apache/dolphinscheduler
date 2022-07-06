@@ -124,7 +124,6 @@ public class DataSourceMapperTest extends BaseDaoTest {
     }
 
 
-
     /**
      * test query datasource by type
      */
@@ -135,14 +134,14 @@ public class DataSourceMapperTest extends BaseDaoTest {
         Map<Integer, DataSource> datasourceMap = createDataSourceMap(userId, "test");
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByType(
-                0, DbType.MYSQL.ordinal());
+            0, DbType.MYSQL.ordinal());
 
         assertThat(actualDataSources.size(), greaterThanOrEqualTo(2));
 
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = datasourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                assertEquals(expectedDataSource,actualDataSource);
+                assertEquals(expectedDataSource, actualDataSource);
             }
         }
 
@@ -166,7 +165,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                assertEquals(expectedDataSource,actualDataSource);
+                assertEquals(expectedDataSource, actualDataSource);
             }
         }
 
@@ -184,7 +183,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
         for (DataSource actualDataSource : actualDataSources) {
             if (expectedDataSource.getId() == actualDataSource.getId()) {
-                assertEquals(expectedDataSource,actualDataSource);
+                assertEquals(expectedDataSource, actualDataSource);
             }
         }
 
@@ -205,7 +204,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                assertEquals(expectedDataSource,actualDataSource);
+                assertEquals(expectedDataSource, actualDataSource);
             }
         }
 
@@ -226,7 +225,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                assertEquals(expectedDataSource,actualDataSource);
+                assertEquals(expectedDataSource, actualDataSource);
             }
         }
     }
@@ -247,7 +246,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                assertEquals(expectedDataSource,actualDataSource);
+                assertEquals(expectedDataSource, actualDataSource);
             }
         }
     }
@@ -263,7 +262,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         DataSource unauthorizdDataSource = createDataSource(generalUser2.getId(), "ds-2");
 
         //data source ids
-        Integer[] dataSourceIds = new Integer[]{dataSource.getId(), unauthorizdDataSource.getId()};
+        Integer[] dataSourceIds = new Integer[] {dataSource.getId(), unauthorizdDataSource.getId()};
 
         List<DataSource> authorizedDataSource = dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
 
@@ -280,15 +279,16 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource relation
+     *
      * @param userId
      */
-    private Map<Integer,DataSource> createDataSourceMap(Integer userId,String name) {
+    private Map<Integer, DataSource> createDataSourceMap(Integer userId, String name) {
 
-        Map<Integer,DataSource> dataSourceMap = new HashMap<>();
+        Map<Integer, DataSource> dataSourceMap = new HashMap<>();
 
         DataSource dataSource = createDataSource(userId, name);
 
-        dataSourceMap.put(dataSource.getId(),dataSource);
+        dataSourceMap.put(dataSource.getId(), dataSource);
 
         DataSource otherDataSource = createDataSource(userId + 1, name + "1");
 
@@ -309,15 +309,16 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource map
+     *
      * @param count datasource count
      * @return datasource map
      */
-    private Map<Integer,DataSource> createDataSourceMap(Integer count) {
-        Map<Integer,DataSource> dataSourceMap = new HashMap<>();
+    private Map<Integer, DataSource> createDataSourceMap(Integer count) {
+        Map<Integer, DataSource> dataSourceMap = new HashMap<>();
 
         for (int i = 0; i < count; i++) {
             DataSource dataSource = createDataSource("test");
-            dataSourceMap.put(dataSource.getId(),dataSource);
+            dataSourceMap.put(dataSource.getId(), dataSource);
         }
 
         return dataSourceMap;
@@ -325,28 +326,31 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @return datasource
      */
     private DataSource createDataSource() {
-        return createDataSource(1,"test");
+        return createDataSource(1, "test");
     }
 
     /**
      * create datasource
+     *
      * @param name name
      * @return datasource
      */
     private DataSource createDataSource(String name) {
-        return createDataSource(1,name);
+        return createDataSource(1, name);
     }
 
     /**
      * create datasource
+     *
      * @param userId userId
-     * @param name name
+     * @param name   name
      * @return datasource
      */
-    private DataSource createDataSource(Integer userId,String name) {
+    private DataSource createDataSource(Integer userId, String name) {
         Random random = new Random();
         DataSource dataSource = new DataSource();
         dataSource.setUserId(userId);
@@ -364,6 +368,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create general user
+     *
      * @return User
      */
     private User createGeneralUser(String userName) {
@@ -382,7 +387,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
     /**
      * create the relation of user and data source
      *
-     * @param user user
+     * @param user       user
      * @param dataSource data source
      * @return DatasourceUser
      */

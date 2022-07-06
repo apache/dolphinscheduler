@@ -46,7 +46,7 @@ public class WriterFactory {
 
         List<BatchWriter> writerList = new ArrayList<>();
 
-        for (WriterConfig writerConfig:writerConfigs) {
+        for (WriterConfig writerConfig : writerConfigs) {
             BatchWriter writer = getWriter(writerConfig);
             if (writer != null) {
                 writer.validateConfig();

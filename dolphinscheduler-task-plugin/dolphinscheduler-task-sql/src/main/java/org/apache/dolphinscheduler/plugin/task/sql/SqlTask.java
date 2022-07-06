@@ -120,38 +120,38 @@ public class SqlTask extends AbstractTaskExecutor {
     public void handle() throws Exception {
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
-                sqlParameters.getType(),
-                sqlParameters.getDatasource(),
-                sqlParameters.getSql(),
-                sqlParameters.getLocalParams(),
-                sqlParameters.getUdfs(),
-                sqlParameters.getShowType(),
-                sqlParameters.getConnParams(),
-                sqlParameters.getVarPool(),
-                sqlParameters.getLimit());
+            sqlParameters.getType(),
+            sqlParameters.getDatasource(),
+            sqlParameters.getSql(),
+            sqlParameters.getLocalParams(),
+            sqlParameters.getUdfs(),
+            sqlParameters.getShowType(),
+            sqlParameters.getConnParams(),
+            sqlParameters.getVarPool(),
+            sqlParameters.getLimit());
         try {
 
             // get datasource
             baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                    DbType.valueOf(sqlParameters.getType()),
-                    sqlTaskExecutionContext.getConnectionParams());
+                DbType.valueOf(sqlParameters.getType()),
+                sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
             List<SqlBinds> mainStatementSqlBinds = SqlSplitter.split(sqlParameters.getSql(), sqlParameters.getSegmentSeparator())
-                    .stream()
-                    .map(this::getSqlAndSqlParamsMap)
-                    .collect(Collectors.toList());
+                .stream()
+                .map(this::getSqlAndSqlParamsMap)
+                .collect(Collectors.toList());
 
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
-                    .orElse(new ArrayList<>())
-                    .stream()
-                    .map(this::getSqlAndSqlParamsMap)
-                    .collect(Collectors.toList());
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(this::getSqlAndSqlParamsMap)
+                .collect(Collectors.toList());
             List<SqlBinds> postStatementSqlBinds = Optional.ofNullable(sqlParameters.getPostStatements())
-                    .orElse(new ArrayList<>())
-                    .stream()
-                    .map(this::getSqlAndSqlParamsMap)
-                    .collect(Collectors.toList());
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(this::getSqlAndSqlParamsMap)
+                .collect(Collectors.toList());
 
             List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncParametersList(), logger);
 
@@ -171,9 +171,9 @@ public class SqlTask extends AbstractTaskExecutor {
      * execute function and sql
      *
      * @param mainStatementsBinds main statements binds
-     * @param preStatementsBinds pre statements binds
+     * @param preStatementsBinds  pre statements binds
      * @param postStatementsBinds post statements binds
-     * @param createFuncs create functions
+     * @param createFuncs         create functions
      */
     public void executeFuncAndSql(List<SqlBinds> mainStatementsBinds,
                                   List<SqlBinds> preStatementsBinds,
@@ -269,8 +269,8 @@ public class SqlTask extends AbstractTaskExecutor {
         String result = JSONUtils.toJsonString(resultJSONArray);
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                    ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", result);
+                ? sqlParameters.getTitle()
+                : taskExecutionContext.getTaskName() + " query result sets", result);
         }
         logger.debug("execute sql result : {}", result);
         return result;
@@ -279,7 +279,7 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * send alert as an attachment
      *
-     * @param title title
+     * @param title   title
      * @param content content
      */
     private void sendAttachment(int groupId, String title, String content) {
@@ -313,7 +313,7 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * create temp function
      *
-     * @param connection connection
+     * @param connection  connection
      * @param createFuncs createFuncs
      */
     private void createTempFunction(Connection connection,
@@ -345,14 +345,14 @@ public class SqlTask extends AbstractTaskExecutor {
      * preparedStatement bind
      *
      * @param connection connection
-     * @param sqlBinds sqlBinds
+     * @param sqlBinds   sqlBinds
      * @return PreparedStatement
      * @throws Exception Exception
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) {
         // is the timeout set
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
-                || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
+            || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
         try {
             PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
             if (timeoutFlag) {
@@ -376,9 +376,9 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * print replace sql
      *
-     * @param content content
-     * @param formatSql format sql
-     * @param rgex rgex
+     * @param content      content
+     * @param formatSql    format sql
+     * @param rgex         rgex
      * @param sqlParamsMap sql params map
      */
     private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
@@ -415,7 +415,7 @@ public class SqlTask extends AbstractTaskExecutor {
 
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
-                    ParamUtils.convert(paramsMap));
+                ParamUtils.convert(paramsMap));
             logger.info("SQL title : {}", title);
             sqlParameters.setTitle(title);
         }
@@ -424,7 +424,7 @@ public class SqlTask extends AbstractTaskExecutor {
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
         sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
-        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap,taskExecutionContext.getTaskInstanceId());
+        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
         //Replace the original value in sql ！{...} ，Does not participate in precompilation
         String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
@@ -455,7 +455,7 @@ public class SqlTask extends AbstractTaskExecutor {
      * create function list
      *
      * @param udfFuncParameters udfFuncParameters
-     * @param logger logger
+     * @param logger            logger
      * @return
      */
     private List<String> createFuncs(List<UdfFuncParameters> udfFuncParameters, Logger logger) {
@@ -475,16 +475,18 @@ public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * build temp function sql
+     *
      * @param udfFuncParameters udfFuncParameters
      * @return
      */
     private List<String> buildTempFuncSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> MessageFormat
-                .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
+            .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
     }
 
     /**
      * build jar sql
+     *
      * @param udfFuncParameters udfFuncParameters
      * @return
      */

@@ -18,18 +18,19 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
+
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -208,9 +209,9 @@ public class ResourceMapperTest extends BaseDaoTest {
         int userId = resource.getUserId();
         int type = resource.getType().ordinal();
         List<Resource> resources = resourceMapper.queryResourceList(
-                alias,
-                userId,
-                type
+            alias,
+            userId,
+            type
         );
 
         Assert.assertNotEquals(resources.size(), 0);
@@ -242,18 +243,18 @@ public class ResourceMapperTest extends BaseDaoTest {
         Page<Resource> page = new Page(1, 3);
 
         IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
-                page,
-                -1,
-                resource.getType().ordinal(),
-                "",
-                new ArrayList<>(resource.getId())
+            page,
+            -1,
+            resource.getType().ordinal(),
+            "",
+            new ArrayList<>(resource.getId())
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
-                page,
-                -1,
-                resource.getType().ordinal(),
-                "",
-                null
+            page,
+            -1,
+            resource.getType().ordinal(),
+            "",
+            null
         );
         Assert.assertEquals(resourceIPage.getTotal(), 1);
         Assert.assertEquals(resourceIPage1.getTotal(), 1);
@@ -306,7 +307,7 @@ public class ResourceMapperTest extends BaseDaoTest {
     public void testQueryResourceExceptUserId() {
         Resource resource = insertOne();
         List<Resource> resources = resourceMapper.queryResourceExceptUserId(
-                11111
+            11111
         );
         Assert.assertNotEquals(resources.size(), 0);
     }
@@ -361,7 +362,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         Resource unauthorizedResource = createResource(generalUser1);
 
         // need download resources
-        String[] resNames = new String[]{resource.getFullName(), unauthorizedResource.getFullName()};
+        String[] resNames = new String[] {resource.getFullName(), unauthorizedResource.getFullName()};
 
         List<Resource> resources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
 

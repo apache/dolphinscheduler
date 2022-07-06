@@ -219,16 +219,6 @@ public class MlflowParameters extends AbstractParameters {
     @Override
     public boolean checkParameters() {
         Boolean checkResult = true;
-//        Boolean checkResult = mlflowTrackingUri != null;
-//        if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
-//            checkResult &= dataPath != null;
-//            checkResult &= experimentName != null;
-//        } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
-//            checkResult &= dataPath != null;
-//            checkResult &= automlTool != null;
-//            checkResult &= experimentName != null;
-//        } else {
-//        }
         return checkResult;
     }
 
@@ -244,7 +234,6 @@ public class MlflowParameters extends AbstractParameters {
             addParamsMapForBasicAlgorithm(paramsMap);
         } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
             getParamsMapForAutoML(paramsMap);
-        } else {
         }
         return paramsMap;
     }
@@ -281,13 +270,13 @@ public class MlflowParameters extends AbstractParameters {
         return env;
     }
 
-    public String getContainerName(){
+    public String getContainerName() {
         String containerName = "ds-mlflow-" + getModelKeyName("-");
         return containerName;
     }
 
-    public boolean getIsDeployDocker(){
+    public boolean getIsDeployDocker() {
         return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER) || deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
     }
 
-};
+}

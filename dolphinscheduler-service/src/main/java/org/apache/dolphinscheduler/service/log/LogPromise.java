@@ -22,34 +22,34 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- *  log asyc callback
+ * log asyc callback
  */
 public class LogPromise {
 
     private static final ConcurrentHashMap<Long, LogPromise> PROMISES = new ConcurrentHashMap<>();
 
     /**
-     *  request unique identification
+     * request unique identification
      */
     private long opaque;
 
     /**
-     *  start timemillis
+     * start timemillis
      */
     private final long start;
 
     /**
-     *  timeout
+     * timeout
      */
     private final long timeout;
 
     /**
-     *  latch
+     * latch
      */
     private final CountDownLatch latch;
 
     /**
-     *  result
+     * result
      */
     private Object result;
 
@@ -62,7 +62,8 @@ public class LogPromise {
     }
 
     /**
-     *  notify client finish
+     * notify client finish
+     *
      * @param opaque unique identification
      * @param result result
      */
@@ -74,7 +75,7 @@ public class LogPromise {
     }
 
     /**
-     *  countdown
+     * countdown
      *
      * @param result result
      */
@@ -84,7 +85,8 @@ public class LogPromise {
     }
 
     /**
-     *  whether timeout
+     * whether timeout
+     *
      * @return timeout
      */
     public boolean isTimeout() {
@@ -92,7 +94,8 @@ public class LogPromise {
     }
 
     /**
-     *  get result
+     * get result
+     *
      * @return
      */
     public Object getResult() {

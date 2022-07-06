@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -122,7 +122,7 @@ public class Property implements Serializable {
         }
         Property property = (Property) o;
         return Objects.equals(prop, property.prop)
-                && Objects.equals(value, property.value);
+            && Objects.equals(value, property.value);
     }
 
     @Override
@@ -133,11 +133,11 @@ public class Property implements Serializable {
     @Override
     public String toString() {
         return "Property{"
-                + "prop='" + prop + '\''
-                + ", direct=" + direct
-                + ", type=" + type
-                + ", value='" + value + '\''
-                + '}';
+            + "prop='" + prop + '\''
+            + ", direct=" + direct
+            + ", type=" + type
+            + ", value='" + value + '\''
+            + '}';
     }
 
 }

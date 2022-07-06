@@ -30,9 +30,9 @@ public class ConfigUtilsTest {
     @Test
     public void testExtractSubConfig() {
         // Setup
-        Map<String,Object> configMap = new HashMap<>();
-        configMap.put("aaa.www","1");
-        configMap.put("bbb.www","1");
+        Map<String, Object> configMap = new HashMap<>();
+        configMap.put("aaa.www", "1");
+        configMap.put("bbb.www", "1");
 
         final Config source = new Config(configMap);
 
@@ -41,6 +41,6 @@ public class ConfigUtilsTest {
         int expect = 1;
         int actual = result.entrySet().size();
 
-        Assert.assertEquals(expect,actual);
+        Assert.assertEquals(expect, actual);
     }
 }

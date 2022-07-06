@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -54,13 +54,13 @@ public class MasterTaskExecThreadTest {
         //       .thenReturn(this.registryCenter);
         ProcessService processService = Mockito.mock(ProcessService.class);
         Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
-                .thenReturn(processService);
+            .thenReturn(processService);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
         Mockito.when(processService.findTaskDefinition(1L, 1))
-                .thenReturn(taskDefinition);
+            .thenReturn(taskDefinition);
         //this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
     }
 
@@ -97,21 +97,21 @@ public class MasterTaskExecThreadTest {
     public void testPauseTask() {
         ProcessService processService = Mockito.mock(ProcessService.class);
         Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
-                .thenReturn(processService);
+            .thenReturn(processService);
 
         TaskInstance taskInstance = getTaskInstance();
         Mockito.when(processService.findTaskInstanceById(252612))
-                .thenReturn(taskInstance);
+            .thenReturn(taskInstance);
 
         Mockito.when(processService.updateTaskInstance(taskInstance))
-                .thenReturn(true);
+            .thenReturn(true);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
         Mockito.when(processService.findTaskDefinition(1L, 1))
-                .thenReturn(taskDefinition);
+            .thenReturn(taskDefinition);
 
         //MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
         //masterTaskExecThread.pauseTask();

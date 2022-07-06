@@ -19,17 +19,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper">
     <select id="checkTableExist" resultType="int">
-        select count(*) from information_schema.TABLES where table_name = 't_ds_plugin_define'
+        select count(*)
+        from information_schema.TABLES
+        where table_name = 't_ds_plugin_define'
     </select>
 
     <select id="queryAllPluginDefineList" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
         select *
         from t_ds_plugin_define
-        where 1=1
+        where 1 = 1
     </select>
 
     <select id="queryByPluginType" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
-        select id,plugin_name,plugin_type,create_time,update_time
+        select id, plugin_name, plugin_type, create_time, update_time
         from t_ds_plugin_define
         where plugin_type = #{pluginType}
     </select>
@@ -37,12 +39,12 @@
     <select id="queryByNameAndType" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
         select *
         from t_ds_plugin_define
-        where plugin_name = #{pluginName} and plugin_type = #{pluginType}
-        limit 1
+        where plugin_name = #{pluginName}
+          and plugin_type = #{pluginType} limit 1
     </select>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
-        select id,plugin_name,plugin_type,plugin_params,create_time,update_time
+        select id, plugin_name, plugin_type, plugin_params, create_time, update_time
         from t_ds_plugin_define
         where id = #{id}
     </select>

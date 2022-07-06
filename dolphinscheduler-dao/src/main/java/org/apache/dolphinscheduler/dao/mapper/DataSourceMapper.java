@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * datasource mapper interface
@@ -35,17 +34,19 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
      * query datasource by type
+     *
      * @param userId userId
-     * @param type type
+     * @param type   type
      * @return datasource list
      */
     List<DataSource> queryDataSourceByType(@Param("userId") int userId, @Param("type") Integer type);
 
     /**
      * datasource page
-     * @param page page
+     *
+     * @param page   page
      * @param userId userId
-     * @param name name
+     * @param name   name
      * @return datasource IPage
      */
     IPage<DataSource> selectPaging(IPage<DataSource> page,
@@ -54,6 +55,7 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
      * query datasource by name
+     *
      * @param name name
      * @return datasource list
      */
@@ -62,6 +64,7 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
      * query authed datasource
+     *
      * @param userId userId
      * @return datasource list
      */
@@ -69,6 +72,7 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
      * query datasource except userId
+     *
      * @param userId userId
      * @return datasource list
      */
@@ -76,6 +80,7 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
      * list all datasource by type
+     *
      * @param type datasource type
      * @return datasource list
      */
@@ -85,12 +90,12 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     /**
      * list authorized UDF function
      *
-     * @param userId userId
+     * @param userId        userId
      * @param dataSourceIds data source id array
-     * @param <T> T
+     * @param <T>           T
      * @return UDF function list
      */
-    <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId,@Param("dataSourceIds")T[] dataSourceIds);
+    <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId, @Param("dataSourceIds") T[] dataSourceIds);
 
     /**
      * query datasource by name and user id
@@ -103,10 +108,11 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
      * selectPagingByIds
+     *
      * @param dataSourcePage
      * @param ids
      * @param searchVal
      * @return
      */
-    IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage, @Param("dataSourceIds")List<Integer> dataSourceIds, @Param("name")String name);
+    IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage, @Param("dataSourceIds") List<Integer> dataSourceIds, @Param("name") String name);
 }

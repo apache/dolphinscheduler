@@ -27,7 +27,8 @@
 
     <fileSets>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server
+            </directory>
             <outputDirectory>alert-server</outputDirectory>
         </fileSet>
 
@@ -56,7 +57,9 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/libs/standalone-server</directory>
+            <directory>
+                ${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/libs/standalone-server
+            </directory>
             <outputDirectory>standalone-server/libs/standalone-server</outputDirectory>
         </fileSet>
         <fileSet>

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.common.enums;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- *  define process and task priority
+ * define process and task priority
  */
 public enum Priority {
     /**

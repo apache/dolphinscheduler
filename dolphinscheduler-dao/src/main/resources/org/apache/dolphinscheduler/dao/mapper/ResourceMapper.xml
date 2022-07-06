@@ -19,8 +19,43 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ResourceMapper">
     <sql id="baseSqlV2">
-       ${alias}.id, ${alias}.alias, ${alias}.file_name, ${alias}.description, ${alias}.user_id, ${alias}.type, ${alias}.size, ${alias}.create_time, ${alias}.update_time,
-       ${alias}.pid, ${alias}.full_name, ${alias}.is_directory
+        ${alias}
+        .
+        id
+        ,
+        ${alias}
+        .
+        alias,
+        ${alias}
+        .
+        file_name,
+        ${alias}
+        .
+        description,
+        ${alias}
+        .
+        user_id,
+        ${alias}
+        .
+        type,
+        ${alias}
+        .
+        size,
+        ${alias}
+        .
+        create_time,
+        ${alias}
+        .
+        update_time,
+        ${alias}
+        .
+        pid,
+        ${alias}
+        .
+        full_name,
+        ${alias}
+        .
+        is_directory
     </sql>
     <select id="queryResourceList" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
@@ -119,7 +154,7 @@
             <property name="alias" value="r"/>
         </include>
         from t_ds_resources r
-        where  r.user_id=#{userId}
+        where r.user_id=#{userId}
         <if test="resIds != null and resIds.length > 0">
             and id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">
@@ -180,14 +215,14 @@
         select 1
         from t_ds_resources
         where full_name = #{fullName}
-        and type = #{type}
-        and user_id = #{userId} limit 1
+          and type = #{type}
+          and user_id = #{userId} limit 1
     </select>
 
     <select id="existResource" resultType="java.lang.Boolean">
         select 1
         from t_ds_resources
         where full_name = #{fullName}
-        and type = #{type} limit 1
+          and type = #{type} limit 1
     </select>
 </mapper>

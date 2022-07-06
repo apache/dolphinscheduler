@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -38,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,11 +85,11 @@ public class DqExecuteResultServiceTest {
         page.setTotal(1);
         page.setRecords(getExecuteResultList());
         when(dqExecuteResultMapper.queryResultListPaging(
-                any(IPage.class), eq(""), eq(loginUser.getId()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
+            any(IPage.class), eq(""), eq(loginUser.getId()), any(), eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
         Result result = dqExecuteResultService.queryResultListPaging(
-                loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
-        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()),result.getCode());
+            loginUser, searchVal, 1, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
     }
 
     public List<DqExecuteResult> getExecuteResultList() {

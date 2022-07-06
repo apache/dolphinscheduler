@@ -50,7 +50,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         ClickHouseConnectionParam connectionParams = (ClickHouseConnectionParam) createConnectionParams(connectionJson);
 
         ClickHouseDataSourceParamDTO
-                clickHouseDatasourceParamDTO = new ClickHouseDataSourceParamDTO();
+            clickHouseDatasourceParamDTO = new ClickHouseDataSourceParamDTO();
         clickHouseDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         clickHouseDatasourceParamDTO.setUserName(connectionParams.getUser());
         clickHouseDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
@@ -112,7 +112,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         ClickHouseConnectionParam clickhouseConnectionParam = (ClickHouseConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(clickhouseConnectionParam),
-                clickhouseConnectionParam.getUser(), PasswordUtils.decodePassword(clickhouseConnectionParam.getPassword()));
+            clickhouseConnectionParam.getUser(), PasswordUtils.decodePassword(clickhouseConnectionParam.getPassword()));
     }
 
     @Override

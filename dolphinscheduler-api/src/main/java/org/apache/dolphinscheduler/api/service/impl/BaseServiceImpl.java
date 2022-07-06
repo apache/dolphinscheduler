@@ -17,15 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.BaseService;
@@ -34,9 +25,17 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +51,9 @@ public class BaseServiceImpl implements BaseService {
 
     @Override
     public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
-        try{
+        try {
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("post handle error", e);
             throw new RuntimeException("resource association user error", e);
         }
@@ -75,7 +74,7 @@ public class BaseServiceImpl implements BaseService {
      * isNotAdmin
      *
      * @param loginUser login user
-     * @param result result code
+     * @param result    result code
      * @return true if not administrator, otherwise false
      */
     @Override
@@ -91,8 +90,8 @@ public class BaseServiceImpl implements BaseService {
     /**
      * put message to map
      *
-     * @param result result code
-     * @param status status
+     * @param result       result code
+     * @param status       status
      * @param statusParams status message
      */
     @Override
@@ -108,8 +107,8 @@ public class BaseServiceImpl implements BaseService {
     /**
      * put message to result object
      *
-     * @param result result code
-     * @param status status
+     * @param result       result code
+     * @param status       status
      * @param statusParams status message
      */
     @Override
@@ -125,8 +124,8 @@ public class BaseServiceImpl implements BaseService {
     /**
      * check
      *
-     * @param result result
-     * @param bool bool
+     * @param result              result
+     * @param bool                bool
      * @param userNoOperationPerm status
      * @return check result
      */
@@ -142,24 +141,9 @@ public class BaseServiceImpl implements BaseService {
     }
 
     /**
-     * create tenant dir if not exists
-     *
-     * @param tenantCode tenant code
-     * @throws IOException if hdfs operation exception
-     */
-//    @Override
-//    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-//        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-//        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-//        // init resource path and udf path
-//        HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
-//        HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
-//    }
-
-    /**
      * Verify that the operator has permissions
      *
-     * @param operateUser operate user
+     * @param operateUser  operate user
      * @param createUserId create user id
      */
     @Override
@@ -169,13 +153,14 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * Verify that the operator has permissions
+     *
      * @param user operate user
-     * @param ids Object[]
+     * @param ids  Object[]
      * @param type AuthorizationType
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
+    public boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String permissionKey) {
         boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
@@ -185,8 +170,8 @@ public class BaseServiceImpl implements BaseService {
      * check and parse date parameters
      *
      * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
+     * @param endDateStr   end date string
+     * @return map<status, startDate, endDate>
      */
     @Override
     public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {

@@ -60,16 +60,16 @@ public class TaskNodeRelation {
         if (!(o instanceof TaskNodeRelation)) {
             return false;
         }
-        TaskNodeRelation relation = (TaskNodeRelation)o;
+        TaskNodeRelation relation = (TaskNodeRelation) o;
         return (relation.getStartNode().equals(this.startNode) && relation.getEndNode().equals(this.endNode));
     }
 
     @Override
     public String toString() {
         return "TaskNodeRelation{"
-                + "startNode='" + startNode + '\''
-                + ", endNode='" + endNode + '\''
-                + '}';
+            + "startNode='" + startNode + '\''
+            + ", endNode='" + endNode + '\''
+            + '}';
     }
 
     @Override

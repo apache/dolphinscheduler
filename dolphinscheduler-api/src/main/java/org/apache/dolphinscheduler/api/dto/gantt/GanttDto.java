@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto.gantt;
 
 import java.util.ArrayList;
@@ -44,19 +45,20 @@ public class GanttDto {
     /**
      * task status map
      */
-    private Map<String,String> taskStatus;
+    private Map<String, String> taskStatus;
 
-
-    public GanttDto(){
+    public GanttDto() {
         this.taskStatus = new HashMap<>();
-        taskStatus.put("success","success");
+        taskStatus.put("success", "success");
     }
-    public GanttDto(int height, List<Task> tasks, List<String> taskNames){
+
+    public GanttDto(int height, List<Task> tasks, List<String> taskNames) {
         this();
         this.height = height;
         this.tasks = tasks;
         this.taskNames = taskNames;
     }
+
     public GanttDto(int height, List<Task> tasks, List<String> taskNames, Map<String, String> taskStatus) {
         this.height = height;
         this.tasks = tasks;

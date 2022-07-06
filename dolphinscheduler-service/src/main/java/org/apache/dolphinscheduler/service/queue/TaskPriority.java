@@ -183,7 +183,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         if (this.getTaskInstancePriority() < other.getTaskInstancePriority()) {
             return -1;
         }
-        if(this.getTaskGroupPriority() != other.getTaskGroupPriority()){
+        if (this.getTaskGroupPriority() != other.getTaskGroupPriority()) {
             // larger number, higher priority
             return Constants.OPPOSITE_VALUE * Integer.compare(this.getTaskGroupPriority(), other.getTaskGroupPriority());
         }
@@ -195,7 +195,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         }
         String thisGroupName = StringUtils.isNotBlank(this.getGroupName()) ? this.getGroupName() : Constants.EMPTY_STRING;
         String otherGroupName = StringUtils.isNotBlank(other.getGroupName()) ? other.getGroupName() : Constants.EMPTY_STRING;
-        if(!thisGroupName.equals(otherGroupName)){
+        if (!thisGroupName.equals(otherGroupName)) {
             return thisGroupName.compareTo(otherGroupName);
         }
         return Long.compare(this.getCheckpoint(), other.getCheckpoint());
@@ -211,11 +211,11 @@ public class TaskPriority implements Comparable<TaskPriority> {
         }
         TaskPriority that = (TaskPriority) o;
         return processInstancePriority == that.processInstancePriority
-                && processInstanceId == that.processInstanceId
-                && taskInstancePriority == that.taskInstancePriority
-                && taskId == that.taskId
-                && taskGroupPriority == that.taskGroupPriority
-                && Objects.equals(groupName, that.groupName);
+            && processInstanceId == that.processInstanceId
+            && taskInstancePriority == that.taskInstancePriority
+            && taskId == that.taskId
+            && taskGroupPriority == that.taskGroupPriority
+            && Objects.equals(groupName, that.groupName);
     }
 
     @Override

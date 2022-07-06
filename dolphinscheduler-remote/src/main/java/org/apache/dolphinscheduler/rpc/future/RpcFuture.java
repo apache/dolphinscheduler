@@ -63,8 +63,8 @@ public class RpcFuture implements Future<Object> {
         boolean success = latch.await(5, TimeUnit.SECONDS);
         if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + this.requestId
-                    + ". Request class name: " + this.request.getClassName()
-                    + ". Request method: " + this.request.getMethodName());
+                + ". Request class name: " + this.request.getClassName()
+                + ". Request method: " + this.request.getMethodName());
         }
         return response;
     }
@@ -74,8 +74,8 @@ public class RpcFuture implements Future<Object> {
         boolean success = latch.await(timeout, unit);
         if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + requestId
-                    + ". Request class name: " + this.request.getClassName()
-                    + ". Request method: " + this.request.getMethodName());
+                + ". Request class name: " + this.request.getClassName()
+                + ". Request method: " + this.request.getMethodName());
         }
         return response;
     }

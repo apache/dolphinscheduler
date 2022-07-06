@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
@@ -38,9 +37,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
 /**
  * access token controller
@@ -68,9 +67,9 @@ public class AccessTokenV2Controller extends BaseController {
     public CreateTokenResponse createToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody CreateTokenRequest createTokenRequest) {
         Result result = accessTokenService.createToken(loginUser,
-                createTokenRequest.getUserId(),
-                createTokenRequest.getExpireTime(),
-                createTokenRequest.getToken());
+            createTokenRequest.getUserId(),
+            createTokenRequest.getExpireTime(),
+            createTokenRequest.getToken());
         return new CreateTokenResponse(result);
     }
 }

@@ -56,7 +56,7 @@ public class AccessLogAspect {
     private static final Pattern sensitiveDataPattern = Pattern.compile(sensitiveDataRegEx, Pattern.CASE_INSENSITIVE);
 
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation)")
-    public void logPointCut(){
+    public void logPointCut() {
         // Do nothing because of it's a pointcut
     }
 
@@ -65,7 +65,7 @@ public class AccessLogAspect {
         long startTime = System.currentTimeMillis();
 
         // fetch AccessLogAnnotation
-        MethodSignature sign =  (MethodSignature) proceedingJoinPoint.getSignature();
+        MethodSignature sign = (MethodSignature) proceedingJoinPoint.getSignature();
         Method method = sign.getMethod();
         AccessLogAnnotation annotation = method.getAnnotation(AccessLogAnnotation.class);
 
@@ -88,12 +88,12 @@ public class AccessLogAspect {
                 // handle sensitive data in the string
                 argsString = handleSensitiveData(argsString);
                 logger.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
-                        traceId,
-                        userName,
-                        request.getRequestURI(),
-                        request.getMethod(),
-                        proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
-                        argsString);
+                    traceId,
+                    userName,
+                    request.getRequestURI(),
+                    request.getMethod(),
+                    proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
+                    argsString);
 
             }
         }
@@ -134,7 +134,7 @@ public class AccessLogAspect {
         boolean exists = false;
         while (matcher.find()) {
             if (matcher.groupCount() == 3) {
-                stream = IntStream.concat(stream, IntStream.range(matcher.end(1),matcher.end(2)));
+                stream = IntStream.concat(stream, IntStream.range(matcher.end(1), matcher.end(2)));
                 exists = true;
             }
         }

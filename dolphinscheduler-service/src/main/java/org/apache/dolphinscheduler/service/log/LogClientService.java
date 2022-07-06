@@ -77,11 +77,11 @@ public class LogClientService implements AutoCloseable {
     /**
      * roll view log
      *
-     * @param host host
-     * @param port port
-     * @param path path
+     * @param host        host
+     * @param port        port
+     * @param path        path
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
@@ -94,7 +94,7 @@ public class LogClientService implements AutoCloseable {
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(
-                        response.getBody(), RollViewLogResponseCommand.class);
+                    response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public class LogClientService implements AutoCloseable {
                 Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
                     ViewLogResponseCommand viewLog = JSONUtils.parseObject(
-                            response.getBody(), ViewLogResponseCommand.class);
+                        response.getBody(), ViewLogResponseCommand.class);
                     result = viewLog.getMsg();
                 }
             }
@@ -155,7 +155,7 @@ public class LogClientService implements AutoCloseable {
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
-                        response.getBody(), GetLogBytesResponseCommand.class);
+                    response.getBody(), GetLogBytesResponseCommand.class);
                 return getLog.getData() == null ? new byte[0] : getLog.getData();
             }
         } catch (Exception e) {
@@ -184,7 +184,7 @@ public class LogClientService implements AutoCloseable {
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(
-                        response.getBody(), RemoveTaskLogResponseCommand.class);
+                    response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }
         } catch (Exception e) {

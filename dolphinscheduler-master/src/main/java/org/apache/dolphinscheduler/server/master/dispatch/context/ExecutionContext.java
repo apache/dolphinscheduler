@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
 /**
- *  execution context
+ * execution context
  */
 public class ExecutionContext {
 
@@ -34,17 +34,17 @@ public class ExecutionContext {
     private Host host;
 
     /**
-     *  command
+     * command
      */
     private final Command command;
 
     /**
-     *  executor type : worker or client
+     * executor type : worker or client
      */
     private final ExecutorType executorType;
 
     /**
-     *  worker group
+     * worker group
      */
     private String workerGroup;
 

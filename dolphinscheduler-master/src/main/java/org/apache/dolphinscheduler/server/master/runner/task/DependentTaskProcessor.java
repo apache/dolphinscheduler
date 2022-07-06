@@ -74,10 +74,10 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         }
         this.setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+            processInstance.getProcessDefinitionCode(),
+            processInstance.getProcessDefinitionVersion(),
+            taskInstance.getProcessInstanceId(),
+            taskInstance.getId()));
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -112,11 +112,11 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean taskTimeout() {
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
+            && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
         logger.info("dependent taskInstanceId: {} timeout, taskName: {}, strategy: {} ",
-                taskInstance.getId(), taskInstance.getName(), taskTimeoutStrategy.getDescp());
+            taskInstance.getId(), taskInstance.getName(), taskTimeoutStrategy.getDescp());
         result = DependResult.FAILED;
         endTask();
         return true;

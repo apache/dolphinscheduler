@@ -53,7 +53,7 @@ public class PageInfo<T> {
     private Integer pageNo;
 
     public PageInfo() {
-        
+
     }
 
     public PageInfo(Integer currentPage, Integer pageSize) {
@@ -97,9 +97,9 @@ public class PageInfo<T> {
             pageSize = 7;
         }
         this.totalPage =
-                (this.total % this.pageSize) == 0
-                        ? ((this.total / this.pageSize) == 0 ? 1 : (this.total / this.pageSize))
-                        : (this.total / this.pageSize + 1);
+            (this.total % this.pageSize) == 0
+                ? ((this.total / this.pageSize) == 0 ? 1 : (this.total / this.pageSize))
+                : (this.total / this.pageSize + 1);
         return this.totalPage;
     }
 

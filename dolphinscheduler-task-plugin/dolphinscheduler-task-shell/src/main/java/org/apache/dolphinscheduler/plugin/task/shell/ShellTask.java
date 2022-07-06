@@ -73,8 +73,8 @@ public class ShellTask extends AbstractTaskExecutor {
 
         this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                logger);
+            taskExecutionContext,
+            logger);
     }
 
     @Override
@@ -120,8 +120,8 @@ public class ShellTask extends AbstractTaskExecutor {
     private String buildCommand() throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(), SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTaskAppId(), SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
 
         File file = new File(fileName);
         Path path = file.toPath();

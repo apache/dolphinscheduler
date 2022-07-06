@@ -51,7 +51,7 @@ public enum DqFailureStrategy {
 
     static {
         for (DqFailureStrategy type : DqFailureStrategy.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.procedure;
 import java.io.Serializable;
 
 /**
- *  master/worker task transport
+ * master/worker task transport
  */
 public class ProcedureTaskExecutionContext implements Serializable {
 
@@ -40,7 +40,7 @@ public class ProcedureTaskExecutionContext implements Serializable {
     @Override
     public String toString() {
         return "ProcedureTaskExecutionContext{"
-                + "connectionParams='" + connectionParams + '\''
-                + '}';
+            + "connectionParams='" + connectionParams + '\''
+            + '}';
     }
 }

@@ -62,14 +62,14 @@ public class LoggerUtils {
         // like TaskAppId=TASK-20211107-798_1-4084-15210
         String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null);
         return String.format("%s=%s-%s-%s_%s-%s-%s",
-                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
+            TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**
      * processing log
      * get yarn application id list
      *
-     * @param log log content
+     * @param log    log content
      * @param logger logger
      * @return app id list
      */

@@ -66,11 +66,11 @@ public class ProcessTaskRelationController extends BaseController {
     /**
      * create process task relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode processDefinitionCode
-     * @param preTaskCode preTaskCode
-     * @param postTaskCode postTaskCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
      * @return create result code
      */
     @ApiOperation(value = "save", notes = "CREATE_PROCESS_TASK_RELATION_NOTES")
@@ -103,10 +103,10 @@ public class ProcessTaskRelationController extends BaseController {
     /**
      * delete process task relation (delete task from workflow)
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param taskCode the post task code
+     * @param taskCode              the post task code
      * @return delete result code
      */
     @ApiOperation(value = "deleteRelation", notes = "DELETE_PROCESS_TASK_RELATION_NOTES")
@@ -129,10 +129,10 @@ public class ProcessTaskRelationController extends BaseController {
     /**
      * delete task upstream relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser    login user
+     * @param projectCode  project code
      * @param preTaskCodes the pre task codes, sep ','
-     * @param taskCode the post task code
+     * @param taskCode     the post task code
      * @return delete result code
      */
     @ApiOperation(value = "deleteUpstreamRelation", notes = "DELETE_UPSTREAM_RELATION_NOTES")
@@ -155,10 +155,10 @@ public class ProcessTaskRelationController extends BaseController {
     /**
      * delete task downstream relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser     login user
+     * @param projectCode   project code
      * @param postTaskCodes the post task codes, sep ','
-     * @param taskCode the pre task code
+     * @param taskCode      the pre task code
      * @return delete result code
      */
     @ApiOperation(value = "deleteDownstreamRelation", notes = "DELETE_DOWNSTREAM_RELATION_NOTES")
@@ -181,9 +181,9 @@ public class ProcessTaskRelationController extends BaseController {
     /**
      * query task upstream relation
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode current task code (post task code)
+     * @param taskCode    current task code (post task code)
      * @return process task relation list
      */
     @ApiOperation(value = "queryUpstreamRelation", notes = "QUERY_UPSTREAM_RELATION_NOTES")
@@ -204,9 +204,9 @@ public class ProcessTaskRelationController extends BaseController {
     /**
      * query task downstream relation
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode pre task code
+     * @param taskCode    pre task code
      * @return process task relation list
      */
     @ApiOperation(value = "queryDownstreamRelation", notes = "QUERY_DOWNSTREAM_RELATION_NOTES")
@@ -230,8 +230,8 @@ public class ProcessTaskRelationController extends BaseController {
      * @param loginUser             login user
      * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param preTaskCode pre task code
-     * @param postTaskCode post task code
+     * @param preTaskCode           pre task code
+     * @param postTaskCode          post task code
      * @return delete result code
      */
     @ApiOperation(value = "deleteEdge", notes = "DELETE_EDGE_NOTES")

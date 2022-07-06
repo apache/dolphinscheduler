@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -86,10 +85,10 @@ public class ProcedureTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         logger.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
-                procedureParameters.getType(),
-                procedureParameters.getDatasource(),
-                procedureParameters.getMethod(),
-                procedureParameters.getLocalParams());
+            procedureParameters.getType(),
+            procedureParameters.getDatasource(),
+            procedureParameters.getMethod(),
+            procedureParameters.getLocalParams());
 
         Connection connection = null;
         CallableStatement stmt = null;
@@ -98,7 +97,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
             DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
             ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
-                    procedureTaskExecutionContext.getConnectionParams());
+                procedureTaskExecutionContext.getConnectionParams());
 
             // get jdbc connection
             connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
@@ -163,7 +162,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
      * @throws Exception Exception
      */
     private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<Integer, Property> paramsMap
-            , Map<String, Property> totalParamsMap) throws Exception {
+        , Map<String, Property> totalParamsMap) throws Exception {
         Map<Integer, Property> outParameterMap = new HashMap<>();
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;

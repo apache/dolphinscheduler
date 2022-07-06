@@ -31,10 +31,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-
-import lombok.Getter;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import lombok.Getter;
 
 @Getter
 public final class UserPage extends NavBarPage implements SecurityPage.Tab {
@@ -53,7 +53,6 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     private final UserForm createUserForm = new UserForm();
     private final UserForm editUserForm = new UserForm();
 
-
     public UserPage(RemoteWebDriver driver) {
         super(driver);
     }
@@ -67,7 +66,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         createUserForm().btnSelectTenantDropdown().click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+            "n-base-select-option__content")));
 
         createUserForm().selectTenant()
             .stream()
@@ -93,27 +92,27 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in user list"))
             .click();
 
-        editUserForm().inputUserName().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputUserName().sendKeys(Keys.CONTROL + "a");
         editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputUserName().sendKeys(editUser);
 
         createUserForm().btnSelectTenantDropdown().click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+            "n-base-select-option__content")));
 
         createUserForm().selectTenant()
-                .stream()
-                .filter(it -> it.getText().contains(tenant))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(tenant))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
+            .click();
 
-        editUserForm().inputEmail().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputEmail().sendKeys(Keys.CONTROL + "a");
         editUserForm().inputEmail().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputEmail().sendKeys(editEmail);
 
-        editUserForm().inputPhone().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputPhone().sendKeys(Keys.CONTROL + "a");
         editUserForm().inputPhone().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputPhone().sendKeys(editPhone);
 
@@ -165,8 +164,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         private List<WebElement> selectTenant;
 
         @FindBys({
-                @FindBy(className = "select-queue"),
-                @FindBy(className = "n-base-selection"),
+            @FindBy(className = "select-queue"),
+            @FindBy(className = "n-base-selection"),
         })
         private WebElement btnSelectQueueDropdown;
 
@@ -174,14 +173,14 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         private List<WebElement> selectQueue;
 
         @FindBys({
-                @FindBy(className = "input-email"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-email"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputEmail;
 
         @FindBys({
-                @FindBy(className = "input-phone"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-phone"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputPhone;
 

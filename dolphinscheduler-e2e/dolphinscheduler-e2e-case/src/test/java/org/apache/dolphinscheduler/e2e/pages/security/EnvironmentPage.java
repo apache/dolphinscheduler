@@ -31,10 +31,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-
-import lombok.Getter;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import lombok.Getter;
 
 @Getter
 public final class EnvironmentPage extends NavBarPage implements SecurityPage.Tab {
@@ -67,14 +67,14 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
         editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+            "n-base-select-option__content")));
         editEnvironmentForm().selectWorkerGroupList()
-                .stream()
-                .filter(it -> it.getText().contains(workerGroup))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
-                        workerGroup)))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(workerGroup))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+                workerGroup)))
+            .click();
 
         createEnvironmentForm().buttonSubmit().click();
         return this;
@@ -82,14 +82,13 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
     public EnvironmentPage update(String oldName, String name, String config, String desc, String workerGroup) {
         environmentList()
-                .stream()
-                .filter(it -> it.findElement(By.className("environment-name")).getAttribute("innerHTML").contains(oldName))
-                .flatMap(it -> it.findElements(By.className("edit")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No edit button in environment list"))
-                .click();
-
+            .stream()
+            .filter(it -> it.findElement(By.className("environment-name")).getAttribute("innerHTML").contains(oldName))
+            .flatMap(it -> it.findElements(By.className("edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in environment list"))
+            .click();
 
         editEnvironmentForm().inputEnvironmentName().sendKeys(Keys.CONTROL + "a");
         editEnvironmentForm().inputEnvironmentName().sendKeys(Keys.BACK_SPACE);
@@ -106,14 +105,14 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         if (editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML").equals(workerGroup)) {
             editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
             new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                    "n-base-select-option__content")));
+                "n-base-select-option__content")));
             editEnvironmentForm().selectWorkerGroupList()
-                    .stream()
-                    .filter(it -> it.getText().contains(workerGroup))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
-                            workerGroup)))
-                    .click();
+                .stream()
+                .filter(it -> it.getText().contains(workerGroup))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in worker group dropdown list",
+                    workerGroup)))
+                .click();
         }
 
         editEnvironmentForm().buttonSubmit().click();
@@ -123,13 +122,13 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
     public EnvironmentPage delete(String name) {
         environmentList()
-                .stream()
-                .filter(it -> it.getText().contains(name))
-                .flatMap(it -> it.findElements(By.className("delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in environment list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(name))
+            .flatMap(it -> it.findElements(By.className("delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No delete button in environment list"))
+            .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -161,8 +160,8 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         private WebElement inputEnvironmentDesc;
 
         @FindBys({
-                @FindBy(className = "input-environment-worker-group"),
-                @FindBy(className = "n-base-selection"),
+            @FindBy(className = "input-environment-worker-group"),
+            @FindBy(className = "n-base-selection"),
         })
         private WebElement btnSelectWorkerGroupDropdown;
 

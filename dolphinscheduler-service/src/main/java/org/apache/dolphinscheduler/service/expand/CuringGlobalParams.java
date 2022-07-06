@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
-import lombok.NonNull;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -31,8 +33,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -42,8 +42,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import lombok.NonNull;
 
 @Component
 public class CuringGlobalParams implements CuringParamsService {
@@ -68,6 +70,7 @@ public class CuringGlobalParams implements CuringParamsService {
 
     /**
      * here it is judged whether external expansion calculation is required and the calculation result is obtained
+     *
      * @param processInstanceId
      * @param globalParamMap
      * @param globalParamList
@@ -88,7 +91,7 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, String> allParamMap = new HashMap<>();
         //If it is a complement, a complement time needs to be passed in, according to the task type
         Map<String, String> timeParams = BusinessTimeUtils.
-                getBusinessTime(commandType, scheduleTime, timezone);
+            getBusinessTime(commandType, scheduleTime, timezone);
 
         if (timeParams != null) {
             allParamMap.putAll(timeParams);
@@ -130,7 +133,7 @@ public class CuringGlobalParams implements CuringParamsService {
     @Override
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters, @NonNull ProcessInstance processInstance) {
         // assign value to definedParams here
-        Map<String,String> globalParamsMap = setGlobalParamsMap(processInstance);
+        Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
         Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
         CommandType commandType = processInstance.getCmdTypeIfComplement();
         Date scheduleTime = processInstance.getScheduleTime();
@@ -149,7 +152,7 @@ public class CuringGlobalParams implements CuringParamsService {
         // of the process instance complement
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
-        Map<String,String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
+        Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
         if (globalParamsMap != null) {
             params.putAll(globalParamsMap);
@@ -183,7 +186,7 @@ public class CuringGlobalParams implements CuringParamsService {
                 if (timeFunctionNeedExpand(val)) {
                     val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
                 } else {
-                    val  = convertParameterPlaceholders(val, params);
+                    val = convertParameterPlaceholders(val, params);
                 }
                 property.setValue(val);
             }

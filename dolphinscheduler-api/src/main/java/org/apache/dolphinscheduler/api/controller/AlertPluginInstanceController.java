@@ -73,9 +73,9 @@ public class AlertPluginInstanceController extends BaseController {
     /**
      * create alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginDefineId alert plugin define id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginDefineId       alert plugin define id
+     * @param instanceName         instance name
      * @param pluginInstanceParams instance params
      * @return result
      */
@@ -100,9 +100,9 @@ public class AlertPluginInstanceController extends BaseController {
     /**
      * updateAlertPluginInstance
      *
-     * @param loginUser login user
-     * @param id alert plugin instance id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param id                   alert plugin instance id
+     * @param instanceName         instance name
      * @param pluginInstanceParams instance params
      * @return result
      */
@@ -128,7 +128,7 @@ public class AlertPluginInstanceController extends BaseController {
      * deleteAlertPluginInstance
      *
      * @param loginUser login user
-     * @param id id
+     * @param id        id
      * @return result
      */
     @ApiOperation(value = "deleteAlertPluginInstance", notes = "DELETE_ALERT_PLUGIN_INSTANCE_NOTES")
@@ -150,7 +150,7 @@ public class AlertPluginInstanceController extends BaseController {
      * getAlertPluginInstance
      *
      * @param loginUser login user
-     * @param id alert plugin instance id
+     * @param id        alert plugin instance id
      * @return result
      */
     @ApiOperation(value = "getAlertPluginInstance", notes = "GET_ALERT_PLUGIN_INSTANCE_NOTES")
@@ -183,7 +183,7 @@ public class AlertPluginInstanceController extends BaseController {
     /**
      * check alert group exist
      *
-     * @param loginUser login user
+     * @param loginUser         login user
      * @param alertInstanceName alert instance name
      * @return check result code
      */
@@ -211,8 +211,8 @@ public class AlertPluginInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return alert plugin instance list page
      */
     @ApiOperation(value = "queryAlertPluginInstanceListPaging", notes = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")

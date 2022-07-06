@@ -90,18 +90,18 @@ public final class AlertSenderService extends Thread {
             }
             AlertData alertData = new AlertData();
             alertData.setId(alertId)
-                    .setContent(alert.getContent())
-                    .setLog(alert.getLog())
-                    .setTitle(alert.getTitle())
-                    .setTitle(alert.getTitle())
-                    .setWarnType(alert.getWarningType().getCode());
+                .setContent(alert.getContent())
+                .setLog(alert.getLog())
+                .setTitle(alert.getTitle())
+                .setTitle(alert.getTitle())
+                .setWarnType(alert.getWarningType().getCode());
 
             int sendSuccessCount = 0;
             for (AlertPluginInstance instance : alertInstanceList) {
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
                     AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alertId,instance.getId());
+                    alertDao.addAlertSendStatus(sendStatus, alertResult.getMessage(), alertId, instance.getId());
                     if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
                         sendSuccessCount++;
                     }
@@ -129,8 +129,8 @@ public final class AlertSenderService extends Thread {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
         alertData.setContent(content)
-                .setTitle(title)
-                .setWarnType(warnType);
+            .setTitle(title)
+            .setWarnType(warnType);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -149,7 +149,7 @@ public final class AlertSenderService extends Thread {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
             if (alertResult != null) {
                 AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                        Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                    Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
                 sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
                 sendResponseResults.add(alertSendResponseResult);
             }
@@ -214,7 +214,7 @@ public final class AlertSenderService extends Thread {
 
         if (!sendWarning) {
             logger.info("Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}",
-                    pluginInstanceName, warningType.getCode(), alertData.getWarnType());
+                pluginInstanceName, warningType.getCode(), alertData.getWarnType());
             return null;
         }
 

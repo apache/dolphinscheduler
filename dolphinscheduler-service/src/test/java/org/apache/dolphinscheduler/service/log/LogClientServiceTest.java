@@ -74,7 +74,7 @@ public class LogClientServiceTest {
         Command command = new Command();
         command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand("")).getBytes(StandardCharsets.UTF_8));
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-                .thenReturn(command);
+            .thenReturn(command);
         LogClientService logClientService = new LogClientService();
         String log = logClientService.viewLog(localMachine, port, path);
         Assert.assertNotNull(log);
@@ -98,7 +98,7 @@ public class LogClientServiceTest {
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new RollViewLogResponseCommand("success")));
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-                .thenReturn(command);
+            .thenReturn(command);
 
         LogClientService logClientService = new LogClientService();
         String msg = logClientService.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
@@ -113,7 +113,7 @@ public class LogClientServiceTest {
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new GetLogBytesResponseCommand("log".getBytes(StandardCharsets.UTF_8))));
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-                .thenReturn(command);
+            .thenReturn(command);
 
         LogClientService logClientService = new LogClientService();
         byte[] logBytes = logClientService.getLogBytes("localhost", 1234, "/tmp/log");
@@ -128,7 +128,7 @@ public class LogClientServiceTest {
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new RemoveTaskLogResponseCommand(true)));
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-                .thenReturn(command);
+            .thenReturn(command);
 
         LogClientService logClientService = new LogClientService();
         Boolean status = logClientService.removeTaskLog("localhost", 1234, "/log/path");

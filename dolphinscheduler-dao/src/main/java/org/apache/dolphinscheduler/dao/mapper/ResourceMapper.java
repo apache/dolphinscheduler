@@ -33,9 +33,10 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * query resource list
+     *
      * @param fullName full name
-     * @param userId userId
-     * @param type type
+     * @param userId   userId
+     * @param type     type
      * @return resource list
      */
     List<Resource> queryResourceList(@Param("fullName") String fullName,
@@ -44,8 +45,9 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * query resource list
+     *
      * @param userId userId
-     * @param type type
+     * @param type   type
      * @return resource list
      */
     List<Resource> queryResourceListAuthored(@Param("userId") int userId,
@@ -53,12 +55,13 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * resource page
-     * @param page page
-     * @param userId userId
-     * @param id id
-     * @param type type
+     *
+     * @param page      page
+     * @param userId    userId
+     * @param id        id
+     * @param type      type
      * @param searchVal searchVal
-     * @param resIds resIds
+     * @param resIds    resIds
      * @return resource page
      */
     IPage<Resource> queryResourcePaging(IPage<Resource> page,
@@ -68,7 +71,8 @@ public interface ResourceMapper extends BaseMapper<Resource> {
                                         @Param("resIds") List<Integer> resIds);
 
     /**
-     *  query resource except userId
+     * query resource except userId
+     *
      * @param userId userId
      * @return resource list
      */
@@ -76,15 +80,17 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * list authorized resource
-     * @param userId userId
+     *
+     * @param userId   userId
      * @param resNames resNames
-     * @param <T> T
+     * @param <T>      T
      * @return resource list
      */
     <T> List<Resource> listAuthorizedResource(@Param("userId") int userId, @Param("resNames") T[] resNames);
 
     /**
      * list resources by id
+     *
      * @param resIds resIds
      * @return resource list
      */
@@ -92,22 +98,25 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * list authorized resource
+     *
      * @param userId userId
      * @param resIds resIds
-     * @param <T> T
+     * @param <T>    T
      * @return resource list
      */
-    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
+    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId, @Param("resIds") T[] resIds);
 
     /**
      * delete resource by id array
+     *
      * @param resIds resource id array
      * @return delete num
      */
-    int deleteIds(@Param("resIds")Integer[] resIds);
+    int deleteIds(@Param("resIds") Integer[] resIds);
 
     /**
      * list children
+     *
      * @param direcotyId directory id
      * @return resource id array
      */
@@ -115,41 +124,46 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * query resource by full name or pid
-     * @param fullName  full name
-     * @param type      resource type
+     *
+     * @param fullName full name
+     * @param type     resource type
      * @return resource
      */
-    List<Resource> queryResource(@Param("fullName") String fullName,@Param("type") int type);
+    List<Resource> queryResource(@Param("fullName") String fullName, @Param("type") int type);
 
     /**
      * list resource by id array
+     *
      * @param resIds resource id array
      * @return resource list
      */
-    List<Resource> listResourceByIds(@Param("resIds")Integer[] resIds);
+    List<Resource> listResourceByIds(@Param("resIds") Integer[] resIds);
 
     /**
      * update resource
-     * @param resourceList  resource list
+     *
+     * @param resourceList resource list
      * @return update num
      */
     int batchUpdateResource(@Param("resourceList") List<Resource> resourceList);
 
     /**
      * check resource exist
+     *
      * @param fullName full name
-     * @param userId userId
-     * @param type type
+     * @param userId   userId
+     * @param type     type
      * @return true if exist else return null
      */
     Boolean existResourceByUser(@Param("fullName") String fullName,
-                              @Param("userId") int userId,
-                              @Param("type") int type);
+                                @Param("userId") int userId,
+                                @Param("type") int type);
 
     /**
      * check resource exist
+     *
      * @param fullName full name
-     * @param type type
+     * @param type     type
      * @return true if exist else return null
      */
     Boolean existResource(@Param("fullName") String fullName,

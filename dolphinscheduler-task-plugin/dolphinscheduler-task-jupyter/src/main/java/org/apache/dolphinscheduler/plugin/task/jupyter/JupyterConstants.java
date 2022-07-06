@@ -36,9 +36,9 @@ public class JupyterConstants {
     /**
      * create and activate conda env from tar
      */
-    public static final String CREATE_ENV_FROM_TAR = "mkdir jupyter_env && " +
-            "tar -xzf %s -C jupyter_env && " +
-            "source jupyter_env/bin/activate";
+    public static final String CREATE_ENV_FROM_TAR = "mkdir jupyter_env && "
+        + "tar -xzf %s -C jupyter_env && "
+        + "source jupyter_env/bin/activate";
 
     /**
      * file suffix tar.gz

@@ -82,12 +82,12 @@ public class K8sTaskMainParameters {
     @Override
     public String toString() {
         return "K8sTaskMainParameters{"
-             + "image='" + image + '\''
-             + ", namespaceName='" + namespaceName + '\''
-             + ", clusterName='" + clusterName + '\''
-             + ", minCpuCores=" + minCpuCores
-             + ", minMemorySpace=" + minMemorySpace
-             + ", paramsMap=" + paramsMap
-             + '}';
+            + "image='" + image + '\''
+            + ", namespaceName='" + namespaceName + '\''
+            + ", clusterName='" + clusterName + '\''
+            + ", minCpuCores=" + minCpuCores
+            + ", minMemorySpace=" + minMemorySpace
+            + ", paramsMap=" + paramsMap
+            + '}';
     }
 }

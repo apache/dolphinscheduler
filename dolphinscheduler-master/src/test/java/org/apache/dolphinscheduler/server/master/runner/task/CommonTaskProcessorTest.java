@@ -107,7 +107,7 @@ public class CommonTaskProcessorTest {
         resource.setFileName("fileName");
         resourcesList.add(resource);
 
-        Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
+        Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[] {123});
         Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
         Assert.assertNotNull(map);
 

@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.mockito.Mockito;
 
@@ -44,10 +43,10 @@ public class ExecutionContextTestUtils {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildProcessInstanceRelatedInfo(processInstance)
-                .buildProcessDefinitionRelatedInfo(processDefinition)
-                .create();
+            .buildTaskInstanceRelatedInfo(taskInstance)
+            .buildProcessInstanceRelatedInfo(processInstance)
+            .buildProcessDefinitionRelatedInfo(processDefinition)
+            .create();
 
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(context);
         Command command = requestCommand.convert2Command();

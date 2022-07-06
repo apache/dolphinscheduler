@@ -25,6 +25,7 @@ package org.apache.dolphinscheduler.alert.api;
 public interface AlertChannel {
     /**
      * process and send alert
+     *
      * @param info alert info
      * @return process alarm result
      */

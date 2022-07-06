@@ -68,7 +68,7 @@ public class AuditPublishService {
     }
 
     /**
-     *  subscribers execute the message processor method
+     * subscribers execute the message processor method
      */
     private void doPublish() {
         AuditMessage message = null;

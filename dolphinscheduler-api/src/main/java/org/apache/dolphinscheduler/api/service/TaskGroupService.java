@@ -66,7 +66,7 @@ public interface TaskGroupService {
      * @param pageSize  page size
      * @return the result code and msg
      */
-    Map<String, Object> queryAllTaskGroup(User loginUser, String name,Integer status, int pageNo, int pageSize);
+    Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize);
 
     /**
      * query all task group by status
@@ -82,10 +82,10 @@ public interface TaskGroupService {
     /**
      * query all task group by name
      *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param projectCode  project code
+     * @param loginUser   login user
+     * @param pageNo      page no
+     * @param pageSize    page size
+     * @param projectCode project code
      * @return the result code and msg
      */
     Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode);

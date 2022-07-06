@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -48,9 +47,9 @@ class QueueE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
-                .goToNav(SecurityPage.class)
-                .goToTab(QueuePage.class)
+            .login("admin", "dolphinscheduler123")
+            .goToNav(SecurityPage.class)
+            .goToTab(QueuePage.class)
         ;
     }
 
@@ -63,9 +62,9 @@ class QueueE2ETest {
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.queueList())
-                    .as("Queue list should contain newly-created queue")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(queueName));
+                .as("Queue list should contain newly-created queue")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(queueName));
         });
     }
 
@@ -76,8 +75,8 @@ class QueueE2ETest {
         page.create(queueName, queueValue);
 
         await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
+            assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists")
         );
 
         page.createQueueForm().buttonCancel().click();
@@ -93,9 +92,9 @@ class QueueE2ETest {
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.queueList())
-                    .as("Queue list should contain newly-modified Queue")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(editQueueName));
+                .as("Queue list should contain newly-modified Queue")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(editQueueName));
         });
     }
 

@@ -20,15 +20,14 @@
 
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
-import lombok.Getter;
-
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -39,9 +38,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
-import java.util.List;
-
+import lombok.Getter;
 
 @Getter
 public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
@@ -74,8 +71,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     private WebElement buttonConfirm;
 
     @FindBys({
-            @FindBy(className = "monaco-editor"),
-            @FindBy(className = "view-line"),
+        @FindBy(className = "monaco-editor"),
+        @FindBy(className = "view-line"),
     })
     private WebElement editor;
 
@@ -113,7 +110,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         return this;
     }
 
-    public FileManagePage rename(String currentName, String AfterName) {
+    public FileManagePage rename(String currentName, String afterName) {
         fileList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
@@ -125,7 +122,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         renameBox().inputName().sendKeys(Keys.CONTROL + "a");
         renameBox().inputName().sendKeys(Keys.BACK_SPACE);
-        renameBox().inputName().sendKeys(AfterName);
+        renameBox().inputName().sendKeys(afterName);
         renameBox().buttonSubmit().click();
 
         return this;
@@ -225,14 +222,14 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-directory-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-directory-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputDirectoryName;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
@@ -250,14 +247,14 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputName;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
@@ -275,8 +272,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-file-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-file-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputFileName;
 
@@ -311,8 +308,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "btn-upload"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "btn-upload"),
+            @FindBy(tagName = "input"),
         })
         private WebElement buttonUpload;
 

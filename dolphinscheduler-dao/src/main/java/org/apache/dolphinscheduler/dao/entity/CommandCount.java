@@ -75,8 +75,8 @@ public class CommandCount {
     @Override
     public String toString() {
         return "CommandCount{"
-                + "commandType=" + commandType
-                + ", count=" + count
-                + '}';
+            + "commandType=" + commandType
+            + ", count=" + count
+            + '}';
     }
 }

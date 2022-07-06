@@ -46,15 +46,15 @@ public class TaskCountDto {
 
     private void countTaskDtos(List<ExecuteStatusCount> taskInstanceStateCounts) {
         Map<ExecutionStatus, Integer> statusCountMap = taskInstanceStateCounts.stream()
-                .collect(Collectors.toMap(ExecuteStatusCount::getExecutionStatus, ExecuteStatusCount::getCount, Integer::sum));
+            .collect(Collectors.toMap(ExecuteStatusCount::getExecutionStatus, ExecuteStatusCount::getCount, Integer::sum));
 
         taskCountDtos = Arrays.stream(ExecutionStatus.values())
-                .map(status -> new TaskStateCount(status, statusCountMap.getOrDefault(status, 0)))
-                .collect(Collectors.toList());
+            .map(status -> new TaskStateCount(status, statusCountMap.getOrDefault(status, 0)))
+            .collect(Collectors.toList());
 
         totalCount = taskCountDtos.stream()
-                .mapToInt(TaskStateCount::getCount)
-                .sum();
+            .mapToInt(TaskStateCount::getCount)
+            .sum();
     }
 
     // remove the specified state

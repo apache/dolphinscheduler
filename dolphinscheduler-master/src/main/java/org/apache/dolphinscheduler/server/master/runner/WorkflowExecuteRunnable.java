@@ -324,14 +324,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     public String getKey() {
         if (StringUtils.isNotEmpty(key)
-                || this.processDefinition == null) {
+            || this.processDefinition == null) {
             return key;
         }
 
         key = String.format("%d_%d_%d",
-                this.processDefinition.getCode(),
-                this.processDefinition.getVersion(),
-                this.processInstance.getId());
+            this.processDefinition.getCode(),
+            this.processDefinition.getVersion(),
+            this.processInstance.getId());
         return key;
     }
 
@@ -444,7 +444,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 } else {
                     ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
                     this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
-                            org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
+                        org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
                 }
             }
         }
@@ -469,12 +469,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         waitToRetryTaskInstanceMap.put(newTaskInstance.getTaskCode(), newTaskInstance);
         if (!taskInstance.retryTaskIntervalOverTime()) {
             logger.info("failure task will be submitted: process id: {}, task instance code: {} state:{} retry times:{} / {}, interval:{}",
-                    processInstance.getId(),
-                    newTaskInstance.getTaskCode(),
-                    newTaskInstance.getState(),
-                    newTaskInstance.getRetryTimes(),
-                    newTaskInstance.getMaxRetryTimes(),
-                    newTaskInstance.getRetryInterval());
+                processInstance.getId(),
+                newTaskInstance.getTaskCode(),
+                newTaskInstance.getState(),
+                newTaskInstance.getRetryTimes(),
+                newTaskInstance.getMaxRetryTimes(),
+                newTaskInstance.getRetryInterval());
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, newTaskInstance);
             stateWheelExecuteThread.addTask4RetryCheck(processInstance, newTaskInstance);
         } else {
@@ -491,7 +491,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         logger.info("process instance update: {}", processInstanceId);
         processInstance = processService.findProcessInstanceById(processInstanceId);
         processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+            processInstance.getProcessDefinitionVersion());
         processInstance.setProcessDefinition(processDefinition);
     }
 
@@ -613,9 +613,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 return true;
             }
             logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
-                    processInstance.getId(),
-                    processInstance.getScheduleTime(),
-                    complementListDate);
+                processInstance.getId(),
+                processInstance.getScheduleTime(),
+                complementListDate);
             scheduleDate = complementListDate.get(index + 1);
         }
         //the next process complement
@@ -664,7 +664,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     private boolean needComplementProcess() {
         if (processInstance.isComplementData()
-                && Flag.NO == processInstance.getIsSubProcess()) {
+            && Flag.NO == processInstance.getIsSubProcess()) {
             return true;
         }
         return false;
@@ -719,11 +719,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     public void checkSerialProcess(ProcessDefinition processDefinition) {
         int nextInstanceId = processInstance.getNextProcessInstanceId();
         if (nextInstanceId == 0) {
-            ProcessInstance nextProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.SERIAL_WAIT.getCode(), processInstance.getId());
+            ProcessInstance nextProcessInstance =
+                this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.SERIAL_WAIT.getCode(), processInstance.getId());
             if (nextProcessInstance == null) {
                 return;
             }
-            ProcessInstance nextReadyStopProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.READY_STOP.getCode(), processInstance.getId());
+            ProcessInstance nextReadyStopProcessInstance =
+                this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.READY_STOP.getCode(), processInstance.getId());
             if (processDefinition.getExecutionType().typeIsSerialPriority() && nextReadyStopProcessInstance != null) {
                 return;
             }
@@ -754,7 +756,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return;
         }
         processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+            processInstance.getProcessDefinitionVersion());
         processInstance.setProcessDefinition(processDefinition);
 
         List<TaskInstance> recoverNodeList = getRecoverTaskInstanceList(processInstance.getCommandParam());
@@ -774,7 +776,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         List<String> recoveryNodeCodeList = getRecoveryNodeCodeList(recoverNodeList);
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
         ProcessDag processDag = generateFlowDag(taskNodeList,
-                startNodeNameList, recoveryNodeCodeList, processInstance.getTaskDependType());
+            startNodeNameList, recoveryNodeCodeList, processInstance.getTaskDependType());
         if (processDag == null) {
             logger.error("processDag is null");
             return;
@@ -857,14 +859,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         complementListDate = CronUtils.getSelfScheduleDateList(cmdParam);
                     }
                     logger.info(" process definition code:{} complement data: {}",
-                            processInstance.getProcessDefinitionCode(), complementListDate);
+                        processInstance.getProcessDefinitionCode(), complementListDate);
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
                         processInstance.setScheduleTime(complementListDate.get(0));
                         String globalParams = curingParamsService.curingGlobalParams(processInstance.getId(),
-                                processDefinition.getGlobalParamMap(),
-                                processDefinition.getGlobalParamList(),
-                                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));
+                            processDefinition.getGlobalParamMap(),
+                            processDefinition.getGlobalParamList(),
+                            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));
                         processInstance.setGlobalParams(globalParams);
                         processService.updateProcessInstance(processInstance);
                     }
@@ -888,15 +890,15 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             taskProcessor.init(taskInstance, processInstance);
 
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
-                    && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
+                && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
 
             boolean submit = taskProcessor.action(TaskAction.SUBMIT);
             if (!submit) {
                 logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
-                        processInstance.getId(), processInstance.getName(),
-                        taskInstance.getId(), taskInstance.getName());
+                    processInstance.getId(), processInstance.getName(),
+                    taskInstance.getId(), taskInstance.getName());
                 return Optional.empty();
             }
 
@@ -1374,10 +1376,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private ExecutionStatus runningState(ExecutionStatus state) {
         if (state == ExecutionStatus.READY_STOP
-                || state == ExecutionStatus.READY_PAUSE
-                || state == ExecutionStatus.WAITING_THREAD
-                || state == ExecutionStatus.READY_BLOCK
-                || state == ExecutionStatus.DELAY_EXECUTION) {
+            || state == ExecutionStatus.READY_PAUSE
+            || state == ExecutionStatus.WAITING_THREAD
+            || state == ExecutionStatus.READY_BLOCK
+            || state == ExecutionStatus.DELAY_EXECUTION) {
             // if the running task is not completed, the state remains unchanged
             return state;
         } else {
@@ -1413,8 +1415,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
                 return readyToSubmitTaskQueue.size() == 0
-                        && activeTaskProcessorMaps.size() == 0
-                        && waitToRetryTaskInstanceMap.size() == 0;
+                    && activeTaskProcessorMaps.size() == 0
+                    && waitToRetryTaskInstanceMap.size() == 0;
             }
         }
         return false;
@@ -1445,9 +1447,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
         if (CollectionUtils.isNotEmpty(pauseList)
-                || processInstance.isBlocked()
-                || !isComplementEnd()
-                || readyToSubmitTaskQueue.size() > 0) {
+            || processInstance.isBlocked()
+            || !isComplementEnd()
+            || readyToSubmitTaskQueue.size() > 0) {
             return ExecutionStatus.PAUSE;
         } else {
             return ExecutionStatus.SUCCESS;
@@ -1512,9 +1514,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
             List<TaskInstance> failList = getCompleteTaskByState(ExecutionStatus.FAILURE);
             if (CollectionUtils.isNotEmpty(stopList)
-                    || CollectionUtils.isNotEmpty(killList)
-                    || CollectionUtils.isNotEmpty(failList)
-                    || !isComplementEnd()) {
+                || CollectionUtils.isNotEmpty(killList)
+                || CollectionUtils.isNotEmpty(failList)
+                || !isComplementEnd()) {
                 return ExecutionStatus.STOP;
             } else {
                 return ExecutionStatus.SUCCESS;

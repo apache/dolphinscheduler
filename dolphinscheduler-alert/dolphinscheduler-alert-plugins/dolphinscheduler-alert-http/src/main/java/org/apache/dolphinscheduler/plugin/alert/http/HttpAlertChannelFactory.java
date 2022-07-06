@@ -39,39 +39,39 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
 
         InputParam url = InputParam.newBuilder(HttpAlertConstants.NAME_URL, HttpAlertConstants.URL)
-                                   .setPlaceholder("input request URL")
-                                   .addValidate(Validate.newBuilder()
-                                                        .setRequired(true)
-                                                        .build())
-                                   .build();
+            .setPlaceholder("input request URL")
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         InputParam headerParams = InputParam.newBuilder(HttpAlertConstants.NAME_HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
-                                            .setPlaceholder("input request headers as JSON format ")
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
+            .setPlaceholder("input request headers as JSON format ")
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         InputParam bodyParams = InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
-                                          .setPlaceholder("input request body as JSON format ")
-                                          .addValidate(Validate.newBuilder()
-                                                               .setRequired(false)
-                                                               .build())
-                                          .build();
+            .setPlaceholder("input request body as JSON format ")
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .build();
 
         InputParam contentField = InputParam.newBuilder(HttpAlertConstants.NAME_CONTENT_FIELD, HttpAlertConstants.CONTENT_FIELD)
-                                            .setPlaceholder("input alert msg field name")
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
+            .setPlaceholder("input alert msg field name")
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         InputParam requestType = InputParam.newBuilder(HttpAlertConstants.NAME_REQUEST_TYPE, HttpAlertConstants.REQUEST_TYPE)
-                                           .setPlaceholder("input request type POST or GET")
-                                           .addValidate(Validate.newBuilder()
-                                                                .setRequired(true)
-                                                                .build())
-                                           .build();
+            .setPlaceholder("input request type POST or GET")
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         return Arrays.asList(url, requestType, headerParams, bodyParams, contentField);
     }

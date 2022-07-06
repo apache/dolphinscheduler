@@ -71,7 +71,7 @@ public class FileUtils {
      * get upload file absolute path and name
      *
      * @param tenantCode tenant code
-     * @param filename file name
+     * @param filename   file name
      * @return local file path
      */
     public static String getUploadFilename(String tenantCode, String filename) {
@@ -87,16 +87,16 @@ public class FileUtils {
     /**
      * directory of process execution
      *
-     * @param projectCode project code
-     * @param processDefineCode process definition Code
+     * @param projectCode          project code
+     * @param processDefineCode    process definition Code
      * @param processDefineVersion process definition version
-     * @param processInstanceId process instance id
-     * @param taskInstanceId task instance id
+     * @param processInstanceId    process instance id
+     * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
     public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
         String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
-                projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
+            projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -143,7 +143,7 @@ public class FileUtils {
     /**
      * write content to file ,if parent path not exists, it will do one's utmost to mkdir
      *
-     * @param content content
+     * @param content  content
      * @param filePath target file path
      * @return true if write success
      */
@@ -230,7 +230,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return whether file path could be traversal or not
      */
-    public static boolean directoryTraversal(String filename){
+    public static boolean directoryTraversal(String filename) {
         if (filename.contains(FOLDER_SEPARATOR)) {
             return true;
         }

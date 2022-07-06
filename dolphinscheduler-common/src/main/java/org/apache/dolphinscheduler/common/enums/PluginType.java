@@ -28,7 +28,7 @@ public enum PluginType {
 
     ALERT(1, "alert", true),
     REGISTER(2, "register", false),
-    TASK(3,"task",true);
+    TASK(3, "task", true);
 
     PluginType(int code, String desc, boolean hasUi) {
         this.code = code;

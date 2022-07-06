@@ -44,7 +44,7 @@ public class ServiceException extends RuntimeException {
      * Construct a new runtime exception with the detail message and cause
      *
      * @param errMsg message
-     * @param cause cause
+     * @param cause  cause
      */
     public ServiceException(String errMsg, Throwable cause) {
         super(errMsg, cause);

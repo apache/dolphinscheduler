@@ -49,10 +49,10 @@ public class StateEventChangeCommand implements Serializable {
                                    int destTaskInstanceId
     ) {
         this.key = String.format("%d-%d-%d-%d",
-                sourceProcessInstanceId,
-                sourceTaskInstanceId,
-                destProcessInstanceId,
-                destTaskInstanceId);
+            sourceProcessInstanceId,
+            sourceTaskInstanceId,
+            destProcessInstanceId,
+            destTaskInstanceId);
 
         this.sourceStatus = sourceStatus;
         this.sourceProcessInstanceId = sourceProcessInstanceId;
@@ -85,8 +85,8 @@ public class StateEventChangeCommand implements Serializable {
     @Override
     public String toString() {
         return "StateEventResponseCommand{"
-                + "key=" + key
-                + '}';
+            + "key=" + key
+            + '}';
     }
 
     public ExecutionStatus getSourceStatus() {

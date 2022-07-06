@@ -74,8 +74,8 @@ public abstract class AbstractCycle {
     protected boolean minFiledIsSetAll() {
         FieldExpression minFieldExpression = minField.getExpression();
         return (minFieldExpression instanceof Every || minFieldExpression instanceof Always
-                || minFieldExpression instanceof Between || minFieldExpression instanceof And
-                || minFieldExpression instanceof On);
+            || minFieldExpression instanceof Between || minFieldExpression instanceof And
+            || minFieldExpression instanceof On);
     }
 
     /**
@@ -96,8 +96,8 @@ public abstract class AbstractCycle {
     protected boolean hourFiledIsSetAll() {
         FieldExpression hourFieldExpression = hourField.getExpression();
         return (hourFieldExpression instanceof Every || hourFieldExpression instanceof Always
-                || hourFieldExpression instanceof Between || hourFieldExpression instanceof And
-                || hourFieldExpression instanceof On);
+            || hourFieldExpression instanceof Between || hourFieldExpression instanceof And
+            || hourFieldExpression instanceof On);
     }
 
     /**
@@ -117,8 +117,8 @@ public abstract class AbstractCycle {
      */
     protected boolean dayOfMonthFieldIsSetAll() {
         return (dayOfMonthField.getExpression() instanceof Every || dayOfMonthField.getExpression() instanceof Always
-                || dayOfMonthField.getExpression() instanceof Between || dayOfMonthField.getExpression() instanceof And
-                || dayOfMonthField.getExpression() instanceof On);
+            || dayOfMonthField.getExpression() instanceof Between || dayOfMonthField.getExpression() instanceof And
+            || dayOfMonthField.getExpression() instanceof On);
     }
 
     /**
@@ -138,8 +138,8 @@ public abstract class AbstractCycle {
     protected boolean monthFieldIsSetAll() {
         FieldExpression monthFieldExpression = monthField.getExpression();
         return (monthFieldExpression instanceof Every || monthFieldExpression instanceof Always
-                || monthFieldExpression instanceof Between || monthFieldExpression instanceof And
-                || monthFieldExpression instanceof On);
+            || monthFieldExpression instanceof Between || monthFieldExpression instanceof And
+            || monthFieldExpression instanceof On);
     }
 
     /**
@@ -160,8 +160,8 @@ public abstract class AbstractCycle {
     protected boolean dayofWeekFieldIsSetAll() {
         FieldExpression dayOfWeekFieldExpression = dayOfWeekField.getExpression();
         return (dayOfWeekFieldExpression instanceof Every || dayOfWeekFieldExpression instanceof Always
-                || dayOfWeekFieldExpression instanceof Between || dayOfWeekFieldExpression instanceof And
-                || dayOfWeekFieldExpression instanceof On);
+            || dayOfWeekFieldExpression instanceof Between || dayOfWeekFieldExpression instanceof And
+            || dayOfWeekFieldExpression instanceof On);
     }
 
     /**
@@ -173,7 +173,7 @@ public abstract class AbstractCycle {
         FieldExpression dayOfWeekFieldExpression = dayOfWeekField.getExpression();
         return (dayOfWeekFieldExpression instanceof Every || dayOfWeekFieldExpression instanceof Always);
     }
-    
+
     /**
      * whether the year field has a value of every or always
      *

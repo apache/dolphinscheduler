@@ -34,8 +34,8 @@ public class TaskPriorityQueueException extends Exception {
     /**
      * Construct a new runtime exception with the detail message and cause
      *
-     * @param message   message
-     * @param cause     cause
+     * @param message message
+     * @param cause   cause
      */
     public TaskPriorityQueueException(String message, Throwable cause) {
         super(message, cause);

@@ -31,6 +31,7 @@ public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
 
     /**
      * delete datasource by userId
+     *
      * @param userId userId
      * @return delete result
      */
@@ -38,6 +39,7 @@ public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
 
     /**
      * delete datasource by id
+     *
      * @param datasourceId datasourceId
      * @return delete result
      */

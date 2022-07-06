@@ -103,10 +103,10 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                                    long sourceWorkFlowCode,
                                    List<WorkFlowLineage> workFlowLineages,
                                    Set<WorkFlowRelation> workFlowRelations) {
-        workFlowLineages.add(workFlowLineageMapper.queryWorkFlowLineageByCode(projectCode,sourceWorkFlowCode));
+        workFlowLineages.add(workFlowLineageMapper.queryWorkFlowLineageByCode(projectCode, sourceWorkFlowCode));
 
         List<WorkFlowLineage> downStreamWorkFlowLineages =
-                workFlowLineageMapper.queryDownstreamLineageByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
+            workFlowLineageMapper.queryDownstreamLineageByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
         workFlowLineages.addAll(downStreamWorkFlowLineages);
         downStreamWorkFlowLineages.forEach(workFlowLineage -> workFlowRelations.add(new WorkFlowRelation(sourceWorkFlowCode, workFlowLineage.getWorkFlowCode())));
 
@@ -119,16 +119,16 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     private void getUpstreamLineages(long sourceWorkFlowCode,
                                      List<WorkFlowLineage> upstreamWorkFlowLineages) {
         List<DependentProcessDefinition> workFlowDependentDefinitionList =
-                workFlowLineageMapper.queryUpstreamDependentParamsByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
+            workFlowLineageMapper.queryUpstreamDependentParamsByProcessDefinitionCode(sourceWorkFlowCode, "DEPENDENT");
 
         List<Long> upstreamProcessDefinitionCodes = new ArrayList<>();
 
         getProcessDefinitionCodeByDependentDefinitionList(workFlowDependentDefinitionList,
-                upstreamProcessDefinitionCodes);
+            upstreamProcessDefinitionCodes);
 
         if (!upstreamProcessDefinitionCodes.isEmpty()) {
             upstreamWorkFlowLineages.addAll(
-                    workFlowLineageMapper.queryWorkFlowLineageByProcessDefinitionCodes(upstreamProcessDefinitionCodes));
+                workFlowLineageMapper.queryWorkFlowLineageByProcessDefinitionCodes(upstreamProcessDefinitionCodes));
         }
     }
 

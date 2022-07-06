@@ -29,6 +29,7 @@ import java.util.List;
 public interface AlertChannelFactory {
     /**
      * Returns the name of the alert channel
+     *
      * @return the name of the alert channel
      */
     String name();

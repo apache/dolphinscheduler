@@ -39,9 +39,9 @@ public interface QueueService {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
     Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
@@ -50,7 +50,7 @@ public interface QueueService {
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
@@ -60,8 +60,8 @@ public interface QueueService {
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */

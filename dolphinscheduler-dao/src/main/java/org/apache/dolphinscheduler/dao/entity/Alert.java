@@ -250,17 +250,17 @@ public class Alert {
         }
         Alert alert = (Alert) o;
         return Objects.equals(id, alert.id)
-                && Objects.equals(alertGroupId, alert.alertGroupId)
-                && Objects.equals(sign, alert.sign)
-                && Objects.equals(title, alert.title)
-                && Objects.equals(content, alert.content)
-                && alertStatus == alert.alertStatus
-                && warningType == alert.warningType
-                && Objects.equals(log, alert.log)
-                && Objects.equals(createTime, alert.createTime)
-                && Objects.equals(updateTime, alert.updateTime)
-                && Objects.equals(info, alert.info)
-                ;
+            && Objects.equals(alertGroupId, alert.alertGroupId)
+            && Objects.equals(sign, alert.sign)
+            && Objects.equals(title, alert.title)
+            && Objects.equals(content, alert.content)
+            && alertStatus == alert.alertStatus
+            && warningType == alert.warningType
+            && Objects.equals(log, alert.log)
+            && Objects.equals(createTime, alert.createTime)
+            && Objects.equals(updateTime, alert.updateTime)
+            && Objects.equals(info, alert.info)
+            ;
     }
 
     @Override
@@ -271,17 +271,17 @@ public class Alert {
     @Override
     public String toString() {
         return "Alert{"
-                + "id=" + id
-                + ", sign='" + sign + '\''
-                + ", title='" + title + '\''
-                + ", content='" + content + '\''
-                + ", alertStatus=" + alertStatus
-                + ", warningType=" + warningType
-                + ", log='" + log + '\''
-                + ", alertGroupId=" + alertGroupId
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + ", info=" + info
-                + '}';
+            + "id=" + id
+            + ", sign='" + sign + '\''
+            + ", title='" + title + '\''
+            + ", content='" + content + '\''
+            + ", alertStatus=" + alertStatus
+            + ", warningType=" + warningType
+            + ", log='" + log + '\''
+            + ", alertGroupId=" + alertGroupId
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + ", info=" + info
+            + '}';
     }
 }

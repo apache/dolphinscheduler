@@ -45,6 +45,7 @@ public class BusinessTimeUtils {
      * @param runTime     run time or schedule time
      * @return business time
      */
+    @SuppressWarnings("checkstyle:FallThrough")
     public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime, String timezone) {
         Date businessDate = runTime;
         Map<String, String> result = new HashMap<>();
@@ -63,9 +64,7 @@ public class BusinessTimeUtils {
             default:
                 businessDate = addDays(new Date(), -1);
                 if (runTime != null) {
-                    /**
-                     * If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
-                     */
+                    // If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
                     businessDate = addDays(runTime, -1);
                 }
                 break;

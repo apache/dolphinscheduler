@@ -64,6 +64,7 @@ public class DataQualityController extends BaseController {
 
     /**
      * get rule from-create json
+     *
      * @param ruleId ruleId
      * @return from-create json
      */
@@ -84,8 +85,8 @@ public class DataQualityController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return rule page
      */
     @ApiOperation(value = "queryRuleListPaging", notes = "QUERY_RULE_LIST_PAGING_NOTES")
@@ -118,6 +119,7 @@ public class DataQualityController extends BaseController {
 
     /**
      * query all rule list
+     *
      * @return rule list
      */
     @ApiOperation(value = "queryRuleList", notes = "QUERY_RULE_LIST_NOTES")
@@ -134,12 +136,12 @@ public class DataQualityController extends BaseController {
      *
      * @param loginUser loginUser
      * @param searchVal searchVal
-     * @param ruleType ruleType
-     * @param state state
+     * @param ruleType  ruleType
+     * @param state     state
      * @param startTime startTime
-     * @param endTime endTime
-     * @param pageNo pageNo
-     * @param pageSize pageSize
+     * @param endTime   endTime
+     * @param pageNo    pageNo
+     * @param pageSize  pageSize
      * @return
      */
     @ApiOperation(value = "queryExecuteResultListPaging", notes = "QUERY_EXECUTE_RESULT_LIST_PAGING_NOTES")
@@ -156,13 +158,13 @@ public class DataQualityController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR)
     public Result queryExecuteResultListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "searchVal", required = false) String searchVal,
-                                       @RequestParam(value = "ruleType", required = false) Integer ruleType,
-                                       @RequestParam(value = "state", required = false) Integer state,
-                                       @RequestParam(value = "startDate", required = false) String startTime,
-                                       @RequestParam(value = "endDate", required = false) String endTime,
-                                       @RequestParam("pageNo") Integer pageNo,
-                                       @RequestParam("pageSize") Integer pageSize) {
+                                               @RequestParam(value = "searchVal", required = false) String searchVal,
+                                               @RequestParam(value = "ruleType", required = false) Integer ruleType,
+                                               @RequestParam(value = "state", required = false) Integer state,
+                                               @RequestParam(value = "startDate", required = false) String startTime,
+                                               @RequestParam(value = "endDate", required = false) String endTime,
+                                               @RequestParam("pageNo") Integer pageNo,
+                                               @RequestParam("pageSize") Integer pageSize) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -175,6 +177,7 @@ public class DataQualityController extends BaseController {
 
     /**
      * get datasource options by id
+     *
      * @param datasourceId datasourceId
      * @return result
      */

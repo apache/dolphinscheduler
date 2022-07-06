@@ -21,12 +21,14 @@ import java.util.Collection;
 
 /**
  * selector
+ *
  * @param <T> T
  */
 public interface Selector<T> {
 
     /**
      * select
+     *
      * @param source source, the given source should not be empty.
      * @return T
      */

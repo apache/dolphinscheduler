@@ -23,9 +23,10 @@ package org.apache.dolphinscheduler.common;
 public interface IStoppable {
 
     /**
-    * Stop this service.
-    * @param cause why stopping
-    */
+     * Stop this service.
+     *
+     * @param cause why stopping
+     */
     void stop(String cause);
 
 }

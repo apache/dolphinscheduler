@@ -28,27 +28,27 @@ public class DataxParametersTest {
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
     @Test
-    public void testLoadJvmEnv()   {
+    public void testLoadJvmEnv() {
 
         DataxParameters dataxParameters = new DataxParameters();
         dataxParameters.setXms(0);
         dataxParameters.setXmx(-100);
 
-        String actual =  loadJvmEnvTest(dataxParameters);
+        String actual = loadJvmEnvTest(dataxParameters);
 
         String except = " --jvm=\"-Xms1G -Xmx1G\" ";
-        Assert.assertEquals(except,actual);
+        Assert.assertEquals(except, actual);
 
         dataxParameters.setXms(13);
         dataxParameters.setXmx(14);
-        actual =  loadJvmEnvTest(dataxParameters);
+        actual = loadJvmEnvTest(dataxParameters);
         except = " --jvm=\"-Xms13G -Xmx14G\" ";
-        Assert.assertEquals(except,actual);
+        Assert.assertEquals(except, actual);
 
     }
 
     @Test
-    public void testToString()   {
+    public void testToString() {
 
         DataxParameters dataxParameters = new DataxParameters();
         dataxParameters.setCustomConfig(0);
@@ -63,24 +63,24 @@ public class DataxParametersTest {
         dataxParameters.setJson("json");
 
         String expected = "DataxParameters"
-                + "{"
-                + "customConfig=0, "
-                + "json='json', "
-                + "dsType='MYSQL', "
-                + "dataSource=1, "
-                + "dtType='MYSQL', "
-                + "dataTarget=1, "
-                + "sql='null', "
-                + "targetTable='null', "
-                + "preStatements=null, "
-                + "postStatements=null, "
-                + "jobSpeedByte=1, "
-                + "jobSpeedRecord=1, "
-                + "xms=0, "
-                + "xmx=-100"
-                + "}";
+            + "{"
+            + "customConfig=0, "
+            + "json='json', "
+            + "dsType='MYSQL', "
+            + "dataSource=1, "
+            + "dtType='MYSQL', "
+            + "dataTarget=1, "
+            + "sql='null', "
+            + "targetTable='null', "
+            + "preStatements=null, "
+            + "postStatements=null, "
+            + "jobSpeedByte=1, "
+            + "jobSpeedRecord=1, "
+            + "xms=0, "
+            + "xmx=-100"
+            + "}";
 
-        Assert.assertEquals(expected,dataxParameters.toString());
+        Assert.assertEquals(expected, dataxParameters.toString());
     }
 
     public String loadJvmEnvTest(DataxParameters dataXParameters) {

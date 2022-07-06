@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -43,9 +44,10 @@ public class UDFUserMapperTest extends BaseDaoTest {
 
     /**
      * insert
+     *
      * @return UDFUser
      */
-    private UDFUser insertOne(){
+    private UDFUser insertOne() {
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(1);
         udfUser.setUserId(1);
@@ -57,11 +59,12 @@ public class UDFUserMapperTest extends BaseDaoTest {
 
     /**
      * insert UDFUser
-     * @param user user
-     * @param udfFunc  udfFunc
+     *
+     * @param user    user
+     * @param udfFunc udfFunc
      * @return UDFUser
      */
-    private UDFUser insertOne(User user,UdfFunc udfFunc){
+    private UDFUser insertOne(User user, UdfFunc udfFunc) {
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(udfFunc.getId());
         udfUser.setUserId(user.getId());
@@ -71,12 +74,12 @@ public class UDFUserMapperTest extends BaseDaoTest {
         return udfUser;
     }
 
-
     /**
      * insert one user
+     *
      * @return User
      */
-    private User insertOneUser(){
+    private User insertOneUser() {
         User user = new User();
         user.setUserName("user1");
         user.setUserPassword("1");
@@ -92,9 +95,10 @@ public class UDFUserMapperTest extends BaseDaoTest {
 
     /**
      * insert one udf
+     *
      * @return UdfFunc
      */
-    private UdfFunc insertOneUdfFunc(){
+    private UdfFunc insertOneUdfFunc() {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setFuncName("dolphin_udf_func");
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
@@ -111,7 +115,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOneUser
         User user = insertOneUser();
         //insertOneUdfFunc
@@ -129,7 +133,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         //insertOneUser
         User user = insertOneUser();
         //insertOneUdfFunc
@@ -144,7 +148,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * test query
      */
     @Test
-    public void testQuery(){
+    public void testQuery() {
         //insertOne
         UDFUser udfUser = insertOne();
         //query

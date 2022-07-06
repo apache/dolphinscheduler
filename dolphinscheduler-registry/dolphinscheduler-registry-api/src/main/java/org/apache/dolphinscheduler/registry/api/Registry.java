@@ -20,7 +20,6 @@
 package org.apache.dolphinscheduler.registry.api;
 
 import java.io.Closeable;
-import java.time.Duration;
 import java.util.Collection;
 
 public interface Registry extends Closeable {

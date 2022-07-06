@@ -36,7 +36,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 @DolphinScheduler(composeFiles = "docker/datasource-clickhouse/docker-compose.yaml")
 public class ClickhouseDataSourceE2ETest {
     private static RemoteWebDriver browser;
@@ -64,7 +63,6 @@ public class ClickhouseDataSourceE2ETest {
     private static final String database = "ch_test";
 
     private static final String jdbcParams = "";
-
 
     @BeforeAll
     public static void setup() {

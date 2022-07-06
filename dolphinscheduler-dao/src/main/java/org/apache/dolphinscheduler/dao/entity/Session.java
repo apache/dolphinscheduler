@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 /**
  * session
@@ -31,7 +32,7 @@ public class Session {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private String id;
 
     /**
@@ -83,12 +84,12 @@ public class Session {
 
     @Override
     public String toString() {
-        return "Session{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", ip='" + ip + '\'' +
-                ", lastLoginTime=" + lastLoginTime +
-                '}';
+        return "Session{"
+            + "id=" + id
+            + ", userId=" + userId
+            + ", ip='" + ip + '\''
+            + ", lastLoginTime=" + lastLoginTime
+            + '}';
     }
 
     @Override

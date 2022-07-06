@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.common.exception;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ExceptionTest {
 
     @Test
-    public void testException(){
+    public void testException() {
         final String message = "Test";
         RuntimeException time = new RuntimeException(message);
 

@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,8 +49,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-
 @ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -64,7 +64,7 @@ public class LoginHandlerInterceptorTest {
     @MockBean(name = "authenticator")
     private Authenticator authenticator;
     @MockBean(name = "userMapper")
-    private UserMapper    userMapper;
+    private UserMapper userMapper;
 
     @Test
     public void testPreHandle() {

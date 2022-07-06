@@ -36,7 +36,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 @DolphinScheduler(composeFiles = "docker/datasource-postgresql/docker-compose.yaml")
 public class PostgresDataSourceE2ETest {
     private static RemoteWebDriver browser;
@@ -64,7 +63,6 @@ public class PostgresDataSourceE2ETest {
     private static final String database = "postgres";
 
     private static final String jdbcParams = "";
-
 
     @BeforeAll
     public static void setup() {

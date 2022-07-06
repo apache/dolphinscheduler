@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
@@ -196,7 +197,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc = insertOne();
         //insertOne
         UdfFunc udfFunc1 = insertOne();
-        Integer[] idArray = new Integer[]{udfFunc.getId(), udfFunc1.getId()};
+        Integer[] idArray = new Integer[] {udfFunc.getId(), udfFunc1.getId()};
         //queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");
         Assert.assertNotEquals(udfFuncList.size(), 0);
@@ -279,14 +280,13 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc unauthorizdUdfFunc = insertOne(generalUser2);
 
         //udf function ids
-        Integer[] udfFuncIds = new Integer[]{udfFunc.getId(), unauthorizdUdfFunc.getId()};
+        Integer[] udfFuncIds = new Integer[] {udfFunc.getId(), unauthorizdUdfFunc.getId()};
 
         List<UdfFunc> authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
 
         Assert.assertEquals(generalUser1.getId(), udfFunc.getUserId());
         Assert.assertNotEquals(generalUser1.getId(), unauthorizdUdfFunc.getUserId());
         Assert.assertFalse(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(udfFuncIds)));
-
 
         //authorize object unauthorizdUdfFunc to generalUser1
         insertOneUDFUser(generalUser1, unauthorizdUdfFunc);

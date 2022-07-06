@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.io.IOException;
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -24,11 +30,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.google.common.base.Strings;
-import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.io.IOException;
-import java.util.Date;
 
 /**
  * udf function
@@ -199,7 +200,6 @@ public class UdfFunc {
         this.createTime = createTime;
     }
 
-
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -246,7 +246,7 @@ public class UdfFunc {
         return JSONUtils.toJsonString(this);
     }
 
-    public static  class UdfFuncDeserializer extends KeyDeserializer {
+    public static class UdfFuncDeserializer extends KeyDeserializer {
 
         @Override
         public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {

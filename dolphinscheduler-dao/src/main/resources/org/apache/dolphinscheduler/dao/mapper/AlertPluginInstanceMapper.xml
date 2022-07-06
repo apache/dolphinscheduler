@@ -20,7 +20,8 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper">
 
     <sql id="baseSql">
-        id, plugin_define_id, plugin_instance_params, create_time, update_time, instance_name
+        id
+        , plugin_define_id, plugin_instance_params, create_time, update_time, instance_name
     </sql>
 
 

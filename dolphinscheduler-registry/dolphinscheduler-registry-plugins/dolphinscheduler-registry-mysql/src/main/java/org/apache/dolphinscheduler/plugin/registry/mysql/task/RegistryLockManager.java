@@ -55,15 +55,15 @@ public class RegistryLockManager implements AutoCloseable {
         this.mysqlOperator = mysqlOperator;
         this.lockHoldMap = new ConcurrentHashMap<>();
         this.lockTermUpdateThreadPool = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("MysqlRegistryLockTermRefreshThread").setDaemon(true).build());
+            new ThreadFactoryBuilder().setNameFormat("MysqlRegistryLockTermRefreshThread").setDaemon(true).build());
     }
 
     public void start() {
         lockTermUpdateThreadPool.scheduleWithFixedDelay(
-                new LockTermRefreshTask(lockHoldMap, mysqlOperator),
-                registryProperties.getTermRefreshInterval().toMillis(),
-                registryProperties.getTermRefreshInterval().toMillis(),
-                TimeUnit.MILLISECONDS);
+            new LockTermRefreshTask(lockHoldMap, mysqlOperator),
+            registryProperties.getTermRefreshInterval().toMillis(),
+            registryProperties.getTermRefreshInterval().toMillis(),
+            TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -121,9 +121,9 @@ public class RegistryLockManager implements AutoCloseable {
                     return;
                 }
                 List<Long> lockIds = lockHoldMap.values()
-                        .stream()
-                        .map(MysqlRegistryLock::getId)
-                        .collect(Collectors.toList());
+                    .stream()
+                    .map(MysqlRegistryLock::getId)
+                    .collect(Collectors.toList());
                 if (!mysqlOperator.updateLockTerm(lockIds)) {
                     logger.warn("Update the lock: {} term failed.", lockIds);
                 }

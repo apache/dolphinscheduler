@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
-
 /**
  * udf func service
  */
@@ -31,14 +29,14 @@ public interface UdfFuncService {
     /**
      * create udf function
      *
-     * @param loginUser login user
-     * @param type udf type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database database
-     * @param desc description
+     * @param loginUser  login user
+     * @param type       udf type
+     * @param funcName   function name
+     * @param argTypes   argument types
+     * @param database   database
+     * @param desc       description
      * @param resourceId resource id
-     * @param className class name
+     * @param className  class name
      * @return create result code
      */
     Result<Object> createUdfFunction(User loginUser,
@@ -53,40 +51,40 @@ public interface UdfFuncService {
     /**
      * query udf function
      *
-     * @param id  udf function id
+     * @param id udf function id
      * @return udf function detail
      */
-    Result<Object> queryUdfFuncDetail(User loginUser,int id);
+    Result<Object> queryUdfFuncDetail(User loginUser, int id);
 
     /**
      * updateProcessInstance udf function
      *
-     * @param udfFuncId udf function id
-     * @param type  resource type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database data base
-     * @param desc description
+     * @param udfFuncId  udf function id
+     * @param type       resource type
+     * @param funcName   function name
+     * @param argTypes   argument types
+     * @param database   data base
+     * @param desc       description
      * @param resourceId resource id
-     * @param className class name
+     * @param className  class name
      * @return update result code
      */
     Result<Object> updateUdfFunc(User loginUser,
-                                      int udfFuncId,
-                                      String funcName,
-                                      String className,
-                                      String argTypes,
-                                      String database,
-                                      String desc,
-                                      UdfType type,
-                                      int resourceId);
+                                 int udfFuncId,
+                                 String funcName,
+                                 String className,
+                                 String argTypes,
+                                 String database,
+                                 String desc,
+                                 UdfType type,
+                                 int resourceId);
 
     /**
      * query udf function list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @param searchVal search value
      * @return udf function list page
      */
@@ -96,7 +94,7 @@ public interface UdfFuncService {
      * query udf list
      *
      * @param loginUser login user
-     * @param type  udf type
+     * @param type      udf type
      * @return udf func list
      */
     Result<Object> queryUdfFuncList(User loginUser, Integer type);

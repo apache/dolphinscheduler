@@ -34,6 +34,7 @@ import java.util.List;
 public class SeatunnelSparkTask extends SeatunnelTask {
 
     private SeatunnelSparkParameters seatunnelParameters;
+
     /**
      * constructor
      *

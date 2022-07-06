@@ -83,7 +83,7 @@ public class TaskCallbackService {
      * add callback channel
      *
      * @param taskInstanceId taskInstanceId
-     * @param channel channel
+     * @param channel        channel
      */
     public void addRemoteChannel(int taskInstanceId, NettyRemoteChannel channel) {
         REMOTE_CHANNELS.put(taskInstanceId, channel);
@@ -146,7 +146,7 @@ public class TaskCallbackService {
      * send result
      *
      * @param taskInstanceId taskInstanceId
-     * @param command command
+     * @param command        command
      */
     public void send(int taskInstanceId, Command command) {
         Optional<NettyRemoteChannel> nettyRemoteChannel = getRemoteChannel(taskInstanceId);

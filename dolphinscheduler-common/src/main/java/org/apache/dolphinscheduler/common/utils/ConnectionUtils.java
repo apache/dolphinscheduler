@@ -42,12 +42,12 @@ public class ConnectionUtils {
             return;
         }
         Arrays.stream(resources).filter(Objects::nonNull)
-                .forEach(resource -> {
-                    try {
-                        resource.close();
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                });
+            .forEach(resource -> {
+                try {
+                    resource.close();
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            });
     }
 }

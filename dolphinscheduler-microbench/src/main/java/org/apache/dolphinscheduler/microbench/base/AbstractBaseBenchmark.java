@@ -56,8 +56,8 @@ public abstract class AbstractBaseBenchmark {
         String className = getClass().getSimpleName();
 
         ChainedOptionsBuilder optBuilder = new OptionsBuilder()
-                // set benchmark ClassName
-                .include(className);
+            // set benchmark ClassName
+            .include(className);
 
         if (getMeasureIterations() > 0) {
             optBuilder.warmupIterations(getMeasureIterations());
@@ -90,7 +90,7 @@ public abstract class AbstractBaseBenchmark {
             }
             if (writeFileStatus) {
                 optBuilder.resultFormat(ResultFormatType.JSON)
-                        .result(filePath);
+                    .result(filePath);
             }
         }
         return optBuilder;

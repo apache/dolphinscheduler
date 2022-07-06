@@ -56,7 +56,7 @@ public class ProcessTaskRelationLogMapperTest extends BaseDaoTest {
     public void testQueryByProcessCodeAndVersion() {
         ProcessTaskRelationLog processTaskRelationLog = insertOne();
         List<ProcessTaskRelationLog> processTaskRelationLogs = processTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(1L, 1);
+            .queryByProcessCodeAndVersion(1L, 1);
         Assert.assertNotEquals(processTaskRelationLogs.size(), 0);
     }
 

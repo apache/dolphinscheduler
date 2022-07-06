@@ -197,7 +197,7 @@ public class HeartBeat {
         this.reportTime = System.currentTimeMillis();
         if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
             logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
-                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
+                loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
             this.serverStatus = Constants.ABNORMAL_NODE_STATUS;
         } else if (workerWaitingTaskCount > workerExecThreadCount) {
             logger.warn("current waiting task count {} is large than worker thread count {}, worker is busy", workerWaitingTaskCount, workerExecThreadCount);

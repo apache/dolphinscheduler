@@ -77,6 +77,7 @@ public class EmrTask extends AbstractTaskExecutor {
     /**
      * config ObjectMapper features and propertyNamingStrategy
      * use UpperCamelCaseStrategy support capital letters parse
+     *
      * @see PropertyNamingStrategy.UpperCamelCaseStrategy
      */
     private static final ObjectMapper objectMapper = new ObjectMapper()

@@ -50,46 +50,46 @@ public class RuleManager {
 
     private static final String NONE_COMPARISON_TYPE = "0";
     private static final String BASE_SQL =
-            "select ${rule_type} as rule_type,"
-                    + "${rule_name} as rule_name,"
-                    + "${process_definition_id} as process_definition_id,"
-                    + "${process_instance_id} as process_instance_id,"
-                    + "${task_instance_id} as task_instance_id,"
-                    + "${statistics_name} AS statistics_value,"
-                    + "${comparison_name} AS comparison_value,"
-                    + "${comparison_type} AS comparison_type,"
-                    + "${check_type} as check_type,"
-                    + "${threshold} as threshold,"
-                    + "${operator} as operator,"
-                    + "${failure_strategy} as failure_strategy,"
-                    + "'${error_output_path}' as error_output_path,"
-                    + "${create_time} as create_time,"
-                    + "${update_time} as update_time ";
+        "select ${rule_type} as rule_type,"
+            + "${rule_name} as rule_name,"
+            + "${process_definition_id} as process_definition_id,"
+            + "${process_instance_id} as process_instance_id,"
+            + "${task_instance_id} as task_instance_id,"
+            + "${statistics_name} AS statistics_value,"
+            + "${comparison_name} AS comparison_value,"
+            + "${comparison_type} AS comparison_type,"
+            + "${check_type} as check_type,"
+            + "${threshold} as threshold,"
+            + "${operator} as operator,"
+            + "${failure_strategy} as failure_strategy,"
+            + "'${error_output_path}' as error_output_path,"
+            + "${create_time} as create_time,"
+            + "${update_time} as update_time ";
 
     public static final String DEFAULT_COMPARISON_WRITER_SQL =
-                    BASE_SQL + "from ${statistics_table} full join ${comparison_table}";
+        BASE_SQL + "from ${statistics_table} full join ${comparison_table}";
 
     public static final String MULTI_TABLE_COMPARISON_WRITER_SQL =
-                    BASE_SQL
-                    + "from ( ${statistics_execute_sql} ) tmp1 "
-                    + "join ( ${comparison_execute_sql} ) tmp2";
+        BASE_SQL
+            + "from ( ${statistics_execute_sql} ) tmp1 "
+            + "join ( ${comparison_execute_sql} ) tmp2";
 
     public static final String SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL =
-                    BASE_SQL
-                    + "from ( ${statistics_table} ) tmp1 "
-                    + "join ${comparison_table}";
+        BASE_SQL
+            + "from ( ${statistics_table} ) tmp1 "
+            + "join ${comparison_table}";
     public static final String TASK_STATISTICS_VALUE_WRITER_SQL =
-            "select "
-                    + "${process_definition_id} as process_definition_id,"
-                    + "${task_instance_id} as task_instance_id,"
-                    + "${rule_id} as rule_id,"
-                    + "${unique_code} as unique_code,"
-                    + "'${statistics_name}'AS statistics_name,"
-                    + "${statistics_name} AS statistics_value,"
-                    + "${data_time} as data_time,"
-                    + "${create_time} as create_time,"
-                    + "${update_time} as update_time "
-                    + "from ${statistics_table}";
+        "select "
+            + "${process_definition_id} as process_definition_id,"
+            + "${task_instance_id} as task_instance_id,"
+            + "${rule_id} as rule_id,"
+            + "${unique_code} as unique_code,"
+            + "'${statistics_name}'AS statistics_name,"
+            + "${statistics_name} AS statistics_value,"
+            + "${data_time} as data_time,"
+            + "${create_time} as create_time,"
+            + "${update_time} as update_time "
+            + "from ${statistics_table}";
 
     public RuleManager(Map<String, String> inputParameterValue, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         this.inputParameterValue = inputParameterValue;
@@ -103,13 +103,13 @@ public class RuleManager {
     public DataQualityConfiguration generateDataQualityParameter() throws RuntimeException {
 
         Map<String, String> inputParameterValueResult =
-                RuleParserUtils.getInputParameterMapFromEntryList(
-                        JSONUtils.toList(dataQualityTaskExecutionContext.getRuleInputEntryList(), DqRuleInputEntry.class));
+            RuleParserUtils.getInputParameterMapFromEntryList(
+                JSONUtils.toList(dataQualityTaskExecutionContext.getRuleInputEntryList(), DqRuleInputEntry.class));
         inputParameterValueResult.putAll(inputParameterValue);
         inputParameterValueResult.putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date()));
         inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, NONE_COMPARISON_TYPE);
         inputParameterValueResult.put(UNIQUE_CODE,
-                SINGLE_QUOTES + RuleParserUtils.generateUniqueCode(inputParameterValueResult) + SINGLE_QUOTES);
+            SINGLE_QUOTES + RuleParserUtils.generateUniqueCode(inputParameterValueResult) + SINGLE_QUOTES);
 
         IRuleParser ruleParser = null;
         switch (RuleType.of(dataQualityTaskExecutionContext.getRuleType())) {

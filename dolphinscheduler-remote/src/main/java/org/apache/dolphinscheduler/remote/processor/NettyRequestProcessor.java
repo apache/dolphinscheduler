@@ -14,18 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.processor;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.remote.command.Command;
 
+import io.netty.channel.Channel;
+
 /**
- *  netty request processor
+ * netty request processor
  */
 public interface NettyRequestProcessor {
 
     /**
-     *  process logic
+     * process logic
+     *
      * @param channel channel
      * @param command command
      */

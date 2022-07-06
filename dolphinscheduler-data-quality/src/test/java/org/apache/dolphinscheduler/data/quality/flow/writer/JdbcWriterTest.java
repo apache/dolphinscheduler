@@ -51,24 +51,24 @@ public class JdbcWriterTest extends FlowTestBase {
     public void testJdbcWriterExecute() {
         JdbcReader jdbcConnector = new JdbcReader(buildJdbcReaderConfig());
         JdbcWriter jdbcWriter = new JdbcWriter(buildJdbcConfig());
-        jdbcWriter.write(jdbcConnector.read(sparkRuntimeEnvironment),sparkRuntimeEnvironment);
+        jdbcWriter.write(jdbcConnector.read(sparkRuntimeEnvironment), sparkRuntimeEnvironment);
     }
 
     private Config buildJdbcConfig() {
-        Map<String,Object> config = new HashMap<>();
-        config.put(DATABASE,"test");
-        config.put(TABLE,"test.test2");
-        config.put(URL,url);
-        config.put(USER,"test");
-        config.put(PASSWORD,"123456");
-        config.put(DRIVER,driver);
-        config.put("save_mode","append");
+        Map<String, Object> config = new HashMap<>();
+        config.put(DATABASE, "test");
+        config.put(TABLE, "test.test2");
+        config.put(URL, url);
+        config.put(USER, "test");
+        config.put(PASSWORD, "123456");
+        config.put(DRIVER, driver);
+        config.put("save_mode", "append");
         return new Config(config);
     }
 
     private Config buildJdbcReaderConfig() {
         Config config = buildJdbcConfig();
-        config.put("sql","SELECT '1' as company,'1' as date,'2' as c1,'2' as c2,'2' as c3, 2 as c4");
+        config.put("sql", "SELECT '1' as company,'1' as date,'2' as c1,'2' as c2,'2' as c3, 2 as c4");
         return config;
     }
 
@@ -79,18 +79,18 @@ public class JdbcWriterTest extends FlowTestBase {
 
             connection.prepareStatement("drop table if exists test.test2").executeUpdate();
             connection
-                    .prepareStatement(
-                            "CREATE TABLE test.test2 (\n"
-                                    + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
-                                    + "  `company` varchar(255) DEFAULT NULL,\n"
-                                    + "  `date` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c1` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c2` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c3` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c4` int(11) DEFAULT NULL,\n"
-                                    + "  PRIMARY KEY (`id`)\n"
-                                    + ")")
-                    .executeUpdate();
+                .prepareStatement(
+                    "CREATE TABLE test.test2 (\n"
+                        + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                        + "  `company` varchar(255) DEFAULT NULL,\n"
+                        + "  `date` varchar(255) DEFAULT NULL,\n"
+                        + "  `c1` varchar(255) DEFAULT NULL,\n"
+                        + "  `c2` varchar(255) DEFAULT NULL,\n"
+                        + "  `c3` varchar(255) DEFAULT NULL,\n"
+                        + "  `c4` int(11) DEFAULT NULL,\n"
+                        + "  PRIMARY KEY (`id`)\n"
+                        + ")")
+                .executeUpdate();
             connection.prepareStatement("set schema test").executeUpdate();
             connection.commit();
         } catch (Exception e) {

@@ -39,14 +39,14 @@ public class ResponseCache {
 
     private final Map<Integer, Command> runningCache = new ConcurrentHashMap<>();
     private final Map<Integer, Command> responseCache = new ConcurrentHashMap<>();
-    private final Map<Integer,Command> recallCache = new ConcurrentHashMap<>();
+    private final Map<Integer, Command> recallCache = new ConcurrentHashMap<>();
 
     /**
      * cache response
      *
      * @param taskInstanceId taskInstanceId
-     * @param command command
-     * @param event event ACK/RESULT
+     * @param command        command
+     * @param event          event ACK/RESULT
      */
     public void cache(Integer taskInstanceId, Command command, Event event) {
         switch (event) {

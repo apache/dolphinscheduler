@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.exceptions;
 
 /**
- *  execute exception
+ * execute exception
  */
 public class ExecuteException extends Exception {
 

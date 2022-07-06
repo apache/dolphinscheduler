@@ -169,16 +169,16 @@ public class JupyterParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "JupyterParameters{" +
-                "condaEnvName='" + condaEnvName + '\'' +
-                ", inputNotePath='" + inputNotePath + '\'' +
-                ", outputNotePath='" + outputNotePath + '\'' +
-                ", parameters='" + parameters + '\'' +
-                ", kernel='" + kernel + '\'' +
-                ", engine='" + engine + '\'' +
-                ", executionTimeout=" + executionTimeout +
-                ", startTimeout=" + startTimeout +
-                ", others='" + others + '\'' +
-                '}';
+        return "JupyterParameters{"
+            + "condaEnvName='" + condaEnvName + '\''
+            + ", inputNotePath='" + inputNotePath + '\''
+            + ", outputNotePath='" + outputNotePath + '\''
+            + ", parameters='" + parameters + '\''
+            + ", kernel='" + kernel + '\''
+            + ", engine='" + engine + '\''
+            + ", executionTimeout=" + executionTimeout
+            + ", startTimeout=" + startTimeout
+            + ", others='" + others + '\''
+            + '}';
     }
 }

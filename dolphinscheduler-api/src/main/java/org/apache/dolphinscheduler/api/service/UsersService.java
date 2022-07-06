@@ -33,13 +33,13 @@ public interface UsersService {
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser login user
-     * @param userName user name
+     * @param loginUser    login user
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tenant id
+     * @param phone        phone
+     * @param queue        queue
      * @return create result code
      * @throws Exception exception
      */
@@ -89,7 +89,7 @@ public interface UsersService {
     /**
      * query user
      *
-     * @param name name
+     * @param name     name
      * @param password password
      * @return user info
      */
@@ -107,9 +107,9 @@ public interface UsersService {
      * query user list
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search avlue
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return user list page
      */
     Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
@@ -117,15 +117,14 @@ public interface UsersService {
     /**
      * updateProcessInstance user
      *
-     *
      * @param loginUser
-     * @param userId user id
-     * @param userName user name
+     * @param userId       user id
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tennat id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tennat id
+     * @param phone        phone
+     * @param queue        queue
      * @return update result code
      * @throws Exception exception
      */
@@ -136,7 +135,7 @@ public interface UsersService {
      * delete user
      *
      * @param loginUser login user
-     * @param id user id
+     * @param id        user id
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
@@ -145,8 +144,8 @@ public interface UsersService {
     /**
      * grant project
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser  login user
+     * @param userId     user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -156,8 +155,8 @@ public interface UsersService {
     /**
      * grant project by code
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser   login user
+     * @param userId      user id
      * @param projectCode project code
      * @return grant result code
      */
@@ -165,9 +164,10 @@ public interface UsersService {
 
     /**
      * revoke the project permission for specified user.
-     * @param loginUser     Login user
-     * @param userId        User id
-     * @param projectCode   Project Code
+     *
+     * @param loginUser   Login user
+     * @param userId      User id
+     * @param projectCode Project Code
      * @return
      */
     Map<String, Object> revokeProject(User loginUser, int userId, long projectCode);
@@ -175,8 +175,8 @@ public interface UsersService {
     /**
      * grant resource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser   login user
+     * @param userId      user id
      * @param resourceIds resource id array
      * @return grant result code
      */
@@ -187,8 +187,8 @@ public interface UsersService {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId user id
-     * @param udfIds udf id array
+     * @param userId    user id
+     * @param udfIds    udf id array
      * @return grant result code
      */
     Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds);
@@ -197,8 +197,8 @@ public interface UsersService {
     /**
      * grant namespace
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser    login user
+     * @param userId       user id
      * @param namespaceIds namespace id array
      * @return grant result code
      */
@@ -208,8 +208,8 @@ public interface UsersService {
     /**
      * grant datasource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser     login user
+     * @param userId        user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
@@ -252,7 +252,7 @@ public interface UsersService {
     /**
      * unauthorized user
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param alertGroupId alert group id
      * @return unauthorize result code
      */
@@ -262,7 +262,7 @@ public interface UsersService {
     /**
      * authorized user
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param alertGroupId alert group id
      * @return authorized result code
      */
@@ -271,10 +271,10 @@ public interface UsersService {
     /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
-     * @param userName user name
-     * @param userPassword user password
+     * @param userName       user name
+     * @param userPassword   user password
      * @param repeatPassword repeat password
-     * @param email email
+     * @param email          email
      * @return registry result code
      * @throws Exception exception
      */
@@ -284,7 +284,7 @@ public interface UsersService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
-     * @param userName user name
+     * @param userName  user name
      * @return create result code
      */
     Map<String, Object> activateUser(User loginUser, String userName);

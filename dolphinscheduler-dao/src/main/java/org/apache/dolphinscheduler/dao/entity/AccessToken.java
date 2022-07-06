@@ -164,13 +164,13 @@ public class AccessToken {
     @Override
     public String toString() {
         return "AccessToken{"
-                + "id=" + id
-                + ", userId=" + userId
-                + ", token='" + token + '\''
-                + ", userName='" + userName + '\''
-                + ", expireTime=" + expireTime
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", userId=" + userId
+            + ", token='" + token + '\''
+            + ", userName='" + userName + '\''
+            + ", expireTime=" + expireTime
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

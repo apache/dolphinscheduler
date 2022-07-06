@@ -25,13 +25,13 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.io.IOException;
 import java.util.List;
 
-
 public interface StorageOperate {
 
     String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
 
     /**
      * if the resource of tenant 's exist, the resource of folder will be created
+     *
      * @param tenantCode
      * @throws Exception
      */
@@ -39,6 +39,7 @@ public interface StorageOperate {
 
     /**
      * get the resource directory of tenant
+     *
      * @param tenantCode
      * @return
      */
@@ -46,6 +47,7 @@ public interface StorageOperate {
 
     /**
      * return the udf directory of tenant
+     *
      * @param tenantCode
      * @return
      */
@@ -54,6 +56,7 @@ public interface StorageOperate {
 
     /**
      * create the directory that the path of tenant wanted to create
+     *
      * @param tenantCode
      * @param path
      * @return
@@ -63,6 +66,7 @@ public interface StorageOperate {
 
     /**
      * get the path of the resource file
+     *
      * @param tenantCode
      * @param fullName
      * @return
@@ -71,6 +75,7 @@ public interface StorageOperate {
 
     /**
      * get the path of the file
+     *
      * @param resourceType
      * @param tenantCode
      * @param fileName
@@ -80,6 +85,7 @@ public interface StorageOperate {
 
     /**
      * predicate  if the resource of tenant exists
+     *
      * @param tenantCode
      * @param fileName
      * @return
@@ -90,6 +96,7 @@ public interface StorageOperate {
     /**
      * delete the resource of  filePath
      * todo if the filePath is the type of directory ,the files in the filePath need to be deleted at all
+     *
      * @param tenantCode
      * @param filePath
      * @param recursive
@@ -100,6 +107,7 @@ public interface StorageOperate {
 
     /**
      * copy the file from srcPath to dstPath
+     *
      * @param srcPath
      * @param dstPath
      * @param deleteSource if need to delete the file of srcPath
@@ -111,6 +119,7 @@ public interface StorageOperate {
 
     /**
      * get the root path of the tenant with resourceType
+     *
      * @param resourceType
      * @param tenantCode
      * @return
@@ -119,6 +128,7 @@ public interface StorageOperate {
 
     /**
      * upload the local srcFile to dstPath
+     *
      * @param tenantCode
      * @param srcFile
      * @param dstPath
@@ -131,17 +141,19 @@ public interface StorageOperate {
 
     /**
      * download the srcPath to local
+     *
      * @param tenantCode
-     * @param srcFilePath the full path of the srcPath
+     * @param srcFilePath  the full path of the srcPath
      * @param dstFile
      * @param deleteSource
      * @param overwrite
      * @throws IOException
      */
-    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite)throws IOException;
+    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException;
 
     /**
      * vim the context of filePath
+     *
      * @param tenantCode
      * @param filePath
      * @param skipLineNums

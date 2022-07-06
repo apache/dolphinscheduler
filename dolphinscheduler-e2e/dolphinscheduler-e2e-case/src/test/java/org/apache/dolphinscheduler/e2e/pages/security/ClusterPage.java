@@ -31,8 +31,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
@@ -78,7 +76,6 @@ public final class ClusterPage extends NavBarPage implements SecurityPage.Tab {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No edit button in cluster list"))
                 .click();
-
 
         editClusterForm().inputClusterName().sendKeys(Keys.CONTROL + "a");
         editClusterForm().inputClusterName().sendKeys(Keys.BACK_SPACE);

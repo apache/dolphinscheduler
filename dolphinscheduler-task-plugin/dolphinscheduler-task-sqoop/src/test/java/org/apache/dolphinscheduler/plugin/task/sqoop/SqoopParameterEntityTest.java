@@ -24,11 +24,11 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMys
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHiveParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**

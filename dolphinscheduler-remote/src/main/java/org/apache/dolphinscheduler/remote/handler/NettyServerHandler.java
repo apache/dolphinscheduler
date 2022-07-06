@@ -87,7 +87,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
+     * @param processor   processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
@@ -97,8 +97,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
+     * @param processor   processor
+     * @param executor    thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
@@ -112,7 +112,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * process received logic
      *
      * @param channel channel
-     * @param msg message
+     * @param msg     message
      */
     private void processReceived(final Channel channel, final Command msg) {
         final CommandType commandType = msg.getType();
@@ -144,7 +144,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * caught exception
      *
-     * @param ctx channel handler context
+     * @param ctx   channel handler context
      * @param cause cause
      */
     @Override
@@ -166,14 +166,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if (!ch.isWritable()) {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is not writable, over high water level : {}",
-                        ch, config.getWriteBufferHighWaterMark());
+                    ch, config.getWriteBufferHighWaterMark());
             }
 
             config.setAutoRead(false);
         } else {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is writable, to low water : {}",
-                        ch, config.getWriteBufferLowWaterMark());
+                    ch, config.getWriteBufferLowWaterMark());
             }
             config.setAutoRead(true);
         }

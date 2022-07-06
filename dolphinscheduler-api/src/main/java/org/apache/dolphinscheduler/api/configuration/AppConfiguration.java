@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import java.util.Locale;
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
+
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,6 +70,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     /**
      * Cookie
+     *
      * @return local resolver
      */
     @Bean(name = "localeResolver")
@@ -99,10 +102,10 @@ public class AppConfiguration implements WebMvcConfigurer {
             registry.addInterceptor(createRateLimitInterceptor());
         }
         registry.addInterceptor(loginInterceptor())
-                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/api-docs/**",
-                        "/doc.html", "/swagger-ui.html", "*.html", "/ui/**", "/error");
+            .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
+            .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
+                "/swagger-resources/**", "/webjars/**", "/api-docs/**",
+                "/doc.html", "/swagger-ui.html", "*.html", "/ui/**", "/error");
     }
 
     @Override

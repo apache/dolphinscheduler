@@ -19,7 +19,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ClusterMapper">
     <sql id="baseSql">
-        id, code, name, config, description, operator, create_time, update_time
+        id
+        , code, name, config, description, operator, create_time, update_time
     </sql>
     <select id="queryByClusterName" resultType="org.apache.dolphinscheduler.dao.entity.Cluster">
         select
@@ -50,6 +51,8 @@
         where code = #{clusterCode}
     </select>
     <delete id="deleteByCode">
-        delete from t_ds_cluster where code = #{code}
+        delete
+        from t_ds_cluster
+        where code = #{code}
     </delete>
 </mapper>

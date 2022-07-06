@@ -80,9 +80,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -95,9 +95,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups/list")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -114,9 +114,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -130,9 +130,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups/query")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -149,9 +149,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + entityId)
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -164,9 +164,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups/verify-name")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -179,9 +179,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups/verify-name")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -194,9 +194,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/" + entityId)
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -206,8 +206,8 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     public void test090DelAlertGroupById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
-            .header("sessionId", sessionId)
-            .params(paramsMap))
+                .header("sessionId", sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();

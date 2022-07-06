@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
-import org.apache.dolphinscheduler.scheduler.quartz.QuartzScheduler;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
@@ -118,7 +116,7 @@ public class SchedulerServiceTest {
         //hash no auth
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
 
-        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result,null)).thenReturn(true);
+        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result, null)).thenReturn(true);
         //schedule not exists
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 2, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));

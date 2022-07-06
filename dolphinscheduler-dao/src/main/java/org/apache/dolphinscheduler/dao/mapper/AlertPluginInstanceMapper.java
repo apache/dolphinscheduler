@@ -46,14 +46,14 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
 
     /**
      * Query alert plugin instance by given name
-     * @param page                page
-     * @param instanceName         Alert plugin name
+     *
+     * @param page         page
+     * @param instanceName Alert plugin name
      * @return alertPluginInstance Ipage
      */
     IPage<AlertPluginInstance> queryByInstanceNamePage(Page page, @Param("instanceName") String instanceName);
 
     /**
-     *
      * @param instanceName instanceName
      * @return if exist return true else return null
      */

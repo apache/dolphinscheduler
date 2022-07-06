@@ -34,21 +34,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -62,24 +62,24 @@ public class JSONUtils {
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
 
     static {
-        logger.info("init timezone: {}",TimeZone.getDefault());
+        logger.info("init timezone: {}", TimeZone.getDefault());
     }
 
     private static final SimpleModule LOCAL_DATE_TIME_MODULE = new SimpleModule()
-            .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
-            .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
+        .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
+        .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
 
     /**
      * can use static singleton, inject: just make sure to reuse!
      */
     private static final ObjectMapper objectMapper = new ObjectMapper()
-            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .registerModule(LOCAL_DATE_TIME_MODULE)
-            .setTimeZone(TimeZone.getDefault())
-            .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
+        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+        .registerModule(LOCAL_DATE_TIME_MODULE)
+        .setTimeZone(TimeZone.getDefault())
+        .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
@@ -100,7 +100,7 @@ public class JSONUtils {
     /**
      * json representation of object
      *
-     * @param object object
+     * @param object  object
      * @param feature feature
      * @return object to json string
      */
@@ -123,9 +123,9 @@ public class JSONUtils {
      * the fields of the specified object are generics, just the object itself should not be a
      * generic type.
      *
-     * @param json the string from which the object is to be deserialized
+     * @param json  the string from which the object is to be deserialized
      * @param clazz the class of T
-     * @param <T> T
+     * @param <T>   T
      * @return an object of type T from the string
      * classOfT
      */
@@ -143,11 +143,11 @@ public class JSONUtils {
     }
 
     /**
-     *  deserialize
+     * deserialize
      *
-     * @param src byte array
+     * @param src   byte array
      * @param clazz class
-     * @param <T> deserialize type
+     * @param <T>   deserialize type
      * @return deserialize type
      */
     public static <T> T parseObject(byte[] src, Class<T> clazz) {
@@ -161,9 +161,9 @@ public class JSONUtils {
     /**
      * json to list
      *
-     * @param json json string
+     * @param json  json string
      * @param clazz class
-     * @param <T> T
+     * @param <T>   T
      * @return list
      */
     public static <T> List<T> toList(String json, Class<T> clazz) {
@@ -190,21 +190,23 @@ public class JSONUtils {
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {});
+        return parseObject(json, new TypeReference<Map<String, String>>() {
+        });
     }
 
     /**
      * json to map
      *
-     * @param json json
+     * @param json   json
      * @param classK classK
      * @param classV classV
-     * @param <K> K
-     * @param <V> V
+     * @param <K>    K
+     * @param <V>    V
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
+        return parseObject(json, new TypeReference<Map<K, V>>() {
+        });
     }
 
     /**
@@ -250,7 +252,7 @@ public class JSONUtils {
      * @param <T> object type
      * @return byte array
      */
-    public static <T> byte[] toJsonByteArray(T obj)  {
+    public static <T> byte[] toJsonByteArray(T obj) {
         if (obj == null) {
             return null;
         }

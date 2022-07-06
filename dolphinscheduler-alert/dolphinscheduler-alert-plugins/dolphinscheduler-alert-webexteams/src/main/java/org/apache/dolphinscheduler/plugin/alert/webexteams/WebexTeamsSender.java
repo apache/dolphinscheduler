@@ -57,7 +57,8 @@ public final class WebexTeamsSender {
         destination = WebexTeamsDestination.of(config.get(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION));
         Preconditions.checkArgument(!Objects.isNull(botAccessToken), "WebexTeams bot access token can not be null");
         Preconditions.checkArgument(!Objects.isNull(destination), "WebexTeams message destination can not be null");
-        Preconditions.checkArgument((!Objects.isNull(roomId) || !Objects.isNull(toPersonId) || !Objects.isNull(toPersonEmail)),"WebexTeams message destination could not be determined. Provide only one destination in the roomId, toPersonEmail, or toPersonId field");
+        Preconditions.checkArgument((!Objects.isNull(roomId) || !Objects.isNull(toPersonId) || !Objects.isNull(toPersonEmail)),
+            "WebexTeams message destination could not be determined. Provide only one destination in the roomId, toPersonEmail, or toPersonId field");
     }
 
     public AlertResult sendWebexTeamsAlter(AlertData alertData) {
@@ -99,6 +100,7 @@ public final class WebexTeamsSender {
         }
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     private WebexMessage getMessage(AlertData alertData) {
         WebexMessage message = new WebexMessage();
         String formatContent = formatContent(alertData);
@@ -137,11 +139,11 @@ public final class WebexTeamsSender {
     public static String addAtPersonEmailInRoom(String formatContent, String atPersonEmailInRoom) {
         String[] emailArr = atPersonEmailInRoom.split(",");
         StringBuilder formatContentBuilder = new StringBuilder(formatContent);
-        for (String email: emailArr) {
+        for (String email : emailArr) {
             formatContentBuilder.append(" <@personEmail:").append(email).append(">");
         }
 
-        return  formatContentBuilder.toString();
+        return formatContentBuilder.toString();
     }
 
     public static String formatContent(AlertData alertData) {

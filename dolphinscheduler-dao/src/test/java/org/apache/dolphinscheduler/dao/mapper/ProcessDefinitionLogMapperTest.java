@@ -106,7 +106,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         userMapper.insert(user);
 
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
-                .queryByDefinitionName(1L, "def 1");
+            .queryByDefinitionName(1L, "def 1");
         Assert.assertEquals(0, processDefinitionLogs.size());
 
     }
@@ -116,7 +116,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
 
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
-                .queryByDefinitionCode(1L);
+            .queryByDefinitionCode(1L);
         Assert.assertNotEquals(0, processDefinitionLogs.size());
     }
 
@@ -125,7 +125,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
 
         ProcessDefinitionLog processDefinitionLogs = processDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(1L, 1);
+            .queryByDefinitionCodeAndVersion(1L, 1);
         Assert.assertNotEquals(null, processDefinitionLogs);
     }
 
@@ -142,7 +142,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryProcessDefinitionVersionsPaging() {
         insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
-        IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L,1L);
+        IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
         Assert.assertNotEquals(processDefinitionLogs.getTotal(), 0);
     }
 

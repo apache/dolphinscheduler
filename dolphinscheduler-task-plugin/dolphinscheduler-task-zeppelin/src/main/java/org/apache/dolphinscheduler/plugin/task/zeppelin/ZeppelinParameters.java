@@ -28,6 +28,7 @@ public class ZeppelinParameters extends AbstractParameters {
 
     /**
      * parameters for zeppelin client API
+     *
      * @see <a href="https://zeppelin.apache.org/docs/0.9.0/usage/zeppelin_sdk/client_api.html">Zeppelin_Client_API_Examples</a>
      */
     private String noteId;
@@ -70,11 +71,11 @@ public class ZeppelinParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "ZeppelinParameters{" +
-                "noteId='" + noteId + '\'' +
-                ", paragraphId='" + paragraphId + '\'' +
-                ", parameters='" + parameters + '\'' +
-                '}';
+        return "ZeppelinParameters{"
+            + "noteId='" + noteId + '\''
+            + ", paragraphId='" + paragraphId + '\''
+            + ", parameters='" + parameters + '\''
+            + '}';
     }
 
 }

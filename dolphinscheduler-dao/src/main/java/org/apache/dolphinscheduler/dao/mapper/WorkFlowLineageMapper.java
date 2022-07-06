@@ -30,7 +30,7 @@ public interface WorkFlowLineageMapper {
     /**
      * queryByName
      *
-     * @param projectCode projectCode
+     * @param projectCode  projectCode
      * @param workFlowName workFlowName
      * @return WorkFlowLineage list
      */
@@ -39,7 +39,7 @@ public interface WorkFlowLineageMapper {
     /**
      * queryWorkFlowLineageByCode
      *
-     * @param projectCode projectCode
+     * @param projectCode  projectCode
      * @param workFlowCode workFlowCode
      * @return WorkFlowLineage
      */
@@ -72,7 +72,7 @@ public interface WorkFlowLineageMapper {
     /**
      * queryCodeRelation
      *
-     * @param projectCode projectCode
+     * @param projectCode           projectCode
      * @param processDefinitionCode processDefinitionCode
      * @return ProcessLineage list
      */

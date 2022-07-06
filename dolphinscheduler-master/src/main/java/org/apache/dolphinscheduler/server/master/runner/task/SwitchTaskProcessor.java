@@ -65,9 +65,9 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         }
         this.setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+            processInstance.getProcessDefinitionVersion(),
+            taskInstance.getProcessInstanceId(),
+            taskInstance.getId()));
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -83,9 +83,9 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             }
         } catch (Exception e) {
             logger.error("update work flow {} switch task {} state error:",
-                    this.processInstance.getId(),
-                    this.taskInstance.getId(),
-                    e);
+                this.processInstance.getId(),
+                this.taskInstance.getId(),
+                e);
         }
         return true;
     }
@@ -128,7 +128,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     private boolean setSwitchResult() {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId()
+            taskInstance.getProcessInstanceId()
         );
         Map<String, ExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
@@ -194,13 +194,13 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         Map<String, Property> globalParams = JSONUtils
-                .toList(processInstance.getGlobalParams(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+            .toList(processInstance.getGlobalParams(), Property.class)
+            .stream()
+            .collect(Collectors.toMap(Property::getProp, Property -> Property));
         Map<String, Property> varParams = JSONUtils
-                .toList(taskInstance.getVarPool(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+            .toList(taskInstance.getVarPool(), Property.class)
+            .stream()
+            .collect(Collectors.toMap(Property::getProp, Property -> Property));
         if (varParams.size() > 0) {
             varParams.putAll(globalParams);
             globalParams = varParams;

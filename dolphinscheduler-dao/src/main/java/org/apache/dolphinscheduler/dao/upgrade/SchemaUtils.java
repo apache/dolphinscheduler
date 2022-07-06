@@ -75,7 +75,7 @@ public class SchemaUtils {
      * Determine whether schemaVersion is higher than version
      *
      * @param schemaVersion schema version
-     * @param version version
+     * @param version       version
      * @return Determine whether schemaVersion is higher than version
      */
     public static boolean isAGreatVersion(String schemaVersion, String version) {

@@ -32,8 +32,9 @@
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id = "baseSql">
-        id, task_id, task_name, group_id, process_id, priority, status , force_start , in_queue, create_time, update_time
+    <sql id="baseSql">
+        id
+        , task_id, task_name, group_id, process_id, priority, status , force_start , in_queue, create_time, update_time
     </sql>
 
     <select id="queryTaskGroupQueuePaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
@@ -54,11 +55,12 @@
         <include refid="baseSql">
         </include>
         from t_ds_task_group_queue
-            where status = #{status}
+        where status = #{status}
     </select>
 
     <delete id="deleteByTaskId">
-        delete from t_ds_task_group_queue
+        delete
+        from t_ds_task_group_queue
         where task_id = #{taskId}
     </delete>
 
@@ -74,7 +76,7 @@
 
     <update id="updateInQueue">
         update t_ds_task_group_queue
-               set in_queue = #{inQueue}
+        set in_queue = #{inQueue}
         where id = #{id}
     </update>
 
@@ -92,39 +94,43 @@
 
     <update id="updateInQueueLimit1">
         update t_ds_task_group_queue
-               set in_queue = #{newValue}
-        where group_id = #{groupId} and in_queue = #{oldValue} and status = #{status} order by priority desc limit 1
+        set in_queue = #{newValue}
+        where group_id = #{groupId}
+          and in_queue = #{oldValue}
+          and status = #{status} order by priority desc limit 1
     </update>
 
     <update id="updateInQueueCAS">
         update t_ds_task_group_queue
-               set in_queue = #{newValue}
-        where id = #{id} and in_queue = #{oldValue}
+        set in_queue = #{newValue}
+        where id = #{id}
+          and in_queue = #{oldValue}
     </update>
 
     <select id="queryHighPriorityTasks" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
-        <include refid="baseSql" />
+        <include refid="baseSql"/>
         from t_ds_task_group_queue
-        where group_id = #{groupId} and status = #{status} and  priority &gt; #{priority}
+        where group_id = #{groupId} and status = #{status} and priority &gt; #{priority}
     </select>
     <select id="queryTheHighestPriorityTasks" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
-        <include refid="baseSql" />
+        <include refid="baseSql"/>
         from t_ds_task_group_queue
         where priority = (select max(priority) from t_ds_task_group_queue where group_id = #{groupId}
-        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} ) and group_id = #{groupId}
-        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} limit 1
+        and status = #{status} and in_queue = #{inQueue} and force_start = #{forceStart} ) and group_id = #{groupId}
+        and status = #{status} and in_queue = #{inQueue} and force_start = #{forceStart} limit 1
     </select>
 
     <select id="queryByTaskId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
-        <include refid="baseSql" />
+        <include refid="baseSql"/>
         from t_ds_task_group_queue
         where task_id = #{taskId}
     </select>
 
-    <select id="queryTaskGroupQueueByTaskGroupIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+    <select id="queryTaskGroupQueueByTaskGroupIdPaging"
+            resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
         queue.id, queue.task_name, queue.group_id, queue.process_id, queue.priority, queue.status
         , queue.force_start, queue.create_time, queue.update_time,

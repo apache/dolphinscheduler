@@ -165,10 +165,10 @@ traffic:
     max-global-qps-rate: 300
     tenant-switch: false
     default-tenant-qps-rate: 10
-    #customize-tenant-qps-rate:
+      #customize-tenant-qps-rate:
       # eg.
       #tenant1: 11
-      #tenant2: 20
+    #tenant2: 20
 
 
 # Override by profile

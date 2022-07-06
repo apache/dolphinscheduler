@@ -117,7 +117,7 @@ public class OpenmldbTask extends PythonTask {
 
         // connect to openmldb
         builder.append(String.format("engine = db.create_engine('openmldb:///?zk=%s&zkPath=%s')\n",
-                openmldbParameters.getZk(), openmldbParameters.getZkPath()));
+            openmldbParameters.getZk(), openmldbParameters.getZkPath()));
         builder.append("con = engine.connect()\n");
 
         // execute mode

@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -66,10 +65,10 @@ public class NettyExecutorManagerTest {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildProcessInstanceRelatedInfo(processInstance)
-                .buildProcessDefinitionRelatedInfo(processDefinition)
-                .create();
+            .buildTaskInstanceRelatedInfo(taskInstance)
+            .buildProcessInstanceRelatedInfo(processInstance)
+            .buildProcessDefinitionRelatedInfo(processDefinition)
+            .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER);
         executionContext.setHost(Host.of(NetUtils.getAddr(serverConfig.getListenPort())));
         Boolean execute = nettyExecutorManager.execute(executionContext);
@@ -85,10 +84,10 @@ public class NettyExecutorManagerTest {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildProcessInstanceRelatedInfo(processInstance)
-                .buildProcessDefinitionRelatedInfo(processDefinition)
-                .create();
+            .buildTaskInstanceRelatedInfo(taskInstance)
+            .buildProcessInstanceRelatedInfo(processInstance)
+            .buildProcessDefinitionRelatedInfo(processDefinition)
+            .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER);
         executionContext.setHost(Host.of(NetUtils.getAddr(4444)));
         nettyExecutorManager.execute(executionContext);

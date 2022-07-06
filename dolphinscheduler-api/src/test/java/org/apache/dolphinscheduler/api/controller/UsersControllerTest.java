@@ -58,9 +58,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.CREATE_USER_ERROR.getCode(), result.getCode().intValue());
@@ -81,9 +81,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/update")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.UPDATE_USER_ERROR.getCode(), result.getCode().intValue());
@@ -98,9 +98,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-project")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -114,12 +114,12 @@ public class UsersControllerTest extends AbstractControllerTest {
         paramsMap.add("projectCode", "3682329499136");
 
         MvcResult mvcResult = this.mockMvc
-                .perform(post("/users/grant-project-by-code")
+            .perform(post("/users/grant-project-by-code")
                 .header(SESSION_ID, this.sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -135,9 +135,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc.perform(post("/users/revoke-project")
                 .header(SESSION_ID, this.sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -153,9 +153,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-file")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -171,9 +171,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-udf-func")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -189,9 +189,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-datasource")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -202,9 +202,9 @@ public class UsersControllerTest extends AbstractControllerTest {
     public void testGetUserInfo() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/users/get-user-info")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -219,9 +219,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/users/list-all")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -238,9 +238,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/users/authed-user")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -257,9 +257,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/users/unauth-user")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -273,9 +273,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/users/verify-user-name")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -290,9 +290,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/delete")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
@@ -304,9 +304,9 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/users/list")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -324,9 +324,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/register")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -341,9 +341,9 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/activate")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -360,8 +360,8 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonUserNames))
-                .andExpect(status().isOk())
-                .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());

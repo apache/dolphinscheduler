@@ -34,16 +34,16 @@ public interface SchedulerService {
     /**
      * save schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefineCode process definition code
-     * @param schedule scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param processDefineCode       process definition code
+     * @param schedule                scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
      * @param processInstancePriority process instance priority
-     * @param workerGroup worker group
-     * @param environmentCode environment code
+     * @param workerGroup             worker group
+     * @param environmentCode         environment code
      * @return create result code
      */
     Map<String, Object> insertSchedule(User loginUser,
@@ -60,15 +60,15 @@ public interface SchedulerService {
     /**
      * updateProcessInstance schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
-     * @param scheduleExpression scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
-     * @param workerGroup worker group
-     * @param environmentCode environment code
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param id                      scheduler id
+     * @param scheduleExpression      scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param workerGroup             worker group
+     * @param environmentCode         environment code
      * @param processInstancePriority process instance priority
      * @return update result code
      */
@@ -87,9 +87,9 @@ public interface SchedulerService {
     /**
      * set schedule online or offline
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
+     * @param loginUser      login user
+     * @param projectCode    project code
+     * @param id             scheduler id
      * @param scheduleStatus schedule status
      * @return publish result code
      */
@@ -101,21 +101,21 @@ public interface SchedulerService {
     /**
      * query schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processDefineCode process definition code
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param searchVal search value
+     * @param pageNo            page number
+     * @param pageSize          page size
+     * @param searchVal         search value
      * @return schedule list page
      */
     Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
-                                      Integer pageNo, Integer pageSize);
+                         Integer pageNo, Integer pageSize);
 
     /**
      * query schedule list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return schedule list
      */
@@ -124,7 +124,7 @@ public interface SchedulerService {
     /**
      * delete schedule
      *
-     * @param projectId project id
+     * @param projectId  project id
      * @param scheduleId schedule id
      * @throws RuntimeException runtime exception
      */
@@ -133,9 +133,9 @@ public interface SchedulerService {
     /**
      * delete schedule by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param scheduleId scheule id
+     * @param scheduleId  scheule id
      * @return delete result code
      */
     Map<String, Object> deleteScheduleById(User loginUser, long projectCode, Integer scheduleId);
@@ -144,7 +144,7 @@ public interface SchedulerService {
      * preview schedule
      *
      * @param loginUser login user
-     * @param schedule schedule expression
+     * @param schedule  schedule expression
      * @return the next five fire time
      */
     Map<String, Object> previewSchedule(User loginUser, String schedule);
@@ -152,14 +152,14 @@ public interface SchedulerService {
     /**
      * update process definition schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param scheduleExpression scheduleExpression
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
-     * @param workerGroup worker group
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param processDefinitionCode   process definition code
+     * @param scheduleExpression      scheduleExpression
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param workerGroup             worker group
      * @param processInstancePriority process instance priority
      * @return update result code
      */

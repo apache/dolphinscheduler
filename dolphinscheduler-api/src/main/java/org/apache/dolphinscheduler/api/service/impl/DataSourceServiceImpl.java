@@ -17,7 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_CREATE_DATASOURCE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -32,7 +37,6 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -40,7 +44,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -52,8 +56,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -66,8 +70,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * data source service impl
@@ -88,14 +90,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     private static final String TABLE = "TABLE";
     private static final String VIEW = "VIEW";
-    private static final String[] TABLE_TYPES = new String[]{TABLE, VIEW};
+    private static final String[] TABLE_TYPES = new String[] {TABLE, VIEW};
     private static final String TABLE_NAME = "TABLE_NAME";
     private static final String COLUMN_NAME = "COLUMN_NAME";
 
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameters
      * @return create result code
      */
@@ -104,7 +106,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
         DataSourceUtils.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.DATASOURCE, DATASOURCE_CREATE_DATASOURCE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.DATASOURCE, DATASOURCE_CREATE_DATASOURCE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -149,7 +151,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param id data source id
+     * @param id        data source id
      * @return update result code
      */
     @Override
@@ -163,7 +165,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
 
-        if (!canOperatorPermissions(loginUser,new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE, DATASOURCE_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {dataSource.getId()}, AuthorizationType.DATASOURCE, DATASOURCE_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -227,7 +229,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
         // type
         BaseDataSourceParamDTO baseDataSourceParamDTO = DataSourceUtils.buildDatasourceParamDTO(
-                dataSource.getType(), dataSource.getConnectionParams());
+            dataSource.getType(), dataSource.getConnectionParams());
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
@@ -242,8 +244,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
     @Override
@@ -263,7 +265,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             dataSourceList = dataSourceMapper.selectPagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
         }
-
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
@@ -299,7 +300,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * query data resource list
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
     @Override
@@ -345,7 +346,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type            data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
@@ -362,8 +363,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         } catch (Exception e) {
             String message = Optional.of(e).map(Throwable::getCause)
-                    .map(Throwable::getMessage)
-                    .orElse(e.getMessage());
+                .map(Throwable::getMessage)
+                .orElse(e.getMessage());
             logger.error("datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type, connectionParam, message);
             return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), message);
         }
@@ -389,7 +390,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * delete datasource
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param datasourceId data source id
      * @return delete result code
      */
@@ -405,7 +406,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()},AuthorizationType.DATASOURCE,DATASOURCE_DELETE)) {
+            if (!canOperatorPermissions(loginUser, new Object[] {dataSource.getId()}, AuthorizationType.DATASOURCE, DATASOURCE_DELETE)) {
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
@@ -423,14 +424,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
     @Override
     public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> datasourceList;
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,null)) {
+        if (canOperatorPermissions(loginUser, null, AuthorizationType.DATASOURCE, null)) {
             // admin gets all data sources except userId
             datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
         } else {
@@ -460,7 +461,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @Override
@@ -481,9 +482,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         List<String> tableList = null;
         BaseConnectionParam connectionParam =
-                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        dataSource.getType(),
-                        dataSource.getConnectionParams());
+            (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                dataSource.getType(),
+                dataSource.getConnectionParams());
 
         if (null == connectionParam) {
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
@@ -491,7 +492,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Connection connection =
-                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+            DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
         ResultSet tables = null;
 
         try {
@@ -510,9 +511,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
 
             tables = metaData.getTables(
-                    connectionParam.getDatabase(),
-                    getDbSchemaPattern(dataSource.getType(),schema,connectionParam),
-                    "%", TABLE_TYPES);
+                connectionParam.getDatabase(),
+                getDbSchemaPattern(dataSource.getType(), schema, connectionParam),
+                "%", TABLE_TYPES);
             if (null == tables) {
                 putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
                 return result;
@@ -541,14 +542,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public Map<String, Object> getTableColumns(Integer datasourceId,String tableName) {
+    public Map<String, Object> getTableColumns(Integer datasourceId, String tableName) {
         Map<String, Object> result = new HashMap<>();
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
         BaseConnectionParam connectionParam =
-                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        dataSource.getType(),
-                        dataSource.getConnectionParams());
+            (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                dataSource.getType(),
+                dataSource.getConnectionParams());
 
         if (null == connectionParam) {
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
@@ -556,7 +557,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Connection connection =
-                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+            DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
         List<String> columnList = new ArrayList<>();
         ResultSet rs = null;
 
@@ -600,14 +601,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
             for (String column : columnList) {
                 ParamsOptions childrenOption =
-                        new ParamsOptions(column, column, false);
+                    new ParamsOptions(column, column, false);
                 options.add(childrenOption);
             }
         }
         return options;
     }
 
-    private String getDbSchemaPattern(DbType dbType,String schema,BaseConnectionParam connectionParam) {
+    private String getDbSchemaPattern(DbType dbType, String schema, BaseConnectionParam connectionParam) {
         if (dbType == null) {
             return null;
         }

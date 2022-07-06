@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -44,7 +45,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 
@@ -94,33 +94,33 @@ public class DqRuleServiceTest {
     @Test
     public void testGetRuleFormCreateJsonById() {
         String json = "[{\"field\":\"src_connector_type\",\"name\":\"源数据类型\",\"props\":{\"placeholder\":"
-                + "\"Please select the source connector type\",\"size\":\"small\"},\"type\":\"select\",\"title\":"
-                + "\"源数据类型\",\"value\":\"JDBC\",\"emit\":[\"change\"],\"options\":[{\"label\":\"HIVE\",\"value\":"
-                + "\"HIVE\",\"disabled\":false},{\"label\":\"JDBC\",\"value\":\"JDBC\",\"disabled\":false}]},{\"props\":"
-                + "{\"disabled\":false,\"rows\":2,\"placeholder\":\"Please enter statistics name, the alias in "
-                + "statistics execute sql\",\"size\":\"small\"},\"field\":\"statistics_name\",\"name\":"
-                + "\"统计值名\",\"type\":\"input\",\"title\":\"统计值名\",\"validate\":[{\"required\":true,\"type\":"
-                + "\"string\",\"trigger\":\"blur\"}]},{\"props\":{\"disabled\":false,\"type\":\"textarea\",\"rows\":"
-                + "1,\"placeholder\":\"Please enter the statistics execute sql\",\"size\":\"small\"},\"field\":"
-                + "\"statistics_execute_sql\",\"name\":\"统计值计算SQL\",\"type\":\"input\",\"title\":"
-                + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
+            + "\"Please select the source connector type\",\"size\":\"small\"},\"type\":\"select\",\"title\":"
+            + "\"源数据类型\",\"value\":\"JDBC\",\"emit\":[\"change\"],\"options\":[{\"label\":\"HIVE\",\"value\":"
+            + "\"HIVE\",\"disabled\":false},{\"label\":\"JDBC\",\"value\":\"JDBC\",\"disabled\":false}]},{\"props\":"
+            + "{\"disabled\":false,\"rows\":2,\"placeholder\":\"Please enter statistics name, the alias in "
+            + "statistics execute sql\",\"size\":\"small\"},\"field\":\"statistics_name\",\"name\":"
+            + "\"统计值名\",\"type\":\"input\",\"title\":\"统计值名\",\"validate\":[{\"required\":true,\"type\":"
+            + "\"string\",\"trigger\":\"blur\"}]},{\"props\":{\"disabled\":false,\"type\":\"textarea\",\"rows\":"
+            + "1,\"placeholder\":\"Please enter the statistics execute sql\",\"size\":\"small\"},\"field\":"
+            + "\"statistics_execute_sql\",\"name\":\"统计值计算SQL\",\"type\":\"input\",\"title\":"
+            + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Map<String,Object> result = dqRuleService.getRuleFormCreateJsonById(1);
-        Assert.assertEquals(json,result.get(Constants.DATA_LIST));
+        Map<String, Object> result = dqRuleService.getRuleFormCreateJsonById(1);
+        Assert.assertEquals(json, result.get(Constants.DATA_LIST));
     }
 
     @Test
     public void testQueryAllRuleList() {
         when(dqRuleMapper.selectList(new QueryWrapper<>())).thenReturn(getRuleList());
-        Map<String,Object> result = dqRuleService.queryAllRuleList();
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Map<String, Object> result = dqRuleService.queryAllRuleList();
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testGetDatasourceOptionsById() {
         when(dataSourceMapper.listAllDataSourceByType(DbType.MYSQL.getCode())).thenReturn(dataSourceList());
-        Map<String,Object> result = dqRuleService.queryAllRuleList();
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Map<String, Object> result = dqRuleService.queryAllRuleList();
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -141,17 +141,17 @@ public class DqRuleServiceTest {
         page.setRecords(getRuleList());
 
         when(dqRuleMapper.queryRuleListPaging(
-                any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end))).thenReturn(page);
+            any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
 
         Result result = dqRuleService.queryRuleListPaging(
-                loginUser,searchVal,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
-        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()),result.getCode());
+            loginUser, searchVal, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
     }
 
-    private  List<DataSource> dataSourceList() {
+    private List<DataSource> dataSourceList() {
         List<DataSource> dataSourceList = new ArrayList<>();
         DataSource dataSource = new DataSource();
         dataSource.setId(1);

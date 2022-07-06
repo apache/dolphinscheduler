@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.enums;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.context.i18n.LocaleContextHolder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 public class StatusTest {
 

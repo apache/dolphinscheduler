@@ -18,11 +18,12 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ScriptSender {
     private static final Logger logger = LoggerFactory.getLogger(ScriptSender.class);

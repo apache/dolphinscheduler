@@ -40,11 +40,11 @@ public class DolphinSchedulerManager {
     public DolphinSchedulerManager(DataSource dataSource, List<UpgradeDao> daos) throws Exception {
         final DbType type = getCurrentDbType(dataSource);
         upgradeDao = daos.stream()
-                         .filter(it -> it.getDbType() == type)
-                         .findFirst()
-                         .orElseThrow(() -> new RuntimeException(
-                             "Cannot find UpgradeDao implementation for db type: " + type
-                         ));
+            .filter(it -> it.getDbType() == type)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(
+                "Cannot find UpgradeDao implementation for db type: " + type
+            ));
     }
 
     private DbType getCurrentDbType(DataSource dataSource) throws Exception {
@@ -60,6 +60,7 @@ public class DolphinSchedulerManager {
 
     /**
      * whether schema is initialized
+     *
      * @return true if schema is initialized
      */
     public boolean schemaIsInitialized() {
@@ -106,7 +107,7 @@ public class DolphinSchedulerManager {
                 if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
                     logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
                     logger.info("Begin upgrading DolphinScheduler's table structure");
-                     upgradeDao.upgradeDolphinScheduler(schemaDir);
+                    upgradeDao.upgradeDolphinScheduler(schemaDir);
                     if ("1.3.0".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     } else if ("1.3.2".equals(schemaVersion)) {

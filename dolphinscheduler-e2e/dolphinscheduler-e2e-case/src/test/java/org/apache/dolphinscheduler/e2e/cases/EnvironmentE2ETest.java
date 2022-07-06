@@ -19,18 +19,14 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
-import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
-import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -56,9 +52,9 @@ class EnvironmentE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
-                .goToNav(SecurityPage.class)
-                .goToTab(EnvironmentPage.class)
+            .login("admin", "dolphinscheduler123")
+            .goToNav(SecurityPage.class)
+            .goToTab(EnvironmentPage.class)
         ;
     }
 
@@ -71,9 +67,9 @@ class EnvironmentE2ETest {
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.environmentList())
-                    .as("Environment list should contain newly-created environment")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(environmentName));
+                .as("Environment list should contain newly-created environment")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(environmentName));
         });
     }
 
@@ -84,8 +80,8 @@ class EnvironmentE2ETest {
         page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
 
         await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
+            assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists")
         );
 
         page.createEnvironmentForm().buttonCancel().click();
@@ -100,9 +96,9 @@ class EnvironmentE2ETest {
         await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.environmentList())
-                    .as("Environment list should contain newly-modified environment")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(editEnvironmentName));
+                .as("Environment list should contain newly-modified environment")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(editEnvironmentName));
         });
     }
 
@@ -117,12 +113,12 @@ class EnvironmentE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.environmentList()
+                page.environmentList()
             )
-            .as("Environment list should not contain deleted environment")
-            .noneMatch(
+                .as("Environment list should not contain deleted environment")
+                .noneMatch(
                     it -> it.getText().contains(environmentName) || it.getText().contains(editEnvironmentName)
-            );
+                );
         });
     }
 }

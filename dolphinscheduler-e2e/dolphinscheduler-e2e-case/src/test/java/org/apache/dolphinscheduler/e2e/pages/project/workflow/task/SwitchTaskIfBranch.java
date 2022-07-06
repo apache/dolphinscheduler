@@ -17,15 +17,18 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+
+import lombok.Getter;
 
 @Getter
 public final class SwitchTaskIfBranch {
@@ -35,9 +38,9 @@ public final class SwitchTaskIfBranch {
     private final CodeEditor codeEditor;
 
     @FindBys({
-            @FindBy(className = "switch-task"),
-            @FindBy(className = "switch-list"),
-            @FindBy(className = "el-input")
+        @FindBy(className = "switch-task"),
+        @FindBy(className = "switch-list"),
+        @FindBy(className = "el-input")
     })
     private WebElement inputIfBranch;
 

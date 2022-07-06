@@ -29,15 +29,15 @@
     <packaging>jar</packaging>
 
     <dependencies>
-    <dependency>
-        <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-spi</artifactId>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-task-api</artifactId>
-        <version>${project.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

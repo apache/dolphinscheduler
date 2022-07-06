@@ -52,9 +52,9 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -68,12 +68,12 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("token", null);
 
         MvcResult mvcResult = this.mockMvc
-                .perform(post("/access-tokens")
+            .perform(post("/access-tokens")
                 .header("sessionId", this.sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -89,9 +89,9 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -105,9 +105,9 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens/generate")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -122,9 +122,9 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -133,11 +133,11 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryAccessTokenByUser() throws Exception {
         MvcResult mvcResult = this.mockMvc
-                .perform(get("/access-tokens/user/1")
+            .perform(get("/access-tokens/user/1")
                 .header("sessionId", this.sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -148,9 +148,9 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         testCreateToken();
         MvcResult mvcResult = mockMvc.perform(delete("/access-tokens/1")
                 .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -166,9 +166,9 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(put("/access-tokens/1")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -184,12 +184,12 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("token", null);
 
         MvcResult mvcResult = this.mockMvc
-                .perform(put("/access-tokens/2")
+            .perform(put("/access-tokens/2")
                 .header("sessionId", this.sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());

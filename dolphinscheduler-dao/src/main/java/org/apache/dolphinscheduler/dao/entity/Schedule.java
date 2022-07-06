@@ -31,7 +31,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * schedule
- *
  */
 @TableName("t_ds_schedules")
 public class Schedule {
@@ -131,7 +130,7 @@ public class Schedule {
     private Priority processInstancePriority;
 
     /**
-     *  worker group
+     * worker group
      */
     private String workerGroup;
 
@@ -298,27 +297,27 @@ public class Schedule {
     @Override
     public String toString() {
         return "Schedule{"
-                + "id=" + id
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", processDefinitionName='" + processDefinitionName + '\''
-                + ", projectName='" + projectName + '\''
-                + ", description='" + definitionDescription + '\''
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", timezoneId='" + timezoneId + +'\''
-                + ", crontab='" + crontab + '\''
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", releaseState=" + releaseState
-                + ", warningGroupId=" + warningGroupId
-                + ", processInstancePriority=" + processInstancePriority
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + '}';
+            + "id=" + id
+            + ", processDefinitionCode=" + processDefinitionCode
+            + ", processDefinitionName='" + processDefinitionName + '\''
+            + ", projectName='" + projectName + '\''
+            + ", description='" + definitionDescription + '\''
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", timezoneId='" + timezoneId + +'\''
+            + ", crontab='" + crontab + '\''
+            + ", failureStrategy=" + failureStrategy
+            + ", warningType=" + warningType
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + ", userId=" + userId
+            + ", userName='" + userName + '\''
+            + ", releaseState=" + releaseState
+            + ", warningGroupId=" + warningGroupId
+            + ", processInstancePriority=" + processInstancePriority
+            + ", workerGroup='" + workerGroup + '\''
+            + ", environmentCode='" + environmentCode + '\''
+            + '}';
     }
 
     public String getDefinitionDescription() {

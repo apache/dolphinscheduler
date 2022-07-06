@@ -140,9 +140,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
 
-        int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                ExecutionStatus.SUCCESS.ordinal()};
+        int[] stateArray = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUCCESS.ordinal()};
 
         List<ProcessInstance> processInstances = processInstanceMapper.queryByHostAndStatus(null, stateArray);
 
@@ -156,9 +156,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQueryProcessInstanceListPaging() {
 
-        int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                ExecutionStatus.SUCCESS.ordinal()};
+        int[] stateArray = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
@@ -179,15 +179,15 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         Page<ProcessInstance> page = new Page(1, 3);
 
         IPage<ProcessInstance> processInstanceIPage = processInstanceMapper.queryProcessInstanceListPaging(
-                page,
-                processDefinition.getProjectCode(),
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getName(),
-                0,
-                stateArray,
-                processInstance.getHost(),
-                null,
-                null
+            page,
+            processDefinition.getProjectCode(),
+            processInstance.getProcessDefinitionCode(),
+            processInstance.getName(),
+            0,
+            stateArray,
+            processInstance.getHost(),
+            null,
+            null
         );
         Assert.assertNotEquals(processInstanceIPage.getTotal(), 0);
 
@@ -201,9 +201,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testSetFailoverByHostAndStateArray() {
 
-        int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                ExecutionStatus.SUCCESS.ordinal()};
+        int[] stateArray = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessInstance processInstance = insertOne();
 
@@ -262,7 +262,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         ProcessInstance processInstance = insertOne();
         int update = processInstanceMapper.updateById(processInstance);
 
-        Long[] projectCodes = new Long[]{processDefinition.getProjectCode()};
+        Long[] projectCodes = new Long[] {processDefinition.getProjectCode()};
 
         List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByProjectCodes(null, null, projectCodes);
 
@@ -314,9 +314,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
 
-        int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                ExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
+        int[] stateArray = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
 
         ProcessInstance processInstance1 = processInstanceMapper.queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null, stateArray);
 
@@ -377,7 +377,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         ProcessInstance processInstance3 = insertOne(startTime3, endTime3);
         Date start = new Date(2020, 1, 1, 1, 1, 1);
         Date end = new Date(2021, 1, 1, 1, 1, 1);
-        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end, ExecutionStatus.SUCCESS,0L);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end, ExecutionStatus.SUCCESS, 0L);
         Assert.assertEquals(2, processInstances.size());
         Assert.assertTrue(isSortedByDuration(processInstances));
         for (ProcessInstance processInstance : processInstances) {

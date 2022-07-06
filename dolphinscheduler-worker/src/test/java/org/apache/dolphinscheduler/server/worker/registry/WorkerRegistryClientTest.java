@@ -68,7 +68,7 @@ public class WorkerRegistryClientTest {
 
     @Mock
     private WorkerManagerThread workerManagerThread;
-    
+
     //private static final Set<String> workerGroups;
 
     static {

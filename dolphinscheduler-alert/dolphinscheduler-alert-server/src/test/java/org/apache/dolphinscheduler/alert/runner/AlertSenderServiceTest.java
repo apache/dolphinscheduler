@@ -147,7 +147,7 @@ public class AlertSenderServiceTest {
         alert.setWarningType(WarningType.FAILURE);
         alertList.add(alert);
 
-//        alertSenderService = new AlertSenderService();
+        // alertSenderService = new AlertSenderService();
 
         int pluginDefineId = 1;
         String pluginInstanceParams = "alert-instance-mail-params";

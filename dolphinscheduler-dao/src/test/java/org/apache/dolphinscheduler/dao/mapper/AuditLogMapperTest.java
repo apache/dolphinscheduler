@@ -36,6 +36,7 @@ public class AuditLogMapperTest extends BaseDaoTest {
 
     /**
      * insert
+     *
      * @return
      */
     private void insertOne() {

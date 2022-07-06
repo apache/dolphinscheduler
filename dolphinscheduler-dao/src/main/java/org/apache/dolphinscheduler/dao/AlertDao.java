@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.codec.digest.DigestUtils;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -89,8 +90,8 @@ public class AlertDao {
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
-     * @param log log
-     * @param id id
+     * @param log         log
+     * @param id          id
      * @return update alert result
      */
     public int updateAlert(AlertStatus alertStatus, String log, int id) {
@@ -108,20 +109,20 @@ public class AlertDao {
      * @param alert alert
      * @return sign's str
      */
-    private String generateSign (Alert alert) {
+    private String generateSign(Alert alert) {
         return Optional.of(alert)
-                .map(Alert::getContent)
-                .map(DigestUtils::sha1Hex)
-                .map(String::toLowerCase)
-                .orElse("");
+            .map(Alert::getContent)
+            .map(DigestUtils::sha1Hex)
+            .map(String::toLowerCase)
+            .orElse("");
     }
 
     /**
      * add AlertSendStatus
      *
-     * @param sendStatus alert send status
-     * @param log log
-     * @param alertId alert id
+     * @param sendStatus            alert send status
+     * @param log                   log
+     * @param alertId               alert id
      * @param alertPluginInstanceId alert plugin instance id
      * @return insert count
      */
@@ -139,16 +140,16 @@ public class AlertDao {
      * MasterServer or WorkerServer stopped
      *
      * @param alertGroupId alertGroupId
-     * @param host host
-     * @param serverType serverType
+     * @param host         host
+     * @param serverType   serverType
      */
     public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
-                type(serverType)
-                .host(host)
-                .event(AlertEvent.SERVER_DOWN)
-                .warningLevel(AlertWarnLevel.SERIOUS).
-                build();
+            type(serverType)
+            .host(host)
+            .event(AlertEvent.SERVER_DOWN)
+            .warningLevel(AlertWarnLevel.SERIOUS).
+            build();
         String content = JSONUtils.toJsonString(Lists.newArrayList(serverStopAlertContent));
 
         Alert alert = new Alert();
@@ -171,27 +172,27 @@ public class AlertDao {
      * process time out alert
      *
      * @param processInstance processInstance
-     * @param projectUser projectUser
+     * @param projectUser     projectUser
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
         int alertGroupId = processInstance.getWarningGroupId();
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .projectCode(projectUser.getProjectCode())
-                .projectName(projectUser.getProjectName())
-                .owner(projectUser.getUserName())
-                .processId(processInstance.getId())
-                .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                .processName(processInstance.getName())
-                .processType(processInstance.getCommandType())
-                .processState(processInstance.getState())
-                .runTimes(processInstance.getRunTimes())
-                .processStartTime(processInstance.getStartTime())
-                .processHost(processInstance.getHost())
-                .event(AlertEvent.TIME_OUT)
-                .warningLevel(AlertWarnLevel.MIDDLE)
-                .build();
+            .projectCode(projectUser.getProjectCode())
+            .projectName(projectUser.getProjectName())
+            .owner(projectUser.getUserName())
+            .processId(processInstance.getId())
+            .processDefinitionCode(processInstance.getProcessDefinitionCode())
+            .processName(processInstance.getName())
+            .processType(processInstance.getCommandType())
+            .processState(processInstance.getState())
+            .runTimes(processInstance.getRunTimes())
+            .processStartTime(processInstance.getStartTime())
+            .processHost(processInstance.getHost())
+            .event(AlertEvent.TIME_OUT)
+            .warningLevel(AlertWarnLevel.MIDDLE)
+            .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Process Timeout Warn");
@@ -217,27 +218,27 @@ public class AlertDao {
      * task timeout warn
      *
      * @param processInstance processInstanceId
-     * @param taskInstance taskInstance
-     * @param projectUser projectUser
+     * @param taskInstance    taskInstance
+     * @param projectUser     projectUser
      */
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, ProjectUser projectUser) {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .projectCode(projectUser.getProjectCode())
-                .projectName(projectUser.getProjectName())
-                .owner(projectUser.getUserName())
-                .processId(processInstance.getId())
-                .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                .processName(processInstance.getName())
-                .taskCode(taskInstance.getTaskCode())
-                .taskName(taskInstance.getName())
-                .taskType(taskInstance.getTaskType())
-                .taskStartTime(taskInstance.getStartTime())
-                .taskHost(taskInstance.getHost())
-                .event(AlertEvent.TIME_OUT)
-                .warningLevel(AlertWarnLevel.MIDDLE)
-                .build();
+            .projectCode(projectUser.getProjectCode())
+            .projectName(projectUser.getProjectName())
+            .owner(projectUser.getUserName())
+            .processId(processInstance.getId())
+            .processDefinitionCode(processInstance.getProcessDefinitionCode())
+            .processName(processInstance.getName())
+            .taskCode(taskInstance.getTaskCode())
+            .taskName(taskInstance.getName())
+            .taskType(taskInstance.getTaskType())
+            .taskStartTime(taskInstance.getStartTime())
+            .taskHost(taskInstance.getHost())
+            .event(AlertEvent.TIME_OUT)
+            .warningLevel(AlertWarnLevel.MIDDLE)
+            .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
@@ -253,7 +254,7 @@ public class AlertDao {
      */
     public List<Alert> listPendingAlerts() {
         LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
-                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
+            .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
         return alertMapper.selectList(wrapper);
     }
 
@@ -277,8 +278,8 @@ public class AlertDao {
         if (!Strings.isNullOrEmpty(alertInstanceIdsParam)) {
             String[] idsArray = alertInstanceIdsParam.split(",");
             List<Integer> ids = Arrays.stream(idsArray)
-                    .map(s -> Integer.parseInt(s.trim()))
-                    .collect(Collectors.toList());
+                .map(s -> Integer.parseInt(s.trim()))
+                .collect(Collectors.toList());
             return alertPluginInstanceMapper.queryByIds(ids);
         }
         return null;

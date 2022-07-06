@@ -53,21 +53,21 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private RateLimiter globalRateLimiter;
 
     private LoadingCache<String, RateLimiter> tenantRateLimiterCache = CacheBuilder.newBuilder()
-            .maximumSize(100)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, RateLimiter>() {
-                @Override
-                public RateLimiter load(String token) {
-                    // use tenant customize rate limit
-                    Map<String, Integer> customizeTenantQpsRate = trafficConfiguration.getCustomizeTenantQpsRate();
-                    int tenantQuota = trafficConfiguration.getDefaultTenantQpsRate();
-                    if (MapUtils.isNotEmpty(customizeTenantQpsRate)) {
-                        tenantQuota = customizeTenantQpsRate.getOrDefault(token, trafficConfiguration.getDefaultTenantQpsRate());
-                    }
-                    // use tenant default rate limit
-                    return RateLimiter.create(tenantQuota, 1, TimeUnit.SECONDS);
+        .maximumSize(100)
+        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .build(new CacheLoader<String, RateLimiter>() {
+            @Override
+            public RateLimiter load(String token) {
+                // use tenant customize rate limit
+                Map<String, Integer> customizeTenantQpsRate = trafficConfiguration.getCustomizeTenantQpsRate();
+                int tenantQuota = trafficConfiguration.getDefaultTenantQpsRate();
+                if (MapUtils.isNotEmpty(customizeTenantQpsRate)) {
+                    tenantQuota = customizeTenantQpsRate.getOrDefault(token, trafficConfiguration.getDefaultTenantQpsRate());
                 }
-            });
+                // use tenant default rate limit
+                return RateLimiter.create(tenantQuota, 1, TimeUnit.SECONDS);
+            }
+        });
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ExecutionException {

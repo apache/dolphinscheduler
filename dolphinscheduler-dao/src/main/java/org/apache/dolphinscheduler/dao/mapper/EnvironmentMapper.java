@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Set;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * environment mapper interface
@@ -51,13 +50,15 @@ public interface EnvironmentMapper extends BaseMapper<Environment> {
 
     /**
      * query all environment list
+     *
      * @return environment list
      */
     List<Environment> queryAllEnvironmentList();
 
     /**
      * environment page
-     * @param page page
+     *
+     * @param page       page
      * @param searchName searchName
      * @return environment IPage
      */
@@ -73,10 +74,11 @@ public interface EnvironmentMapper extends BaseMapper<Environment> {
 
     /**
      * queryEnvironmentListPagingByIds
+     *
      * @param page
      * @param ids
      * @param searchVal
      * @return
      */
-    IPage<Environment> queryEnvironmentListPagingByIds(Page<Environment> page, @Param("ids")List<Integer> ids, @Param("searchName")String searchVal);
+    IPage<Environment> queryEnvironmentListPagingByIds(Page<Environment> page, @Param("ids") List<Integer> ids, @Param("searchName") String searchVal);
 }

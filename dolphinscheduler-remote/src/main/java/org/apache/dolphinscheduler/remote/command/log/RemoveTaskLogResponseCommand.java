@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import java.io.Serializable;
 
 /**
- *  remove task log request command
+ * remove task log request command
  */
 public class RemoveTaskLogResponseCommand implements Serializable {
 

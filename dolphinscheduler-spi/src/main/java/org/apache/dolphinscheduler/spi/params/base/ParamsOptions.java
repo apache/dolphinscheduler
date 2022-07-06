@@ -34,7 +34,8 @@ public class ParamsOptions {
      */
     private boolean disabled;
 
-    public ParamsOptions() {}
+    public ParamsOptions() {
+    }
 
     public ParamsOptions(String label, Object value, boolean disabled) {
         this.label = label;

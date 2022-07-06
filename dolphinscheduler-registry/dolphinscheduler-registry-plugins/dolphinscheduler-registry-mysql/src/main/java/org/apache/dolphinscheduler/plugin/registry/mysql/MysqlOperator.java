@@ -77,13 +77,13 @@ public class MysqlOperator implements AutoCloseable {
             List<MysqlRegistryData> result = new ArrayList<>(resultSet.getFetchSize());
             while (resultSet.next()) {
                 MysqlRegistryData mysqlRegistryData = MysqlRegistryData.builder()
-                        .id(resultSet.getLong("id"))
-                        .key(resultSet.getString("key"))
-                        .data(resultSet.getString("data"))
-                        .type(resultSet.getInt("type"))
-                        .createTime(resultSet.getTimestamp("create_time"))
-                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                        .build();
+                    .id(resultSet.getLong("id"))
+                    .key(resultSet.getString("key"))
+                    .data(resultSet.getString("data"))
+                    .type(resultSet.getInt("type"))
+                    .createTime(resultSet.getTimestamp("create_time"))
+                    .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
+                    .build();
                 result.add(mysqlRegistryData);
             }
             return result;
@@ -91,8 +91,8 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
-                "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
+        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)"
+            + "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
         // put a ephemeralData
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -110,8 +110,8 @@ public class MysqlOperator implements AutoCloseable {
     }
 
     public long insertOrUpdatePersistentData(String key, String value) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
-                "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
+        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)"
+            + "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
         // put a persistent Data
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -162,7 +162,7 @@ public class MysqlOperator implements AutoCloseable {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setTimestamp(1,
-                    new Timestamp(System.currentTimeMillis() - expireTimeWindow));
+                new Timestamp(System.currentTimeMillis() - expireTimeWindow));
             int i = preparedStatement.executeUpdate();
             if (i > 0) {
                 logger.info("Clear expire lock, size: {}", i);
@@ -197,13 +197,13 @@ public class MysqlOperator implements AutoCloseable {
                     return null;
                 }
                 return MysqlRegistryData.builder()
-                        .id(resultSet.getLong("id"))
-                        .key(resultSet.getString("key"))
-                        .data(resultSet.getString("data"))
-                        .type(resultSet.getInt("type"))
-                        .createTime(resultSet.getTimestamp("create_time"))
-                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                        .build();
+                    .id(resultSet.getLong("id"))
+                    .key(resultSet.getString("key"))
+                    .data(resultSet.getString("data"))
+                    .type(resultSet.getInt("type"))
+                    .createTime(resultSet.getTimestamp("create_time"))
+                    .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
+                    .build();
             }
         }
     }
@@ -271,13 +271,13 @@ public class MysqlOperator implements AutoCloseable {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return MysqlRegistryLock.builder()
-                            .id(resultSet.getLong("id"))
-                            .key(resultSet.getString("key"))
-                            .lockOwner(resultSet.getString("lock_owner"))
-                            .lastTerm(resultSet.getTimestamp("last_term"))
-                            .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                            .createTime(resultSet.getTimestamp("create_time"))
-                            .build();
+                        .id(resultSet.getLong("id"))
+                        .key(resultSet.getString("key"))
+                        .lockOwner(resultSet.getString("lock_owner"))
+                        .lastTerm(resultSet.getTimestamp("last_term"))
+                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
+                        .createTime(resultSet.getTimestamp("create_time"))
+                        .build();
                 }
             }
             return null;
@@ -319,7 +319,7 @@ public class MysqlOperator implements AutoCloseable {
     public void close() throws Exception {
         if (!dataSource.isClosed()) {
             try (HikariDataSource closedDatasource = this.dataSource) {
-
+                // this is just want to close the resource
             }
         }
     }

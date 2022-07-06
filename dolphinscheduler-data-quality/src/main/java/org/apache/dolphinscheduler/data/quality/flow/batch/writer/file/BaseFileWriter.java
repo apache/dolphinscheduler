@@ -59,11 +59,11 @@ public abstract class BaseFileWriter implements BatchWriter {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-        Map<String,Object> defaultConfig = new HashMap<>();
+        Map<String, Object> defaultConfig = new HashMap<>();
 
         defaultConfig.put(PARTITION_BY, Collections.emptyList());
-        defaultConfig.put(SAVE_MODE,"error");
-        defaultConfig.put(SERIALIZER,"csv");
+        defaultConfig.put(SAVE_MODE, "error");
+        defaultConfig.put(SERIALIZER, "csv");
 
         config.merge(defaultConfig);
     }
@@ -96,13 +96,13 @@ public abstract class BaseFileWriter implements BatchWriter {
 
         if (CollectionUtils.isNotEmpty(config.getStringList(PARTITION_BY))) {
             List<String> partitionKeys = config.getStringList(PARTITION_BY);
-            writer.partitionBy(partitionKeys.toArray(new String[]{}));
+            writer.partitionBy(partitionKeys.toArray(new String[] {}));
         }
 
         Config fileConfig = ConfigUtils.extractSubConfig(config, "options.", false);
         if (fileConfig.isNotEmpty()) {
-            Map<String,String> optionMap = new HashMap<>(16);
-            fileConfig.entrySet().forEach(x -> optionMap.put(x.getKey(),String.valueOf(x.getValue())));
+            Map<String, String> optionMap = new HashMap<>(16);
+            fileConfig.entrySet().forEach(x -> optionMap.put(x.getKey(), String.valueOf(x.getValue())));
             writer.options(optionMap);
         }
 

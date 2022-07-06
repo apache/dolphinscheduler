@@ -38,12 +38,12 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
 /**
- *  netty remote client test
+ * netty remote client test
  */
 public class NettyRemotingClientTest {
 
     /**
-     *  test send sync
+     * test send sync
      */
     @Test
     public void testSendSync() {
@@ -56,7 +56,6 @@ public class NettyRemotingClientTest {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
             }
         });
-
 
         server.start();
         //
@@ -74,10 +73,10 @@ public class NettyRemotingClientTest {
     }
 
     /**
-     *  test sned async
+     * test sned async
      */
     @Test
-    public void testSendAsync(){
+    public void testSendAsync() {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);

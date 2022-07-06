@@ -181,9 +181,9 @@ public enum Status {
     MOVE_PROCESS_DEFINITION_ERROR(10150, "move process definition from {0} to {1} error : {2}", "从{0}移动工作流到{1}错误 : {2}"),
     SWITCH_PROCESS_DEFINITION_VERSION_ERROR(10151, "Switch process definition version error", "切换工作流版本出错"),
     SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_ERROR(10152
-            , "Switch process definition version error: not exists process definition, [process definition id {0}]", "切换工作流版本出错：工作流不存在，[工作流id {0}]"),
+        , "Switch process definition version error: not exists process definition, [process definition id {0}]", "切换工作流版本出错：工作流不存在，[工作流id {0}]"),
     SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR(10153
-            , "Switch process definition version error: not exists process definition version, [process definition id {0}] [version number {1}]", "切换工作流版本出错：工作流版本信息不存在，[工作流id {0}] [版本号 {1}]"),
+        , "Switch process definition version error: not exists process definition version, [process definition id {0}] [version number {1}]", "切换工作流版本出错：工作流版本信息不存在，[工作流id {0}] [版本号 {1}]"),
     QUERY_PROCESS_DEFINITION_VERSIONS_ERROR(10154, "query process definition versions error", "查询工作流历史版本信息出错"),
     DELETE_PROCESS_DEFINITION_VERSION_ERROR(10156, "delete process definition version error", "删除工作流历史版本出错"),
 
@@ -330,7 +330,9 @@ public enum Status {
 
     //plugin
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
-    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query alarm plugins result is empty, please check the startup status of the alarm component and confirm that the relevant alarm plugin is successfully registered", "查询告警插件为空, 请检查告警组件启动状态并确认相关告警插件已注册成功"),
+    QUERY_PLUGINS_RESULT_IS_NULL(110002,
+        "query alarm plugins result is empty, please check the startup status of the alarm component and confirm that the relevant alarm plugin is successfully registered",
+        "查询告警插件为空, 请检查告警组件启动状态并确认相关告警插件已注册成功"),
     QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
     QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
 
@@ -342,7 +344,7 @@ public enum Status {
     PLUGIN_INSTANCE_ALREADY_EXIT(110010, "plugin instance already exit", "该告警插件实例已存在"),
     LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012, "failed to delete the alert instance, there is an alarm group associated with this alert instance",
-            "删除告警实例失败，存在与此告警实例关联的警报组"),
+        "删除告警实例失败，存在与此告警实例关联的警报组"),
     PROCESS_DEFINITION_VERSION_IS_USED(110013, "this process definition version is used", "此工作流定义版本被使用"),
 
     CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
@@ -398,7 +400,7 @@ public enum Status {
     TASK_GROUP_CACHE_START_FAILED(130014, "cache start failed", "任务组相关的缓存启动失败"),
     ENVIRONMENT_WORKER_GROUPS_IS_INVALID(130015, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
     UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016, "You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
-            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
+        "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
     TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源"),
     TASK_GROUP_STATUS_CLOSED(130018, "The task group has been closed.", "任务组已经被关闭"),
     TASK_GROUP_STATUS_OPENED(130019, "The task group has been opened.", "任务组已经被开启"),

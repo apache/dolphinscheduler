@@ -160,7 +160,7 @@ public class OSUtils {
         long now = System.currentTimeMillis();
         if (now - prevTickTime > 950) {
             // Enough time has elapsed.
-            cpuUsage =  processor.getSystemCpuLoadBetweenTicks(prevTicks);
+            cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
             prevTickTime = System.currentTimeMillis();
             prevTicks = processor.getSystemCpuLoadTicks();
         }
@@ -199,7 +199,7 @@ public class OSUtils {
         List<String> userList = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(new FileInputStream("/etc/passwd")))) {
+            new InputStreamReader(new FileInputStream("/etc/passwd")))) {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -273,12 +273,12 @@ public class OSUtils {
      * @return boolean
      */
     public static boolean existTenantCodeInLinux(String tenantCode) {
-        try{
-            String result = exeCmd("id "+ tenantCode);
-            if (!StringUtils.isEmpty(result)){
+        try {
+            String result = exeCmd("id " + tenantCode);
+            if (!StringUtils.isEmpty(result)) {
                 return result.contains("uid=");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             //because ShellExecutor method throws exception to the linux return status is not 0
             //not exist user return status is 1
             logger.error(e.getMessage(), e);
@@ -331,7 +331,7 @@ public class OSUtils {
     /**
      * create linux user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -345,7 +345,7 @@ public class OSUtils {
     /**
      * create mac user (Supports Mac OSX 10.10+)
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -364,7 +364,7 @@ public class OSUtils {
     /**
      * create windows user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -412,7 +412,7 @@ public class OSUtils {
      * get sudo command
      *
      * @param tenantCode tenantCode
-     * @param command command
+     * @param command    command
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {

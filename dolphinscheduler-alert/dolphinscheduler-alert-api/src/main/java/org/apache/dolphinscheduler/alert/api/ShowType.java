@@ -31,7 +31,8 @@ public enum ShowType {
     TEXT(1, "text"),
     ATTACHMENT(2, "attachment"),
     TABLE_ATTACHMENT(3, "table attachment"),
-    MARKDOWN(4, "markdown"),;
+    MARKDOWN(4, "markdown"),
+    ;
 
     private final int code;
     private final String descp;

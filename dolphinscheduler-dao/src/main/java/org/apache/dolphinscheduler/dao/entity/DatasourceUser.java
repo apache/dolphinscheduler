@@ -110,12 +110,12 @@ public class DatasourceUser {
     @Override
     public String toString() {
         return "DatasourceUser{"
-                + "id=" + id
-                + ", userId=" + userId
-                + ", datasourceId=" + datasourceId
-                + ", perm=" + perm
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", userId=" + userId
+            + ", datasourceId=" + datasourceId
+            + ", perm=" + perm
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

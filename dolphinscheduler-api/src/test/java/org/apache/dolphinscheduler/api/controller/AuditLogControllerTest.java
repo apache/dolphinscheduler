@@ -50,12 +50,12 @@ public class AuditLogControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/projects/audit/audit-log-list")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

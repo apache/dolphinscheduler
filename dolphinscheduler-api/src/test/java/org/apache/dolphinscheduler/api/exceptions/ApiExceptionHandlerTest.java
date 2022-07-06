@@ -38,7 +38,7 @@ public class ApiExceptionHandlerTest {
         Method method = controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -48,6 +48,6 @@ public class ApiExceptionHandlerTest {
         Method method = controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(), result.getCode().intValue());
     }
 }

@@ -48,12 +48,12 @@ public class LoginControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/login")
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -64,12 +64,12 @@ public class LoginControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/signOut")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

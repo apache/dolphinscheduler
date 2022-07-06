@@ -19,7 +19,8 @@
 
 # Release
 
-**PyDolphinScheduler** office release is in [ASF Distribution Directory](https://downloads.apache.org/dolphinscheduler/),
+**PyDolphinScheduler** office release is in [ASF Distribution Directory](https://downloads.apache.org/dolphinscheduler/)
+,
 and it should be released together with [apache-dolphinscheduler](https://github.com/apache/dolphinscheduler).
 
 ## To ASF Distribution Directory
@@ -32,4 +33,5 @@ website.
 
 [PyPI](https://pypi.org), Python Package Index, is a repository of software for the Python programming language.
 User could install Python package from it. Release to PyPi make user easier to install and try PyDolphinScheduler,
-There is an official way to package project from [PyPA](https://packaging.python.org/en/latest/tutorials/packaging-projects)
+There is an official way to package project
+from [PyPA](https://packaging.python.org/en/latest/tutorials/packaging-projects)

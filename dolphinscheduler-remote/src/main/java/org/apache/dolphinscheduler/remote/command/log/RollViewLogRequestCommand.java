@@ -24,22 +24,22 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import java.io.Serializable;
 
 /**
- *  roll view log request command
+ * roll view log request command
  */
 public class RollViewLogRequestCommand implements Serializable {
 
     /**
-     *  log path
+     * log path
      */
     private String path;
 
     /**
-     *  skip line number
+     * skip line number
      */
     private int skipLineNum;
 
     /**
-     *  query line number
+     * query line number
      */
     private int limit;
 

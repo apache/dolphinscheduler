@@ -46,7 +46,7 @@ public class DqRuleInputEntry implements Serializable {
     private String field;
     /**
      * form type
-      */
+     */
     @TableField(value = "type")
     private String type;
     /**
@@ -61,7 +61,7 @@ public class DqRuleInputEntry implements Serializable {
     private String value;
     /**
      * default options，can be null
-     *  [{label:"",value:""}]
+     * [{label:"",value:""}]
      */
     @TableField(value = "options")
     private String options;
@@ -274,24 +274,24 @@ public class DqRuleInputEntry implements Serializable {
     @Override
     public String toString() {
         return "DqRuleInputEntry{"
-                + "id=" + id
-                + ", field='" + field + '\''
-                + ", type=" + type
-                + ", title='" + title + '\''
-                + ", value='" + value + '\''
-                + ", options='" + options + '\''
-                + ", placeholder='" + placeholder + '\''
-                + ", optionSourceType=" + optionSourceType
-                + ", valueType=" + valueType
-                + ", inputType=" + inputType
-                + ", isShow=" + isShow
-                + ", canEdit=" + canEdit
-                + ", isEmit=" + isEmit
-                + ", isValidate=" + isValidate
-                + ", valuesMap='" + valuesMap + '\''
-                + ", index=" + index
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", field='" + field + '\''
+            + ", type=" + type
+            + ", title='" + title + '\''
+            + ", value='" + value + '\''
+            + ", options='" + options + '\''
+            + ", placeholder='" + placeholder + '\''
+            + ", optionSourceType=" + optionSourceType
+            + ", valueType=" + valueType
+            + ", inputType=" + inputType
+            + ", isShow=" + isShow
+            + ", canEdit=" + canEdit
+            + ", isEmit=" + isEmit
+            + ", isValidate=" + isValidate
+            + ", valuesMap='" + valuesMap + '\''
+            + ", index=" + index
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

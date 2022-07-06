@@ -50,7 +50,7 @@ public class DataQualityApplication {
 
         String dataQualityParameter = args[0];
 
-        DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(dataQualityParameter,DataQualityConfiguration.class);
+        DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(dataQualityParameter, DataQualityConfiguration.class);
         if (dataQualityConfiguration == null) {
             logger.info("DataQualityConfiguration is null");
             System.exit(-1);
@@ -60,13 +60,13 @@ public class DataQualityApplication {
 
         EnvConfig envConfig = dataQualityConfiguration.getEnvConfig();
         Config config = new Config(envConfig.getConfig());
-        config.put("type",envConfig.getType());
+        config.put("type", envConfig.getType());
         if (Strings.isNullOrEmpty(config.getString(SPARK_APP_NAME))) {
-            config.put(SPARK_APP_NAME,dataQualityConfiguration.getName());
+            config.put(SPARK_APP_NAME, dataQualityConfiguration.getName());
         }
 
         SparkRuntimeEnvironment sparkRuntimeEnvironment = new SparkRuntimeEnvironment(config);
-        DataQualityContext dataQualityContext = new DataQualityContext(sparkRuntimeEnvironment,dataQualityConfiguration);
+        DataQualityContext dataQualityContext = new DataQualityContext(sparkRuntimeEnvironment, dataQualityConfiguration);
         dataQualityContext.execute();
     }
 }

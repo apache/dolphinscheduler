@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -27,23 +25,26 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class DataSourceClientProvider {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
     private static long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(duration, TimeUnit.HOURS)
-            .maximumSize(100)
-            .build();
+        .expireAfterWrite(duration, TimeUnit.HOURS)
+        .maximumSize(100)
+        .build();
     private DataSourcePluginManager dataSourcePluginManager;
 
     private DataSourceClientProvider() {

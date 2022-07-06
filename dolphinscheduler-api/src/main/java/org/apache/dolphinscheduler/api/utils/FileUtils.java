@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.commons.io.IOUtils;
@@ -39,6 +40,7 @@ public class FileUtils {
 
     /**
      * copy source InputStream to target file
+     *
      * @param file
      * @param destFilename
      */
@@ -72,6 +74,7 @@ public class FileUtils {
 
     /**
      * file convert String
+     *
      * @param file MultipartFile file
      * @return file content string
      */

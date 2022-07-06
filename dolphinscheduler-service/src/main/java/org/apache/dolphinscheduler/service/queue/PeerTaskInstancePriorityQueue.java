@@ -112,7 +112,6 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
 
     /**
      * clear task
-     *
      */
     public void clear() {
         queue.clear();
@@ -155,10 +154,10 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     // So we use processInstanceId + taskCode + version to identify a taskInstance.
     private String getTaskInstanceIdentify(TaskInstance taskInstance) {
         return String.join(
-                String.valueOf(taskInstance.getProcessInstanceId()),
-                String.valueOf(taskInstance.getTaskCode()),
-                String.valueOf(taskInstance.getTaskDefinitionVersion())
-                , "-");
+            String.valueOf(taskInstance.getProcessInstanceId()),
+            String.valueOf(taskInstance.getTaskCode()),
+            String.valueOf(taskInstance.getTaskDefinitionVersion())
+            , "-");
     }
 
     /**
@@ -175,9 +174,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
          */
         @Override
         public int compare(TaskInstance o1, TaskInstance o2) {
-            if(o1.getTaskInstancePriority().equals(o2.getTaskInstancePriority())){
+            if (o1.getTaskInstancePriority().equals(o2.getTaskInstancePriority())) {
                 // larger number, higher priority
-                return Constants.OPPOSITE_VALUE * Integer.compare(o1.getTaskGroupPriority(),o2.getTaskGroupPriority());
+                return Constants.OPPOSITE_VALUE * Integer.compare(o1.getTaskGroupPriority(), o2.getTaskGroupPriority());
             }
             return o1.getTaskInstancePriority().compareTo(o2.getTaskInstancePriority());
         }

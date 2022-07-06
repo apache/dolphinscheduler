@@ -32,21 +32,21 @@ public class WebexTeamsSenderTest {
 
     private AlertData alertData;
 
-    private String content = "[{" +
-        "\"projectId\":90001," +
-        "\"projectName\":\"test-k8s\"," +
-        "\"owner\":\"test@cisco.com\"," +
-        "\"processId\":90019," +
-        "\"processDefinitionCode\":1111111," +
-        "\"processName\":\"test-name\"," +
-        "\"taskCode\":2222222," +
-        "\"taskName\":\"test\"," +
-        "\"taskType\":\"SQL\"," +
-        "\"taskState\":\"FAILURE\"," +
-        "\"taskStartTime\":\"2022-01-12 11:05:27\"," +
-        "\"taskEndTime\":\"2022-01-12 11:05:28\"," +
-        "\"taskHost\":\"dolphinscheduler-test\"," +
-        "\"logPath\":\"test.log\"}]";
+    private String content = "[{"
+        + "\"projectId\":90001,"
+        + "\"projectName\":\"test-k8s\","
+        + "\"owner\":\"test@cisco.com\","
+        + "\"processId\":90019,"
+        + "\"processDefinitionCode\":1111111,"
+        + "\"processName\":\"test-name\","
+        + "\"taskCode\":2222222,"
+        + "\"taskName\":\"test\","
+        + "\"taskType\":\"SQL\","
+        + "\"taskState\":\"FAILURE\","
+        + "\"taskStartTime\":\"2022-01-12 11:05:27\","
+        + "\"taskEndTime\":\"2022-01-12 11:05:28\","
+        + "\"taskHost\":\"dolphinscheduler-test\","
+        + "\"logPath\":\"test.log\"}]";
 
     @Before
     public void initDingTalkConfig() {
@@ -78,7 +78,7 @@ public class WebexTeamsSenderTest {
         testSend();
     }
 
-    public void testSend(){
+    public void testSend() {
         WebexTeamsSender webexTeamsSender = new WebexTeamsSender(webexTeamsConfig);
         AlertResult alertResult = webexTeamsSender.sendWebexTeamsAlter(alertData);
         Assert.assertEquals("false", alertResult.getStatus());

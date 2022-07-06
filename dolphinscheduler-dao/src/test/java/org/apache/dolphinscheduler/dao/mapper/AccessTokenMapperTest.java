@@ -183,7 +183,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         }
 
         AccessToken resultAccessToken =
-                accessTokenMapper.selectById(accessToken.getId());
+            accessTokenMapper.selectById(accessToken.getId());
         assertNull(resultAccessToken);
     }
 
@@ -196,7 +196,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
      * @throws Exception
      */
     private Map<Integer, AccessToken> createAccessTokens(
-            Integer count, String userName) throws Exception {
+        Integer count, String userName) throws Exception {
 
         User user = createUser(userName);
 

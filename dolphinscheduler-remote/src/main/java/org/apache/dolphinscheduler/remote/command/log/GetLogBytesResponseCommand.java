@@ -24,12 +24,12 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import java.io.Serializable;
 
 /**
- *  get log bytes response command
+ * get log bytes response command
  */
 public class GetLogBytesResponseCommand implements Serializable {
 
     /**
-     *  log byte data
+     * log byte data
      */
     private byte[] data;
 

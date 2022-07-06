@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 public interface Visitor {
     /**
      * visit
+     *
      * @return resource component
      */
     ResourceComponent visit();

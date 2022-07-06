@@ -19,7 +19,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper">
     <sql id="baseSql">
-        id, code, name, config, description, operator, create_time, update_time
+        id
+        , code, name, config, description, operator, create_time, update_time
     </sql>
     <select id="queryByEnvironmentName" resultType="org.apache.dolphinscheduler.dao.entity.Environment">
         select
@@ -49,7 +50,7 @@
         from t_ds_environment
         where 1=1
         <if test="ids != null and ids.size() > 0">
-            and id  in
+            and id in
             <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
                 #{id}
             </foreach>
@@ -67,6 +68,8 @@
         where code = #{environmentCode}
     </select>
     <delete id="deleteByCode">
-        delete from t_ds_environment where code = #{code}
+        delete
+        from t_ds_environment
+        where code = #{code}
     </delete>
 </mapper>

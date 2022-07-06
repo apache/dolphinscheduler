@@ -19,22 +19,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper">
     <sql id="baseSql">
-        id, environment_code, worker_group, operator, create_time, update_time
+        id
+        , environment_code, worker_group, operator, create_time, update_time
     </sql>
-    <select id="queryByEnvironmentCode" resultType="org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation">
+    <select id="queryByEnvironmentCode"
+            resultType="org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation">
         select
         <include refid="baseSql"/>
         from t_ds_environment_worker_group_relation
         WHERE environment_code = #{environmentCode}
     </select>
-    <select id="queryByWorkerGroupName" resultType="org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation">
+    <select id="queryByWorkerGroupName"
+            resultType="org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation">
         select
         <include refid="baseSql"/>
         from t_ds_environment_worker_group_relation
         WHERE worker_group = #{workerGroupName}
     </select>
     <delete id="deleteByCode">
-        delete from t_ds_environment_worker_group_relation
-        WHERE environment_code = #{environmentCode} and worker_group = #{workerGroupName}
+        delete
+        from t_ds_environment_worker_group_relation
+        WHERE environment_code = #{environmentCode}
+          and worker_group = #{workerGroupName}
     </delete>
 </mapper>

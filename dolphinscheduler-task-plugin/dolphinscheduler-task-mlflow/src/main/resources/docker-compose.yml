@@ -33,7 +33,7 @@ services:
 
 
     healthcheck:
-      test: ["CMD", "curl", "http://127.0.0.1:8080/ping"]
+      test: [ "CMD", "curl", "http://127.0.0.1:8080/ping" ]
       interval: 5s
       timeout: 5s
       retries: 5

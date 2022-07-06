@@ -65,8 +65,8 @@ public class EnvironmentController extends BaseController {
      * create environment
      *
      * @param loginUser   login user
-     * @param name environment name
-     * @param config config
+     * @param name        environment name
+     * @param config      config
      * @param description description
      * @return returns an error if it exists
      */
@@ -82,10 +82,10 @@ public class EnvironmentController extends BaseController {
     @ApiException(CREATE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("name") String name,
-                                @RequestParam("config") String config,
-                                @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "workerGroups", required = false) String workerGroups) {
+                                    @RequestParam("name") String name,
+                                    @RequestParam("config") String config,
+                                    @RequestParam(value = "description", required = false) String description,
+                                    @RequestParam(value = "workerGroups", required = false) String workerGroups) {
 
         Map<String, Object> result = environmentService.createEnvironment(loginUser, name, config, description, workerGroups);
         return returnDataList(result);
@@ -95,9 +95,9 @@ public class EnvironmentController extends BaseController {
      * update environment
      *
      * @param loginUser   login user
-     * @param code   environment code
-     * @param name environment name
-     * @param config environment config
+     * @param code        environment code
+     * @param name        environment name
+     * @param config      environment config
      * @param description description
      * @return update result code
      */
@@ -138,7 +138,7 @@ public class EnvironmentController extends BaseController {
     @ApiException(QUERY_ENVIRONMENT_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryEnvironmentByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam("environmentCode") Long environmentCode) {
+                                         @RequestParam("environmentCode") Long environmentCode) {
 
         Map<String, Object> result = environmentService.queryEnvironmentByCode(environmentCode);
         return returnDataList(result);
@@ -163,9 +163,9 @@ public class EnvironmentController extends BaseController {
     @ApiException(QUERY_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryEnvironmentListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "searchVal", required = false) String searchVal,
-                                         @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
+                                             @RequestParam(value = "searchVal", required = false) String searchVal,
+                                             @RequestParam("pageSize") Integer pageSize,
+                                             @RequestParam("pageNo") Integer pageNo
     ) {
 
         Result result = checkPageParams(pageNo, pageSize);
@@ -180,7 +180,7 @@ public class EnvironmentController extends BaseController {
     /**
      * delete environment by code
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param environmentCode environment code
      * @return delete result code
      */
@@ -193,7 +193,7 @@ public class EnvironmentController extends BaseController {
     @ApiException(DELETE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("environmentCode") Long environmentCode
+                                    @RequestParam("environmentCode") Long environmentCode
     ) {
 
         Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, environmentCode);
@@ -219,7 +219,7 @@ public class EnvironmentController extends BaseController {
     /**
      * verify environment and environment name
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param environmentName environment name
      * @return true if the environment name not exists, otherwise return false
      */
@@ -232,7 +232,7 @@ public class EnvironmentController extends BaseController {
     @ApiException(VERIFY_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "environmentName") String environmentName
+                                    @RequestParam(value = "environmentName") String environmentName
     ) {
         Map<String, Object> result = environmentService.verifyEnvironment(environmentName);
         return returnDataList(result);

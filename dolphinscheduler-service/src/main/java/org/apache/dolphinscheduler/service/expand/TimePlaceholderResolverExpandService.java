@@ -21,6 +21,7 @@ public interface TimePlaceholderResolverExpandService {
 
     /**
      * check is need expand function
+     *
      * @param placeholderName
      * @return
      */
@@ -28,6 +29,7 @@ public interface TimePlaceholderResolverExpandService {
 
     /**
      * time function extension
+     *
      * @param placeholderName
      * @return
      */

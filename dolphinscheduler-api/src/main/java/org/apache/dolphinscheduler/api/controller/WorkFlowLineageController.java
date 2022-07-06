@@ -81,8 +81,8 @@ public class WorkFlowLineageController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                 @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
+                                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                  @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
         try {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
             return returnDataList(result);
@@ -97,7 +97,7 @@ public class WorkFlowLineageController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Map<String, Object>> queryWorkFlowLineage(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+                                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
             return returnDataList(result);

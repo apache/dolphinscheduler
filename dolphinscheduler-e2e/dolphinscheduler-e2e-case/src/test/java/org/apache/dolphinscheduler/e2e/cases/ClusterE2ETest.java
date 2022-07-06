@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -114,10 +113,10 @@ class ClusterE2ETest {
             assertThat(
                     page.clusterList()
             )
-            .as("Cluster list should not contain deleted cluster")
-            .noneMatch(
+                .as("Cluster list should not contain deleted cluster")
+                .noneMatch(
                     it -> it.getText().contains(clusterName) || it.getText().contains(editClusterName)
-            );
+                );
         });
     }
 }

@@ -30,7 +30,7 @@ public class RuleTypeTest {
         assertEquals(2, RuleType.MULTI_TABLE_ACCURACY.getCode());
         assertEquals(3, RuleType.MULTI_TABLE_COMPARISON.getCode());
     }
- 
+
     @Test
     public void testGetDescription() {
         assertEquals("single_table", RuleType.SINGLE_TABLE.getDescription());

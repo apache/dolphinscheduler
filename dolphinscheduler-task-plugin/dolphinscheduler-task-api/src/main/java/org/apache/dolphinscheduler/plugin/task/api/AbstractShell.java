@@ -85,7 +85,7 @@ public abstract class AbstractShell {
 
     /**
      * @param interval the minimum duration to wait before re-executing the
-     * command.
+     *                 command.
      */
     AbstractShell(long interval) {
         this.interval = interval;
@@ -147,16 +147,16 @@ public abstract class AbstractShell {
         if (timeOutInterval > 0) {
             timeOutTimer = new Timer();
             timeoutTimerTask = new ShellTimeoutTimerTask(
-                    this);
+                this);
             //One time scheduling.
             timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);
         }
         final BufferedReader errReader =
-                new BufferedReader(
-                        new InputStreamReader(process.getErrorStream()));
+            new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
         BufferedReader inReader =
-                new BufferedReader(
-                        new InputStreamReader(process.getInputStream()));
+            new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
         final StringBuilder errMsg = new StringBuilder();
 
         // read error and input streams as this would free up the buffers
@@ -247,7 +247,7 @@ public abstract class AbstractShell {
      * @throws IOException errors
      */
     protected abstract void parseExecResult(BufferedReader lines)
-            throws IOException;
+        throws IOException;
 
     /**
      * get the current sub-process executing the given command

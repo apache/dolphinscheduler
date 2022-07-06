@@ -29,7 +29,9 @@ public class WechatAppMessage {
     private Map<String, String> text;
     private Map<String, String> markdown;
     private Integer safe;
+    @SuppressWarnings("checkstyle:MemberName")
     private Integer enable_id_trans;
+    @SuppressWarnings("checkstyle:MemberName")
     private Integer enable_duplicate_check;
 
     public String getTouser() {
@@ -76,6 +78,7 @@ public class WechatAppMessage {
         return enable_id_trans;
     }
 
+    @SuppressWarnings("checkstyle:ParameterName")
     public void setEnable_id_trans(Integer enable_id_trans) {
         this.enable_id_trans = enable_id_trans;
     }
@@ -84,6 +87,7 @@ public class WechatAppMessage {
         return enable_duplicate_check;
     }
 
+    @SuppressWarnings("checkstyle:ParameterName")
     public void setEnable_duplicate_check(Integer enable_duplicate_check) {
         this.enable_duplicate_check = enable_duplicate_check;
     }

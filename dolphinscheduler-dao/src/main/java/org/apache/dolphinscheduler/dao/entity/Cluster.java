@@ -125,15 +125,15 @@ public class Cluster {
     @Override
     public String toString() {
         return "Cluster{"
-                + "id= " + id
-                + ", code= " + code
-                + ", name= " + name
-                + ", config= " + config
-                + ", description= " + description
-                + ", operator= " + operator
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + "}";
+            + "id= " + id
+            + ", code= " + code
+            + ", name= " + name
+            + ", config= " + config
+            + ", description= " + description
+            + ", operator= " + operator
+            + ", createTime= " + createTime
+            + ", updateTime= " + updateTime
+            + "}";
     }
 
 }

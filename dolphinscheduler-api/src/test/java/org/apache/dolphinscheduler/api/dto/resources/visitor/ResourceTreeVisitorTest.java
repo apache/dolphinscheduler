@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * resource tree visitor test
@@ -33,13 +35,13 @@ public class ResourceTreeVisitorTest {
     public void visit() throws Exception {
         List<Resource> resourceList = new ArrayList<>();
 
-        Resource resource1 = new Resource(3,-1,"b","/b",true);
-        Resource resource2 = new Resource(4,2,"a1.txt","/a/a1.txt",false);
-        Resource resource3 = new Resource(5,3,"b1.txt","/b/b1.txt",false);
-        Resource resource4 = new Resource(6,3,"b2.jar","/b/b2.jar",false);
-        Resource resource5 = new Resource(7,-1,"b2","/b2",true);
-        Resource resource6 = new Resource(8,-1,"b2","/b/b2",true);
-        Resource resource7 = new Resource(9,8,"c2.jar","/b/b2/c2.jar",false);
+        Resource resource1 = new Resource(3, -1, "b", "/b", true);
+        Resource resource2 = new Resource(4, 2, "a1.txt", "/a/a1.txt", false);
+        Resource resource3 = new Resource(5, 3, "b1.txt", "/b/b1.txt", false);
+        Resource resource4 = new Resource(6, 3, "b2.jar", "/b/b2.jar", false);
+        Resource resource5 = new Resource(7, -1, "b2", "/b2", true);
+        Resource resource6 = new Resource(8, -1, "b2", "/b/b2", true);
+        Resource resource7 = new Resource(9, 8, "c2.jar", "/b/b2/c2.jar", false);
         resourceList.add(resource1);
         resourceList.add(resource2);
         resourceList.add(resource3);
@@ -57,13 +59,13 @@ public class ResourceTreeVisitorTest {
     public void rootNode() throws Exception {
         List<Resource> resourceList = new ArrayList<>();
 
-        Resource resource1 = new Resource(3,-1,"b","/b",true);
-        Resource resource2 = new Resource(4,2,"a1.txt","/a/a1.txt",false);
-        Resource resource3 = new Resource(5,3,"b1.txt","/b/b1.txt",false);
-        Resource resource4 = new Resource(6,3,"b2.jar","/b/b2.jar",false);
-        Resource resource5 = new Resource(7,-1,"b2","/b2",true);
-        Resource resource6 = new Resource(8,-1,"b2","/b/b2",true);
-        Resource resource7 = new Resource(9,8,"c2.jar","/b/b2/c2.jar",false);
+        Resource resource1 = new Resource(3, -1, "b", "/b", true);
+        Resource resource2 = new Resource(4, 2, "a1.txt", "/a/a1.txt", false);
+        Resource resource3 = new Resource(5, 3, "b1.txt", "/b/b1.txt", false);
+        Resource resource4 = new Resource(6, 3, "b2.jar", "/b/b2.jar", false);
+        Resource resource5 = new Resource(7, -1, "b2", "/b2", true);
+        Resource resource6 = new Resource(8, -1, "b2", "/b/b2", true);
+        Resource resource7 = new Resource(9, 8, "c2.jar", "/b/b2/c2.jar", false);
         resourceList.add(resource1);
         resourceList.add(resource2);
         resourceList.add(resource3);

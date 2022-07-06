@@ -63,9 +63,9 @@ public class OpenmldbTaskTest {
         OpenmldbParameters openmldbParameters = new OpenmldbParameters();
         openmldbParameters.setExecuteMode("offline");
         String rawSQLScript = "select * from users\r\n"
-                + "-- some comment\n"
-                + "inner join order on users.order_id = order.id; \n\n;"
-                + "select * from users;";
+            + "-- some comment\n"
+            + "inner join order on users.order_id = order.id; \n\n;"
+            + "select * from users;";
         openmldbParameters.setSql(rawSQLScript);
         Whitebox.setInternalState(openmldbTask, "openmldbParameters", openmldbParameters);
         OpenmldbParameters internal = (OpenmldbParameters) openmldbTask.getParameters();
@@ -74,16 +74,16 @@ public class OpenmldbTaskTest {
 
         String result1 = openmldbTask.buildPythonScriptContent();
         Assert.assertEquals("import openmldb\n"
-                        + "import sqlalchemy as db\n"
-                        + "engine = db.create_engine('openmldb:///?zk=null&zkPath=null')\n"
-                        + "con = engine.connect()\n"
-                        + "con.execute(\"set @@execute_mode='offline';\")\n"
-                        + "con.execute(\"set @@sync_job=true\")\n"
-                        + "con.execute(\"set @@job_timeout=1800000\")\n"
-                        + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
-                        + "order.id\")\n"
-                        + "con.execute(\"select * from users\")\n"
-                , result1);
+                + "import sqlalchemy as db\n"
+                + "engine = db.create_engine('openmldb:///?zk=null&zkPath=null')\n"
+                + "con = engine.connect()\n"
+                + "con.execute(\"set @@execute_mode='offline';\")\n"
+                + "con.execute(\"set @@sync_job=true\")\n"
+                + "con.execute(\"set @@job_timeout=1800000\")\n"
+                + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
+                + "order.id\")\n"
+                + "con.execute(\"select * from users\")\n"
+            , result1);
     }
 
 }

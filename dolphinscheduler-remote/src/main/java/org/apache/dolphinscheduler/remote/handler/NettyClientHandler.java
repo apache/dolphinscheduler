@@ -104,7 +104,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
+     * @param processor   processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
@@ -114,8 +114,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
+     * @param processor   processor
+     * @param executor    thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
@@ -169,7 +169,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     /**
      * caught exception
      *
-     * @param ctx channel handler context
+     * @param ctx   channel handler context
      * @param cause cause
      */
     @Override
@@ -186,7 +186,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             heartBeat.setType(CommandType.HEART_BEAT);
             heartBeat.setBody(heartBeatData);
             ctx.channel().writeAndFlush(heartBeat)
-                    .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+                .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             if (logger.isDebugEnabled()) {
                 logger.debug("Client send heart beat to: {}", ChannelUtils.getRemoteAddress(ctx.channel()));
             }

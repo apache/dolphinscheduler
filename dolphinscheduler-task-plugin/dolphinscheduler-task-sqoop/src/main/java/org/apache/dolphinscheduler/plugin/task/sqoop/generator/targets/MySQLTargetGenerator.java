@@ -64,19 +64,19 @@ public class MySQLTargetGenerator implements ITargetGenerator {
 
                 // get datasource
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getTargetType(),
-                        sqoopTaskExecutionContext.getTargetConnectionParams());
+                    sqoopTaskExecutionContext.getTargetType(),
+                    sqoopTaskExecutionContext.getTargetConnectionParams());
 
                 if (null != baseDataSource) {
 
                     mysqlTargetSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(DB_USERNAME)
-                            .append(SPACE).append(baseDataSource.getUser())
-                            .append(SPACE).append(DB_PWD)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
+                        .append(SPACE).append(DOUBLE_QUOTES)
+                        .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
+                        .append(SPACE).append(DB_USERNAME)
+                        .append(SPACE).append(baseDataSource.getUser())
+                        .append(SPACE).append(DB_PWD)
+                        .append(SPACE).append(DOUBLE_QUOTES)
+                        .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
                         .append(SPACE).append(TABLE)
                         .append(SPACE).append(targetMysqlParameter.getTargetTable());
 

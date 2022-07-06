@@ -18,23 +18,24 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
+
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.util.Date;
-
 /**
  * user
  */
 @TableName("t_ds_user")
-public class  User {
+public class User {
 
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -63,7 +64,7 @@ public class  User {
     private UserType userType;
 
     /**
-     *  tenant id
+     * tenant id
      */
     private int tenantId;
 
@@ -174,7 +175,6 @@ public class  User {
         this.updateTime = updateTime;
     }
 
-
     public String getPhone() {
         return phone;
     }
@@ -258,22 +258,22 @@ public class  User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", userPassword='" + userPassword + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", userType=" + userType +
-                ", tenantId=" + tenantId +
-                ", state=" + state +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", queueName='" + queueName + '\'' +
-                ", alertGroup='" + alertGroup + '\'' +
-                ", queue='" + queue + '\''  +
-                ", timeZone='" + timeZone + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "User{"
+            + "id=" + id
+            + ", userName='" + userName + '\''
+            + ", userPassword='" + userPassword + '\''
+            + ", email='" + email + '\''
+            + ", phone='" + phone + '\''
+            + ", userType=" + userType
+            + ", tenantId=" + tenantId
+            + ", state=" + state
+            + ", tenantCode='" + tenantCode + '\''
+            + ", queueName='" + queueName + '\''
+            + ", alertGroup='" + alertGroup + '\''
+            + ", queue='" + queue + '\''
+            + ", timeZone='" + timeZone + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

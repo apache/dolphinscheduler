@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
@@ -84,8 +85,8 @@ public class ZookeeperRecord {
      */
     private int state;
 
-
-    public ZookeeperRecord(String hostname,int connections, int watches, long sent, long received, String mode, float minLatency, float avgLatency, float maxLatency, int nodeCount, int state,Date date) {
+    public ZookeeperRecord(String hostname, int connections, int watches, long sent, long received, String mode, float minLatency, float avgLatency, float maxLatency, int nodeCount, int state,
+                           Date date) {
         this.hostname = hostname;
         this.connections = connections;
         this.watches = watches;
@@ -99,7 +100,6 @@ public class ZookeeperRecord {
         this.state = state;
         this.date = date;
     }
-
 
     public String getHostname() {
         return hostname;
@@ -199,19 +199,19 @@ public class ZookeeperRecord {
 
     @Override
     public String toString() {
-        return "ZookeeperRecord{" +
-                "hostname='" + hostname + '\'' +
-                ", connections=" + connections +
-                ", watches=" + watches +
-                ", sent=" + sent +
-                ", received=" + received +
-                ", mode='" + mode + '\'' +
-                ", minLatency=" + minLatency +
-                ", avgLatency=" + avgLatency +
-                ", maxLatency=" + maxLatency +
-                ", nodeCount=" + nodeCount +
-                ", date=" + date +
-                ", state=" + state +
-                '}';
+        return "ZookeeperRecord{"
+            + "hostname='" + hostname + '\''
+            + ", connections=" + connections
+            + ", watches=" + watches
+            + ", sent=" + sent
+            + ", received=" + received
+            + ", mode='" + mode + '\''
+            + ", minLatency=" + minLatency
+            + ", avgLatency=" + avgLatency
+            + ", maxLatency=" + maxLatency
+            + ", nodeCount=" + nodeCount
+            + ", date=" + date
+            + ", state=" + state
+            + '}';
     }
 }

@@ -57,20 +57,20 @@ public class DataQualityParameterTest {
     @Test
     public void testCheckParameterNormal() {
 
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("src_filter","date=2012-10-05");
-        inputParameterValue.put("src_field","id");
+        Map<String, String> inputParameterValue = new HashMap<>();
+        inputParameterValue.put("src_connector_type", "JDBC");
+        inputParameterValue.put("src_datasource_id", "1");
+        inputParameterValue.put("src_table", "test1");
+        inputParameterValue.put("src_filter", "date=2012-10-05");
+        inputParameterValue.put("src_field", "id");
 
-        inputParameterValue.put("rule_type","1");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","1000");
-        inputParameterValue.put("create_time","2012-10-05");
-        inputParameterValue.put("update_time","2012-10-05");
+        inputParameterValue.put("rule_type", "1");
+        inputParameterValue.put("process_definition_id", "1");
+        inputParameterValue.put("task_instance_id", "1");
+        inputParameterValue.put("check_type", "1");
+        inputParameterValue.put("threshold", "1000");
+        inputParameterValue.put("create_time", "2012-10-05");
+        inputParameterValue.put("update_time", "2012-10-05");
 
         dataQualityParameters.setRuleInputParameter(inputParameterValue);
 
@@ -80,14 +80,14 @@ public class DataQualityParameterTest {
     @Test
     public void testRuleInputParameter() {
         String formCreateJson = "[{\"field\":\"src_connector_type\",\"name\":\"源数据类型\","
-                + "\"props\":{\"disabled\":false,\"multiple\":false,\"size\":\"small\"},"
-                + "\"type\":\"select\",\"title\":\"源数据类型\",\"value\":\"JDBC\","
-                + "\"options\":[{\"label\":\"HIVE\",\"value\":\"HIVE\",\"disabled\":false},"
-                + "{\"label\":\"JDBC\",\"value\":\"JDBC\",\"disabled\":false}]},"
-                + "{\"props\":{\"disabled\":false,\"rows\":0,\"placeholder\":\"Please enter source table name\","
-                + "\"size\":\"small\"},\"field\":\"src_table\",\"name\":\"源数据表\","
-                + "\"type\":\"input\",\"title\":\"源数据表\",\"validate\":[{\"required\":true,\"type\":\"string\","
-                + "\"trigger\":\"blur\"}]}]";
+            + "\"props\":{\"disabled\":false,\"multiple\":false,\"size\":\"small\"},"
+            + "\"type\":\"select\",\"title\":\"源数据类型\",\"value\":\"JDBC\","
+            + "\"options\":[{\"label\":\"HIVE\",\"value\":\"HIVE\",\"disabled\":false},"
+            + "{\"label\":\"JDBC\",\"value\":\"JDBC\",\"disabled\":false}]},"
+            + "{\"props\":{\"disabled\":false,\"rows\":0,\"placeholder\":\"Please enter source table name\","
+            + "\"size\":\"small\"},\"field\":\"src_table\",\"name\":\"源数据表\","
+            + "\"type\":\"input\",\"title\":\"源数据表\",\"validate\":[{\"required\":true,\"type\":\"string\","
+            + "\"trigger\":\"blur\"}]}]";
 
         List<PluginParams> pluginParamsList = new ArrayList<>();
         SelectParamProps selectParamProps = new SelectParamProps();
@@ -95,12 +95,12 @@ public class DataQualityParameterTest {
         selectParamProps.setDisabled(false);
         selectParamProps.setSize("small");
 
-        SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type","源数据类型")
-                .setProps(selectParamProps)
-                .addOptions(new ParamsOptions("HIVE","HIVE",false))
-                .addOptions(new ParamsOptions("JDBC","JDBC",false))
-                .setValue("JDBC")
-                .build();
+        SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type", "源数据类型")
+            .setProps(selectParamProps)
+            .addOptions(new ParamsOptions("HIVE", "HIVE", false))
+            .addOptions(new ParamsOptions("JDBC", "JDBC", false))
+            .setValue("JDBC")
+            .build();
 
         InputParamProps inputParamProps = new InputParamProps();
         inputParamProps.setPlaceholder("Please enter source table name");
@@ -108,10 +108,10 @@ public class DataQualityParameterTest {
         inputParamProps.setSize("small");
         inputParamProps.setRows(0);
 
-        InputParam srcTable = InputParam.newBuilder("src_table","源数据表")
-                .setProps(inputParamProps)
-                .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
-                .build();
+        InputParam srcTable = InputParam.newBuilder("src_table", "源数据表")
+            .setProps(inputParamProps)
+            .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
+            .build();
 
         pluginParamsList.add(srcConnectorType);
         pluginParamsList.add(srcTable);
@@ -126,6 +126,6 @@ public class DataQualityParameterTest {
             Assert.fail();
         }
 
-        Assert.assertEquals(formCreateJson,result);
+        Assert.assertEquals(formCreateJson, result);
     }
 }

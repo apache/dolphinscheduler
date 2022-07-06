@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,8 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.Date;
 
 /**
  * login interceptor, must log in first
@@ -54,9 +54,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     /**
      * Intercept the execution of a handler. Called after HandlerMapping determined
      *
-     * @param request current HTTP request
+     * @param request  current HTTP request
      * @param response current HTTP response
-     * @param handler chosen handler to execute, for type and/or instance evaluation
+     * @param handler  chosen handler to execute, for type and/or instance evaluation
      * @return boolean true or false
      */
     @Override

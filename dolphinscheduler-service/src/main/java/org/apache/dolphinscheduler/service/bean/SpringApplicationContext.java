@@ -37,7 +37,7 @@ public class SpringApplicationContext implements ApplicationContextAware {
      * Close this application context, destroying all beans in its bean factory.
      */
     public void close() {
-        ((AbstractApplicationContext)applicationContext).close();
+        ((AbstractApplicationContext) applicationContext).close();
     }
 
     public static <T> T getBean(Class<T> requiredType) {

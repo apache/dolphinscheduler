@@ -83,7 +83,7 @@ public class PropertyUtils {
     /**
      * get property value
      *
-     * @param key property name
+     * @param key        property name
      * @param defaultVal default value
      * @return property value
      */
@@ -103,7 +103,7 @@ public class PropertyUtils {
     }
 
     /**
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return property value
      */
@@ -134,7 +134,7 @@ public class PropertyUtils {
     /**
      * get property value
      *
-     * @param key property name
+     * @param key          property name
      * @param defaultValue default value
      * @return property value
      */
@@ -146,7 +146,7 @@ public class PropertyUtils {
     /**
      * get property long value
      *
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return property value
      */
@@ -174,7 +174,8 @@ public class PropertyUtils {
 
     /**
      * set value
-     * @param key key
+     *
+     * @param key   key
      * @param value value
      */
     public static void setValue(String key, String value) {

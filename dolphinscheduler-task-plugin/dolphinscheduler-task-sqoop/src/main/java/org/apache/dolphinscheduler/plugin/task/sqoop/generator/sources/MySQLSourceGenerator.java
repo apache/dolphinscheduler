@@ -68,19 +68,19 @@ public class MySQLSourceGenerator implements ISourceGenerator {
 
             if (null != sourceMysqlParameter) {
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getSourcetype(),
-                        sqoopTaskExecutionContext.getSourceConnectionParams());
+                    sqoopTaskExecutionContext.getSourcetype(),
+                    sqoopTaskExecutionContext.getSourceConnectionParams());
 
                 if (null != baseDataSource) {
 
                     mysqlSourceSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
+                        .append(SPACE).append(DOUBLE_QUOTES)
+                        .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
                         .append(SPACE).append(DB_USERNAME)
                         .append(SPACE).append(baseDataSource.getUser())
                         .append(SPACE).append(DB_PWD)
                         .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
+                        .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
 
                     //sqoop table & sql query
                     if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {

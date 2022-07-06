@@ -56,7 +56,7 @@ public class PostgreSQLDataSourceProcessorTest {
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
-                .createConnectionParams(postgreSqlDatasourceParamDTO);
+            .createConnectionParams(postgreSqlDatasourceParamDTO);
         Assert.assertEquals("jdbc:postgresql://localhost:3308", connectionParams.getAddress());
         Assert.assertEquals("jdbc:postgresql://localhost:3308/default", connectionParams.getJdbcUrl());
         Assert.assertEquals("root", connectionParams.getUser());
@@ -65,9 +65,9 @@ public class PostgreSQLDataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:postgresql://localhost:3308\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:postgresql://localhost:3308/default\"}";
+            + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:postgresql://localhost:3308/default\"}";
         PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
-                .createConnectionParams(connectionJson);
+            .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }

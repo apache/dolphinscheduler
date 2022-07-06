@@ -41,25 +41,25 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
 
         InputParam scriptUserParam = InputParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, ScriptParamsConstants.SCRIPT_USER_PARAMS)
-                                               .addValidate(Validate.newBuilder()
-                                                                    .setRequired(false)
-                                                                    .build())
-                                               .setPlaceholder("please enter your custom parameters, which will be passed to you when calling your script")
-                                               .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .setPlaceholder("please enter your custom parameters, which will be passed to you when calling your script")
+            .build();
         // need check file type and file exist
         InputParam scriptPathParam = InputParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_PATH, ScriptParamsConstants.SCRIPT_PATH)
-                                               .addValidate(Validate.newBuilder()
-                                                                    .setRequired(true)
-                                                                    .build())
-                                               .setPlaceholder("please upload the file to the disk directory of the alert server,"
-                                                   + " and ensure that the path is absolute and has the corresponding access rights")
-                                               .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .setPlaceholder("please upload the file to the disk directory of the alert server,"
+                + " and ensure that the path is absolute and has the corresponding access rights")
+            .build();
 
         RadioParam scriptTypeParams = RadioParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_TYPE, ScriptParamsConstants.SCRIPT_TYPE)
-                                                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getDescp(), false))
-                                                .setValue(ScriptType.SHELL.getDescp())
-                                                .addValidate(Validate.newBuilder().setRequired(true).build())
-                                                .build();
+            .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getDescp(), false))
+            .setValue(ScriptType.SHELL.getDescp())
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         return Arrays.asList(scriptUserParam, scriptPathParam, scriptTypeParams);
     }

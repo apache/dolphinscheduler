@@ -36,16 +36,16 @@ public class OracleDataSourceParamDTO extends BaseDataSourceParamDTO {
     @Override
     public String toString() {
         return "OracleDataSourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", connectType=" + connectType
-                + ", other='" + other + '\''
-                + '}';
+            + "name='" + name + '\''
+            + ", note='" + note + '\''
+            + ", host='" + host + '\''
+            + ", port=" + port
+            + ", database='" + database + '\''
+            + ", userName='" + userName + '\''
+            + ", password='" + password + '\''
+            + ", connectType=" + connectType
+            + ", other='" + other + '\''
+            + '}';
     }
 
     @Override

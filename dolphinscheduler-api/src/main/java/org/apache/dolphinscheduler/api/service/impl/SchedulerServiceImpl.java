@@ -62,7 +62,6 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,16 +107,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * save schedule
      *
-     * @param loginUser login user
-     * @param projectCode project name
-     * @param processDefineCode process definition code
-     * @param schedule scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
+     * @param loginUser               login user
+     * @param projectCode             project name
+     * @param processDefineCode       process definition code
+     * @param schedule                scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
      * @param processInstancePriority process instance priority
-     * @param workerGroup worker group
-     * @param environmentCode environment code
+     * @param workerGroup             worker group
+     * @param environmentCode         environment code
      * @return create result code
      */
     @Override
@@ -138,14 +137,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        result = executorService.checkProcessDefinitionValid(projectCode,processDefinition, processDefineCode, processDefinition.getVersion());
+        result = executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode, processDefinition.getVersion());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -209,15 +208,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * updateProcessInstance schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
-     * @param scheduleExpression scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
-     * @param workerGroup worker group
-     * @param environmentCode environment code
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param id                      scheduler id
+     * @param scheduleExpression      scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param workerGroup             worker group
+     * @param environmentCode         environment code
      * @param processInstancePriority process instance priority
      * @return update result code
      */
@@ -238,7 +237,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -265,9 +264,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * set schedule online or offline
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
+     * @param loginUser      login user
+     * @param projectCode    project code
+     * @param id             scheduler id
      * @param scheduleStatus schedule status
      * @return publish result code
      */
@@ -281,7 +280,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -296,7 +295,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         // check schedule release state
         if (scheduleObj.getReleaseState() == scheduleStatus) {
             logger.info("schedule release is already {},needn't to change schedule id: {} from {} to {}",
-                    scheduleObj.getReleaseState(), scheduleObj.getId(), scheduleObj.getReleaseState(), scheduleStatus);
+                scheduleObj.getReleaseState(), scheduleObj.getId(), scheduleObj.getReleaseState(), scheduleStatus);
             putMsg(result, Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
             return result;
         }
@@ -314,7 +313,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             // check process definition release state
             if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
                 logger.info("not release process definition id: {} , name : {}",
-                        processDefinition.getId(), processDefinition.getName());
+                    processDefinition.getId(), processDefinition.getName());
                 putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
                 return result;
             }
@@ -323,7 +322,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             processService.recurseFindSubProcess(processDefinition.getCode(), subProcessDefineCodes);
             if (!subProcessDefineCodes.isEmpty()) {
                 List<ProcessDefinition> subProcessDefinitionList =
-                        processDefinitionMapper.queryByCodes(subProcessDefineCodes);
+                    processDefinitionMapper.queryByCodes(subProcessDefineCodes);
                 if (subProcessDefinitionList != null && !subProcessDefinitionList.isEmpty()) {
                     for (ProcessDefinition subProcessDefinition : subProcessDefinitionList) {
                         /**
@@ -331,7 +330,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                          */
                         if (subProcessDefinition.getReleaseState() != ReleaseState.ONLINE) {
                             logger.info("not release process definition id: {} , name : {}",
-                                    subProcessDefinition.getId(), subProcessDefinition.getName());
+                                subProcessDefinition.getId(), subProcessDefinition.getName());
                             putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(subProcessDefinition.getId()));
                             return result;
                         }
@@ -379,17 +378,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * query schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processDefineCode process definition code
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param searchVal search value
+     * @param pageNo            page number
+     * @param pageSize          page size
+     * @param searchVal         search value
      * @return schedule list page
      */
     @Override
     public Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
-                                             Integer pageNo, Integer pageSize) {
+                                Integer pageNo, Integer pageSize) {
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
@@ -426,7 +425,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * query schedule list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return schedule list
      */
@@ -436,7 +435,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -461,7 +460,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * delete schedule
      *
-     * @param projectId project id
+     * @param projectId  project id
      * @param scheduleId schedule id
      * @throws RuntimeException runtime exception
      */
@@ -475,7 +474,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * check valid
      *
      * @param result result
-     * @param bool bool
+     * @param bool   bool
      * @param status status
      * @return check result code
      */
@@ -491,9 +490,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * delete schedule by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param scheduleId scheule id
+     * @param scheduleId  scheule id
      * @return delete result code
      */
     @Override
@@ -502,7 +501,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
@@ -517,7 +516,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         // Determine if the login user is the owner of the schedule
         if (loginUser.getId() != schedule.getUserId()
-                && loginUser.getUserType() != UserType.ADMIN_USER) {
+            && loginUser.getUserType() != UserType.ADMIN_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -542,7 +541,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * preview schedule
      *
      * @param loginUser login user
-     * @param schedule schedule expression
+     * @param schedule  schedule expression
      * @return the next five fire time
      */
     @Override
@@ -554,7 +553,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
         Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
-        startTime =  now.after(startTime) ? now : startTime;
+        startTime = now.after(startTime) ? now : startTime;
 
         try {
             cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
@@ -574,14 +573,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     /**
      * update process definition schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param scheduleExpression scheduleExpression
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
-     * @param workerGroup worker group
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param processDefinitionCode   process definition code
+     * @param scheduleExpression      scheduleExpression
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param workerGroup             worker group
      * @param processInstancePriority process instance priority
      * @return update result code
      */
@@ -598,7 +597,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                      long environmentCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

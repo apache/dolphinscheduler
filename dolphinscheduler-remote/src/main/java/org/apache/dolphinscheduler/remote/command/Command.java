@@ -21,8 +21,8 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *  receive task log request command and content fill
- *  for netty data serializable transfer
+ * receive task log request command and content fill
+ * for netty data serializable transfer
  */
 public class Command implements Serializable {
 
@@ -33,11 +33,11 @@ public class Command implements Serializable {
     public static final byte MAGIC = (byte) 0xbabe;
     public static final byte VERSION = 0;
 
-    public Command(){
+    public Command() {
         this.opaque = REQUEST_ID.getAndIncrement();
     }
 
-    public Command(long opaque){
+    public Command(long opaque) {
         this.opaque = opaque;
     }
 
@@ -47,7 +47,7 @@ public class Command implements Serializable {
     private CommandType type;
 
     /**
-     *  request unique identification
+     * request unique identification
      */
     private long opaque;
 
@@ -57,7 +57,7 @@ public class Command implements Serializable {
     private CommandContext context = new CommandContext();
 
     /**
-     *  data body
+     * data body
      */
     private byte[] body;
 

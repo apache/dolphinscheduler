@@ -28,7 +28,7 @@ public class BeanConfig {
     @Bean
     public AlertClientService alertClientService(WorkerConfig workerConfig) {
         return new AlertClientService(
-                workerConfig.getAlertListenHost(),
-                workerConfig.getAlertListenPort());
+            workerConfig.getAlertListenHost(),
+            workerConfig.getAlertListenPort());
     }
 }

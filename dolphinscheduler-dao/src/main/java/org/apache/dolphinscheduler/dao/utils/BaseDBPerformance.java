@@ -28,6 +28,7 @@ public abstract class BaseDBPerformance {
 
     /**
      * return the current database performance
+     *
      * @param conn connection
      * @return MonitorRecord
      */

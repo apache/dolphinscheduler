@@ -34,6 +34,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface ProjectMapper extends BaseMapper<Project> {
     /**
      * query project detail by code
+     *
      * @param projectCode projectCode
      * @return project
      */
@@ -41,6 +42,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query project detail by code list
+     *
      * @param codes codes
      * @return project list
      */
@@ -49,6 +51,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
     /**
      * TODO: delete
      * query project detail by id
+     *
      * @param projectId projectId
      * @return project
      */
@@ -56,6 +59,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query project detail by code
+     *
      * @param projectCode projectCode
      * @return project
      */
@@ -63,6 +67,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query project by name
+     *
      * @param projectName projectName
      * @return project
      */
@@ -70,9 +75,10 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * project page
-     * @param page page
+     *
+     * @param page        page
      * @param projectsIds projectsIds
-     * @param searchName searchName
+     * @param searchName  searchName
      * @return project Ipage
      */
     IPage<Project> queryProjectListPaging(IPage<Project> page,
@@ -80,7 +86,8 @@ public interface ProjectMapper extends BaseMapper<Project> {
                                           @Param("searchName") String searchName);
 
     /**
-     *  query create project user
+     * query create project user
+     *
      * @param userId userId
      * @return project list
      */
@@ -88,6 +95,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query authed project list by userId
+     *
      * @param userId userId
      * @return project list
      */
@@ -95,6 +103,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query relation project list by userId
+     *
      * @param userId userId
      * @return project list
      */
@@ -102,6 +111,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query project except userId
+     *
      * @param userId userId
      * @return project list
      */
@@ -109,6 +119,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query project list by userId
+     *
      * @param userId
      * @return
      */
@@ -116,6 +127,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query project name and user name by processInstanceId.
+     *
      * @param processInstanceId processInstanceId
      * @return projectName and userName
      */
@@ -123,6 +135,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * query all project
+     *
      * @param userId
      * @return projectList
      */
@@ -131,10 +144,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
 
     /**
      * list authorized Projects
+     *
      * @param userId
      * @param projectsIds
      * @param <T>
      * @return
      */
-    List<Project> listAuthorizedProjects(@Param("userId") int userId, @Param("projectsIds")List<Integer> projectsIds);
+    List<Project> listAuthorizedProjects(@Param("userId") int userId, @Param("projectsIds") List<Integer> projectsIds);
 }

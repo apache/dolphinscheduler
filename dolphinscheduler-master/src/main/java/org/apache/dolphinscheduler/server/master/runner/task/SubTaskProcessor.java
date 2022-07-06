@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.auto.service.AutoService;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -33,6 +33,8 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +42,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.auto.service.AutoService;
 
 /**
  * subtask processor
@@ -67,10 +69,10 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         }
         this.setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+            processInstance.getProcessDefinitionCode(),
+            processInstance.getProcessDefinitionVersion(),
+            taskInstance.getProcessInstanceId(),
+            taskInstance.getId()));
 
         return true;
     }
@@ -84,9 +86,9 @@ public class SubTaskProcessor extends BaseTaskProcessor {
             }
         } catch (Exception e) {
             logger.error("work flow {} sub task {} exceptions",
-                    this.processInstance.getId(),
-                    this.taskInstance.getId(),
-                    e);
+                this.processInstance.getId(),
+                this.taskInstance.getId(),
+                e);
         } finally {
             this.runLock.unlock();
         }
@@ -107,11 +109,11 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     protected boolean taskTimeout() {
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
+            && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
         logger.info("sub process task {} timeout, strategy {} ",
-                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+            taskInstance.getId(), taskTimeoutStrategy.getDescp());
         killTask();
         return true;
     }
@@ -119,10 +121,10 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     private void updateTaskState() {
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         logger.info("work flow {} task {}, sub work flow: {} state: {}",
-                this.processInstance.getId(),
-                this.taskInstance.getId(),
-                subProcessInstance.getId(),
-                subProcessInstance.getState().getDescp());
+            this.processInstance.getId(),
+            this.taskInstance.getId(),
+            subProcessInstance.getId(),
+            subProcessInstance.getState().getDescp());
         if (subProcessInstance != null && subProcessInstance.getState().typeIsFinished()) {
             taskInstance.setState(subProcessInstance.getState());
             taskInstance.setEndTime(new Date());
@@ -146,7 +148,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
                 if (localParams != null) {
                     List<Property> properties = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
                     Map<String, String> subProcessParam = JSONUtils.toList(subProcessInstanceVarPool, Property.class).stream()
-                            .collect(Collectors.toMap(Property::getProp, Property::getValue));
+                        .collect(Collectors.toMap(Property::getProp, Property::getValue));
                     List<Property> outProperties = properties.stream().filter(r -> Direct.OUT == r.getDirect()).collect(Collectors.toList());
                     for (Property info : outProperties) {
                         info.setValue(subProcessParam.get(info.getProp()));
@@ -179,8 +181,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     private boolean setSubWorkFlow() {
         logger.info("set work flow {} task {} running",
-                this.processInstance.getId(),
-                this.taskInstance.getId());
+            this.processInstance.getId(),
+            this.taskInstance.getId());
         if (this.subProcessInstance != null) {
             return true;
         }
@@ -193,9 +195,9 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         logger.info("set sub work flow {} task {} state: {}",
-                processInstance.getId(),
-                taskInstance.getId(),
-                taskInstance.getState());
+            processInstance.getId(),
+            taskInstance.getId(),
+            taskInstance.getState());
         return true;
 
     }
@@ -214,7 +216,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     private void sendToSubProcess() {
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(), subProcessInstance.getId(), 0
+            processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(), subProcessInstance.getId(), 0
         );
         Host host = new Host(subProcessInstance.getHost());
         this.stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());

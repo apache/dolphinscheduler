@@ -52,6 +52,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
     /**
      * insert
+     *
      * @return Schedule
      */
     private Schedule insertOne() {
@@ -135,9 +136,9 @@ public class ScheduleMapperTest extends BaseDaoTest {
         schedule.setProcessDefinitionCode(processDefinition.getCode());
         scheduleMapper.insert(schedule);
 
-        Page<Schedule> page = new Page(1,3);
+        Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
-                processDefinition.getCode(), "");
+            processDefinition.getCode(), "");
         Assert.assertNotEquals(scheduleIPage.getSize(), 0);
     }
 
@@ -173,9 +174,9 @@ public class ScheduleMapperTest extends BaseDaoTest {
         schedule.setProcessDefinitionCode(processDefinition.getCode());
         scheduleMapper.insert(schedule);
 
-        Page<Schedule> page = new Page(1,3);
+        Page<Schedule> page = new Page(1, 3);
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
-                project.getName()
+            project.getName()
         );
 
         Assert.assertNotEquals(schedules.size(), 0);

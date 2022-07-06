@@ -72,7 +72,7 @@ public enum CommandType {
 
     static {
         for (CommandType commandType : CommandType.values()) {
-            COMMAND_TYPE_MAP.put(commandType.code,commandType);
+            COMMAND_TYPE_MAP.put(commandType.code, commandType);
         }
     }
 

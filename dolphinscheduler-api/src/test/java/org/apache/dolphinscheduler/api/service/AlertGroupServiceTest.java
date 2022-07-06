@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
-import org.apache.commons.compress.utils.Sets;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -42,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -162,12 +164,12 @@ public class AlertGroupServiceTest {
         // not exist
         user.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(), ALERT_GROUP_UPDATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{1}, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[] {1}, 0, baseServiceLogger)).thenReturn(true);
         result = alertGroupService.updateAlertgroup(user, 1, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.ALERT_GROUP_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{2}, user.getId(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[] {2}, user.getId(), baseServiceLogger)).thenReturn(true);
         Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
         result = alertGroupService.updateAlertgroup(user, 2, groupName, groupName, null);
         logger.info(result.toString());
@@ -180,7 +182,7 @@ public class AlertGroupServiceTest {
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(), ALERT_GROUP_UPDATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{2}, user.getId(), baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[] {2}, user.getId(), baseServiceLogger)).thenReturn(true);
         Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
         Mockito.when(alertGroupMapper.updateById(Mockito.any())).thenThrow(new DuplicateKeyException("group name exist"));
         Map<String, Object> result = alertGroupService.updateAlertgroup(user, 2, groupName, groupName, null);
@@ -193,7 +195,7 @@ public class AlertGroupServiceTest {
         User user = new User();
         // no operate
         user.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(),ALERT_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(), ALERT_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = alertGroupService.delAlertgroupById(user, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
@@ -202,12 +204,12 @@ public class AlertGroupServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(), ALERT_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{2}, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[] {2}, 0, baseServiceLogger)).thenReturn(true);
         result = alertGroupService.delAlertgroupById(user, 2);
         logger.info(result.toString());
         Assert.assertEquals(Status.ALERT_GROUP_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{2}, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[] {2}, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
         result = alertGroupService.delAlertgroupById(user, 2);
         logger.info(result.toString());

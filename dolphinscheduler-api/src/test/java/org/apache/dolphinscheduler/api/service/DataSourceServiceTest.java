@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_LIST;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -40,7 +41,6 @@ import org.apache.dolphinscheduler.plugin.datasource.hive.param.HiveDataSourcePa
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.oracle.param.OracleDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLDataSourceParamDTO;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -50,7 +50,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -211,7 +210,7 @@ public class DataSourceServiceTest {
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), baseServiceLogger)).thenReturn(ids);
 
         Result result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
-        Assert.assertEquals(Status.SUCCESS.getCode(),(int)result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 
     @Test
@@ -228,7 +227,7 @@ public class DataSourceServiceTest {
         int dataSourceId = 1;
         Result result = new Result();
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, new Object[]{dataSourceId}, -1, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, new Object[] {dataSourceId}, -1, baseServiceLogger)).thenReturn(true);
         //resource not exist
         dataSourceService.putMsg(result, Status.RESOURCE_NOT_EXIST);
         PowerMockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
@@ -248,7 +247,7 @@ public class DataSourceServiceTest {
         loginUser.setId(1);
         dataSource.setId(22);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), DATASOURCE_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,new Object[]{dataSource.getId()} , 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, new Object[] {dataSource.getId()}, 0, baseServiceLogger)).thenReturn(true);
         PowerMockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
         Assert.assertEquals(result.getCode(), dataSourceService.delete(loginUser, dataSourceId).getCode());
 
@@ -359,7 +358,7 @@ public class DataSourceServiceTest {
         dataSource.setNote("Note");
         dataSource.setType(DbType.ORACLE);
         dataSource.setConnectionParams("{\"connectType\":\"ORACLE_SID\",\"address\":\"jdbc:oracle:thin:@192.168.xx.xx:49161\",\"database\":\"XE\","
-                + "\"jdbcUrl\":\"jdbc:oracle:thin:@192.168.xx.xx:49161/XE\",\"user\":\"system\",\"password\":\"oracle\"}");
+            + "\"jdbcUrl\":\"jdbc:oracle:thin:@192.168.xx.xx:49161/XE\",\"user\":\"system\",\"password\":\"oracle\"}");
 
         return dataSource;
     }
@@ -371,7 +370,7 @@ public class DataSourceServiceTest {
         dataSource.setNote("Note");
         dataSource.setType(DbType.ORACLE);
         dataSource.setConnectionParams("{\"connectType\":\"ORACLE_SID\",\"address\":\"jdbc:oracle:thin:@192.168.xx.xx:49161\",\"database\":\"XE\","
-                + "\"jdbcUrl\":\"jdbc:oracle:thin:@192.168.xx.xx:49161/XE\",\"user\":\"system\",\"password\":\"oracle\"}");
+            + "\"jdbcUrl\":\"jdbc:oracle:thin:@192.168.xx.xx:49161/XE\",\"user\":\"system\",\"password\":\"oracle\"}");
 
         return dataSource;
     }
@@ -388,7 +387,7 @@ public class DataSourceServiceTest {
 
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(oracleDatasourceParamDTO);
         String expected = "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\","
-                + "\"driverClassName\":\"oracle.jdbc.OracleDriver\",\"validationQuery\":\"select 1 from dual\",\"connectType\":\"ORACLE_SERVICE_NAME\"}";
+            + "\"driverClassName\":\"oracle.jdbc.OracleDriver\",\"validationQuery\":\"select 1 from dual\",\"connectType\":\"ORACLE_SERVICE_NAME\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
         PowerMockito.mockStatic(CommonUtils.class);
@@ -408,9 +407,9 @@ public class DataSourceServiceTest {
         connectionParam = DataSourceUtils.buildConnectionParams(hiveDataSourceParamDTO);
 
         expected = "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:hive2://192.168.9.1:10000\",\"database\":\"im\","
-                + "\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\",\"validationQuery\":\"select 1\","
-                + "\"principal\":\"hive/hdfs-mycluster@ESZ.COM\",\"javaSecurityKrb5Conf\":\"/opt/krb5.conf\",\"loginUserKeytabUsername\":\"test2/hdfs-mycluster@ESZ.COM\","
-                + "\"loginUserKeytabPath\":\"/opt/hdfs.headless.keytab\"}";
+            + "\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\",\"validationQuery\":\"select 1\","
+            + "\"principal\":\"hive/hdfs-mycluster@ESZ.COM\",\"javaSecurityKrb5Conf\":\"/opt/krb5.conf\",\"loginUserKeytabUsername\":\"test2/hdfs-mycluster@ESZ.COM\","
+            + "\"loginUserKeytabPath\":\"/opt/hdfs.headless.keytab\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
     }
@@ -430,7 +429,7 @@ public class DataSourceServiceTest {
         mysqlDatasourceParamDTO.setOther(other);
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
         String expected = "{\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/"
-                + "im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\",\"props\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}}";
+            + "im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\",\"props\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
@@ -442,7 +441,7 @@ public class DataSourceServiceTest {
         mysqlDatasourceParamDTO.setPassword("123456");
         connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
         expected = "{\"user\":\"test\",\"password\":\"123456\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\","
-                + "\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}";
+            + "\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
     }
 

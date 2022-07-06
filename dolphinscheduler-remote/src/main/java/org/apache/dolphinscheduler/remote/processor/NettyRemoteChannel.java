@@ -25,17 +25,17 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
 /**
- *  callback channel
+ * callback channel
  */
 public class NettyRemoteChannel {
 
     /**
-     *  channel
+     * channel
      */
     private final Channel channel;
 
     /**
-     *  request unique identification
+     * request unique identification
      */
     private final long opaque;
 
@@ -43,7 +43,6 @@ public class NettyRemoteChannel {
      * master host
      */
     private final Host host;
-
 
     public NettyRemoteChannel(Channel channel, long opaque) {
         this.channel = channel;
@@ -69,7 +68,7 @@ public class NettyRemoteChannel {
         return host;
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return this.channel.isActive();
     }
 
@@ -77,7 +76,7 @@ public class NettyRemoteChannel {
         return this.channel.writeAndFlush(command);
     }
 
-    public void close(){
+    public void close() {
         this.channel.close();
     }
 }

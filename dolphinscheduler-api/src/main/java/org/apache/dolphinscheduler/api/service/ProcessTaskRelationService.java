@@ -29,11 +29,11 @@ public interface ProcessTaskRelationService {
     /**
      * create process task relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode processDefinitionCode
-     * @param preTaskCode preTaskCode
-     * @param postTaskCode postTaskCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
      * @return create result code
      */
     Map<String, Object> createProcessTaskRelation(User loginUser,
@@ -45,10 +45,10 @@ public interface ProcessTaskRelationService {
     /**
      * delete process task relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param taskCode the post task code
+     * @param taskCode              the post task code
      * @return delete result code
      */
     Map<String, Object> deleteTaskProcessRelation(User loginUser,
@@ -59,10 +59,10 @@ public interface ProcessTaskRelationService {
     /**
      * delete task upstream relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser    login user
+     * @param projectCode  project code
      * @param preTaskCodes the pre task codes, sep ','
-     * @param taskCode the post task code
+     * @param taskCode     the post task code
      * @return delete result code
      */
     Map<String, Object> deleteUpstreamRelation(User loginUser,
@@ -73,10 +73,10 @@ public interface ProcessTaskRelationService {
     /**
      * delete task downstream relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser     login user
+     * @param projectCode   project code
      * @param postTaskCodes the post task codes, sep ','
-     * @param taskCode the pre task code
+     * @param taskCode      the pre task code
      * @return delete result code
      */
     Map<String, Object> deleteDownstreamRelation(User loginUser,
@@ -87,9 +87,9 @@ public interface ProcessTaskRelationService {
     /**
      * query task upstream relation
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode current task code (post task code)
+     * @param taskCode    current task code (post task code)
      * @return process task relation list
      */
     Map<String, Object> queryUpstreamRelation(User loginUser,
@@ -99,9 +99,9 @@ public interface ProcessTaskRelationService {
     /**
      * query task downstream relation
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode pre task code
+     * @param taskCode    pre task code
      * @return process task relation list
      */
     Map<String, Object> queryDownstreamRelation(User loginUser,
@@ -114,8 +114,8 @@ public interface ProcessTaskRelationService {
      * @param loginUser             login user
      * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param preTaskCode pre task code
-     * @param postTaskCode post task code
+     * @param preTaskCode           pre task code
+     * @param postTaskCode          post task code
      * @return delete result code
      */
     Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode);

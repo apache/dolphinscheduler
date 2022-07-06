@@ -56,6 +56,7 @@ public class KerberosHttpClient {
 
     private String principal;
     private String keyTabLocation;
+
     public KerberosHttpClient(String principal, String keyTabLocation) {
         super();
         this.principal = principal;
@@ -78,7 +79,7 @@ public class KerberosHttpClient {
     private static CloseableHttpClient buildSpengoHttpClient() {
         HttpClientBuilder builder = HttpClientBuilder.create();
         Lookup<AuthSchemeProvider> authSchemeRegistry = RegistryBuilder.<AuthSchemeProvider>create()
-                .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory(true)).build();
+            .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory(true)).build();
         builder.setDefaultAuthSchemeRegistry(authSchemeRegistry);
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(new AuthScope(null, -1, null), new Credentials() {
@@ -114,9 +115,9 @@ public class KerberosHttpClient {
                 options.put("debug", "true");
                 return new AppConfigurationEntry[] {
                     new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-                    AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options) };
-                }
-            };
+                        AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
+            }
+        };
         Set<Principal> princ = new HashSet<>(1);
         princ.add(new KerberosPrincipal(userId));
         Subject sub = new Subject(false, princ, new HashSet<>(), new HashSet<>());

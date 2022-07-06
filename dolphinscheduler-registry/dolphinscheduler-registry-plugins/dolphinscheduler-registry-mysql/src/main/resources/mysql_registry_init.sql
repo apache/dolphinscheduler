@@ -15,17 +15,18 @@
  * limitations under the License.
 */
 
-SET FOREIGN_KEY_CHECKS = 0;
+SET
+FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `t_ds_mysql_registry_data`;
 CREATE TABLE `t_ds_mysql_registry_data`
 (
-    `id`               bigint(11)   NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `key`              varchar(200) NOT NULL COMMENT 'key, like zookeeper node path',
     `data`             varchar(200) NOT NULL COMMENT 'data, like zookeeper node value',
-    `type`             tinyint(4)   NOT NULL COMMENT '1: ephemeral node, 2: persistent node',
-    `last_update_time` timestamp    NULL COMMENT 'last update time',
-    `create_time`      timestamp    NULL COMMENT 'create time',
+    `type`             tinyint(4) NOT NULL COMMENT '1: ephemeral node, 2: persistent node',
+    `last_update_time` timestamp NULL COMMENT 'last update time',
+    `create_time`      timestamp NULL COMMENT 'create time',
     PRIMARY KEY (`id`),
     unique (`key`)
 ) ENGINE = InnoDB
@@ -35,12 +36,12 @@ CREATE TABLE `t_ds_mysql_registry_data`
 DROP TABLE IF EXISTS `t_ds_mysql_registry_lock`;
 CREATE TABLE `t_ds_mysql_registry_lock`
 (
-    `id`               bigint(11)   NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `key`              varchar(200) NOT NULL COMMENT 'lock path',
     `lock_owner`       varchar(100) NOT NULL COMMENT 'the lock owner, ip_processId',
     `last_term`        timestamp    NOT NULL COMMENT 'last term time',
-    `last_update_time` timestamp    NULL COMMENT 'last update time',
-    `create_time`      timestamp    NULL COMMENT 'lock create time',
+    `last_update_time` timestamp NULL COMMENT 'last update time',
+    `create_time`      timestamp NULL COMMENT 'lock create time',
     PRIMARY KEY (`id`),
     unique (`key`)
 ) ENGINE = InnoDB

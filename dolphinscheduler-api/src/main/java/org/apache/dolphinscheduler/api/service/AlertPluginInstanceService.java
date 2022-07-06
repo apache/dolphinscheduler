@@ -30,29 +30,30 @@ public interface AlertPluginInstanceService {
     /**
      * creat alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginDefineId plugin define id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginDefineId       plugin define id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> create(User loginUser,int pluginDefineId,String instanceName,String pluginInstanceParams);
+    Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams);
 
     /**
      * update
-     * @param loginUser login user
+     *
+     * @param loginUser             login user
      * @param alertPluginInstanceId plugin instance id
-     * @param instanceName instance name
-     * @param pluginInstanceParams plugin instance params
+     * @param instanceName          instance name
+     * @param pluginInstanceParams  plugin instance params
      * @return result
      */
-    Map<String, Object> update(User loginUser, int alertPluginInstanceId,String instanceName,String pluginInstanceParams);
+    Map<String, Object> update(User loginUser, int alertPluginInstanceId, String instanceName, String pluginInstanceParams);
 
     /**
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param id id
+     * @param id        id
      * @return result
      */
     Map<String, Object> delete(User loginUser, int id);
@@ -61,7 +62,7 @@ public interface AlertPluginInstanceService {
      * get alert plugin instance
      *
      * @param loginUser login user
-     * @param id get id
+     * @param id        get id
      * @return alert plugin
      */
     Map<String, Object> get(User loginUser, int id);
@@ -75,6 +76,7 @@ public interface AlertPluginInstanceService {
 
     /**
      * checkExistPluginInstanceName
+     *
      * @param pluginName plugin name
      * @return isExist
      */
@@ -82,6 +84,7 @@ public interface AlertPluginInstanceService {
 
     /**
      * queryPluginPage
+     *
      * @param loginUser login user
      * @param searchVal search value
      * @param pageNo    page index

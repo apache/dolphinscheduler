@@ -44,7 +44,7 @@ public class TransformerFactory {
 
         List<BatchTransformer> transformers = new ArrayList<>();
 
-        for (TransformerConfig transformerConfig:transformerConfigs) {
+        for (TransformerConfig transformerConfig : transformerConfigs) {
             BatchTransformer transformer = getTransformer(transformerConfig);
             if (transformer != null) {
                 transformer.validateConfig();

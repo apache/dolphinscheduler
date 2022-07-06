@@ -51,7 +51,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         HiveDataSourceParamDTO
-                hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
+            hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) createConnectionParams(connectionJson);
 
         hiveDataSourceParamDTO.setDatabase(hiveConnectionParam.getDatabase());
@@ -135,10 +135,10 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         CommonUtils.loadKerberosConf(hiveConnectionParam.getJavaSecurityKrb5Conf(),
-                hiveConnectionParam.getLoginUserKeytabUsername(), hiveConnectionParam.getLoginUserKeytabPath());
+            hiveConnectionParam.getLoginUserKeytabUsername(), hiveConnectionParam.getLoginUserKeytabPath());
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                hiveConnectionParam.getUser(), PasswordUtils.decodePassword(hiveConnectionParam.getPassword()));
+            hiveConnectionParam.getUser(), PasswordUtils.decodePassword(hiveConnectionParam.getPassword()));
     }
 
     @Override

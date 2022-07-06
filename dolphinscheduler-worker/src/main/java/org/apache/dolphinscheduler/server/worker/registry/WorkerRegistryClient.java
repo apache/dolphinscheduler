@@ -101,14 +101,14 @@ public class WorkerRegistryClient {
         long workerHeartbeatInterval = workerConfig.getHeartbeatInterval().getSeconds();
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                workerConfig.getMaxCpuLoadAvg(),
-                workerConfig.getReservedMemory(),
-                workerConfig.getHostWeight(),
-                workerZkPaths,
-                Constants.WORKER_TYPE,
-                registryClient,
-                workerConfig.getExecThreads(),
-                workerManagerThread.getThreadPoolQueueSize()
+            workerConfig.getMaxCpuLoadAvg(),
+            workerConfig.getReservedMemory(),
+            workerConfig.getHostWeight(),
+            workerZkPaths,
+            Constants.WORKER_TYPE,
+            registryClient,
+            workerConfig.getExecThreads(),
+            workerManagerThread.getThreadPoolQueueSize()
         );
 
         for (String workerZKPath : workerZkPaths) {

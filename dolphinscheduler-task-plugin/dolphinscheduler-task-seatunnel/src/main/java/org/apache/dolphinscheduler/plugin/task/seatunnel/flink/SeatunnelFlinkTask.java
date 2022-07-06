@@ -29,6 +29,7 @@ import java.util.Objects;
 public class SeatunnelFlinkTask extends SeatunnelTask {
 
     private SeatunnelFlinkParameters seatunnelParameters;
+
     public SeatunnelFlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
     }

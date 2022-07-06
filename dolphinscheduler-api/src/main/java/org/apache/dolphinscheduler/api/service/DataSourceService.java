@@ -33,7 +33,7 @@ public interface DataSourceService {
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameter
      * @return create result code
      */
@@ -42,8 +42,8 @@ public interface DataSourceService {
     /**
      * updateProcessInstance datasource
      *
-     * @param loginUser login user
-     * @param id data source id
+     * @param loginUser       login user
+     * @param id              data source id
      * @param dataSourceParam data source params
      * @return update result code
      */
@@ -80,7 +80,7 @@ public interface DataSourceService {
     /**
      * verify datasource exists
      *
-     * @param name      datasource name
+     * @param name datasource name
      * @return true if data datasource not exists, otherwise return false
      */
     Result<Object> verifyDataSourceName(String name);
@@ -131,6 +131,7 @@ public interface DataSourceService {
 
     /**
      * get tables
+     *
      * @param datasourceId
      * @return
      */
@@ -138,9 +139,10 @@ public interface DataSourceService {
 
     /**
      * get table columns
+     *
      * @param datasourceId
      * @param tableName
      * @return
      */
-    Map<String, Object> getTableColumns(Integer datasourceId,String tableName);
+    Map<String, Object> getTableColumns(Integer datasourceId, String tableName);
 }

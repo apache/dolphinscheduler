@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALART_INSTANCE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
+
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
@@ -53,8 +57,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-
 /**
  * alert plugin instance service impl
  */
@@ -74,9 +76,9 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     /**
      * creat alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginDefineId plugin define id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginDefineId       plugin define id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      */
     @Override
@@ -88,7 +90,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         alertPluginInstance.setPluginDefineId(pluginDefineId);
 
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE,ALART_INSTANCE_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALART_INSTANCE_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -110,9 +112,9 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     /**
      * update alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginInstanceId plugin instance id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginInstanceId     plugin instance id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      */
     @Override
@@ -123,7 +125,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE,ALERT_PLUGIN_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -141,7 +143,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param id id
+     * @param id        id
      * @return result
      */
     @Override
@@ -153,7 +155,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             putMsg(result, Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
             return result;
         }
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE,ALERT_PLUGIN_DELETE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -170,14 +172,14 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * get alert plugin instance
      *
      * @param loginUser login user
-     * @param id get id
+     * @param id        get id
      * @return alert plugin
      */
     @Override
     public Map<String, Object> get(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(id);
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_PLUGIN_INSTANCE,ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -271,7 +273,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * parse To Plugin Ui Params
      *
      * @param pluginParamsMapString k-v data
-     * @param pluginUiParams Complete parameters(include ui)
+     * @param pluginUiParams        Complete parameters(include ui)
      * @return Complete parameters list(include ui)
      */
     private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {

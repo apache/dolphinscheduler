@@ -70,9 +70,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/list")
                 .header(SESSION_ID, sessionId)
                 .param("type", ResourceType.FILE.name()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -86,7 +86,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.SUCCESS.getCode());
         PowerMockito.when(resourcesService.queryResourceListPaging(
                 Mockito.any(), Mockito.anyInt(), Mockito.any(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(mockResult);
+            .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("type", String.valueOf(ResourceType.FILE));
@@ -98,9 +98,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -121,9 +121,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/verify-name")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -144,9 +144,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/view", "5")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -160,7 +160,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         PowerMockito.when(resourcesService
                 .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
-                .thenReturn(mockResult);
+            .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("type", String.valueOf(ResourceType.FILE));
@@ -174,9 +174,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/resources/online-create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -197,9 +197,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(put("/resources/1/update-content")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -214,8 +214,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/download", 5)
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andReturn();
+            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+            .andReturn();
 
         Assert.assertNotNull(mvcResult);
     }
@@ -226,7 +226,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         PowerMockito.when(udfFuncService
                 .createUdfFunction(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
-                .thenReturn(mockResult);
+            .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("type", String.valueOf(UdfType.HIVE));
@@ -240,9 +240,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/resources/{resourceId}/udf-func", "123")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -256,13 +256,13 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         putMsg(mockResult, Status.TENANT_NOT_EXIST);
         PowerMockito.when(udfFuncService
                 .queryUdfFuncDetail(Mockito.any(), Mockito.anyInt()))
-                .thenReturn(mockResult);
+            .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/udf-func", "123")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -275,8 +275,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result<Object> mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         PowerMockito.when(udfFuncService
-                .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
-                .thenReturn(mockResult);
+                .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()
+                    , Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
+            .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "1");
@@ -291,9 +292,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(put("/resources/{resourceId}/udf-func/{id}", "123", "456")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -315,9 +316,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/udf-func")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -337,9 +338,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/udf-func/list")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -359,9 +360,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/udf-func/verify-name")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -381,9 +382,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/authed-file")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -403,9 +404,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/authed-udf-func")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -425,9 +426,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/resources/unauth-udf-func")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -443,9 +444,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/resources/udf-func/{id}", "123")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -461,9 +462,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/resources/{id}", "123")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 

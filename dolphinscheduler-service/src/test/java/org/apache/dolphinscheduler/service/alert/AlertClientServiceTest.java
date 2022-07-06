@@ -71,7 +71,7 @@ public class AlertClientServiceTest {
         AlertSendResponseCommand alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertNull(alertSendResponseCommand);
 
-        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(groupId,title,content, WarningType.FAILURE.getCode());
+        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(groupId, title, content, WarningType.FAILURE.getCode());
         Command reqCommand = alertSendRequestCommand.convert2Command();
         boolean sendResponseStatus;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -79,7 +79,7 @@ public class AlertClientServiceTest {
         //2.alter instance does not exist
         sendResponseStatus = false;
         AlertSendResponseResult alertResult = new AlertSendResponseResult();
-        String message = String.format("Alert GroupId %s send error : not found alert instance",groupId);
+        String message = String.format("Alert GroupId %s send error : not found alert instance", groupId);
         alertResult.setStatus(false);
         alertResult.setMessage(message);
         sendResponseResults.add(alertResult);
@@ -90,12 +90,12 @@ public class AlertClientServiceTest {
         alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+            logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //3.alter plugin does not exist
         sendResponseStatus = false;
         String pluginInstanceName = "alert-mail";
-        message = String.format("Alert Plugin %s send error : return value is null",pluginInstanceName);
+        message = String.format("Alert Plugin %s send error : return value is null", pluginInstanceName);
         alertResult.setStatus(false);
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
@@ -104,11 +104,11 @@ public class AlertClientServiceTest {
         alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+            logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //4.alter result is null
         sendResponseStatus = false;
-        message = String.format("Alert Plugin %s send error : return result value is null",pluginInstanceName);
+        message = String.format("Alert Plugin %s send error : return result value is null", pluginInstanceName);
         alertResult.setStatus(false);
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
@@ -117,7 +117,7 @@ public class AlertClientServiceTest {
         alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+            logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //5.abnormal information inside the alert plug-in code
         sendResponseStatus = false;
@@ -129,11 +129,11 @@ public class AlertClientServiceTest {
         alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+            logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //6.alert plugin send success
         sendResponseStatus = true;
-        message = String.format("Alert Plugin %s send success",pluginInstanceName);
+        message = String.format("Alert Plugin %s send success", pluginInstanceName);
         alertResult.setStatus(true);
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
@@ -142,7 +142,7 @@ public class AlertClientServiceTest {
         alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertTrue(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+            logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         if (Objects.nonNull(alertClient) && alertClient.isRunning()) {
             alertClient.close();

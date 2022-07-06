@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.configuration;
 
 import static com.google.common.collect.Maps.newTreeMap;
@@ -91,7 +92,7 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
         swagger.setSchemes(mapSchemes(from.getSchemes()));
         swagger.setPaths(mapApiListings(from.getApiListings()));
         swagger.setHost(from.getHost());
-        swagger.setDefinitions(modelsFromApiListings( from.getApiListings() ) );
+        swagger.setDefinitions(modelsFromApiListings(from.getApiListings()));
         swagger.setSecurityDefinitions(securityMapper.toSecuritySchemeDefinitions(from.getResourceListing()));
         ApiInfo info = fromResourceListingInfo(from);
         if (info != null) {
@@ -114,7 +115,6 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
 
         return swagger;
     }
-
 
     @Override
     protected Info mapApiInfo(ApiInfo from) {
@@ -171,19 +171,19 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
         operation.setSchemes(stringSetToSchemeList(from.getProtocol()));
         Set<String> tagsSet = new HashSet<>(1);
 
-        if(from.getTags() != null && from.getTags().size() > 0){
+        if (from.getTags() != null && from.getTags().size() > 0) {
 
             List<String> list = new ArrayList<String>(tagsSet.size());
 
             Iterator<String> it = from.getTags().iterator();
-            while(it.hasNext()){
-               String tag = it.next();
-               list.add(
-                   StringUtils.isNotBlank(tag) ? messageSource.getMessage(tag, null, tag, locale) : " ");
+            while (it.hasNext()) {
+                String tag = it.next();
+                list.add(
+                    StringUtils.isNotBlank(tag) ? messageSource.getMessage(tag, null, tag, locale) : " ");
             }
 
             operation.setTags(list);
-        }else {
+        } else {
             operation.setTags(null);
         }
 
@@ -201,7 +201,6 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
         } else {
             operation.setProduces(null);
         }
-
 
         operation.setParameters(parameterListToParameterList(from.getParameters()));
         if (from.getDeprecated() != null) {
@@ -228,7 +227,6 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
 
         return tag;
     }
-
 
     private ApiInfo fromResourceListingInfo(Documentation documentation) {
 
@@ -281,13 +279,15 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
         for (springfox.documentation.service.Parameter param : list) {
             String description = messageSource.getMessage(param.getDescription(), null, param.getDescription(), locale);
 
-            springfox.documentation.service.Parameter parameter = new springfox.documentation.service.Parameter(param.getName(),description,param.getDefaultValue(),param.isRequired(),param.isAllowMultiple(),param.isAllowEmptyValue(),param.getModelRef(),param.getType(),param.getAllowableValues(),param.getParamType(),param.getParamAccess(),param.isHidden(),param.getPattern(),param.getCollectionFormat(),param.getOrder(),param.getScalarExample(),param.getExamples() ,param.getVendorExtentions());
+            springfox.documentation.service.Parameter parameter =
+                new springfox.documentation.service.Parameter(param.getName(), description, param.getDefaultValue(), param.isRequired(), param.isAllowMultiple(), param.isAllowEmptyValue(),
+                    param.getModelRef(), param.getType(), param.getAllowableValues(), param.getParamType(), param.getParamAccess(), param.isHidden(), param.getPattern(), param.getCollectionFormat(),
+                    param.getOrder(), param.getScalarExample(), param.getExamples(), param.getVendorExtentions());
             list1.add(parameterMapper.mapParameter(parameter));
         }
 
         return list1;
     }
-
 
     Map<String, Model> modelsFromApiListings(Multimap<String, ApiListing> apiListings) {
         Map<String, springfox.documentation.schema.Model> definitions = newTreeMap();

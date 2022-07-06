@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,8 +28,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
-import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
 
 public class PropertyUtils {
 
@@ -96,7 +99,7 @@ public class PropertyUtils {
     /**
      * get property value
      *
-     * @param key property name
+     * @param key        property name
      * @param defaultVal default value
      * @return property value
      */
@@ -116,7 +119,7 @@ public class PropertyUtils {
     }
 
     /**
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return property value
      */
@@ -147,7 +150,7 @@ public class PropertyUtils {
     /**
      * get property value
      *
-     * @param key property name
+     * @param key          property name
      * @param defaultValue default value
      * @return property value
      */
@@ -159,7 +162,7 @@ public class PropertyUtils {
     /**
      * get property long value
      *
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return property value
      */
@@ -186,7 +189,7 @@ public class PropertyUtils {
     }
 
     /**
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return property value
      */
@@ -207,7 +210,7 @@ public class PropertyUtils {
     /**
      * get array
      *
-     * @param key property name
+     * @param key      property name
      * @param splitStr separator
      * @return property value through array
      */
@@ -220,10 +223,10 @@ public class PropertyUtils {
     }
 
     /**
-     * @param key key
-     * @param type type
+     * @param key          key
+     * @param type         type
      * @param defaultValue default value
-     * @param <T> T
+     * @param <T>          T
      * @return get enum value
      */
     public static <T extends Enum<T>> T getEnum(String key, Class<T> type,
@@ -259,7 +262,8 @@ public class PropertyUtils {
 
     /**
      * set value
-     * @param key key
+     *
+     * @param key   key
      * @param value value
      */
     public static void setValue(String key, String value) {

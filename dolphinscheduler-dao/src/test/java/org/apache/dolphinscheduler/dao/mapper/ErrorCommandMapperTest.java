@@ -40,6 +40,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
 
     /**
      * insert
+     *
      * @return ErrorCommand
      */
     private ErrorCommand insertOne() {
@@ -52,9 +53,6 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         errorCommandMapper.insert(errorCommand);
         return errorCommand;
     }
-
-
-
 
 
     /**
@@ -77,20 +75,20 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         errorCommandMapper.updateById(errorCommand);
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
-                0,
-                null,
-                null,
-                new Long[0]
+            0,
+            null,
+            null,
+            new Long[0]
         );
 
         Long[] projectCodeArray = new Long[2];
         projectCodeArray[0] = processDefinition.getProjectCode();
         projectCodeArray[1] = 200L;
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
-                0,
-                null,
-                null,
-                projectCodeArray
+            0,
+            null,
+            null,
+            projectCodeArray
         );
 
         Assert.assertNotEquals(commandCounts.size(), 0);

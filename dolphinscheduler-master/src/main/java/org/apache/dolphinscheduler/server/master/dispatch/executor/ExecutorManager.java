@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 
 /**
- *  executor manager
+ * executor manager
  */
 public interface ExecutorManager<T> {
 
@@ -35,6 +35,7 @@ public interface ExecutorManager<T> {
 
     /**
      * execute task
+     *
      * @param context context
      * @return T
      * @throws ExecuteException if error throws ExecuteException
@@ -43,13 +44,15 @@ public interface ExecutorManager<T> {
 
     /**
      * execute task directly without retry
+     *
      * @param context context
      * @throws ExecuteException if error throws ExecuteException
      */
     void executeDirectly(ExecutionContext context) throws ExecuteException;
 
     /**
-     *  after execute
+     * after execute
+     *
      * @param context context
      * @throws ExecuteException if error throws ExecuteException
      */

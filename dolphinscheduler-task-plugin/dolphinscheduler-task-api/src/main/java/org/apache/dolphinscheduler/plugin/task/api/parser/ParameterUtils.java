@@ -21,8 +21,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_SHECDULE_TIME;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 

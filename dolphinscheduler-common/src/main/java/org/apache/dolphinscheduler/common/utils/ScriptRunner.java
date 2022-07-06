@@ -60,7 +60,7 @@ public class ScriptRunner {
      * Runs an SQL script (read in using the Reader parameter)
      *
      * @param reader - the source of the script
-     * @throws IOException errors
+     * @throws IOException  errors
      * @throws SQLException errors
      */
     public void runScript(Reader reader) throws IOException, SQLException {
@@ -85,10 +85,10 @@ public class ScriptRunner {
      * Runs an SQL script (read in using the Reader parameter) using the connection
      * passed in
      *
-     * @param conn - the connection to use for the script
+     * @param conn   - the connection to use for the script
      * @param reader - the source of the script
      * @throws SQLException if any SQL errors occur
-     * @throws IOException if there is an error reading from the Reader
+     * @throws IOException  if there is an error reading from the Reader
      */
     private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
         StringBuffer command = null;
@@ -109,7 +109,7 @@ public class ScriptRunner {
                     this.setDelimiter(newDelimiter, fullLineDelimiter);
 
                 } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
-                        || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
+                    || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
                     command.append(line, 0, line.lastIndexOf(getDelimiter()));
                     command.append(" ");
                     logger.info("sql: {}", command);

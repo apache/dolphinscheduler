@@ -56,7 +56,7 @@ public class Result<T> {
             this.msg = status.getMsg();
         }
     }
-    
+
     public Result(Integer code, String msg, T data) {
         this.code = code;
         this.msg = msg;
@@ -67,13 +67,13 @@ public class Result<T> {
      * Call this function if there is success
      *
      * @param data data
-     * @param <T> type
+     * @param <T>  type
      * @return resule
      */
     public static <T> Result<T> success(T data) {
         return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
     }
-    
+
     public static Result success() {
         return success(null);
     }
@@ -104,7 +104,7 @@ public class Result<T> {
      * Call this function if there is any error
      *
      * @param status status
-     * @param args args
+     * @param args   args
      * @return result
      */
     public static <T> Result<T> errorWithArgs(Status status, Object... args) {
@@ -138,11 +138,11 @@ public class Result<T> {
     @Override
     public String toString() {
         return "Status{"
-                + "code='" + code
-                + '\'' + ", msg='"
-                + msg + '\''
-                + ", data=" + data
-                + '}';
+            + "code='" + code
+            + '\'' + ", msg='"
+            + msg + '\''
+            + ", data=" + data
+            + '}';
     }
 
     public Boolean checkResult() {

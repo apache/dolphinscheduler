@@ -35,12 +35,12 @@ public interface ResourcesService {
     /**
      * create directory
      *
-     * @param loginUser login user
-     * @param name alias
+     * @param loginUser   login user
+     * @param name        alias
      * @param description description
-     * @param type type
-     * @param pid parent id
-     * @param currentDir current directory
+     * @param type        type
+     * @param pid         parent id
+     * @param currentDir  current directory
      * @return create directory result
      */
     Result<Object> createDirectory(User loginUser,
@@ -53,12 +53,12 @@ public interface ResourcesService {
     /**
      * create resource
      *
-     * @param loginUser login user
-     * @param name alias
-     * @param desc description
-     * @param file file
-     * @param type type
-     * @param pid parent id
+     * @param loginUser  login user
+     * @param name       alias
+     * @param desc       description
+     * @param file       file
+     * @param type       type
+     * @param pid        parent id
      * @param currentDir current directory
      * @return create result code
      */
@@ -72,13 +72,14 @@ public interface ResourcesService {
 
     /**
      * update resource
-     * @param loginUser     login user
-     * @param resourceId    resource id
-     * @param name          name
-     * @param desc          description
-     * @param type          resource type
-     * @param file          resource file
-     * @return  update result code
+     *
+     * @param loginUser  login user
+     * @param resourceId resource id
+     * @param name       name
+     * @param desc       description
+     * @param type       resource type
+     * @param file       resource file
+     * @return update result code
      */
     Result<Object> updateResource(User loginUser,
                                   int resourceId,
@@ -91,10 +92,10 @@ public interface ResourcesService {
      * query resources list paging
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return resource list page
      */
     Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
@@ -103,7 +104,7 @@ public interface ResourcesService {
      * query resource list
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     Map<String, Object> queryResourceList(User loginUser, ResourceType type);
@@ -112,7 +113,7 @@ public interface ResourcesService {
      * query resource list by program type
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType);
@@ -120,7 +121,7 @@ public interface ResourcesService {
     /**
      * delete resource
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param resourceId resource id
      * @return delete result code
      * @throws IOException exception
@@ -129,53 +130,55 @@ public interface ResourcesService {
 
     /**
      * verify resource by name and type
+     *
      * @param loginUser login user
      * @param fullName  resource full name
      * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    Result<Object> verifyResourceName(String fullName, ResourceType type,User loginUser);
+    Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser);
 
     /**
      * verify resource by full name or pid and type
-     * @param fullName  resource full name
-     * @param id        resource id
-     * @param type      resource type
+     *
+     * @param fullName resource full name
+     * @param id       resource id
+     * @param type     resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    Result<Object> queryResource(User loginUser,String fullName,Integer id,ResourceType type);
+    Result<Object> queryResource(User loginUser, String fullName, Integer id, ResourceType type);
 
     /**
      * view resource file online
      *
-     * @param resourceId resource id
+     * @param resourceId  resource id
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return resource content
      */
-    Result<Object> readResource(User loginUser,int resourceId, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser, int resourceId, int skipLineNum, int limit);
 
     /**
      * create resource file online
      *
-     * @param loginUser login user
-     * @param type resource type
-     * @param fileName file name
+     * @param loginUser  login user
+     * @param type       resource type
+     * @param fileName   file name
      * @param fileSuffix file suffix
-     * @param desc description
-     * @param content content
+     * @param desc       description
+     * @param content    content
      * @return create result code
      */
-    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory);
+    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content, int pid, String currentDirectory);
 
     /**
      * updateProcessInstance resource
      *
      * @param resourceId resource id
-     * @param content content
+     * @param content    content
      * @return update result cod
      */
-    Result<Object> updateResourceContent(User loginUser,int resourceId, String content);
+    Result<Object> updateResourceContent(User loginUser, int resourceId, String content);
 
     /**
      * download file
@@ -190,7 +193,7 @@ public interface ResourcesService {
      * list all file
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
@@ -199,7 +202,7 @@ public interface ResourcesService {
      * unauthorized file
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     Map<String, Object> unauthorizedFile(User loginUser, Integer userId);
@@ -208,7 +211,7 @@ public interface ResourcesService {
      * unauthorized udf function
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId);
@@ -217,7 +220,7 @@ public interface ResourcesService {
      * authorized udf function
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId);
@@ -226,13 +229,14 @@ public interface ResourcesService {
      * authorized file
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result
      */
     Map<String, Object> authorizedFile(User loginUser, Integer userId);
 
     /**
      * get resource by id
+     *
      * @param resourceId resource id
      * @return resource
      */

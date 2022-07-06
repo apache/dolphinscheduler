@@ -57,7 +57,7 @@ public class PluginParamsTransfer {
     /**
      * generate Plugin Params
      *
-     * @param paramsJsonStr paramsJsonStr value
+     * @param paramsJsonStr        paramsJsonStr value
      * @param pluginParamsTemplate pluginParamsTemplate
      * @return return plugin params value
      */
@@ -69,7 +69,7 @@ public class PluginParamsTransfer {
     /**
      * generate Plugin Params
      *
-     * @param paramsMap paramsMap
+     * @param paramsMap            paramsMap
      * @param pluginParamsTemplate pluginParamsTemplate
      * @return return plugin params value
      */
@@ -77,7 +77,8 @@ public class PluginParamsTransfer {
         if (paramsMap == null || paramsMap.isEmpty()) {
             return null;
         }
-        List<Map<String, Object>> pluginParamsList = JSONUtils.parseObject(pluginParamsTemplate, new TypeReference<List<Map<String, Object>>>() {});
+        List<Map<String, Object>> pluginParamsList = JSONUtils.parseObject(pluginParamsTemplate, new TypeReference<List<Map<String, Object>>>() {
+        });
         pluginParamsList.forEach(pluginParams -> pluginParams.put(STRING_PLUGIN_PARAM_VALUE, paramsMap.get(pluginParams.get(STRING_PLUGIN_PARAM_FIELD))));
         return pluginParamsList;
     }

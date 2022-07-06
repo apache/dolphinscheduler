@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkArgsUtils;
@@ -53,7 +52,6 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,33 +91,33 @@ public class DataQualityTask extends AbstractYarnTask {
             throw new RuntimeException("data quality task params is not valid");
         }
 
-        Map<String,String> inputParameter = dataQualityParameters.getRuleInputParameter();
-        for (Map.Entry<String,String> entry: inputParameter.entrySet()) {
+        Map<String, String> inputParameter = dataQualityParameters.getRuleInputParameter();
+        for (Map.Entry<String, String> entry : inputParameter.entrySet()) {
             if (entry != null && entry.getValue() != null) {
                 entry.setValue(entry.getValue().trim());
             }
         }
 
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext
-                        = dqTaskExecutionContext.getDataQualityTaskExecutionContext();
+            = dqTaskExecutionContext.getDataQualityTaskExecutionContext();
 
         operateInputParameter(inputParameter, dataQualityTaskExecutionContext);
 
         RuleManager ruleManager = new RuleManager(
-                inputParameter,
-                dataQualityTaskExecutionContext);
+            inputParameter,
+            dataQualityTaskExecutionContext);
 
         DataQualityConfiguration dataQualityConfiguration =
-                ruleManager.generateDataQualityParameter();
+            ruleManager.generateDataQualityParameter();
 
         dataQualityParameters
-                .getSparkParameters()
-                .setMainArgs("\""
-                        + StringUtils.replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
+            .getSparkParameters()
+            .setMainArgs("\""
+                + StringUtils.replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
 
         dataQualityParameters
-                .getSparkParameters()
-                .setQueue(dqTaskExecutionContext.getQueue());
+            .getSparkParameters()
+            .setQueue(dqTaskExecutionContext.getQueue());
 
         setMainJarName();
     }
@@ -139,21 +137,21 @@ public class DataQualityTask extends AbstractYarnTask {
         inputParameter.put(TASK_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
 
         if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
-            inputParameter.put(DATA_TIME,ArgsUtils.wrapperSingleQuotes(now));
+            inputParameter.put(DATA_TIME, ArgsUtils.wrapperSingleQuotes(now));
         }
 
         if (StringUtils.isNotEmpty(inputParameter.get(REGEXP_PATTERN))) {
-            inputParameter.put(REGEXP_PATTERN,StringUtils.escapeJava(StringUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
+            inputParameter.put(REGEXP_PATTERN, StringUtils.escapeJava(StringUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
         }
 
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getHdfsPath())) {
             inputParameter.put(ERROR_OUTPUT_PATH,
-                    dataQualityTaskExecutionContext.getHdfsPath()
-                            + SLASH + dqTaskExecutionContext.getProcessDefineId()
-                            + UNDERLINE + dqTaskExecutionContext.getProcessInstanceId()
-                            + UNDERLINE + dqTaskExecutionContext.getTaskName());
+                dataQualityTaskExecutionContext.getHdfsPath()
+                    + SLASH + dqTaskExecutionContext.getProcessDefineId()
+                    + UNDERLINE + dqTaskExecutionContext.getProcessInstanceId()
+                    + UNDERLINE + dqTaskExecutionContext.getTaskName());
         } else {
-            inputParameter.put(ERROR_OUTPUT_PATH,"");
+            inputParameter.put(ERROR_OUTPUT_PATH, "");
         }
     }
 

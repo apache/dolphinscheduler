@@ -66,9 +66,9 @@ public class ProcessUtils {
     /**
      * kill yarn application.
      *
-     * @param appIds app id list
-     * @param logger logger
-     * @param tenantCode tenant code
+     * @param appIds      app id list
+     * @param logger      logger
+     * @param tenantCode  tenant code
      * @param executePath execute path
      */
     public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
@@ -100,10 +100,10 @@ public class ProcessUtils {
         boolean hadoopKerberosState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
         if (hadoopKerberosState) {
             kerberosCommandBuilder.append("export KRB5_CONFIG=")
-                    .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
-                    .append("\n\n")
-                    .append(String.format("kinit -k -t %s %s || true", PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
-                    .append("\n\n");
+                .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                .append("\n\n")
+                .append(String.format("kinit -k -t %s %s || true", PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
+                .append("\n\n");
             logger.info("kerberos init command: {}", kerberosCommandBuilder);
         }
         return kerberosCommandBuilder.toString();
@@ -112,11 +112,11 @@ public class ProcessUtils {
     /**
      * build kill command for yarn application
      *
-     * @param logger logger
-     * @param tenantCode tenant code
-     * @param appId app id
+     * @param logger      logger
+     * @param tenantCode  tenant code
+     * @param appId       app id
      * @param commandFile command file
-     * @param cmd cmd
+     * @param cmd         cmd
      */
     private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile, String cmd) {
         try {
@@ -198,10 +198,10 @@ public class ProcessUtils {
             if (!StringUtils.isEmpty(log)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext.setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                            taskExecutionContext.getProcessDefineCode(),
-                            taskExecutionContext.getProcessDefineVersion(),
-                            taskExecutionContext.getProcessInstanceId(),
-                            taskExecutionContext.getTaskInstanceId()));
+                        taskExecutionContext.getProcessDefineCode(),
+                        taskExecutionContext.getProcessDefineVersion(),
+                        taskExecutionContext.getProcessInstanceId(),
+                        taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);

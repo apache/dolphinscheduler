@@ -55,8 +55,6 @@ import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 /**
  * logger request process logic
  */
@@ -69,7 +67,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     public LoggerRequestProcessor() {
         this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1,
-                new NamedThreadFactory("Log-Request-Process-Thread"));
+            new NamedThreadFactory("Log-Request-Process-Thread"));
     }
 
     @Override
@@ -81,7 +79,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         switch (commandType) {
             case GET_LOG_BYTES_REQUEST:
                 GetLogBytesRequestCommand getLogRequest = JSONUtils.parseObject(
-                        command.getBody(), GetLogBytesRequestCommand.class);
+                    command.getBody(), GetLogBytesRequestCommand.class);
                 String path = getLogRequest.getPath();
                 if (!checkPathSecurity(path)) {
                     throw new IllegalArgumentException("Illegal path: " + path);
@@ -92,7 +90,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 break;
             case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
-                        command.getBody(), ViewLogRequestCommand.class);
+                    command.getBody(), ViewLogRequestCommand.class);
                 String viewLogPath = viewLogRequest.getPath();
                 if (!checkPathSecurity(viewLogPath)) {
                     throw new IllegalArgumentException("Illegal path: " + viewLogPath);
@@ -103,7 +101,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 break;
             case ROLL_VIEW_LOG_REQUEST:
                 RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(
-                        command.getBody(), RollViewLogRequestCommand.class);
+                    command.getBody(), RollViewLogRequestCommand.class);
 
                 String rollViewLogPath = rollViewLogRequest.getPath();
                 if (!checkPathSecurity(rollViewLogPath)) {
@@ -111,7 +109,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 }
 
                 List<String> lines = readPartFileContent(rollViewLogPath,
-                        rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
+                    rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
                     builder.append(line).append("\r\n");
@@ -121,7 +119,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 break;
             case REMOVE_TAK_LOG_REQUEST:
                 RemoveTaskLogRequestCommand removeTaskLogRequest = JSONUtils.parseObject(
-                        command.getBody(), RemoveTaskLogRequestCommand.class);
+                    command.getBody(), RemoveTaskLogRequestCommand.class);
 
                 String taskLogPath = removeTaskLogRequest.getPath();
                 if (!checkPathSecurity(taskLogPath)) {
@@ -147,6 +145,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     /**
      * LogServer only can read the logs dir.
+     *
      * @param path
      * @return
      */
@@ -193,7 +192,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      *
      * @param filePath file path
      * @param skipLine skip line
-     * @param limit read lines limit
+     * @param limit    read lines limit
      * @return part file content
      */
     private List<String> readPartFileContent(String filePath,

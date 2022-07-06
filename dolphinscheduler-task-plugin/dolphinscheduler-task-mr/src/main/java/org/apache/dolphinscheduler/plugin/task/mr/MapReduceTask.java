@@ -25,11 +25,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +37,8 @@ import java.util.Map;
 public class MapReduceTask extends AbstractYarnTask {
 
     /**
-     *  mapreduce command
-     *  usage: hadoop jar <jar> [mainClass] [GENERIC_OPTIONS] args...
+     * mapreduce command
+     * usage: hadoop jar <jar> [mainClass] [GENERIC_OPTIONS] args...
      */
     private static final String MAPREDUCE_COMMAND = TaskConstants.HADOOP;
 
@@ -56,6 +54,7 @@ public class MapReduceTask extends AbstractYarnTask {
 
     /**
      * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
      */
     public MapReduceTask(TaskExecutionContext taskExecutionContext) {
@@ -81,16 +80,17 @@ public class MapReduceTask extends AbstractYarnTask {
         // replace placeholder,and combine local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-        String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));
+        String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(), ParamUtils.convert(paramsMap));
         mapreduceParameters.setMainArgs(args);
         if (mapreduceParameters.getProgramType() != null && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
-            String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),  ParamUtils.convert(paramsMap));
+            String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(), ParamUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
     }
 
     /**
      * build command
+     *
      * @return command
      */
     @Override
@@ -103,7 +103,7 @@ public class MapReduceTask extends AbstractYarnTask {
         args.addAll(MapReduceArgsUtils.buildArgs(mapreduceParameters));
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args),
-                taskExecutionContext.getDefinedParams());
+            taskExecutionContext.getDefinedParams());
         logger.info("mapreduce task command: {}", command);
 
         return command;

@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -47,8 +52,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * alert group service impl
@@ -91,7 +94,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * query alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return one alert group
      */
     @Override
@@ -100,7 +103,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.ALERT_GROUP,ALERT_GROUP_VIEW)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_VIEW)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -120,8 +123,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return alert group list page
      */
     @Override
@@ -153,9 +156,9 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     /**
      * create alert group
      *
-     * @param loginUser login user
-     * @param groupName group name
-     * @param desc description
+     * @param loginUser        login user
+     * @param groupName        group name
+     * @param desc             description
      * @param alertInstanceIds alertInstanceIds
      * @return create result code
      */
@@ -164,7 +167,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -200,10 +203,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     /**
      * updateProcessInstance alert group
      *
-     * @param loginUser login user
-     * @param id alert group id
-     * @param groupName group name
-     * @param desc description
+     * @param loginUser        login user
+     * @param id               alert group id
+     * @param groupName        group name
+     * @param desc             description
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
@@ -211,7 +214,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser, new Object[]{id},AuthorizationType.ALERT_GROUP,ALERT_GROUP_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -247,7 +250,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * delete alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return delete result code
      */
     @Override
@@ -257,7 +260,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.ALERT_GROUP,ALERT_GROUP_DELETE)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

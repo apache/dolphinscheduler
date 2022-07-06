@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")

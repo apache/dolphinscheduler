@@ -30,15 +30,15 @@ public class JdbcUrlParserTest {
     @Test
     public void testGetJdbcInfo() {
         JdbcInfo jdbcInfo =
-                JdbcUrlParser.getJdbcInfo("jdbc:mysql://localhost:3306/dolphinscheduler?"
-                        + "useUnicode=true&characterEncoding=UTF-8");
+            JdbcUrlParser.getJdbcInfo("jdbc:mysql://localhost:3306/dolphinscheduler?"
+                + "useUnicode=true&characterEncoding=UTF-8");
         if (jdbcInfo != null) {
             String jdbcInfoStr = jdbcInfo.toString();
             String expected = "JdbcInfo{host='localhost', port='3306', "
-                    + "driverName='mysql', database='dolphinscheduler', "
-                    + "params='useUnicode=true&characterEncoding=UTF-8', "
-                    + "address='jdbc:mysql://localhost:3306'}";
-            Assert.assertEquals(expected,jdbcInfoStr);
+                + "driverName='mysql', database='dolphinscheduler', "
+                + "params='useUnicode=true&characterEncoding=UTF-8', "
+                + "address='jdbc:mysql://localhost:3306'}";
+            Assert.assertEquals(expected, jdbcInfoStr);
         }
     }
 }

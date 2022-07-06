@@ -47,6 +47,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
 import io.netty.channel.Channel;
 
 /**
@@ -104,7 +105,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
 
         taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
+            new NettyRemoteChannel(channel, command.getOpaque()));
 
         taskExecutionContext.setCurrentExecutionStatus(result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
@@ -125,14 +126,15 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
         // find log and kill yarn job
         Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
+            taskExecutionContext.getLogPath(),
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTenantCode());
         return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
     }
 
     /**
      * kill task by cancel application
+     *
      * @param taskInstanceId
      */
     protected void cancelApplication(int taskInstanceId) {
@@ -156,6 +158,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
     /**
      * kill system process
+     *
      * @param tenantCode
      * @param processId
      */
@@ -182,16 +185,16 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      * kill yarn job
      *
-     * @param host host
-     * @param logPath logPath
+     * @param host        host
+     * @param logPath     logPath
      * @param executePath executePath
-     * @param tenantCode tenantCode
+     * @param tenantCode  tenantCode
      * @return Pair<Boolean, List < String>> yarn kill result
      */
     private Pair<Boolean, List<String>> killYarnJob(Host host, String logPath, String executePath, String tenantCode) {
         try (LogClientService logClient = new LogClientService();) {
             logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), logPath,
-                    host.getPort());
+                host.getPort());
             String log = logClient.viewLog(host.getIp(), host.getPort(), logPath);
             List<String> appIds = Collections.emptyList();
             if (!Strings.isNullOrEmpty(log)) {

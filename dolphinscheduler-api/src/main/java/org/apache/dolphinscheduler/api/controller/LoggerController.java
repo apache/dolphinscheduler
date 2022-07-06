@@ -61,10 +61,10 @@ public class LoggerController extends BaseController {
     /**
      * query task log
      *
-     * @param loginUser login user
+     * @param loginUser      login user
      * @param taskInstanceId task instance id
-     * @param skipNum skip number
-     * @param limit limit
+     * @param skipNum        skip number
+     * @param limit          limit
      * @return task log content
      */
     @ApiOperation(value = "queryLog", notes = "QUERY_TASK_INSTANCE_LOG_NOTES")
@@ -87,7 +87,7 @@ public class LoggerController extends BaseController {
     /**
      * download log file
      *
-     * @param loginUser login user
+     * @param loginUser      login user
      * @param taskInstanceId task instance id
      * @return log file content
      */
@@ -112,7 +112,7 @@ public class LoggerController extends BaseController {
      * query task log in specified project
      *
      * @param loginUser      login user
-     * @param projectCode project code
+     * @param projectCode    project code
      * @param taskInstanceId task instance id
      * @param skipNum        skip number
      * @param limit          limit
@@ -159,8 +159,8 @@ public class LoggerController extends BaseController {
                                           @RequestParam(value = "taskInstanceId") int taskInstanceId) {
         byte[] logBytes = loggerService.getLogBytes(loginUser, projectCode, taskInstanceId);
         return ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
-                .body(logBytes);
+            .ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+            .body(logBytes);
     }
 }

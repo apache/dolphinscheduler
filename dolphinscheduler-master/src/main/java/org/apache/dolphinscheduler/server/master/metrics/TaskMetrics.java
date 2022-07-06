@@ -23,75 +23,74 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 
-
 public final class TaskMetrics {
     private TaskMetrics() {
         throw new UnsupportedOperationException("Utility class");
     }
 
     private static final Counter TASK_SUBMIT_COUNTER =
-            Counter.builder("ds.task.submit.count")
-                    .description("Task submit total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.submit.count")
+            .description("Task submit total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_FINISH_COUNTER =
-            Counter.builder("ds.task.finish.count")
-                    .description("Task finish total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.finish.count")
+            .description("Task finish total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_SUCCESS_COUNTER =
-            Counter.builder("ds.task.success.count")
-                    .description("Task success total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.success.count")
+            .description("Task success total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_FAILURE_COUNTER =
-            Counter.builder("ds.task.failure.count")
-                    .description("Task failure total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.failure.count")
+            .description("Task failure total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_TIMEOUT_COUNTER =
-            Counter.builder("ds.task.timeout.count")
-                    .description("Task timeout total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.timeout.count")
+            .description("Task timeout total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_RETRY_COUNTER =
-            Counter.builder("ds.task.retry.count")
-                    .description("Task retry total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.retry.count")
+            .description("Task retry total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_STOP_COUNTER =
-            Counter.builder("ds.task.stop.count")
-                    .description("Task stop total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.stop.count")
+            .description("Task stop total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_FAILOVER_COUNTER =
-            Counter.builder("ds.task.failover.count")
-                    .description("Task failover total count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.failover.count")
+            .description("Task failover total count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_DISPATCH_COUNTER =
-            Counter.builder("ds.task.dispatch.count")
-                    .description("Task dispatch count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.dispatch.count")
+            .description("Task dispatch count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_DISPATCHER_FAILED =
-            Counter.builder("ds.task.dispatch.failure.count")
-                    .description("Task dispatch failed count")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.dispatch.failure.count")
+            .description("Task dispatch failed count")
+            .register(Metrics.globalRegistry);
 
     private static final Counter TASK_DISPATCH_ERROR =
-            Counter.builder("ds.task.dispatch.error.count")
-                    .description("Task dispatch error")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.dispatch.error.count")
+            .description("Task dispatch error")
+            .register(Metrics.globalRegistry);
 
     public static void incTaskSubmit() {
         TASK_SUBMIT_COUNTER.increment();
     }
 
-    public synchronized static void registerTaskPrepared(Supplier<Number> consumer) {
+    public static synchronized  void registerTaskPrepared(Supplier<Number> consumer) {
         Gauge.builder("ds.task.prepared", consumer)
-                .description("Task prepared count")
-                .register(Metrics.globalRegistry);
+            .description("Task prepared count")
+            .register(Metrics.globalRegistry);
     }
 
     public static void incTaskFinish() {

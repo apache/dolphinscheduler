@@ -17,11 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
+import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -35,6 +43,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSour
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,22 +59,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
 
 /**
  * data source controller
@@ -81,7 +83,6 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
      * @return create result code
      */
     @ApiOperation(value = "createDataSource", notes = "CREATE_DATA_SOURCE_NOTES")
@@ -102,13 +103,12 @@ public class DataSourceController extends BaseController {
      * @param loginUser login user
      * @param id        datasource id
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
+        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Integer"),
+        @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -126,7 +126,7 @@ public class DataSourceController extends BaseController {
      * query data source detail
      *
      * @param loginUser login user
-     * @param id datasource id
+     * @param id        datasource id
      * @return data source detail
      */
     @ApiOperation(value = "queryDataSource", notes = "QUERY_DATA_SOURCE_NOTES")
@@ -149,7 +149,7 @@ public class DataSourceController extends BaseController {
      * query datasource by type
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
@@ -171,8 +171,8 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
@@ -202,12 +202,11 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
      * @return connect result code
      */
     @ApiOperation(value = "connectDataSource", notes = "CONNECT_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
+        @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
     })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
@@ -225,7 +224,7 @@ public class DataSourceController extends BaseController {
      * connection test
      *
      * @param loginUser login user
-     * @param id data source id
+     * @param id        data source id
      * @return connect result code
      */
     @ApiOperation(value = "connectionTest", notes = "CONNECT_DATA_SOURCE_TEST_NOTES")
@@ -245,7 +244,7 @@ public class DataSourceController extends BaseController {
      * delete datasource by id
      *
      * @param loginUser login user
-     * @param id datasource id
+     * @param id        datasource id
      * @return delete result
      */
     @ApiOperation(value = "deleteDataSource", notes = "DELETE_DATA_SOURCE_NOTES")
@@ -257,7 +256,7 @@ public class DataSourceController extends BaseController {
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                         @PathVariable("id") int id) {
+                                   @PathVariable("id") int id) {
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -265,7 +264,7 @@ public class DataSourceController extends BaseController {
      * verify datasource name
      *
      * @param loginUser login user
-     * @param name data source name
+     * @param name      data source name
      * @return true if data source name not exists.otherwise return false
      */
     @ApiOperation(value = "verifyDataSourceName", notes = "VERIFY_DATA_SOURCE_NOTES")
@@ -286,7 +285,7 @@ public class DataSourceController extends BaseController {
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
     @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
@@ -308,7 +307,7 @@ public class DataSourceController extends BaseController {
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
@@ -364,7 +363,7 @@ public class DataSourceController extends BaseController {
     @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
     public Result getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
                                   @RequestParam("tableName") String tableName) {
-        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId,tableName);
+        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId, tableName);
         return returnDataList(result);
     }
 }

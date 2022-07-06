@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -57,7 +56,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,7 +121,7 @@ public class DataxTask extends AbstractTaskExecutor {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, logger);
+            taskExecutionContext, logger);
     }
 
     /**
@@ -175,7 +173,7 @@ public class DataxTask extends AbstractTaskExecutor {
      */
     @Override
     public void cancelApplication(boolean cancelApplication)
-            throws Exception {
+        throws Exception {
         // cancel process
         shellCommandExecutor.cancelApplication();
     }
@@ -187,11 +185,11 @@ public class DataxTask extends AbstractTaskExecutor {
      * @throws Exception if error throws Exception
      */
     private String buildDataxJsonFile(Map<String, Property> paramsMap)
-            throws Exception {
+        throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTaskAppId());
         String json;
 
         Path path = new File(fileName).toPath();
@@ -231,18 +229,18 @@ public class DataxTask extends AbstractTaskExecutor {
     private List<ObjectNode> buildDataxJobContentJson() {
 
         BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                dataxTaskExecutionContext.getSourcetype(),
-                dataxTaskExecutionContext.getSourceConnectionParams());
+            dataxTaskExecutionContext.getSourcetype(),
+            dataxTaskExecutionContext.getSourceConnectionParams());
 
         BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                dataxTaskExecutionContext.getTargetType(),
-                dataxTaskExecutionContext.getTargetConnectionParams());
+            dataxTaskExecutionContext.getTargetType(),
+            dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
         ObjectNode readerConn = JSONUtils.createObjectNode();
 
         ArrayNode sqlArr = readerConn.putArray("querySql");
-        for (String sql : new String[]{dataXParameters.getSql()}) {
+        for (String sql : new String[] {dataXParameters.getSql()}) {
             sqlArr.add(sql);
         }
 
@@ -273,8 +271,8 @@ public class DataxTask extends AbstractTaskExecutor {
         writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
 
         String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
-                dataxTaskExecutionContext.getTargetType(),
-                dataSourceCfg, dataXParameters.getSql());
+            dataxTaskExecutionContext.getTargetType(),
+            dataSourceCfg, dataXParameters.getSql());
 
         ArrayNode columnArr = writerParam.putArray("column");
         for (String column : columns) {
@@ -372,12 +370,12 @@ public class DataxTask extends AbstractTaskExecutor {
      * @throws Exception if error throws Exception
      */
     private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap)
-            throws Exception {
+        throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(),
-                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTaskAppId(),
+            SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
 
         Path path = new File(fileName).toPath();
 
@@ -440,10 +438,10 @@ public class DataxTask extends AbstractTaskExecutor {
     /**
      * parsing synchronized column names in SQL statements
      *
-     * @param sourceType the database type of the data source
-     * @param targetType the database type of the data target
+     * @param sourceType    the database type of the data source
+     * @param targetType    the database type of the data target
      * @param dataSourceCfg the database connection parameters of the data source
-     * @param sql sql for data synchronization
+     * @param sql           sql for data synchronization
      * @return Keyword converted column names
      */
     private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
@@ -463,7 +461,7 @@ public class DataxTask extends AbstractTaskExecutor {
      * try grammatical parsing column
      *
      * @param dbType database type
-     * @param sql sql for data synchronization
+     * @param sql    sql for data synchronization
      * @return column name array
      * @throws RuntimeException if error throws RuntimeException
      */
@@ -492,7 +490,7 @@ public class DataxTask extends AbstractTaskExecutor {
             }
 
             notNull(selectItemList,
-                    String.format("select query type [%s] is not support", sqlSelect.getQuery().toString()));
+                String.format("select query type [%s] is not support", sqlSelect.getQuery().toString()));
 
             columnNames = new String[selectItemList.size()];
             for (int i = 0; i < selectItemList.size(); i++) {
@@ -512,12 +510,12 @@ public class DataxTask extends AbstractTaskExecutor {
                     }
                 } else {
                     throw new RuntimeException(
-                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                        String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
                 }
 
                 if (columnName == null) {
                     throw new RuntimeException(
-                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                        String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
                 }
 
                 columnNames[i] = columnName;
@@ -534,7 +532,7 @@ public class DataxTask extends AbstractTaskExecutor {
      * try to execute sql to resolve column names
      *
      * @param baseDataSource the database connection parameters
-     * @param sql sql for data synchronization
+     * @param sql            sql for data synchronization
      * @return column name array
      */
     public String[] tryExecuteSqlResolveColumnNames(DbType sourceType, BaseConnectionParam baseDataSource, String sql) {
@@ -543,9 +541,9 @@ public class DataxTask extends AbstractTaskExecutor {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                ResultSet resultSet = stmt.executeQuery()) {
+            Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet resultSet = stmt.executeQuery()) {
 
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();

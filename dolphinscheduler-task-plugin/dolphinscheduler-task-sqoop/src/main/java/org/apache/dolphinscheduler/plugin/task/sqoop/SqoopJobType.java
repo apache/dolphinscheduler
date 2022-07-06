@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
-public enum  SqoopJobType {
+public enum SqoopJobType {
 
     CUSTOM(0, "CUSTOM"),
     TEMPLATE(1, "TEMPLATE");

@@ -45,48 +45,48 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
     public DataQualityConfiguration parse(Map<String, String> inputParameterValue,
                                           DataQualityTaskExecutionContext context) throws DataQualityException {
         List<DqRuleExecuteSql> dqRuleExecuteSqlList =
-                JSONUtils.toList(context.getExecuteSqlList(),DqRuleExecuteSql.class);
+            JSONUtils.toList(context.getExecuteSqlList(), DqRuleExecuteSql.class);
 
         DqRuleExecuteSql statisticsSql =
-                RuleParserUtils.getExecuteSqlListByType(
-                        dqRuleExecuteSqlList, ExecuteSqlType.STATISTICS).get(0);
-        inputParameterValue.put(STATISTICS_TABLE,statisticsSql.getTableAlias());
+            RuleParserUtils.getExecuteSqlListByType(
+                dqRuleExecuteSqlList, ExecuteSqlType.STATISTICS).get(0);
+        inputParameterValue.put(STATISTICS_TABLE, statisticsSql.getTableAlias());
 
         int index = 1;
 
         List<BaseConfig> readerConfigList =
-                RuleParserUtils.getReaderConfigList(inputParameterValue,context);
+            RuleParserUtils.getReaderConfigList(inputParameterValue, context);
 
-        RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList,context);
+        RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList, context);
 
         List<BaseConfig> transformerConfigList = new ArrayList<>();
 
         List<MappingColumn> mappingColumnList = RuleParserUtils.getMappingColumnList(inputParameterValue.get(MAPPING_COLUMNS));
 
         //get on clause
-        inputParameterValue.put(ON_CLAUSE, RuleParserUtils.getOnClause(mappingColumnList,inputParameterValue));
+        inputParameterValue.put(ON_CLAUSE, RuleParserUtils.getOnClause(mappingColumnList, inputParameterValue));
         //get where clause
-        inputParameterValue.put(WHERE_CLAUSE, RuleParserUtils.getWhereClause(mappingColumnList,inputParameterValue));
+        inputParameterValue.put(WHERE_CLAUSE, RuleParserUtils.getWhereClause(mappingColumnList, inputParameterValue));
 
         index = RuleParserUtils.replaceExecuteSqlPlaceholder(
-                dqRuleExecuteSqlList,
-                index,
-                inputParameterValue,
-                transformerConfigList);
+            dqRuleExecuteSqlList,
+            index,
+            inputParameterValue,
+            transformerConfigList);
 
         String writerSql = RuleManager.DEFAULT_COMPARISON_WRITER_SQL;
         if (context.isCompareWithFixedValue()) {
-            writerSql = writerSql.replaceAll("full join \\$\\{comparison_table}","");
+            writerSql = writerSql.replaceAll("full join \\$\\{comparison_table}", "");
         }
 
         List<BaseConfig> writerConfigList = RuleParserUtils.getAllWriterConfigList(inputParameterValue,
-                context, index, transformerConfigList, writerSql,RuleManager.TASK_STATISTICS_VALUE_WRITER_SQL);
+            context, index, transformerConfigList, writerSql, RuleManager.TASK_STATISTICS_VALUE_WRITER_SQL);
 
         return new DataQualityConfiguration(
-                context.getRuleName(),
-                RuleParserUtils.getEnvConfig(),
-                readerConfigList,
-                writerConfigList,
-                transformerConfigList);
+            context.getRuleName(),
+            RuleParserUtils.getEnvConfig(),
+            readerConfigList,
+            writerConfigList,
+            transformerConfigList);
     }
 }

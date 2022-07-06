@@ -20,8 +20,6 @@
 
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
-import lombok.Getter;
-
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
@@ -34,8 +32,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+
+import lombok.Getter;
 
 @Getter
 public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
@@ -46,8 +44,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
     private List<WebElement> functionList;
 
     @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -129,26 +127,26 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "radio-function-type"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "radio-function-type"),
+            @FindBy(tagName = "input"),
         })
         private WebElement radioFunctionType;
 
         @FindBys({
-                @FindBy(className = "input-function-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-function-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputFunctionName;
 
         @FindBys({
-                @FindBy(className = "input-class-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-class-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputClassName;
 
         @FindBys({
-                @FindBy(className = "btn-udf-resource-dropdown"),
-                @FindBy(className = "n-base-selection"),
+            @FindBy(className = "btn-udf-resource-dropdown"),
+            @FindBy(className = "n-base-selection"),
         })
         private WebElement buttonUdfResourceDropDown;
 
@@ -156,8 +154,8 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         private List<WebElement> selectUdfResource;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 
@@ -175,20 +173,20 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-function-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-function-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputFunctionName;
 
         @FindBys({
-                @FindBy(className = "input-class-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-class-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputClassName;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 

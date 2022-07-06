@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 

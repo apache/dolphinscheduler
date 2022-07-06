@@ -36,8 +36,11 @@
                a.is_validate,
                b.values_map,
                b.index
-        FROM t_ds_dq_rule_input_entry a join ( SELECT *
-        FROM t_ds_relation_rule_input_entry where rule_id = #{ruleId} )  b
-        on a.id = b.rule_input_entry_id order by b.index
+        FROM t_ds_dq_rule_input_entry a
+                 join (SELECT *
+                       FROM t_ds_relation_rule_input_entry
+                       where rule_id = #{ruleId}) b
+                      on a.id = b.rule_input_entry_id
+        order by b.index
     </select>
 </mapper>

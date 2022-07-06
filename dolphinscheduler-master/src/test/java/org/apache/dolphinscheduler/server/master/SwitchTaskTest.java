@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -68,7 +68,7 @@ public class SwitchTaskTest {
         processInstance = getProcessInstance();
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
-                .thenReturn(processInstance);
+            .thenReturn(processInstance);
     }
 
     private TaskInstance testBasicInit(ExecutionStatus expectResult) {
@@ -77,25 +77,25 @@ public class SwitchTaskTest {
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
         Mockito.when(processService.findTaskDefinition(1L, 1))
-                .thenReturn(taskDefinition);
+            .thenReturn(taskDefinition);
         TaskInstance taskInstance = getTaskInstance(getTaskNode(), processInstance);
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
                 .submitTask(processInstance, taskInstance))
-                .thenReturn(taskInstance);
+            .thenReturn(taskInstance);
         // for MasterBaseTaskExecThread.call
         Mockito.when(processService
                 .findTaskInstanceById(taskInstance.getId()))
-                .thenReturn(taskInstance);
+            .thenReturn(taskInstance);
         // for SwitchTaskExecThread.initTaskParameters
         Mockito.when(processService
                 .saveTaskInstance(taskInstance))
-                .thenReturn(true);
+            .thenReturn(true);
         // for SwitchTaskExecThread.updateTaskState
         Mockito.when(processService
                 .updateTaskInstance(taskInstance))
-                .thenReturn(true);
+            .thenReturn(true);
 
         return taskInstance;
     }

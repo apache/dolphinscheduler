@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -101,7 +100,6 @@ class WorkerGroupE2ETest {
                 .anyMatch(it -> it.contains(editWorkerGroupName));
         });
     }
-
 
     @Test
     @Order(40)

@@ -52,6 +52,4 @@ public @interface Rpc {
     Class<? extends AbstractRpcCallBack> ackCallback() default AbstractRpcCallBack.class;
 
 
-
-
 }

@@ -70,8 +70,9 @@ import io.fabric8.kubernetes.client.WatcherException;
  */
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     private Job job;
+
     public K8sTaskExecutor(Logger logger, TaskExecutionContext taskRequest) {
-        super(logger,taskRequest);
+        super(logger, taskRequest);
     }
 
     public Job buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
@@ -99,7 +100,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         List<EnvVar> envVars = new ArrayList<>();
         envVars.add(taskInstanceIdVar);
         if (MapUtils.isNotEmpty(otherParams)) {
-            for (Map.Entry<String,String> entry : otherParams.entrySet()) {
+            for (Map.Entry<String, String> entry : otherParams.entrySet()) {
                 String param = entry.getKey();
                 String paramValue = entry.getValue();
                 EnvVar envVar = new EnvVar(param, paramValue, null);
@@ -139,14 +140,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             public void eventReceived(Action action, Job job) {
                 if (action != Action.ADDED) {
                     int jobStatus = getK8sJobStatus(job);
-                    setTaskStatus(jobStatus,taskInstanceId, taskResponse, k8STaskMainParameters);
+                    setTaskStatus(jobStatus, taskInstanceId, taskResponse, k8STaskMainParameters);
                     countDownLatch.countDown();
-                    }
                 }
+            }
 
             @Override
             public void onClose(WatcherException e) {
-                logStringBuffer.append(String.format("[K8sJobExecutor-%s] fail in k8s: %s",job.getMetadata().getName(),e.getMessage()));
+                logStringBuffer.append(String.format("[K8sJobExecutor-%s] fail in k8s: %s", job.getMetadata().getName(), e.getMessage()));
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
                 countDownLatch.countDown();
             }
@@ -169,11 +170,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             }
             flushLog(taskResponse);
         } catch (InterruptedException e) {
-            logger.error("job failed in k8s: {}",e.getMessage(), e);
+            logger.error("job failed in k8s: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         } catch (Exception e) {
-            logger.error("job failed in k8s: {}",e.getMessage(), e);
+            logger.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         } finally {
             if (watch != null) {
@@ -197,7 +198,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String  configYaml = k8sTaskExecutionContext.getConfigYaml();
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result, k8STaskMainParameters);
@@ -260,7 +261,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    public void setTaskStatus(int jobStatus,String taskInstanceId, TaskResponse taskResponse, K8sTaskMainParameters k8STaskMainParameters) {
+    public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse, K8sTaskMainParameters k8STaskMainParameters) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
             if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
                 logStringBuffer.append(String.format("[K8sJobExecutor-%s] killed", job.getMetadata().getName()));

@@ -16,6 +16,7 @@
  */
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,8 +44,8 @@ public class K8sParametersTest {
 
     @Test
     public void testGetResourceFilesListNormal() {
-       Assert.assertNotNull(k8sTaskParameters.getResourceFilesList());
-       Assert.assertEquals(0, k8sTaskParameters.getResourceFilesList().size());
+        Assert.assertNotNull(k8sTaskParameters.getResourceFilesList());
+        Assert.assertEquals(0, k8sTaskParameters.getResourceFilesList().size());
     }
 
     @Test
@@ -52,7 +53,7 @@ public class K8sParametersTest {
         Assert.assertEquals(image, k8sTaskParameters.getImage());
         Assert.assertEquals(namespace, k8sTaskParameters.getNamespace());
         Assert.assertEquals(0, Double.compare(minCpuCores, k8sTaskParameters.getMinCpuCores()));
-        Assert.assertEquals(0,Double.compare(minMemorySpace, k8sTaskParameters.getMinMemorySpace()));
+        Assert.assertEquals(0, Double.compare(minMemorySpace, k8sTaskParameters.getMinMemorySpace()));
     }
 
 }

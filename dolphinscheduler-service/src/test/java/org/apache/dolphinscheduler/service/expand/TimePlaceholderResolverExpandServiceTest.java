@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.commons.lang3.StringUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -60,7 +60,7 @@ public abstract class AbstractCommandExecutor {
      * rules for extracting application ID
      */
     protected static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.APPLICATION_REGEX);
-    
+
     /**
      * rules for extracting Var Pool
      */
@@ -153,6 +153,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * generate systemd command.
      * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryMax=200M --uid=root
+     *
      * @param command command
      */
     private void generateCgroupCommand(List<String> command) {
@@ -238,13 +239,13 @@ public abstract class AbstractCommandExecutor {
 
         } else {
             logger.error("process has failure , exitStatusCode:{}, processExitValue:{}, ready to kill ...",
-                    result.getExitStatusCode(), process.exitValue());
+                result.getExitStatusCode(), process.exitValue());
             ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
-                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
+            taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
         return result;
 
     }
@@ -445,9 +446,10 @@ public abstract class AbstractCommandExecutor {
 
         return lineList;
     }
-    
+
     /**
      * find var pool
+     *
      * @param line
      * @return
      */
@@ -537,9 +539,9 @@ public abstract class AbstractCommandExecutor {
 
     ExecutorService newDaemonSingleThreadExecutor(String threadName) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setNameFormat(threadName)
-                .build();
+            .setDaemon(true)
+            .setNameFormat(threadName)
+            .build();
         return Executors.newSingleThreadExecutor(threadFactory);
     }
 

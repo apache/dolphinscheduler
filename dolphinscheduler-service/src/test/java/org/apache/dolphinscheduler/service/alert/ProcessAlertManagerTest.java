@@ -110,6 +110,6 @@ public class ProcessAlertManagerTest {
 
         ProjectUser projectUser = new ProjectUser();
 
-        processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+        processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
     }
 }

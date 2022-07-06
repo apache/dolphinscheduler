@@ -31,8 +31,9 @@
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id = "baseSql">
-        id,name,description,user_id,project_code,group_size,use_size,status,create_time,update_time
+    <sql id="baseSql">
+        id
+        ,name,description,user_id,project_code,group_size,use_size,status,create_time,update_time
     </sql>
 
     <select id="queryTaskGroupPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -69,53 +70,53 @@
                 #{i}
             </foreach>
         </if>
-        and project_code in ( #{projectCode} ,  0)
+        and project_code in ( #{projectCode} , 0)
         order by update_time desc
     </select>
 
     <!--modify data by id-->
     <update id="updateTaskGroupResource">
         update t_ds_task_group
-           set use_size = use_size+1
-        where id = #{id} and use_size  &lt; group_size and
-         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+        set use_size = use_size + 1
+        where id = #{id}
+          and use_size &lt; group_size
+          and (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus}) = 1
     </update>
 
     <!--modify data by id-->
     <update id="releaseTaskGroupResource">
         update t_ds_task_group
-          set use_size = use_size-1
-        where id = #{id} and use_size > 0 and
-         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+        set use_size = use_size - 1
+        where id = #{id}
+          and use_size > 0
+          and (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus}) = 1
     </update>
 
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
         select
-        <include refid="baseSql" />
+        <include refid="baseSql"/>
         from t_ds_task_group
         where
-        user_id = #{userId} and name =  #{name}
+        user_id = #{userId} and name = #{name}
     </select>
 
     <select id="selectAvailableCountById" resultType="java.lang.Integer">
-        select
-        count(1)
+        select count(1)
         from t_ds_task_group
-        where
-        id = #{groupId} and use_size &lt; group_size
+        where id = #{groupId}
+          and use_size &lt; group_size
     </select>
 
     <select id="selectCountByIdStatus" resultType="java.lang.Integer">
-        select
-        count(1)
+        select count(1)
         from t_ds_task_group
-        where
-        id = #{id} and status = #{status}
+        where id = #{id}
+          and status = #{status}
     </select>
 
     <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
         select
-        <include refid="baseSql" />
+        <include refid="baseSql"/>
         from t_ds_task_group
         where 1=1
         <if test="userId != 0">

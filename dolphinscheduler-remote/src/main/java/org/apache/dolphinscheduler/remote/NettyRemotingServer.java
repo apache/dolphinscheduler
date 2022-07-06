@@ -120,21 +120,21 @@ public class NettyRemotingServer {
     public void start() {
         if (isStarted.compareAndSet(false, true)) {
             this.serverBootstrap
-                    .group(this.bossGroup, this.workGroup)
-                    .channel(NettyUtils.getServerSocketChannelClass())
-                    .option(ChannelOption.SO_REUSEADDR, true)
-                    .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
-                    .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
-                    .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
-                    .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
-                    .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                .group(this.bossGroup, this.workGroup)
+                .channel(NettyUtils.getServerSocketChannelClass())
+                .option(ChannelOption.SO_REUSEADDR, true)
+                .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
+                .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
+                .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
+                .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
+                .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
+                .childHandler(new ChannelInitializer<SocketChannel>() {
 
-                        @Override
-                        protected void initChannel(SocketChannel ch) {
-                            initNettyChannel(ch);
-                        }
-                    });
+                    @Override
+                    protected void initChannel(SocketChannel ch) {
+                        initNettyChannel(ch);
+                    }
+                });
 
             ChannelFuture future;
             try {
@@ -160,17 +160,17 @@ public class NettyRemotingServer {
      */
     private void initNettyChannel(SocketChannel ch) {
         ch.pipeline()
-                .addLast("encoder", new NettyEncoder())
-                .addLast("decoder", new NettyDecoder())
-                .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
-                .addLast("handler", serverHandler);
+            .addLast("encoder", new NettyEncoder())
+            .addLast("decoder", new NettyDecoder())
+            .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
+            .addLast("handler", serverHandler);
     }
 
     /**
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
+     * @param processor   processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
@@ -180,8 +180,8 @@ public class NettyRemotingServer {
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
+     * @param processor   processor
+     * @param executor    thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         this.serverHandler.registerProcessor(commandType, processor, executor);

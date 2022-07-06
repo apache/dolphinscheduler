@@ -30,6 +30,7 @@ public interface BatchReader extends Component {
 
     /**
      * read data from source return dataset
+     *
      * @param env env
      * @return Dataset<Row>
      */

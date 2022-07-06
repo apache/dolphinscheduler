@@ -92,7 +92,7 @@ public class TaskExecuteProcessorTest {
         alertClientService = PowerMockito.mock(AlertClientService.class);
         workerExecService = PowerMockito.mock(ExecutorService.class);
         PowerMockito.when(workerExecService.submit(Mockito.any(TaskExecuteThread.class)))
-                .thenReturn(null);
+            .thenReturn(null);
 
         PowerMockito.mockStatic(ChannelUtils.class);
         PowerMockito.when(ChannelUtils.toAddress(null)).thenReturn(null);
@@ -122,11 +122,11 @@ public class TaskExecuteProcessorTest {
 
         PowerMockito.mockStatic(JsonSerializer.class);
         PowerMockito.when(JsonSerializer.deserialize(command.getBody(), TaskExecuteRequestCommand.class))
-                .thenReturn(taskRequestCommand);
+            .thenReturn(taskRequestCommand);
 
         PowerMockito.mockStatic(JSONUtils.class);
         PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskExecuteRequestCommand.class))
-                .thenReturn(taskRequestCommand);
+            .thenReturn(taskRequestCommand);
 
         PowerMockito.mockStatic(FileUtils.class);
         PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),

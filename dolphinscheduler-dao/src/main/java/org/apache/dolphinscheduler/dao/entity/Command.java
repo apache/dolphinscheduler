@@ -146,21 +146,21 @@ public class Command {
     }
 
     public Command(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            long processDefinitionCode,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            String workerGroup,
-            Long environmentCode,
-            Priority processInstancePriority,
-            int dryRun,
-            int processInstanceId,
-            int processDefinitionVersion
+        CommandType commandType,
+        TaskDependType taskDependType,
+        FailureStrategy failureStrategy,
+        int executorId,
+        long processDefinitionCode,
+        String commandParam,
+        WarningType warningType,
+        int warningGroupId,
+        Date scheduleTime,
+        String workerGroup,
+        Long environmentCode,
+        Priority processInstancePriority,
+        int dryRun,
+        int processInstanceId,
+        int processDefinitionVersion
     ) {
         this.commandType = commandType;
         this.executorId = executorId;
@@ -415,25 +415,25 @@ public class Command {
     @Override
     public String toString() {
         return "Command{"
-                + "id=" + id
-                + ", commandType=" + commandType
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", executorId=" + executorId
-                + ", commandParam='" + commandParam + '\''
-                + ", taskDependType=" + taskDependType
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", warningGroupId=" + warningGroupId
-                + ", scheduleTime=" + scheduleTime
-                + ", startTime=" + startTime
-                + ", processInstancePriority=" + processInstancePriority
-                + ", updateTime=" + updateTime
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", dryRun='" + dryRun + '\''
-                + ", processInstanceId='" + processInstanceId + '\''
-                + ", processDefinitionVersion='" + processDefinitionVersion + '\''
-                + '}';
+            + "id=" + id
+            + ", commandType=" + commandType
+            + ", processDefinitionCode=" + processDefinitionCode
+            + ", executorId=" + executorId
+            + ", commandParam='" + commandParam + '\''
+            + ", taskDependType=" + taskDependType
+            + ", failureStrategy=" + failureStrategy
+            + ", warningType=" + warningType
+            + ", warningGroupId=" + warningGroupId
+            + ", scheduleTime=" + scheduleTime
+            + ", startTime=" + startTime
+            + ", processInstancePriority=" + processInstancePriority
+            + ", updateTime=" + updateTime
+            + ", workerGroup='" + workerGroup + '\''
+            + ", environmentCode='" + environmentCode + '\''
+            + ", dryRun='" + dryRun + '\''
+            + ", processInstanceId='" + processInstanceId + '\''
+            + ", processDefinitionVersion='" + processDefinitionVersion + '\''
+            + '}';
     }
 
 }

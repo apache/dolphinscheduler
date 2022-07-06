@@ -46,14 +46,14 @@ public class JsonUtils {
      * can use static singleton, inject: just make sure to reuse!
      */
     private static final ObjectMapper MAPPER = new ObjectMapper()
-            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-            .configure(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT,true)
-            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .configure(FAIL_ON_EMPTY_BEANS,false)
-            .setTimeZone(TimeZone.getDefault())
-            .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
+        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+        .configure(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true)
+        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+        .configure(FAIL_ON_EMPTY_BEANS, false)
+        .setTimeZone(TimeZone.getDefault())
+        .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JsonUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");

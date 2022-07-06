@@ -40,7 +40,6 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -74,11 +73,11 @@ public final class ZookeeperRegistry implements Registry {
 
         CuratorFrameworkFactory.Builder builder =
             CuratorFrameworkFactory.builder()
-                                   .connectString(properties.getConnectString())
-                                   .retryPolicy(retryPolicy)
-                                   .namespace(properties.getNamespace())
-                                   .sessionTimeoutMs((int) properties.getSessionTimeout().toMillis())
-                                   .connectionTimeoutMs((int) properties.getConnectionTimeout().toMillis());
+                .connectString(properties.getConnectString())
+                .retryPolicy(retryPolicy)
+                .namespace(properties.getNamespace())
+                .sessionTimeoutMs((int) properties.getSessionTimeout().toMillis())
+                .connectionTimeoutMs((int) properties.getConnectionTimeout().toMillis());
 
         final String digest = properties.getDigest();
         if (!Strings.isNullOrEmpty(digest)) {
@@ -89,17 +88,17 @@ public final class ZookeeperRegistry implements Registry {
 
     private void buildDigest(CuratorFrameworkFactory.Builder builder, String digest) {
         builder.authorization("digest", digest.getBytes(StandardCharsets.UTF_8))
-               .aclProvider(new ACLProvider() {
-                   @Override
-                   public List<ACL> getDefaultAcl() {
-                       return ZooDefs.Ids.CREATOR_ALL_ACL;
-                   }
+            .aclProvider(new ACLProvider() {
+                @Override
+                public List<ACL> getDefaultAcl() {
+                    return ZooDefs.Ids.CREATOR_ALL_ACL;
+                }
 
-                   @Override
-                   public List<ACL> getAclForPath(final String path) {
-                       return ZooDefs.Ids.CREATOR_ALL_ACL;
-                   }
-               });
+                @Override
+                public List<ACL> getAclForPath(final String path) {
+                    return ZooDefs.Ids.CREATOR_ALL_ACL;
+                }
+            });
     }
 
     @PostConstruct
@@ -162,10 +161,10 @@ public final class ZookeeperRegistry implements Registry {
 
         try {
             client.create()
-                  .orSetData()
-                  .creatingParentsIfNeeded()
-                  .withMode(mode)
-                  .forPath(key, value.getBytes(StandardCharsets.UTF_8));
+                .orSetData()
+                .creatingParentsIfNeeded()
+                .withMode(mode)
+                .forPath(key, value.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new RegistryException("Failed to put registry key: " + key, e);
         }
@@ -186,8 +185,8 @@ public final class ZookeeperRegistry implements Registry {
     public void delete(String nodePath) {
         try {
             client.delete()
-                  .deletingChildrenIfNeeded()
-                  .forPath(nodePath);
+                .deletingChildrenIfNeeded()
+                .forPath(nodePath);
         } catch (KeeperException.NoNodeException ignored) {
             // Is already deleted or does not exist
         } catch (Exception e) {

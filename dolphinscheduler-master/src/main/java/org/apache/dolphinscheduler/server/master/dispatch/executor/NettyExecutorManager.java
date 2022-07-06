@@ -147,7 +147,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     /**
      * execute logic
      *
-     * @param host host
+     * @param host    host
      * @param command command
      * @throws ExecuteException if error throws ExecuteException
      */

@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.ExecutionException;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
 
 public class RetryerUtilsTest {
 

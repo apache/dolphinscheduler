@@ -65,9 +65,9 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         MySQLConnectionParam
-                connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
+            connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
         MySQLDataSourceParamDTO
-                mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
+            mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -89,7 +89,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
 
         MySQLConnectionParam
-                mysqlConnectionParam = new MySQLConnectionParam();
+            mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl(jdbcUrl);
         mysqlConnectionParam.setDatabase(mysqlDatasourceParam.getDatabase());
         mysqlConnectionParam.setAddress(address);
@@ -121,7 +121,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         MySQLConnectionParam
-                mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
+            mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
         String jdbcUrl = mysqlConnectionParam.getJdbcUrl();
         if (!StringUtils.isEmpty(mysqlConnectionParam.getOther())) {
             return String.format("%s?%s&%s", jdbcUrl, mysqlConnectionParam.getOther(), APPEND_PARAMS);
@@ -177,9 +177,9 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private static boolean checkKeyIsLegitimate(String key) {
         return !key.contains(ALLOW_LOAD_LOCAL_IN_FILE_NAME)
-                && !key.contains(AUTO_DESERIALIZE)
-                && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
-                && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
+            && !key.contains(AUTO_DESERIALIZE)
+            && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
+            && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
     }
 
     private Map<String, String> parseOther(String other) {

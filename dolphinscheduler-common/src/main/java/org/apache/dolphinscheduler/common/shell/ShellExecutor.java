@@ -44,26 +44,26 @@ public class ShellExecutor extends AbstractShell {
     }
 
     public ShellExecutor(String[] execString, File dir,
-                                Map<String, String> env) {
-        this(execString, dir, env,0L);
+                         Map<String, String> env) {
+        this(execString, dir, env, 0L);
     }
 
     /**
      * Create a new instance of the ShellExecutor to execute a command.
      *
      * @param execString The command to execute with arguments
-     * @param dir If not-null, specifies the directory which should be set
-     *            as the current working directory for the command.
-     *            If null, the current working directory is not modified.
-     * @param env If not-null, environment of the command will include the
-     *            key-value pairs specified in the map. If null, the current
-     *            environment is not modified.
-     * @param timeout Specifies the time in milliseconds, after which the
-     *                command will be killed and the status marked as timedout.
-     *                If 0, the command will not be timed out.
+     * @param dir        If not-null, specifies the directory which should be set
+     *                   as the current working directory for the command.
+     *                   If null, the current working directory is not modified.
+     * @param env        If not-null, environment of the command will include the
+     *                   key-value pairs specified in the map. If null, the current
+     *                   environment is not modified.
+     * @param timeout    Specifies the time in milliseconds, after which the
+     *                   command will be killed and the status marked as timedout.
+     *                   If 0, the command will not be timed out.
      */
     public ShellExecutor(String[] execString, File dir,
-                                Map<String, String> env, long timeout) {
+                         Map<String, String> env, long timeout) {
         command = execString.clone();
         if (dir != null) {
             setWorkingDirectory(dir);
@@ -78,6 +78,7 @@ public class ShellExecutor extends AbstractShell {
      * Static method to execute a shell command.
      * Covers most of the simple cases without requiring the user to implement
      * the <code>AbstractShell</code> interface.
+     *
      * @param cmd shell command to execute.
      * @return the output of the executed command.
      * @throws IOException errors
@@ -90,8 +91,9 @@ public class ShellExecutor extends AbstractShell {
      * Static method to execute a shell command.
      * Covers most of the simple cases without requiring the user to implement
      * the <code>AbstractShell</code> interface.
-     * @param env the map of environment key=value
-     * @param cmd shell command to execute.
+     *
+     * @param env     the map of environment key=value
+     * @param cmd     shell command to execute.
      * @param timeout time in milliseconds after which script should be marked timeout
      * @return the output of the executed command.
      * @throws IOException errors
@@ -99,7 +101,7 @@ public class ShellExecutor extends AbstractShell {
     public static String execCommand(Map<String, String> env, String[] cmd,
                                      long timeout) throws IOException {
         ShellExecutor exec = new ShellExecutor(cmd, null, env,
-                timeout);
+            timeout);
         exec.execute();
         return exec.getOutput();
     }
@@ -108,18 +110,20 @@ public class ShellExecutor extends AbstractShell {
      * Static method to execute a shell command.
      * Covers most of the simple cases without requiring the user to implement
      * the <code>AbstractShell</code> interface.
+     *
      * @param env the map of environment key=value
      * @param cmd shell command to execute.
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static String execCommand(Map<String,String> env, String... cmd)
-            throws IOException {
+    public static String execCommand(Map<String, String> env, String... cmd)
+        throws IOException {
         return execCommand(env, cmd, 0L);
     }
 
     /**
      * Execute the shell command
+     *
      * @throws IOException errors
      */
     public void execute() throws IOException {
@@ -138,13 +142,12 @@ public class ShellExecutor extends AbstractShell {
         int nRead;
         String line = "";
         while ((nRead = lines.read(buf, 0, buf.length)) > 0) {
-            line = new String(buf,0,nRead);
+            line = new String(buf, 0, nRead);
             output.append(line);
         }
     }
 
     /**
-     *
      * @return the output of the shell command
      */
     public String getOutput() {

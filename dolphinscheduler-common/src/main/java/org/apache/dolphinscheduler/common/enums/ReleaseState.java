@@ -41,7 +41,7 @@ public enum ReleaseState {
     private final String descp;
 
     public static ReleaseState getEnum(int value) {
-        for (ReleaseState e:ReleaseState.values()) {
+        for (ReleaseState e : ReleaseState.values()) {
             if (e.ordinal() == value) {
                 return e;
             }

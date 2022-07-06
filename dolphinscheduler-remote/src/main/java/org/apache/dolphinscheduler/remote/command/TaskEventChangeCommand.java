@@ -37,12 +37,12 @@ public class TaskEventChangeCommand implements Serializable {
     }
 
     public TaskEventChangeCommand(
-                                  int processInstanceId,
-                                  int taskInstanceId
+        int processInstanceId,
+        int taskInstanceId
     ) {
         this.key = String.format("%d-%d",
-                processInstanceId,
-                taskInstanceId);
+            processInstanceId,
+            taskInstanceId);
 
         this.processInstanceId = processInstanceId;
         this.taskInstanceId = taskInstanceId;
@@ -72,8 +72,8 @@ public class TaskEventChangeCommand implements Serializable {
     @Override
     public String toString() {
         return "TaskEventChangeCommand{"
-                + "key=" + key
-                + '}';
+            + "key=" + key
+            + '}';
     }
 
     public int getProcessInstanceId() {

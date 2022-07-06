@@ -43,7 +43,7 @@ public class CommonUtil {
     }
 
     public static synchronized UserGroupInformation createUGI(Configuration configuration, String principal, String keyTab, String krb5File, String username)
-            throws IOException {
+        throws IOException {
         if (getKerberosStartupState()) {
             Objects.requireNonNull(keyTab);
             if (StringUtils.isNotBlank(krb5File)) {
@@ -55,7 +55,7 @@ public class CommonUtil {
     }
 
     public static synchronized UserGroupInformation loginKerberos(final Configuration config, final String principal, final String keyTab)
-            throws IOException {
+        throws IOException {
         config.set(Constants.HADOOP_SECURITY_AUTHENTICATION, Constants.KERBEROS);
         UserGroupInformation.setConfiguration(config);
         UserGroupInformation.loginUserFromKeytab(principal.trim(), keyTab.trim());

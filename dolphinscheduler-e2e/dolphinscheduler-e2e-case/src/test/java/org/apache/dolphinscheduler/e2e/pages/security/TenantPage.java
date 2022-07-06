@@ -113,8 +113,8 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
         }
 
         @FindBys({
-                @FindBy(className = "input-tenant-code"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-tenant-code"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputTenantCode;
 
@@ -122,8 +122,8 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
         private WebElement selectQueue;
 
         @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDescription;
 

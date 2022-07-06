@@ -19,7 +19,8 @@
 
 # UPDATING
 
-Updating is try to document non-backward compatible updates which notice users the detail changes about pydolphinscheduler.
+Updating is try to document non-backward compatible updates which notice users the detail changes about
+pydolphinscheduler.
 It started after version 2.0.5 released
 
 ## dev
@@ -29,7 +30,8 @@ It started after version 2.0.5 released
 
 ## 3.0.0a0
 
-* Integrate Python gateway server into Dolphinscheduler API server, and you could start Python gateway service by command
+* Integrate Python gateway server into Dolphinscheduler API server, and you could start Python gateway service by
+  command
   `./bin/dolphinscheduler-daemon.sh start api-server` instead of independent command
   `./bin/dolphinscheduler-daemon.sh start python-gateway-server`.
 * Remove parameter `queue` from class `ProcessDefinition` to avoid confuse user when it change but not work

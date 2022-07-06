@@ -17,25 +17,30 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.dolphinscheduler.common.Constants;
+
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocalServerHttpUtilsTest extends TestCase{
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+public class LocalServerHttpUtilsTest extends TestCase {
 
     public static final Logger logger = LoggerFactory.getLogger(LocalServerHttpUtilsTest.class);
     private static LocalJettyHttpServer server = null;
-    public static Test suite(){
-        TestSuite suite=new TestSuite();
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
         suite.addTestSuite(LocalServerHttpUtilsTest.class);
         server = new LocalJettyHttpServer(suite);
         return server;
@@ -44,21 +49,21 @@ public class LocalServerHttpUtilsTest extends TestCase{
     public void testGetTest() throws Exception {
         // success
         String result = null;
-        result = HttpUtils.get("http://localhost:" + server.getServerPort()+ "/test.json");
+        result = HttpUtils.get("http://localhost:" + server.getServerPort() + "/test.json");
         Assert.assertNotNull(result);
-		ObjectNode jsonObject = JSONUtils.parseObject(result);
-		Assert.assertEquals("Github",jsonObject.path("name").asText());
-		result = HttpUtils.get("http://123.333.111.33/ccc");
-		Assert.assertNull(result);
+        ObjectNode jsonObject = JSONUtils.parseObject(result);
+        Assert.assertEquals("Github", jsonObject.path("name").asText());
+        result = HttpUtils.get("http://123.333.111.33/ccc");
+        Assert.assertNull(result);
     }
 
     public void testGetResponseContentString() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpGet httpget = new HttpGet("http://localhost:" +server.getServerPort()+"/test.json");
+        HttpGet httpget = new HttpGet("http://localhost:" + server.getServerPort() + "/test.json");
         /** set timeout、request time、socket timeout */
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
-                .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
-                .setSocketTimeout(Constants.SOCKET_TIMEOUT).setRedirectsEnabled(true).build();
+            .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+            .setSocketTimeout(Constants.SOCKET_TIMEOUT).setRedirectsEnabled(true).build();
         httpget.setConfig(requestConfig);
 
         String responseContent = null;

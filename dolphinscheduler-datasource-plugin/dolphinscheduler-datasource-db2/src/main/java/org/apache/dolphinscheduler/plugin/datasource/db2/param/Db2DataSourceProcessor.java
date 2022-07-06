@@ -51,7 +51,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) createConnectionParams(connectionJson);
 
         Db2DataSourceParamDTO
-                db2DatasourceParamDTO = new Db2DataSourceParamDTO();
+            db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
         db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
@@ -108,7 +108,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(db2ConnectionParam),
-                db2ConnectionParam.getUser(), PasswordUtils.decodePassword(db2ConnectionParam.getPassword()));
+            db2ConnectionParam.getUser(), PasswordUtils.decodePassword(db2ConnectionParam.getPassword()));
     }
 
     @Override

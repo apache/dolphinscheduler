@@ -74,10 +74,10 @@ public class TaskExecuteThreadTest {
             Assert.assertNotNull(e);
         }
         downloads.add(Pair.of("shell", "shell.sh"));
-        try{
+        try {
             taskExecuteThread.downloadResource(path, LOGGER, downloads);
-        }catch (Exception e){
-
+        } catch (Exception e) {
+            // ignore
         }
     }
 }

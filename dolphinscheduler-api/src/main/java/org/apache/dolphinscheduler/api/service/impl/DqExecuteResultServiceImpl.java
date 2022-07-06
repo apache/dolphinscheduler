@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -59,7 +58,7 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
         int[] statusArray = null;
         // filter by state
         if (state != null) {
-            statusArray = new int[]{state};
+            statusArray = new int[] {state};
         }
 
         Date start = null;
@@ -84,14 +83,14 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
         }
 
         IPage<DqExecuteResult> dqsResultPage =
-                dqExecuteResultMapper.queryResultListPaging(
-                        page,
-                        searchVal,
-                        loginUser.getId(),
-                        statusArray,
-                        ruleType,
-                        start,
-                        end);
+            dqExecuteResultMapper.queryResultListPaging(
+                page,
+                searchVal,
+                loginUser.getId(),
+                statusArray,
+                ruleType,
+                start,
+                end);
 
         pageInfo.setTotal((int) dqsResultPage.getTotal());
         pageInfo.setTotalList(dqsResultPage.getRecords());

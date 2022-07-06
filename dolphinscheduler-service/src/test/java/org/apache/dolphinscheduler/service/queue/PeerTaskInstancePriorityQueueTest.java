@@ -48,7 +48,6 @@ public class PeerTaskInstancePriorityQueueTest {
         Assert.assertTrue(queue.size() < peekBeforeLength);
     }
 
-
     @Test(expected = TaskPriorityQueueException.class)
     public void poll() throws Exception {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
@@ -63,7 +62,7 @@ public class PeerTaskInstancePriorityQueueTest {
     }
 
     @Test
-    public void peekTaskGroupPriority() throws Exception{
+    public void peekTaskGroupPriority() throws Exception {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
         TaskInstance taskInstanceHigPriority = createTaskInstance("high", Priority.HIGH, 2);
         TaskInstance taskInstanceMediumPriority = createTaskInstance("medium", Priority.HIGH, 1);

@@ -28,6 +28,7 @@ public interface TaskGroupQueueService {
 
     /**
      * query tasks in task group queue by group id
+     *
      * @param loginUser   login user
      * @param groupId     group id
      * @param taskName    Task Name
@@ -35,17 +36,17 @@ public interface TaskGroupQueueService {
      * @param status      Task queue status
      * @param pageNo      page no
      * @param pageSize    page size
-
      * @return tasks list
      */
     Map<String, Object> queryTasksByGroupId(User loginUser, String taskName
-        , String processName, Integer status, int groupId, int pageNo,int pageSize);
+        , String processName, Integer status, int groupId, int pageNo, int pageSize);
 
     /**
      * query tasks in task group queue by project id
+     *
      * @param loginUser login user
-     * @param pageNo page no
-     * @param pageSize page size
+     * @param pageNo    page no
+     * @param pageSize  page size
      * @param processId process id
      * @return tasks list
      */
@@ -54,21 +55,23 @@ public interface TaskGroupQueueService {
 
     /**
      * query all tasks in task group queue
+     *
      * @param loginUser login user
-     * @param pageNo page no
-     * @param pageSize page size
+     * @param pageNo    page no
+     * @param pageSize  page size
      * @return tasks list
      */
     Map<String, Object> queryAllTasks(User loginUser, int pageNo, int pageSize);
 
     /**
      * delete by task id
+     *
      * @param taskId task id
      * @return TaskGroupQueue entity
      */
     boolean deleteByTaskId(int taskId);
 
-    void forceStartTask(int queueId,int forceStart);
+    void forceStartTask(int queueId, int forceStart);
 
     void modifyPriority(Integer queueId, Integer priority);
 }

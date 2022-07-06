@@ -75,9 +75,9 @@ public class HostUpdateResponseCommand implements Serializable {
     @Override
     public String toString() {
         return "HostUpdateResponseCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + "host=" + processHost
-                + '}';
+            + "taskInstanceId=" + taskInstanceId
+            + "host=" + processHost
+            + '}';
     }
 
 }

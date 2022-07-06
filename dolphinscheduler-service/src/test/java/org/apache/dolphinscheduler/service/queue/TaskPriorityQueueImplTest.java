@@ -72,7 +72,7 @@ public class TaskPriorityQueueImplTest {
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 0, 1, "default_1");
-        priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_2");
+        priorityTwo = new TaskPriority(0, 0, 0, 0, 1, "default_2");
         priorityThree = new TaskPriority(0, 0, 0, 0, 1, "default_3");
         taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
         Collections.sort(taskPrioritys);
@@ -82,33 +82,33 @@ public class TaskPriorityQueueImplTest {
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 0, 2, "default_1");
-        priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_2");
+        priorityTwo = new TaskPriority(0, 0, 0, 0, 1, "default_2");
         priorityThree = new TaskPriority(0, 0, 0, 0, 3, "default_3");
         taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
         Collections.sort(taskPrioritys);
         Assert.assertEquals(
-                Arrays.asList(priorityThree, priorityOne, priorityTwo),
-                taskPrioritys
+            Arrays.asList(priorityThree, priorityOne, priorityTwo),
+            taskPrioritys
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 0, 1, "default_1");
-        priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_2");
+        priorityTwo = new TaskPriority(0, 0, 0, 0, 1, "default_2");
         priorityThree = new TaskPriority(0, 0, 0, 0, 3, "default_3");
         taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
         Collections.sort(taskPrioritys);
         Assert.assertEquals(
-                Arrays.asList(priorityThree, priorityOne, priorityTwo),
-                taskPrioritys
+            Arrays.asList(priorityThree, priorityOne, priorityTwo),
+            taskPrioritys
         );
 
-        priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_1");
+        priorityTwo = new TaskPriority(0, 0, 0, 0, 1, "default_1");
         priorityOne = new TaskPriority(0, 0, 0, 0, 1, "default_1");
         priorityThree = new TaskPriority(0, 0, 0, 0, 3, "default_1");
         taskPrioritys = Arrays.asList(priorityTwo, priorityOne, priorityThree);
         Collections.sort(taskPrioritys);
         Assert.assertEquals(
-                Arrays.asList(priorityThree, priorityTwo, priorityOne),
-                taskPrioritys
+            Arrays.asList(priorityThree, priorityTwo, priorityOne),
+            taskPrioritys
         );
     }
 

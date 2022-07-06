@@ -17,6 +17,7 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -31,8 +32,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
@@ -45,8 +44,8 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     private List<WebElement> projectList;
 
     @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -83,11 +82,11 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     public ProjectDetailPage goTo(String project) {
         projectList().stream()
-                     .filter(it -> it.getText().contains(project))
-                     .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
-                     .findFirst()
-                     .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
-                     .click();
+            .filter(it -> it.getText().contains(project))
+            .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
+            .click();
 
         return new ProjectDetailPage(driver);
     }
@@ -99,8 +98,8 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         }
 
         @FindBys({
-                @FindBy(className = "input-project-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-project-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputProjectName;
 

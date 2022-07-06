@@ -42,7 +42,7 @@ public class SubProcessTaskChannel implements TaskChannel {
     @Override
     public AbstractParameters parseParameters(ParametersNode parametersNode) {
         return JSONUtils.parseObject(StringUtils.isEmpty(parametersNode.getSwitchResult())
-                ? parametersNode.getTaskParams() : parametersNode.getSwitchResult(), SwitchParameters.class);
+            ? parametersNode.getTaskParams() : parametersNode.getSwitchResult(), SwitchParameters.class);
     }
 
     @Override

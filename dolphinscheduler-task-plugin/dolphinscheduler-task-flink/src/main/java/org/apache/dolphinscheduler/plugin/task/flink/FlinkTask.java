@@ -19,19 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FlinkTask extends AbstractYarnTask {
 
@@ -76,7 +69,7 @@ public class FlinkTask extends AbstractYarnTask {
         List<String> args = FlinkArgsUtils.buildCommandLine(taskExecutionContext, flinkParameters);
 
         String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
+            .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
         logger.info("flink task command : {}", command);
         return command;

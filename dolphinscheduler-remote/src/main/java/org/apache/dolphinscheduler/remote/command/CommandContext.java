@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- *  command context
+ * command context
  */
 public class CommandContext implements Serializable {
 

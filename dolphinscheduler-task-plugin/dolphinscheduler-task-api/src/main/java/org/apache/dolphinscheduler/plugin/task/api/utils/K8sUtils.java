@@ -47,7 +47,7 @@ public class K8sUtils {
                 .inNamespace(namespace)
                 .create(job);
         } catch (Exception e) {
-            throw new TaskException("fail to create job",e);
+            throw new TaskException("fail to create job", e);
         }
     }
 
@@ -59,7 +59,7 @@ public class K8sUtils {
                 .withName(jobName)
                 .delete();
         } catch (Exception e) {
-            throw new TaskException("fail to delete job",e);
+            throw new TaskException("fail to delete job", e);
         }
     }
 
@@ -82,7 +82,7 @@ public class K8sUtils {
             return client.batch().v1()
                 .jobs().withName(jobName).watch(watcher);
         } catch (Exception e) {
-            throw new TaskException("fail to register batch job watcher",e);
+            throw new TaskException("fail to register batch job watcher", e);
         }
     }
 
@@ -112,7 +112,7 @@ public class K8sUtils {
             Config config = Config.fromKubeconfig(configYaml);
             client = new DefaultKubernetesClient(config);
         } catch (Exception e) {
-            throw new TaskException("fail to build k8s ApiClient",e);
+            throw new TaskException("fail to build k8s ApiClient", e);
         }
     }
 

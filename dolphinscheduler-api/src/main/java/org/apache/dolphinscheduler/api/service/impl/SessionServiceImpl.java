@@ -84,7 +84,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * create session
      *
      * @param user user
-     * @param ip ip
+     * @param ip   ip
      * @return session string
      */
     @Override
@@ -142,7 +142,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * sign out
      * remove ip restrictions
      *
-     * @param ip no use
+     * @param ip        no use
      * @param loginUser login user
      */
     @Override

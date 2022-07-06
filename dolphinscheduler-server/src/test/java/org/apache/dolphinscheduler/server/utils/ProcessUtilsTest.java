@@ -18,12 +18,14 @@
 package org.apache.dolphinscheduler.server.utils;
 
 import static org.powermock.api.mockito.PowerMockito.when;
-import org.apache.commons.lang3.SystemUtils;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,12 +66,12 @@ public class ProcessUtilsTest {
     @Test
     public void testGetKerberosInitCommand() {
         PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)).thenReturn(true);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(true);
         PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
         PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
         PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
         Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)).thenReturn(false);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(false);
         Assert.assertEquals("", ProcessUtils.getKerberosInitCommand());
     }
 

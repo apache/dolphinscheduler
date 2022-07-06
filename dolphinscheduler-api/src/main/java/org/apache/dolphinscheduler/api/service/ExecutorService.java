@@ -38,22 +38,22 @@ public interface ExecutorService {
     /**
      * execute process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param cronTime cron time
-     * @param commandType command type
-     * @param failureStrategy failuer strategy
-     * @param startNodeList start nodelist
-     * @param taskDependType node dependency type
-     * @param warningType warning type
-     * @param warningGroupId notify group id
-     * @param processInstancePriority process instance priority
-     * @param workerGroup worker group name
-     * @param environmentCode environment code
-     * @param runMode run mode
-     * @param timeout timeout
-     * @param startParams the global param values which pass to new process instance
+     * @param loginUser                 login user
+     * @param projectCode               project code
+     * @param processDefinitionCode     process definition code
+     * @param cronTime                  cron time
+     * @param commandType               command type
+     * @param failureStrategy           failuer strategy
+     * @param startNodeList             start nodelist
+     * @param taskDependType            node dependency type
+     * @param warningType               warning type
+     * @param warningGroupId            notify group id
+     * @param processInstancePriority   process instance priority
+     * @param workerGroup               worker group name
+     * @param environmentCode           environment code
+     * @param runMode                   run mode
+     * @param timeout                   timeout
+     * @param startParams               the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return execute process instance code
      */
@@ -70,10 +70,10 @@ public interface ExecutorService {
     /**
      * check whether the process definition can be executed
      *
-     * @param projectCode project code
+     * @param projectCode       project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
-     * @param verison process definition version
+     * @param verison           process definition version
      * @return check result code
      */
     Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode, Integer verison);
@@ -81,10 +81,10 @@ public interface ExecutorService {
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param executeType execute type
+     * @param executeType       execute type
      * @return execute result code
      */
     Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType);
@@ -99,6 +99,7 @@ public interface ExecutorService {
 
     /**
      * check if the current process has subprocesses and all subprocesses are valid
+     *
      * @param processDefinition
      * @return check result
      */
@@ -106,6 +107,7 @@ public interface ExecutorService {
 
     /**
      * force start Task Instance
+     *
      * @param loginUser
      * @param queueId
      * @return

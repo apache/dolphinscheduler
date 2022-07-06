@@ -161,15 +161,15 @@ public class TaskExecuteRunningCommand implements Serializable {
     @Override
     public String toString() {
         return "TaskExecuteRunningCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", processInstanceId='" + processInstanceId + '\''
-                + ", startTime=" + startTime
-                + ", host='" + host + '\''
-                + ", status=" + status
-                + ", logPath='" + logPath + '\''
-                + ", executePath='" + executePath + '\''
-                + ", processId=" + processId + '\''
-                + ", appIds='" + appIds + '\''
-                + '}';
+            + "taskInstanceId=" + taskInstanceId
+            + ", processInstanceId='" + processInstanceId + '\''
+            + ", startTime=" + startTime
+            + ", host='" + host + '\''
+            + ", status=" + status
+            + ", logPath='" + logPath + '\''
+            + ", executePath='" + executePath + '\''
+            + ", processId=" + processId + '\''
+            + ", appIds='" + appIds + '\''
+            + '}';
     }
 }

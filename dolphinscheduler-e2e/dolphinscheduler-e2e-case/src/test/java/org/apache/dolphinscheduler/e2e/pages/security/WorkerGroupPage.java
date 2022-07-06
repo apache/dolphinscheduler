@@ -19,8 +19,10 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -30,8 +32,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
-import java.util.List;
-
+import lombok.Getter;
 
 @Getter
 public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Tab {
@@ -49,8 +50,6 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
 
     private final WorkerGroupForm createWorkerForm = new WorkerGroupForm();
     private final WorkerGroupForm editWorkerForm = new WorkerGroupForm();
-
-
 
     public WorkerGroupPage(RemoteWebDriver driver) {
         super(driver);
@@ -70,13 +69,13 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
 
     public WorkerGroupPage update(String workerGroupName, String editWorkerGroupName) {
         workerGroupList()
-                .stream()
-                .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(workerGroupName))
-                .flatMap(it -> it.findElements(By.className("edit")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No edit button in workerGroup list"))
-                .click();
+            .stream()
+            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(workerGroupName))
+            .flatMap(it -> it.findElements(By.className("edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in workerGroup list"))
+            .click();
 
         editWorkerForm().inputWorkerGroupName().sendKeys(Keys.CONTROL + "a");
         editWorkerForm().inputWorkerGroupName().sendKeys(Keys.BACK_SPACE);
@@ -87,11 +86,10 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
         return this;
     }
 
-
-    public WorkerGroupPage delete(String Worker) {
+    public WorkerGroupPage delete(String worker) {
         workerGroupList()
             .stream()
-            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(Worker))
+            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(worker))
             .flatMap(it -> it.findElements(By.className("delete")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()

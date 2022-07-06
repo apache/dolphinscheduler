@@ -35,7 +35,6 @@ package org.apache.dolphinscheduler.api.permission;
 
 import static java.util.stream.Collectors.toSet;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
@@ -51,9 +50,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -65,6 +62,8 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +97,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             List<AuthorizationType> authorizationTypes = authorizedResourceList.authorizationTypes();
             authorizationTypes.forEach(auth -> RESOURCE_LIST_MAP.put(auth, authorizedResourceList));
         }
-     }
+    }
 
     @Override
     public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId, Logger logger) {
@@ -142,7 +141,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             return Collections.emptySet();
         }
         return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(
-                user.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId, logger);
+            user.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId, logger);
     }
 
     @Component
@@ -256,7 +255,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<UdfFunc> udfFuncList = udfFuncMapper.listAuthorizedUdfByUserId(userId);
-            if (udfFuncList.isEmpty()){
+            if (udfFuncList.isEmpty()) {
                 return Collections.emptySet();
             }
             return udfFuncList.stream().map(UdfFunc::getId).collect(toSet());
@@ -322,7 +321,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         }
     }
 
-
     @Component
     public static class EnvironmentResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
@@ -339,7 +337,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-           return true;
+            return true;
         }
 
         @Override
@@ -366,7 +364,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         public boolean permissionCheck(int userId, String url, Logger logger) {
             return false;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
@@ -396,7 +393,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             return false;
         }
 
-
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             return Collections.emptySet();
@@ -422,9 +418,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-           return false;
+            return false;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
@@ -453,7 +448,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         public boolean permissionCheck(int userId, String url, Logger logger) {
             return false;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
@@ -486,7 +480,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         public boolean permissionCheck(int userId, String url, Logger logger) {
             return true;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
@@ -522,11 +515,11 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         }
     }
 
-
     interface ResourceAcquisitionAndPermissionCheck<T> {
 
         /**
          * authorization types
+         *
          * @return
          */
         List<AuthorizationType> authorizationTypes();
@@ -541,6 +534,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         /**
          * permission check
+         *
          * @param userId
          * @return
          */

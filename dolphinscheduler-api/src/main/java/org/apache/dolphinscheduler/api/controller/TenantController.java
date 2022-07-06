@@ -67,9 +67,9 @@ public class TenantController extends BaseController {
     /**
      * create tenant
      *
-     * @param loginUser login user
-     * @param tenantCode tenant code
-     * @param queueId queue id
+     * @param loginUser   login user
+     * @param tenantCode  tenant code
+     * @param queueId     queue id
      * @param description description
      * @return create result code
      */
@@ -97,8 +97,8 @@ public class TenantController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
     @ApiOperation(value = "queryTenantlistPaging", notes = "QUERY_TENANT_LIST_PAGING_NOTES")
@@ -146,10 +146,10 @@ public class TenantController extends BaseController {
     /**
      * update tenant
      *
-     * @param loginUser login user
-     * @param id tenant id
-     * @param tenantCode tenant code
-     * @param queueId queue id
+     * @param loginUser   login user
+     * @param id          tenant id
+     * @param tenantCode  tenant code
+     * @param queueId     queue id
      * @param description description
      * @return update result code
      */
@@ -178,7 +178,7 @@ public class TenantController extends BaseController {
      * delete tenant by id
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      */
     @ApiOperation(value = "deleteTenantById", notes = "DELETE_TENANT_NOTES")
@@ -198,7 +198,7 @@ public class TenantController extends BaseController {
     /**
      * verify tenant code
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */

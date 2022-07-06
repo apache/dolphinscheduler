@@ -30,7 +30,8 @@ public interface BatchWriter extends Component {
 
     /**
      * write data to target storage
-     * @param data data
+     *
+     * @param data        data
      * @param environment environment
      */
     void write(Dataset<Row> data, SparkRuntimeEnvironment environment);

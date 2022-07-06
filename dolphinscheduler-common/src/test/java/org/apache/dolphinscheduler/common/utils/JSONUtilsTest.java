@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,18 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class JSONUtilsTest {
 
@@ -116,7 +117,7 @@ public class JSONUtilsTest {
         String str = list2String();
 
         List<LinkedHashMap> maps = JSONUtils.toList(str,
-                LinkedHashMap.class);
+            LinkedHashMap.class);
 
         Assert.assertEquals(1, maps.size());
         Assert.assertEquals("mysql200", maps.get(0).get("mysql service name"));
@@ -172,9 +173,9 @@ public class JSONUtilsTest {
     @Test
     public void testToList() {
         Assert.assertEquals(new ArrayList(),
-                JSONUtils.toList("A1B2C3", null));
+            JSONUtils.toList("A1B2C3", null));
         Assert.assertEquals(new ArrayList(),
-                JSONUtils.toList("", null));
+            JSONUtils.toList("", null));
     }
 
     @Test
@@ -186,7 +187,7 @@ public class JSONUtilsTest {
     @Test
     public void testFindValue() {
         Assert.assertNull(JSONUtils.findValue(
-                new ArrayNode(new JsonNodeFactory(true)), null));
+            new ArrayNode(new JsonNodeFactory(true)), null));
     }
 
     @Test
@@ -195,10 +196,10 @@ public class JSONUtilsTest {
         map.put("foo", "bar");
 
         Assert.assertTrue(map.equals(JSONUtils.toMap(
-                "{\n" + "\"foo\": \"bar\"\n" + "}")));
+            "{\n" + "\"foo\": \"bar\"\n" + "}")));
 
         Assert.assertFalse(map.equals(JSONUtils.toMap(
-                "{\n" + "\"bar\": \"foo\"\n" + "}")));
+            "{\n" + "\"bar\": \"foo\"\n" + "}")));
 
         Assert.assertNull(JSONUtils.toMap("3"));
         Assert.assertNull(JSONUtils.toMap(null));
@@ -214,12 +215,12 @@ public class JSONUtilsTest {
         map.put("foo", "bar");
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
-                JSONUtils.toJsonString(map));
+            JSONUtils.toJsonString(map));
         Assert.assertEquals(String.valueOf((Object) null),
-                JSONUtils.toJsonString(null));
+            JSONUtils.toJsonString(null));
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
-                JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
+            JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
     }
 
     @Test
@@ -247,12 +248,12 @@ public class JSONUtilsTest {
     @Test
     public void jsonDataDeserializerTest() {
         String a = "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-                + "\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,"
-                + "\"id\":\"tasks-86823\",\"maxRetryTimes\":1,\"name\":\"shell test\","
-                + "\"params\":\"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo "
-                + "'yyc'\\\"}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\","
-                + "\"taskInstancePriority\":\"HIGHEST\",\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-                + "\"timeout\":\"{}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}";
+            + "\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,"
+            + "\"id\":\"tasks-86823\",\"maxRetryTimes\":1,\"name\":\"shell test\","
+            + "\"params\":\"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo "
+            + "'yyc'\\\"}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\","
+            + "\"taskInstancePriority\":\"HIGHEST\",\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
+            + "\"timeout\":\"{}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}";
 
         TaskNode taskNode = JSONUtils.parseObject(a, TaskNode.class);
 
@@ -264,7 +265,7 @@ public class JSONUtilsTest {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         TimeZone.setDefault(timeZone);
         JSONUtils.setTimeZone(timeZone);
-      
+
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
@@ -279,12 +280,11 @@ public class JSONUtilsTest {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         TimeZone.setDefault(timeZone);
         JSONUtils.setTimeZone(timeZone);
-      
+
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
         Assert.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
 
     }
-
 
 }

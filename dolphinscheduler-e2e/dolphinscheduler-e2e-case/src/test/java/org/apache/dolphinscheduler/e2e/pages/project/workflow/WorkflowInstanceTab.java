@@ -17,6 +17,7 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -31,10 +32,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.openqa.selenium.support.pagefactory.ByChained;
 
 @Getter
 public final class WorkflowInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
@@ -51,8 +52,8 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
     private WebElement buttonDeleteAll;
 
     @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -100,11 +101,11 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
 
         public Row rerun() {
             row.findElements(new ByChained(By.className("btn-rerun"), By.className("n-button__content")))
-               .stream()
-               .filter(WebElement::isDisplayed)
-               .findFirst()
-               .orElseThrow(() -> new RuntimeException("Cannot find rerun button"))
-               .click();
+                .stream()
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find rerun button"))
+                .click();
 
             return this;
         }

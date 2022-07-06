@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * NodeInfo：node description information
  * EdgeInfo: edge description information
  */
+@SuppressWarnings("checkstyle:ClassTypeParameterName")
 public class DAG<Node, NodeInfo, EdgeInfo> {
     private static final Logger logger = LoggerFactory.getLogger(DAG.class);
 
@@ -70,7 +71,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     /**
      * add node information
      *
-     * @param node node
+     * @param node     node
      * @param nodeInfo node information
      */
     public void addNode(Node node, NodeInfo nodeInfo) {
@@ -88,7 +89,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
      * add edge
      *
      * @param fromNode node of origin
-     * @param toNode node of destination
+     * @param toNode   node of destination
      * @return The result of adding an edge. returns false if the DAG result is a ring result
      */
     public boolean addEdge(Node fromNode, Node toNode) {
@@ -98,8 +99,8 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     /**
      * add edge
      *
-     * @param fromNode node of origin
-     * @param toNode node of destination
+     * @param fromNode   node of origin
+     * @param toNode     node of destination
      * @param createNode whether the node needs to be created if it does not exist
      * @return The result of adding an edge. returns false if the DAG result is a ring result
      */
@@ -110,9 +111,9 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     /**
      * add edge
      *
-     * @param fromNode node of origin
-     * @param toNode node of destination
-     * @param edge edge description
+     * @param fromNode   node of origin
+     * @param toNode     node of destination
+     * @param edge       edge description
      * @param createNode whether the node needs to be created if it does not exist
      * @return The result of adding an edge. returns false if the DAG result is a ring result
      */
@@ -159,7 +160,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
      * whether this edge is contained
      *
      * @param fromNode node of origin
-     * @param toNode node of destination
+     * @param toNode   node of destination
      * @return true if contains
      */
     public boolean containsEdge(Node fromNode, Node toNode) {
@@ -346,7 +347,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     /**
      * if tho node does not exist,add this node
      *
-     * @param node node
+     * @param node     node
      * @param nodeInfo node information
      */
     private void addNodeIfAbsent(Node node, NodeInfo nodeInfo) {
@@ -359,9 +360,9 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
      * add edge
      *
      * @param fromNode node of origin
-     * @param toNode node of destination
-     * @param edge edge description
-     * @param edges edge set
+     * @param toNode   node of destination
+     * @param edge     edge description
+     * @param edges    edge set
      */
     private void addEdge(Node fromNode, Node toNode, EdgeInfo edge, Map<Node, Map<Node, EdgeInfo>> edges) {
         edges.putIfAbsent(fromNode, new HashMap<>());
@@ -373,8 +374,8 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
      * Whether an edge can be successfully added(fromNode -> toNode)
      * need to determine whether the DAG has cycle
      *
-     * @param fromNode node of origin
-     * @param toNode node of destination
+     * @param fromNode   node of origin
+     * @param toNode     node of destination
      * @param createNode whether to create a node
      * @return true if added
      */
@@ -417,7 +418,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     /**
      * Get all neighbor nodes of the node
      *
-     * @param node Node id to be calculated
+     * @param node  Node id to be calculated
      * @param edges neighbor edge information
      * @return all neighbor nodes of the node
      */

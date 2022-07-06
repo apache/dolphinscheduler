@@ -50,7 +50,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) createConnectionParams(connectionJson);
         PostgreSQLDataSourceParamDTO
-                postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
+            postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
         postgreSqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         postgreSqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         postgreSqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
@@ -113,7 +113,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         PostgreSQLConnectionParam postgreSqlConnectionParam = (PostgreSQLConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(postgreSqlConnectionParam),
-                postgreSqlConnectionParam.getUser(), PasswordUtils.decodePassword(postgreSqlConnectionParam.getPassword()));
+            postgreSqlConnectionParam.getUser(), PasswordUtils.decodePassword(postgreSqlConnectionParam.getPassword()));
     }
 
     @Override

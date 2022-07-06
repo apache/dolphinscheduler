@@ -84,13 +84,13 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
     void updateForceStart(@Param("queueId") int queueId, @Param("forceStart") int forceStart);
 
     int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue
-            , @Param("groupId") int id, @Param("status") int status);
+        , @Param("groupId") int id, @Param("status") int status);
 
     int updateInQueueCAS(@Param("oldValue") int oldValue, @Param("newValue") int newValue, @Param("id") int id);
 
     void modifyPriority(@Param("queueId") int queueId, @Param("priority") int priority);
 
-    IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page, @Param("taskName")String taskName
-        ,@Param("processName") String processName,@Param("status") Integer status,@Param("groupId") int groupId
-        ,@Param("projects") List<Project> projects);
+    IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page, @Param("taskName") String taskName
+        , @Param("processName") String processName, @Param("status") Integer status, @Param("groupId") int groupId
+        , @Param("projects") List<Project> projects);
 }

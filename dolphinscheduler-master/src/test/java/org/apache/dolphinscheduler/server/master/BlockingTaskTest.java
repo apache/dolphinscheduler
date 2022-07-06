@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -28,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
@@ -87,7 +87,7 @@ public class BlockingTaskTest {
         // mock process instance
         processInstance = getProcessInstance();
         Mockito.when(processService
-            .findProcessInstanceById(processInstance.getId()))
+                .findProcessInstanceById(processInstance.getId()))
             .thenReturn(processInstance);
 
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -121,9 +121,9 @@ public class BlockingTaskTest {
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setFirstSubmitTime(new Date());
         Mockito.when(processService
-            .submitTaskWithRetry(Mockito.any(ProcessInstance.class)
-                , Mockito.any(TaskInstance.class)
-                , Mockito.any(Integer.class), Mockito.any(Long.class)))
+                .submitTaskWithRetry(Mockito.any(ProcessInstance.class)
+                    , Mockito.any(TaskInstance.class)
+                    , Mockito.any(Integer.class), Mockito.any(Long.class)))
             .thenReturn(taskInstance);
         return taskInstance;
     }
@@ -181,27 +181,27 @@ public class BlockingTaskTest {
         TaskInstance taskInstance = getTaskInstance(getTaskNode(blockingCondition), processInstance);
 
         Mockito.when(processService
-            .submitTask(processInstance, taskInstance))
+                .submitTask(processInstance, taskInstance))
             .thenReturn(taskInstance);
 
         Mockito.when(processService
-            .findTaskInstanceById(taskInstance.getId()))
+                .findTaskInstanceById(taskInstance.getId()))
             .thenReturn(taskInstance);
 
         // for BlockingTaskExecThread.initTaskParameters
         Mockito.when(processService
-            .saveTaskInstance(taskInstance))
+                .saveTaskInstance(taskInstance))
             .thenReturn(true);
 
         // for BlockingTaskExecThread.updateTaskState
         Mockito.when(processService
-            .updateTaskInstance(taskInstance))
+                .updateTaskInstance(taskInstance))
             .thenReturn(true);
 
         // for BlockingTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = getTaskInstanceForValidTaskList(expectResults);
         Mockito.when(processService.
-            findValidTaskListByProcessId(processInstance.getId()))
+                findValidTaskListByProcessId(processInstance.getId()))
             .thenReturn(conditions);
         return taskInstance;
     }

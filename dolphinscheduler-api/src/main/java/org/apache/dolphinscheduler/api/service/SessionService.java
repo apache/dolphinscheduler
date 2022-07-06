@@ -39,7 +39,7 @@ public interface SessionService {
      * create session
      *
      * @param user user
-     * @param ip ip
+     * @param ip   ip
      * @return session string
      */
     String createSession(User user, String ip);
@@ -48,7 +48,7 @@ public interface SessionService {
      * sign out
      * remove ip restrictions
      *
-     * @param ip   no use
+     * @param ip        no use
      * @param loginUser login user
      */
     void signOut(String ip, User loginUser);

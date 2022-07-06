@@ -54,13 +54,13 @@ public class JdbcReaderTest extends FlowTestBase {
     }
 
     private Config buildReaderConfig() {
-        Map<String,Object> config = new HashMap<>();
-        config.put(DATABASE,"test");
-        config.put(TABLE,"test.test1");
-        config.put(URL,url);
-        config.put(USER,"test");
-        config.put(PASSWORD,"123456");
-        config.put(DRIVER,driver);
+        Map<String, Object> config = new HashMap<>();
+        config.put(DATABASE, "test");
+        config.put(TABLE, "test.test1");
+        config.put(URL, url);
+        config.put(USER, "test");
+        config.put(PASSWORD, "123456");
+        config.put(DRIVER, driver);
         return new Config(config);
     }
 
@@ -71,25 +71,25 @@ public class JdbcReaderTest extends FlowTestBase {
 
             connection.prepareStatement("drop table if exists test.test1").executeUpdate();
             connection
-                    .prepareStatement(
-                            "CREATE TABLE test.test1 (\n"
-                                    + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
-                                    + "  `company` varchar(255) DEFAULT NULL,\n"
-                                    + "  `date` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c1` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c2` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c3` varchar(255) DEFAULT NULL,\n"
-                                    + "  `c4` int(11) DEFAULT NULL,\n"
-                                    + "  PRIMARY KEY (`id`)\n"
-                                    + ")")
-                    .executeUpdate();
+                .prepareStatement(
+                    "CREATE TABLE test.test1 (\n"
+                        + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                        + "  `company` varchar(255) DEFAULT NULL,\n"
+                        + "  `date` varchar(255) DEFAULT NULL,\n"
+                        + "  `c1` varchar(255) DEFAULT NULL,\n"
+                        + "  `c2` varchar(255) DEFAULT NULL,\n"
+                        + "  `c3` varchar(255) DEFAULT NULL,\n"
+                        + "  `c4` int(11) DEFAULT NULL,\n"
+                        + "  PRIMARY KEY (`id`)\n"
+                        + ")")
+                .executeUpdate();
             connection.prepareStatement("INSERT INTO test.test1 (company,`date`,c1,c2,c3,c4) VALUES\n"
-                    + "\t ('1','2019-03-01','11','12','13',1),\n"
-                    + "\t ('2','2019-06-01','21','22','23',1),\n"
-                    + "\t ('3','2019-09-01','31','32','33',1),\n"
-                    + "\t ('4','2019-12-01','41','42','43',1),\n"
-                    + "\t ('5','2013','42','43','54',1),\n"
-                    + "\t ('6','2020','42','43','54',1);").executeUpdate();
+                + "\t ('1','2019-03-01','11','12','13',1),\n"
+                + "\t ('2','2019-06-01','21','22','23',1),\n"
+                + "\t ('3','2019-09-01','31','32','33',1),\n"
+                + "\t ('4','2019-12-01','41','42','43',1),\n"
+                + "\t ('5','2013','42','43','54',1),\n"
+                + "\t ('6','2020','42','43','54',1);").executeUpdate();
             connection.commit();
         } catch (Exception e) {
             e.printStackTrace();

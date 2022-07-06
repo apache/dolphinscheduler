@@ -220,9 +220,9 @@ public class DataxParameters extends AbstractParameters {
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0
-                    && dataTarget != 0
-                    && StringUtils.isNotEmpty(sql)
-                    && StringUtils.isNotEmpty(targetTable);
+                && dataTarget != 0
+                && StringUtils.isNotEmpty(sql)
+                && StringUtils.isNotEmpty(targetTable);
         } else {
             return StringUtils.isNotEmpty(json);
         }
@@ -236,21 +236,21 @@ public class DataxParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "DataxParameters{"
-                + "customConfig=" + customConfig
-                + ", json='" + json + '\''
-                + ", dsType='" + dsType + '\''
-                + ", dataSource=" + dataSource
-                + ", dtType='" + dtType + '\''
-                + ", dataTarget=" + dataTarget
-                + ", sql='" + sql + '\''
-                + ", targetTable='" + targetTable + '\''
-                + ", preStatements=" + preStatements
-                + ", postStatements=" + postStatements
-                + ", jobSpeedByte=" + jobSpeedByte
-                + ", jobSpeedRecord=" + jobSpeedRecord
-                + ", xms=" + xms
-                + ", xmx=" + xmx
-                + '}';
+            + "customConfig=" + customConfig
+            + ", json='" + json + '\''
+            + ", dsType='" + dsType + '\''
+            + ", dataSource=" + dataSource
+            + ", dtType='" + dtType + '\''
+            + ", dataTarget=" + dataTarget
+            + ", sql='" + sql + '\''
+            + ", targetTable='" + targetTable + '\''
+            + ", preStatements=" + preStatements
+            + ", postStatements=" + postStatements
+            + ", jobSpeedByte=" + jobSpeedByte
+            + ", jobSpeedRecord=" + jobSpeedRecord
+            + ", xms=" + xms
+            + ", xmx=" + xmx
+            + '}';
     }
 
     @Override

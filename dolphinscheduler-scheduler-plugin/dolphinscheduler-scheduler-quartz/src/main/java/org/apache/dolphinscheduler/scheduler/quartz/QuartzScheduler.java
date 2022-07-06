@@ -106,15 +106,15 @@ public class QuartzScheduler implements SchedulerApi {
              * but it does not want to be fired now.
              */
             CronTrigger cronTrigger = newTrigger()
-                    .withIdentity(triggerKey)
-                    .startAt(startDate)
-                    .endAt(endDate)
-                    .withSchedule(
-                            cronSchedule(cronExpression)
-                                    .withMisfireHandlingInstructionDoNothing()
-                                    .inTimeZone(DateUtils.getTimezone(timezoneId))
-                    )
-                    .forJob(jobDetail).build();
+                .withIdentity(triggerKey)
+                .startAt(startDate)
+                .endAt(endDate)
+                .withSchedule(
+                    cronSchedule(cronExpression)
+                        .withMisfireHandlingInstructionDoNothing()
+                        .inTimeZone(DateUtils.getTimezone(timezoneId))
+                )
+                .forJob(jobDetail).build();
 
             if (scheduler.checkExists(triggerKey)) {
                 // updateProcessInstance scheduler trigger when scheduler cycle changes
@@ -125,12 +125,12 @@ public class QuartzScheduler implements SchedulerApi {
                     // reschedule job trigger
                     scheduler.rescheduleJob(triggerKey, cronTrigger);
                     logger.info("reschedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
-                            triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
+                        triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
                 }
             } else {
                 scheduler.scheduleJob(cronTrigger);
                 logger.info("schedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
-                        triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
+                    triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
             }
 
         } catch (Exception e) {

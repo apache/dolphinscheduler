@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -115,7 +114,7 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
     public void testQueryByK8sNamespaceId() {
         K8sNamespace entity = insertOne();
         K8sNamespace k8sNamespace = k8sNamespaceMapper.selectById(entity.getId());
-        Assert.assertEquals(entity.toString(),k8sNamespace.toString());
+        Assert.assertEquals(entity.toString(), k8sNamespace.toString());
     }
 
 
@@ -126,11 +125,11 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
     public void testQueryK8sNamespaceListPaging() {
         K8sNamespace entity = insertOne();
         Page<K8sNamespace> page = new Page<>(1, 10);
-        IPage<K8sNamespace> k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"");
+        IPage<K8sNamespace> k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page, "");
         List<K8sNamespace> k8sNamespaceList = k8sNamespaceIPage.getRecords();
         Assert.assertEquals(k8sNamespaceList.size(), 1);
 
-        k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"abc");
+        k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page, "abc");
         k8sNamespaceList = k8sNamespaceIPage.getRecords();
         Assert.assertEquals(k8sNamespaceList.size(), 0);
     }

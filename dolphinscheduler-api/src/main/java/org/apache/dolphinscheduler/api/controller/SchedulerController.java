@@ -79,15 +79,15 @@ public class SchedulerController extends BaseController {
     /**
      * create schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param schedule scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param processDefinitionCode   process definition code
+     * @param schedule                scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
      * @param processInstancePriority process instance priority
-     * @param workerGroup worker group
+     * @param workerGroup             worker group
      * @return create result code
      */
     @ApiOperation(value = "createSchedule", notes = "CREATE_SCHEDULE_NOTES")
@@ -125,14 +125,14 @@ public class SchedulerController extends BaseController {
     /**
      * updateProcessInstance schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
-     * @param schedule scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
-     * @param workerGroup worker group
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param id                      scheduler id
+     * @param schedule                scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param workerGroup             worker group
      * @param processInstancePriority process instance priority
      * @return update result code
      */
@@ -170,9 +170,9 @@ public class SchedulerController extends BaseController {
     /**
      * publish schedule setScheduleState
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id scheduler id
+     * @param id          scheduler id
      * @return publish result code
      */
     @ApiOperation(value = "online", notes = "ONLINE_SCHEDULE_NOTES")
@@ -183,8 +183,8 @@ public class SchedulerController extends BaseController {
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result publishScheduleOnline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                         @PathVariable("id") Integer id) {
+                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                        @PathVariable("id") Integer id) {
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
         return returnDataList(result);
     }
@@ -192,9 +192,9 @@ public class SchedulerController extends BaseController {
     /**
      * offline schedule
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id schedule id
+     * @param id          schedule id
      * @return operation result code
      */
     @ApiOperation(value = "offline", notes = "OFFLINE_SCHEDULE_NOTES")
@@ -205,8 +205,8 @@ public class SchedulerController extends BaseController {
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result offlineSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                          @PathVariable("id") Integer id) {
+                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                  @PathVariable("id") Integer id) {
 
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
         return returnDataList(result);
@@ -215,12 +215,12 @@ public class SchedulerController extends BaseController {
     /**
      * query schedule list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param searchVal search value
+     * @param pageNo                page number
+     * @param pageSize              page size
+     * @param searchVal             search value
      * @return schedule list page
      */
     @ApiOperation(value = "queryScheduleListPaging", notes = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
@@ -252,9 +252,9 @@ public class SchedulerController extends BaseController {
     /**
      * delete schedule by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id scheule id
+     * @param id          scheule id
      * @return delete result code
      */
     @ApiOperation(value = "deleteScheduleById", notes = "OFFLINE_SCHEDULE_NOTES")
@@ -275,7 +275,7 @@ public class SchedulerController extends BaseController {
     /**
      * query schedule list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return schedule list
      */
@@ -293,7 +293,7 @@ public class SchedulerController extends BaseController {
      * preview schedule
      *
      * @param loginUser login user
-     * @param schedule schedule expression
+     * @param schedule  schedule expression
      * @return the next five fire time
      */
     @ApiOperation(value = "previewSchedule", notes = "PREVIEW_SCHEDULE_NOTES")
@@ -313,14 +313,14 @@ public class SchedulerController extends BaseController {
     /**
      * update process definition schedule
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param schedule scheduler
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param failureStrategy failure strategy
-     * @param workerGroup worker group
+     * @param loginUser               login user
+     * @param projectCode             project code
+     * @param processDefinitionCode   process definition code
+     * @param schedule                scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param workerGroup             worker group
      * @param processInstancePriority process instance priority
      * @return update result code
      */

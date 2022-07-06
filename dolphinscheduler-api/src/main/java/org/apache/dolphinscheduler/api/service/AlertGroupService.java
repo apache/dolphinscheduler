@@ -39,7 +39,7 @@ public interface AlertGroupService {
      * query alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return one alert group
      */
     Map<String, Object> queryAlertGroupById(User loginUser, Integer id);
@@ -49,8 +49,8 @@ public interface AlertGroupService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return alert group list page
      */
     Result listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
@@ -58,9 +58,9 @@ public interface AlertGroupService {
     /**
      * create alert group
      *
-     * @param loginUser login user
-     * @param groupName group name
-     * @param desc description
+     * @param loginUser        login user
+     * @param groupName        group name
+     * @param desc             description
      * @param alertInstanceIds alertInstanceIds
      * @return create result code
      */
@@ -69,10 +69,10 @@ public interface AlertGroupService {
     /**
      * updateProcessInstance alert group
      *
-     * @param loginUser login user
-     * @param id alert group id
-     * @param groupName group name
-     * @param desc description
+     * @param loginUser        login user
+     * @param id               alert group id
+     * @param groupName        group name
+     * @param desc             description
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
@@ -82,7 +82,7 @@ public interface AlertGroupService {
      * delete alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return delete result code
      */
     Map<String, Object> delAlertgroupById(User loginUser, int id);

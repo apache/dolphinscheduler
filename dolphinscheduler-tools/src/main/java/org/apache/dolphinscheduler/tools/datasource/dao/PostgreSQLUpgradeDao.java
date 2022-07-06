@@ -100,7 +100,7 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
     /**
      * determines whether a field exists in the specified table
      *
-     * @param tableName tableName
+     * @param tableName  tableName
      * @param columnName columnName
      * @return if column name exist return true，else return false
      */

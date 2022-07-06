@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -34,8 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class JSONUtilsTest {
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public class JSONUtilsTest {
 
     @Test
     public void createObjectNodeTest() {
@@ -59,13 +59,12 @@ public class JSONUtilsTest {
 
     }
 
-
     @Test
     public void string2MapTest() {
         String str = list2String();
 
         List<LinkedHashMap> maps = JSONUtils.toList(str,
-                LinkedHashMap.class);
+            LinkedHashMap.class);
 
         Assert.assertEquals(1, maps.size());
         Assert.assertEquals("mysql200", maps.get(0).get("mysql service name"));
@@ -96,7 +95,6 @@ public class JSONUtilsTest {
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
     }
 
-
     @Test
     public void testJsonByteArray() {
         String str = "foo";
@@ -112,9 +110,9 @@ public class JSONUtilsTest {
     @Test
     public void testToList() {
         Assert.assertEquals(new ArrayList(),
-                JSONUtils.toList("A1B2C3", null));
+            JSONUtils.toList("A1B2C3", null));
         Assert.assertEquals(new ArrayList(),
-                JSONUtils.toList("", null));
+            JSONUtils.toList("", null));
     }
 
     @Test
@@ -123,10 +121,10 @@ public class JSONUtilsTest {
         map.put("foo", "bar");
 
         Assert.assertTrue(map.equals(JSONUtils.toMap(
-                "{\n" + "\"foo\": \"bar\"\n" + "}")));
+            "{\n" + "\"foo\": \"bar\"\n" + "}")));
 
         Assert.assertFalse(map.equals(JSONUtils.toMap(
-                "{\n" + "\"bar\": \"foo\"\n" + "}")));
+            "{\n" + "\"bar\": \"foo\"\n" + "}")));
 
         Assert.assertNull(JSONUtils.toMap("3"));
         Assert.assertNull(JSONUtils.toMap(null));
@@ -142,12 +140,12 @@ public class JSONUtilsTest {
         map.put("foo", "bar");
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
-                JSONUtils.toJsonString(map));
+            JSONUtils.toJsonString(map));
         Assert.assertEquals(String.valueOf((Object) null),
-                JSONUtils.toJsonString(null));
+            JSONUtils.toJsonString(null));
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
-                JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
+            JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
     }
 
     @Test
@@ -188,7 +186,8 @@ public class JSONUtilsTest {
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        List<LocalDateTime> timeList = JSONUtils.parseObject("[\"2022-02-22 13:38:24\"]", new TypeReference<List<LocalDateTime>>(){});
+        List<LocalDateTime> timeList = JSONUtils.parseObject("[\"2022-02-22 13:38:24\"]", new TypeReference<List<LocalDateTime>>() {
+        });
         Assert.assertNotNull(timeList);
         Assert.assertEquals(1, timeList.size());
         Assert.assertEquals(localDateTime, timeList.get(0));

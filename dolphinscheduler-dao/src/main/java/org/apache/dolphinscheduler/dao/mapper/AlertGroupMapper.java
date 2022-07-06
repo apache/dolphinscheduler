@@ -19,10 +19,8 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -37,7 +35,8 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
     /**
      * alertgroup page
-     * @param page page
+     *
+     * @param page      page
      * @param groupName groupName
      * @return alertgroup Ipage
      */
@@ -47,6 +46,7 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
     /**
      * query by group name
+     *
      * @param groupName groupName
      * @return alertgroup list
      */
@@ -54,6 +54,7 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
     /**
      * Judge whether the alert group exist
+     *
      * @param groupName groupName
      * @return if exist return true else return null
      */
@@ -61,6 +62,7 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
     /**
      * query by userId
+     *
      * @param userId userId
      * @return alertgroup list
      */
@@ -68,18 +70,21 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
     /**
      * query all group list
+     *
      * @return alertgroup list
      */
     List<AlertGroup> queryAllGroupList();
 
     /**
      * query instance ids All
+     *
      * @return list
      */
     List<String> queryInstanceIdsList();
 
     /**
      * queryAlertGroupInstanceIdsById
+     *
      * @param alertGroupId
      * @return
      */
@@ -87,14 +92,16 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
     /**
      * list authorized AlertGroup
+     *
      * @param userId
      * @param alertGroupsIds
      * @return
      */
-    <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")List<Integer> alertGroupsIds);
+    <T> List<AlertGroup> listAuthorizedAlertGroupList(@Param("userId") int userId, @Param("alertGroupsIds") List<Integer> alertGroupsIds);
 
     /**
      * queryAlertGroupPageByIds
+     *
      * @param page
      * @param ids
      * @param searchVal

@@ -78,16 +78,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * create or update a worker group
      *
      * @param loginUser login user
-     * @param id worker group id
-     * @param name worker group name
-     * @param addrList addr list
+     * @param id        worker group id
+     * @param name      worker group name
+     * @param addrList  addr list
      * @return create or update result code
      */
     @Override
     @Transactional
     public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -125,7 +125,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
-            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
+            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()), logger);
         }
         putMsg(result, Status.SUCCESS);
         return result;
@@ -179,9 +179,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * query worker group paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return worker group list page
      */
     @Override
@@ -249,8 +249,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroups = getWorkerGroups(false, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<String> availableWorkerGroupList = workerGroups.stream()
-                .map(WorkerGroup::getName)
-                .collect(Collectors.toList());
+            .map(WorkerGroup::getName)
+            .collect(Collectors.toList());
         int index = availableWorkerGroupList.indexOf(Constants.DEFAULT_WORKER_GROUP);
         if (index > -1) {
             availableWorkerGroupList.remove(index);
@@ -329,7 +329,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Transactional
     public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP,WORKER_GROUP_DELETE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

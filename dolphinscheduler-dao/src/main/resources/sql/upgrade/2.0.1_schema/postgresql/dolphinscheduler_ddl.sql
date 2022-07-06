@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-delimiter d//
-CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+delimiter
+d//
+CREATE
+OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
     RETURNS character varying
     LANGUAGE 'plpgsql'
@@ -23,16 +25,18 @@ CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
-    v_schema varchar;
+v_schema varchar;
 BEGIN
     ---get schema name
-    v_schema =current_schema();
+    v_schema
+=current_schema();
 
-    EXECUTE 'DROP INDEX IF EXISTS "start_time_index"';
-    EXECUTE 'CREATE INDEX IF NOT EXISTS start_time_index ON ' || quote_ident(v_schema) ||'.t_ds_process_instance USING Btree("start_time","end_time")';
+EXECUTE 'DROP INDEX IF EXISTS "start_time_index"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS start_time_index ON ' || quote_ident(v_schema) ||
+        '.t_ds_process_instance USING Btree("start_time","end_time")';
 
-	return 'Success!';
-	exception when others then
+return 'Success!';
+exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
         return SQLERRM;
 END;
@@ -40,4 +44,5 @@ $BODY$;
 
 select dolphin_update_metadata();
 
-d//
+d
+//

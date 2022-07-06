@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
+import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MIN_LENGTH;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -30,9 +33,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
-
-import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
-import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MIN_LENGTH;
 
 /**
  * check utils
@@ -84,7 +84,7 @@ public class CheckUtils {
         if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
             result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             result.put(Constants.MSG,
-                    MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+                MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
@@ -112,7 +112,8 @@ public class CheckUtils {
     }
 
     /**
-     *  check password length
+     * check password length
+     *
      * @param password password
      * @return true if password length valid, otherwise return false
      */
@@ -132,6 +133,7 @@ public class CheckUtils {
 
     /**
      * check time zone parameter
+     *
      * @param timeZone timeZone
      * @return true if timeZone is valid, otherwise return false
      */

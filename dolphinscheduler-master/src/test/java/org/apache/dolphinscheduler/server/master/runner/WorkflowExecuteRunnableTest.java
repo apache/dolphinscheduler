@@ -27,7 +27,6 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -40,6 +39,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
@@ -158,7 +158,7 @@ public class WorkflowExecuteRunnableTest {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1,2,3,4");
             Mockito.when(processService.findTaskInstanceByIdList(
-                    Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(), taskInstance4.getId()))
+                Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(), taskInstance4.getId()))
             ).thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
             Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getRecoverTaskInstanceList", String.class);

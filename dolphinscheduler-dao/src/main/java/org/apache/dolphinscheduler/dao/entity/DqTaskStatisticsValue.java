@@ -41,7 +41,7 @@ public class DqTaskStatisticsValue implements Serializable {
      * process definition name
      */
     @TableField(exist = false)
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * task instance id
      */
@@ -200,19 +200,19 @@ public class DqTaskStatisticsValue implements Serializable {
     @Override
     public String toString() {
         return "DqTaskStatisticsValue{"
-                + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
-                + ", processDefinitionName='" + processDefinitionName + '\''
-                + ", taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", ruleId=" + ruleId
-                + ", ruleType=" + ruleType
-                + ", ruleName='" + ruleName + '\''
-                + ", statisticsValue=" + statisticsValue
-                + ", statisticsName='" + statisticsName + '\''
-                + ", dataTime=" + dataTime
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", processDefinitionId=" + processDefinitionId
+            + ", processDefinitionName='" + processDefinitionName + '\''
+            + ", taskInstanceId=" + taskInstanceId
+            + ", taskName='" + taskName + '\''
+            + ", ruleId=" + ruleId
+            + ", ruleType=" + ruleType
+            + ", ruleName='" + ruleName + '\''
+            + ", statisticsValue=" + statisticsValue
+            + ", statisticsName='" + statisticsName + '\''
+            + ", dataTime=" + dataTime
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

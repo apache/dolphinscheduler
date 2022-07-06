@@ -126,14 +126,14 @@ public class DqRuleExecuteSql implements Serializable {
     @Override
     public String toString() {
         return "DqRuleExecuteSql{"
-                + "id=" + id
-                + ", index=" + index
-                + ", sql='" + sql + '\''
-                + ", tableAlias='" + tableAlias + '\''
-                + ", type=" + type
-                + ", isErrorOutputSql=" + isErrorOutputSql
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", index=" + index
+            + ", sql='" + sql + '\''
+            + ", tableAlias='" + tableAlias + '\''
+            + ", type=" + type
+            + ", isErrorOutputSql=" + isErrorOutputSql
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

@@ -63,7 +63,7 @@ public class AlertDaoTest {
 
     @Test
     public void testAddAlertSendStatus() {
-        int insertCount = alertDao.addAlertSendStatus(AlertStatus.EXECUTION_SUCCESS,"success",1,1);
+        int insertCount = alertDao.addAlertSendStatus(AlertStatus.EXECUTION_SUCCESS, "success", 1, 1);
         Assert.assertEquals(1, insertCount);
     }
 
@@ -75,9 +75,9 @@ public class AlertDaoTest {
         alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
         alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
         long count = alertDao.listPendingAlerts()
-                             .stream()
-                             .filter(alert -> alert.getContent().contains(host))
-                             .count();
+            .stream()
+            .filter(alert -> alert.getContent().contains(host))
+            .count();
         Assert.assertEquals(1L, count);
     }
 }

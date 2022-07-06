@@ -84,10 +84,10 @@ public class CycleDependency {
     @Override
     public String toString() {
         return "CycleDependency{"
-                + "processDefineId=" + processDefineId
-                + ", lastScheduleTime=" + lastScheduleTime
-                + ", expirationTime=" + expirationTime
-                + ", cycleEnum=" + cycleEnum
-                + '}';
+            + "processDefineId=" + processDefineId
+            + ", lastScheduleTime=" + lastScheduleTime
+            + ", expirationTime=" + expirationTime
+            + ", cycleEnum=" + cycleEnum
+            + '}';
     }
 }

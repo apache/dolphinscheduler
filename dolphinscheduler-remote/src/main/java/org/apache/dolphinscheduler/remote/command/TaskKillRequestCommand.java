@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.io.Serializable;
 
 /**
- *  kill task request command
+ * kill task request command
  */
 public class TaskKillRequestCommand implements Serializable {
 
     /**
-     *  task id
+     * task id
      */
     private int taskInstanceId;
 
@@ -40,7 +40,7 @@ public class TaskKillRequestCommand implements Serializable {
     }
 
     /**
-     *  package request command
+     * package request command
      *
      * @return command
      */
@@ -55,7 +55,7 @@ public class TaskKillRequestCommand implements Serializable {
     @Override
     public String toString() {
         return "TaskKillRequestCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + '}';
+            + "taskInstanceId=" + taskInstanceId
+            + '}';
     }
 }

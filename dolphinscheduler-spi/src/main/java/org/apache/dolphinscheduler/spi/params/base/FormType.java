@@ -57,7 +57,7 @@ public enum FormType {
     }
 
     private static final Map<String, FormType> FORM_TYPE_MAP =
-            Arrays.stream(FormType.values()).collect(toMap(FormType::getFormType, Functions.identity()));
+        Arrays.stream(FormType.values()).collect(toMap(FormType::getFormType, Functions.identity()));
 
     public static FormType of(String type) {
         if (FORM_TYPE_MAP.containsKey(type)) {

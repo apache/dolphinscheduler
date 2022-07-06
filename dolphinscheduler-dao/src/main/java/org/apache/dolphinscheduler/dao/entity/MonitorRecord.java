@@ -110,14 +110,14 @@ public class MonitorRecord {
     @Override
     public String toString() {
         return "MonitorRecord{"
-                + "state=" + state
-                + ", dbType=" + dbType
-                + ", maxConnections=" + maxConnections
-                + ", maxUsedConnections=" + maxUsedConnections
-                + ", threadsConnections=" + threadsConnections
-                + ", threadsRunningConnections=" + threadsRunningConnections
-                + ", date=" + date
-                + '}';
+            + "state=" + state
+            + ", dbType=" + dbType
+            + ", maxConnections=" + maxConnections
+            + ", maxUsedConnections=" + maxUsedConnections
+            + ", threadsConnections=" + threadsConnections
+            + ", threadsRunningConnections=" + threadsRunningConnections
+            + ", date=" + date
+            + '}';
     }
 
     public DbType getDbType() {

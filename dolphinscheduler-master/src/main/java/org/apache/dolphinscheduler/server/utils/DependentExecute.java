@@ -108,7 +108,7 @@ public class DependentExecute {
         DependResult result = DependResult.FAILED;
         for (DateInterval dateInterval : dateIntervals) {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
-                    dateInterval);
+                dateInterval);
             if (processInstance == null) {
                 return DependResult.WAITING;
             }
@@ -230,9 +230,9 @@ public class DependentExecute {
     private DependResult getDependResultByProcessStateWhenTaskNull(ExecutionStatus state) {
 
         if (state.typeIsRunning()
-                || state == ExecutionStatus.SUBMITTED_SUCCESS
-                || state == ExecutionStatus.DISPATCH
-                || state == ExecutionStatus.WAITING_THREAD) {
+            || state == ExecutionStatus.SUBMITTED_SUCCESS
+            || state == ExecutionStatus.DISPATCH
+            || state == ExecutionStatus.WAITING_THREAD) {
             return DependResult.WAITING;
         } else {
             return DependResult.FAILED;

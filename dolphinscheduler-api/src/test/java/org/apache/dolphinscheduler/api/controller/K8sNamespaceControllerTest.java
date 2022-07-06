@@ -28,12 +28,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -58,8 +54,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "20");
 
         MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -75,8 +71,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("k8s", "k8s");
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isCreated()) //it can
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -94,8 +90,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("tag", "flink");
 
         MvcResult mvcResult = mockMvc.perform(put("/k8s-namespace/{id}", 1)
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isCreated())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -114,8 +110,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         // success
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -129,8 +125,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("namespace", null);
         paramsMap.add("k8s", "default");
         mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -146,8 +142,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "1");
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/delete")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -164,8 +160,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("userId", "1");
 
         MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace/unauth-namespace")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -181,8 +177,8 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("userId", "1");
 
         MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace/authed-namespace")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();

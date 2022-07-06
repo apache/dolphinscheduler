@@ -20,7 +20,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -33,6 +32,15 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -43,16 +51,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.Objects;
+import lombok.SneakyThrows;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class UdfManageE2ETest {
@@ -95,7 +94,7 @@ public class UdfManageE2ETest {
             .goToTab(UserPage.class);
 
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+            new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
             .goToNav(ResourcePage.class)
@@ -126,24 +125,6 @@ public class UdfManageE2ETest {
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testDirectoryName)));
     }
-
-//when s3  the directory cannot be renamed
-//    @Test
-//    @Order(20)
-//    void testRenameDirectory() {
-//        final UdfManagePage page = new UdfManagePage(browser);
-//
-//        page.rename(testDirectoryName, testRenameDirectoryName);
-//
-//        await().untilAsserted(() -> {
-//            browser.navigate().refresh();
-//
-//            assertThat(page.udfList())
-//                .as("File list should contain newly-created file")
-//                .extracting(WebElement::getText)
-//                .anyMatch(it -> it.contains(testRenameDirectoryName));
-//        });
-//    }
 
     @Test
     @Order(30)

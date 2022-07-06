@@ -17,25 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,6 +24,33 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * executor controller test
@@ -69,11 +77,11 @@ public class ExecutorControllerTest extends AbstractControllerTest {
     final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
 
     final JsonObject expectResponseContent = gson
-            .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
-                    , JsonObject.class);
+        .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
+            , JsonObject.class);
 
     final ImmutableMap<String, Object> executeServiceResult =
-            ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
+        ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
 
     @MockBean(name = "executorServiceImpl")
     private ExecutorService executorService;
@@ -99,23 +107,22 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
         paramsMap.add("dryRun", String.valueOf(dryRun));
 
-
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
-                eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
-                eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun), eq(complementDependentMode)))
-                .thenReturn(executeServiceResult);
+            eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
+            eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+            eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun), eq(complementDependentMode)))
+            .thenReturn(executeServiceResult);
 
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         //Then
         final JsonObject actualResponseContent =
-                gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
+            gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
         assertThat(actualResponseContent).isEqualTo(expectResponseContent);
     }
 
@@ -140,18 +147,18 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
-                eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
-                eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun),
-                eq(complementDependentMode))).thenReturn(executeServiceResult);
+            eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
+            eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+            eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun),
+            eq(complementDependentMode))).thenReturn(executeServiceResult);
 
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         //Then
         final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
         assertThat(actualResponseContent).isEqualTo(expectResponseContent);
@@ -178,18 +185,18 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
-                eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
-                eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun),
-                eq(complementDependentMode))).thenReturn(executeServiceResult);
+            eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType), eq(warningType),
+            eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+            eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun),
+            eq(complementDependentMode))).thenReturn(executeServiceResult);
 
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         //Then
         final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
         assertThat(actualResponseContent).isEqualTo(expectResponseContent);
@@ -205,18 +212,18 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         paramsMap.add("scheduleTime", scheduleTime);
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
-				eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
-                eq(0), eq(null), eq(null), eq("default"), eq(-1L),
-                eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0),
-                eq(complementDependentMode))).thenReturn(executeServiceResult);
+            eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
+            eq(0), eq(null), eq(null), eq("default"), eq(-1L),
+            eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0),
+            eq(complementDependentMode))).thenReturn(executeServiceResult);
 
-		//When
+        //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         //Then
         final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
         assertThat(actualResponseContent).isEqualTo(expectResponseContent);
@@ -236,19 +243,19 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         executeServiceResult.put(Constants.DATA_LIST, "Test Data");
 
         final JsonObject expectResponseContent = gson
-                .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
-                        , JsonObject.class);
+            .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
+                , JsonObject.class);
 
         when(executorService.execute(any(User.class), eq(projectCode), eq(processInstanceId), eq(ExecuteType.NONE)))
-                .thenReturn(executeServiceResult);
+            .thenReturn(executeServiceResult);
 
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/execute", projectCode)
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         //Then
         final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
         assertThat(actualResponseContent).isEqualTo(expectResponseContent);
@@ -258,14 +265,14 @@ public class ExecutorControllerTest extends AbstractControllerTest {
     public void testStartCheckProcessDefinition() throws Exception {
         //Given
         when(executorService.startCheckByProcessDefinedCode(processDefinitionCode))
-                .thenReturn(executeServiceResult);
+            .thenReturn(executeServiceResult);
         //When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-check", projectCode)
-                        .header(SESSION_ID, sessionId)
-                        .param("processDefinitionCode", String.valueOf(processDefinitionCode)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header(SESSION_ID, sessionId)
+                .param("processDefinitionCode", String.valueOf(processDefinitionCode)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         //Then
         final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
         assertThat(actualResponseContent).isEqualTo(expectResponseContent);

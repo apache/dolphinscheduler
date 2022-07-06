@@ -102,13 +102,13 @@ public class EnvironmentWorkerGroupRelation {
     @Override
     public String toString() {
         return "EnvironmentWorkerGroupRelation{"
-                + "id= " + id
-                + ", environmentCode= " + environmentCode
-                + ", workerGroup= " + workerGroup
-                + ", operator= " + operator
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + "}";
+            + "id= " + id
+            + ", environmentCode= " + environmentCode
+            + ", workerGroup= " + workerGroup
+            + ", operator= " + operator
+            + ", createTime= " + createTime
+            + ", updateTime= " + updateTime
+            + "}";
     }
 
 }

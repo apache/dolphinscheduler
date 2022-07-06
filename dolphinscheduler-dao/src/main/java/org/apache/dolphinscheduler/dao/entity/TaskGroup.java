@@ -69,7 +69,7 @@ public class TaskGroup implements Serializable {
      */
     private long projectCode;
 
-    public TaskGroup(String name,long projectCode, String description, int groupSize, int userId,int status) {
+    public TaskGroup(String name, long projectCode, String description, int groupSize, int userId, int status) {
         this.name = name;
         this.projectCode = projectCode;
         this.description = description;
@@ -92,16 +92,16 @@ public class TaskGroup implements Serializable {
     @Override
     public String toString() {
         return "TaskGroup{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", description='" + description + '\''
-                + ", groupSize=" + groupSize
-                + ", useSize=" + useSize
-                + ", userId=" + userId
-                + ", status=" + status
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", description='" + description + '\''
+            + ", groupSize=" + groupSize
+            + ", useSize=" + useSize
+            + ", userId=" + userId
+            + ", status=" + status
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 
     public int getId() {

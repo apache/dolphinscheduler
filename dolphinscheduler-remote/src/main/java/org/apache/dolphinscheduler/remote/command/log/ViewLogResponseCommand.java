@@ -24,12 +24,12 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import java.io.Serializable;
 
 /**
- *  view log response command
+ * view log response command
  */
 public class ViewLogResponseCommand implements Serializable {
 
     /**
-     *  response data
+     * response data
      */
     private String msg;
 

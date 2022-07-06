@@ -70,10 +70,10 @@ public class LoginController extends BaseController {
     /**
      * login
      *
-     * @param userName user name
+     * @param userName     user name
      * @param userPassword user password
-     * @param request request
-     * @param response response
+     * @param request      request
+     * @param response     response
      * @return login result
      */
     @ApiOperation(value = "login", notes = "LOGIN_NOTES")
@@ -121,7 +121,7 @@ public class LoginController extends BaseController {
      * sign out
      *
      * @param loginUser login user
-     * @param request request
+     * @param request   request
      * @return sign out result
      */
     @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")

@@ -14,26 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+package org.apache.dolphinscheduler.dao.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 /**
  * resource process definition utils test
  */
 public class ResourceProcessDefinitionUtilsTest {
     @Test
-    public void getResourceProcessDefinitionMapTest(){
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
-        map.put("code",1L);
-        map.put("resource_ids","1,2,3");
+    public void getResourceProcessDefinitionMapTest() {
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", 1L);
+        map.put("resource_ids", "1,2,3");
         mapList.add(map);
         Assert.assertNotNull(ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(mapList));
     }

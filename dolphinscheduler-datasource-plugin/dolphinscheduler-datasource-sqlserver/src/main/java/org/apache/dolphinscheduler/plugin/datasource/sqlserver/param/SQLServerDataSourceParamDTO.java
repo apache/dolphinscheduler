@@ -25,15 +25,15 @@ public class SQLServerDataSourceParamDTO extends BaseDataSourceParamDTO {
     @Override
     public String toString() {
         return "SqlServerDataSourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", other='" + other + '\''
-                + '}';
+            + "name='" + name + '\''
+            + ", note='" + note + '\''
+            + ", host='" + host + '\''
+            + ", port=" + port
+            + ", database='" + database + '\''
+            + ", userName='" + userName + '\''
+            + ", password='" + password + '\''
+            + ", other='" + other + '\''
+            + '}';
     }
 
     @Override

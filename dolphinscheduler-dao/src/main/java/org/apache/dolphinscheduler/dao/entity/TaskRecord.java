@@ -236,22 +236,22 @@ public class TaskRecord {
     @Override
     public String toString() {
         return "task record, id:" + id
-                + " proc id:" + procId
-                + " proc name:" + procName
-                + " proc date: " + procDate
-                + " start date:" + startTime
-                + " end date:" + endTime
-                + " result : " + result
-                + " duration : " + duration
-                + " note : " + note
-                + " schema : " + schema
-                + " job id : " + jobId
-                + " source table : " + sourceTab
-                + " source row count: " + sourceRowCount
-                + " target table : " + targetTab
-                + " target row count: " + targetRowCount
-                + " error code: " + errorCode
-                ;
+            + " proc id:" + procId
+            + " proc name:" + procName
+            + " proc date: " + procDate
+            + " start date:" + startTime
+            + " end date:" + endTime
+            + " result : " + result
+            + " duration : " + duration
+            + " note : " + note
+            + " schema : " + schema
+            + " job id : " + jobId
+            + " source table : " + sourceTab
+            + " source row count: " + sourceRowCount
+            + " target table : " + targetTab
+            + " target row count: " + targetRowCount
+            + " error code: " + errorCode
+            ;
     }
 
 }

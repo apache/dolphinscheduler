@@ -17,6 +17,7 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;

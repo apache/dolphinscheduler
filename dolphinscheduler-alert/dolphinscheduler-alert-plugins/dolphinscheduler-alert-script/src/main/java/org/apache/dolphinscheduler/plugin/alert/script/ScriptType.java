@@ -23,6 +23,7 @@ public enum ScriptType {
 
     private final int code;
     private final String descp;
+
     ScriptType(int code, String descp) {
         this.code = code;
         this.descp = descp;

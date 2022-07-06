@@ -26,7 +26,8 @@
     <baseDirectory>standalone-server</baseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server/libs</directory>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server/libs
+            </directory>
             <outputDirectory>libs/alert-server</outputDirectory>
         </fileSet>
         <fileSet>

@@ -47,7 +47,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
      * decode
      *
      * @param ctx channel handler context
-     * @param in byte buffer
+     * @param in  byte buffer
      * @param out out content
      */
     @Override

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -24,6 +23,13 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,12 +38,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CuringGlobalParamsServiceTest {

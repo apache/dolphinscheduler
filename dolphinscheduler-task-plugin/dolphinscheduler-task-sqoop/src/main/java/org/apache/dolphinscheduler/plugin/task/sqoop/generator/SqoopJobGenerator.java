@@ -61,7 +61,7 @@ public class SqoopJobGenerator {
     /**
      * get the final sqoop scripts
      *
-     * @param sqoopParameters sqoop params
+     * @param sqoopParameters           sqoop params
      * @param sqoopTaskExecutionContext
      * @return sqoop scripts
      */

@@ -17,18 +17,6 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -71,10 +59,25 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import py4j.GatewayServer;
 
 @Component
@@ -197,23 +200,23 @@ public class PythonGateway {
      * If process definition do not exists in Project=`projectCode` would create a new one
      * If process definition already exists in Project=`projectCode` would update it
      *
-     * @param userName user name who create or update process definition
-     * @param projectName project name which process definition belongs to
-     * @param name process definition name
-     * @param description description
-     * @param globalParams global params
-     * @param schedule schedule for process definition, will not set schedule if null,
-     * and if would always fresh exists schedule if not null
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param locations locations json object about all tasks
-     * @param timeout timeout for process definition working, if running time longer than timeout,
-     * task will mark as fail
-     * @param workerGroup run task in which worker group
-     * @param tenantCode tenantCode
-     * @param taskRelationJson relation json for nodes
+     * @param userName           user name who create or update process definition
+     * @param projectName        project name which process definition belongs to
+     * @param name               process definition name
+     * @param description        description
+     * @param globalParams       global params
+     * @param schedule           schedule for process definition, will not set schedule if null,
+     *                           and if would always fresh exists schedule if not null
+     * @param warningType        warning type
+     * @param warningGroupId     warning group id
+     * @param locations          locations json object about all tasks
+     * @param timeout            timeout for process definition working, if running time longer than timeout,
+     *                           task will mark as fail
+     * @param workerGroup        run task in which worker group
+     * @param tenantCode         tenantCode
+     * @param taskRelationJson   relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param otherParamsJson    otherParamsJson handle other params
      * @return create result code
      */
     public Long createOrUpdateProcessDefinition(String userName,
@@ -245,10 +248,10 @@ public class PythonGateway {
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
@@ -264,8 +267,8 @@ public class PythonGateway {
     /**
      * get process definition
      *
-     * @param user user who create or update schedule
-     * @param projectCode project which process definition belongs to
+     * @param user                  user who create or update schedule
+     * @param projectCode           project which process definition belongs to
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
@@ -289,13 +292,13 @@ public class PythonGateway {
      * It would always use latest schedule define in workflow-as-code, and set schedule online when
      * it's not null
      *
-     * @param user user who create or update schedule
-     * @param projectCode project which process definition belongs to
+     * @param user                  user who create or update schedule
+     * @param projectCode           project which process definition belongs to
      * @param processDefinitionCode process definition code
-     * @param schedule schedule expression
-     * @param workerGroup work group
-     * @param warningType warning type
-     * @param warningGroupId warning group id
+     * @param schedule              schedule expression
+     * @param workerGroup           work group
+     * @param warningType           warning type
+     * @param warningGroupId        warning group id
      */
     private void createOrUpdateSchedule(User user,
                                         long projectCode,
@@ -310,13 +313,13 @@ public class PythonGateway {
         if (scheduleObj == null) {
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, WarningType.valueOf(warningType),
-                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
-                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
         schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
     }
@@ -338,24 +341,24 @@ public class PythonGateway {
         processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(), ReleaseState.ONLINE);
 
         executorService.execProcessInstance(user,
-                project.getCode(),
-                processDefinition.getCode(),
-                cronTime,
-                null,
-                DEFAULT_FAILURE_STRATEGY,
-                null,
-                DEFAULT_TASK_DEPEND_TYPE,
-                WarningType.valueOf(warningType),
-                warningGroupId,
-                DEFAULT_RUN_MODE,
-                DEFAULT_PRIORITY,
-                workerGroup,
-                DEFAULT_ENVIRONMENT_CODE,
-                timeout,
-                null,
-                null,
-                DEFAULT_DRY_RUN,
-                COMPLEMENT_DEPENDENT_MODE
+            project.getCode(),
+            processDefinition.getCode(),
+            cronTime,
+            null,
+            DEFAULT_FAILURE_STRATEGY,
+            null,
+            DEFAULT_TASK_DEPEND_TYPE,
+            WarningType.valueOf(warningType),
+            warningGroupId,
+            DEFAULT_RUN_MODE,
+            DEFAULT_PRIORITY,
+            workerGroup,
+            DEFAULT_ENVIRONMENT_CODE,
+            timeout,
+            null,
+            null,
+            DEFAULT_DRY_RUN,
+            COMPLEMENT_DEPENDENT_MODE
         );
     }
 
@@ -472,8 +475,8 @@ public class PythonGateway {
      * Get processDefinition by given processDefinitionName name. It return map contain processDefinition id, name, code.
      * Useful in Python API create subProcess task which need processDefinition information.
      *
-     * @param userName user who create or update schedule
-     * @param projectName project name which process definition belongs to
+     * @param userName              user who create or update schedule
+     * @param projectName           project name which process definition belongs to
      * @param processDefinitionName process definition name
      */
     public Map<String, Object> getProcessDefinitionInfo(String userName, String projectName, String processDefinitionName) {
@@ -503,9 +506,9 @@ public class PythonGateway {
      * Get project, process definition, task code.
      * Useful in Python API create dependent task which need processDefinition information.
      *
-     * @param projectName project name which process definition belongs to
+     * @param projectName           project name which process definition belongs to
      * @param processDefinitionName process definition name
-     * @param taskName task name
+     * @param taskName              task name
      */
     public Map<String, Object> getDependentInfo(String projectName, String processDefinitionName, String taskName) {
         Map<String, Object> result = new HashMap<>();
@@ -539,7 +542,7 @@ public class PythonGateway {
      * Useful in Python API create flink or spark task which need processDefinition information.
      *
      * @param programType program type one of SCALA, JAVA and PYTHON
-     * @param fullName full name of the resource
+     * @param fullName    full name of the resource
      */
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();

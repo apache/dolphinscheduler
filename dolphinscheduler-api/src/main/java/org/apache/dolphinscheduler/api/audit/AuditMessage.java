@@ -85,10 +85,10 @@ public class AuditMessage {
     @Override
     public String toString() {
         return "AuditMessage{"
-                + "user=" + user
-                + ", Date=" + auditDate
-                + ", resourceType" + resourceType
-                + ", operation=" + operation
-                + ", resourceId='" + resourceId + '\'';
+            + "user=" + user
+            + ", Date=" + auditDate
+            + ", resourceType" + resourceType
+            + ", operation=" + operation
+            + ", resourceId='" + resourceId + '\'';
     }
 }

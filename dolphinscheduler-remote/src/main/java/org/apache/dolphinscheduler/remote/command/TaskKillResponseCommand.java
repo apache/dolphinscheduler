@@ -109,11 +109,11 @@ public class TaskKillResponseCommand implements Serializable {
     @Override
     public String toString() {
         return "TaskKillResponseCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", host='" + host + '\''
-                + ", status=" + status
-                + ", processId=" + processId
-                + ", appIds=" + appIds
-                + '}';
+            + "taskInstanceId=" + taskInstanceId
+            + ", host='" + host + '\''
+            + ", status=" + status
+            + ", processId=" + processId
+            + ", appIds=" + appIds
+            + '}';
     }
 }

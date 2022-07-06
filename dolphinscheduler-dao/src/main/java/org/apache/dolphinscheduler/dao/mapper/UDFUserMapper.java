@@ -14,11 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * udf user realtion mapper interface
@@ -27,6 +30,7 @@ public interface UDFUserMapper extends BaseMapper<UDFUser> {
 
     /**
      * delete udf user realtion by userId
+     *
      * @param userId userId
      * @return delete result
      */
@@ -34,6 +38,7 @@ public interface UDFUserMapper extends BaseMapper<UDFUser> {
 
     /**
      * delete udf user realtion by function id
+     *
      * @param udfFuncId udfFuncId
      * @return delete result
      */

@@ -17,16 +17,16 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -34,13 +34,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.io.Resources;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @SuppressWarnings("UnstableApiUsage")
 @Getter
@@ -64,14 +64,14 @@ public final class WorkflowForm {
     }
 
     @SneakyThrows
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "checkstyle:MissingSwitchDefault"})
     public <T> T addTask(TaskType type) {
         final WebElement task = driver.findElement(By.className("task-item-" + type.name()));
         final WebElement canvas = driver.findElement(By.className("dag-container"));
 
         final JavascriptExecutor js = (JavascriptExecutor) driver;
         final String dragAndDrop = String.join("\n",
-                Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
+            Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
         js.executeScript(dragAndDrop, task, canvas);
 
         switch (type) {
@@ -87,12 +87,12 @@ public final class WorkflowForm {
 
     public WebElement getTask(String taskName) {
         List<WebElement> tasks = new WebDriverWait(driver, 10)
-                .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
+            .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
 
         WebElement task = tasks.stream()
-                .filter(t -> t.getText().contains(taskName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such task: " + taskName));
+            .filter(t -> t.getText().contains(taskName))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No such task: " + taskName));
 
         Actions action = new Actions(driver);
         action.doubleClick(task).build().perform();

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.service;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -31,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
@@ -165,7 +165,7 @@ public class FailoverService {
             }
 
             if (serverStartupTime != null && processInstance.getRestartTime() != null
-                    && processInstance.getRestartTime().after(serverStartupTime)) {
+                && processInstance.getRestartTime().after(serverStartupTime)) {
                 continue;
             }
 
@@ -306,8 +306,8 @@ public class FailoverService {
     /**
      * task needs failover if task start before server starts
      *
-     * @param servers servers, can container master servers or worker servers
-     * @param taskInstance  task instance
+     * @param servers      servers, can container master servers or worker servers
+     * @param taskInstance task instance
      * @return true if task instance need fail over
      */
     private boolean checkTaskInstanceNeedFailover(List<Server> servers, TaskInstance taskInstance) {
@@ -343,7 +343,7 @@ public class FailoverService {
     /**
      * check task start after the worker server starts.
      *
-     * @param servers servers, can contain master servers or worker servers
+     * @param servers      servers, can contain master servers or worker servers
      * @param taskInstance task instance
      * @return true if task instance start time after server start date
      */

@@ -31,17 +31,17 @@ public interface TaskInstanceService {
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param searchVal search value
-     * @param taskName task name
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param searchVal         search value
+     * @param taskName          task name
+     * @param stateType         state type
+     * @param host              host
+     * @param startDate         start time
+     * @param endDate           end time
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @return task list page
      */
     Result queryTaskListPaging(User loginUser,
@@ -61,8 +61,8 @@ public interface TaskInstanceService {
     /**
      * change one task instance's state from failure to forced success
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser      login user
+     * @param projectCode    project code
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */

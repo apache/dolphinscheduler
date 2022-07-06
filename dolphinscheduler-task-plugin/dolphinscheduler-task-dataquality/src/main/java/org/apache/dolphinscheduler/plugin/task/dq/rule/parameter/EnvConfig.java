@@ -27,8 +27,8 @@ public class EnvConfig extends BaseConfig {
     public EnvConfig() {
     }
 
-    public EnvConfig(String type, Map<String,Object> config) {
-        super(type,config);
+    public EnvConfig(String type, Map<String, Object> config) {
+        super(type, config);
     }
 
 }

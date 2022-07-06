@@ -30,8 +30,9 @@ public interface BatchTransformer extends Component {
 
     /**
      * transform the dataset
+     *
      * @param data data
-     * @param env env
+     * @param env  env
      * @return Dataset<Row>
      */
     Dataset<Row> transform(Dataset<Row> data, SparkRuntimeEnvironment env);

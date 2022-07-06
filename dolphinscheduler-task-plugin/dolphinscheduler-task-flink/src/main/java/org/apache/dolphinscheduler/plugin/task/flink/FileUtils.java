@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.commons.lang3.SystemUtils;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,11 +35,14 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
-    private FileUtils() {}
+
+    private FileUtils() {
+    }
 
     public static String getInitScriptFilePath(TaskExecutionContext taskExecutionContext) {
         return String.format("%s/%s_init.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
@@ -52,9 +56,9 @@ public class FileUtils {
         String initScriptFilePath = FileUtils.getInitScriptFilePath(taskExecutionContext);
         String scriptFilePath = FileUtils.getScriptFilePath(taskExecutionContext);
         String initOptionsString = StringUtils.join(
-                FlinkArgsUtils.buildInitOptionsForSql(flinkParameters),
-                FlinkConstants.FLINK_SQL_NEWLINE
-            ).concat(FlinkConstants.FLINK_SQL_NEWLINE);
+            FlinkArgsUtils.buildInitOptionsForSql(flinkParameters),
+            FlinkConstants.FLINK_SQL_NEWLINE
+        ).concat(FlinkConstants.FLINK_SQL_NEWLINE);
         writeScriptFile(initScriptFilePath, initOptionsString + flinkParameters.getInitScript());
         writeScriptFile(scriptFilePath, flinkParameters.getRawScript());
     }
@@ -96,7 +100,7 @@ public class FileUtils {
             LOGGER.info("Writing content: " + content);
             LOGGER.info("To file: " + file.getAbsolutePath());
             Files.write(file.getAbsoluteFile().toPath(), content.getBytes(StandardCharsets.UTF_8), standardOpenOption);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Error writing file: " + file.getAbsoluteFile(), e);
         }
     }

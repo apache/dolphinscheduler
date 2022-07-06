@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -30,6 +29,7 @@ import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Map;
@@ -191,7 +191,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(), taskInstance.getId()
+            finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(), taskInstance.getId()
         );
         Host host = new Host(processInstanceHost);
         stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());

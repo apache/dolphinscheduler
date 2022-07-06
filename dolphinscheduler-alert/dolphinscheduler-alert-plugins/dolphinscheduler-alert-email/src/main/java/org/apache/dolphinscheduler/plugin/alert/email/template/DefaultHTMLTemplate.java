@@ -131,7 +131,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     /**
      * get alert message from a html template
      *
-     * @param title message title
+     * @param title   message title
      * @param content message content
      * @return alert message which use html template
      */

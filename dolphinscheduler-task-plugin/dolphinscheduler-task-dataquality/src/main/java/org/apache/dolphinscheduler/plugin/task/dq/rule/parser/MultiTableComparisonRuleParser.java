@@ -39,20 +39,20 @@ public class MultiTableComparisonRuleParser implements IRuleParser {
                                           DataQualityTaskExecutionContext context) throws DataQualityException {
 
         List<BaseConfig> readerConfigList =
-                RuleParserUtils.getReaderConfigList(inputParameterValue,context);
-        RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList,context);
+            RuleParserUtils.getReaderConfigList(inputParameterValue, context);
+        RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList, context);
 
         List<BaseConfig> transformerConfigList = new ArrayList<>();
 
         List<BaseConfig> writerConfigList = RuleParserUtils.getWriterConfigList(
-                ParameterUtils.convertParameterPlaceholders(RuleManager.MULTI_TABLE_COMPARISON_WRITER_SQL,inputParameterValue),
-                context);
+            ParameterUtils.convertParameterPlaceholders(RuleManager.MULTI_TABLE_COMPARISON_WRITER_SQL, inputParameterValue),
+            context);
 
         return new DataQualityConfiguration(
-                context.getRuleName(),
-                RuleParserUtils.getEnvConfig(),
-                readerConfigList,
-                writerConfigList,
-                transformerConfigList);
+            context.getRuleName(),
+            RuleParserUtils.getEnvConfig(),
+            readerConfigList,
+            writerConfigList,
+            transformerConfigList);
     }
 }

@@ -17,21 +17,19 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import lombok.Getter;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.ByChained;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.stream.Stream;
+import lombok.Getter;
 
 @Getter
 public final class WorkflowSaveDialog {
@@ -39,8 +37,8 @@ public final class WorkflowSaveDialog {
     private final WorkflowForm parent;
 
     @FindBys({
-            @FindBy(className = "input-name"),
-            @FindBy(tagName = "input")
+        @FindBy(className = "input-name"),
+        @FindBy(tagName = "input")
     })
     private WebElement inputName;
 
@@ -48,14 +46,14 @@ public final class WorkflowSaveDialog {
     private WebElement buttonSubmit;
 
     @FindBys({
-            @FindBy(className = "input-global-params"),
-            @FindBy(tagName = "button"),
+        @FindBy(className = "input-global-params"),
+        @FindBy(tagName = "button"),
     })
     private WebElement buttonGlobalCustomParameters;
 
     @FindBys({
-            @FindBy(className = "btn-select-tenant-code"),
-            @FindBy(className = "n-base-selection"),
+        @FindBy(className = "btn-select-tenant-code"),
+        @FindBy(className = "n-base-selection"),
     })
     private WebElement selectTenant;
 
@@ -82,12 +80,11 @@ public final class WorkflowSaveDialog {
         selectTenant().click();
 
         selectTenantOption()
-                .stream()
-                .filter(it -> it.getAttribute("innerText").contains(tenant))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in workflow save dialog tenant dropdown " +
-                        "list", tenant)))
-                .click();
+            .stream()
+            .filter(it -> it.getAttribute("innerText").contains(tenant))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in workflow save dialog tenant dropdown list", tenant)))
+            .click();
 
         return this;
     }
@@ -103,10 +100,10 @@ public final class WorkflowSaveDialog {
             globalParamsItems().findElements(By.tagName("input")).get(0).sendKeys(key);
             globalParamsItems().findElements(By.tagName("input")).get(1).sendKeys(value);
         } else {
-            globalParamsItems().findElements(By.tagName("button")).get(len-1).click();
+            globalParamsItems().findElements(By.tagName("button")).get(len - 1).click();
 
             globalParamsItems().findElements(By.tagName("input")).get(len).sendKeys(key);
-            globalParamsItems().findElements(By.tagName("input")).get(len+1).sendKeys(value);
+            globalParamsItems().findElements(By.tagName("input")).get(len + 1).sendKeys(value);
         }
 
         return this;

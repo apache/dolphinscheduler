@@ -30,10 +30,10 @@ public interface TenantService {
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
@@ -47,8 +47,8 @@ public interface TenantService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
     Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
@@ -56,22 +56,22 @@ public interface TenantService {
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser login user
-     * @param id tennat id
+     * @param loginUser  login user
+     * @param id         tennat id
      * @param tenantCode tennat code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
     Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
-            String desc) throws Exception;
+                                     String desc) throws Exception;
 
     /**
      * delete tenant
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      * @throws Exception exception
      */

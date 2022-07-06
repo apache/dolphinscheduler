@@ -17,10 +17,13 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
+
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -28,18 +31,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.stream.Stream;
+import lombok.Getter;
 
 @Getter
 public abstract class TaskNodeForm {
     @FindBys({
-            @FindBy(className = "input-node-name"),
-            @FindBy(tagName = "input")
+        @FindBy(className = "input-node-name"),
+        @FindBy(tagName = "input")
     })
     private WebElement inputNodeName;
 
@@ -59,14 +60,14 @@ public abstract class TaskNodeForm {
     private List<WebElement> inputParamValue;
 
     @FindBys({
-            @FindBy(className = "pre-tasks-model"),
-            @FindBy(className = "n-base-selection"),
+        @FindBy(className = "pre-tasks-model"),
+        @FindBy(className = "n-base-selection"),
     })
     private WebElement selectPreTasks;
 
     @FindBys({
-            @FindBy(className = "btn-custom-parameters"),
-            @FindBy(tagName = "button"),
+        @FindBy(className = "btn-custom-parameters"),
+        @FindBy(tagName = "button"),
     })
     private WebElement buttonCustomParameters;
 
@@ -112,19 +113,19 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm preTask(String preTaskName) {
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
 
         final By optionsLocator = By.className("option-pre-tasks");
 
         new WebDriverWait(parent.driver(), 10)
-                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+            .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
-        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+        List<WebElement> webElements = parent.driver().findElements(optionsLocator);
         webElements.stream()
-                .filter(it -> it.getText().contains(preTaskName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
-                .click();
+            .filter(it -> it.getText().contains(preTaskName))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
+            .click();
 
         inputNodeName().click();
 

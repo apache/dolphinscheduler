@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *  SQL Task ExecutionContext
+ * SQL Task ExecutionContext
  */
 public class SQLTaskExecutionContext implements Serializable {
 
@@ -80,9 +80,9 @@ public class SQLTaskExecutionContext implements Serializable {
     @Override
     public String toString() {
         return "SQLTaskExecutionContext{"
-                + "warningGroupId=" + warningGroupId
-                + ", connectionParams='" + connectionParams + '\''
-                + ", udfFuncParametersList=" + udfFuncParametersList
-                + ", defaultFS='" + defaultFS + '\'' + '}';
+            + "warningGroupId=" + warningGroupId
+            + ", connectionParams='" + connectionParams + '\''
+            + ", udfFuncParametersList=" + udfFuncParametersList
+            + ", defaultFS='" + defaultFS + '\'' + '}';
     }
 }

@@ -85,8 +85,8 @@ public class SeatunnelParameters extends AbstractParameters {
     @Override
     public boolean checkParameters() {
         return Objects.nonNull(engine)
-                && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
-                || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList) && resourceList.size() == 1));
+            && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
+            || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList) && resourceList.size() == 1));
     }
 
     @Override

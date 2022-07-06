@@ -28,7 +28,7 @@ public interface ISourceGenerator {
     /**
      * generate the source script
      *
-     * @param sqoopParameters      sqoopParameters
+     * @param sqoopParameters           sqoopParameters
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
      * @return source script
      */

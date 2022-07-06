@@ -100,6 +100,7 @@ public class ExecutorDispatcher implements InitializingBean {
 
     /**
      * register init
+     *
      * @throws Exception if error throws Exception
      */
     @Override
@@ -109,8 +110,9 @@ public class ExecutorDispatcher implements InitializingBean {
     }
 
     /**
-     *  register
-     * @param type executor type
+     * register
+     *
+     * @param type            executor type
      * @param executorManager executorManager
      */
     public void register(ExecutorType type, ExecutorManager executorManager) {

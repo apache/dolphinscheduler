@@ -49,13 +49,15 @@ public interface ClusterMapper extends BaseMapper<Cluster> {
 
     /**
      * query all cluster list
+     *
      * @return cluster list
      */
     List<Cluster> queryAllClusterList();
 
     /**
      * cluster page
-     * @param page page
+     *
+     * @param page       page
      * @param searchName searchName
      * @return cluster IPage
      */

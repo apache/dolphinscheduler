@@ -21,7 +21,6 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
-import java.security.Key;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -61,13 +60,13 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
 
     public QueuePage update(String queueName, String editQueueName, String editQueueValue) {
         queueList()
-                .stream()
-                .filter(it -> it.findElement(By.className("queue-name")).getAttribute("innerHTML").contains(queueName))
-                .flatMap(it -> it.findElements(By.className("edit")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No edit button in queue list"))
-                .click();
+            .stream()
+            .filter(it -> it.findElement(By.className("queue-name")).getAttribute("innerHTML").contains(queueName))
+            .flatMap(it -> it.findElements(By.className("edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in queue list"))
+            .click();
 
         editQueueForm().inputQueueName().sendKeys(Keys.CONTROL + "a");
         editQueueForm().inputQueueName().sendKeys(Keys.BACK_SPACE);
@@ -95,8 +94,8 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
         private WebElement inputQueueName;
 
         @FindBys({
-                @FindBy(className = "input-queue-value"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-queue-value"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputQueueValue;
 

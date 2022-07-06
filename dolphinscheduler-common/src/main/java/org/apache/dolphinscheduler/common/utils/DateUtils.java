@@ -66,7 +66,7 @@ public final class DateUtils {
     /**
      * date to local datetime
      *
-     * @param date date
+     * @param date   date
      * @param zoneId zoneId
      * @return local datetime
      */
@@ -151,7 +151,7 @@ public final class DateUtils {
     /**
      * convert time to yyyy-MM-dd HH:mm:ss format
      *
-     * @param date date
+     * @param date     date
      * @param timezone timezone
      * @return date string
      */
@@ -162,8 +162,8 @@ public final class DateUtils {
     /**
      * convert string to date and time
      *
-     * @param date   date
-     * @param format format
+     * @param date     date
+     * @param format   format
      * @param timezone timezone, if null, use system default timezone
      * @return date
      */
@@ -197,7 +197,7 @@ public final class DateUtils {
     /**
      * convert date str to yyyy-MM-dd HH:mm:ss format
      *
-     * @param date date string
+     * @param date     date string
      * @param timezone
      * @return yyyy-MM-dd HH:mm:ss format
      */

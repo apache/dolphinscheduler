@@ -153,16 +153,16 @@ public class DataSource {
     @Override
     public String toString() {
         return "DataSource{"
-                + "id=" + id
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", type=" + type
-                + ", connectionParams='" + connectionParams + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", userId=" + userId
+            + ", userName='" + userName + '\''
+            + ", name='" + name + '\''
+            + ", note='" + note + '\''
+            + ", type=" + type
+            + ", connectionParams='" + connectionParams + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 
     @Override

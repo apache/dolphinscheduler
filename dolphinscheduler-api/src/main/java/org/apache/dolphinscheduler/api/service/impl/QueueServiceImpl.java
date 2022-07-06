@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,8 +49,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * queue service impl
@@ -88,9 +90,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
     @Override
@@ -118,7 +120,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
@@ -126,7 +128,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Transactional
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.QUEUE, YARN_QUEUE_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -170,15 +172,15 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */
     @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[] {id}, AuthorizationType.QUEUE, YARN_QUEUE_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -207,7 +209,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         // check queue name is exist
         if (!queueName.equals(queueObj.getQueueName())
-                && checkQueueNameExist(queueName)) {
+            && checkQueueNameExist(queueName)) {
             putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
@@ -241,7 +243,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     /**
      * verify queue and queueName
      *
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */

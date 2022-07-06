@@ -205,15 +205,15 @@ public class ResponseFuture {
     @Override
     public String toString() {
         return "ResponseFuture{"
-                + "opaque=" + opaque
-                + ", timeoutMillis=" + timeoutMillis
-                + ", invokeCallback=" + invokeCallback
-                + ", releaseSemaphore=" + releaseSemaphore
-                + ", latch=" + latch
-                + ", beginTimestamp=" + beginTimestamp
-                + ", responseCommand=" + responseCommand
-                + ", sendOk=" + sendOk
-                + ", cause=" + cause
-                + '}';
+            + "opaque=" + opaque
+            + ", timeoutMillis=" + timeoutMillis
+            + ", invokeCallback=" + invokeCallback
+            + ", releaseSemaphore=" + releaseSemaphore
+            + ", latch=" + latch
+            + ", beginTimestamp=" + beginTimestamp
+            + ", responseCommand=" + responseCommand
+            + ", sendOk=" + sendOk
+            + ", cause=" + cause
+            + '}';
     }
 }

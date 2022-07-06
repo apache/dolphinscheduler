@@ -78,14 +78,14 @@ public class HadoopUtils implements Closeable, StorageOperate {
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 2), TimeUnit.HOURS)
-            .build(new CacheLoader<String, HadoopUtils>() {
-                @Override
-                public HadoopUtils load(String key) throws Exception {
-                    return new HadoopUtils();
-                }
-            });
+        .newBuilder()
+        .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 2), TimeUnit.HOURS)
+        .build(new CacheLoader<String, HadoopUtils>() {
+            @Override
+            public HadoopUtils load(String key) throws Exception {
+                return new HadoopUtils();
+            }
+        });
 
     private volatile boolean yarnEnabled = false;
 
@@ -130,8 +130,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
             String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
 
-            if (StringUtils.isBlank(defaultFS)){
-                defaultFS= PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+            if (StringUtils.isBlank(defaultFS)) {
+                defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
             }
 
             //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
@@ -143,7 +143,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
             } else {
                 logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
                 throw new NullPointerException(
-                        String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
+                    String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS)
                 );
             }
 
@@ -451,7 +451,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
         String applicationUrl = getApplicationUrl(applicationId);
         logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
 
-        String responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
+        String responseContent =
+            Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
             if (!jsonObject.has("app")) {
@@ -463,7 +464,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
-            responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
+            responseContent =
+                Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
 
             if (null != responseContent) {
                 ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
@@ -533,7 +535,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
     public String getDir(ResourceType resourceType, String tenantCode) {
         return getHdfsDir(resourceType, tenantCode);
     }
-
 
     /**
      * hdfs resource dir

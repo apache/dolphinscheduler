@@ -25,17 +25,17 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
-
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import io.netty.channel.Channel;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.netty.channel.Channel;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AlertRequestProcessorTest {
@@ -44,7 +44,6 @@ public class AlertRequestProcessorTest {
 
     @Mock
     private AlertSenderService alertSenderService;
-
 
     @Test
     public void testProcess() {

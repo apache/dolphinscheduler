@@ -131,10 +131,10 @@ public class Host implements Serializable {
     @Override
     public String toString() {
         return "Host{"
-                + "address='" + address + '\''
-                + ", ip='" + ip + '\''
-                + ", port=" + port
-                + '}';
+            + "address='" + address + '\''
+            + ", ip='" + ip + '\''
+            + ", port=" + port
+            + '}';
     }
 
     @Override

@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -39,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,8 +71,8 @@ public class SeatunnelTask extends AbstractTaskExecutor {
 
         this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                logger);
+            taskExecutionContext,
+            logger);
     }
 
     @Override

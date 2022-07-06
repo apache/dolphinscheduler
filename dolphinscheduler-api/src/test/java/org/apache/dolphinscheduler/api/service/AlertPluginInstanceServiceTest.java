@@ -17,7 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALART_INSTANCE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
@@ -36,7 +41,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,8 +51,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * alert plugin instance service test
@@ -77,78 +79,78 @@ public class AlertPluginInstanceServiceTest {
     private User user;
 
     private String uiParams = "[\n"
-            + "    {\n"
-            + "        \"field\":\"userParams\",\n"
-            + "        \"name\":\"user.params\",\n"
-            + "        \"props\":{\n"
-            + "            \"placeholder\":\"please enter your custom parameters, which will be passed to you when calling your script\",\n"
-            + "            \"size\":\"small\"\n"
-            + "        },\n"
-            + "        \"type\":\"input\",\n"
-            + "        \"title\":\"user.params\",\n"
-            + "        \"value\":\"userParams\",\n"
-            + "        \"validate\":[\n"
-            + "            {\n"
-            + "                \"required\":false,\n"
-            + "                \"message\":null,\n"
-            + "                \"type\":\"string\",\n"
-            + "                \"trigger\":\"blur\",\n"
-            + "                \"min\":null,\n"
-            + "                \"max\":null\n"
-            + "            }\n"
-            + "        ]\n"
-            + "    },\n"
-            + "    {\n"
-            + "        \"field\":\"path\",\n"
-            + "        \"name\":\"path\",\n"
-            + "        \"props\":{\n"
-            + "            \"placeholder\":\"please upload the file to the disk directory of the alert server, and ensure that the path is absolute and has the corresponding access rights\",\n"
-            + "            \"size\":\"small\"\n"
-            + "        },\n"
-            + "        \"type\":\"input\",\n"
-            + "        \"title\":\"path\",\n"
-            + "        \"value\":\"/kris/script/path\",\n"
-            + "        \"validate\":[\n"
-            + "            {\n"
-            + "                \"required\":true,\n"
-            + "                \"message\":null,\n"
-            + "                \"type\":\"string\",\n"
-            + "                \"trigger\":\"blur\",\n"
-            + "                \"min\":null,\n"
-            + "                \"max\":null\n"
-            + "            }\n"
-            + "        ]\n"
-            + "    },\n"
-            + "    {\n"
-            + "        \"field\":\"type\",\n"
-            + "        \"name\":\"type\",\n"
-            + "        \"props\":{\n"
-            + "            \"placeholder\":null,\n"
-            + "            \"size\":\"small\"\n"
-            + "        },\n"
-            + "        \"type\":\"radio\",\n"
-            + "        \"title\":\"type\",\n"
-            + "        \"value\":0,\n"
-            + "        \"validate\":[\n"
-            + "            {\n"
-            + "                \"required\":true,\n"
-            + "                \"message\":null,\n"
-            + "                \"type\":\"string\",\n"
-            + "                \"trigger\":\"blur\",\n"
-            + "                \"min\":null,\n"
-            + "                \"max\":null\n"
-            + "            }\n"
-            + "        ],\n"
-            + "        \"options\":[\n"
-            + "            {\n"
-            + "                \"label\":\"SHELL\",\n"
-            + "                \"value\":0,\n"
-            + "                \"disabled\":false\n"
-            + "            }\n"
-            + "        ]\n"
-            + "    }\n"
-            + "]\n"
-            + "\n";
+        + "    {\n"
+        + "        \"field\":\"userParams\",\n"
+        + "        \"name\":\"user.params\",\n"
+        + "        \"props\":{\n"
+        + "            \"placeholder\":\"please enter your custom parameters, which will be passed to you when calling your script\",\n"
+        + "            \"size\":\"small\"\n"
+        + "        },\n"
+        + "        \"type\":\"input\",\n"
+        + "        \"title\":\"user.params\",\n"
+        + "        \"value\":\"userParams\",\n"
+        + "        \"validate\":[\n"
+        + "            {\n"
+        + "                \"required\":false,\n"
+        + "                \"message\":null,\n"
+        + "                \"type\":\"string\",\n"
+        + "                \"trigger\":\"blur\",\n"
+        + "                \"min\":null,\n"
+        + "                \"max\":null\n"
+        + "            }\n"
+        + "        ]\n"
+        + "    },\n"
+        + "    {\n"
+        + "        \"field\":\"path\",\n"
+        + "        \"name\":\"path\",\n"
+        + "        \"props\":{\n"
+        + "            \"placeholder\":\"please upload the file to the disk directory of the alert server, and ensure that the path is absolute and has the corresponding access rights\",\n"
+        + "            \"size\":\"small\"\n"
+        + "        },\n"
+        + "        \"type\":\"input\",\n"
+        + "        \"title\":\"path\",\n"
+        + "        \"value\":\"/kris/script/path\",\n"
+        + "        \"validate\":[\n"
+        + "            {\n"
+        + "                \"required\":true,\n"
+        + "                \"message\":null,\n"
+        + "                \"type\":\"string\",\n"
+        + "                \"trigger\":\"blur\",\n"
+        + "                \"min\":null,\n"
+        + "                \"max\":null\n"
+        + "            }\n"
+        + "        ]\n"
+        + "    },\n"
+        + "    {\n"
+        + "        \"field\":\"type\",\n"
+        + "        \"name\":\"type\",\n"
+        + "        \"props\":{\n"
+        + "            \"placeholder\":null,\n"
+        + "            \"size\":\"small\"\n"
+        + "        },\n"
+        + "        \"type\":\"radio\",\n"
+        + "        \"title\":\"type\",\n"
+        + "        \"value\":0,\n"
+        + "        \"validate\":[\n"
+        + "            {\n"
+        + "                \"required\":true,\n"
+        + "                \"message\":null,\n"
+        + "                \"type\":\"string\",\n"
+        + "                \"trigger\":\"blur\",\n"
+        + "                \"min\":null,\n"
+        + "                \"max\":null\n"
+        + "            }\n"
+        + "        ],\n"
+        + "        \"options\":[\n"
+        + "            {\n"
+        + "                \"label\":\"SHELL\",\n"
+        + "                \"value\":0,\n"
+        + "                \"disabled\":false\n"
+        + "            }\n"
+        + "        ]\n"
+        + "    }\n"
+        + "]\n"
+        + "\n";
 
     private String paramsMap = "{\"path\":\"/kris/script/path\",\"userParams\":\"userParams\",\"type\":\"0\"}";
 

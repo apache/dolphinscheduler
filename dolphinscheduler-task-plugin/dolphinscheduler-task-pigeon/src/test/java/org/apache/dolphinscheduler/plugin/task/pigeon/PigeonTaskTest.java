@@ -81,7 +81,7 @@ public class PigeonTaskTest {
         String jobName = "mysql_elastic";
         int taskId = 123;
         Assert.assertEquals("ws://" + tisHost + "/tjs/download/logfeedback?logtype=full&collection=mysql_elastic&taskid=" + taskId
-                , cfg.getJobLogsFetchUrl(tisHost, jobName, taskId));
+            , cfg.getJobLogsFetchUrl(tisHost, jobName, taskId));
 
         Assert.assertEquals("action=datax_action&emethod=trigger_fullbuild_task", cfg.getJobTriggerPostBody());
 
@@ -94,7 +94,7 @@ public class PigeonTaskTest {
 
     @Test
     public void testInit()
-            throws Exception {
+        throws Exception {
         try {
             pigeonTask.init();
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public class PigeonTaskTest {
 
     @Test
     public void testHandle()
-            throws Exception {
+        throws Exception {
         HttpServer server = jsonHttpServer(8080, file("src/test/resources/org/apache/dolphinscheduler/plugin/task/pigeon/PigeonTaskTest.json"));
 
         running(server, () -> {

@@ -20,11 +20,8 @@
 
 package org.apache.dolphinscheduler.e2e.pages.datasource;
 
-import lombok.Getter;
-
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
-import java.security.Key;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -38,6 +35,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import lombok.Getter;
 
 @Getter
 public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem {
@@ -49,8 +47,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     private List<WebElement> dataSourceItemsList;
 
     @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -69,7 +67,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("dialog-create-data-source")));
+            new By.ByClassName("dialog-create-data-source")));
 
         createDataSourceForm().selectDataSourceType()
             .stream()
@@ -122,56 +120,56 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         private List<WebElement> selectDataSourceType;
 
         @FindBys({
-                @FindBy(className = "btn-data-source-type-drop-down"),
-                @FindBy(className = "n-base-selection"),
+            @FindBy(className = "btn-data-source-type-drop-down"),
+            @FindBy(className = "n-base-selection"),
         })
         private WebElement btnDataSourceTypeDropdown;
 
         @FindBys({
-                @FindBy(className = "input-data-source-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-data-source-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputDataSourceName;
 
         @FindBys({
-                @FindBy(className = "input-data-source-description"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-data-source-description"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputDataSourceDescription;
 
         @FindBys({
-                @FindBy(className = "input-ip"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-ip"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputIP;
 
         @FindBys({
-                @FindBy(className = "input-port"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-port"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputPort;
 
         @FindBys({
-                @FindBy(className = "input-username"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-username"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputUserName;
 
         @FindBys({
-                @FindBy(className = "input-password"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-password"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputPassword;
 
         @FindBys({
-                @FindBy(className = "input-data-base"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-data-base"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputDataBase;
 
         @FindBys({
-                @FindBy(className = "input-jdbc-params"),
-                @FindBy(tagName = "textarea"),
+            @FindBy(className = "input-jdbc-params"),
+            @FindBy(tagName = "textarea"),
         })
         private WebElement inputJdbcParams;
 

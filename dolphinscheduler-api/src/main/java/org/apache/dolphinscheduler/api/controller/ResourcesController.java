@@ -100,21 +100,21 @@ public class ResourcesController extends BaseController {
     private UdfFuncService udfFuncService;
 
     /**
-     * @param loginUser login user
-     * @param type type
-     * @param alias alias
+     * @param loginUser   login user
+     * @param type        type
+     * @param alias       alias
      * @param description description
-     * @param pid parent id
-     * @param currentDir current directory
+     * @param pid         parent id
+     * @param currentDir  current directory
      * @return create result code
      */
     @ApiOperation(value = "createDirectory", notes = "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+        @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
+        @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
+        @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -136,12 +136,12 @@ public class ResourcesController extends BaseController {
      */
     @ApiOperation(value = "createResource", notes = "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+        @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
+        @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
+        @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
+        @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
     })
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -160,21 +160,21 @@ public class ResourcesController extends BaseController {
     /**
      * update resource
      *
-     * @param loginUser login user
-     * @param alias alias
-     * @param resourceId resource id
-     * @param type resource type
+     * @param loginUser   login user
+     * @param alias       alias
+     * @param resourceId  resource id
+     * @param type        resource type
      * @param description description
-     * @param file resource file
+     * @param file        resource file
      * @return update result code
      */
     @ApiOperation(value = "updateResource", notes = "UPDATE_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+        @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+        @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
+        @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })
     @PutMapping(value = "/{id}")
     @ApiException(UPDATE_RESOURCE_ERROR)
@@ -193,12 +193,12 @@ public class ResourcesController extends BaseController {
      * query resources list
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     @ApiOperation(value = "queryResourceList", notes = "QUERY_RESOURCE_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType")
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
@@ -215,19 +215,19 @@ public class ResourcesController extends BaseController {
      * query resources list paging
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return resource list page
      */
     @ApiOperation(value = "queryResourceListPaging", notes = "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int", example = "10"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+        @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int", example = "10"),
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -254,13 +254,13 @@ public class ResourcesController extends BaseController {
     /**
      * delete resource
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param resourceId resource id
      * @return delete result code
      */
     @ApiOperation(value = "deleteResource", notes = "DELETE_RESOURCE_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -277,14 +277,14 @@ public class ResourcesController extends BaseController {
      * verify resource by alias and type
      *
      * @param loginUser login user
-     * @param fullName resource full name
-     * @param type resource type
+     * @param fullName  resource full name
+     * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyResourceName", notes = "VERIFY_RESOURCE_NAME_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+        @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -301,12 +301,12 @@ public class ResourcesController extends BaseController {
      * query resources by type
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     @ApiOperation(value = "queryResourceByProgramType", notes = "QUERY_RESOURCE_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType")
     })
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.OK)
@@ -316,23 +316,23 @@ public class ResourcesController extends BaseController {
                                                @RequestParam(value = "type") ResourceType type,
                                                @RequestParam(value = "programType", required = false) ProgramType programType
     ) {
-         return resourceService.queryResourceByProgramType(loginUser, type, programType);
+        return resourceService.queryResourceByProgramType(loginUser, type, programType);
     }
 
     /**
      * query resource by full name and type
      *
      * @param loginUser login user
-     * @param fullName resource full name
-     * @param type resource type
-     * @param id resource id
+     * @param fullName  resource full name
+     * @param type      resource type
+     * @param id        resource id
      * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "queryResource", notes = "QUERY_BY_RESOURCE_NAME")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int", example = "10")
+        @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+        @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int", example = "10")
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -350,10 +350,10 @@ public class ResourcesController extends BaseController {
     /**
      * view resource file online
      *
-     * @param loginUser login user
-     * @param resourceId resource id
+     * @param loginUser   login user
+     * @param resourceId  resource id
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return resource content
      */
     @ApiOperation(value = "viewResource", notes = "VIEW_RESOURCE_BY_ID_NOTES")
@@ -410,9 +410,9 @@ public class ResourcesController extends BaseController {
     /**
      * edit resource file online
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param resourceId resource id
-     * @param content content
+     * @param content    content
      * @return update result code
      */
     @ApiOperation(value = "updateResourceContent", notes = "UPDATE_RESOURCE_NOTES")
@@ -437,7 +437,7 @@ public class ResourcesController extends BaseController {
     /**
      * download resource file
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param resourceId resource id
      * @return resource content
      */
@@ -465,14 +465,14 @@ public class ResourcesController extends BaseController {
     /**
      * create udf function
      *
-     * @param loginUser login user
-     * @param type udf type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database database
+     * @param loginUser   login user
+     * @param type        udf type
+     * @param funcName    function name
+     * @param argTypes    argument types
+     * @param database    database
      * @param description description
-     * @param className class name
-     * @param resourceId resource id
+     * @param className   class name
+     * @param resourceId  resource id
      * @return create result code
      */
     @ApiOperation(value = "createUdfFunc", notes = "CREATE_UDF_FUNCTION_NOTES")
@@ -506,7 +506,7 @@ public class ResourcesController extends BaseController {
      * view udf function
      *
      * @param loginUser login user
-     * @param id resource id
+     * @param id        resource id
      * @return udf function detail
      */
     @ApiOperation(value = "viewUIUdfFunction", notes = "VIEW_UDF_FUNCTION_NOTES")
@@ -526,15 +526,15 @@ public class ResourcesController extends BaseController {
     /**
      * update udf function
      *
-     * @param loginUser login user
-     * @param type resource type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database data base
+     * @param loginUser   login user
+     * @param type        resource type
+     * @param funcName    function name
+     * @param argTypes    argument types
+     * @param database    data base
      * @param description description
-     * @param resourceId resource id
-     * @param className class name
-     * @param udfFuncId udf function id
+     * @param resourceId  resource id
+     * @param className   class name
+     * @param udfFuncId   udf function id
      * @return update result code
      */
     @ApiOperation(value = "updateUdfFunc", notes = "UPDATE_UDF_FUNCTION_NOTES")
@@ -569,8 +569,8 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return udf function list page
      */
     @ApiOperation(value = "queryUdfFuncListPaging", notes = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
@@ -599,7 +599,7 @@ public class ResourcesController extends BaseController {
      * query udf func list by type
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     @ApiOperation(value = "queryUdfFuncList", notes = "QUERY_UDF_FUNC_LIST_NOTES")
@@ -619,7 +619,7 @@ public class ResourcesController extends BaseController {
      * verify udf function name can use or not
      *
      * @param loginUser login user
-     * @param name name
+     * @param name      name
      * @return true if the name can user, otherwise return false
      */
     @ApiOperation(value = "verifyUdfFuncName", notes = "VERIFY_UDF_FUNCTION_NAME_NOTES")
@@ -662,7 +662,7 @@ public class ResourcesController extends BaseController {
      * authorized file resource list
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result
      */
     @ApiOperation(value = "authorizedFile", notes = "AUTHORIZED_FILE_NOTES")
@@ -684,7 +684,7 @@ public class ResourcesController extends BaseController {
      * unauthorized file resource list
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     @ApiOperation(value = "authorizeResourceTree", notes = "AUTHORIZE_RESOURCE_TREE_NOTES")
@@ -706,7 +706,7 @@ public class ResourcesController extends BaseController {
      * unauthorized udf function
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     @ApiOperation(value = "unauthUDFFunc", notes = "UNAUTHORIZED_UDF_FUNC_NOTES")
@@ -729,7 +729,7 @@ public class ResourcesController extends BaseController {
      * authorized udf function
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @ApiOperation(value = "authUDFFunc", notes = "AUTHORIZED_UDF_FUNC_NOTES")
@@ -750,7 +750,7 @@ public class ResourcesController extends BaseController {
      * query resource by resource id
      *
      * @param loginUser login user
-     * @param id resource id
+     * @param id        resource id
      * @return resource
      */
     @ApiOperation(value = "queryResourceById", notes = "QUERY_BY_RESOURCE_NAME")
@@ -762,7 +762,7 @@ public class ResourcesController extends BaseController {
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryResourceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-        @PathVariable(value = "id", required = true) Integer id
+                                    @PathVariable(value = "id", required = true) Integer id
     ) {
 
         return resourceService.queryResourceById(loginUser, id);

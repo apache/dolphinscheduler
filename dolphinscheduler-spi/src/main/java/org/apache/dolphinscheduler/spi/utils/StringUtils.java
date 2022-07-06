@@ -103,10 +103,10 @@ public class StringUtils {
      * <p>Returns either the passed in CharSequence, or if the CharSequence is
      * whitespace, empty ("") or {@code null}, the value of {@code defaultStr}.</p>
      *
-     * @param <T> the specific kind of CharSequence
-     * @param str the CharSequence to check, may be null
-     * @param defaultStr  the default CharSequence to return
-     *  if the input is whitespace, empty ("") or {@code null}, may be null
+     * @param <T>        the specific kind of CharSequence
+     * @param str        the CharSequence to check, may be null
+     * @param defaultStr the default CharSequence to return
+     *                   if the input is whitespace, empty ("") or {@code null}, may be null
      * @return the passed in CharSequence, or the default
      */
     public static <T extends CharSequence> T defaultIfBlank(final T str, final T defaultStr) {
@@ -117,10 +117,10 @@ public class StringUtils {
      * <p>Compares two String, returning {@code true} if they represent
      * equal string, ignoring case.</p>
      *
-     * @param str1  the first String, may be null
-     * @param str2  the second String, may be null
+     * @param str1 the first String, may be null
+     * @param str2 the second String, may be null
      * @return {@code true} if the String are equal, case insensitive, or
-     *  both {@code null}
+     * both {@code null}
      */
     public static boolean equalsIgnoreCase(String str1, String str2) {
         return str1 == null ? str2 == null : str1.equalsIgnoreCase(str2);
@@ -131,7 +131,7 @@ public class StringUtils {
      * containing the provided Collection of elements.</p>
      *
      * @param collection the collection, may be null
-     * @param separator the separator
+     * @param separator  the separator
      * @return a single String
      */
     public static String join(Collection<?> collection, String separator) {
@@ -142,7 +142,7 @@ public class StringUtils {
      * <p>Joins the elements of the provided Iterator into a single String
      * containing the provided Iterator of elements.</p>
      *
-     * @param iterator the iterator, may be null
+     * @param iterator  the iterator, may be null
      * @param separator the separator
      * @return a single String
      */
@@ -216,27 +216,27 @@ public class StringUtils {
                 out.write("\\u00" + hex(ch));
             } else if (ch < 32) {
                 switch (ch) {
-                    case '\b' :
+                    case '\b':
                         out.write('\\');
                         out.write('b');
                         break;
-                    case '\n' :
+                    case '\n':
                         out.write('\\');
                         out.write('n');
                         break;
-                    case '\t' :
+                    case '\t':
                         out.write('\\');
                         out.write('t');
                         break;
-                    case '\f' :
+                    case '\f':
                         out.write('\\');
                         out.write('f');
                         break;
-                    case '\r' :
+                    case '\r':
                         out.write('\\');
                         out.write('r');
                         break;
-                    default :
+                    default:
                         if (ch > 0xf) {
                             out.write("\\u00" + hex(ch));
                         } else {
@@ -246,27 +246,27 @@ public class StringUtils {
                 }
             } else {
                 switch (ch) {
-                    case '\'' :
+                    case '\'':
                         if (escapeSingleQuote) {
                             out.write('\\');
                         }
                         out.write('\'');
                         break;
-                    case '"' :
+                    case '"':
                         out.write('\\');
                         out.write('"');
                         break;
-                    case '\\' :
+                    case '\\':
                         out.write('\\');
                         out.write('\\');
                         break;
-                    case '/' :
+                    case '/':
                         if (escapeForwardSlash) {
                             out.write('\\');
                         }
                         out.write('/');
                         break;
-                    default :
+                    default:
                         out.write(ch);
                         break;
                 }
@@ -280,12 +280,12 @@ public class StringUtils {
 
     public static String replaceDoubleBrackets(String mainParameter) {
         mainParameter = mainParameter
-                .replace(Constants.DOUBLE_BRACKETS_LEFT, Constants.DOUBLE_BRACKETS_LEFT_SPACE)
-                .replace(Constants.DOUBLE_BRACKETS_RIGHT, Constants.DOUBLE_BRACKETS_RIGHT_SPACE);
+            .replace(Constants.DOUBLE_BRACKETS_LEFT, Constants.DOUBLE_BRACKETS_LEFT_SPACE)
+            .replace(Constants.DOUBLE_BRACKETS_RIGHT, Constants.DOUBLE_BRACKETS_RIGHT_SPACE);
         if (mainParameter.contains(Constants.DOUBLE_BRACKETS_LEFT) || mainParameter.contains(Constants.DOUBLE_BRACKETS_RIGHT)) {
             return replaceDoubleBrackets(mainParameter);
         } else {
-            return  mainParameter;
+            return mainParameter;
         }
     }
 }

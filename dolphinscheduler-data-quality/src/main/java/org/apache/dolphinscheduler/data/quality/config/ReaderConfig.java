@@ -24,9 +24,10 @@ import java.util.Map;
  */
 public class ReaderConfig extends BaseConfig {
 
-    public ReaderConfig() {}
+    public ReaderConfig() {
+    }
 
-    public ReaderConfig(String type, Map<String,Object> config) {
+    public ReaderConfig(String type, Map<String, Object> config) {
         super(type, config);
     }
 }

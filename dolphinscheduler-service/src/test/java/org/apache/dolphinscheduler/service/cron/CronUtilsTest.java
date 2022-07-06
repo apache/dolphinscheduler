@@ -60,14 +60,14 @@ public class CronUtilsTest {
     @Test
     public void testCronAsString() {
         Cron cron = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
-                .withYear(always())
-                .withDoW(questionMark())
-                .withMonth(always())
-                .withDoM(always())
-                .withHour(always())
-                .withMinute(every(5))
-                .withSecond(on(0))
-                .instance();
+            .withYear(always())
+            .withDoW(questionMark())
+            .withMonth(always())
+            .withDoM(always())
+            .withHour(always())
+            .withMinute(every(5))
+            .withSecond(on(0))
+            .instance();
         // Obtain the string expression
         String cronAsString = cron.asString();
 
@@ -131,17 +131,17 @@ public class CronUtilsTest {
     @Test
     public void test2() {
         Cron cron1 = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
-                .withYear(always())
-                .withDoW(questionMark())
-                .withMonth(always())
-                .withDoM(always())
-                .withHour(always())
-                .withMinute(every(5))
-                .withSecond(on(0))
-                .instance();
+            .withYear(always())
+            .withDoW(questionMark())
+            .withMonth(always())
+            .withDoM(always())
+            .withHour(always())
+            .withMinute(every(5))
+            .withSecond(on(0))
+            .instance();
         // minute cycle
         String[] cronArayy = new String[] {"* * * * * ? *", "* 0 * * * ? *",
-                "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *", "0 0 7 * 1,2 ? *"};
+            "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *", "0 0 7 * 1,2 ? *"};
         for (String minCrontab : cronArayy) {
             if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
                 throw new RuntimeException(minCrontab + " verify failure, cron expression not valid");
@@ -222,8 +222,8 @@ public class CronUtilsTest {
         from = DateUtils.stringToDate("2020-01-01 00:02:00");
         to = DateUtils.stringToDate("2020-01-01 00:04:00");
         Assert.assertEquals(2, CronUtils.getFireDateList(new Date(from.getTime() - 1000),
-                new Date(to.getTime() - 1000),
-                CronUtils.parse2CronExpression("0 * * * * ? ")).size());
+            new Date(to.getTime() - 1000),
+            CronUtils.parse2CronExpression("0 * * * * ? ")).size());
     }
 
     @Test

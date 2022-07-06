@@ -113,14 +113,14 @@ public class DependentUtilsTest {
         Date curDay = DateUtils.stringToDate("2019-02-05 00:00:00");
 
         DateInterval diCur = new DateInterval(DateUtils.getStartOfDay(curDay),
-                DateUtils.getEndOfDay(curDay));
+            DateUtils.getEndOfDay(curDay));
 
         Date day1 = DateUtils.stringToDate("2019-02-04 00:00:00");
         DateInterval di1 = new DateInterval(DateUtils.getStartOfDay(day1),
-                DateUtils.getEndOfDay(day1));
+            DateUtils.getEndOfDay(day1));
         Date day2 = DateUtils.stringToDate("2019-02-03 00:00:00");
         DateInterval di2 = new DateInterval(DateUtils.getStartOfDay(day2),
-                DateUtils.getEndOfDay(day2));
+            DateUtils.getEndOfDay(day2));
         String dateValue = "last1Days";
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
         Assert.assertEquals(dateIntervals.get(0), di1);
@@ -160,111 +160,111 @@ public class DependentUtilsTest {
 
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-04 10:00:00"), "last1Hour");
         DateInterval expect = new DateInterval(DateUtils.stringToDate("2019-02-04 09:00:00"),
-                DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 09:00:00")));
+            DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 09:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
 
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-04 10:00:00"), "last2Hours");
         expect = new DateInterval(DateUtils.stringToDate("2019-02-04 08:00:00"),
-                DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 08:00:00")));
+            DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 08:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
 
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-04 10:00:00"), "last3Hours");
         expect = new DateInterval(DateUtils.stringToDate("2019-02-04 07:00:00"),
-                DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 07:00:00")));
+            DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 07:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
 
         dateValue = "last3Days";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-02-07 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-07 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-07 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
 
         dateValue = "last7Days";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-02-03 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
 
         dateValue = "lastWeek";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-28 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-28 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-28 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         expect = new DateInterval(DateUtils.stringToDate("2019-02-03 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(6));
         Assert.assertEquals(7, dateIntervals.size());
 
         dateValue = "lastMonday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-28 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-28 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-28 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastTuesday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-29 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-29 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-29 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastWednesday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-30 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-30 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-30 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastThursday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-31 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastFriday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-02-01 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-01 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-01 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastSaturday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-02-02 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-02 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-02 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastSunday";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-02-03 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastMonth";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-01 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-01 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-01 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         expect = new DateInterval(DateUtils.stringToDate("2019-01-31 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(30));
         Assert.assertEquals(31, dateIntervals.size());
 
         dateValue = "lastMonthBegin";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-01 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-01 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-01 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
 
         dateValue = "lastMonthEnd";
         dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
         expect = new DateInterval(DateUtils.stringToDate("2019-01-31 00:00:00"),
-                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
+            DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
     }
@@ -275,27 +275,27 @@ public class DependentUtilsTest {
         Date curDay = DateUtils.stringToDate("2019-02-05 00:00:00");
         Date day1 = DateUtils.stringToDate("2019-01-28 00:00:00");
         DateInterval di1 = new DateInterval(DateUtils.getStartOfDay(day1),
-                DateUtils.getEndOfDay(day1));
+            DateUtils.getEndOfDay(day1));
 
         Date day2 = DateUtils.stringToDate("2019-01-29 00:00:00");
         DateInterval di2 = new DateInterval(DateUtils.getStartOfDay(day2),
-                DateUtils.getEndOfDay(day2));
+            DateUtils.getEndOfDay(day2));
         Date day3 = DateUtils.stringToDate("2019-01-30 00:00:00");
         DateInterval di3 = new DateInterval(DateUtils.getStartOfDay(day3),
-                DateUtils.getEndOfDay(day3));
+            DateUtils.getEndOfDay(day3));
         Date day4 = DateUtils.stringToDate("2019-01-31 00:00:00");
         DateInterval di4 = new DateInterval(DateUtils.getStartOfDay(day4),
-                DateUtils.getEndOfDay(day4));
+            DateUtils.getEndOfDay(day4));
         Date day5 = DateUtils.stringToDate("2019-02-01 00:00:00");
         DateInterval di5 = new DateInterval(DateUtils.getStartOfDay(day5),
-                DateUtils.getEndOfDay(day5));
+            DateUtils.getEndOfDay(day5));
         Date day6 = DateUtils.stringToDate("2019-02-02 00:00:00");
         DateInterval di6 = new DateInterval(DateUtils.getStartOfDay(day6),
-                DateUtils.getEndOfDay(day6));
+            DateUtils.getEndOfDay(day6));
         Date day7 = DateUtils.stringToDate("2019-02-03 00:00:00");
         DateInterval di7 = new DateInterval(DateUtils.getStartOfDay(day7),
-                DateUtils.getEndOfDay(day7));
-        List<DateInterval> dateIntervals  = DependentDateUtils.getLastWeekInterval(curDay);
+            DateUtils.getEndOfDay(day7));
+        List<DateInterval> dateIntervals = DependentDateUtils.getLastWeekInterval(curDay);
         Assert.assertEquals(dateIntervals.size(), 7);
         Assert.assertEquals(dateIntervals.get(0), di1);
         Assert.assertEquals(dateIntervals.get(1), di2);
@@ -324,13 +324,13 @@ public class DependentUtilsTest {
         Date curDay = DateUtils.stringToDate("2019-02-05 12:10:00");
         Date day1 = DateUtils.stringToDate("2019-02-05 11:00:00");
         DateInterval di1 = new DateInterval(DateUtils.getStartOfHour(day1),
-                DateUtils.getEndOfHour(day1));
+            DateUtils.getEndOfHour(day1));
         Date day2 = DateUtils.stringToDate("2019-02-05 10:00:00");
         DateInterval di2 = new DateInterval(DateUtils.getStartOfHour(day2),
-                DateUtils.getEndOfHour(day2));
+            DateUtils.getEndOfHour(day2));
         Date day3 = DateUtils.stringToDate("2019-02-05 09:00:00");
         DateInterval di3 = new DateInterval(DateUtils.getStartOfHour(day3),
-                DateUtils.getEndOfHour(day3));
+            DateUtils.getEndOfHour(day3));
 
         List<DateInterval> dateIntervals = DependentDateUtils.getLastHoursInterval(curDay, 1);
         Assert.assertEquals(dateIntervals.get(0), di1);
@@ -350,7 +350,7 @@ public class DependentUtilsTest {
 
         Date curDay = DateUtils.stringToDate("2020-05-15 12:10:00");
 
-        List<DateInterval> dateIntervals  = DependentUtils.getDateIntervalList(curDay, dateValue);
+        List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
 
         DateInterval expect = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 12:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 12:59:59")));
 
@@ -372,7 +372,7 @@ public class DependentUtilsTest {
                 i = "0" + i;
             }
             DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":00:00")),
-                    DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":59:59")));
+                DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":59:59")));
             expect.add(dateInterval);
         }
         DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 00:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 00:59:59")));
@@ -390,11 +390,11 @@ public class DependentUtilsTest {
         Date curDay = DateUtils.stringToDate("2019-02-05 00:00:00");
         Date day1 = DateUtils.stringToDate("2019-01-01 00:00:00");
         DateInterval di1 = new DateInterval(DateUtils.getStartOfDay(day1),
-                DateUtils.getEndOfDay(day1));
+            DateUtils.getEndOfDay(day1));
 
         Date day2 = DateUtils.stringToDate("2019-01-31 00:00:00");
         DateInterval di2 = new DateInterval(DateUtils.getStartOfDay(day2),
-                DateUtils.getEndOfDay(day2));
+            DateUtils.getEndOfDay(day2));
 
         List<DateInterval> dateIntervals = DependentDateUtils.getLastMonthInterval(curDay);
 

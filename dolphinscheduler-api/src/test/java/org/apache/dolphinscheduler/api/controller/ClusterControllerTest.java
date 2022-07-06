@@ -66,8 +66,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("description", desc);
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/create")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isCreated())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -91,8 +91,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("desc", "the test cluster update");
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/update")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -110,8 +110,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterCode", clusterCode);
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/query-by-code")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -132,8 +132,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "2");
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/list-paging")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -149,8 +149,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/query-cluster-list")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -168,8 +168,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterName", clusterName);
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/verify-cluster")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -188,8 +188,8 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterCode", clusterCode);
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/delete")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();

@@ -57,7 +57,7 @@ public class SQLServerDataSourceProcessorTest {
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) sqlServerDatasourceProcessor
-                .createConnectionParams(sqlServerDatasourceParamDTO);
+            .createConnectionParams(sqlServerDatasourceParamDTO);
         Assert.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
         Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default", connectionParams.getJdbcUrl());
         Assert.assertEquals("root", connectionParams.getUser());
@@ -66,7 +66,7 @@ public class SQLServerDataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
+            + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
         SQLServerConnectionParam sqlServerConnectionParam = JSONUtils.parseObject(connectionJson, SQLServerConnectionParam.class);
         Assert.assertNotNull(sqlServerConnectionParam);
         Assert.assertEquals("root", sqlServerConnectionParam.getUser());
@@ -83,7 +83,7 @@ public class SQLServerDataSourceProcessorTest {
         sqlServerConnectionParam.setJdbcUrl("jdbc:sqlserver://localhost:1234;databaseName=default");
         sqlServerConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default;other",
-                sqlServerDatasourceProcessor.getJdbcUrl(sqlServerConnectionParam));
+            sqlServerDatasourceProcessor.getJdbcUrl(sqlServerConnectionParam));
     }
 
     @Test

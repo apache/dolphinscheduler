@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.telegram;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_FALSE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_NO;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_TRUE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_YES;
+
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
@@ -31,7 +35,7 @@ import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.*;
+import com.google.auto.service.AutoService;
 
 @AutoService(AlertChannelFactory.class)
 public final class TelegramAlertChannelFactory implements AlertChannelFactory {
@@ -49,75 +53,73 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
     @Override
     public List<PluginParams> params() {
 
-
         InputParam webHookParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK, TelegramParamsConstants.TELEGRAM_WEB_HOOK)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .setPlaceholder("telegram web hook")
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .setPlaceholder("telegram web hook")
+            .build();
 
         InputParam botTokenParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, TelegramParamsConstants.TELEGRAM_BOT_TOKEN)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .setPlaceholder("telegram bot token")
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .setPlaceholder("telegram bot token")
+            .build();
 
         InputParam chatIdParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, TelegramParamsConstants.TELEGRAM_CHAT_ID)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .setPlaceholder("telegram channel chat id")
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .setPlaceholder("telegram channel chat id")
+            .build();
 
         SelectParam parseMode = SelectParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramParamsConstants.TELEGRAM_PARSE_MODE)
-                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_TXT, TelegramAlertConstants.PARSE_MODE_TXT, false))
-                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN, TelegramAlertConstants.PARSE_MODE_MARKDOWN, false))
-                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, false))
-                .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_HTML, TelegramAlertConstants.PARSE_MODE_HTML, false))
-                .setValue(TelegramAlertConstants.PARSE_MODE_TXT)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .build();
+            .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_TXT, TelegramAlertConstants.PARSE_MODE_TXT, false))
+            .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN, TelegramAlertConstants.PARSE_MODE_MARKDOWN, false))
+            .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, TelegramAlertConstants.PARSE_MODE_MARKDOWN_V2, false))
+            .addOptions(new ParamsOptions(TelegramAlertConstants.PARSE_MODE_HTML, TelegramAlertConstants.PARSE_MODE_HTML, false))
+            .setValue(TelegramAlertConstants.PARSE_MODE_TXT)
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
 
         RadioParam isEnableProxy = RadioParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PROXY_ENABLE, TelegramParamsConstants.TELEGRAM_PROXY_ENABLE)
-                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
-                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
-                .setValue(STRING_FALSE)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(false)
-                        .build())
-                .build();
+            .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+            .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+            .setValue(STRING_FALSE)
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .build();
 
         InputParam proxyParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PROXY, TelegramParamsConstants.TELEGRAM_PROXY)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(false)
-                        .build())
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .build();
 
         InputParam portParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(false)
-                        .build())
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .build();
 
         InputParam userParam = InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_USER, TelegramParamsConstants.TELEGRAM_USER)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(false)
-                        .build())
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .build();
 
         PasswordParam passwordParam = PasswordParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PASSWORD, TelegramParamsConstants.TELEGRAM_PASSWORD)
-                .addValidate(Validate.newBuilder()
-                        .setRequired(false)
-                        .build())
-                .setPlaceholder("if enable use authentication, you need input password")
-                .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(false)
+                .build())
+            .setPlaceholder("if enable use authentication, you need input password")
+            .build();
 
         return Arrays.asList(webHookParam, botTokenParam, chatIdParam, parseMode, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
-
 
 }

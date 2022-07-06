@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
-        "security.authentication.type=LDAP",
+    "security.authentication.type=LDAP",
 })
 public class SecurityConfigLDAPTest extends AbstractControllerTest {
 

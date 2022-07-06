@@ -371,7 +371,7 @@ public class ServerNodeManager implements InitializingBean {
      * sync worker group nodes
      *
      * @param workerGroup worker group
-     * @param nodes worker nodes
+     * @param nodes       worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
         workerGroupLock.lock();

@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ServiceExceptionTest {
     @Test
-    public void getCodeTest(){
+    public void getCodeTest() {
         ServiceException serviceException = new ServiceException();
         Assert.assertNull(serviceException.getCode());
 
@@ -32,8 +34,9 @@ public class ServiceExceptionTest {
         serviceException = new ServiceException(10012, "alarm group already exists");
         Assert.assertNotNull(serviceException.getCode());
     }
+
     @Test
-    public void getMessageTest(){
+    public void getMessageTest() {
         ServiceException serviceException = new ServiceException();
         Assert.assertNull(serviceException.getMessage());
 

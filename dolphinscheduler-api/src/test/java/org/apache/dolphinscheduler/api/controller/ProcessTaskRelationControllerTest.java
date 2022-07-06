@@ -50,13 +50,13 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         PowerMockito.when(processTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
-                .thenReturn(mockResult);
+            .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/downstream", "1113", "123")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -68,13 +68,13 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         PowerMockito.when(processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
-                .thenReturn(mockResult);
+            .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/upstream", "1113", "123")
                 .header(SESSION_ID, sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);

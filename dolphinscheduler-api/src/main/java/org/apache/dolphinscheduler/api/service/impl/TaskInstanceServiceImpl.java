@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -50,9 +53,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
-
 /**
  * task instance service impl
  */
@@ -83,50 +83,50 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param searchVal search value
-     * @param taskName task name
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param searchVal         search value
+     * @param taskName          task name
+     * @param stateType         state type
+     * @param host              host
+     * @param startDate         start time
+     * @param endDate           end time
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @return task list page
      */
     @Override
     public Result queryTaskListPaging(User loginUser,
-                                                   long projectCode,
-                                                   Integer processInstanceId,
-                                                   String processInstanceName,
-                                                   String taskName,
-                                                   String executorName,
-                                                   String startDate,
-                                                   String endDate,
-                                                   String searchVal,
-                                                   ExecutionStatus stateType,
-                                                   String host,
-                                                   Integer pageNo,
-                                                   Integer pageSize) {
+                                      long projectCode,
+                                      Integer processInstanceId,
+                                      String processInstanceName,
+                                      String taskName,
+                                      String executorName,
+                                      String startDate,
+                                      String endDate,
+                                      String searchVal,
+                                      ExecutionStatus stateType,
+                                      String host,
+                                      Integer pageNo,
+                                      Integer pageSize) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            putMsg(result,status);
+            putMsg(result, status);
             return result;
         }
         int[] statusArray = null;
         if (stateType != null) {
-            statusArray = new int[]{stateType.ordinal()};
+            statusArray = new int[] {stateType.ordinal()};
         }
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
         status = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            putMsg(result,status);
+            putMsg(result, status);
             return result;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
@@ -161,8 +161,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     /**
      * change one task instance's state from failure to forced success
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser      login user
+     * @param projectCode    project code
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
@@ -170,7 +170,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

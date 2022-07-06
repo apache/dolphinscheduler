@@ -58,7 +58,7 @@ public class SparkDataSourceProcessorTest {
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
-                .createConnectionParams(sparkDatasourceParamDTO);
+            .createConnectionParams(sparkDatasourceParamDTO);
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default", connectionParams.getJdbcUrl());
     }
@@ -66,9 +66,9 @@ public class SparkDataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"12345\",\"address\":\"jdbc:hive2://localhost1:1234,localhost2:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
+            + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
-                .createConnectionParams(connectionJson);
+            .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }
@@ -84,7 +84,7 @@ public class SparkDataSourceProcessorTest {
         sparkConnectionParam.setJdbcUrl("jdbc:hive2://localhost1:1234,localhost2:1234/default");
         sparkConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default;other",
-                sparkDatasourceProcessor.getJdbcUrl(sparkConnectionParam));
+            sparkDatasourceProcessor.getJdbcUrl(sparkConnectionParam));
     }
 
     @Test

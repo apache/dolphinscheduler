@@ -54,10 +54,10 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         SparkConnectionParam
-                connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
+            connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
 
         SparkDataSourceParamDTO
-                sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
+            sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
         sparkDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         sparkDatasourceParamDTO.setUserName(connectionParams.getUser());
         sparkDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
@@ -90,7 +90,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         String jdbcUrl = address + "/" + sparkDatasourceParam.getDatabase();
 
         SparkConnectionParam
-                sparkConnectionParam = new SparkConnectionParam();
+            sparkConnectionParam = new SparkConnectionParam();
         sparkConnectionParam.setPassword(PasswordUtils.encodePassword(sparkDatasourceParam.getPassword()));
         sparkConnectionParam.setUser(sparkDatasourceParam.getUserName());
         sparkConnectionParam.setOther(transformOther(sparkDatasourceParam.getOther()));
@@ -129,7 +129,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         SparkConnectionParam
-                sparkConnectionParam = (SparkConnectionParam) connectionParam;
+            sparkConnectionParam = (SparkConnectionParam) connectionParam;
         if (!StringUtils.isEmpty(sparkConnectionParam.getOther())) {
             return String.format("%s;%s", sparkConnectionParam.getJdbcUrl(), sparkConnectionParam.getOther());
         }
@@ -140,10 +140,10 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
         SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
         CommonUtils.loadKerberosConf(sparkConnectionParam.getJavaSecurityKrb5Conf(),
-                sparkConnectionParam.getLoginUserKeytabUsername(), sparkConnectionParam.getLoginUserKeytabPath());
+            sparkConnectionParam.getLoginUserKeytabUsername(), sparkConnectionParam.getLoginUserKeytabPath());
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(sparkConnectionParam),
-                sparkConnectionParam.getUser(), PasswordUtils.decodePassword(sparkConnectionParam.getPassword()));
+            sparkConnectionParam.getUser(), PasswordUtils.decodePassword(sparkConnectionParam.getPassword()));
     }
 
     @Override
@@ -161,7 +161,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
             return null;
         }
         List<String> stringBuilder = otherMap.entrySet().stream()
-                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue())).collect(Collectors.toList());
+            .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue())).collect(Collectors.toList());
         return String.join(";", stringBuilder);
     }
 

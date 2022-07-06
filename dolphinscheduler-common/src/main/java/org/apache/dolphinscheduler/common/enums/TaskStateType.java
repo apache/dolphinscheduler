@@ -42,26 +42,26 @@ public enum TaskStateType {
 
         switch (taskStateType) {
             case SUCCESS:
-                return new int[]{ExecutionStatus.SUCCESS.ordinal()};
+                return new int[] {ExecutionStatus.SUCCESS.ordinal()};
             case FAILED:
-                return new int[]{
-                        ExecutionStatus.FAILURE.ordinal(),
-                        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal()};
+                return new int[] {
+                    ExecutionStatus.FAILURE.ordinal(),
+                    ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal()};
             case FINISH:
-                return new int[]{
-                        ExecutionStatus.PAUSE.ordinal(),
-                        ExecutionStatus.STOP.ordinal()
+                return new int[] {
+                    ExecutionStatus.PAUSE.ordinal(),
+                    ExecutionStatus.STOP.ordinal()
                 };
             case RUNNING:
-                return new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-                        ExecutionStatus.DISPATCH.ordinal(),
-                        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-                        ExecutionStatus.READY_PAUSE.ordinal(),
-                        ExecutionStatus.READY_STOP.ordinal()};
+                return new int[] {ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+                    ExecutionStatus.DISPATCH.ordinal(),
+                    ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+                    ExecutionStatus.DELAY_EXECUTION.ordinal(),
+                    ExecutionStatus.READY_PAUSE.ordinal(),
+                    ExecutionStatus.READY_STOP.ordinal()};
             case WAITTING:
-                return new int[]{
-                        ExecutionStatus.SUBMITTED_SUCCESS.ordinal()
+                return new int[] {
+                    ExecutionStatus.SUBMITTED_SUCCESS.ordinal()
                 };
             default:
                 break;

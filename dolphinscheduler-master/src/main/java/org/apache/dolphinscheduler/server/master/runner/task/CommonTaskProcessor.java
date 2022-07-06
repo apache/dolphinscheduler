@@ -58,10 +58,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         int taskGroupId = taskInstance.getTaskGroupId();
         if (taskGroupId > 0) {
             boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
-                    taskInstance.getName(),
-                    taskGroupId,
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskGroupPriority());
+                taskInstance.getName(),
+                taskGroupId,
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getTaskGroupPriority());
             if (!acquireTaskGroup) {
                 logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
                 return true;
@@ -115,15 +115,15 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             }
             // task cannot be submitted because its execution state is RUNNING or DELAY.
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
-                    || taskInstance.getState() == ExecutionStatus.DELAY_EXECUTION) {
+                || taskInstance.getState() == ExecutionStatus.DELAY_EXECUTION) {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
             logger.info("task ready to submit: taskInstanceId: {}", taskInstance.getId());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
-                    processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
-                    taskInstance.getId(), taskInstance.getTaskGroupPriority(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+                processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
+                taskInstance.getId(), taskInstance.getTaskGroupPriority(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
             if (taskExecutionContext == null) {
@@ -179,7 +179,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         }
 
         logger.info("master kill taskInstance name :{} taskInstance id:{}",
-                taskInstance.getName(), taskInstance.getId());
+            taskInstance.getName(), taskInstance.getId());
         return true;
     }
 }

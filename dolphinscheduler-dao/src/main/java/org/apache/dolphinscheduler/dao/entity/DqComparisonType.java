@@ -135,14 +135,14 @@ public class DqComparisonType implements Serializable {
     @Override
     public String toString() {
         return "DqComparisonType{"
-                + "id=" + id
-                + ", type='" + type + '\''
-                + ", executeSql='" + executeSql + '\''
-                + ", outputTable='" + outputTable + '\''
-                + ", name='" + name + '\''
-                + ", isInnerSource='" + isInnerSource + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", type='" + type + '\''
+            + ", executeSql='" + executeSql + '\''
+            + ", outputTable='" + outputTable + '\''
+            + ", name='" + name + '\''
+            + ", isInnerSource='" + isInnerSource + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

@@ -34,9 +34,9 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import lombok.Getter;
-
 import com.google.common.base.Strings;
+
+import lombok.Getter;
 
 @Getter
 public final class TokenPage extends NavBarPage implements Tab {
@@ -71,14 +71,14 @@ public final class TokenPage extends NavBarPage implements Tab {
         new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
         createTokenForm().selectUserNameDropdown().click();
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+            "n-base-select-option__content")));
         createTokenForm().selectUserNameList()
-                .stream()
-                .filter(it -> it.getText().contains(userName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in token dropdown list",
-                        userName)))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(userName))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in token dropdown list",
+                userName)))
+            .click();
 
         createTokenForm().buttonGenerateToken().click();
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
@@ -108,12 +108,12 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public String getToken(String userName) {
         return tokenList().stream()
-                          .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
-                          .flatMap(it -> it.findElements(By.className("token")).stream())
-                          .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
-                          .map(it -> it.getAttribute("innerHTML"))
-                          .findFirst()
-                          .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
+            .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
+            .flatMap(it -> it.findElements(By.className("token")).stream())
+            .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
+            .map(it -> it.getAttribute("innerHTML"))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
     }
 
     public TokenPage delete(String userName) {

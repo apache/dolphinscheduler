@@ -34,12 +34,12 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
     /**
      * data quality task execute result page
      *
-     * @param page page
-     * @param searchVal searchVal
-     * @param userId userId
+     * @param page        page
+     * @param searchVal   searchVal
+     * @param userId      userId
      * @param statusArray states
-     * @param ruleType ruleType
-     * @param startTime startTime
+     * @param ruleType    ruleType
+     * @param startTime   startTime
      * @return endTime endTime
      */
     IPage<DqExecuteResult> queryResultListPaging(IPage<DqExecuteResult> page,
@@ -52,6 +52,7 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
 
     /**
      * get execute result by id
+     *
      * @param taskInstanceId taskInstanceId
      * @return DqExecuteResult
      */

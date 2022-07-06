@@ -56,6 +56,7 @@ public class NetUtils {
 
     /**
      * get addr like host:port
+     *
      * @return addr
      */
     public static String getAddr(String host, int port) {
@@ -64,6 +65,7 @@ public class NetUtils {
 
     /**
      * get addr like host:port
+     *
      * @return addr
      */
     public static String getAddr(int port) {
@@ -72,6 +74,7 @@ public class NetUtils {
 
     /**
      * get host
+     *
      * @return host
      */
     public static String getHost(InetAddress inetAddress) {
@@ -183,9 +186,9 @@ public class NetUtils {
         }
         String name = address.getHostAddress();
         return (name != null
-                && IP_PATTERN.matcher(name).matches()
-                && !address.isAnyLocalAddress()
-                && !address.isLoopbackAddress());
+            && IP_PATTERN.matcher(name).matches()
+            && !address.isAnyLocalAddress()
+            && !address.isLoopbackAddress());
     }
 
     /**
@@ -252,14 +255,14 @@ public class NetUtils {
      */
     public static boolean ignoreNetworkInterface(NetworkInterface networkInterface) throws SocketException {
         return networkInterface == null
-                || networkInterface.isLoopback()
-                || networkInterface.isVirtual()
-                || !networkInterface.isUp();
+            || networkInterface.isLoopback()
+            || networkInterface.isVirtual()
+            || !networkInterface.isUp();
     }
 
     private static boolean isSpecifyNetworkInterface(NetworkInterface networkInterface) {
         String preferredNetworkInterface = PropertyUtils.getString(Constants.DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED,
-                System.getProperty(Constants.DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED));
+            System.getProperty(Constants.DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED));
         return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
     }
 
@@ -305,7 +308,7 @@ public class NetUtils {
             while (address.hasMoreElements()) {
                 InetAddress ip = address.nextElement();
                 if (ip.isSiteLocalAddress()
-                        && !ip.isLoopbackAddress()) {
+                    && !ip.isLoopbackAddress()) {
                     networkInterface = ni;
                 }
             }
@@ -320,7 +323,7 @@ public class NetUtils {
             while (address.hasMoreElements()) {
                 InetAddress ip = address.nextElement();
                 if (!ip.isSiteLocalAddress()
-                        && !ip.isLoopbackAddress()) {
+                    && !ip.isLoopbackAddress()) {
                     networkInterface = ni;
                 }
             }

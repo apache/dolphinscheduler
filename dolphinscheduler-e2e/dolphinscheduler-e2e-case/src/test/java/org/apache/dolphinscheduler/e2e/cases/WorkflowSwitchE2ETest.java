@@ -19,6 +19,9 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -34,16 +37,14 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowSwitchE2ETest {
@@ -97,7 +98,7 @@ class WorkflowSwitchE2ETest {
 
         WorkflowForm workflowForm = workflowDefinitionPage.createWorkflow();
 
-        workflowForm.<ShellTaskForm> addTask(TaskType.SHELL)
+        workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
             .script("echo ${today}\necho ${global_param}\n")
             .name("pre-task")
             .submit();
@@ -145,27 +146,27 @@ class WorkflowSwitchE2ETest {
     @Order(10)
     void testRunWorkflow() {
         final ProjectDetailPage projectPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(project);
+            new ProjectPage(browser)
+                .goToNav(ProjectPage.class)
+                .goTo(project);
 
         projectPage
-                .goToTab(WorkflowInstanceTab.class)
-                .deleteAll();
+            .goToTab(WorkflowInstanceTab.class)
+            .deleteAll();
 
         projectPage
-                .goToTab(WorkflowDefinitionTab.class)
-                .run(workflow)
-                .submit();
+            .goToTab(WorkflowDefinitionTab.class)
+            .run(workflow)
+            .submit();
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage
-                    .goToTab(WorkflowInstanceTab.class)
-                    .instances()
-                    .iterator()
-                    .next();
+                .goToTab(WorkflowInstanceTab.class)
+                .instances()
+                .iterator()
+                .next();
 
             assertThat(row.isSuccess()).isTrue();
             assertThat(row.executionTime()).isEqualTo(1);
@@ -173,8 +174,8 @@ class WorkflowSwitchE2ETest {
 
         // check task for switch
         List<TaskInstanceTab.Row> taskInstances = projectPage
-                .goToTab(TaskInstanceTab.class)
-                .instances();
+            .goToTab(TaskInstanceTab.class)
+            .instances();
 
         await().untilAsserted(() -> {
             assertThat(taskInstances.size()).isEqualTo(3);

@@ -117,7 +117,7 @@ public class DataSourceUtilsTest {
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3308");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.MYSQL, mysqlConnectionParam);
         Assert.assertEquals("jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
-                jdbcUrl);
+            jdbcUrl);
     }
 
     @Test

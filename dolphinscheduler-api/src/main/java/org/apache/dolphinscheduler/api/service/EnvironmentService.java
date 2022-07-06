@@ -30,10 +30,10 @@ public interface EnvironmentService {
     /**
      * create environment
      *
-     * @param loginUser login user
-     * @param name environment name
-     * @param config environment config
-     * @param desc environment desc
+     * @param loginUser    login user
+     * @param name         environment name
+     * @param config       environment config
+     * @param desc         environment desc
      * @param workerGroups worker groups
      */
     Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups);
@@ -57,18 +57,18 @@ public interface EnvironmentService {
      * delete environment
      *
      * @param loginUser login user
-     * @param code environment code
+     * @param code      environment code
      */
     Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code);
 
     /**
      * update environment
      *
-     * @param loginUser login user
-     * @param code environment code
-     * @param name environment name
-     * @param config environment config
-     * @param desc environment desc
+     * @param loginUser    login user
+     * @param code         environment code
+     * @param name         environment name
+     * @param config       environment config
+     * @param desc         environment desc
      * @param workerGroups worker groups
      */
     Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups);
@@ -76,9 +76,9 @@ public interface EnvironmentService {
     /**
      * query environment paging
      *
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return environment list page
      */
     Result queryEnvironmentListPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);

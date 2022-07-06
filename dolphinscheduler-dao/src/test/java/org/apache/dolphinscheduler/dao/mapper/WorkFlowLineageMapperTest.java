@@ -72,7 +72,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     /**
      * insert
-     *
      */
     private void insertOneProcessDefinition() {
         //insertOne
@@ -88,7 +87,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     /**
      * insert
-     *
      */
     private void insertOneSchedule(int id) {
         //insertOne

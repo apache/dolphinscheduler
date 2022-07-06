@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
@@ -156,7 +155,6 @@ public class MysqlRegistry implements Registry {
         return true;
     }
 
-
     @Override
     public void close() {
         LOGGER.info("Closing Mysql Registry...");
@@ -165,6 +163,7 @@ public class MysqlRegistry implements Registry {
              SubscribeDataManager close2 = subscribeDataManager;
              RegistryLockManager close3 = registryLockManager;
              MysqlOperator closed4 = mysqlOperator) {
+            // this is just want to close the resource
         } catch (Exception e) {
             LOGGER.error("Close Mysql Registry error", e);
         }

@@ -51,9 +51,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-projectCode")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -69,9 +69,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/task-group/list-paging")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -87,9 +87,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-status")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -108,9 +108,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
@@ -124,9 +124,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result1 = JSONUtils.parseObject(mvcResult1.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result1 != null && result1.isFailed());
         logger.info("create queue return result:{}", mvcResult1.getResponse().getContentAsString());
@@ -144,9 +144,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/task-group/update")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
         Assert.assertTrue(result != null && result.isSuccess());
@@ -162,9 +162,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/task-group/close-task-group")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
         Assert.assertTrue(result != null && result.isSuccess());
@@ -176,9 +176,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/start-task-group")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result1 = JSONUtils.parseObject(mvcResult1.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult1.getResponse().getContentAsString());
         Assert.assertTrue(result1 != null && result1.isSuccess());

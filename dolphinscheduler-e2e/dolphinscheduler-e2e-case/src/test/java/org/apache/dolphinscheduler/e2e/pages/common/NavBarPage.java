@@ -17,6 +17,7 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.common;
 
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
@@ -24,11 +25,9 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;

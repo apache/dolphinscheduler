@@ -49,17 +49,17 @@ public class DataQualityContext {
 
     public void execute() throws DataQualityException {
         List<BatchReader> readers = ReaderFactory
-                .getInstance()
-                .getReaders(this.sparkRuntimeEnvironment,dataQualityConfiguration.getReaderConfigs());
+            .getInstance()
+            .getReaders(this.sparkRuntimeEnvironment, dataQualityConfiguration.getReaderConfigs());
         List<BatchTransformer> transformers = TransformerFactory
-                .getInstance()
-                .getTransformer(this.sparkRuntimeEnvironment,dataQualityConfiguration.getTransformerConfigs());
+            .getInstance()
+            .getTransformer(this.sparkRuntimeEnvironment, dataQualityConfiguration.getTransformerConfigs());
         List<BatchWriter> writers = WriterFactory
-                .getInstance()
-                .getWriters(this.sparkRuntimeEnvironment,dataQualityConfiguration.getWriterConfigs());
+            .getInstance()
+            .getWriters(this.sparkRuntimeEnvironment, dataQualityConfiguration.getWriterConfigs());
 
         if (sparkRuntimeEnvironment.isBatch()) {
-            sparkRuntimeEnvironment.getBatchExecution().execute(readers,transformers,writers);
+            sparkRuntimeEnvironment.getBatchExecution().execute(readers, transformers, writers);
         } else {
             throw new DataQualityException("stream mode is not supported now");
         }

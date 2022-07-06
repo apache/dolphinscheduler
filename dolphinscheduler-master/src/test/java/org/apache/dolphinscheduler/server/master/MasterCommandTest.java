@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  master test
+ * master test
  */
 @Ignore
 public class MasterCommandTest {

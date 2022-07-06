@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl implements
-        EnvironmentWorkerGroupRelationService {
+    EnvironmentWorkerGroupRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentWorkerGroupRelationServiceImpl.class);
 
@@ -69,8 +69,8 @@ public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl i
 
         List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
 
-        result.put(Constants.DATA_LIST,relations);
-        putMsg(result,Status.SUCCESS);
+        result.put(Constants.DATA_LIST, relations);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 }

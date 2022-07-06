@@ -57,7 +57,7 @@ public class Db2DataSourceProcessorTest {
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
 
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
-                .createConnectionParams(db2DatasourceParamDTO);
+            .createConnectionParams(db2DatasourceParamDTO);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
         Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
@@ -66,9 +66,9 @@ public class Db2DataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:db2://localhost:5142\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:db2://localhost:5142/default\"}";
+            + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:db2://localhost:5142/default\"}";
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
-                .createConnectionParams(connectionJson);
+            .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionJson);
         Assert.assertEquals("root", connectionParams.getUser());
 

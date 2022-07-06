@@ -34,10 +34,10 @@ public class DependentItem {
 
     public String getKey() {
         return String.format("%d-%d-%s-%s",
-                getDefinitionCode(),
-                getDepTaskCode(),
-                getCycle(),
-                getDateValue());
+            getDefinitionCode(),
+            getDepTaskCode(),
+            getCycle(),
+            getDateValue());
     }
 
     public long getProjectCode() {

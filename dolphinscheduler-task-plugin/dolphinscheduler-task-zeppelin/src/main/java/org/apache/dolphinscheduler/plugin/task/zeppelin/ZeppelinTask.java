@@ -17,23 +17,26 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kong.unirest.Unirest;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kong.unirest.Unirest;
 
 public class ZeppelinTask extends AbstractTaskExecutor {
 
@@ -51,7 +54,6 @@ public class ZeppelinTask extends AbstractTaskExecutor {
      * zeppelin api client
      */
     private ZeppelinClient zClient;
-
 
     /**
      * constructor
@@ -95,10 +97,10 @@ public class ZeppelinTask extends AbstractTaskExecutor {
                 StringBuilder resultContentBuilder = new StringBuilder();
                 for (ParagraphResult paragraphResult : paragraphResultList) {
                     resultContentBuilder.append(
-                            String.format(
-                                    "paragraph_id: %s, paragraph_result: %s\n",
-                                    paragraphResult.getParagraphId(),
-                                    paragraphResult.getResultInText()));
+                        String.format(
+                            "paragraph_id: %s, paragraph_result: %s\n",
+                            paragraphResult.getParagraphId(),
+                            paragraphResult.getResultInText()));
                     status = paragraphResult.getStatus();
                     // we treat note execution as failure if any paragraph in the note fails
                     // status will be further processed in method mapStatusToExitCode below
@@ -173,23 +175,23 @@ public class ZeppelinTask extends AbstractTaskExecutor {
         String paragraphId = this.zeppelinParameters.getParagraphId();
         if (paragraphId == null) {
             logger.info("trying terminate zeppelin task, taskId: {}, noteId: {}",
-                    this.taskExecutionContext.getTaskInstanceId(),
-                    noteId);
+                this.taskExecutionContext.getTaskInstanceId(),
+                noteId);
             Unirest.config().defaultBaseUrl(PropertyUtils.getString(TaskConstants.ZEPPELIN_REST_URL) + "/api");
             Unirest.delete("/notebook/job/{noteId}").routeParam("noteId", noteId).asJson();
             logger.info("zeppelin task terminated, taskId: {}, noteId: {}",
-                    this.taskExecutionContext.getTaskInstanceId(),
-                    noteId);
+                this.taskExecutionContext.getTaskInstanceId(),
+                noteId);
         } else {
             logger.info("trying terminate zeppelin task, taskId: {}, noteId: {}, paragraphId: {}",
-                    this.taskExecutionContext.getTaskInstanceId(),
-                    noteId,
-                    paragraphId);
+                this.taskExecutionContext.getTaskInstanceId(),
+                noteId,
+                paragraphId);
             this.zClient.cancelParagraph(noteId, paragraphId);
             logger.info("zeppelin task terminated, taskId: {}, noteId: {}, paragraphId: {}",
-                    this.taskExecutionContext.getTaskInstanceId(),
-                    noteId,
-                    paragraphId);
+                this.taskExecutionContext.getTaskInstanceId(),
+                noteId,
+                paragraphId);
         }
 
     }

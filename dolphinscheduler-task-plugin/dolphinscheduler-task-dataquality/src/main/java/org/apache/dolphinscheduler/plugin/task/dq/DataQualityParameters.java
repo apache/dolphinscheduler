@@ -43,7 +43,7 @@ public class DataQualityParameters extends AbstractParameters {
     /**
      * rule input entry value map
      */
-    private Map<String,String> ruleInputParameter;
+    private Map<String, String> ruleInputParameter;
     /**
      * spark parameters
      */
@@ -68,6 +68,7 @@ public class DataQualityParameters extends AbstractParameters {
     /**
      * In this function ,we need more detailed check every parameter,
      * if the parameter is non-conformant will return false
+     *
      * @return boolean result
      */
     @Override

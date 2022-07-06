@@ -94,7 +94,7 @@ public class HiveTargetGenerator implements ITargetGenerator {
 
                 if (StringUtils.isNotEmpty(targetHiveParameter.getHiveTargetDir())) {
                     hiveTargetSb.append(SPACE).append(TARGET_DIR)
-                            .append(SPACE).append(targetHiveParameter.getHiveTargetDir());
+                        .append(SPACE).append(targetHiveParameter.getHiveTargetDir());
                 }
 
             }

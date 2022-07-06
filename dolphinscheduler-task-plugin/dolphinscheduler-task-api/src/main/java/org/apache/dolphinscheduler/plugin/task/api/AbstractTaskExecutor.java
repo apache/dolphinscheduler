@@ -37,6 +37,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+
     /**
      * constructor
      *
@@ -67,13 +68,13 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
     /**
      * regular expressions match the contents between two specified strings
      *
-     * @param content content
-     * @param rgex rgex
-     * @param sqlParamsMap sql params map
+     * @param content        content
+     * @param rgex           rgex
+     * @param sqlParamsMap   sql params map
      * @param paramsPropsMap params props map
      */
     public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
-                                Map<String, Property> paramsPropsMap,int taskInstanceId) {
+                                Map<String, Property> paramsPropsMap, int taskInstanceId) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         int index = 1;

@@ -32,8 +32,8 @@ public interface ProjectService {
      * create project
      *
      * @param loginUser login user
-     * @param name project name
-     * @param desc description
+     * @param name      project name
+     * @param desc      description
      * @return returns an error if it exists
      */
     Map<String, Object> createProject(User loginUser, String name, String desc);
@@ -49,7 +49,7 @@ public interface ProjectService {
     /**
      * query project details by name
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
      * @return project detail information
      */
@@ -58,15 +58,15 @@ public interface ProjectService {
     /**
      * check project and authorization
      *
-     * @param loginUser login user
-     * @param project project
+     * @param loginUser   login user
+     * @param project     project
      * @param projectCode project code
-     * @param perm String
+     * @param perm        String
      * @return true if the login user have permission to see the project
      */
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,String perm);
+    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
 
-    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result,String perm);
+    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String perm);
 
     boolean hasProjectAndPerm(User loginUser, Project project, Result result);
 
@@ -75,8 +75,8 @@ public interface ProjectService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which the login user have permission to see
      */
     Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
@@ -84,7 +84,7 @@ public interface ProjectService {
     /**
      * delete project by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return delete result code
      */
@@ -93,11 +93,11 @@ public interface ProjectService {
     /**
      * updateProcessInstance project
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param projectName project name
-     * @param desc description
-     * @param userName project owner
+     * @param desc        description
+     * @param userName    project owner
      * @return update result code
      */
     Map<String, Object> update(User loginUser, Long projectCode, String projectName, String desc, String userName);
@@ -106,7 +106,7 @@ public interface ProjectService {
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the projects which user have not permission to see
      */
     Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId);
@@ -115,7 +115,7 @@ public interface ProjectService {
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId);
@@ -123,8 +123,8 @@ public interface ProjectService {
     /**
      * query authorized user
      *
-     * @param loginUser     login user
-     * @param projectCode   project code
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return users        who have permission for the specified project
      */
     Map<String, Object> queryAuthorizedUser(User loginUser, Long projectCode);
@@ -139,6 +139,7 @@ public interface ProjectService {
 
     /**
      * query all project list that have one or more process definitions.
+     *
      * @param loginUser
      * @return project list
      */
@@ -146,6 +147,7 @@ public interface ProjectService {
 
     /**
      * query authorized and user create project list by user id
+     *
      * @param loginUser login user
      * @return project list
      */

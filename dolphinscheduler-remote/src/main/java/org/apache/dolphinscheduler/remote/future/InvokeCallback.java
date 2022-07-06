@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.future;
 
 /**
@@ -22,7 +23,7 @@ package org.apache.dolphinscheduler.remote.future;
 public interface InvokeCallback {
 
     /**
-     *  operation
+     * operation
      *
      * @param responseFuture responseFuture
      */

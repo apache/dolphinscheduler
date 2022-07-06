@@ -44,8 +44,8 @@ public class PlaceholderUtils {
      * Replaces all placeholders of format {@code ${name}} with the value returned
      * from the supplied {@link PropertyPlaceholderHelper.PlaceholderResolver}.
      *
-     * @param value the value containing the placeholders to be replaced
-     * @param paramsMap placeholder data dictionary
+     * @param value                          the value containing the placeholders to be replaced
+     * @param paramsMap                      placeholder data dictionary
      * @param ignoreUnresolvablePlaceholders ignoreUnresolvablePlaceholders
      * @return the supplied value with placeholders replaced inline
      */
@@ -66,8 +66,9 @@ public class PlaceholderUtils {
 
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
+     *
      * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-     * be ignored ({@code true}) or cause an exception ({@code false})
+     *                                       be ignored ({@code true}) or cause an exception ({@code false})
      * @return PropertyPlaceholderHelper
      */
     public static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {

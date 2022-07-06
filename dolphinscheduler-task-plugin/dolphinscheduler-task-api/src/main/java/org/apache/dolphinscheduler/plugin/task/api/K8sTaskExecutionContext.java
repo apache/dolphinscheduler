@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import java.io.Serializable;
 
 /**
- *  k8s Task ExecutionContext
+ * k8s Task ExecutionContext
  */
 
 public class K8sTaskExecutionContext implements Serializable {

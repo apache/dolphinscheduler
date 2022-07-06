@@ -34,19 +34,19 @@ public final class TaskMetrics {
 
     private static Map<String, Counter> TASK_TYPE_EXECUTE_COUNTER = new HashMap<>();
     private static final Counter UNKNOWN_TASK_EXECUTE_COUNTER =
-            Counter.builder("ds.task.execution.count.by.type")
-                    .tag("task_type", "unknown")
-                    .description("task execution counter by type")
-                    .register(Metrics.globalRegistry);
+        Counter.builder("ds.task.execution.count.by.type")
+            .tag("task_type", "unknown")
+            .description("task execution counter by type")
+            .register(Metrics.globalRegistry);
 
     static {
         for (TaskChannelFactory taskChannelFactory : ServiceLoader.load(TaskChannelFactory.class)) {
             TASK_TYPE_EXECUTE_COUNTER.put(
-                    taskChannelFactory.getName(),
-                    Counter.builder("ds.task.execution.count.by.type")
-                            .tag("task_type", taskChannelFactory.getName())
-                            .description("task execution counter by type")
-                            .register(Metrics.globalRegistry)
+                taskChannelFactory.getName(),
+                Counter.builder("ds.task.execution.count.by.type")
+                    .tag("task_type", taskChannelFactory.getName())
+                    .description("task execution counter by type")
+                    .register(Metrics.globalRegistry)
             );
         }
     }

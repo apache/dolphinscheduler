@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-
 
 /**
  * service exception
@@ -37,7 +37,7 @@ public class ServiceException extends RuntimeException {
         this.code = status.getCode();
     }
 
-    public ServiceException(Integer code,String message) {
+    public ServiceException(Integer code, String message) {
         super(message);
         this.code = code;
     }

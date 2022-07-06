@@ -118,7 +118,7 @@ public enum ExecutionStatus {
      */
     public boolean typeIsFinished() {
         return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-                || typeIsStop() || typeIsBlock();
+            || typeIsStop() || typeIsBlock();
     }
 
     /**

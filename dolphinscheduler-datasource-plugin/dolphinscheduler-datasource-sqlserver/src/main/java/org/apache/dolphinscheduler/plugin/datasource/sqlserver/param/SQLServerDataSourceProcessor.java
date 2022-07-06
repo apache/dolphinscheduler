@@ -110,7 +110,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
         SQLServerConnectionParam sqlServerConnectionParam = (SQLServerConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam), sqlServerConnectionParam.getUser(),
-                PasswordUtils.decodePassword(sqlServerConnectionParam.getPassword()));
+            PasswordUtils.decodePassword(sqlServerConnectionParam.getPassword()));
     }
 
     @Override

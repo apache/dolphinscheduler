@@ -56,7 +56,7 @@ public class PrestoDataSourceProcessorTest {
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(prestoDatasourceParamDTO);
+            .createConnectionParams(prestoDatasourceParamDTO);
         Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
         Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
     }
@@ -64,9 +64,9 @@ public class PrestoDataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
+            + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(connectionJson);
+            .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }
@@ -82,7 +82,7 @@ public class PrestoDataSourceProcessorTest {
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
         prestoConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
-                prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
+            prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }
 

@@ -41,7 +41,7 @@ public class DqExecuteResult implements Serializable {
      * process definition name
      */
     @TableField(exist = false)
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * process definition code
      */
@@ -355,32 +355,32 @@ public class DqExecuteResult implements Serializable {
 
     @Override
     public String toString() {
-        return "DqExecuteResult{" 
-                + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
-                + ", processDefinitionName='" + processDefinitionName + '\''
-                + ", processDefinitionCode='" + processDefinitionCode + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", processInstanceName='" + processInstanceName + '\''
-                + ", projectCode='" + projectCode + '\''
-                + ", taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", ruleType=" + ruleType
-                + ", ruleName='" + ruleName + '\''
-                + ", statisticsValue=" + statisticsValue
-                + ", comparisonValue=" + comparisonValue
-                + ", comparisonType=" + comparisonType
-                + ", comparisonTypeName=" + comparisonTypeName
-                + ", checkType=" + checkType
-                + ", threshold=" + threshold
-                + ", operator=" + operator
-                + ", failureStrategy=" + failureStrategy
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", state=" + state
-                + ", errorOutputPath=" + errorOutputPath
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+        return "DqExecuteResult{"
+            + "id=" + id
+            + ", processDefinitionId=" + processDefinitionId
+            + ", processDefinitionName='" + processDefinitionName + '\''
+            + ", processDefinitionCode='" + processDefinitionCode + '\''
+            + ", processInstanceId=" + processInstanceId
+            + ", processInstanceName='" + processInstanceName + '\''
+            + ", projectCode='" + projectCode + '\''
+            + ", taskInstanceId=" + taskInstanceId
+            + ", taskName='" + taskName + '\''
+            + ", ruleType=" + ruleType
+            + ", ruleName='" + ruleName + '\''
+            + ", statisticsValue=" + statisticsValue
+            + ", comparisonValue=" + comparisonValue
+            + ", comparisonType=" + comparisonType
+            + ", comparisonTypeName=" + comparisonTypeName
+            + ", checkType=" + checkType
+            + ", threshold=" + threshold
+            + ", operator=" + operator
+            + ", failureStrategy=" + failureStrategy
+            + ", userId=" + userId
+            + ", userName='" + userName + '\''
+            + ", state=" + state
+            + ", errorOutputPath=" + errorOutputPath
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

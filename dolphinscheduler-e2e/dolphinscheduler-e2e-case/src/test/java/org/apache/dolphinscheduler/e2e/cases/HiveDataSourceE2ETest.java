@@ -64,7 +64,6 @@ public class HiveDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
-
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)

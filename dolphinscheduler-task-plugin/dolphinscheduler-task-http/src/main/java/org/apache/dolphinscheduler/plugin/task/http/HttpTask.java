@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -47,7 +46,6 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,8 +100,8 @@ public class HttpTask extends AbstractTaskExecutor {
             exitStatusCode = validResponse(body, statusCode);
             long costTime = System.currentTimeMillis() - startTime;
             logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
-                    formatTimeStamp, httpParameters.getUrl(),
-                    httpParameters.getHttpMethod(), costTime, statusCode, body, output);
+                formatTimeStamp, httpParameters.getUrl(),
+                httpParameters.getHttpMethod(), costTime, statusCode, body, output);
         } catch (Exception e) {
             appendMessage(e.toString());
             exitStatusCode = -1;
@@ -148,7 +146,7 @@ public class HttpTask extends AbstractTaskExecutor {
      * @param httpResponse http response
      * @return response body
      * @throws ParseException parse exception
-     * @throws IOException io exception
+     * @throws IOException    io exception
      */
     protected String getResponseBody(CloseableHttpResponse httpResponse) throws ParseException, IOException {
         if (httpResponse == null) {
@@ -174,7 +172,7 @@ public class HttpTask extends AbstractTaskExecutor {
     /**
      * valid response
      *
-     * @param body body
+     * @param body       body
      * @param statusCode status code
      * @return exit status code
      */
@@ -184,14 +182,14 @@ public class HttpTask extends AbstractTaskExecutor {
             case BODY_CONTAINS:
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " doesn contain "
-                            + httpParameters.getCondition());
+                        + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
             case BODY_NOT_CONTAINS:
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " contains "
-                            + httpParameters.getCondition());
+                        + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
@@ -232,7 +230,7 @@ public class HttpTask extends AbstractTaskExecutor {
     /**
      * add request params
      *
-     * @param builder buidler
+     * @param builder          buidler
      * @param httpPropertyList http property list
      */
     protected void addRequestParams(RequestBuilder builder, List<HttpProperty> httpPropertyList) {
@@ -257,7 +255,7 @@ public class HttpTask extends AbstractTaskExecutor {
     /**
      * set headers
      *
-     * @param request request
+     * @param request          request
      * @param httpPropertyList http property list
      */
     protected void setHeaders(HttpUriRequest request, List<HttpProperty> httpPropertyList) {

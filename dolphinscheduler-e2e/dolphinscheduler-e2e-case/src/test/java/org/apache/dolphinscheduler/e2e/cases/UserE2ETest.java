@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -58,18 +57,18 @@ class UserE2ETest {
     @BeforeAll
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class)
-                .create(tenant);
+            .login("admin", "dolphinscheduler123")
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .create(tenant);
 
         await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-                .as("Tenant list should contain newly-created tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
 
         tenantPage.goToNav(SecurityPage.class)
-                .goToTab(UserPage.class);
+            .goToTab(UserPage.class);
     }
 
     @AfterAll
@@ -118,7 +117,7 @@ class UserE2ETest {
         UserPage page = new UserPage(browser);
 
         new WebDriverWait(browser, 20).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+            new By.ByClassName("name")));
 
         browser.navigate().refresh();
 
@@ -132,7 +131,7 @@ class UserE2ETest {
                 .anyMatch(it -> it.contains(editUser));
         });
     }
-    
+
     @Test
     @Order(40)
     void testDeleteUser() {

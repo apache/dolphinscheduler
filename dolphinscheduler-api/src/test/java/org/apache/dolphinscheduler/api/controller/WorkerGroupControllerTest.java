@@ -70,14 +70,14 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","cxc_work_group");
-        paramsMap.add("addrList","192.168.0.1,192.168.0.2");
+        paramsMap.add("name", "cxc_work_group");
+        paramsMap.add("addrList", "192.168.0.1,192.168.0.2");
         MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -86,15 +86,15 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryAllWorkerGroupsPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","2");
-        paramsMap.add("searchVal","cxc");
-        paramsMap.add("pageSize","2");
+        paramsMap.add("pageNo", "2");
+        paramsMap.add("searchVal", "cxc");
+        paramsMap.add("pageSize", "2");
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -106,9 +106,9 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups/all")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -117,10 +117,10 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void queryWorkerAddressList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
-                        .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -138,9 +138,9 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
                 .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());

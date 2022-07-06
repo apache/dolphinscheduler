@@ -26,10 +26,10 @@ public enum UdfType {
     /**
      * 0 hive; 1 spark
      */
-  HIVE(0, "hive"),
-  SPARK(1, "spark");
+    HIVE(0, "hive"),
+    SPARK(1, "spark");
 
-    UdfType(int code, String descp){
+    UdfType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -46,14 +46,13 @@ public enum UdfType {
         return descp;
     }
 
-    public static UdfType of(int type){
-        for(UdfType ut : values()){
-            if(ut.getCode() == type){
+    public static UdfType of(int type) {
+        for (UdfType ut : values()) {
+            if (ut.getCode() == type) {
                 return ut;
             }
         }
         throw new IllegalArgumentException("invalid type : " + type);
     }
-
 
 }

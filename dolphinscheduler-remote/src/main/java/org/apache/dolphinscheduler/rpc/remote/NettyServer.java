@@ -130,22 +130,22 @@ public class NettyServer {
     public void start() {
         if (isStarted.compareAndSet(false, true)) {
             this.serverBootstrap
-                    .group(this.bossGroup, this.workGroup)
-                    .channel(NettyUtils.getServerSocketChannelClass())
-                    .option(ChannelOption.SO_REUSEADDR, true)
-                    .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
-                    .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
-                    .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
-                    .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
-                    .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
-                    .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                .group(this.bossGroup, this.workGroup)
+                .channel(NettyUtils.getServerSocketChannelClass())
+                .option(ChannelOption.SO_REUSEADDR, true)
+                .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
+                .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
+                .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
+                .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
+                .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
+                .handler(new LoggingHandler(LogLevel.DEBUG))
+                .childHandler(new ChannelInitializer<SocketChannel>() {
 
-                        @Override
-                        protected void initChannel(SocketChannel ch) {
-                            initNettyChannel(ch);
-                        }
-                    });
+                    @Override
+                    protected void initChannel(SocketChannel ch) {
+                        initNettyChannel(ch);
+                    }
+                });
 
             ChannelFuture future;
             try {
@@ -171,10 +171,10 @@ public class NettyServer {
      */
     private void initNettyChannel(SocketChannel ch) {
         ch.pipeline()
-                .addLast(new NettyDecoder(RpcRequest.class))
-                .addLast(new NettyEncoder())
-                .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
-                .addLast("handler", new NettyServerHandler());
+            .addLast(new NettyDecoder(RpcRequest.class))
+            .addLast(new NettyEncoder())
+            .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
+            .addLast("handler", new NettyServerHandler());
     }
 
     public void close() {

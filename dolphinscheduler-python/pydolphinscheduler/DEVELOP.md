@@ -41,13 +41,12 @@ Next, we have to open pydolphinscheduler project in you editor. We recommend you
 instead of [IntelliJ IDEA][idea] to open it. And you could just open directory
 `dolphinscheduler-python/pydolphinscheduler` instead of `dolphinscheduler-python`.
 
-
 ## Brief Concept
 
 Apache DolphinScheduler is design to define workflow by UI, and pydolphinscheduler try to define it by code. When
 define by code, user usually do not care user, tenant, or queue exists or not. All user care about is created
 a new workflow by the code his/her definition. So we have some **side object** in `pydolphinscheduler/side`
-directory, their only check object exists or not, and create them if not exists. 
+directory, their only check object exists or not, and create them if not exists.
 
 ### Process Definition
 
@@ -66,7 +65,8 @@ Linting and tests is very important for open source project, so we pay more atte
 integration service run by GitHub Action to test whether the patch is good or not, which you could jump to
 section [With GitHub Action](#with-github-action) see more detail.
 
-And to make more convenience to local tests, we also have the way to run your [test automated with tox](#automated-testing-with-tox)
+And to make more convenience to local tests, we also have the way to run
+your [test automated with tox](#automated-testing-with-tox)
 locally(*run all tests except integrate test with need docker environment*). It is helpful when your try to find out the
 detail when continuous integration in GitHub Action failed, or you have a great patch and want to test local first.
 
@@ -74,10 +74,10 @@ Besides [automated testing with tox](#automated-testing-with-tox) locally, we al
 run tests. And it is scattered commands to reproduce each step of the integration test we told about.
 
 * Remote
-  * [With GitHub Action](#with-github-action)
+    * [With GitHub Action](#with-github-action)
 * Local
-  * [Automated Testing With tox](#automated-testing-with-tox)(including all but integrate test)
-  * [Manually](#manually)(with integrate test)
+    * [Automated Testing With tox](#automated-testing-with-tox)(including all but integrate test)
+    * [Manually](#manually)(with integrate test)
 
 ### With GitHub Action
 
@@ -106,7 +106,7 @@ and the next time you run it will be faster.
 
 If you failed section `lint` when you run command `tox -e local-ci`, you could try to run command `tox -e auto-lint`
 which we provider fix as many lints as possible. When I finish, you could run command `tox -e local-ci` to see
-whether the linter pass or not, you have to fix it by yourself if linter still fail. 
+whether the linter pass or not, you have to fix it by yourself if linter still fail.
 
 ### Manually
 
@@ -119,7 +119,7 @@ maybe you could follow [Black-integration][black-editor] to configure them in yo
 Our Python API CI would automatically run code style checker and unittest when you submit pull request in
 GitHub, you could also run static check locally.
 
-We recommend [pre-commit](https://pre-commit.com/) to do the checker mentioned above before you develop locally. 
+We recommend [pre-commit](https://pre-commit.com/) to do the checker mentioned above before you develop locally.
 You should install `pre-commit` by running
 
 ```shell
@@ -148,7 +148,8 @@ python -m flake8
 
 ## Build Docs
 
-We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in 
+We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit
+pull request in
 GitHub. You may locally ensure docs could be built suceessfully in case the failure blocks CI.
 
 To build docs locally, install sphinx and related python modules first via:
@@ -157,7 +158,7 @@ To build docs locally, install sphinx and related python modules first via:
 python -m pip install '.[doc]'
 ``` 
 
-Then 
+Then
 
 ```shell
 cd pydolphinscheduler/docs/
@@ -175,7 +176,8 @@ pydolphinscheduler using [pytest][pytest] to run all tests in directory `tests`.
 python -m pytest --cov=pydolphinscheduler --cov-config=.coveragerc tests/
 ```
 
-Besides run tests, it will also check the unit test [coverage][coverage] threshold, for now when test cover less than 90%
+Besides run tests, it will also check the unit test [coverage][coverage] threshold, for now when test cover less than
+90%
 will fail the coverage, as well as our GitHub Action.
 
 The command above will check test coverage automatically, and you could also test the coverage by command.
@@ -191,8 +193,10 @@ this command output.
 #### Integrate Test
 
 Integrate Test can not run when you execute command `tox -e local-ci` because it needs external environment
-including [Docker](https://docs.docker.com/get-docker/) and specific image build by [maven](https://maven.apache.org/install.html).
-Here we would show you the step to run integrate test in directory `dolphinscheduler-python/pydolphinscheduler/tests/integration`.
+including [Docker](https://docs.docker.com/get-docker/) and specific image build
+by [maven](https://maven.apache.org/install.html).
+Here we would show you the step to run integrate test in
+directory `dolphinscheduler-python/pydolphinscheduler/tests/integration`.
 
 ```shell
 # Go to project root directory and build Docker image
@@ -222,14 +226,25 @@ When you change public class, method or interface, you should change the [UPDATI
 users who may use it in other way.
 
 <!-- content -->
+
 [py4j]: https://www.py4j.org/index.html
+
 [pycharm]: https://www.jetbrains.com/pycharm
+
 [idea]: https://www.jetbrains.com/idea/
+
 [all-task]: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/task/shell.html
+
 [pytest]: https://docs.pytest.org/en/latest/
+
 [black]: https://black.readthedocs.io/en/stable/index.html
+
 [flake8]: https://flake8.pycqa.org/en/latest/index.html
+
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
+
 [coverage]: https://coverage.readthedocs.io/en/stable/
+
 [isort]: https://pycqa.github.io/isort/index.html
+
 [sphinx]: https://www.sphinx-doc.org/en/master/

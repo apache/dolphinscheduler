@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.log;
 
 import ch.qos.logback.classic.Level;
@@ -32,12 +33,13 @@ public class MasterLogFilter extends Filter<ILoggingEvent> {
 
     /**
      * Accept or reject based on thread name
+     *
      * @param event event
      * @return FilterReply
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
+        if (event.getThreadName().startsWith("Master-")) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;

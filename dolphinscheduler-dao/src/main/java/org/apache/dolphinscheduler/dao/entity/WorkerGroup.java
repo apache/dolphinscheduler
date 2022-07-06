@@ -95,13 +95,13 @@ public class WorkerGroup {
     @Override
     public String toString() {
         return "WorkerGroup{"
-                + "id= " + id
-                + ", name= " + name
-                + ", addrList= " + addrList
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + ", systemDefault= " + systemDefault
-                + "}";
+            + "id= " + id
+            + ", name= " + name
+            + ", addrList= " + addrList
+            + ", createTime= " + createTime
+            + ", updateTime= " + updateTime
+            + ", systemDefault= " + systemDefault
+            + "}";
     }
 
 }

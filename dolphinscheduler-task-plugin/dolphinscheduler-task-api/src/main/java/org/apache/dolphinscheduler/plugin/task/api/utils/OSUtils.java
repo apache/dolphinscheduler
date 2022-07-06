@@ -34,7 +34,7 @@ public class OSUtils {
      * get sudo command
      *
      * @param tenantCode tenantCode
-     * @param command command
+     * @param command    command
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {

@@ -54,18 +54,18 @@ import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
+import org.testcontainers.utility.DockerImageName;
 
 import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 
 import lombok.extern.slf4j.Slf4j;
-import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
-    private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
+    private final boolean localMode = Objects.equals(System.getProperty("local"), "true");
 
-    private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
+    private final boolean m1ChipFlag = Objects.equals(System.getProperty("m1_chip"), "true");
 
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
@@ -84,7 +84,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
         setRecordPath();
 
-        if (LOCAL_MODE) {
+        if (localMode) {
             runInLocal();
         } else {
             runInDockerContainer(context);
@@ -100,10 +100,10 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver = browser.getWebDriver();
 
         driver.manage().timeouts()
-              .implicitlyWait(5, TimeUnit.SECONDS)
-              .pageLoadTimeout(5, TimeUnit.SECONDS);
+            .implicitlyWait(5, TimeUnit.SECONDS)
+            .pageLoadTimeout(5, TimeUnit.SECONDS);
         driver.manage().window()
-              .maximize();
+            .maximize();
 
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
@@ -111,9 +111,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
         final Class<?> clazz = context.getRequiredTestClass();
         Stream.of(clazz.getDeclaredFields())
-              .filter(it -> Modifier.isStatic(it.getModifiers()))
-              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-              .forEach(it -> setDriver(clazz, it));
+            .filter(it -> Modifier.isStatic(it.getModifiers()))
+            .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+            .forEach(it -> setDriver(clazz, it));
     }
 
     private void runInLocal() {
@@ -127,7 +127,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose.start();
 
         final ContainerState dsContainer = compose.getContainerByServiceName("dolphinscheduler_1")
-                .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
+            .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
         final String networkId = dsContainer.getContainerInfo().getNetworkSettings().getNetworks().keySet().iterator().next();
         network = new Network() {
             @Override
@@ -151,22 +151,22 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private void setBrowserContainerByOsName() {
         DockerImageName imageName;
 
-        if (LOCAL_MODE && M1_CHIP_FLAG) {
+        if (localMode && m1ChipFlag) {
             imageName = DockerImageName.parse("seleniarm/standalone-chromium:4.1.2-20220227")
-                    .asCompatibleSubstituteFor("selenium/standalone-chrome");
+                .asCompatibleSubstituteFor("selenium/standalone-chrome");
 
             browser = new BrowserWebDriverContainer<>(imageName)
-                    .withCapabilities(new ChromeOptions())
-                    .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
-                    .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
+                .withCapabilities(new ChromeOptions())
+                .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
+                .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
+                    Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
         } else {
             browser = new BrowserWebDriverContainer<>()
-                    .withCapabilities(new ChromeOptions())
-                    .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
-                    .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
-                    .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
+                .withCapabilities(new ChromeOptions())
+                .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
+                .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
+                    Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
         }
     }
 
@@ -196,8 +196,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     public void beforeEach(ExtensionContext context) {
         final Object instance = context.getRequiredTestInstance();
         Stream.of(instance.getClass().getDeclaredFields())
-              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-              .forEach(it -> setDriver(instance, it));
+            .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+            .forEach(it -> setDriver(instance, it));
     }
 
     private void setDriver(Object object, Field field) {
@@ -213,11 +213,11 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
-                                       .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
-                                       .filter(Objects::nonNull)
-                                       .map(URL::getPath)
-                                       .map(File::new)
-                                       .collect(Collectors.toList());
+            .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
+            .filter(Objects::nonNull)
+            .map(URL::getPath)
+            .map(File::new)
+            .collect(Collectors.toList());
         compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)

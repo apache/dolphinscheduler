@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.remote.exceptions;
 
 /**
- *  remote exception
+ * remote exception
  */
 public class RemotingException extends Exception {
 
@@ -29,7 +29,7 @@ public class RemotingException extends Exception {
     /**
      * Construct a new runtime exception with the detail message
      *
-     * @param   message  detail message
+     * @param message detail message
      */
     public RemotingException(String message) {
         super(message);
@@ -38,9 +38,9 @@ public class RemotingException extends Exception {
     /**
      * Construct a new runtime exception with the detail message and cause
      *
-     * @param  message the detail message
-     * @param  cause the cause
-     * @since  1.4
+     * @param message the detail message
+     * @param cause   the cause
+     * @since 1.4
      */
     public RemotingException(String message, Throwable cause) {
         super(message, cause);
@@ -49,11 +49,10 @@ public class RemotingException extends Exception {
     /**
      * Construct a new runtime exception with throwable
      *
-     * @param  cause the cause
+     * @param cause the cause
      */
     public RemotingException(Throwable cause) {
         super(cause);
     }
-
 
 }

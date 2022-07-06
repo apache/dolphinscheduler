@@ -117,14 +117,14 @@ public class Server {
 
     @Override
     public String toString() {
-        return "MasterServer{" +
-                "id=" + id +
-                ", host='" + host + '\'' +
-                ", port=" + port +
-                ", zkDirectory='" + zkDirectory + '\'' +
-                ", resInfo='" + resInfo + '\'' +
-                ", createTime=" + createTime +
-                ", lastHeartbeatTime=" + lastHeartbeatTime +
-                '}';
+        return "MasterServer{"
+            + "id=" + id
+            + ", host='" + host + '\''
+            + ", port=" + port
+            + ", zkDirectory='" + zkDirectory + '\''
+            + ", resInfo='" + resInfo + '\''
+            + ", createTime=" + createTime
+            + ", lastHeartbeatTime=" + lastHeartbeatTime
+            + '}';
     }
 }

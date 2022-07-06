@@ -34,8 +34,8 @@ public enum ThreadPoolManager {
 
     ThreadPoolManager() {
         executorService = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(WORK_QUEUE_SIZE),
-                new DiscardPolicy());
+            new ArrayBlockingQueue<>(WORK_QUEUE_SIZE),
+            new DiscardPolicy());
     }
 
     public void addExecuteTask(Runnable task) {

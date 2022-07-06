@@ -70,7 +70,6 @@ public class TaskInstanceTest {
     }
 
     /**
-     *
      * @return
      */
     private DependentParameters getDependentParameters() {

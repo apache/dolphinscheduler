@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
-        "security.authentication.type=PASSWORD",
+    "security.authentication.type=PASSWORD",
 })
 public class SecurityConfigPasswordTest extends AbstractControllerTest {
 

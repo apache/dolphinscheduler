@@ -135,13 +135,13 @@ public class DqRule implements Serializable {
     @Override
     public String toString() {
         return "DqRule{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", type=" + type
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", type=" + type
+            + ", userId=" + userId
+            + ", userName='" + userName + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

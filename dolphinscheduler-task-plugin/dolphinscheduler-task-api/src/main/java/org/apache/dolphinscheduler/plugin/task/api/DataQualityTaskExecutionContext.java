@@ -41,7 +41,7 @@ public class DataQualityTaskExecutionContext implements Serializable {
      */
     private String ruleInputEntryList;
     /**
-     *  execute sql list
+     * execute sql list
      */
     private String executeSqlList;
     /**

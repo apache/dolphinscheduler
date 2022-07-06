@@ -81,7 +81,7 @@ public class LdapService {
     /**
      * login by userId and return user email
      *
-     * @param userId user identity id
+     * @param userId  user identity id
      * @param userPwd user login password
      * @return user email
      */
@@ -92,7 +92,7 @@ public class LdapService {
             //Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
             ctx = new InitialLdapContext(searchEnv, null);
             SearchControls sc = new SearchControls();
-            sc.setReturningAttributes(new String[]{ldapEmailAttribute});
+            sc.setReturningAttributes(new String[] {ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
             String searchFilter = String.format("(%s=%s)", ldapUserIdentifyingAttribute, userId);
             //Search for the user you want to authenticate, search him with some attribute

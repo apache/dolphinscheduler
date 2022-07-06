@@ -56,7 +56,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
         PrestoDataSourceParamDTO
-                prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
+            prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
         prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -115,7 +115,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                prestoConnectionParam.getUser(), PasswordUtils.decodePassword(prestoConnectionParam.getPassword()));
+            prestoConnectionParam.getUser(), PasswordUtils.decodePassword(prestoConnectionParam.getPassword()));
     }
 
     @Override

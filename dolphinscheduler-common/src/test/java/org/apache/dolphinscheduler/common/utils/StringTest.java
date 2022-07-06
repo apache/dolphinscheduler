@@ -14,20 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+package org.apache.dolphinscheduler.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class StringTest {
 
     @Test
-    public void stringCompareTest(){
+    public void stringCompareTest() {
 
-        for(int j = 0; j < 5; j++) {
+        for (int j = 0; j < 5; j++) {
             long start = System.currentTimeMillis();
             int size = 10000;
 

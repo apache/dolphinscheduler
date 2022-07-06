@@ -295,5 +295,5 @@ public interface ProcessService {
 
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
 
-    public String findConfigYamlByName(String clusterName) ;
+    public String findConfigYamlByName(String clusterName);
 }

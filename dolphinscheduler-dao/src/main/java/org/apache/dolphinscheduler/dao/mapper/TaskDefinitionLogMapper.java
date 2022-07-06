@@ -42,7 +42,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     /**
      * query task definition log
      *
-     * @param code taskDefinitionCode
+     * @param code    taskDefinitionCode
      * @param version version
      * @return task definition log
      */
@@ -58,7 +58,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     /**
      * delete the certain task definition version by task definition code and version
      *
-     * @param code task definition code
+     * @param code    task definition code
      * @param version task definition version
      * @return delete result
      */
@@ -89,9 +89,9 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     /**
      * query the paging task definition version list by pagination info
      *
-     * @param page pagination info
+     * @param page        pagination info
      * @param projectCode project code
-     * @param code process definition code
+     * @param code        process definition code
      * @return the paging task definition version list
      */
     IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code, @Param("projectCode") long projectCode);

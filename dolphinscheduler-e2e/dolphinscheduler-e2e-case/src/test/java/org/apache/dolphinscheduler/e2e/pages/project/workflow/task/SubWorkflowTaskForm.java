@@ -17,11 +17,13 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
-import lombok.Getter;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -30,13 +32,13 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
+import lombok.Getter;
 
 @Getter
 public final class SubWorkflowTaskForm extends TaskNodeForm {
     @FindBys({
-            @FindBy(className = "select-child-node"),
-            @FindBy(className = "n-base-selection"),
+        @FindBy(className = "select-child-node"),
+        @FindBy(className = "n-base-selection"),
     })
     private WebElement btnSelectChildNodeDropdown;
 
@@ -44,7 +46,6 @@ public final class SubWorkflowTaskForm extends TaskNodeForm {
     private List<WebElement> selectChildNode;
 
     private WebDriver driver;
-
 
     public SubWorkflowTaskForm(WorkflowForm parent) {
         super(parent);
@@ -54,18 +55,18 @@ public final class SubWorkflowTaskForm extends TaskNodeForm {
 
     public SubWorkflowTaskForm childNode(String node) {
         new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
-        
+
         btnSelectChildNodeDropdown().click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(By.className(
-                "n-base-select-option__content")));
+            "n-base-select-option__content")));
 
         selectChildNode()
-                .stream()
-                .filter(it -> it.getText().contains(node))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in child node dropdown list", node)))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(node))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in child node dropdown list", node)))
+            .click();
 
         return this;
     }

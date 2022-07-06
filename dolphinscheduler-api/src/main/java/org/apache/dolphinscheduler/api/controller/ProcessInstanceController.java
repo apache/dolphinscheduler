@@ -17,19 +17,17 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_INSTANCE_ERROR;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -40,6 +38,16 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,17 +62,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_INSTANCE_ERROR;
 
 /**
  * process instance controller
@@ -82,17 +86,17 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query process instance list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param loginUser         login user
+     * @param projectCode       project code
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @param processDefineCode process definition code
-     * @param searchVal search value
-     * @param stateType state type
-     * @param host host
-     * @param startTime start time
-     * @param endTime end time
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param searchVal         search value
+     * @param stateType         state type
+     * @param host              host
+     * @param startTime         start time
+     * @param endTime           end time
+     * @param otherParamsJson   otherParamsJson handle other params
      * @return process instance list
      */
     @ApiOperation(value = "queryProcessInstanceListPaging", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
@@ -130,16 +134,16 @@ public class ProcessInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
-                searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
+            searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
         return result;
     }
 
     /**
      * query task list by process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return task list for the process instance
      */
     @ApiOperation(value = "queryTaskListByProcessId", notes = "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
@@ -160,15 +164,15 @@ public class ProcessInstanceController extends BaseController {
     /**
      * update process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskRelationJson process task relation json
+     * @param loginUser          login user
+     * @param projectCode        project code
+     * @param taskRelationJson   process task relation json
      * @param taskDefinitionJson taskDefinitionJson
-     * @param id process instance id
-     * @param scheduleTime schedule time
-     * @param syncDefine sync define
-     * @param locations locations
-     * @param tenantCode tenantCode
+     * @param id                 process instance id
+     * @param scheduleTime       schedule time
+     * @param syncDefine         sync define
+     * @param locations          locations
+     * @param tenantCode         tenantCode
      * @return update result code
      */
     @ApiOperation(value = "updateProcessInstance", notes = "UPDATE_PROCESS_INSTANCE_NOTES")
@@ -206,9 +210,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query process instance by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return process instance detail
      */
     @ApiOperation(value = "queryProcessInstanceById", notes = "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
@@ -229,11 +233,11 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query top n process instance order by running duration
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param size number of process instance
-     * @param startTime start time
-     * @param endTime end time
+     * @param size        number of process instance
+     * @param startTime   start time
+     * @param endTime     end time
      * @return list of process instance
      */
     @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
@@ -259,9 +263,9 @@ public class ProcessInstanceController extends BaseController {
      * delete process instance by id, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return delete result code
      */
     @ApiOperation(value = "deleteProcessInstanceById", notes = "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
@@ -282,9 +286,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskId task id
+     * @param taskId      task id
      * @return sub process instance detail
      */
     @ApiOperation(value = "querySubProcessInstanceByTaskCode", notes = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
@@ -305,9 +309,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param subId sub process id
+     * @param subId       sub process id
      * @return parent instance detail
      */
     @ApiOperation(value = "queryParentInstanceBySubId", notes = "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
@@ -329,7 +333,7 @@ public class ProcessInstanceController extends BaseController {
      * query process instance global variables and local variables
      *
      * @param loginUser login user
-     * @param id process instance id
+     * @param id        process instance id
      * @return variables data
      */
     @ApiOperation(value = "viewVariables", notes = "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
@@ -350,9 +354,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * encapsulation gantt structure
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return gantt tree data
      */
     @ApiOperation(value = "vieGanttTree", notes = "VIEW_GANTT_NOTES")
@@ -374,8 +378,8 @@ public class ProcessInstanceController extends BaseController {
      * batch delete process instance by ids, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param processInstanceIds process instance id
      * @return delete result code
      */

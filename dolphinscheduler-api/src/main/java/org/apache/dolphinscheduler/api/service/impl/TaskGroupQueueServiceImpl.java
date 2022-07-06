@@ -78,7 +78,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         }
         List<Project> projects = projectMapper.selectBatchIds(projectIds);
         IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(page, taskName
-            ,processName,status,groupId,projects);
+            , processName, status, groupId, projects);
 
         pageInfo.setTotal((int) taskGroupQueue.getTotal());
         pageInfo.setTotalList(taskGroupQueue.getRecords());
@@ -99,7 +99,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      */
     @Override
     public Map<String, Object> queryTasksByProcessId(User loginUser, int pageNo, int pageSize, int processId) {
-        return this.doQuery(loginUser, pageNo, pageSize,  processId);
+        return this.doQuery(loginUser, pageNo, pageSize, processId);
     }
 
     /**
@@ -112,7 +112,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      */
     @Override
     public Map<String, Object> queryAllTasks(User loginUser, int pageNo, int pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize,  0);
+        return this.doQuery(loginUser, pageNo, pageSize, 0);
     }
 
     public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize,
@@ -145,12 +145,12 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     }
 
     @Override
-    public void forceStartTask(int queueId,int forceStart) {
-        taskGroupQueueMapper.updateForceStart(queueId,forceStart);
+    public void forceStartTask(int queueId, int forceStart) {
+        taskGroupQueueMapper.updateForceStart(queueId, forceStart);
     }
 
     @Override
     public void modifyPriority(Integer queueId, Integer priority) {
-        taskGroupQueueMapper.modifyPriority(queueId,priority);
+        taskGroupQueueMapper.modifyPriority(queueId, priority);
     }
 }

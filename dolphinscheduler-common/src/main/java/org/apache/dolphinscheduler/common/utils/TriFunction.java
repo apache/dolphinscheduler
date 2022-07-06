@@ -21,8 +21,8 @@ package org.apache.dolphinscheduler.common.utils;
  * tri function function interface
  */
 @FunctionalInterface
-public interface TriFunction<IN1, IN2, IN3, OUT1> {
+public interface TriFunction<IN1T, IN2T, IN3T, OUT1T> {
 
-    OUT1 apply(IN1 in1, IN2 in2, IN3 in3);
+    OUT1T apply(IN1T in1T, IN2T in2T, IN3T in3T);
 
 }

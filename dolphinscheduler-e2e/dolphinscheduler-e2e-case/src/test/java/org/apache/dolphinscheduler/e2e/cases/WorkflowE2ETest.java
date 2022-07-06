@@ -19,6 +19,9 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -33,6 +36,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTa
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -41,9 +45,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowE2ETest {
@@ -64,19 +65,19 @@ class WorkflowE2ETest {
     @BeforeAll
     public static void setup() {
         UserPage userPage = new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class)
-                .create(tenant)
-                .goToNav(SecurityPage.class)
-                .goToTab(UserPage.class);
+            .login("admin", "dolphinscheduler123")
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .create(tenant)
+            .goToNav(SecurityPage.class)
+            .goToTab(UserPage.class);
 
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+            new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
-                .goToNav(ProjectPage.class)
-                .create(project)
+            .goToNav(ProjectPage.class)
+            .create(project)
         ;
     }
 
@@ -110,7 +111,7 @@ class WorkflowE2ETest {
         workflowDefinitionPage
             .createWorkflow()
 
-            .<ShellTaskForm> addTask(TaskType.SHELL)
+            .<ShellTaskForm>addTask(TaskType.SHELL)
             .script("echo ${today}\necho ${global_param}\n")
             .name("test-1")
             .addParam("today", "${system.datetime}")
@@ -124,10 +125,10 @@ class WorkflowE2ETest {
         ;
 
         await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
-                .as("Workflow list should contain newly-created workflow")
-                .anyMatch(
-                        it -> it.getText().contains(workflow)
-                ));
+            .as("Workflow list should contain newly-created workflow")
+            .anyMatch(
+                it -> it.getText().contains(workflow)
+            ));
         workflowDefinitionPage.publish(workflow);
     }
 
@@ -144,7 +145,7 @@ class WorkflowE2ETest {
         workflowDefinitionPage
             .createWorkflow()
 
-            .<SubWorkflowTaskForm> addTask(TaskType.SUB_PROCESS)
+            .<SubWorkflowTaskForm>addTask(TaskType.SUB_PROCESS)
             .childNode("test-workflow-1")
             .name("test-sub-1")
             .submit()
@@ -167,48 +168,48 @@ class WorkflowE2ETest {
     void testRunWorkflow() {
         final String workflow = "test-workflow-1";
         final ProjectDetailPage projectPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(project);
+            new ProjectPage(browser)
+                .goToNav(ProjectPage.class)
+                .goTo(project);
 
         projectPage
-                .goToTab(WorkflowInstanceTab.class)
-                .deleteAll();
+            .goToTab(WorkflowInstanceTab.class)
+            .deleteAll();
         projectPage
-                .goToTab(WorkflowDefinitionTab.class)
-                .run(workflow)
-                .submit();
+            .goToTab(WorkflowDefinitionTab.class)
+            .run(workflow)
+            .submit();
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage
-                    .goToTab(WorkflowInstanceTab.class)
-                    .instances()
-                    .iterator()
-                    .next();
+                .goToTab(WorkflowInstanceTab.class)
+                .instances()
+                .iterator()
+                .next();
 
             assertThat(row.isSuccess()).isTrue();
             assertThat(row.executionTime()).isEqualTo(1);
         });
         // Test rerun
         projectPage
-                .goToTab(WorkflowInstanceTab.class)
-                .instances()
-                .stream()
-                .filter(it -> it.rerunButton().isDisplayed())
-                .iterator()
-                .next()
-                .rerun();
+            .goToTab(WorkflowInstanceTab.class)
+            .instances()
+            .stream()
+            .filter(it -> it.rerunButton().isDisplayed())
+            .iterator()
+            .next()
+            .rerun();
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage
-                    .goToTab(WorkflowInstanceTab.class)
-                    .instances()
-                    .iterator()
-                    .next();
+                .goToTab(WorkflowInstanceTab.class)
+                .instances()
+                .iterator()
+                .next();
 
             assertThat(row.isSuccess()).isTrue();
             assertThat(row.executionTime()).isEqualTo(2);

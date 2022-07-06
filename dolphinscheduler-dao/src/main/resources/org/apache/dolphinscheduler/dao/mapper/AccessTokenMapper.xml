@@ -42,7 +42,8 @@
     </select>
 
     <delete id="deleteAccessTokenByUserId">
-        delete from t_ds_access_token
+        delete
+        from t_ds_access_token
         where user_id = #{userId}
     </delete>
 
@@ -54,7 +55,7 @@
             and t.user_id = #{userId}
         </if>
         <if test="accessTokensIds != null and accessTokensIds.size() > 0">
-            and t.id  in
+            and t.id in
             <foreach item="id" index="index" collection="accessTokensIds" open="(" separator="," close=")">
                 #{id}
             </foreach>

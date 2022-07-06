@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.configuration;
 
-import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -32,9 +34,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- *
  * swager2 config class
- *
  */
 @Configuration
 @EnableSwagger2
@@ -46,39 +46,39 @@ public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public Docket createV1RestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("v1(current)")
-                .apiInfo(apiV1Info())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
-                .paths(PathSelectors.any())
-                .paths(PathSelectors.regex("^(?!/v2).*"))
-                .build();
+            .groupName("v1(current)")
+            .apiInfo(apiV1Info())
+            .select()
+            .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
+            .paths(PathSelectors.any())
+            .paths(PathSelectors.regex("^(?!/v2).*"))
+            .build();
     }
 
     private ApiInfo apiV1Info() {
         return new ApiInfoBuilder()
-                .title("Dolphin Scheduler Api Docs")
-                .description("Dolphin Scheduler Api Docs")
-                .version("V1")
-                .build();
+            .title("Dolphin Scheduler Api Docs")
+            .description("Dolphin Scheduler Api Docs")
+            .version("V1")
+            .build();
     }
 
     @Bean
     public Docket createV2RestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("v2")
-                .apiInfo(apiV2Info())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
-                .paths(PathSelectors.ant("/v2/**"))
-                .build();
+            .groupName("v2")
+            .apiInfo(apiV2Info())
+            .select()
+            .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
+            .paths(PathSelectors.ant("/v2/**"))
+            .build();
     }
 
     private ApiInfo apiV2Info() {
         return new ApiInfoBuilder()
-                .title("Dolphin Scheduler Api Docs")
-                .description("Dolphin Scheduler Api Docs")
-                .version("V2")
-                .build();
+            .title("Dolphin Scheduler Api Docs")
+            .description("Dolphin Scheduler Api Docs")
+            .version("V2")
+            .build();
     }
 }

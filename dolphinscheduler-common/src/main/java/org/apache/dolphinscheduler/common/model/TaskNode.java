@@ -21,13 +21,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -274,7 +274,7 @@ public class TaskNode {
 
     public boolean isForbidden() {
         return (!StringUtils.isEmpty(this.runFlag)
-                && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
+            && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
 
     @Override
@@ -287,17 +287,17 @@ public class TaskNode {
         }
         TaskNode taskNode = (TaskNode) o;
         return Objects.equals(name, taskNode.name)
-                && Objects.equals(desc, taskNode.desc)
-                && Objects.equals(type, taskNode.type)
-                && Objects.equals(params, taskNode.params)
-                && Objects.equals(preTasks, taskNode.preTasks)
-                && Objects.equals(extras, taskNode.extras)
-                && Objects.equals(runFlag, taskNode.runFlag)
-                && Objects.equals(dependence, taskNode.dependence)
-                && Objects.equals(workerGroup, taskNode.workerGroup)
-                && Objects.equals(environmentCode, taskNode.environmentCode)
-                && Objects.equals(conditionResult, taskNode.conditionResult)
-                && CollectionUtils.equalLists(depList, taskNode.depList);
+            && Objects.equals(desc, taskNode.desc)
+            && Objects.equals(type, taskNode.type)
+            && Objects.equals(params, taskNode.params)
+            && Objects.equals(preTasks, taskNode.preTasks)
+            && Objects.equals(extras, taskNode.extras)
+            && Objects.equals(runFlag, taskNode.runFlag)
+            && Objects.equals(dependence, taskNode.dependence)
+            && Objects.equals(workerGroup, taskNode.workerGroup)
+            && Objects.equals(environmentCode, taskNode.environmentCode)
+            && Objects.equals(conditionResult, taskNode.conditionResult)
+            && CollectionUtils.equalLists(depList, taskNode.depList);
     }
 
     @Override
@@ -420,7 +420,8 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {
+        });
 
         if (taskParams == null) {
             taskParams = new HashMap<>();
@@ -433,7 +434,8 @@ public class TaskNode {
     }
 
     public Map<String, Object> taskParamsToJsonObj(String taskParams) {
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {
+        });
         if (taskParamsMap == null) {
             taskParamsMap = new HashMap<>();
         }
@@ -443,29 +445,29 @@ public class TaskNode {
     @Override
     public String toString() {
         return "TaskNode{"
-                + "id='" + id + '\''
-                + ", code=" + code
-                + ", version=" + version
-                + ", name='" + name + '\''
-                + ", desc='" + desc + '\''
-                + ", type='" + type + '\''
-                + ", runFlag='" + runFlag + '\''
-                + ", loc='" + loc + '\''
-                + ", maxRetryTimes=" + maxRetryTimes
-                + ", retryInterval=" + retryInterval
-                + ", params='" + params + '\''
-                + ", preTasks='" + preTasks + '\''
-                + ", preTaskNodeList=" + preTaskNodeList
-                + ", extras='" + extras + '\''
-                + ", depList=" + depList
-                + ", dependence='" + dependence + '\''
-                + ", conditionResult='" + conditionResult + '\''
-                + ", taskInstancePriority=" + taskInstancePriority
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode=" + environmentCode
-                + ", timeout='" + timeout + '\''
-                + ", delayTime=" + delayTime
-                + '}';
+            + "id='" + id + '\''
+            + ", code=" + code
+            + ", version=" + version
+            + ", name='" + name + '\''
+            + ", desc='" + desc + '\''
+            + ", type='" + type + '\''
+            + ", runFlag='" + runFlag + '\''
+            + ", loc='" + loc + '\''
+            + ", maxRetryTimes=" + maxRetryTimes
+            + ", retryInterval=" + retryInterval
+            + ", params='" + params + '\''
+            + ", preTasks='" + preTasks + '\''
+            + ", preTaskNodeList=" + preTaskNodeList
+            + ", extras='" + extras + '\''
+            + ", depList=" + depList
+            + ", dependence='" + dependence + '\''
+            + ", conditionResult='" + conditionResult + '\''
+            + ", taskInstancePriority=" + taskInstancePriority
+            + ", workerGroup='" + workerGroup + '\''
+            + ", environmentCode=" + environmentCode
+            + ", timeout='" + timeout + '\''
+            + ", delayTime=" + delayTime
+            + '}';
     }
 
     public void setEnvironmentCode(Long environmentCode) {

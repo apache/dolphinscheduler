@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * task priority queue
+ *
  * @param <T>
  */
 public interface TaskPriorityQueue<T> {
@@ -46,6 +47,7 @@ public interface TaskPriorityQueue<T> {
 
     /**
      * poll taskInfo with timeout
+     *
      * @param timeout
      * @param unit
      * @return

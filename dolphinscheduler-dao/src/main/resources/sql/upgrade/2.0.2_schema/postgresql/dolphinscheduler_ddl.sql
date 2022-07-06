@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-delimiter d//
-CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+delimiter
+d//
+CREATE
+OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
     RETURNS character varying
     LANGUAGE 'plpgsql'
@@ -23,14 +25,16 @@ CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
-    v_schema varchar;
+v_schema varchar;
 BEGIN
     ---get schema name
-    v_schema =current_schema();
+    v_schema
+=current_schema();
 
-    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "restart_time" timestamp DEFAULT NULL';
-	return 'Success!';
-	exception when others then
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||
+        '.t_ds_process_instance ADD COLUMN IF NOT EXISTS "restart_time" timestamp DEFAULT NULL';
+return 'Success!';
+exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
         return SQLERRM;
 END;
@@ -38,4 +42,5 @@ $BODY$;
 
 select dolphin_update_metadata();
 
-d//
+d
+//

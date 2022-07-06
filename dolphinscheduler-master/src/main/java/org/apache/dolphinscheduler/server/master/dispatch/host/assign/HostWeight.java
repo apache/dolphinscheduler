@@ -25,11 +25,11 @@ import org.apache.dolphinscheduler.remote.utils.Host;
  */
 public class HostWeight {
 
-    private final int CPU_FACTOR = 10;
+    private final int cpuFactor = 10;
 
-    private final int MEMORY_FACTOR = 20;
+    private final int memoryFactor = 20;
 
-    private final int LOAD_AVERAGE_FACTOR = 70;
+    private final int loadAverageFactor = 70;
 
     private final HostWorker hostWorker;
 
@@ -63,7 +63,7 @@ public class HostWeight {
     }
 
     public Host getHost() {
-        return (Host)hostWorker;
+        return (Host) hostWorker;
     }
 
     public int getWaitingTaskCount() {
@@ -81,7 +81,7 @@ public class HostWeight {
     }
 
     private double calculateWeight(double cpu, double memory, double loadAverage, long startTime) {
-        double calculatedWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
+        double calculatedWeight = cpu * cpuFactor + memory * memoryFactor + loadAverage * loadAverageFactor;
         long uptime = System.currentTimeMillis() - startTime;
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
             // If the warm-up is not over, add the weight

@@ -20,18 +20,19 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {

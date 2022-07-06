@@ -91,7 +91,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
 
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        assertThat(delete,greaterThanOrEqualTo(1));
+        assertThat(delete, greaterThanOrEqualTo(1));
 
     }
 

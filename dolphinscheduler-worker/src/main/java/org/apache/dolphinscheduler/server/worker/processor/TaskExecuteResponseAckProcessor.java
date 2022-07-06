@@ -44,10 +44,10 @@ public class TaskExecuteResponseAckProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESPONSE_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = JSONUtils.parseObject(
-                command.getBody(), TaskExecuteResponseAckCommand.class);
+            command.getBody(), TaskExecuteResponseAckCommand.class);
 
         if (taskExecuteResponseAckCommand == null) {
             logger.error("task execute response ack command is null");

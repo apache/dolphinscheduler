@@ -32,11 +32,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +43,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -287,7 +287,7 @@ public class TaskGroupController extends BaseController {
     public Result modifyPriority(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "queueId") Integer queueId,
                                  @RequestParam(value = "priority") Integer priority) {
-        Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId,priority);
+        Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId, priority);
         return returnDataList(result);
     }
 
@@ -321,12 +321,12 @@ public class TaskGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
-                                      @RequestParam(value = "taskInstanceName",required = false) String taskName,
-                                      @RequestParam(value = "processInstanceName",required = false) String processName,
-                                      @RequestParam(value = "status",required = false) Integer status,
+                                      @RequestParam(value = "taskInstanceName", required = false) String taskName,
+                                      @RequestParam(value = "processInstanceName", required = false) String processName,
+                                      @RequestParam(value = "status", required = false) Integer status,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName,processName,status,
+        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName, processName, status,
             groupId, pageNo, pageSize);
         return returnDataList(result);
     }

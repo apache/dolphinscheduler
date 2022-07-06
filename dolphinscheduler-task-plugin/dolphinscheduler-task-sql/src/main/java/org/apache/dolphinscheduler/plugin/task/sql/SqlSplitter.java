@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import com.google.common.base.Strings;
 
 public class SqlSplitter {
@@ -34,6 +35,7 @@ public class SqlSplitter {
      * <p>The segment separator is used
      * when the data source does not support multi-segment SQL execution,
      * and the client needs to split the SQL and execute it multiple times.</p>
+     *
      * @param sql
      * @param segmentSeparator
      * @return

@@ -99,10 +99,11 @@ public abstract class UpgradeDao {
 
     /**
      * run init sql to init db schema
+     *
      * @param dbType db type
      */
     private void runInitSql(DbType dbType) {
-        String sqlFile = String.format("dolphinscheduler_%s.sql",dbType.getDescp());
+        String sqlFile = String.format("dolphinscheduler_%s.sql", dbType.getDescp());
         Resource mysqlSQLFilePath = new ClassPathResource("sql/" + sqlFile);
         try (Connection conn = dataSource.getConnection()) {
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
@@ -454,7 +455,7 @@ public abstract class UpgradeDao {
                                             List<TaskDefinitionLog> taskDefinitionLogs,
                                             Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) throws Exception {
         Map<Integer, ProcessDefinition> processDefinitionMap = processDefinitions.stream()
-                                                                                 .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
+            .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
         Date now = new Date();
         for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()) {
             if (entry.getValue() == null) {

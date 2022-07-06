@@ -17,21 +17,18 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import lombok.Getter;
-import org.openqa.selenium.By;
+import java.util.List;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.ByChained;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.stream.Stream;
+import lombok.Getter;
 
 @Getter
 public final class WorkflowFormatDialog {
@@ -39,8 +36,8 @@ public final class WorkflowFormatDialog {
     private final WorkflowForm parent;
 
     @FindBys({
-            @FindBy(className = "el-dialog__wrapper"),
-            @FindBy(className = "el-button--primary"),
+        @FindBy(className = "el-dialog__wrapper"),
+        @FindBy(className = "el-button--primary"),
     })
     private List<WebElement> buttonConfirm;
 
@@ -53,11 +50,11 @@ public final class WorkflowFormatDialog {
 
     public WorkflowForm confirm() {
         buttonConfirm()
-                .stream()
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No confirm button when confirm"))
-                .click();
+            .stream()
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No confirm button when confirm"))
+            .click();
 
         return parent;
     }

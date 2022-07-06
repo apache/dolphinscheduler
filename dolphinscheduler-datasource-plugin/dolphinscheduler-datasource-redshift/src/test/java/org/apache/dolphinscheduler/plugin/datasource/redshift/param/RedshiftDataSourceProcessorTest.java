@@ -56,7 +56,7 @@ public class RedshiftDataSourceProcessorTest {
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
-                .createConnectionParams(redshiftDatasourceParamDTO);
+            .createConnectionParams(redshiftDatasourceParamDTO);
         Assert.assertEquals("jdbc:redshift://localhost:5439", connectionParams.getAddress());
         Assert.assertEquals("jdbc:redshift://localhost:5439/dev", connectionParams.getJdbcUrl());
     }
@@ -64,9 +64,9 @@ public class RedshiftDataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"awsuser\",\"password\":\"123456\",\"address\":\"jdbc:redshift://localhost:5439\""
-                + ",\"database\":\"dev\",\"jdbcUrl\":\"jdbc:redshift://localhost:5439/dev\"}";
+            + ",\"database\":\"dev\",\"jdbcUrl\":\"jdbc:redshift://localhost:5439/dev\"}";
         RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
-                .createConnectionParams(connectionJson);
+            .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("awsuser", connectionParams.getUser());
     }
@@ -82,7 +82,7 @@ public class RedshiftDataSourceProcessorTest {
         redshiftConnectionParam.setJdbcUrl("jdbc:redshift://localhost:5439/default");
         redshiftConnectionParam.setOther("DSILogLevel=6;defaultRowFetchSize=100");
         Assert.assertEquals("jdbc:redshift://localhost:5439/default?DSILogLevel=6;defaultRowFetchSize=100",
-                redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
+            redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
 
     }
 

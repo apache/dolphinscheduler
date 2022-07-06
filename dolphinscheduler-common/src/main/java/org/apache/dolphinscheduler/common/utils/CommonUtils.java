@@ -98,16 +98,16 @@ public class CommonUtils {
      */
     public static boolean loadKerberosConf(Configuration configuration) throws IOException {
         return loadKerberosConf(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH),
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), configuration);
+            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), configuration);
     }
 
     /**
      * load kerberos configuration
      *
-     * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
+     * @param javaSecurityKrb5Conf    javaSecurityKrb5Conf
      * @param loginUserKeytabUsername loginUserKeytabUsername
-     * @param loginUserKeytabPath loginUserKeytabPath
+     * @param loginUserKeytabPath     loginUserKeytabPath
      * @throws IOException errors
      */
     public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws IOException {
@@ -117,10 +117,10 @@ public class CommonUtils {
     /**
      * load kerberos configuration
      *
-     * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
+     * @param javaSecurityKrb5Conf    javaSecurityKrb5Conf
      * @param loginUserKeytabUsername loginUserKeytabUsername
-     * @param loginUserKeytabPath loginUserKeytabPath
-     * @param configuration configuration
+     * @param loginUserKeytabPath     loginUserKeytabPath
+     * @param configuration           configuration
      * @return load kerberos config return true
      * @throws IOException errors
      */
@@ -130,7 +130,7 @@ public class CommonUtils {
             configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, Constants.KERBEROS);
             UserGroupInformation.setConfiguration(configuration);
             UserGroupInformation.loginUserFromKeytab(StringUtils.defaultIfBlank(loginUserKeytabUsername, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)),
-                    StringUtils.defaultIfBlank(loginUserKeytabPath, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)));
+                StringUtils.defaultIfBlank(loginUserKeytabPath, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)));
             return true;
         }
         return false;

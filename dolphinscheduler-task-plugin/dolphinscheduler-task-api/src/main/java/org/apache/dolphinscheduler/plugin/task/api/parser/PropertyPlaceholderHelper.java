@@ -62,6 +62,7 @@ public class PropertyPlaceholderHelper {
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
      * Unresolvable placeholders are ignored.
+     *
      * @param placeholderPrefix the prefix that denotes the start of a placeholder
      * @param placeholderSuffix the suffix that denotes the end of a placeholder
      */
@@ -71,12 +72,13 @@ public class PropertyPlaceholderHelper {
 
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
-     * @param placeholderPrefix the prefix that denotes the start of a placeholder
-     * @param placeholderSuffix the suffix that denotes the end of a placeholder
-     * @param valueSeparator the separating character between the placeholder variable
-     * and the associated default value, if any
+     *
+     * @param placeholderPrefix              the prefix that denotes the start of a placeholder
+     * @param placeholderSuffix              the suffix that denotes the end of a placeholder
+     * @param valueSeparator                 the separating character between the placeholder variable
+     *                                       and the associated default value, if any
      * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-     * be ignored ({@code true}) or cause an exception ({@code false})
+     *                                       be ignored ({@code true}) or cause an exception ({@code false})
      */
     public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix,
                                      String valueSeparator, boolean ignoreUnresolvablePlaceholders) {
@@ -88,8 +90,7 @@ public class PropertyPlaceholderHelper {
         String simplePrefixForSuffix = wellKnownSimplePrefixes.get(this.placeholderSuffix);
         if (simplePrefixForSuffix != null && this.placeholderPrefix.endsWith(simplePrefixForSuffix)) {
             this.simplePrefix = simplePrefixForSuffix;
-        }
-        else {
+        } else {
             this.simplePrefix = this.placeholderPrefix;
         }
         this.valueSeparator = valueSeparator;
@@ -99,7 +100,8 @@ public class PropertyPlaceholderHelper {
     /**
      * Replaces all placeholders of format {@code ${name}} with the corresponding
      * property from the supplied {@link Properties}.
-     * @param value the value containing the placeholders to be replaced
+     *
+     * @param value      the value containing the placeholders to be replaced
      * @param properties the {@code Properties} to use for replacement
      * @return the supplied value with placeholders replaced inline
      */
@@ -116,7 +118,8 @@ public class PropertyPlaceholderHelper {
     /**
      * Replaces all placeholders of format {@code ${name}} with the value returned
      * from the supplied {@link PlaceholderResolver}.
-     * @param value the value containing the placeholders to be replaced
+     *
+     * @param value               the value containing the placeholders to be replaced
      * @param placeholderResolver the {@code PlaceholderResolver} to use for replacement
      * @return the supplied value with placeholders replaced inline
      */
@@ -126,7 +129,7 @@ public class PropertyPlaceholderHelper {
     }
 
     protected String parseStringValue(
-            String value, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
+        String value, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
 
         StringBuilder result = new StringBuilder(value);
 
@@ -138,7 +141,7 @@ public class PropertyPlaceholderHelper {
                 String originalPlaceholder = placeholder;
                 if (!visitedPlaceholders.add(originalPlaceholder)) {
                     throw new IllegalArgumentException(
-                            "Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
+                        "Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
                 }
                 // Recursive invocation, parsing placeholders contained in the placeholder key.
                 placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
@@ -164,18 +167,15 @@ public class PropertyPlaceholderHelper {
                         logger.trace("Resolved placeholder '" + placeholder + "'");
                     }
                     startIndex = result.indexOf(this.placeholderPrefix, startIndex + propVal.length());
-                }
-                else if (this.ignoreUnresolvablePlaceholders) {
+                } else if (this.ignoreUnresolvablePlaceholders) {
                     // Proceed with unprocessed value.
                     startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
-                }
-                else {
+                } else {
                     throw new IllegalArgumentException("Could not resolve placeholder '"
-                            + placeholder + "'" + " in value \"" + value + "\"");
+                        + placeholder + "'" + " in value \"" + value + "\"");
                 }
                 visitedPlaceholders.remove(originalPlaceholder);
-            }
-            else {
+            } else {
                 startIndex = -1;
             }
         }
@@ -191,16 +191,13 @@ public class PropertyPlaceholderHelper {
                 if (withinNestedPlaceholder > 0) {
                     withinNestedPlaceholder--;
                     index = index + this.placeholderSuffix.length();
-                }
-                else {
+                } else {
                     return index;
                 }
-            }
-            else if (substringMatch(buf, index, this.simplePrefix)) {
+            } else if (substringMatch(buf, index, this.simplePrefix)) {
                 withinNestedPlaceholder++;
                 index = index + this.simplePrefix.length();
-            }
-            else {
+            } else {
                 index++;
             }
         }
@@ -214,6 +211,7 @@ public class PropertyPlaceholderHelper {
 
         /**
          * Resolve the supplied placeholder name to the replacement value.
+         *
          * @param placeholderName the name of the placeholder to resolve
          * @return the replacement value, or {@code null} if no replacement is to be made
          */
@@ -223,8 +221,9 @@ public class PropertyPlaceholderHelper {
     /**
      * Test whether the given string matches the given substring
      * at the given index.
-     * @param str the original string (or StringBuilder)
-     * @param index the index in the original string to start matching against
+     *
+     * @param str       the original string (or StringBuilder)
+     * @param index     the index in the original string to start matching against
      * @param substring the substring to match at the given index
      * @return whether the given string matches the given substring
      */
@@ -241,7 +240,8 @@ public class PropertyPlaceholderHelper {
     /**
      * Assert that an object is not {@code null}.
      * <pre class="code">Assert.notNull(clazz, "The class must not be null");</pre>
-     * @param object the object to check
+     *
+     * @param object  the object to check
      * @param message the exception message to use if the assertion fails
      * @throws IllegalArgumentException if the object is {@code null}
      */

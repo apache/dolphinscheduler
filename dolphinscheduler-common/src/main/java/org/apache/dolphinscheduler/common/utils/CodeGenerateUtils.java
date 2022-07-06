@@ -1,4 +1,6 @@
-/** Copyright 2010-2012 Twitter, Inc.*/
+/**
+ * Copyright 2010-2012 Twitter, Inc.
+ */
 
 package org.apache.dolphinscheduler.common.utils;
 
@@ -24,7 +26,7 @@ public class CodeGenerateUtils {
     private long recordMillisecond = -1L;
 
     private static final long SYSTEM_TIMESTAMP = System.currentTimeMillis();
-    private static final long SYSTEM_NANOTIME  = System.nanoTime();
+    private static final long SYSTEM_NANOTIME = System.nanoTime();
 
     private CodeGenerateUtils() throws CodeGenerateException {
         try {

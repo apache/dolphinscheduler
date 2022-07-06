@@ -32,11 +32,11 @@ public class RpcClient implements IRpcClient {
     @Override
     public <T> T create(Class<T> clazz, Host host) throws Exception {
         return new ByteBuddy()
-                .subclass(clazz)
-                .method(isDeclaredBy(clazz)).intercept(MethodDelegation.to(new ConsumerInterceptor(host)))
-                .make()
-                .load(getClass().getClassLoader())
-                .getLoaded()
-                .getDeclaredConstructor().newInstance();
+            .subclass(clazz)
+            .method(isDeclaredBy(clazz)).intercept(MethodDelegation.to(new ConsumerInterceptor(host)))
+            .make()
+            .load(getClass().getClassLoader())
+            .getLoaded()
+            .getDeclaredConstructor().newInstance();
     }
 }

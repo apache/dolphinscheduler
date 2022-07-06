@@ -55,7 +55,7 @@ public class EnvironmentWorkerGroupRelationServiceTest {
         Mockito.when(relationMapper.queryByEnvironmentCode(1L)).thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
         Map<String, Object> result = relationService.queryEnvironmentWorkerGroupRelation(1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class EnvironmentWorkerGroupRelationServiceTest {
         Mockito.when(relationMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
         Map<String, Object> result = relationService.queryAllEnvironmentWorkerGroupRelationList();
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
 }

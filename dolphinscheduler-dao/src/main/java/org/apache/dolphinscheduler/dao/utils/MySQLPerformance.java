@@ -42,6 +42,7 @@ public class MySQLPerformance extends BaseDBPerformance {
 
     /**
      * get monitor record
+     *
      * @param conn connection
      * @return MonitorRecord
      */
@@ -51,43 +52,42 @@ public class MySQLPerformance extends BaseDBPerformance {
         monitorRecord.setDate(new Date());
         monitorRecord.setDbType(DbType.MYSQL);
         monitorRecord.setState(Flag.YES);
-        Statement pstmt= null;
-        try{
+        Statement pstmt = null;
+        try {
             pstmt = conn.createStatement();
 
             try (ResultSet rs1 = pstmt.executeQuery("show global variables")) {
-                while(rs1.next()){
-                    if("MAX_CONNECTIONS".equalsIgnoreCase(rs1.getString(VARIABLE_NAME))){
-                        monitorRecord.setMaxConnections( Long.parseLong(rs1.getString("value")));
+                while (rs1.next()) {
+                    if ("MAX_CONNECTIONS".equalsIgnoreCase(rs1.getString(VARIABLE_NAME))) {
+                        monitorRecord.setMaxConnections(Long.parseLong(rs1.getString("value")));
                     }
                 }
             }
 
             try (ResultSet rs2 = pstmt.executeQuery("show global status")) {
-                while(rs2.next()){
-                    if("MAX_USED_CONNECTIONS".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))){
+                while (rs2.next()) {
+                    if ("MAX_USED_CONNECTIONS".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))) {
                         monitorRecord.setMaxUsedConnections(Long.parseLong(rs2.getString("value")));
-                    }else if("THREADS_CONNECTED".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))){
+                    } else if ("THREADS_CONNECTED".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))) {
                         monitorRecord.setThreadsConnections(Long.parseLong(rs2.getString("value")));
-                    }else if("THREADS_RUNNING".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))){
+                    } else if ("THREADS_RUNNING".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))) {
                         monitorRecord.setThreadsRunningConnections(Long.parseLong(rs2.getString("value")));
                     }
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             monitorRecord.setState(Flag.NO);
             logger.error("SQLException ", e);
-        }finally {
+        } finally {
             try {
                 if (pstmt != null) {
                     pstmt.close();
                 }
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 logger.error("SQLException ", e);
             }
         }
         return monitorRecord;
     }
-
 
 }

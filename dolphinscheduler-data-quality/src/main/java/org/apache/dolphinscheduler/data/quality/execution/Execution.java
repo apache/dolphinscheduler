@@ -27,9 +27,10 @@ import java.util.List;
 public interface Execution<R extends Component, T extends Component, W extends Component> {
     /**
      * execute
-     * @param readers readers
+     *
+     * @param readers      readers
      * @param transformers transformers
-     * @param writers writers
+     * @param writers      writers
      */
     void execute(List<R> readers, List<T> transformers, List<W> writers);
 }

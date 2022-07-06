@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
 
 public class PropertyUtilsTest {
 
@@ -32,7 +32,7 @@ public class PropertyUtilsTest {
     }
 
     @Test
-    public void getResUploadStartupState(){
+    public void getResUploadStartupState() {
         Assert.assertFalse(PropertyUtils.getResUploadStartupState());
     }
 }

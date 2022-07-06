@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,13 +72,14 @@ public abstract class AbstractParameters implements IParameters {
 
     /**
      * get local parameters map
+     *
      * @return parameters map
      */
     public Map<String, Property> getLocalParametersMap() {
         Map<String, Property> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
             for (Property property : localParams) {
-                localParametersMaps.put(property.getProp(),property);
+                localParametersMaps.put(property.getProp(), property);
             }
         }
         return localParametersMaps;
@@ -85,6 +87,7 @@ public abstract class AbstractParameters implements IParameters {
 
     /**
      * get input local parameters map if the param direct is IN
+     *
      * @return parameters map
      */
     public Map<String, Property> getInputLocalParametersMap() {
@@ -177,6 +180,7 @@ public abstract class AbstractParameters implements IParameters {
 
     /**
      * shell's result format is key=value$VarPool$key=value$VarPool$
+     *
      * @param result
      * @return
      */

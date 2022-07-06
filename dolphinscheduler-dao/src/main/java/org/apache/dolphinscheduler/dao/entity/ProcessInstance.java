@@ -267,9 +267,9 @@ public class ProcessInstance {
         this.processDefinition = processDefinition;
         // todo: the name is not unique
         this.name = String.join("-",
-                processDefinition.getName(),
-                String.valueOf(processDefinition.getVersion()),
-                DateUtils.getCurrentTimeStamp());
+            processDefinition.getName(),
+            String.valueOf(processDefinition.getVersion()),
+            DateUtils.getCurrentTimeStamp());
     }
 
     public String getVarPool() {

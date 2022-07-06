@@ -65,7 +65,7 @@ public class AlertSendRequestCommand implements Serializable {
         this.warnType = warnType;
     }
 
-    public AlertSendRequestCommand(){
+    public AlertSendRequestCommand() {
 
     }
 
@@ -91,11 +91,11 @@ public class AlertSendRequestCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "AlertSendRequestCommand{" +
-                "groupId=" + groupId +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", warnType=" + warnType +
-                '}';
+        return "AlertSendRequestCommand{"
+            + "groupId=" + groupId
+            + ", title='" + title + '\''
+            + ", content='" + content + '\''
+            + ", warnType=" + warnType
+            + '}';
     }
 }

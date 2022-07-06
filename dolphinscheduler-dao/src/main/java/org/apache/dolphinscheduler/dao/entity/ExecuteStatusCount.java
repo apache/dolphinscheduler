@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 /**
  * count execute state
- *
  */
 public class ExecuteStatusCount {
 
@@ -54,8 +53,8 @@ public class ExecuteStatusCount {
     @Override
     public String toString() {
         return "ExecuteStatusCount{"
-                + "state=" + state
-                + ", count=" + count
-                + '}';
+            + "state=" + state
+            + ", count=" + count
+            + '}';
     }
 }

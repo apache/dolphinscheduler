@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -26,90 +27,88 @@ import java.util.List;
  * definition json data structure
  */
 public class ProcessData {
-  /**
-   * task list
-   */
-  private List<TaskNode> tasks;
+    /**
+     * task list
+     */
+    private List<TaskNode> tasks;
 
-  /**
-   * global parameters
-   */
-  private List<Property> globalParams;
-
-
-  private int timeout;
-
-  private int tenantId;
+    /**
+     * global parameters
+     */
+    private List<Property> globalParams;
 
 
-  public ProcessData() {
-  }
+    private int timeout;
 
-  /**
-   *
-   * @param tasks tasks
-   * @param globalParams globalParams
-   */
-  public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
-    this.tasks = tasks;
-    this.globalParams = globalParams;
-  }
+    private int tenantId;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    public ProcessData() {
     }
 
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    /**
+     * @param tasks        tasks
+     * @param globalParams globalParams
+     */
+    public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
+        this.tasks = tasks;
+        this.globalParams = globalParams;
     }
 
-    ProcessData that = (ProcessData) o;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
-    return CollectionUtils.equalLists(tasks, that.tasks) &&
-        CollectionUtils.equalLists(globalParams, that.globalParams);
-  }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-  public List<TaskNode> getTasks() {
-    return tasks;
-  }
+        ProcessData that = (ProcessData) o;
 
-  public void setTasks(List<TaskNode> tasks) {
-    this.tasks = tasks;
-  }
+        return CollectionUtils.equalLists(tasks, that.tasks)
+            && CollectionUtils.equalLists(globalParams, that.globalParams);
+    }
 
-  public List<Property> getGlobalParams() {
-    return globalParams;
-  }
+    public List<TaskNode> getTasks() {
+        return tasks;
+    }
 
-  public void setGlobalParams(List<Property> globalParams) {
-    this.globalParams = globalParams;
-  }
+    public void setTasks(List<TaskNode> tasks) {
+        this.tasks = tasks;
+    }
 
-  public int getTimeout() {
-    return timeout;
-  }
+    public List<Property> getGlobalParams() {
+        return globalParams;
+    }
 
-  public void setTimeout(int timeout) {
-    this.timeout = timeout;
-  }
+    public void setGlobalParams(List<Property> globalParams) {
+        this.globalParams = globalParams;
+    }
 
-  public int getTenantId() {
-    return tenantId;
-  }
+    public int getTimeout() {
+        return timeout;
+    }
 
-  public void setTenantId(int tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
-  @Override
-  public String toString() {
-    return "ProcessData{" +
-            "tasks=" + tasks +
-            ", globalParams=" + globalParams +
-            ", timeout=" + timeout +
-            ", tenantId=" + tenantId +
-            '}';
-  }
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessData{"
+            + "tasks=" + tasks
+            + ", globalParams=" + globalParams
+            + ", timeout=" + timeout
+            + ", tenantId=" + tenantId
+            + '}';
+    }
 }

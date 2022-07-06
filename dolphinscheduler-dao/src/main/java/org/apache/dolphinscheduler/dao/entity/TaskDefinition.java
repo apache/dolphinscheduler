@@ -20,12 +20,13 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -515,37 +516,37 @@ public class TaskDefinition {
     @Override
     public String toString() {
         return "TaskDefinition{"
-                + "id=" + id
-                + ", code=" + code
-                + ", name='" + name + '\''
-                + ", version=" + version
-                + ", description='" + description + '\''
-                + ", projectCode=" + projectCode
-                + ", userId=" + userId
-                + ", taskType=" + taskType
-                + ", taskParams='" + taskParams + '\''
-                + ", taskParamList=" + taskParamList
-                + ", taskParamMap=" + taskParamMap
-                + ", flag=" + flag
-                + ", taskPriority=" + taskPriority
-                + ", userName='" + userName + '\''
-                + ", projectName='" + projectName + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", failRetryTimes=" + failRetryTimes
-                + ", environmentCode='" + environmentCode + '\''
-                + ", taskGroupId='" + taskGroupId + '\''
-                + ", taskGroupPriority='" + taskGroupPriority + '\''
-                + ", failRetryInterval=" + failRetryInterval
-                + ", timeoutFlag=" + timeoutFlag
-                + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
-                + ", timeout=" + timeout
-                + ", delayTime=" + delayTime
-                + ", resourceIds='" + resourceIds + '\''
-                + ", cpuQuota=" + cpuQuota
-                + ", memoryMax=" + memoryMax
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", code=" + code
+            + ", name='" + name + '\''
+            + ", version=" + version
+            + ", description='" + description + '\''
+            + ", projectCode=" + projectCode
+            + ", userId=" + userId
+            + ", taskType=" + taskType
+            + ", taskParams='" + taskParams + '\''
+            + ", taskParamList=" + taskParamList
+            + ", taskParamMap=" + taskParamMap
+            + ", flag=" + flag
+            + ", taskPriority=" + taskPriority
+            + ", userName='" + userName + '\''
+            + ", projectName='" + projectName + '\''
+            + ", workerGroup='" + workerGroup + '\''
+            + ", failRetryTimes=" + failRetryTimes
+            + ", environmentCode='" + environmentCode + '\''
+            + ", taskGroupId='" + taskGroupId + '\''
+            + ", taskGroupPriority='" + taskGroupPriority + '\''
+            + ", failRetryInterval=" + failRetryInterval
+            + ", timeoutFlag=" + timeoutFlag
+            + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
+            + ", timeout=" + timeout
+            + ", delayTime=" + delayTime
+            + ", resourceIds='" + resourceIds + '\''
+            + ", cpuQuota=" + cpuQuota
+            + ", memoryMax=" + memoryMax
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 
     public int getTaskGroupPriority() {

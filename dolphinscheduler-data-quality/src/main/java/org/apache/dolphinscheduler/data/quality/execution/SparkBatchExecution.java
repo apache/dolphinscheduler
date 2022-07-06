@@ -49,12 +49,12 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
 
         if (!readers.isEmpty()) {
             Dataset<Row> ds = readers.get(0).read(environment);
-            for (BatchTransformer tf:transformers) {
+            for (BatchTransformer tf : transformers) {
                 ds = executeTransformer(environment, tf, ds);
                 registerTransformTempView(tf, ds);
             }
 
-            for (BatchWriter sink: writers) {
+            for (BatchWriter sink : writers) {
                 executeWriter(environment, sink, ds);
             }
         }
@@ -77,7 +77,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
             registerTempView(tableName, reader.read(environment));
         } else {
             throw new ConfigRuntimeException(
-                    "[" + reader.getClass().getName() + "] must be registered as dataset, please set \"output_table\" config");
+                "[" + reader.getClass().getName() + "] must be registered as dataset, please set \"output_table\" config");
         }
     }
 
@@ -88,7 +88,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
         if (Boolean.TRUE.equals(config.has(INPUT_TABLE))) {
             String[] tableNames = config.getString(INPUT_TABLE).split(",");
 
-            for (String sourceTableName: tableNames) {
+            for (String sourceTableName : tableNames) {
                 inputDataset = environment.sparkSession().read().table(sourceTableName);
 
                 if (outputDataset == null) {

@@ -102,13 +102,12 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         processInstanceMap.setParentProcessInstanceId(100);
         processInstanceMapMapper.updateById(processInstanceMap);
         int delete = processInstanceMapMapper.deleteByParentProcessId(
-                processInstanceMap.getParentProcessInstanceId()
+            processInstanceMap.getParentProcessInstanceId()
         );
         Assert.assertEquals(1, delete);
     }
 
     /**
-     *
      * test query sub ids by process instance parentId
      */
     @Test
@@ -122,7 +121,6 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         List<Integer> subIds = processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
 
         Assert.assertNotEquals(subIds.size(), 0);
-
 
     }
 }

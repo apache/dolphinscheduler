@@ -32,7 +32,7 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- *  task response processor
+ * task response processor
  */
 @Component
 public class TaskKillResponseProcessor implements NettyRequestProcessor {

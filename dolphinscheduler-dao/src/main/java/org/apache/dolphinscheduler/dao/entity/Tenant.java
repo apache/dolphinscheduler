@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
-import java.util.Objects;
 
 /**
  * tenant
@@ -33,7 +34,7 @@ public class Tenant {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -71,7 +72,6 @@ public class Tenant {
      * update time
      */
     private Date updateTime;
-
 
     public int getId() {
         return id;
@@ -131,15 +131,15 @@ public class Tenant {
 
     @Override
     public String toString() {
-        return "Tenant{" +
-                "id=" + id +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", queueId=" + queueId +
-                ", queueName='" + queueName + '\'' +
-                ", queue='" + queue + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "Tenant{"
+            + "id=" + id
+            +  ", tenantCode='" + tenantCode + '\''
+            +  ", queueId=" + queueId
+            +  ", queueName='" + queueName + '\''
+            +  ", queue='" + queue + '\''
+            +  ", createTime=" + createTime
+            +  ", updateTime=" + updateTime
+            +  '}';
     }
 
     public String getDescription() {

@@ -19,7 +19,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.SessionMapper">
     <sql id="baseSql">
-        id, user_id, ip, last_login_time
+        id
+        , user_id, ip, last_login_time
     </sql>
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Session">
         select

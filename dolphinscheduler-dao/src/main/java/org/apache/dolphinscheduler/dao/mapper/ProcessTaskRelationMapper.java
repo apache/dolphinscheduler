@@ -100,7 +100,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * query upstream process task relation by taskCode
      *
      * @param projectCode projectCode
-     * @param taskCode taskCode
+     * @param taskCode    taskCode
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
@@ -109,7 +109,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * query downstream process task relation by taskCode
      *
      * @param projectCode projectCode
-     * @param taskCode taskCode
+     * @param taskCode    taskCode
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
@@ -117,8 +117,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * query task relation by codes
      *
-     * @param projectCode projectCode
-     * @param taskCode taskCode
+     * @param projectCode  projectCode
+     * @param taskCode     taskCode
      * @param preTaskCodes preTaskCode list
      * @return ProcessTaskRelation
      */
@@ -127,7 +127,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * query process task relation by process definition code
      *
-     * @param processDefinitionCode process definition code
+     * @param processDefinitionCode    process definition code
      * @param processDefinitionVersion process definition version
      * @return ProcessTaskRelation
      */
@@ -137,8 +137,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * count upstream by codes
      *
-     * @param projectCode projectCode
-     * @param taskCode taskCode
+     * @param projectCode            projectCode
+     * @param taskCode               taskCode
      * @param processDefinitionCodes processDefinitionCodes
      * @return upstream count list group by process definition code
      */
@@ -157,10 +157,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * query by code
      *
-     * @param projectCode projectCode
+     * @param projectCode           projectCode
      * @param processDefinitionCode processDefinitionCode
-     * @param preTaskCode preTaskCode
-     * @param postTaskCode postTaskCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryByCode(@Param("projectCode") long projectCode,
@@ -179,10 +179,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * count by code
      *
-     * @param projectCode projectCode
+     * @param projectCode           projectCode
      * @param processDefinitionCode processDefinitionCode
-     * @param preTaskCode preTaskCode
-     * @param postTaskCode postTaskCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
      * @return ProcessTaskRelation
      */
     int countByCode(@Param("projectCode") long projectCode,
@@ -192,10 +192,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
 
     /**
      * query downstream process task relation by processDefinitionCode
+     *
      * @param processDefinitionCode
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
-
 
 }

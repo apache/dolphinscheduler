@@ -96,7 +96,7 @@ public class ProcessAlertManager {
      * get process instance content
      *
      * @param processInstance process instance
-     * @param taskInstances task instance list
+     * @param taskInstances   task instance list
      * @return process instance format content
      */
     public String getContentProcessInstance(ProcessInstance processInstance,
@@ -107,20 +107,20 @@ public class ProcessAlertManager {
         if (processInstance.getState().typeIsSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                    .projectCode(projectUser.getProjectCode())
-                    .projectName(projectUser.getProjectName())
-                    .owner(projectUser.getUserName())
-                    .processId(processInstance.getId())
-                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                    .processName(processInstance.getName())
-                    .processType(processInstance.getCommandType())
-                    .processState(processInstance.getState())
-                    .recovery(processInstance.getRecovery())
-                    .runTimes(processInstance.getRunTimes())
-                    .processStartTime(processInstance.getStartTime())
-                    .processEndTime(processInstance.getEndTime())
-                    .processHost(processInstance.getHost())
-                    .build();
+                .projectCode(projectUser.getProjectCode())
+                .projectName(projectUser.getProjectName())
+                .owner(projectUser.getUserName())
+                .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                .processName(processInstance.getName())
+                .processType(processInstance.getCommandType())
+                .processState(processInstance.getState())
+                .recovery(processInstance.getRecovery())
+                .runTimes(processInstance.getRunTimes())
+                .processStartTime(processInstance.getStartTime())
+                .processEndTime(processInstance.getEndTime())
+                .processHost(processInstance.getHost())
+                .build();
             successTaskList.add(processAlertContent);
             res = JSONUtils.toJsonString(successTaskList);
         } else if (processInstance.getState().typeIsFailure()) {
@@ -131,21 +131,21 @@ public class ProcessAlertManager {
                     continue;
                 }
                 ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                        .projectCode(projectUser.getProjectCode())
-                        .projectName(projectUser.getProjectName())
-                        .owner(projectUser.getUserName())
-                        .processId(processInstance.getId())
-                        .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                        .processName(processInstance.getName())
-                        .taskCode(task.getTaskCode())
-                        .taskName(task.getName())
-                        .taskType(task.getTaskType())
-                        .taskState(task.getState())
-                        .taskStartTime(task.getStartTime())
-                        .taskEndTime(task.getEndTime())
-                        .taskHost(task.getHost())
-                        .logPath(task.getLogPath())
-                        .build();
+                    .projectCode(projectUser.getProjectCode())
+                    .projectName(projectUser.getProjectName())
+                    .owner(projectUser.getUserName())
+                    .processId(processInstance.getId())
+                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                    .processName(processInstance.getName())
+                    .taskCode(task.getTaskCode())
+                    .taskName(task.getName())
+                    .taskType(task.getTaskType())
+                    .taskState(task.getState())
+                    .taskStartTime(task.getStartTime())
+                    .taskEndTime(task.getEndTime())
+                    .taskHost(task.getHost())
+                    .logPath(task.getLogPath())
+                    .build();
                 failedTaskList.add(processAlertContent);
             }
             res = JSONUtils.toJsonString(failedTaskList);
@@ -157,7 +157,7 @@ public class ProcessAlertManager {
     /**
      * getting worker fault tolerant content
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param toleranceTaskList tolerance task list
      * @return worker tolerance content
      */
@@ -167,14 +167,14 @@ public class ProcessAlertManager {
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                    .processId(processInstance.getId())
-                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                    .processName(processInstance.getName())
-                    .taskCode(taskInstance.getTaskCode())
-                    .taskName(taskInstance.getName())
-                    .taskHost(taskInstance.getHost())
-                    .retryTimes(taskInstance.getRetryTimes())
-                    .build();
+                .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                .processName(processInstance.getName())
+                .taskCode(taskInstance.getTaskCode())
+                .taskName(taskInstance.getName())
+                .taskHost(taskInstance.getHost())
+                .retryTimes(taskInstance.getRetryTimes())
+                .build();
             toleranceTaskInstanceList.add(processAlertContent);
         }
         return JSONUtils.toJsonString(toleranceTaskInstanceList);
@@ -183,7 +183,7 @@ public class ProcessAlertManager {
     /**
      * send worker alert fault tolerance
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param toleranceTaskList tolerance task list
      */
     public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
@@ -209,7 +209,7 @@ public class ProcessAlertManager {
      * send process instance alert
      *
      * @param processInstance process instance
-     * @param taskInstances task instance list
+     * @param taskInstances   task instance list
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances,
@@ -274,7 +274,7 @@ public class ProcessAlertManager {
      * send process timeout alert
      *
      * @param processInstance process instance
-     * @param projectUser projectUser
+     * @param projectUser     projectUser
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
         alertDao.sendProcessTimeoutAlert(processInstance, projectUser);
@@ -303,7 +303,7 @@ public class ProcessAlertManager {
     /**
      * send data quality task error alert
      */
-    public void sendTaskErrorAlert(TaskInstance taskInstance,ProcessInstance processInstance) {
+    public void sendTaskErrorAlert(TaskInstance taskInstance, ProcessInstance processInstance) {
         Alert alert = new Alert();
         alert.setTitle("Task [" + taskInstance.getName() + "] Failure Warning");
         String content = getTaskAlterContent(taskInstance);
@@ -319,54 +319,56 @@ public class ProcessAlertManager {
 
     /**
      * getDataQualityAlterContent
+     *
      * @param result DqExecuteResult
      * @return String String
      */
     public String getDataQualityAlterContent(DqExecuteResult result) {
 
         DqExecuteResultAlertContent content = DqExecuteResultAlertContent.newBuilder()
-                .processDefinitionId(result.getProcessDefinitionId())
-                .processDefinitionName(result.getProcessDefinitionName())
-                .processInstanceId(result.getProcessInstanceId())
-                .processInstanceName(result.getProcessInstanceName())
-                .taskInstanceId(result.getTaskInstanceId())
-                .taskName(result.getTaskName())
-                .ruleType(result.getRuleType())
-                .ruleName(result.getRuleName())
-                .statisticsValue(result.getStatisticsValue())
-                .comparisonValue(result.getComparisonValue())
-                .checkType(result.getCheckType())
-                .threshold(result.getThreshold())
-                .operator(result.getOperator())
-                .failureStrategy(result.getFailureStrategy())
-                .userId(result.getUserId())
-                .userName(result.getUserName())
-                .state(result.getState())
-                .errorDataPath(result.getErrorOutputPath())
-                .build();
+            .processDefinitionId(result.getProcessDefinitionId())
+            .processDefinitionName(result.getProcessDefinitionName())
+            .processInstanceId(result.getProcessInstanceId())
+            .processInstanceName(result.getProcessInstanceName())
+            .taskInstanceId(result.getTaskInstanceId())
+            .taskName(result.getTaskName())
+            .ruleType(result.getRuleType())
+            .ruleName(result.getRuleName())
+            .statisticsValue(result.getStatisticsValue())
+            .comparisonValue(result.getComparisonValue())
+            .checkType(result.getCheckType())
+            .threshold(result.getThreshold())
+            .operator(result.getOperator())
+            .failureStrategy(result.getFailureStrategy())
+            .userId(result.getUserId())
+            .userName(result.getUserName())
+            .state(result.getState())
+            .errorDataPath(result.getErrorOutputPath())
+            .build();
 
         return JSONUtils.toJsonString(content);
     }
 
     /**
      * getTaskAlterContent
+     *
      * @param taskInstance TaskInstance
      * @return String String
      */
     public String getTaskAlterContent(TaskInstance taskInstance) {
 
         TaskAlertContent content = TaskAlertContent.newBuilder()
-                .processInstanceName(taskInstance.getProcessInstanceName())
-                .processInstanceId(taskInstance.getProcessInstanceId())
-                .taskInstanceId(taskInstance.getId())
-                .taskName(taskInstance.getName())
-                .taskType(taskInstance.getTaskType())
-                .state(taskInstance.getState())
-                .startTime(taskInstance.getStartTime())
-                .endTime(taskInstance.getEndTime())
-                .host(taskInstance.getHost())
-                .logPath(taskInstance.getLogPath())
-                .build();
+            .processInstanceName(taskInstance.getProcessInstanceName())
+            .processInstanceId(taskInstance.getProcessInstanceId())
+            .taskInstanceId(taskInstance.getId())
+            .taskName(taskInstance.getName())
+            .taskType(taskInstance.getTaskType())
+            .state(taskInstance.getState())
+            .startTime(taskInstance.getStartTime())
+            .endTime(taskInstance.getEndTime())
+            .host(taskInstance.getHost())
+            .logPath(taskInstance.getLogPath())
+            .build();
 
         return JSONUtils.toJsonString(content);
     }
@@ -376,11 +378,10 @@ public class ProcessAlertManager {
     }
 
     /**
-     *
      * check node type and process blocking flag, then insert a block record into db
      *
      * @param processInstance process instance
-     * @param projectUser the project owner
+     * @param projectUser     the project owner
      */
     public void sendProcessBlockingAlert(ProcessInstance processInstance,
                                          ProjectUser projectUser) {
@@ -388,18 +389,18 @@ public class ProcessAlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .projectCode(projectUser.getProjectCode())
-                .projectName(projectUser.getProjectName())
-                .owner(projectUser.getUserName())
-                .processId(processInstance.getId())
-                .processName(processInstance.getName())
-                .processType(processInstance.getCommandType())
-                .processState(processInstance.getState())
-                .runTimes(processInstance.getRunTimes())
-                .processStartTime(processInstance.getStartTime())
-                .processEndTime(processInstance.getEndTime())
-                .processHost(processInstance.getHost())
-                .build();
+            .projectCode(projectUser.getProjectCode())
+            .projectName(projectUser.getProjectName())
+            .owner(projectUser.getUserName())
+            .processId(processInstance.getId())
+            .processName(processInstance.getName())
+            .processType(processInstance.getCommandType())
+            .processState(processInstance.getState())
+            .runTimes(processInstance.getRunTimes())
+            .processStartTime(processInstance.getStartTime())
+            .processEndTime(processInstance.getEndTime())
+            .processHost(processInstance.getHost())
+            .build();
         blockingNodeList.add(processAlertContent);
         String content = JSONUtils.toJsonString(blockingNodeList);
         alert.setTitle(cmdName + " Blocked");
@@ -411,6 +412,6 @@ public class ProcessAlertManager {
         alert.setProcessInstanceId(processInstance.getId());
         alert.setAlertType(AlertType.PROCESS_INSTANCE_BLOCKED);
         alertDao.addAlert(alert);
-        logger.info("add alert to db, alert: {}",alert);
+        logger.info("add alert to db, alert: {}", alert);
     }
 }

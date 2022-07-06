@@ -57,16 +57,16 @@ public class SubscribeDataManager implements AutoCloseable {
         this.registryProperties = registryProperties;
         this.mysqlOperator = mysqlOperator;
         this.dataSubscribeCheckThreadPool = Executors.newScheduledThreadPool(
-                1,
-                new ThreadFactoryBuilder().setNameFormat("MysqlRegistrySubscribeDataCheckThread").setDaemon(true).build());
+            1,
+            new ThreadFactoryBuilder().setNameFormat("MysqlRegistrySubscribeDataCheckThread").setDaemon(true).build());
     }
 
     public void start() {
         dataSubscribeCheckThreadPool.scheduleWithFixedDelay(
-                new RegistrySubscribeDataCheckTask(dataSubScribeMap, mysqlOperator, mysqlRegistryDataMap),
-                registryProperties.getTermRefreshInterval().toMillis(),
-                registryProperties.getTermRefreshInterval().toMillis(),
-                TimeUnit.MILLISECONDS);
+            new RegistrySubscribeDataCheckTask(dataSubScribeMap, mysqlOperator, mysqlRegistryDataMap),
+            registryProperties.getTermRefreshInterval().toMillis(),
+            registryProperties.getTermRefreshInterval().toMillis(),
+            TimeUnit.MILLISECONDS);
     }
 
     public void addListener(String path, SubscribeListener subscribeListener) {
@@ -103,8 +103,8 @@ public class SubscribeDataManager implements AutoCloseable {
             // query the full data from database, and update the mysqlRegistryDataMap
             try {
                 Map<String, MysqlRegistryData> currentMysqlDataMap = mysqlOperator.queryAllMysqlRegistryData()
-                        .stream()
-                        .collect(Collectors.toMap(MysqlRegistryData::getKey, Function.identity()));
+                    .stream()
+                    .collect(Collectors.toMap(MysqlRegistryData::getKey, Function.identity()));
                 // find the different
                 List<MysqlRegistryData> addedData = new ArrayList<>();
                 List<MysqlRegistryData> deletedData = new ArrayList<>();
@@ -147,7 +147,7 @@ public class SubscribeDataManager implements AutoCloseable {
             for (MysqlRegistryData data : dataList) {
                 if (data.getKey().startsWith(subscribeKey)) {
                     subscribeListeners.forEach(subscribeListener ->
-                            subscribeListener.notify(new Event(data.getKey(), data.getKey(), data.getData(), type)));
+                        subscribeListener.notify(new Event(data.getKey(), data.getKey(), data.getData(), type)));
                 }
             }
         }

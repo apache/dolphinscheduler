@@ -85,12 +85,12 @@ public class JdbcInfo {
     @Override
     public String toString() {
         return "JdbcInfo{"
-                + "host='" + host + '\''
-                + ", port='" + port + '\''
-                + ", driverName='" + driverName + '\''
-                + ", database='" + database + '\''
-                + ", params='" + params + '\''
-                + ", address='" + address + '\''
-                + '}';
+            + "host='" + host + '\''
+            + ", port='" + port + '\''
+            + ", driverName='" + driverName + '\''
+            + ", database='" + database + '\''
+            + ", params='" + params + '\''
+            + ", address='" + address + '\''
+            + '}';
     }
 }

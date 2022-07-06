@@ -38,16 +38,16 @@ public class SensitiveDataConverterTest {
     private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
 
     private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
-            + "\"database\":\"carbond\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
-            + "\"user\":\"view\","
-            + "\"password\":\"view1\"}";
+        + "\"database\":\"carbond\","
+        + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
+        + "\"user\":\"view\","
+        + "\"password\":\"view1\"}";
 
     private final String maskLogMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
-            + "\"database\":\"carbond\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
-            + "\"user\":\"view\","
-            + "\"password\":\"******\"}";
+        + "\"database\":\"carbond\","
+        + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
+        + "\"user\":\"view\","
+        + "\"password\":\"******\"}";
 
     @Test
     public void convert() {

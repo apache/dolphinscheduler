@@ -34,6 +34,11 @@ import org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,10 +48,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Stopper.class})
@@ -85,25 +86,25 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = getTaskInstance();
 
         Mockito.when(processService
-                        .findProcessInstanceById(processInstance.getId()))
-                .thenReturn(processInstance);
+                .findProcessInstanceById(processInstance.getId()))
+            .thenReturn(processInstance);
 
         // for SubProcessTaskExecThread.setTaskInstanceState
         Mockito.when(processService
-                        .updateTaskInstance(Mockito.any()))
-                .thenReturn(true);
+                .updateTaskInstance(Mockito.any()))
+            .thenReturn(true);
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                        .submitTask(processInstance, taskInstance))
-                .thenAnswer(t -> t.getArgument(0));
+                .submitTask(processInstance, taskInstance))
+            .thenAnswer(t -> t.getArgument(0));
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
         Mockito.when(processService.findTaskDefinition(1L, 1))
-                .thenReturn(taskDefinition);
+            .thenReturn(taskDefinition);
     }
 
     private TaskInstance testBasicInit(ExecutionStatus expectResult) {
@@ -113,11 +114,11 @@ public class SubProcessTaskTest {
         subProcessInstance.setVarPool(getProperty());
         // for SubProcessTaskExecThread.waitTaskQuit
         Mockito.when(processService
-                        .findProcessInstanceById(subProcessInstance.getId()))
-                .thenReturn(subProcessInstance);
+                .findProcessInstanceById(subProcessInstance.getId()))
+            .thenReturn(subProcessInstance);
         Mockito.when(processService
-                        .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
-                .thenReturn(subProcessInstance);
+                .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
+            .thenReturn(subProcessInstance);
 
         return taskInstance;
     }
@@ -134,13 +135,13 @@ public class SubProcessTaskTest {
     public void testFinish() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
         taskInstance.setVarPool(getProperty());
-        taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
-                "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
-                "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
-                "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
-                "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
-                "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
-                "\"waitStartTimeout\":{},\"switchResult\":{}}");
+        taskInstance.setTaskParams("{\"processDefinitionCode\":110,"
+            + "\"dependence\":{},\"localParams\":[{\"prop\":\"key\","
+            + "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"},"
+            + "{\"prop\":\"database_name\",\"direct\":\"OUT\","
+            + "\"type\":\"VARCHAR\",\"value\":\"\"}],"
+            + "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},"
+            + "\"waitStartTimeout\":{},\"switchResult\":{}}");
         SubTaskProcessor subTaskProcessor = new SubTaskProcessor();
         subTaskProcessor.init(taskInstance, processInstance);
         subTaskProcessor.action(TaskAction.RUN);

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -45,7 +46,7 @@ public class ResourceProcessDefinitionUtils {
             for (Map<String, Object> resourceMap : resourceList) {
                 Long code = (Long) resourceMap.get("code");
                 String[] resourceIds = ((String) resourceMap.get("resource_ids"))
-                        .split(",");
+                    .split(",");
 
                 Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
                 for (Integer resourceId : resourceIdSet) {

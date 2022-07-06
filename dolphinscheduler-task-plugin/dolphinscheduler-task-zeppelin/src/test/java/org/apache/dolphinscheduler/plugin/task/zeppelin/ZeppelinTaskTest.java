@@ -27,15 +27,16 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-
-import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.NoteResult;
+import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
+
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,14 +47,13 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
-        ZeppelinTask.class,
-        ZeppelinClient.class,
-        ObjectMapper.class,
+    ZeppelinTask.class,
+    ZeppelinClient.class,
+    ObjectMapper.class,
 })
 @PowerMockIgnore({"javax.*"})
 public class ZeppelinTaskTest {
@@ -91,8 +91,8 @@ public class ZeppelinTaskTest {
         when(this.paragraphResult.getStatus()).thenReturn(Status.FINISHED);
         this.zeppelinTask.handle();
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
-                MOCK_PARAGRAPH_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            MOCK_PARAGRAPH_ID,
+            (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.paragraphResult).getResultInText();
         Mockito.verify(this.paragraphResult).getStatus();
         Assert.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
@@ -103,8 +103,8 @@ public class ZeppelinTaskTest {
         when(this.paragraphResult.getStatus()).thenReturn(Status.ABORT);
         this.zeppelinTask.handle();
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
-                MOCK_PARAGRAPH_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            MOCK_PARAGRAPH_ID,
+            (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.paragraphResult).getResultInText();
         Mockito.verify(this.paragraphResult).getStatus();
         Assert.assertEquals(EXIT_CODE_KILL, this.zeppelinTask.getExitStatusCode());
@@ -115,8 +115,8 @@ public class ZeppelinTaskTest {
         when(this.paragraphResult.getStatus()).thenReturn(Status.ERROR);
         this.zeppelinTask.handle();
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
-                MOCK_PARAGRAPH_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            MOCK_PARAGRAPH_ID,
+            (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.paragraphResult).getResultInText();
         Mockito.verify(this.paragraphResult).getStatus();
         Assert.assertEquals(EXIT_CODE_FAILURE, this.zeppelinTask.getExitStatusCode());
@@ -125,12 +125,11 @@ public class ZeppelinTaskTest {
     @Test
     public void testHandleWithParagraphExecutionException() throws Exception {
         when(this.zClient.executeParagraph(any(), any(), any(Map.class))).
-                thenThrow(new Exception("Something wrong happens from zeppelin side"));
-//        when(this.paragraphResult.getStatus()).thenReturn(Status.ERROR);
+            thenThrow(new Exception("Something wrong happens from zeppelin side"));
         this.zeppelinTask.handle();
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
-                MOCK_PARAGRAPH_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            MOCK_PARAGRAPH_ID,
+            (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.paragraphResult, Mockito.times(0)).getResultInText();
         Mockito.verify(this.paragraphResult, Mockito.times(0)).getStatus();
         Assert.assertEquals(EXIT_CODE_FAILURE, this.zeppelinTask.getExitStatusCode());
@@ -139,7 +138,7 @@ public class ZeppelinTaskTest {
     @Test
     public void testHandleWithNoteExecutionSuccess() throws Exception {
         String zeppelinParametersWithNoParagraphId = buildZeppelinTaskParametersWithNoParagraphId();
-        TaskExecutionContext taskExecutionContext= PowerMockito.mock(TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
@@ -155,7 +154,7 @@ public class ZeppelinTaskTest {
         when(this.paragraphResult.getStatus()).thenReturn(Status.FINISHED);
         this.zeppelinTask.handle();
         Mockito.verify(this.zClient).executeNote(MOCK_NOTE_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.noteResult).getParagraphResultList();
         Assert.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
     }

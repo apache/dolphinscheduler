@@ -19,5 +19,5 @@ package org.apache.dolphinscheduler.common.enums;
 
 public enum SlotCheckState {
 
-    PASS,INJECT,CHANGE
+    PASS, INJECT, CHANGE
 }

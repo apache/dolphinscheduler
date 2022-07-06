@@ -28,6 +28,7 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
      * process task
      */
     private AbstractK8sTaskExecutor abstractK8sTaskExecutor;
+
     /**
      * Abstract k8s Task
      *
@@ -35,7 +36,7 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
      */
     protected AbstractK8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger,taskRequest);
+        this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger, taskRequest);
     }
 
     @Override
@@ -46,7 +47,7 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
             setAppIds(response.getAppIds());
         } catch (Exception e) {
             exitStatusCode = -1;
-            throw new TaskException("k8s process failure",e);
+            throw new TaskException("k8s process failure", e);
         }
     }
 

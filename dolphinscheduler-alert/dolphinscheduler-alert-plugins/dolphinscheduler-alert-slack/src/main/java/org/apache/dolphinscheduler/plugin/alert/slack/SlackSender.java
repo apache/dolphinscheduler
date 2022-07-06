@@ -60,7 +60,7 @@ public final class SlackSender {
     /**
      * Send message to slack channel
      *
-     * @param title title
+     * @param title   title
      * @param content content
      * @return slack response
      */
@@ -120,17 +120,17 @@ public final class SlackSender {
         final int elementLen = maxLen;
         StringBuilder stringBuilder = new StringBuilder(200);
         stringBuilder.append(headers.stream()
-                                    .map(header -> generateString(header, elementLen, " "))
-                                    .collect(Collectors.joining("|")));
+            .map(header -> generateString(header, elementLen, " "))
+            .collect(Collectors.joining("|")));
         stringBuilder.append("\n");
         for (List<String> element : elements) {
             stringBuilder.append(element.stream()
-                                        .map(lement -> generateString("", elementLen, "-"))
-                                        .collect(Collectors.joining("|")));
+                .map(lement -> generateString("", elementLen, "-"))
+                .collect(Collectors.joining("|")));
             stringBuilder.append("\n");
             stringBuilder.append(element.stream()
-                                        .map(e -> generateString(e, elementLen, " "))
-                                        .collect(Collectors.joining("|")));
+                .map(e -> generateString(e, elementLen, " "))
+                .collect(Collectors.joining("|")));
             stringBuilder.append("\n");
         }
         return String.format("```%s```", stringBuilder);

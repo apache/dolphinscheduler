@@ -44,7 +44,8 @@ public class DataQualityConfiguration {
     @JsonProperty("writers")
     private List<BaseConfig> writerConfigs;
 
-    public DataQualityConfiguration() {}
+    public DataQualityConfiguration() {
+    }
 
     public DataQualityConfiguration(String name,
                                     List<BaseConfig> readerConfigs,
@@ -111,11 +112,11 @@ public class DataQualityConfiguration {
     @Override
     public String toString() {
         return "DataQualityConfiguration{"
-                + "name='" + name + '\''
-                + ", envConfig=" + envConfig
-                + ", readerConfigs=" + readerConfigs
-                + ", transformerConfigs=" + transformerConfigs
-                + ", writerConfigs=" + writerConfigs
-                + '}';
+            + "name='" + name + '\''
+            + ", envConfig=" + envConfig
+            + ", readerConfigs=" + readerConfigs
+            + ", transformerConfigs=" + transformerConfigs
+            + ", writerConfigs=" + writerConfigs
+            + '}';
     }
 }

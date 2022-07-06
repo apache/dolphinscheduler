@@ -68,29 +68,29 @@ public class HttpAlertChannelTest {
 
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam urlParam = InputParam.newBuilder("url", "url")
-                                        .setValue("http://www.baidu.com")
-                                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                                        .build();
+            .setValue("http://www.baidu.com")
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         InputParam headerParams = InputParam.newBuilder("headerParams", "headerParams")
-                                            .addValidate(Validate.newBuilder().setRequired(true).build())
-                                            .setValue("{\"Content-Type\":\"application/json\"}")
-                                            .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("{\"Content-Type\":\"application/json\"}")
+            .build();
 
         InputParam bodyParams = InputParam.newBuilder("bodyParams", "bodyParams")
-                                          .addValidate(Validate.newBuilder().setRequired(true).build())
-                                          .setValue("{\"number\":\"13457654323\"}")
-                                          .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("{\"number\":\"13457654323\"}")
+            .build();
 
         InputParam content = InputParam.newBuilder("contentField", "contentField")
-                                       .setValue("content")
-                                       .addValidate(Validate.newBuilder().setRequired(true).build())
-                                       .build();
+            .setValue("content")
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         InputParam requestType = InputParam.newBuilder("requestType", "requestType")
-                                           .setValue("POST")
-                                           .addValidate(Validate.newBuilder().setRequired(true).build())
-                                           .build();
+            .setValue("POST")
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         paramsList.add(urlParam);
         paramsList.add(headerParams);

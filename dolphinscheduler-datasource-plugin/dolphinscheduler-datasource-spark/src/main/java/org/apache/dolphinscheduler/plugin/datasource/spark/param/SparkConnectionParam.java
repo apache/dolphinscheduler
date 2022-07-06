@@ -23,19 +23,19 @@ public class SparkConnectionParam extends BaseHDFSConnectionParam {
     @Override
     public String toString() {
         return "SparkConnectionParam{"
-                + "user='" + user + '\''
-                + ", password='" + password + '\''
-                + ", address='" + address + '\''
-                + ", database='" + database + '\''
-                + ", jdbcUrl='" + jdbcUrl + '\''
-                + ", driverLocation='" + driverLocation + '\''
-                + ", driverClassName='" + driverClassName + '\''
-                + ", validationQuery='" + validationQuery + '\''
-                + ", other='" + other + '\''
-                + ", principal='" + principal + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
-                + '}';
+            + "user='" + user + '\''
+            + ", password='" + password + '\''
+            + ", address='" + address + '\''
+            + ", database='" + database + '\''
+            + ", jdbcUrl='" + jdbcUrl + '\''
+            + ", driverLocation='" + driverLocation + '\''
+            + ", driverClassName='" + driverClassName + '\''
+            + ", validationQuery='" + validationQuery + '\''
+            + ", other='" + other + '\''
+            + ", principal='" + principal + '\''
+            + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
+            + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
+            + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
+            + '}';
     }
 }

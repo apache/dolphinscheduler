@@ -20,8 +20,11 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper">
 
     <select id="getExecuteSqlList" resultType="org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql">
-        SELECT * FROM t_ds_dq_rule_execute_sql a join ( SELECT *
-        FROM t_ds_relation_rule_execute_sql where rule_id = #{ruleId}) b
-        on a.id = b.execute_sql_id
+        SELECT *
+        FROM t_ds_dq_rule_execute_sql a
+                 join (SELECT *
+                       FROM t_ds_relation_rule_execute_sql
+                       where rule_id = #{ruleId}) b
+                      on a.id = b.execute_sql_id
     </select>
 </mapper>

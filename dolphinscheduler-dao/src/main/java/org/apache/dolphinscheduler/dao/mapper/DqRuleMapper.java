@@ -34,9 +34,9 @@ public interface DqRuleMapper extends BaseMapper<DqRule> {
     /**
      * data quality rule page
      *
-     * @param page page
+     * @param page      page
      * @param searchVal searchVal
-     * @param ruleType ruleType
+     * @param ruleType  ruleType
      * @param startTime startTime
      * @return endTime endTime
      */

@@ -41,7 +41,7 @@ public class DateInterval {
         } else {
             DateInterval that = (DateInterval) obj;
             return startTime.equals(that.startTime)
-                    && endTime.equals(that.endTime);
+                && endTime.equals(that.endTime);
         }
     }
 

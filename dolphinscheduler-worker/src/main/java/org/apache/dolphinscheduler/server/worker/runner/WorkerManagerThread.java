@@ -108,8 +108,8 @@ public class WorkerManagerThread implements Runnable {
      */
     public void killTaskBeforeExecuteByInstanceId(Integer taskInstanceId) {
         waitSubmitQueue.stream()
-                          .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
-                          .forEach(waitSubmitQueue::remove);
+            .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
+            .forEach(waitSubmitQueue::remove);
         sendTaskKillResponse(taskInstanceId);
     }
 
@@ -163,7 +163,7 @@ public class WorkerManagerThread implements Runnable {
                 } else {
                     WorkerServerMetrics.incWorkerOverloadCount();
                     logger.info("Exec queue is full, waiting submit queue {}, waiting exec queue size {}",
-                            this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
+                        this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
                     ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             } catch (Exception e) {

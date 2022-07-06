@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
@@ -50,12 +49,10 @@ import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,18 +154,18 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
 
             taskExecutionContext.setTaskAppId(String.format("%s_%s",
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId()));
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId()));
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
                 throw new ServiceException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
             String taskLogName = LoggerUtils.buildTaskId(taskExecutionContext.getFirstSubmitTime(),
-                    taskExecutionContext.getProcessDefineCode(),
-                    taskExecutionContext.getProcessDefineVersion(),
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId());
             taskExecutionContext.setTaskLogName(taskLogName);
 
             // set the name of the current thread
@@ -268,7 +265,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
      *
      * @param execLocalPath execLocalPath
      * @param fileDownloads projectRes
-     * @param logger logger
+     * @param logger        logger
      */
     public void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
         for (Pair<String, String> fileDownload : fileDownloads) {
@@ -325,7 +322,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
     @Override
     public long getDelay(TimeUnit unit) {
         return unit.convert(DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
+            taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
     }
 
     @Override

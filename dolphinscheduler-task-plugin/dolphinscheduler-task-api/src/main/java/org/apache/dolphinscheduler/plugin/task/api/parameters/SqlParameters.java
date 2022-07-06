@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -302,22 +302,22 @@ public class SqlParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "SqlParameters{"
-                + "type='" + type + '\''
-                + ", datasource=" + datasource
-                + ", sql='" + sql + '\''
-                + ", sqlType=" + sqlType
-                + ", sendEmail=" + sendEmail
-                + ", displayRows=" + displayRows
-                + ", limit=" + limit
-                + ", segmentSeparator=" + segmentSeparator
-                + ", udfs='" + udfs + '\''
-                + ", showType='" + showType + '\''
-                + ", connParams='" + connParams + '\''
-                + ", groupId='" + groupId + '\''
-                + ", title='" + title + '\''
-                + ", preStatements=" + preStatements
-                + ", postStatements=" + postStatements
-                + '}';
+            + "type='" + type + '\''
+            + ", datasource=" + datasource
+            + ", sql='" + sql + '\''
+            + ", sqlType=" + sqlType
+            + ", sendEmail=" + sendEmail
+            + ", displayRows=" + displayRows
+            + ", limit=" + limit
+            + ", segmentSeparator=" + segmentSeparator
+            + ", udfs='" + udfs + '\''
+            + ", showType='" + showType + '\''
+            + ", connParams='" + connParams + '\''
+            + ", groupId='" + groupId + '\''
+            + ", title='" + title + '\''
+            + ", preStatements=" + preStatements
+            + ", postStatements=" + postStatements
+            + '}';
     }
 
     @Override
@@ -327,7 +327,7 @@ public class SqlParameters extends AbstractParameters {
 
         // whether udf type
         boolean udfTypeFlag = Enums.getIfPresent(UdfType.class, Strings.nullToEmpty(this.getType())).isPresent()
-                && !StringUtils.isEmpty(this.getUdfs());
+            && !StringUtils.isEmpty(this.getUdfs());
 
         if (udfTypeFlag) {
             String[] udfFunIds = this.getUdfs().split(",");
@@ -340,6 +340,7 @@ public class SqlParameters extends AbstractParameters {
 
     /**
      * TODO SQLTaskExecutionContext needs to be optimized
+     *
      * @param parametersHelper
      * @return
      */
@@ -351,7 +352,7 @@ public class SqlParameters extends AbstractParameters {
 
         // whether udf type
         boolean udfTypeFlag = Enums.getIfPresent(UdfType.class, Strings.nullToEmpty(this.getType())).isPresent()
-                && !StringUtils.isEmpty(this.getUdfs());
+            && !StringUtils.isEmpty(this.getUdfs());
 
         if (udfTypeFlag) {
             List<UdfFuncParameters> collect = parametersHelper.getResourceMap(ResourceType.UDF).entrySet().stream().map(entry -> (UdfFuncParameters) entry.getValue()).collect(Collectors.toList());

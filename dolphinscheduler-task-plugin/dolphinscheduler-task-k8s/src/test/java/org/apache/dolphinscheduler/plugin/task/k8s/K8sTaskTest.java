@@ -44,8 +44,9 @@ public class K8sTaskTest {
     private final int taskInstanceId = 1000;
     private final String taskName = "k8s_task_test";
 
-    private final String DAY = "day";
+    private final String day = "day";
     private final String date = "20220507";
+
     @Before
     public void before() {
         k8sTaskParameters = new K8sTaskParameters();
@@ -58,12 +59,12 @@ public class K8sTaskTest {
         taskRequest.setTaskName(taskName);
         taskRequest.setTaskParams(JSONUtils.toJsonString(k8sTaskParameters));
         Property property = new Property();
-        property.setProp(DAY);
+        property.setProp(day);
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue(date);
         Map<String, Property> paramsMap = new HashMap<>();
-        paramsMap.put(DAY,property);
+        paramsMap.put(day, property);
         taskRequest.setParamsMap(paramsMap);
 
         Map<String, Property> prepareParamsMap = new HashMap<>();

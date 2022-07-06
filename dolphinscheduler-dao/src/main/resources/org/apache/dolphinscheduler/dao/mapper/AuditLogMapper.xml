@@ -19,10 +19,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AuditLogMapper">
     <sql id="baseSql">
-        id, user_id, resource_type, operation, resource_id, time
+        id
+        , user_id, resource_type, operation, resource_id, time
     </sql>
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.user_id, ${alias}.resource_type, ${alias}.operation, ${alias}.resource_id, ${alias}.time
+        ${alias}
+        .
+        id
+        ,
+        ${alias}
+        .
+        user_id,
+        ${alias}
+        .
+        resource_type,
+        ${alias}
+        .
+        operation,
+        ${alias}
+        .
+        resource_id,
+        ${alias}
+        .
+        time
     </sql>
 
     <select id="queryAuditLog" resultType="org.apache.dolphinscheduler.dao.entity.AuditLog">

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import io.micrometer.core.annotation.Counted;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
@@ -32,6 +30,8 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+
+import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -51,7 +51,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -136,6 +135,7 @@ import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -152,7 +152,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +164,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -318,7 +319,8 @@ public class ProcessServiceImpl implements ProcessService {
         //when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             while (true) {
-                List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                List<ProcessInstance> runningProcessInstances =
+                    this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
                 if (CollectionUtils.isEmpty(runningProcessInstances)) {
                     processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
@@ -332,7 +334,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
         } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+                processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.STOP);
                 saveProcessInstance(processInstance);
@@ -342,7 +344,7 @@ public class ProcessServiceImpl implements ProcessService {
             saveProcessInstance(processInstance);
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+                processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
                 saveProcessInstance(processInstance);
@@ -359,13 +361,13 @@ public class ProcessServiceImpl implements ProcessService {
                 // determine whether the process is normal
                 if (update > 0) {
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                            info.getId(), 0, info.getState(), info.getId(), 0
+                        info.getId(), 0, info.getState(), info.getId(), 0
                     );
                     try {
                         Host host = new Host(info.getHost());
                         stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
                     } catch (Exception e) {
-                        logger.error("sendResultError",e );
+                        logger.error("sendResultError", e);
                     }
                 }
             }
@@ -802,10 +804,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                getCommandTypeIfComplement(processInstance, command),
-                processInstance.getScheduleTime(), timezoneId);
+            processDefinition.getGlobalParamMap(),
+            processDefinition.getGlobalParamList(),
+            getCommandTypeIfComplement(processInstance, command),
+            processInstance.getScheduleTime(), timezoneId);
         processInstance.setGlobalParams(globalParams);
 
         // set process instance priority
@@ -954,10 +956,10 @@ public class ProcessServiceImpl implements ProcessService {
 
             // Recalculate global parameters after rerun.
             String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    commandTypeIfComplement,
-                    processInstance.getScheduleTime(), timezoneId);
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                commandTypeIfComplement,
+                processInstance.getScheduleTime(), timezoneId);
             processInstance.setGlobalParams(globalParams);
             processInstance.setProcessDefinition(processDefinition);
         }
@@ -1130,11 +1132,11 @@ public class ProcessServiceImpl implements ProcessService {
         Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
         Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
         List<Date> complementDate = Lists.newLinkedList();
-        if(start != null && end != null){
+        if (start != null && end != null) {
             List<Schedule> listSchedules = queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
             complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
         }
-        if(cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)){
+        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
             complementDate = CronUtils.getSelfScheduleDateList(cmdParam);
         }
 
@@ -1147,9 +1149,9 @@ public class ProcessServiceImpl implements ProcessService {
         String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
         String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId);
+            processDefinition.getGlobalParamMap(),
+            processDefinition.getGlobalParamList(),
+            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId);
         processInstance.setGlobalParams(globalParams);
     }
 
@@ -3073,6 +3075,7 @@ public class ProcessServiceImpl implements ProcessService {
             throw new ServiceException("delete command fail, id:" + commandId);
         }
     }
+
     /**
      * find k8s config yaml by clusterName
      *

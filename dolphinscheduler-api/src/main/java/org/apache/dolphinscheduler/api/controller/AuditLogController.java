@@ -54,15 +54,15 @@ public class AuditLogController extends BaseController {
     /**
      * query audit log list paging
      *
-     * @param loginUser         login user
-     * @param pageNo            page number
-     * @param resourceType     resource type
-     * @param operationType     operation type
-     * @param startDate         start time
-     * @param endDate           end time
-     * @param userName          user name
-     * @param pageSize          page size
-     * @return      audit log content
+     * @param loginUser     login user
+     * @param pageNo        page number
+     * @param resourceType  resource type
+     * @param operationType operation type
+     * @param startDate     start time
+     * @param endDate       end time
+     * @param userName      user name
+     * @param pageSize      page size
+     * @return audit log content
      */
     @ApiOperation(value = "queryAuditLogListPaging", notes = "QUERY_AUDIT_LOG")
     @ApiImplicitParams({

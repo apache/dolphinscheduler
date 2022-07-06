@@ -19,7 +19,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper">
     <sql id="baseSql">
-        id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        id
+        , code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
         worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, operator, operate_time, create_time, update_time, task_group_id, task_group_priority, cpu_quota, memory_max
     </sql>
@@ -39,7 +40,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_task_definition_log
-        WHERE  1 = 1
+        WHERE 1 = 1
         <if test="taskDefinitions != null and taskDefinitions.size != 0">
             and
             <foreach collection="taskDefinitions" index="index" item="item" open="(" separator=" or " close=")">
@@ -50,7 +51,8 @@
     </select>
     <insert id="batchInsert">
         insert into t_ds_task_definition_log (code, name, version, description, project_code, user_id,
-        task_type, task_params, flag, task_priority, worker_group, environment_code, fail_retry_times, fail_retry_interval,
+        task_type, task_params, flag, task_priority, worker_group, environment_code, fail_retry_times,
+        fail_retry_interval,
         timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, operator, operate_time, create_time,
         update_time, task_group_id, task_group_priority, cpu_quota, memory_max)
         values
@@ -60,7 +62,8 @@
             #{taskDefinitionLog.flag},#{taskDefinitionLog.taskPriority},#{taskDefinitionLog.workerGroup},#{taskDefinitionLog.environmentCode},
             #{taskDefinitionLog.failRetryTimes},#{taskDefinitionLog.failRetryInterval},#{taskDefinitionLog.timeoutFlag},#{taskDefinitionLog.timeoutNotifyStrategy},
             #{taskDefinitionLog.timeout},#{taskDefinitionLog.delayTime},#{taskDefinitionLog.resourceIds},#{taskDefinitionLog.operator},#{taskDefinitionLog.operateTime},
-            #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime}, #{taskDefinitionLog.taskGroupId},#{taskDefinitionLog.taskGroupPriority},
+            #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime},
+            #{taskDefinitionLog.taskGroupId},#{taskDefinitionLog.taskGroupPriority},
             #{taskDefinitionLog.cpuQuota},#{taskDefinitionLog.memoryMax})
         </foreach>
     </insert>
@@ -70,7 +73,8 @@
         where code = #{code}
           and version = #{version}
     </delete>
-    <select id="queryTaskDefinitionVersionsPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+    <select id="queryTaskDefinitionVersionsPaging"
+            resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
         select
         <include refid="baseSql"/>
         from t_ds_task_definition_log

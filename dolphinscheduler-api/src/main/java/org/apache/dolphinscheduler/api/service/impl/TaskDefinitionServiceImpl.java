@@ -17,8 +17,16 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_VERSION_VIEW;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.PermissionCheck;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -45,7 +53,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.api.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -71,8 +78,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * task definition service impl
@@ -111,8 +116,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param taskDefinitionJson task definition json
      */
     @Transactional
@@ -135,10 +140,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                    .taskType(taskDefinitionLog.getTaskType())
-                    .taskParams(taskDefinitionLog.getTaskParams())
-                    .dependence(taskDefinitionLog.getDependence())
-                    .build())) {
+                .taskType(taskDefinitionLog.getTaskType())
+                .taskParams(taskDefinitionLog.getTaskParams())
+                .dependence(taskDefinitionLog.getDependence())
+                .build())) {
                 logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
@@ -160,11 +165,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create single task definition that binds the workflow
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return create result code
      */
     @Transactional
@@ -176,7 +181,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                        String upstreamCodes) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_CREATE);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -196,10 +201,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                .taskType(taskDefinition.getTaskType())
-                .taskParams(taskDefinition.getTaskParams())
-                .dependence(taskDefinition.getDependence())
-                .build())) {
+            .taskType(taskDefinition.getTaskType())
+            .taskParams(taskDefinition.getTaskParams())
+            .dependence(taskDefinition.getDependence())
+            .build())) {
             logger.error("task definition {} parameter invalid", taskDefinition.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinition.getName());
             return result;
@@ -270,16 +275,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * query task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param processCode process code
-     * @param taskName task name
+     * @param taskName    task name
      */
     @Override
     public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, long processCode, String taskName) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -298,16 +303,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * delete task definition
      * Only offline and no downstream dependency can be deleted
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode task code
+     * @param taskCode    task code
      */
     @Transactional
     @Override
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_DELETE);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_DELETE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -327,9 +332,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryDownstreamByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
             Set<Long> postTaskCodes = processTaskRelationList
-                    .stream()
-                    .map(ProcessTaskRelation::getPostTaskCode)
-                    .collect(Collectors.toSet());
+                .stream()
+                .map(ProcessTaskRelation::getPostTaskCode)
+                .collect(Collectors.toSet());
             putMsg(result, Status.TASK_HAS_DOWNSTREAM, StringUtils.join(postTaskCodes, ","));
             return result;
         }
@@ -363,7 +368,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         List<ProcessTaskRelationLog> relationLogs = processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(),
-                insertVersion, relationLogs, taskDefinitionLogs, Boolean.TRUE);
+            insertVersion, relationLogs, taskDefinitionLogs, Boolean.TRUE);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
@@ -376,9 +381,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task code
      * @param taskDefinitionJsonObj task definition json object
      */
     @Transactional
@@ -403,7 +408,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj, Map<String, Object> result) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_UPDATE));
+        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_UPDATE));
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return null;
         }
@@ -426,10 +431,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return null;
         }
         if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                .taskType(taskDefinitionToUpdate.getTaskType())
-                .taskParams(taskDefinitionToUpdate.getTaskParams())
-                .dependence(taskDefinitionToUpdate.getDependence())
-                .build())) {
+            .taskType(taskDefinitionToUpdate.getTaskType())
+            .taskParams(taskDefinitionToUpdate.getTaskParams())
+            .dependence(taskDefinitionToUpdate.getDependence())
+            .build())) {
             logger.error("task definition {} parameter invalid", taskDefinitionToUpdate.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
             return null;
@@ -463,11 +468,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition and upstream
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task definition code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return update result code
      */
     @Override
@@ -540,17 +545,17 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * switch task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode task code
-     * @param version the version user want to switch
+     * @param taskCode    task code
+     * @param version     the version user want to switch
      */
     @Transactional
     @Override
     public Map<String, Object> switchVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project,projectCode,WORKFLOW_SWITCH_TO_THIS_VERSION);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_SWITCH_TO_THIS_VERSION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -592,7 +597,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_VERSION_VIEW);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_VERSION_VIEW);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -614,7 +619,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_DELETE);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_DELETE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -641,7 +646,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -667,7 +672,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -675,7 +680,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
         IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
-                searchTaskName, taskType == null ? StringUtils.EMPTY : taskType);
+            searchTaskName, taskType == null ? StringUtils.EMPTY : taskType);
         List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
         if (!records.isEmpty()) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
@@ -733,9 +738,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * release task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param code         task definition code
      * @param releaseState releaseState
      * @return update result code
      */
@@ -744,7 +749,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         Status resultStatus = (Status) result.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             return result;

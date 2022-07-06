@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 /**
  * TODO <p>Need to optimize, why there are multiple task parameter variables:taskParams,dependence,switchResult</p>
- *
  */
 public class ParametersNode {
 

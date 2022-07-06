@@ -61,11 +61,11 @@ public class DataSourceControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(mysqlDatasourceParam)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -73,23 +73,23 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testUpdateDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
-        paramsMap.add("name","mysql");
-        paramsMap.add("node","mysql data source test");
-        paramsMap.add("type","MYSQL");
-        paramsMap.add("host","192.168.xxxx.xx");
-        paramsMap.add("port","3306");
-        paramsMap.add("principal","");
-        paramsMap.add("database","dolphinscheduler");
-        paramsMap.add("userName","root");
-        paramsMap.add("password","root@123");
-        paramsMap.add("other","");
+        paramsMap.add("id", "2");
+        paramsMap.add("name", "mysql");
+        paramsMap.add("node", "mysql data source test");
+        paramsMap.add("type", "MYSQL");
+        paramsMap.add("host", "192.168.xxxx.xx");
+        paramsMap.add("port", "3306");
+        paramsMap.add("principal", "");
+        paramsMap.add("database", "dolphinscheduler");
+        paramsMap.add("userName", "root");
+        paramsMap.add("password", "root@123");
+        paramsMap.add("other", "");
         MvcResult mvcResult = mockMvc.perform(post("/datasources/update")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -99,47 +99,47 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
+        paramsMap.add("id", "2");
         MvcResult mvcResult = mockMvc.perform(post("/datasources/update-ui")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryDataSourceList() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("type","MYSQL");
+        paramsMap.add("type", "MYSQL");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryDataSourceListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("searchVal","mysql");
-        paramsMap.add("pageNo","1");
-        paramsMap.add("pageSize","1");
+        paramsMap.add("searchVal", "mysql");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "1");
         MvcResult mvcResult = mockMvc.perform(get("/datasources")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -147,22 +147,22 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testConnectDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","hive data source");
-        paramsMap.add("type","HIVE");
-        paramsMap.add("host","192.168.xx.xx");
-        paramsMap.add("port","10000");
-        paramsMap.add("database","default");
-        paramsMap.add("userName","hive");
-        paramsMap.add("password","");
-        paramsMap.add("other","");
+        paramsMap.add("name", "hive data source");
+        paramsMap.add("type", "HIVE");
+        paramsMap.add("host", "192.168.xx.xx");
+        paramsMap.add("port", "10000");
+        paramsMap.add("database", "default");
+        paramsMap.add("userName", "hive");
+        paramsMap.add("password", "");
+        paramsMap.add("other", "");
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -170,60 +170,60 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testConnectionTest() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
+        paramsMap.add("id", "2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/connect-by-id")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testVerifyDataSourceName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","mysql");
+        paramsMap.add("name", "mysql");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/verify-name")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testAuthedDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId","2");
+        paramsMap.add("userId", "2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUnauthDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId","2");
+        paramsMap.add("userId", "2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -231,11 +231,11 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     public void testGetKerberosStartupState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
                 .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -243,15 +243,15 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testDelete() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","16");
+        paramsMap.add("id", "16");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/delete")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

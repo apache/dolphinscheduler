@@ -24,10 +24,10 @@ import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
 import static org.apache.dolphinscheduler.common.Constants.LEFT_BRACE_CHAR;
 import static org.apache.dolphinscheduler.common.Constants.LEFT_BRACE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.MULTIPLY_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.STAR;
 import static org.apache.dolphinscheduler.common.Constants.N;
 import static org.apache.dolphinscheduler.common.Constants.P;
 import static org.apache.dolphinscheduler.common.Constants.RIGHT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.STAR;
 import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_CHAR;
 import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_STRING;
 

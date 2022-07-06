@@ -113,7 +113,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryByClusterName() {
         Cluster entity = insertOne();
         Cluster cluster = clusterMapper.queryByClusterName(entity.getName());
-        Assert.assertEquals(entity.toString(),cluster.toString());
+        Assert.assertEquals(entity.toString(), cluster.toString());
     }
 
     /**
@@ -123,7 +123,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryByClusterCode() {
         Cluster entity = insertOne();
         Cluster cluster = clusterMapper.queryByClusterCode(entity.getCode());
-        Assert.assertEquals(entity.toString(),cluster.toString());
+        Assert.assertEquals(entity.toString(), cluster.toString());
     }
 
     /**
@@ -134,7 +134,7 @@ public class ClusterMapperTest extends BaseDaoTest {
         Cluster entity = insertOne();
         List<Cluster> clusters = clusterMapper.queryAllClusterList();
         Assert.assertEquals(clusters.size(), 1);
-        Assert.assertEquals(entity.toString(),clusters.get(0).toString());
+        Assert.assertEquals(entity.toString(), clusters.get(0).toString());
     }
 
     /**
@@ -144,11 +144,11 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryClusterListPaging() {
         Cluster entity = insertOne();
         Page<Cluster> page = new Page<>(1, 10);
-        IPage<Cluster> clusterIPage = clusterMapper.queryClusterListPaging(page,"");
+        IPage<Cluster> clusterIPage = clusterMapper.queryClusterListPaging(page, "");
         List<Cluster> clusterList = clusterIPage.getRecords();
         Assert.assertEquals(clusterList.size(), 1);
 
-        clusterIPage = clusterMapper.queryClusterListPaging(page,"abc");
+        clusterIPage = clusterMapper.queryClusterListPaging(page, "abc");
         clusterList = clusterIPage.getRecords();
         Assert.assertEquals(clusterList.size(), 0);
     }
@@ -172,20 +172,20 @@ public class ClusterMapperTest extends BaseDaoTest {
      */
     private String getConfig() {
         return "export HADOOP_HOME=/opt/hadoop-2.6.5\n"
-                + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
-                + "export SPARK_HOME1=/opt/soft/spark1\n"
-                + "export SPARK_HOME2=/opt/soft/spark2\n"
-                + "export PYTHON_HOME=/opt/soft/python\n"
-                + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
-                + "export HIVE_HOME=/opt/soft/hive\n"
-                + "export FLINK_HOME=/opt/soft/flink\n"
-                + "export DATAX_HOME=/opt/soft/datax\n"
-                + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
-                + "\n"
-                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
-                + "\n"
-                + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
-                + "\n"
-                + "#echo \"HADOOP_CLASSPATH=\"$HADOOP_CLASSPATH";
+            + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
+            + "export SPARK_HOME1=/opt/soft/spark1\n"
+            + "export SPARK_HOME2=/opt/soft/spark2\n"
+            + "export PYTHON_HOME=/opt/soft/python\n"
+            + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
+            + "export HIVE_HOME=/opt/soft/hive\n"
+            + "export FLINK_HOME=/opt/soft/flink\n"
+            + "export DATAX_HOME=/opt/soft/datax\n"
+            + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
+            + "\n"
+            + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
+            + "\n"
+            + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
+            + "\n"
+            + "#echo \"HADOOP_CLASSPATH=\"$HADOOP_CLASSPATH";
     }
 }

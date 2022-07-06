@@ -17,8 +17,8 @@
  * under the License.
  *
  */
-package org.apache.dolphinscheduler.e2e.cases;
 
+package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterAll;
@@ -85,21 +84,21 @@ public class FileManageE2ETest {
     @BeforeAll
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
-                .login(user, password)
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class)
-                .create(tenant);
+            .login(user, password)
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .create(tenant);
 
         await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-                .as("Tenant list should contain newly-created tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
 
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
 
         new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+            new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
             .goToNav(ResourcePage.class)
@@ -112,9 +111,9 @@ public class FileManageE2ETest {
         Files.deleteIfExists(testUnder1GBFilePath);
         Files.deleteIfExists(testOver1GBFilePath);
         Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
-             .sorted(Comparator.reverseOrder())
-             .map(Path::toFile)
-             .forEach(File::delete);
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
     }
 
     @Test
@@ -125,9 +124,9 @@ public class FileManageE2ETest {
         page.createDirectory(testDirectoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.fileList())
-                .as("File list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testDirectoryName)));
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
     @Test
@@ -143,52 +142,32 @@ public class FileManageE2ETest {
             .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
-//    @Test
-//    @Order(20)
-//    void testCreateDuplicateDirectory() {
-//        final FileManagePage page = new FileManagePage(browser);
-//
-//        page.createDirectory(testDirectoryName, "test_desc");
-//
-//        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
-//                .contains("resource already exists")
-//        );
-//
-//        page.createDirectoryBox().buttonCancel().click();
-//    }
+    // @Test
+    //    @Order(20)
+    //    void testCreateDuplicateDirectory() {
+    //        final FileManagePage page = new FileManagePage(browser);
+    //
+    //        page.createDirectory(testDirectoryName, "test_desc");
+    //
+    //        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+    //                .contains("resource already exists")
+    //        );
+    //
+    //        page.createDirectoryBox().buttonCancel().click();
+    //    }
 
-//    @Test
-//    @Order(21)
-//    void testCreateSubDirectory() {
-//        final FileManagePage page = new FileManagePage(browser);
-//
-//        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
-//
-//        await().untilAsserted(() -> assertThat(page.fileList())
-//            .as("File list should contain newly-created file")
-//            .extracting(WebElement::getText)
-//            .anyMatch(it -> it.contains(testSubDirectoryName)));
-//    }
-
-/*
-* when the storage is s3,the directory cannot be renamed
-* */
-//    @Test
-//    @Order(22)
-//    void testRenameDirectory() {
-//        final FileManagePage page = new FileManagePage(browser);
-//
-//        page.rename(testDirectoryName, testRenameDirectoryName);
-//
-//        await().untilAsserted(() -> {
-//            browser.navigate().refresh();
-//
-//            assertThat(page.fileList())
-//                .as("File list should contain newly-created file")
-//                .extracting(WebElement::getText)
-//                .anyMatch(it -> it.contains(testRenameDirectoryName));
-//        });
-//    }
+    //    @Test
+    //    @Order(21)
+    //    void testCreateSubDirectory() {
+    //        final FileManagePage page = new FileManagePage(browser);
+    //
+    //        page.createSubDirectory(testDirectoryName, testSubDirectoryName, "test_desc");
+    //
+    //        await().untilAsserted(() -> assertThat(page.fileList())
+    //            .as("File list should contain newly-created file")
+    //            .extracting(WebElement::getText)
+    //            .anyMatch(it -> it.contains(testSubDirectoryName)));
+    //    }
 
     @Test
     @Order(30)
@@ -203,9 +182,9 @@ public class FileManageE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.fileList()
+                page.fileList()
             ).noneMatch(
-                    it -> it.getText().contains(testDirectoryName)
+                it -> it.getText().contains(testDirectoryName)
             );
         });
     }

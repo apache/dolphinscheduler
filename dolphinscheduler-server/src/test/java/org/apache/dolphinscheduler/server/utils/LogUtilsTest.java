@@ -64,9 +64,9 @@ public class LogUtilsTest {
         Mockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
 
         Path logPath = Paths.get(".").toAbsolutePath().getParent()
-                .resolve(logBase)
-                .resolve(DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null))
-                .resolve("1_1-100-1000.log");
+            .resolve(logBase)
+            .resolve(DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null))
+            .resolve("1_1-100-1000.log");
         Assert.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskExecutionContext));
     }
 

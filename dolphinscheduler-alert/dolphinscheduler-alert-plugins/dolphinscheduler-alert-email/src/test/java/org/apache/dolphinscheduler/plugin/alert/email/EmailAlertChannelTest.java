@@ -55,9 +55,9 @@ public class EmailAlertChannelTest {
         String mapjson = JSONUtils.toJsonString(maps);
 
         alertData.setId(10)
-                 .setContent(mapjson)
-                 .setLog("10")
-                 .setTitle("test");
+            .setContent(mapjson)
+            .setLog("10")
+            .setTitle("test");
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
         Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getEmailAlertParams());
@@ -71,62 +71,62 @@ public class EmailAlertChannelTest {
     public String getEmailAlertParams() {
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam receivesParam = InputParam.newBuilder(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS, "receivers")
-                                             .setValue("540957506@qq.com")
-                                             .addValidate(Validate.newBuilder().setRequired(true).build())
-                                             .build();
+            .setValue("540957506@qq.com")
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         InputParam mailSmtpHost = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_HOST, "smtp.host")
-                                            .addValidate(Validate.newBuilder().setRequired(true).build())
-                                            .setValue("smtp.126.com")
-                                            .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("smtp.126.com")
+            .build();
 
         InputParam mailSmtpPort = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_PORT, "smtp.port")
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .setValue("25")
-                                            .build();
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .setValue("25")
+            .build();
 
         InputParam mailSender = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SENDER, "sender")
-                                          .addValidate(Validate.newBuilder().setRequired(true).build())
-                                          .setValue("dolphinscheduler@126.com")
-                                          .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("dolphinscheduler@126.com")
+            .build();
 
         RadioParam enableSmtpAuth = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_AUTH, "smtp.auth")
-                                              .addParamsOptions(new ParamsOptions("YES", "true", false))
-                                              .addParamsOptions(new ParamsOptions("NO", "false", false))
-                                              .addValidate(Validate.newBuilder().setRequired(true).build())
-                                              .setValue("false")
-                                              .build();
+            .addParamsOptions(new ParamsOptions("YES", "true", false))
+            .addParamsOptions(new ParamsOptions("NO", "false", false))
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("false")
+            .build();
 
         InputParam mailUser = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_USER, "user")
-                                        .setPlaceholder("if enable use authentication, you need input user")
-                                        .setValue("dolphinscheduler@126.com")
-                                        .build();
+            .setPlaceholder("if enable use authentication, you need input user")
+            .setValue("dolphinscheduler@126.com")
+            .build();
 
         PasswordParam mailPassword = PasswordParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, "passwd")
-                                                  .setPlaceholder("if enable use authentication, you need input password")
-                                                  .setValue("escheduler123")
-                                                  .build();
+            .setPlaceholder("if enable use authentication, you need input password")
+            .setValue("escheduler123")
+            .build();
 
         RadioParam enableTls = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE, "starttls.enable")
-                                         .addParamsOptions(new ParamsOptions("YES", "true", false))
-                                         .addParamsOptions(new ParamsOptions("NO", "false", false))
-                                         .addValidate(Validate.newBuilder().setRequired(true).build())
-                                         .setValue("true")
-                                         .build();
+            .addParamsOptions(new ParamsOptions("YES", "true", false))
+            .addParamsOptions(new ParamsOptions("NO", "false", false))
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("true")
+            .build();
 
         RadioParam enableSsl = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE, "smtp.ssl.enable")
-                                         .addParamsOptions(new ParamsOptions("YES", "true", false))
-                                         .addParamsOptions(new ParamsOptions("NO", "false", false))
-                                         .addValidate(Validate.newBuilder().setRequired(true).build())
-                                         .setValue("true")
-                                         .build();
+            .addParamsOptions(new ParamsOptions("YES", "true", false))
+            .addParamsOptions(new ParamsOptions("NO", "false", false))
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("true")
+            .build();
 
         InputParam sslTrust = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST, "smtp.ssl.trust")
-                                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                                        .setValue("smtp.126.com")
-                                        .build();
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .setValue("smtp.126.com")
+            .build();
 
         List<ParamsOptions> emailShowTypeList = new ArrayList<>();
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false));
@@ -134,10 +134,10 @@ public class EmailAlertChannelTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLE_ATTACHMENT.getDescp(), ShowType.TABLE_ATTACHMENT.getDescp(), false));
         RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, "showType")
-                                        .setOptions(emailShowTypeList)
-                                        .setValue(ShowType.TABLE.getDescp())
-                                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                                        .build();
+            .setOptions(emailShowTypeList)
+            .setValue(ShowType.TABLE.getDescp())
+            .addValidate(Validate.newBuilder().setRequired(true).build())
+            .build();
 
         paramsList.add(receivesParam);
         paramsList.add(mailSmtpHost);

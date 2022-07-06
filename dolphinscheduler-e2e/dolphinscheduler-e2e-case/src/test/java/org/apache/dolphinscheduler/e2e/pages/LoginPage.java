@@ -20,7 +20,6 @@
 package org.apache.dolphinscheduler.e2e.pages;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -40,7 +39,7 @@ public final class LoginPage extends NavBarPage {
     })
     private WebElement inputUsername;
 
-    @FindBys( {
+    @FindBys({
         @FindBy(className = "input-password"),
         @FindBy(tagName = "input"),
     })

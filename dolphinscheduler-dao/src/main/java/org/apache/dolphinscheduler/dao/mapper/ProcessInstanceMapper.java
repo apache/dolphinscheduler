@@ -55,6 +55,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     /**
      * query process instance host by stateArray
+     *
      * @param stateArray
      * @return
      */
@@ -222,10 +223,10 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     /**
      * query top n process instance order by running duration
      *
-     * @param size size
-     * @param startTime start time
-     * @param startTime end time
-     * @param status process instance status
+     * @param size        size
+     * @param startTime   start time
+     * @param startTime   end time
+     * @param status      process instance status
      * @param projectCode project code
      * @return ProcessInstance list
      */
@@ -248,8 +249,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                             @Param("states") int[] states);
 
     List<ProcessInstance> queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
-                                                                               @Param("processDefinitionVersion") int processDefinitionVersion,
-                                                                     @Param("states") int[] states, @Param("id") int id);
+                                                                                                @Param("processDefinitionVersion") int processDefinitionVersion,
+                                                                                                @Param("states") int[] states, @Param("id") int id);
 
     int updateGlobalParamsById(@Param("globalParams") String globalParams,
                                @Param("id") int id);

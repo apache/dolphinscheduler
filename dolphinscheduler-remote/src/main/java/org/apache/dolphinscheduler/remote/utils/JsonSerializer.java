@@ -76,9 +76,9 @@ public class JsonSerializer {
     /**
      * deserialize
      *
-     * @param src byte array
+     * @param src   byte array
      * @param clazz class
-     * @param <T> deserialize type
+     * @param <T>   deserialize type
      * @return deserialize type
      */
     public static <T> T deserialize(byte[] src, Class<T> clazz) {

@@ -33,7 +33,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
 @PrepareForTest({ClickHouseDataSourceClient.class, ClickHouseDataSourceChannel.class})
 public class ClickHouseDataSourceChannelTest {
-    
+
     @Test
     public void testCreateDataSourceClient() {
         ClickHouseDataSourceChannel sourceChannel = PowerMockito.mock(ClickHouseDataSourceChannel.class);

@@ -309,20 +309,19 @@ public class S3Utils implements Closeable, StorageOperate {
      * upload local directory to S3
      *
      * @param tenantCode
-     * @param keyPrefix the name of directory
+     * @param keyPrefix  the name of directory
      * @param strPath
      */
     private void uploadDirectory(String tenantCode, String keyPrefix, String strPath) {
         s3Client.putObject(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(strPath));
     }
 
-
     /**
      * xxx untest
      * download S3 Directory to local
      *
      * @param tenantCode
-     * @param keyPrefix the name of directory
+     * @param keyPrefix  the name of directory
      * @param srcPath
      */
     private void downloadDirectory(String tenantCode, String keyPrefix, String srcPath) {

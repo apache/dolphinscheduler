@@ -33,15 +33,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A base class for running a Unix command.
- * 
+ *
  * <code>AbstractShell</code> can be used to run unix commands like <code>du</code> or
- * <code>df</code>. It also offers facilities to gate commands by 
+ * <code>df</code>. It also offers facilities to gate commands by
  * time-intervals.
  */
 public abstract class AbstractShell {
-  
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractShell.class);
-  
 
 
     /**
@@ -55,7 +54,7 @@ public abstract class AbstractShell {
 
     /**
      * refresh interval in msec
-      */
+     */
     private long interval;
 
     /**
@@ -79,14 +78,14 @@ public abstract class AbstractShell {
      * If or not script finished executing
      */
     private AtomicBoolean completed;
-  
+
     public AbstractShell() {
         this(0L);
     }
-  
+
     /**
      * @param interval the minimum duration to wait before re-executing the
-     *        command.
+     *                 command.
      */
     public AbstractShell(long interval) {
         this.interval = interval;
@@ -95,6 +94,7 @@ public abstract class AbstractShell {
 
     /**
      * set the environment for the command
+     *
      * @param env Mapping of environment variables
      */
     protected void setEnvironment(Map<String, String> env) {
@@ -103,6 +103,7 @@ public abstract class AbstractShell {
 
     /**
      * set the working directory
+     *
      * @param dir The directory where the command would be executed
      */
     protected void setWorkingDirectory(File dir) {
@@ -111,6 +112,7 @@ public abstract class AbstractShell {
 
     /**
      * check to see if a command needs to be executed and execute if needed
+     *
      * @throws IOException errors
      */
     protected void run() throws IOException {
@@ -149,11 +151,11 @@ public abstract class AbstractShell {
             timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);
         }
         final BufferedReader errReader =
-                new BufferedReader(
-                        new InputStreamReader(process.getErrorStream()));
+            new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
         BufferedReader inReader =
-                new BufferedReader(
-                        new InputStreamReader(process.getInputStream()));
+            new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
         final StringBuilder errMsg = new StringBuilder();
 
         // read error and input streams as this would free up the buffers
@@ -200,7 +202,7 @@ public abstract class AbstractShell {
             } catch (InterruptedException ie) {
                 logger.warn("Interrupted while reading the error and in stream", ie);
             }
-            completed.compareAndSet(false,true);
+            completed.compareAndSet(false, true);
             //the timeout thread handling
             //taken care in finally block
             if (exitCode != 0 || errMsg.length() > 0) {
@@ -233,13 +235,13 @@ public abstract class AbstractShell {
     }
 
     /**
-     *
      * @return an array containing the command name and its parameters
      */
     protected abstract String[] getExecString();
-  
+
     /**
      * Parse the execution result
+     *
      * @param lines lines
      * @throws IOException errors
      */
@@ -247,13 +249,16 @@ public abstract class AbstractShell {
 
     /**
      * get the current sub-process executing the given command
+     *
      * @return process executing the command
      */
     public Process getProcess() {
         return process;
     }
 
-    /** get the exit code
+    /**
+     * get the exit code
+     *
      * @return the exit code of the process
      */
     public int getExitCode() {
@@ -262,7 +267,6 @@ public abstract class AbstractShell {
 
     /**
      * Set if the command has timed out.
-     *
      */
     private void setTimedOut() {
         this.timedOut.set(true);
@@ -314,7 +318,6 @@ public abstract class AbstractShell {
 
     /**
      * process manage container
-     *
      */
     public static class ProcessContainer extends ConcurrentHashMap<Integer, Process> {
         private static final ProcessContainer container = new ProcessContainer();

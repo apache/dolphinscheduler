@@ -34,9 +34,9 @@ public class SeatunnelSparkParameters extends SeatunnelParameters {
     @Override
     public boolean checkParameters() {
         return super.checkParameters()
-                && Objects.nonNull(deployMode)
-                && (DeployModeEnum.local != deployMode && Objects.nonNull(master))
-                && (DeployModeEnum.local != deployMode && (MasterTypeEnum.SPARK == master || MasterTypeEnum.MESOS == master) && StringUtils.isNotBlank(masterUrl));
+            && Objects.nonNull(deployMode)
+            && (DeployModeEnum.local != deployMode && Objects.nonNull(master))
+            && (DeployModeEnum.local != deployMode && (MasterTypeEnum.SPARK == master || MasterTypeEnum.MESOS == master) && StringUtils.isNotBlank(masterUrl));
     }
 
     public static enum MasterTypeEnum {

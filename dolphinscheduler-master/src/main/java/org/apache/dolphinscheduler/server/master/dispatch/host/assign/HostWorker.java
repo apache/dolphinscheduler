@@ -69,9 +69,9 @@ public class HostWorker extends Host {
     @Override
     public String toString() {
         return "Host{"
-                + "hostWeight=" + hostWeight
-                + ", workerGroup='" + workerGroup + '\''
-                + '}';
+            + "hostWeight=" + hostWeight
+            + ", workerGroup='" + workerGroup + '\''
+            + '}';
     }
 
 }

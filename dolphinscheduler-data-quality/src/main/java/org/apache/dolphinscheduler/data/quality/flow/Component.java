@@ -44,9 +44,9 @@ public interface Component {
 
         if (!nonExistsOptions.isEmpty()) {
             return new ValidateResult(
-                    false,
-                    nonExistsOptions.stream().map(option ->
-                            "[" + option + "]").collect(Collectors.joining(",")) + " is not exist");
+                false,
+                nonExistsOptions.stream().map(option ->
+                    "[" + option + "]").collect(Collectors.joining(",")) + " is not exist");
         } else {
             return new ValidateResult(true, "");
         }

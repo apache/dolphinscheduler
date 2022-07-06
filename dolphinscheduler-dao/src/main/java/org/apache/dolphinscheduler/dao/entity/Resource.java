@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -94,7 +94,6 @@ public class Resource {
      */
     @TableField(exist = false)
     private String userName;
-
 
     public Resource() {
     }
@@ -199,7 +198,6 @@ public class Resource {
         this.userId = userId;
     }
 
-
     public ResourceType getType() {
         return type;
     }
@@ -242,21 +240,21 @@ public class Resource {
 
     @Override
     public String toString() {
-        return "Resource{" +
-            "id=" + id +
-            ", pid=" + pid +
-            ", alias='" + alias + '\'' +
-            ", fullName='" + fullName + '\'' +
-            ", isDirectory=" + isDirectory +
-            ", description='" + description + '\'' +
-            ", fileName='" + fileName + '\'' +
-            ", userId=" + userId +
-            ", type=" + type +
-            ", size=" + size +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            ",userName=" + userName +
-            '}';
+        return "Resource{"
+            + "id=" + id
+            + ", pid=" + pid
+            + ", alias='" + alias + '\''
+            + ", fullName='" + fullName + '\''
+            + ", isDirectory=" + isDirectory
+            + ", description='" + description + '\''
+            + ", fileName='" + fileName + '\''
+            + ", userId=" + userId
+            + ", type=" + type
+            + ", size=" + size
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + ",userName=" + userName
+            + '}';
     }
 
     @Override

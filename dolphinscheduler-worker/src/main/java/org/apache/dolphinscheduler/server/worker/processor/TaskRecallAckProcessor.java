@@ -48,7 +48,7 @@ public class TaskRecallAckProcessor implements NettyRequestProcessor {
             return;
         }
 
-        if (taskRecallAckCommand.getStatus() ==  ExecutionStatus.SUCCESS.getCode()) {
+        if (taskRecallAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponseCache.get().removeRecallCache(taskRecallAckCommand.getTaskInstanceId());
             logger.debug("removeRecallCache: task instance id:{}", taskRecallAckCommand.getTaskInstanceId());
             TaskCallbackService.remove(taskRecallAckCommand.getTaskInstanceId());

@@ -55,10 +55,10 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * add new audit log
      *
-     * @param user                  login user
-     * @param resourceType          resource type
-     * @param resourceId            resource id
-     * @param operation             operation type
+     * @param user         login user
+     * @param resourceType resource type
+     * @param resourceId   resource id
+     * @param operation    operation type
      */
     @Override
     public void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation) {
@@ -68,15 +68,15 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * query audit log paging
      *
-     * @param loginUser         login user
-     * @param resourceType      resource type
-     * @param operationType     operation type
-     * @param startDate         start time
-     * @param endDate           end time
-     * @param userName          query user name
-     * @param pageNo            page number
-     * @param pageSize          page size
-     * @return  audit log string data
+     * @param loginUser     login user
+     * @param resourceType  resource type
+     * @param operationType operation type
+     * @param startDate     start time
+     * @param endDate       end time
+     * @param userName      query user name
+     * @param pageNo        page number
+     * @param pageSize      page size
+     * @return audit log string data
      */
     @Override
     public Result queryLogListPaging(User loginUser, AuditResourceType resourceType,
@@ -88,18 +88,18 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
         Status resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
-            putMsg(result,resultEnum);
+            putMsg(result, resultEnum);
             return result;
         }
 
         int[] resourceArray = null;
         if (resourceType != null) {
-            resourceArray = new int[]{resourceType.getCode()};
+            resourceArray = new int[] {resourceType.getCode()};
         }
 
         int[] opsArray = null;
         if (operationType != null) {
-            opsArray = new int[]{operationType.getCode()};
+            opsArray = new int[] {operationType.getCode()};
         }
 
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);

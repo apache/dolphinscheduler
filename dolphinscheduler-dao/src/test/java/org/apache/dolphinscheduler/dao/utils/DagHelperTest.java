@@ -51,7 +51,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class DagHelperTest {
 
     @Test
-    public void testHaveSubAfterNode(){
+    public void testHaveSubAfterNode() {
         String parentNodeCode = "5293789969856";
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
         TaskNodeRelation relation = new TaskNodeRelation();
@@ -86,7 +86,7 @@ public class DagHelperTest {
         ProcessDag processDag = new ProcessDag();
         processDag.setEdges(taskNodeRelations);
         processDag.setNodes(taskNodes);
-        DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
         boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
         Assert.assertTrue(canSubmit);
 
@@ -263,16 +263,16 @@ public class DagHelperTest {
         TaskNode node3 = dag.getNode("3");
         node3.setType(TASK_TYPE_CONDITIONS);
         node3.setConditionResult("{\n"
-                +
-                "                \"successNode\": [5\n"
-                +
-                "                ],\n"
-                +
-                "                \"failedNode\": [6\n"
-                +
-                "                ]\n"
-                +
-                "            }");
+            +
+            "                \"successNode\": [5\n"
+            +
+            "                ],\n"
+            +
+            "                \"failedNode\": [6\n"
+            +
+            "                ]\n"
+            +
+            "            }");
         completeTaskList.remove("3");
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(ExecutionStatus.SUCCESS);
@@ -337,11 +337,11 @@ public class DagHelperTest {
      * 4->3->6
      * 1->2->8->5->7
      * DAG graph:
-     *      4 ->   -> 6
-     *          \ /
+     * 4 ->   -> 6
+     * \ /
      * 1 -> 2 -> 3 -> 5 -> 7
-     *       \       /
-     *        -> 8 ->
+     * \       /
+     * -> 8 ->
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
@@ -427,7 +427,7 @@ public class DagHelperTest {
         List<String> startNodes = new ArrayList<>();
         List<String> recoveryNodes = new ArrayList<>();
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
-                startNodes, recoveryNodes, TaskDependType.TASK_POST);
+            startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
         ProcessDag processDag = new ProcessDag();
         processDag.setEdges(taskNodeRelations);
@@ -437,11 +437,11 @@ public class DagHelperTest {
 
     /**
      * DAG graph:
-     *    2
-     *    ↑
+     * 2
+     * ↑
      * 0->1(switch)
-     *    ↓
-     *    4
+     * ↓
+     * 4
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
@@ -497,7 +497,7 @@ public class DagHelperTest {
         List<String> startNodes = new ArrayList<>();
         List<String> recoveryNodes = new ArrayList<>();
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
-                startNodes, recoveryNodes, TaskDependType.TASK_POST);
+            startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
         ProcessDag processDag = new ProcessDag();
         processDag.setEdges(taskNodeRelations);
@@ -527,14 +527,14 @@ public class DagHelperTest {
     @Test
     public void testBuildDagGraph() {
         String shellJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\","
-                +
-                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"},"
-                +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\","
-                +
-                "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\","
-                +
-                "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+            +
+            "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"},"
+            +
+            "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\","
+            +
+            "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\","
+            +
+            "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
         ProcessData processData = JSONUtils.parseObject(shellJson, ProcessData.class);
         assert processData != null;

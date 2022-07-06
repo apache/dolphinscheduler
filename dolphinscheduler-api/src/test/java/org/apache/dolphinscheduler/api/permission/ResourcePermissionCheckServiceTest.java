@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.permission;
 
+package org.apache.dolphinscheduler.api.permission;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -57,7 +57,7 @@ public class ResourcePermissionCheckServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private  ApplicationContext context;
+    private ApplicationContext context;
     @Mock
     private ResourcePermissionCheckService<Object> resourcePermissionCheckService;
 
@@ -67,16 +67,16 @@ public class ResourcePermissionCheckServiceTest {
     protected static final Map<AuthorizationType, ResourcePermissionCheckServiceImpl.ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP = new ConcurrentHashMap<>();
 
     @Test
-    public void testResourcePermissionCheck(){
+    public void testResourcePermissionCheck() {
         User user = new User();
         user.setId(1);
-        Object[] obj = new Object[]{1,2};
+        Object[] obj = new Object[] {1, 2};
         boolean result = this.resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, obj, user.getId(), logger);
         Assert.assertFalse(result);
     }
 
     @Test
-    public void testOperationPermissionCheck(){
+    public void testOperationPermissionCheck() {
         User user = new User();
         user.setId(1);
         resourcePermissionCheckServices.setApplicationContext(context);
@@ -86,24 +86,24 @@ public class ResourcePermissionCheckServiceTest {
     }
 
     @Test
-    public void testUserOwnedResourceIdsAcquisition(){
+    public void testUserOwnedResourceIdsAcquisition() {
         User user = new User();
         user.setId(1);
         //ADMIN
         user.setUserType(UserType.ADMIN_USER);
-        Object[] obj = new Object[]{1,2};
+        Object[] obj = new Object[] {1, 2};
         List<Project> projectList = Lists.newArrayList(this.getEntity());
         Set result = resourcePermissionCheckServices.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                user.getId(),
-                logger);
+            user.getId(),
+            logger);
         Assert.assertNotNull(result);
     }
 
-
     @Test
-    public void  testSetApplication(){
-       resourcePermissionCheckServices.setApplicationContext(context);
+    public void testSetApplication() {
+        resourcePermissionCheckServices.setApplicationContext(context);
     }
+
     /**
      * create entity
      */

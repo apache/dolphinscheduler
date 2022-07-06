@@ -39,7 +39,7 @@ public class HttpParameters extends AbstractParameters {
     private HttpMethod httpMethod;
 
     /**
-     *  http params
+     * http params
      */
     private List<HttpProperty> httpParams;
 

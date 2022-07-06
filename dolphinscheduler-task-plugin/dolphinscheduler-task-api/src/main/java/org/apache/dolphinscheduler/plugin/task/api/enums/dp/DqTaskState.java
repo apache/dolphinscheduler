@@ -31,9 +31,9 @@ public enum DqTaskState {
      * 1-success
      * 2-failure
      */
-    DEFAULT(0,"default"),
-    SUCCESS(1,"success"),
-    FAILURE(2,"failure");
+    DEFAULT(0, "default"),
+    SUCCESS(1, "success"),
+    FAILURE(2, "failure");
 
     DqTaskState(int code, String description) {
         this.code = code;
@@ -56,7 +56,7 @@ public enum DqTaskState {
 
     static {
         for (DqTaskState type : DqTaskState.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

@@ -63,17 +63,17 @@ public class TaskInstanceController extends BaseController {
     /**
      * query task list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param searchVal search value
-     * @param taskName task name
-     * @param stateType state type
-     * @param host host
-     * @param startTime start time
-     * @param endTime end time
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param searchVal         search value
+     * @param taskName          task name
+     * @param stateType         state type
+     * @param host              host
+     * @param startTime         start time
+     * @param endTime           end time
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @return task list page
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
@@ -113,16 +113,16 @@ public class TaskInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
-                taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+            taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return result;
     }
 
     /**
      * change one task instance's state from FAILURE to FORCED_SUCCESS
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id task instance id
+     * @param id          task instance id
      * @return the result code and msg
      */
     @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")

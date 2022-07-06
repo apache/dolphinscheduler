@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 
 /**
@@ -44,13 +45,14 @@ public interface BaseService {
      * isNotAdmin
      *
      * @param loginUser login user
-     * @param result result code
+     * @param result    result code
      * @return true if not administrator, otherwise false
      */
     boolean isNotAdmin(User loginUser, Map<String, Object> result);
 
     /**
      * permissionPostHandle
+     *
      * @param authorizationType
      * @param userId
      * @param ids
@@ -61,8 +63,8 @@ public interface BaseService {
     /**
      * put message to map
      *
-     * @param result result code
-     * @param status status
+     * @param result       result code
+     * @param status       status
      * @param statusParams status message
      */
     void putMsg(Map<String, Object> result, Status status, Object... statusParams);
@@ -70,8 +72,8 @@ public interface BaseService {
     /**
      * put message to result object
      *
-     * @param result result code
-     * @param status status
+     * @param result       result code
+     * @param status       status
      * @param statusParams status message
      */
     void putMsg(Result<Object> result, Status status, Object... statusParams);
@@ -79,8 +81,8 @@ public interface BaseService {
     /**
      * check
      *
-     * @param result result
-     * @param bool bool
+     * @param result              result
+     * @param bool                bool
      * @param userNoOperationPerm status
      * @return check result
      */
@@ -90,7 +92,7 @@ public interface BaseService {
     /**
      * Verify that the operator has permissions
      *
-     * @param operateUser operate user
+     * @param operateUser  operate user
      * @param createUserId create user id
      * @return check result
      */
@@ -98,11 +100,12 @@ public interface BaseService {
 
     /**
      * Verify that the operator has permissions
+     *
      * @param user operate user
-     * @param ids Object[]
+     * @param ids  Object[]
+     * @return check result
      * @Param type authorizationType
      * @Param perm String
-     * @return check result
      */
     boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String perm);
 
@@ -110,8 +113,8 @@ public interface BaseService {
      * check and parse date parameters
      *
      * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
+     * @param endDateStr   end date string
+     * @return map<status, startDate, endDate>
      */
     Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
 }

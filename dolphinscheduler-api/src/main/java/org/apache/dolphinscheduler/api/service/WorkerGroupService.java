@@ -31,9 +31,9 @@ public interface WorkerGroupService {
      * create or update a worker group
      *
      * @param loginUser login user
-     * @param id worker group id
-     * @param name worker group name
-     * @param addrList addr list
+     * @param id        worker group id
+     * @param name      worker group name
+     * @param addrList  addr list
      * @return create or update result code
      */
     Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList);
@@ -42,9 +42,9 @@ public interface WorkerGroupService {
      * query worker group paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return worker group list page
      */
     Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
@@ -59,6 +59,7 @@ public interface WorkerGroupService {
 
     /**
      * delete worker group by id
+     *
      * @param id worker group id
      * @return delete result code
      */

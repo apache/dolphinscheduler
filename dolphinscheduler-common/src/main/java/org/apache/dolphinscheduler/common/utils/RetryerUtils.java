@@ -40,11 +40,11 @@ public class RetryerUtils {
     private static Retryer<Boolean> getDefaultRetryerResultNoCheck() {
         if (defaultRetryerResultNoCheck == null) {
             defaultRetryerResultNoCheck = RetryerBuilder
-                    .<Boolean>newBuilder()
-                    .retryIfException()
-                    .withWaitStrategy(WaitStrategies.fixedWait(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS))
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-                    .build();
+                .<Boolean>newBuilder()
+                .retryIfException()
+                .withWaitStrategy(WaitStrategies.fixedWait(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
         }
         return defaultRetryerResultNoCheck;
     }
@@ -72,12 +72,12 @@ public class RetryerUtils {
     public static Retryer<Boolean> getDefaultRetryer() {
         if (defaultRetryerResultCheck == null) {
             defaultRetryerResultCheck = RetryerBuilder
-                    .<Boolean>newBuilder()
-                    .retryIfResult(Boolean.FALSE::equals)
-                    .retryIfException()
-                    .withWaitStrategy(WaitStrategies.fixedWait(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS))
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-                    .build();
+                .<Boolean>newBuilder()
+                .retryIfResult(Boolean.FALSE::equals)
+                .retryIfException()
+                .withWaitStrategy(WaitStrategies.fixedWait(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .build();
         }
         return defaultRetryerResultCheck;
     }

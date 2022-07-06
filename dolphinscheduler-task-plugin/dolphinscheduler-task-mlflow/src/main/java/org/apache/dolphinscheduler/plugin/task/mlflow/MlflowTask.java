@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.mlflow;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -26,14 +27,11 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,9 +85,9 @@ public class MlflowTask extends AbstractTaskExecutor {
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             int exitCode = exitStatusCode;
-            if (mlflowParameters.getIsDeployDocker()){
+            if (mlflowParameters.getIsDeployDocker()) {
                 exitCode = checkDockerHealth();
-            }else {
+            } else {
                 exitCode = getExitStatusCode();
             }
             setExitStatusCode(exitCode);
@@ -137,9 +135,9 @@ public class MlflowTask extends AbstractTaskExecutor {
             args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
             args.add(String.format(MlflowConstants.SET_REPOSITORY, MlflowConstants.PRESET_BASIC_ALGORITHM_PROJECT));
 
-
             runCommand = MlflowConstants.MLFLOW_RUN_BASIC_ALGORITHM;
-            runCommand = String.format(runCommand, mlflowParameters.getAlgorithm(), mlflowParameters.getParams(), mlflowParameters.getSearchParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
+            runCommand = String.format(runCommand, mlflowParameters.getAlgorithm(), mlflowParameters.getParams(), mlflowParameters.getSearchParams(), mlflowParameters.getModelName(),
+                mlflowParameters.getExperimentName());
 
         } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_AUTOML)) {
             args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
@@ -147,7 +145,6 @@ public class MlflowTask extends AbstractTaskExecutor {
 
             runCommand = MlflowConstants.MLFLOW_RUN_AUTOML_PROJECT;
             runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
-
 
         } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT)) {
             args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));
@@ -168,7 +165,6 @@ public class MlflowTask extends AbstractTaskExecutor {
         /**
          * papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
          */
-
 
         Map<String, Property> paramsMap = getParamsMap();
         List<String> args = new ArrayList<>();
@@ -211,7 +207,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         logger.info("checking container healthy ... ");
         int exitCode = -1;
         String[] command = {"sh", "-c", String.format(MlflowConstants.DOCKER_HEALTH_CHECK, mlflowParameters.getContainerName())};
-        for(int x = 0; x < MlflowConstants.DOCKER_HEALTH_CHECK_TIMEOUT; x = x+1) {
+        for (int x = 0; x < MlflowConstants.DOCKER_HEALTH_CHECK_TIMEOUT; x = x + 1) {
             String status;
             try {
                 status = OSUtils.exeShell(command).replace("\n", "").replace("\"", "");
@@ -224,7 +220,7 @@ public class MlflowTask extends AbstractTaskExecutor {
                 exitCode = 0;
                 logger.info("container is healthy");
                 return exitCode;
-            }else {
+            } else {
                 logger.info("The health check has been running for {} seconds", x * MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL / 1000);
                 ThreadUtils.sleep(MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL);
             }
@@ -233,7 +229,6 @@ public class MlflowTask extends AbstractTaskExecutor {
         logger.info("health check fail");
         return exitCode;
     }
-
 
     @Override
     public AbstractParameters getParameters() {

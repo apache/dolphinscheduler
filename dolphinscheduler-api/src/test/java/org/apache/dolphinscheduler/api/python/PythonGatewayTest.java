@@ -31,6 +31,10 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import java.util.Date;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +42,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Date;
-import java.util.Map;
 
 /**
  * python gate test
@@ -95,7 +96,6 @@ public class PythonGatewayTest {
         Map<String, Object> result = pythonGateway.getDependentInfo(project.getName(), processDefinition.getName(), taskDefinition.getName());
         Assert.assertEquals((long) result.get("taskDefinitionCode"), taskDefinition.getCode());
     }
-
 
     @Test
     public void testQueryResourcesFileInfo() {

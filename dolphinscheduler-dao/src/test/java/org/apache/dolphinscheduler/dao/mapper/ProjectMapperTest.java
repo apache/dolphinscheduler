@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -143,14 +142,14 @@ public class ProjectMapperTest extends BaseDaoTest {
 
         Page<Project> page = new Page(1, 3);
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(
-                page,
-                null,
-                null
+            page,
+            null,
+            null
         );
         IPage<Project> projectIPage1 = projectMapper.queryProjectListPaging(
-                page,
-                null,
-                project.getName()
+            page,
+            null,
+            project.getName()
         );
         Assert.assertEquals(projectIPage.getTotal(), 1);
         Assert.assertEquals(projectIPage1.getTotal(), 1);
@@ -189,7 +188,7 @@ public class ProjectMapperTest extends BaseDaoTest {
         Project project = insertOne();
 
         List<Project> projects = projectMapper.queryProjectExceptUserId(
-                100000
+            100000
         );
 
         Assert.assertNotEquals(projects.size(), 0);
@@ -199,10 +198,10 @@ public class ProjectMapperTest extends BaseDaoTest {
      * test query project permission
      */
     @Test
-    public void testListAuthorizedProjects(){
+    public void testListAuthorizedProjects() {
         Project project = insertOne();
-        List<Project> projects  = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
-        Assert.assertEquals(projects.size(),0);
+        List<Project> projects = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
+        Assert.assertEquals(projects.size(), 0);
     }
 
 }

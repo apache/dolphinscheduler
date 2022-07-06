@@ -14,25 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.log;
+
+import org.apache.dolphinscheduler.common.Constants;
+
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Marker;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
 import ch.qos.logback.core.spi.FilterReply;
-import org.apache.dolphinscheduler.common.Constants;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Marker;
-import java.util.Map;
 
 public class MasterLogFilterTest {
 
     @Test
     public void decide() {
         MasterLogFilter masterLogFilter = new MasterLogFilter();
-
 
         FilterReply filterReply = masterLogFilter.decide(new ILoggingEvent() {
             @Override
@@ -48,7 +51,7 @@ public class MasterLogFilterTest {
             @Override
             public String getMessage() {
                 return "master insert into queue success, task : shell2";
-//                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
+                //    return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
             }
 
             @Override

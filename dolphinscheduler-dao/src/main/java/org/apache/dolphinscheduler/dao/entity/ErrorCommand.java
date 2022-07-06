@@ -72,7 +72,7 @@ public class ErrorCommand {
     private FailureStrategy failureStrategy;
 
     /**
-     *  warning type
+     * warning type
      */
     private WarningType warningType;
 
@@ -121,7 +121,8 @@ public class ErrorCommand {
      */
     private int dryRun;
 
-    public ErrorCommand() {}
+    public ErrorCommand() {
+    }
 
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();
@@ -281,23 +282,23 @@ public class ErrorCommand {
     @Override
     public String toString() {
         return "ErrorCommand{"
-                + "id=" + id
-                + ", commandType=" + commandType
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", executorId=" + executorId
-                + ", commandParam='" + commandParam + '\''
-                + ", taskDependType=" + taskDependType
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", warningGroupId=" + warningGroupId
-                + ", scheduleTime=" + scheduleTime
-                + ", startTime=" + startTime
-                + ", processInstancePriority=" + processInstancePriority
-                + ", updateTime=" + updateTime
-                + ", message='" + message + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", dryRun='" + dryRun + '\''
-                + '}';
+            + "id=" + id
+            + ", commandType=" + commandType
+            + ", processDefinitionCode=" + processDefinitionCode
+            + ", executorId=" + executorId
+            + ", commandParam='" + commandParam + '\''
+            + ", taskDependType=" + taskDependType
+            + ", failureStrategy=" + failureStrategy
+            + ", warningType=" + warningType
+            + ", warningGroupId=" + warningGroupId
+            + ", scheduleTime=" + scheduleTime
+            + ", startTime=" + startTime
+            + ", processInstancePriority=" + processInstancePriority
+            + ", updateTime=" + updateTime
+            + ", message='" + message + '\''
+            + ", workerGroup='" + workerGroup + '\''
+            + ", environmentCode='" + environmentCode + '\''
+            + ", dryRun='" + dryRun + '\''
+            + '}';
     }
 }

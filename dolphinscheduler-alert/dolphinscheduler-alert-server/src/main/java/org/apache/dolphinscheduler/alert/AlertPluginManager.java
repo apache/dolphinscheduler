@@ -63,13 +63,13 @@ public final class AlertPluginManager {
 
     public PluginParams getWarningTypeParams() {
         return
-                RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                        .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                        .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                        .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                        .setValue(WarningType.ALL.getDescp())
-                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                        .build();
+            RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                .setValue(WarningType.ALL.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
     }
 
     @EventListener

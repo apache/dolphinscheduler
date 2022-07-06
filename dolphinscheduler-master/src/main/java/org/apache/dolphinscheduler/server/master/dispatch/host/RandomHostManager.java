@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RandomSele
 import java.util.Collection;
 
 /**
- *  random host manager
+ * random host manager
  */
 public class RandomHostManager extends CommonHostManager {
 

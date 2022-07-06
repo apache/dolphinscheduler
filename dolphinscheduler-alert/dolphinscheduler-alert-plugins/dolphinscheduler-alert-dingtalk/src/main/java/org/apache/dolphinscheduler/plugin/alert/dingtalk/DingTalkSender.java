@@ -52,8 +52,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- *     https://open.dingtalk.com/document/robots/custom-robot-access
- *     https://open.dingtalk.com/document/robots/customize-robot-security-settings
+ * https://open.dingtalk.com/document/robots/custom-robot-access
+ * https://open.dingtalk.com/document/robots/customize-robot-security-settings
  * </p>
  */
 public final class DingTalkSender {
@@ -149,7 +149,7 @@ public final class DingTalkSender {
     /**
      * send dingtalk msg handler
      *
-     * @param title title
+     * @param title   title
      * @param content content
      * @return
      */
@@ -202,7 +202,7 @@ public final class DingTalkSender {
     /**
      * generate msg json
      *
-     * @param title title
+     * @param title   title
      * @param content content
      * @return msg
      */
@@ -229,9 +229,9 @@ public final class DingTalkSender {
     /**
      * generate text msg
      *
-     * @param title title
+     * @param title   title
      * @param content content
-     * @param text text
+     * @param text    text
      */
     private void generateTextMsg(String title, String content, Map<String, Object> text) {
         StringBuilder builder = new StringBuilder(title);
@@ -249,9 +249,9 @@ public final class DingTalkSender {
     /**
      * generate markdown msg
      *
-     * @param title title
+     * @param title   title
      * @param content content
-     * @param text text
+     * @param text    text
      */
     private void generateMarkdownMsg(String title, String content, Map<String, Object> text) {
         StringBuilder builder = new StringBuilder(content);
@@ -313,7 +313,7 @@ public final class DingTalkSender {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
             byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
-            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)),"UTF-8");
+            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
         } catch (Exception e) {
             logger.error("generate sign error, message:{}", e);
         }

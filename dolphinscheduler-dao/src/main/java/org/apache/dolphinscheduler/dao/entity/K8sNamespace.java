@@ -209,19 +209,19 @@ public class K8sNamespace {
 
     @Override
     public String toString() {
-        return "K8sNamespace{" +
-            "id=" + id +
-            ", namespace=" + namespace +
-            ", limitsCpu=" + limitsCpu +
-            ", limitsMemory=" + limitsMemory +
-            ", userId=" + userId +
-            ", podRequestCpu=" + podRequestCpu +
-            ", podRequestMemory=" + podRequestMemory +
-            ", podReplicas=" + podReplicas +
-            ", k8s=" + k8s +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
+        return "K8sNamespace{"
+            + "id=" + id
+            + ", namespace=" + namespace
+            + ", limitsCpu=" + limitsCpu
+            + ", limitsMemory=" + limitsMemory
+            + ", userId=" + userId
+            + ", podRequestCpu=" + podRequestCpu
+            + ", podRequestMemory=" + podRequestMemory
+            + ", podReplicas=" + podReplicas
+            + ", k8s=" + k8s
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 
     @Override
@@ -245,7 +245,7 @@ public class K8sNamespace {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (k8s+namespace).hashCode();
+        result = 31 * result + (k8s + namespace).hashCode();
         return result;
     }
 }

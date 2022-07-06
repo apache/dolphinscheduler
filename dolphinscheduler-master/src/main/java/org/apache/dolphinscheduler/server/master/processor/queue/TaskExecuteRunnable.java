@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -27,6 +26,7 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
@@ -103,7 +103,7 @@ public class TaskExecuteRunnable implements Runnable {
     public boolean addEvent(TaskEvent event) {
         if (event.getProcessInstanceId() != this.processInstanceId) {
             logger.warn("event would be abounded, task instance id:{}, process instance id:{}, this.processInstanceId:{}",
-                    event.getTaskInstanceId(), event.getProcessInstanceId(), this.processInstanceId);
+                event.getTaskInstanceId(), event.getProcessInstanceId(), this.processInstanceId);
             return false;
         }
         return this.events.add(event);

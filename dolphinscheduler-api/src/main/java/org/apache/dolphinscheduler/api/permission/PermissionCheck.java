@@ -64,7 +64,7 @@ public class PermissionCheck<T> {
      * permission check
      *
      * @param authorizationType authorization type
-     * @param processService process dao
+     * @param processService    process dao
      */
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService) {
         this.authorizationType = authorizationType;

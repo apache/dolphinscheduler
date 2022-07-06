@@ -19,12 +19,13 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class TelegramSenderTest {
 
@@ -33,15 +34,14 @@ public class TelegramSenderTest {
     @Before
     public void initConfig() {
         telegramConfig.put(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK,
-                "https://api.telegram.org/bot{botToken}/sendMessage");
+            "https://api.telegram.org/bot{botToken}/sendMessage");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "BOT_TOKEN");
+            TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "BOT_TOKEN");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "CHAT_ID");
+            TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "CHAT_ID");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
+            TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
     }
-
 
     @Test
     public void testSendMessageFailByParamToken() {
@@ -49,7 +49,7 @@ public class TelegramSenderTest {
         alertData.setTitle("[telegram alert] test title");
         alertData.setContent("telegram test content");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "XXXXXXX");
+            TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN, "XXXXXXX");
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
         Assert.assertEquals("false", result.getStatus());
@@ -62,13 +62,11 @@ public class TelegramSenderTest {
         alertData.setTitle("[telegram alert] test title");
         alertData.setContent("telegram test content");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "-XXXXXXX");
+            TelegramParamsConstants.NAME_TELEGRAM_CHAT_ID, "-XXXXXXX");
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
         Assert.assertEquals("false", result.getStatus());
     }
-
-
 
     @Test
     public void testSendMessage() {
@@ -87,7 +85,7 @@ public class TelegramSenderTest {
         alertData.setTitle("[telegram alert]test markdown");
         alertData.setContent("```python \npre-formatted fixed-width code block written in the Python programming language```");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_MARKDOWN);
+            TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_MARKDOWN);
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
         Assert.assertEquals("false", result.getStatus());
@@ -100,12 +98,11 @@ public class TelegramSenderTest {
         alertData.setTitle("[telegram alert]test html");
         alertData.setContent("<b>bold</b>");
         telegramConfig.put(
-                TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_HTML);
+            TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_HTML);
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
         AlertResult result = telegramSender.sendMessage(alertData);
         Assert.assertEquals("false", result.getStatus());
 
     }
-
 
 }

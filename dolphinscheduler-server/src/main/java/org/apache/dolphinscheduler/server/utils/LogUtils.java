@@ -63,7 +63,7 @@ public class LogUtils {
             .map(TaskLogDiscriminator::getLogBase)
             .map(e -> Paths.get(e)
                 .toAbsolutePath()
-                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD, null))
+                .resolve(DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null))
                 .resolve(taskLogFileName))
             .map(Path::toString)
             .orElse("");
@@ -73,7 +73,7 @@ public class LogUtils {
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(),taskExecutionContext.getProcessDefineCode(),
+        return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getProcessDefineCode(),
             taskExecutionContext.getProcessDefineVersion(),
             taskExecutionContext.getProcessInstanceId(),
             taskExecutionContext.getTaskInstanceId());

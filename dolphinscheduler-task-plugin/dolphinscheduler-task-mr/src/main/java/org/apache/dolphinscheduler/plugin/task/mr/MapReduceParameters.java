@@ -150,10 +150,10 @@ public class MapReduceParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "mainJar= " + mainJar
-                + "mainClass=" + mainClass
-                + "mainArgs=" + mainArgs
-                + "queue=" + queue
-                + "other mainArgs=" + others
-                ;
+            + "mainClass=" + mainClass
+            + "mainArgs=" + mainArgs
+            + "queue=" + queue
+            + "other mainArgs=" + others
+            ;
     }
 }

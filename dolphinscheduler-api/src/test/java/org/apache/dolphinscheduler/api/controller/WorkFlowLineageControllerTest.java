@@ -82,7 +82,7 @@ public class WorkFlowLineageControllerTest {
     }
 
     @Test
-    public  void testQueryWorkFlowLineageByCode() {
+    public void testQueryWorkFlowLineageByCode() {
         long projectCode = 1L;
         long code = 1L;
         Map<String, Object> result = new HashMap<>();

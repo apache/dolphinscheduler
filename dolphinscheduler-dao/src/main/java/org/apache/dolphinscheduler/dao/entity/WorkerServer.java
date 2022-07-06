@@ -115,14 +115,14 @@ public class WorkerServer {
 
     @Override
     public String toString() {
-        return "WorkerServer{" +
-                "id=" + id +
-                ", host='" + host + '\'' +
-                ", port=" + port +
-                ", zkDirectory='" + zkDirectory + '\'' +
-                ", resInfo='" + resInfo + '\'' +
-                ", createTime=" + createTime +
-                ", lastHeartbeatTime=" + lastHeartbeatTime +
-                '}';
+        return "WorkerServer{"
+            + "id=" + id
+            + ", host='" + host + '\''
+            + ", port=" + port
+            + ", zkDirectory='" + zkDirectory + '\''
+            + ", resInfo='" + resInfo + '\''
+            + ", createTime=" + createTime
+            + ", lastHeartbeatTime=" + lastHeartbeatTime
+            + '}';
     }
 }

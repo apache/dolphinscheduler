@@ -24,8 +24,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +44,7 @@ public class FlinkArgsUtils {
     private static final String FLINK_VERSION_AFTER_OR_EQUALS_1_12 = ">=1.12";
     private static final String FLINK_VERSION_AFTER_OR_EQUALS_1_13 = ">=1.13";
     /**
-     *  default flink deploy mode
+     * default flink deploy mode
      */
     public static final FlinkDeployMode DEFAULT_DEPLOY_MODE = FlinkDeployMode.CLUSTER;
 
@@ -150,6 +148,7 @@ public class FlinkArgsUtils {
         return initOptions;
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     private static List<String> buildCommandLineForOthers(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
@@ -254,7 +253,7 @@ public class FlinkArgsUtils {
         ResourceInfo mainJar = flinkParameters.getMainJar();
         if (mainJar != null) {
             // -py
-            if(ProgramType.PYTHON == programType) {
+            if (ProgramType.PYTHON == programType) {
                 args.add(FlinkConstants.FLINK_PYTHON);
             }
             args.add(mainJar.getRes());

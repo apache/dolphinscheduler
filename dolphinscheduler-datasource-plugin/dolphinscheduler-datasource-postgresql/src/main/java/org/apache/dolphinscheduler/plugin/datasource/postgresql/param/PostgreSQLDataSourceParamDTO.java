@@ -25,13 +25,13 @@ public class PostgreSQLDataSourceParamDTO extends BaseDataSourceParamDTO {
     @Override
     public String toString() {
         return "PostgreSQLDataSourceParamDTO{"
-                + "host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", other='" + other + '\''
-                + '}';
+            + "host='" + host + '\''
+            + ", port=" + port
+            + ", database='" + database + '\''
+            + ", userName='" + userName + '\''
+            + ", password='" + password + '\''
+            + ", other='" + other + '\''
+            + '}';
     }
 
     @Override

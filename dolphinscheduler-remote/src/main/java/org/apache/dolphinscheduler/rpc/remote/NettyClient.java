@@ -110,7 +110,7 @@ public class NettyClient {
     /**
      * create channel
      *
-     * @param host host
+     * @param host   host
      * @param isSync sync flag
      * @return channel
      */
@@ -170,24 +170,24 @@ public class NettyClient {
     private void start() {
 
         this.bootstrap
-                .group(this.workerGroup)
-                .channel(NettyUtils.getSocketChannelClass())
-                .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
-                .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
-                .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
-                .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
-                .handler(new LoggingHandler(LogLevel.DEBUG))
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) {
-                        ch.pipeline()
-                                .addLast(new NettyEncoder())
-                                .addLast(new NettyDecoder(RpcResponse.class))
-                                .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
-                                .addLast(new NettyClientHandler());
-                    }
-                });
+            .group(this.workerGroup)
+            .channel(NettyUtils.getSocketChannelClass())
+            .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
+            .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
+            .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
+            .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
+            .handler(new LoggingHandler(LogLevel.DEBUG))
+            .handler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                public void initChannel(SocketChannel ch) {
+                    ch.pipeline()
+                        .addLast(new NettyEncoder())
+                        .addLast(new NettyDecoder(RpcResponse.class))
+                        .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
+                        .addLast(new NettyClientHandler());
+                }
+            });
 
         isStarted.compareAndSet(false, true);
     }

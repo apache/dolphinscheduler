@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
@@ -73,8 +71,8 @@ public class PythonTask extends AbstractTaskExecutor {
         this.taskRequest = taskRequest;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                logger);
+            taskRequest,
+            logger);
     }
 
     @Override
@@ -188,8 +186,8 @@ public class PythonTask extends AbstractTaskExecutor {
 
             // write data to file
             FileUtils.writeStringToFile(new File(pythonScriptFile),
-                    sb.toString(),
-                    StandardCharsets.UTF_8);
+                sb.toString(),
+                StandardCharsets.UTF_8);
         }
     }
 

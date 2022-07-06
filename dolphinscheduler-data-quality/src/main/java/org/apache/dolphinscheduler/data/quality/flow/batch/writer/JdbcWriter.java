@@ -64,7 +64,7 @@ public class JdbcWriter implements BatchWriter {
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
         if (Strings.isNullOrEmpty(config.getString(SAVE_MODE))) {
-            config.put(SAVE_MODE,APPEND);
+            config.put(SAVE_MODE, APPEND);
         }
     }
 
@@ -76,8 +76,8 @@ public class JdbcWriter implements BatchWriter {
 
         data.write()
             .format(JDBC)
-            .option(DRIVER,config.getString(DRIVER))
-            .option(URL,config.getString(URL))
+            .option(DRIVER, config.getString(DRIVER))
+            .option(URL, config.getString(URL))
             .option(DB_TABLE, config.getString(TABLE))
             .option(USER, config.getString(USER))
             .option(PASSWORD, config.getString(PASSWORD))

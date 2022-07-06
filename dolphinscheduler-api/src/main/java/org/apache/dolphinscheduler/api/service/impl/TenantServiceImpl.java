@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_UPDATE;
+import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -39,14 +39,11 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,8 +51,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * tenant service impl
@@ -83,10 +86,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
@@ -98,12 +101,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                             String desc) throws Exception {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT, TENANT_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
-        if(StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH){
+        if (StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH) {
             putMsg(result, Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
             return result;
         }
@@ -112,7 +115,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
             return result;
         }
-
 
         if (checkTenantExists(tenantCode)) {
             putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
@@ -172,11 +174,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser login user
-     * @param id tenant id
+     * @param loginUser  login user
+     * @param id         tenant id
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
@@ -187,7 +189,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -237,7 +239,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * delete tenant
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      * @throws Exception exception
      */
@@ -246,7 +248,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_DELETE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -264,7 +266,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
 
         List<ProcessDefinition> processDefinitions =
-                processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
+            processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(processDefinitions)) {
             putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
             return result;
@@ -278,7 +280,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         // if resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
-          storageOperate.deleteTenant(tenant.getTenantCode());
+            storageOperate.deleteTenant(tenant.getTenantCode());
         }
 
         tenantMapper.deleteById(id);

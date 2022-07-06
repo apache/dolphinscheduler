@@ -42,7 +42,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      *
      * @param projectCode projectCode
      * @param processCode processCode
-     * @param name name
+     * @param name        name
      * @return task definition
      */
     TaskDefinition queryByName(@Param("projectCode") long projectCode,
@@ -108,11 +108,11 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     /**
      * task main info page
      *
-     * @param page page
-     * @param projectCode projectCode
+     * @param page               page
+     * @param projectCode        projectCode
      * @param searchWorkflowName searchWorkflowName
-     * @param searchTaskName searchTaskName
-     * @param taskType taskType
+     * @param searchTaskName     searchTaskName
+     * @param taskType           taskType
      * @return task main info IPage
      */
     IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,

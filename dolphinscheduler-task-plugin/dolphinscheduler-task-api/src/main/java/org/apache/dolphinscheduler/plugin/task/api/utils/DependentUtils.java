@@ -64,7 +64,7 @@ public class DependentUtils {
      * get date interval list by business date and date value.
      *
      * @param businessDate business date
-     * @param dateValue date value
+     * @param dateValue    date value
      * @return date interval list by business date and date value.
      */
     public static List<DateInterval> getDateIntervalList(Date businessDate, String dateValue) {

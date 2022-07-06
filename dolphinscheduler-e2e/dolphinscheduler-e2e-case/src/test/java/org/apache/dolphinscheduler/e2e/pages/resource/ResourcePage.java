@@ -17,11 +17,11 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -29,6 +29,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import lombok.Getter;
 
 @Getter
 public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.enums;
 
 /**
  * task record status
- *
  */
 public enum TaskRecordStatus {
 
@@ -29,7 +28,7 @@ public enum TaskRecordStatus {
      * 1 failure
      * 2 exception
      */
-    SUCCESS,FAILURE,EXCEPTION
+    SUCCESS, FAILURE, EXCEPTION
 
 
 }

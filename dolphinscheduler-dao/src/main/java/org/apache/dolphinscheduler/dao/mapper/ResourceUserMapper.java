@@ -32,8 +32,9 @@ public interface ResourceUserMapper extends BaseMapper<ResourcesUser> {
 
     /**
      * query resourcesId list by userId and perm
+     *
      * @param userId userId
-     * @param perm perm
+     * @param perm   perm
      * @return resourcesId list result
      */
     List<Integer> queryResourcesIdListByUserIdAndPerm(@Param("userId") int userId,
@@ -41,7 +42,8 @@ public interface ResourceUserMapper extends BaseMapper<ResourcesUser> {
 
     /**
      * delete resource user relation
-     * @param userId userId
+     *
+     * @param userId     userId
      * @param resourceId resourceId
      * @return delete result
      */
@@ -50,11 +52,12 @@ public interface ResourceUserMapper extends BaseMapper<ResourcesUser> {
 
     /**
      * delete resource user relation
+     *
      * @param userId userId
      * @param resIds resource Ids
      * @return delete result
      */
     int deleteResourceUserArray(@Param("userId") int userId,
-                           @Param("resIds") Integer[] resIds);
+                                @Param("resIds") Integer[] resIds);
 
 }

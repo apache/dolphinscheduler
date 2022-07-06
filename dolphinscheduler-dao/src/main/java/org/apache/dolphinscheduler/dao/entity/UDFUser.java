@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 /**
  * udf user relation
@@ -28,94 +29,94 @@ import java.util.Date;
 @TableName("t_ds_relation_udfs_user")
 public class UDFUser {
 
-  /**
-   * id
-   */
-  @TableId(value="id", type=IdType.AUTO)
-  private int id;
+    /**
+     * id
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private int id;
 
-  /**
-   * id
-   */
-  private int userId;
+    /**
+     * id
+     */
+    private int userId;
 
-  /**
-   * udf id
-   */
-  private int udfId;
+    /**
+     * udf id
+     */
+    private int udfId;
 
-  /**
-   * permission
-   */
-  private int perm;
+    /**
+     * permission
+     */
+    private int perm;
 
-  /**
-   * create time
-   */
-  private Date createTime;
+    /**
+     * create time
+     */
+    private Date createTime;
 
-  /**
-   * update time
-   */
-  private Date updateTime;
+    /**
+     * update time
+     */
+    private Date updateTime;
 
-  public int getId() {
-    return id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public int getUserId() {
-    return userId;
-  }
+    public int getUserId() {
+        return userId;
+    }
 
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-  public int getUdfId() {
-    return udfId;
-  }
+    public int getUdfId() {
+        return udfId;
+    }
 
-  public void setUdfId(int udfId) {
-    this.udfId = udfId;
-  }
+    public void setUdfId(int udfId) {
+        this.udfId = udfId;
+    }
 
-  public int getPerm() {
-    return perm;
-  }
+    public int getPerm() {
+        return perm;
+    }
 
-  public void setPerm(int perm) {
-    this.perm = perm;
-  }
+    public void setPerm(int perm) {
+        this.perm = perm;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-  @Override
-  public String toString() {
-    return "UDFUser{" +
-            "id=" + id +
-            ", userId=" + userId +
-            ", udfId=" + udfId +
-            ", perm=" + perm +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "UDFUser{"
+            + "id=" + id
+            + ", userId=" + userId
+            + ", udfId=" + udfId
+            + ", perm=" + perm
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
+    }
 }
