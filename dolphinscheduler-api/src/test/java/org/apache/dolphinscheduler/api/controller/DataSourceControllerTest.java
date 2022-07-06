@@ -30,7 +30,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.HashMap;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
