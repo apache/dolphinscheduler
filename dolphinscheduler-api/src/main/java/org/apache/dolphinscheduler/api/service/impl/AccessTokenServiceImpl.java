@@ -109,6 +109,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * create token
      *
+     * @param loginUser
      * @param userId token for user
      * @param expireTime token expire time
      * @param token token string (if it is absent, it will be automatically generated)
@@ -161,6 +162,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * generate token
      *
+     * @param loginUser
      * @param userId token for user
      * @param expireTime token expire time
      * @return token string

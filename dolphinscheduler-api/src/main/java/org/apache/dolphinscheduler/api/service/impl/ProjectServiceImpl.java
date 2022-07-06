@@ -87,7 +87,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return returns an error if it exists
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
         Map<String, Object> result = checkDesc(desc);
