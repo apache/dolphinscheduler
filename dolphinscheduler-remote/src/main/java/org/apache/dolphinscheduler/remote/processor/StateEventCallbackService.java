@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -71,19 +72,19 @@ public class StateEventCallbackService {
      * @param host
      * @return callback channel
      */
-    private NettyRemoteChannel newRemoteChannel(Host host) {
+    private Optional<NettyRemoteChannel> newRemoteChannel(Host host) {
         Channel newChannel;
         NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(host.getAddress());
         if (nettyRemoteChannel != null) {
             if (nettyRemoteChannel.isActive()) {
-                return nettyRemoteChannel;
+                return Optional.of(nettyRemoteChannel);
             }
         }
         newChannel = nettyRemotingClient.getChannel(host);
         if (newChannel != null) {
-            return newRemoteChannel(newChannel, host.getAddress());
+            return Optional.of(newRemoteChannel(newChannel, host.getAddress()));
         }
-        return null;
+        return Optional.empty();
     }
 
     public long pause(int ntries) {
@@ -110,24 +111,26 @@ public class StateEventCallbackService {
     }
 
     /**
-     * send result
+     * Send the command to target address, this method doesn't guarantee the command send success.
      *
-     * @param command command
+     * @param command command need tp send
      */
     public void sendResult(String address, int port, Command command) {
         logger.info("send result, host:{}, command:{}", address, command.toString());
         Host host = new Host(address, port);
-        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
-        if (nettyRemoteChannel != null) {
-            nettyRemoteChannel.writeAndFlush(command);
-        }
+        sendResult(host, command);
     }
 
+    /**
+     * Send the command to target host, this method doesn't guarantee the command send success.
+     *
+     * @param host    target host
+     * @param command command need to send
+     */
     public void sendResult(Host host, Command command) {
         logger.info("send result, host:{}, command:{}", host.getAddress(), command.toString());
-        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
-        if (nettyRemoteChannel != null) {
+        newRemoteChannel(host).ifPresent(nettyRemoteChannel -> {
             nettyRemoteChannel.writeAndFlush(command);
-        }
+        });
     }
 }
