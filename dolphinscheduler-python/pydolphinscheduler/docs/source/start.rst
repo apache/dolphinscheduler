@@ -59,7 +59,7 @@ The latest version of *PyDolphinScheduler* would be installed after you run abov
 command in your terminal. You could go and `start Python Gateway Service`_ to finish
 the prepare, and then go to :doc:`tutorial` to make your hand dirty. But if you
 want to install the unreleased version of *PyDolphinScheduler*, you could go and see
-section `installing PyDolphinScheduler in dev`_ for more detail.
+section `installing PyDolphinScheduler in dev branch`_ for more detail.
 
 .. note::
 
