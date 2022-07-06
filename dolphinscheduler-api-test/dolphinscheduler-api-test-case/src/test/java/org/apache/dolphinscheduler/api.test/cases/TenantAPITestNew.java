@@ -39,14 +39,14 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
-@DisplayName("Tenant API interface test")
+@DisplayName("Tenant Page API test")
 public class TenantAPITestNew extends AbstractAPITest {
     protected final Fairy fairy = Fairy.create();
     private TenantResponseEntity tenantResponseEntity = null;
     private TenantPageAPI tenantPageAPI = null;
 
     @BeforeAll
-    public void initTenantEndPointFactory() {
+    public void initTenantPageAPIFactory() {
         tenantPageAPI = pageAPIFactory.createTenantPageAPI();
     }
 

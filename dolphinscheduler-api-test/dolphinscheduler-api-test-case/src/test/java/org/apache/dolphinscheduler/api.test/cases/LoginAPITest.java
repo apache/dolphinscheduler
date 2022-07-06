@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
-@DisplayName("User Login API test")
+@DisplayName("User Login Page API test")
 public class LoginAPITest extends AbstractAPITest {
     private LoginPageAPI loginPageAPI = null;
     private LoginRequestEntity loginRequestEntity = null;
