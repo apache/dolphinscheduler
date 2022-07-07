@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+
+import static io.restassured.RestAssured.given;
 
 import org.apache.dolphinscheduler.api.test.base.AbstractAPITest;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
