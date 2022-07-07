@@ -164,8 +164,10 @@
         select
         <include refid="baseSql"/>
         from t_ds_project p
-        right join t_ds_relation_project_user rpu on p.id = rpu.project_id
-        where rpu.user_id = #{userId}
+        <if test="userId != 0">
+            right join t_ds_relation_project_user rpu on p.id = rpu.project_id
+            where rpu.user_id = #{userId}
+        </if>
     </select>
 
     <select id="listAuthorizedProjects" resultType="org.apache.dolphinscheduler.dao.entity.Project">
