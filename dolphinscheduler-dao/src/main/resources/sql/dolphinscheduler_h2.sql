@@ -639,8 +639,8 @@ CREATE TABLE t_ds_project
     create_time datetime NOT NULL,
     update_time datetime     DEFAULT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY unique_name(name),
-    UNIQUE KEY unique_code(code)
+    UNIQUE KEY unique_name (name),
+    UNIQUE KEY unique_code (code)
 );
 
 -- ----------------------------
@@ -658,7 +658,8 @@ CREATE TABLE t_ds_queue
     queue       varchar(64) DEFAULT NULL,
     create_time datetime    DEFAULT NULL,
     update_time datetime    DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_queue_name (queue_name)
 );
 
 -- ----------------------------
@@ -889,7 +890,7 @@ CREATE TABLE t_ds_tenant
     create_time datetime     DEFAULT NULL,
     update_time datetime     DEFAULT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY unique_tenant_code(tenant_code)
+    UNIQUE KEY unique_tenant_code (tenant_code)
 );
 
 -- ----------------------------
@@ -915,7 +916,7 @@ CREATE TABLE t_ds_udfs
     create_time   datetime     NOT NULL,
     update_time   datetime     NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY unique_func_name(func_name)
+    UNIQUE KEY unique_func_name (func_name)
 );
 
 -- ----------------------------
@@ -1857,8 +1858,7 @@ CREATE TABLE t_ds_task_group_queue
    in_queue     int(4) DEFAULT '0' ,
    create_time  datetime DEFAULT NULL ,
    update_time  datetime DEFAULT NULL ,
-   PRIMARY KEY (id),
-   UNIQUE KEY unique_queue_name(queue_name)
+   PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS t_ds_task_group;
