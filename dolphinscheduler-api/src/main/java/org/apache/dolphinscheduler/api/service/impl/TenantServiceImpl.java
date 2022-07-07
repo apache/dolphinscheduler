@@ -327,7 +327,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Result<Object> verifyTenantCode(String tenantCode) {
         Result<Object> result = new Result<>();
         if (checkTenantExists(tenantCode)) {
-            throw new ServiceException(Status.OS_TENANT_CODE_EXIST);
+            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenantCode);
         }
         putMsg(result, Status.SUCCESS);
         return result;
@@ -381,5 +381,5 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenantCodeValid(tenantCode);
         Queue newQueue = queueService.createQueueIfNotExists(queue, queueName);
         return createObjToDB(tenantCode, desc, newQueue.getId());
-    };
+    }
 }

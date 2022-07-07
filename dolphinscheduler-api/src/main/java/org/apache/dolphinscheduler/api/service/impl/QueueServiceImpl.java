@@ -292,6 +292,6 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return createObjToDB(queue, queueName);
         }
         return existsQueue;
-    };
+    }
 
 }
