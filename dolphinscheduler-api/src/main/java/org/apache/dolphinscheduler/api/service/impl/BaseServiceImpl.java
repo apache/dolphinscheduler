@@ -121,24 +121,6 @@ public class BaseServiceImpl implements BaseService {
     }
 
     /**
-     * put Map object with both status and message to result object
-     *
-     * @param result result code
-     * @param mapObj Map object contain status and message.
-     */
-    @Override
-    public void putMsg(Result<Object> result, Map<String, Object> mapObj) {
-        Status status = (Status) mapObj.get(Constants.STATUS);
-        String msg = (String) mapObj.get(Constants.MSG);
-        result.setCode(status.getCode());
-        if (StringUtils.isNotEmpty(msg)) {
-            result.setMsg(msg);
-        } else {
-            result.setMsg(status.getMsg());
-        }
-    }
-
-    /**
      * check
      *
      * @param result result

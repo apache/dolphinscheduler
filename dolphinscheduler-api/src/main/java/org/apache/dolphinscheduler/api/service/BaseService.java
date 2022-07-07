@@ -77,14 +77,6 @@ public interface BaseService {
     void putMsg(Result<Object> result, Status status, Object... statusParams);
 
     /**
-     * put message to result object
-     *
-     * @param result result code
-     * @param mapObj Map object contain status and message.
-     */
-    void putMsg(Result<Object> result, Map<String, Object> mapObj);
-
-    /**
      * check
      *
      * @param result result
