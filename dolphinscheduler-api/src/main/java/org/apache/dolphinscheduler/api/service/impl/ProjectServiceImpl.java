@@ -413,6 +413,49 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return result;
     }
 
+    /**
+     * query all project with authorized level
+     * @param loginUser login user
+     * @return project list
+     */
+    @Override
+    public Map<String, Object> queryProjectWithAuthorizedLevel(User loginUser, Integer userId){
+        Map<String, Object> result = new HashMap<>();
+
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+//        if (projectIds.isEmpty()) {
+//            result.put(Constants.DATA_LIST, Collections.emptyList());
+//            putMsg(result, Status.SUCCESS);
+//            return result;
+//        }
+        List<Project> projectList = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
+
+        List<Project> unauthorizedProjectsList = new ArrayList<>();
+        List<Project> authedProjectList = new ArrayList<>();
+        Set<Project> projectSet;
+        if (projectList != null && !projectList.isEmpty()) {
+            projectSet = new HashSet<>(projectList);
+            authedProjectList = projectMapper.queryAuthedProjectListByUserId(userId);
+            unauthorizedProjectsList = getUnauthorizedProjects(projectSet, authedProjectList);
+        }
+
+        for (int i = 0; i < authedProjectList.size(); i++) {
+            authedProjectList.get(i).setPerm(7);
+        }
+
+        for (int i = 0; i < unauthorizedProjectsList.size(); i++) {
+            unauthorizedProjectsList.get(i).setPerm(0);
+        }
+
+        List<Project> joined = new ArrayList<>();
+        joined.addAll(authedProjectList);
+        joined.addAll(unauthorizedProjectsList);
+
+        result.put(Constants.DATA_LIST, joined);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
 
     /**
      * query unauthorized project

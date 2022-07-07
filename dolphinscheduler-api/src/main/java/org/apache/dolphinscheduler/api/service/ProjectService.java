@@ -132,6 +132,13 @@ public interface ProjectService {
     Result queryAuthorizedProject(User loginUser, Integer userId);
 
     /**
+     * query all project with authorized level
+     * @param loginUser login user
+     * @return project list
+     */
+    Map<String, Object> queryProjectWithAuthorizedLevel(User loginUser, Integer userId);
+
+    /**
      * query authorized user
      *
      * @param loginUser     login user

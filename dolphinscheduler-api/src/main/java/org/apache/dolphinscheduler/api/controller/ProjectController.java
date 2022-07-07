@@ -236,6 +236,27 @@ public class ProjectController extends BaseController {
     }
 
     /**
+     * query all project with authorized level
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return All projects with users' authorized level for them
+     */
+    @ApiOperation(value = "queryProjectWithAuthorizedLevel", notes = "QUERY_PROJECT_AUTHORIZED_LEVEL")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+    })
+    @GetMapping(value = "/project-with-authorized-level")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUTHORIZED_PROJECT)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProjectWithAuthorizedLevel(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @RequestParam("userId") Integer userId) {
+        Map<String, Object> result = projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
+        return returnDataList(result);
+    }
+
+    /**
      * query authorized user
      *
      * @param loginUser   login user
