@@ -19,11 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.core.extensions;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 
 import java.io.File;
@@ -33,8 +28,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback {
