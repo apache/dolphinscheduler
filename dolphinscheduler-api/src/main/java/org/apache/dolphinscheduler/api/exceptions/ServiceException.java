@@ -39,7 +39,7 @@ public class ServiceException extends RuntimeException {
         this.code = status.getCode();
     }
 
-    public ServiceException(Status status, String formatter) {
+    public ServiceException(Status status, Object... formatter) {
         super(MessageFormat.format(status.getMsg(), formatter));
         this.code = status.getCode();
     }

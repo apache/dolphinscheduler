@@ -53,6 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
@@ -144,8 +145,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT, TENANT_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         tenantCodeValid(tenantCode);
@@ -207,18 +207,15 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                             String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
 
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_UPDATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         Tenant tenant = tenantMapper.queryById(id);
 
-        if (tenant == null) {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
+        if (Objects.isNull(tenant)) {
+            throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
 
         tenantCodeValid(tenantCode);
@@ -233,10 +230,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Date now = new Date();
 
-        if (!StringUtils.isEmpty(tenantCode)) {
-            tenant.setTenantCode(tenantCode);
-        }
-
         if (queueId != 0) {
             tenant.setQueueId(queueId);
         }
@@ -244,8 +237,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenant.setUpdateTime(now);
         tenantMapper.updateById(tenant);
 
-        result.put(Constants.STATUS, Status.SUCCESS);
-        result.put(Constants.MSG, Status.SUCCESS.getMsg());
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -263,33 +255,28 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Map<String, Object> result = new HashMap<>();
 
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         Tenant tenant = tenantMapper.queryById(id);
-        if (tenant == null) {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
+        if (Objects.isNull(tenant)) {
+            throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
 
         List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
-            return result;
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
         }
 
         List<ProcessDefinition> processDefinitions =
                 processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(processDefinitions)) {
-            putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
-            return result;
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
         }
 
         List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(userList)) {
-            putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
-            return result;
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }
 
         // if resource upload startup
@@ -340,10 +327,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Result<Object> verifyTenantCode(String tenantCode) {
         Result<Object> result = new Result<>();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
-        } else {
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.OS_TENANT_CODE_EXIST);
         }
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
