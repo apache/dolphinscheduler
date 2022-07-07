@@ -269,8 +269,6 @@ export default {
     k8s_namespace_tips: '请输入k8s命名空间',
     k8s_cluster: 'K8S集群',
     k8s_cluster_tips: '请输入k8s集群',
-    owner: '负责人',
-    owner_tips: '请输入负责人',
     limit_cpu: '最大CPU',
     limit_cpu_tips: '请输入最大CPU',
     limit_memory: '最大内存',
