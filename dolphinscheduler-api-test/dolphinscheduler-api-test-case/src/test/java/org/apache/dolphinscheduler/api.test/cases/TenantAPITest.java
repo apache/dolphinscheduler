@@ -15,33 +15,27 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.test.cases;
 
+import static org.hamcrest.Matchers.equalTo;
 
-import com.devskiller.jfairy.Fairy;
-import io.restassured.response.Response;
 import org.apache.dolphinscheduler.api.test.base.AbstractAPITest;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.extensions.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
-import org.apache.dolphinscheduler.api.test.entity.PageResponseEntity;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantResponseEntity;
-import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 import org.apache.dolphinscheduler.api.test.utils.Status;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.equalTo;
-
+import com.devskiller.jfairy.Fairy;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisplayName("Tenant Page API test")
@@ -55,7 +49,6 @@ public class TenantAPITest extends AbstractAPITest {
         tenantPageAPI = pageAPIFactory.createTenantPageAPI();
     }
 
-
     @Test
     @Order(1)
     @DisplayName("Test the correct Tenant information to log in to the system")
@@ -68,7 +61,6 @@ public class TenantAPITest extends AbstractAPITest {
         result.isResponseSuccessful();
         tenantResponseEntity = result.getResponse().jsonPath().getObject(Constants.DATA_KEY, TenantResponseEntity.class);
     }
-
 
     @Test
     @Order(2)
@@ -87,13 +79,12 @@ public class TenantAPITest extends AbstractAPITest {
     @DisplayName("Verify that the existing tenant returns code 10009")
     public void testVerifyExistTenantCode() {
         tenantPageAPI.verifyTenantCode(tenantResponseEntity.getTenantCode()).getResponse().then().
-                body(Constants.CODE_KEY, equalTo(Status.OS_TENANT_CODE_EXIST.getCode()));
+            body(Constants.CODE_KEY, equalTo(Status.OS_TENANT_CODE_EXIST.getCode()));
     }
-
 
     @Test
     @Order(4)
-    public void testQueryTenantlistPaging() {
+    public void testQueryTenantListPaging() {
         PageRequestEntity pageParamEntity = new PageRequestEntity();
         pageParamEntity.setPageNo(1);
         pageParamEntity.setPageSize(10);
@@ -101,13 +92,11 @@ public class TenantAPITest extends AbstractAPITest {
         tenantPageAPI.getTenants(pageParamEntity).isResponseSuccessful();
     }
 
-
     @Test
     @Order(5)
     public void testQueryTenantListAll() {
         tenantPageAPI.getTenantsListAll().isResponseSuccessful();
     }
-
 
     @Test
     @Order(6)
@@ -117,7 +106,6 @@ public class TenantAPITest extends AbstractAPITest {
         tenantRequestEntity.setTenantCode(fairy.person().getCompany().getName());
         tenantPageAPI.verifyTenantCode(tenantRequestEntity.getTenantCode()).isResponseSuccessful();
     }
-
 
     @Test
     @Order(7)

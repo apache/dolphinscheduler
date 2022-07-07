@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.test.pages;
 
-import io.restassured.specification.RequestSpecification;
 import org.apache.dolphinscheduler.api.test.base.IPageAPIFactory;
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.token.TokenPageAPI;
+
+import io.restassured.specification.RequestSpecification;
 
 public class PageAPIFactory implements IPageAPIFactory {
     private final RequestSpecification reqSpec;

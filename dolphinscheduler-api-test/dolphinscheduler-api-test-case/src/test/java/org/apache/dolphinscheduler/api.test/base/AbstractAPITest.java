@@ -17,24 +17,23 @@
 
 package org.apache.dolphinscheduler.api.test.base;
 
-import io.restassured.RestAssured;
-import io.restassured.specification.RequestSpecification;
-
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.extensions.DolphinSchedulerExtension;
-import org.apache.dolphinscheduler.api.test.core.extensions.RandomParametersExtension;
-import org.apache.dolphinscheduler.api.test.core.extensions.TimingExtension;
 import org.apache.dolphinscheduler.api.test.pages.PageAPI;
 import org.apache.dolphinscheduler.api.test.pages.PageAPIFactory;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith({DolphinSchedulerExtension.class, RandomParametersExtension.class, TimingExtension.class})
+import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
+
+@ExtendWith({DolphinSchedulerExtension.class})
 public abstract class AbstractAPITest implements TestLifecycleLogger {
     protected RequestSpecification reqSpec = null;
     protected RequestSpecification request = RestAssured.given();
@@ -61,7 +60,6 @@ public abstract class AbstractAPITest implements TestLifecycleLogger {
         sessionId = result.getResponse().getCookie(Constants.SESSION_ID_KEY);
         logger.info("user sessionId: " + sessionId);
     }
-
 
     protected void initPageApiFactory() {
         pageAPIFactory = new PageAPIFactory(reqSpec, sessionId);

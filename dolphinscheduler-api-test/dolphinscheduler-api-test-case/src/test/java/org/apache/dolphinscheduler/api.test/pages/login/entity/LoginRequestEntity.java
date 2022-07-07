@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.test.pages.login.entity;
 
 import org.apache.dolphinscheduler.api.test.base.AbstractBaseEntity;

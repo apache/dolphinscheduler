@@ -33,6 +33,10 @@ public final class Constants {
 
     public static final int DOLPHINSCHEDULER_API_PORT = 12345;
 
+    public static final String USER_NAME = "admin";
+
+    public static final String USER_PASSWD = "dolphinscheduler123";
+
     /**
      * backend api request header's content type
      */
@@ -68,4 +72,11 @@ public final class Constants {
     public static final String SUCCESS_KEY = "success";
 
     public static final String FAILED_KEY = "failed";
+
+    public static final String USER_NAME_KEY = "userName";
+
+    public static final String USER_PASSWD_KEY = "userPassword";
+
+    public static final String TENANT_CODE_KEY = "tenantCode";
+
 }

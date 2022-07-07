@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.security.tenant.entity;
 
-
 public class TenantResponseEntity extends TenantRequestEntity {
 
     private int id;

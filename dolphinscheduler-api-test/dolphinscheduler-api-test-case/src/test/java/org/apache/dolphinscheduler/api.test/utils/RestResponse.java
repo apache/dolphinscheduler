@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
-import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
+import static org.hamcrest.Matchers.equalTo;
+
 import org.apache.dolphinscheduler.api.test.base.IRestResponse;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 
 import java.util.Objects;
 
-import static org.hamcrest.Matchers.equalTo;
+import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 
 public class RestResponse<T> implements IRestResponse<T> {
     private T data;

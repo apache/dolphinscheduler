@@ -17,21 +17,20 @@
 
 package org.apache.dolphinscheduler.api.test.pages.security.tenant;
 
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
-import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
+import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.Route;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 public class TenantPageAPI implements ITenantPageAPI {
     private final RequestSpecification reqSpec;
     private final String sessionId;
-
 
     public TenantPageAPI(RequestSpecification reqSpec, String sessionId) {
         this.reqSpec = reqSpec;
@@ -71,7 +70,7 @@ public class TenantPageAPI implements ITenantPageAPI {
     public RestResponse<Result> verifyTenantCode(String tenantCode) {
         Response resp = getRequestNewInstance().spec(reqSpec).
                 cookies(Constants.SESSION_ID_KEY, sessionId).
-                queryParam("tenantCode", tenantCode).
+                queryParam(Constants.TENANT_CODE_KEY, tenantCode).
                 when().get(Route.tenantsVerifyCode());
         return toResponse(resp);
     }
