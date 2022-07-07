@@ -165,7 +165,7 @@ worker.groups=default,test
 
 > 创建/更新 k8s集群
 
-- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`，后续会通过页面配置.
+- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`给批次使用后续移除，namespace的创建现在通过下拉选择集群.
 
 > 创建/更新 namespace
 

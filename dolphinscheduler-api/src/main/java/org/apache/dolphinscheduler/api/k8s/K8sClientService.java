@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.k8s;
 
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import java.util.Optional;
 
@@ -41,15 +42,15 @@ public class K8sClientService {
     @Autowired
     private K8sManager k8sManager;
 
-    public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace, String yamlStr) {
-        upsertNamespaceToK8s(k8sNamespace.getNamespace(), k8sNamespace.getK8s());
+    public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace, String yamlStr) throws RemotingException {
+        upsertNamespaceToK8s(k8sNamespace.getNamespace(), k8sNamespace.getClusterCode());
         return upsertNamespacedResourceToK8s(k8sNamespace, yamlStr);
     }
 
-    public Optional<Namespace> deleteNamespaceToK8s(String name, String k8s) {
-        Optional<Namespace> result = getNamespaceFromK8s(name, k8s);
+    public Optional<Namespace> deleteNamespaceToK8s(String name, Long clusterCode) throws RemotingException {
+        Optional<Namespace> result = getNamespaceFromK8s(name, clusterCode);
         if (result.isPresent()) {
-            KubernetesClient client = k8sManager.getK8sClient(k8s);
+            KubernetesClient client = k8sManager.getK8sClient(clusterCode);
             Namespace body = new Namespace();
             ObjectMeta meta = new ObjectMeta();
             meta.setNamespace(name);
@@ -57,12 +58,12 @@ public class K8sClientService {
             body.setMetadata(meta);
             client.namespaces().delete(body);
         }
-        return getNamespaceFromK8s(name, k8s);
+        return getNamespaceFromK8s(name, clusterCode);
     }
 
-    private ResourceQuota upsertNamespacedResourceToK8s(K8sNamespace k8sNamespace, String yamlStr) {
+    private ResourceQuota upsertNamespacedResourceToK8s(K8sNamespace k8sNamespace, String yamlStr) throws RemotingException {
 
-        KubernetesClient client = k8sManager.getK8sClient(k8sNamespace.getK8s());
+        KubernetesClient client = k8sManager.getK8sClient(k8sNamespace.getClusterCode());
 
         //创建资源
         ResourceQuota queryExist = client.resourceQuotas()
@@ -86,9 +87,9 @@ public class K8sClientService {
             .createOrReplace(body);
     }
 
-    private Optional<Namespace> getNamespaceFromK8s(String name, String k8s) {
+    private Optional<Namespace> getNamespaceFromK8s(String name, Long clusterCode) throws RemotingException {
         NamespaceList listNamespace =
-            k8sManager.getK8sClient(k8s).namespaces().list();
+            k8sManager.getK8sClient(clusterCode).namespaces().list();
 
         Optional<Namespace> list =
             listNamespace.getItems().stream()
@@ -99,11 +100,11 @@ public class K8sClientService {
         return list;
     }
 
-    private Namespace upsertNamespaceToK8s(String name, String k8s) {
-        Optional<Namespace> result = getNamespaceFromK8s(name, k8s);
+    private Namespace upsertNamespaceToK8s(String name, Long clusterCode) throws RemotingException {
+        Optional<Namespace> result = getNamespaceFromK8s(name, clusterCode);
         //if not exist create
         if (!result.isPresent()) {
-            KubernetesClient client = k8sManager.getK8sClient(k8s);
+            KubernetesClient client = k8sManager.getK8sClient(clusterCode);
             Namespace body = new Namespace();
             ObjectMeta meta = new ObjectMeta();
             meta.setNamespace(name);

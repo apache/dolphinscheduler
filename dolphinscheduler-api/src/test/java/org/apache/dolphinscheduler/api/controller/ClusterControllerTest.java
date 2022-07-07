@@ -42,7 +42,7 @@ import com.google.common.base.Preconditions;
 
 public class ClusterControllerTest extends AbstractControllerTest {
     public static final String clusterName = "Cluster1";
-    public static final String config = "this is config content";
+    public static final String config = "{\"k8s\":\"apiVersion: v1\"}";
     public static final String desc = "this is cluster description";
     private static final Logger logger = LoggerFactory.getLogger(ClusterControllerTest.class);
     private String clusterCode;

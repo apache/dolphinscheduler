@@ -23,7 +23,7 @@ interface ListReq {
 
 interface K8SReq {
   namespace: string
-  k8s: string
+  clusterCode: string
   owner?: string
   tag?: string
   limitsCpu?: number | string
