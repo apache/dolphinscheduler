@@ -165,8 +165,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         queueValid(queue, queueName);
 
@@ -190,22 +189,19 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         queueValid(queue, queueName);
 
         Queue queueObj = queueMapper.selectById(id);
-        if (queueObj == null) {
-            putMsg(result, Status.QUEUE_NOT_EXIST, id);
-            return result;
+        if (Objects.isNull(queueObj)) {
+            throw new ServiceException(Status.QUEUE_NOT_EXIST);
         }
 
         // whether queue value or queueName is changed
         if (queue.equals(queueObj.getQueue()) && queueName.equals(queueObj.getQueueName())) {
-            putMsg(result, Status.NEED_NOT_UPDATE_QUEUE);
-            return result;
+            throw new ServiceException(Status.NEED_NOT_UPDATE_QUEUE);
         }
 
         // check old queue using by any user

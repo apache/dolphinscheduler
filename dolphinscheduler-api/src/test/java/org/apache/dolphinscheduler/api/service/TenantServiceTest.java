@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -50,6 +51,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -86,41 +88,41 @@ public class TenantServiceTest {
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
     private static final String tenantCode = "hayden";
+    private static final String tenantDesc = "This is the tenant desc";
 
 
     @Test
-    public void testCreateTenant() {
+    public void testCreateTenant() throws Exception {
 
         User loginUser = getLoginUser();
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, loginUser.getId(), TENANT_CREATE , baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result;
-        try {
-            //check exist
-            result = tenantService.createTenant(loginUser, "", 1, "TenantServiceTest");
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
-            //check tenant code too long
-            String longStr = "this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string";
-            result = tenantService.createTenant(loginUser, longStr, 1, "TenantServiceTest");
-            Assert.assertEquals(Status.TENANT_FULL_NAME_TOO_LONG_ERROR, result.get(Constants.STATUS));
+        //check exist
+        String emptyTenantCode = "";
+        Throwable exception = Assertions.assertThrows(ServiceException.class, ()->tenantService.createTenant(loginUser, emptyTenantCode, 1, tenantDesc));
+        String formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), emptyTenantCode);
+        Assertions.assertEquals(formatter, exception.getMessage());
 
-            //check tenant code invalid
-            result = tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
-            Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
+        //check tenant code too long
+        String longStr = "this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string";
+        exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.createTenant(loginUser, longStr, 1, tenantDesc));
+        Assert.assertEquals(Status.TENANT_FULL_NAME_TOO_LONG_ERROR.getMsg(), exception.getMessage());
 
-            //check exist
-            result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
-            Assert.assertEquals(Status.OS_TENANT_CODE_EXIST, result.get(Constants.STATUS));
+        //check tenant code invalid
+        exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.createTenant(getLoginUser(), "%!1111", 1, tenantDesc));
+        Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR.getMsg(), exception.getMessage());
 
-            // success
-            result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
-            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        //check exist
+        exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.createTenant(loginUser, tenantCode, 1, tenantDesc));
+        formatter = MessageFormat.format(Status.OS_TENANT_CODE_EXIST.getMsg(), tenantCode);
+        Assert.assertEquals(formatter, exception.getMessage());
 
-        } catch (Exception e) {
-            Assert.fail("create tenant error");
-        }
+        // success
+        result = tenantService.createTenant(loginUser, "test", 1, tenantDesc);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -146,9 +148,9 @@ public class TenantServiceTest {
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
-        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq("TenantServiceTest")))
+        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq(tenantDesc)))
         .thenReturn(page);
-        Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
+        Result result = tenantService.queryTenantList(getLoginUser(), tenantDesc, 1, 10);
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
@@ -163,10 +165,10 @@ public class TenantServiceTest {
         try {
             // id not exist
             Map<String, Object> result =
-                    tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, "desc");
+                    tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc);
             // success
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
-            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, "desc");
+            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
             Assert.fail("update tenant error");
