@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.api.test.core.extensions;
 
+import java.lang.reflect.Method;
+import java.util.logging.Logger;
+
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
-
-import java.lang.reflect.Method;
-import java.util.logging.Logger;
 
 public class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
