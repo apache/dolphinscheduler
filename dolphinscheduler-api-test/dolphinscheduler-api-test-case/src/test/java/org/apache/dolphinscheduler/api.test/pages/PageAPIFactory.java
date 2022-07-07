@@ -21,6 +21,7 @@ import io.restassured.specification.RequestSpecification;
 import org.apache.dolphinscheduler.api.test.base.IPageAPIFactory;
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.token.TokenPageAPI;
 
 public class PageAPIFactory implements IPageAPIFactory {
     private final RequestSpecification reqSpec;
@@ -39,6 +40,11 @@ public class PageAPIFactory implements IPageAPIFactory {
     @Override
     public LoginPageAPI createLoginPageAPI() {
         return new LoginPageAPI();
+    }
+
+    @Override
+    public TokenPageAPI createTokenPageAPI() {
+        return new TokenPageAPI(reqSpec, sessionId);
     }
 
 

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.test.base;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
 
-import org.apache.dolphinscheduler.api.test.core.common.FormParam;
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.extensions.DolphinSchedulerExtension;
 import org.apache.dolphinscheduler.api.test.core.extensions.RandomParametersExtension;
 import org.apache.dolphinscheduler.api.test.core.extensions.TimingExtension;
@@ -58,7 +58,7 @@ public abstract class AbstractAPITest implements TestLifecycleLogger {
         reqSpec = PageAPI.requestSpec();
         RestResponse<Result> result = PageAPI.getSession(request, reqSpec);
         result.isResponseSuccessful();
-        sessionId = result.getResponse().getCookie(FormParam.SESSION_ID.getParam());
+        sessionId = result.getResponse().getCookie(Constants.SESSION_ID_KEY);
         logger.info("user sessionId: " + sessionId);
     }
 

@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.api.test.utils;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import org.apache.dolphinscheduler.api.test.base.IRestResponse;
-import org.apache.dolphinscheduler.api.test.core.common.FormParam;
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
+
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.equalTo;
 
@@ -53,7 +55,7 @@ public class RestResponse<T> implements IRestResponse<T> {
 
     public ValidatableResponse isResponseSuccessful() {
         return response.then().
-                body(FormParam.CODE.getParam(), equalTo(0));
+                body(Constants.CODE_KEY, equalTo(0));
     }
 
     public String getStatusDescription() {
@@ -64,6 +66,13 @@ public class RestResponse<T> implements IRestResponse<T> {
         return response;
     }
 
+    public Object getResponseData() {
+        return Objects.requireNonNull(JSONUtils.parseObject(getContent(), Result.class)).getData();
+    }
+
+    public <T> T getResponseJsonData(Class<T> targetType) {
+        return JSONUtils.convertValue(getResponseData(), targetType);
+    }
 
     public T getBody() {
         try {

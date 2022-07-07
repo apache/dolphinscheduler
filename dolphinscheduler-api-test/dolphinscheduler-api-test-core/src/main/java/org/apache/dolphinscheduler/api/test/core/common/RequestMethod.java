@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.test.core.common;
 
 public enum RequestMethod {
