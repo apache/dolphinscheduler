@@ -638,7 +638,9 @@ CREATE TABLE t_ds_project
     flag        tinyint(4) DEFAULT '1',
     create_time datetime NOT NULL,
     update_time datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_name (name),
+    UNIQUE KEY unique_code (code)
 );
 
 -- ----------------------------
@@ -656,7 +658,8 @@ CREATE TABLE t_ds_queue
     queue       varchar(64) DEFAULT NULL,
     create_time datetime    DEFAULT NULL,
     update_time datetime    DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_queue_name (queue_name)
 );
 
 -- ----------------------------
@@ -886,7 +889,8 @@ CREATE TABLE t_ds_tenant
     queue_id    int(11)      DEFAULT NULL,
     create_time datetime     DEFAULT NULL,
     update_time datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_tenant_code (tenant_code)
 );
 
 -- ----------------------------
@@ -911,7 +915,8 @@ CREATE TABLE t_ds_udfs
     resource_name varchar(255) NOT NULL,
     create_time   datetime     NOT NULL,
     update_time   datetime     NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_func_name (func_name)
 );
 
 -- ----------------------------
