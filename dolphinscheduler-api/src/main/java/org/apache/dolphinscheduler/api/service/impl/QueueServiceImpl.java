@@ -73,8 +73,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param queueName queue name
      */
     private void queueValid(String queue, String queueName) throws ServiceException {
-        if (StringUtils.isEmpty(queue) || StringUtils.isEmpty(queueName)) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+        if (StringUtils.isEmpty(queue)) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
+        } else if (StringUtils.isEmpty(queueName)) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
         } else if (checkQueueExist(queue)) {
             throw new ServiceException(Status.QUEUE_VALUE_EXIST, queue);
         } else if (checkQueueNameExist(queueName)) {
@@ -196,7 +198,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Queue queueObj = queueMapper.selectById(id);
         if (Objects.isNull(queueObj)) {
-            throw new ServiceException(Status.QUEUE_NOT_EXIST);
+            throw new ServiceException(Status.QUEUE_NOT_EXIST, queue);
         }
 
         // whether queue value or queueName is changed
