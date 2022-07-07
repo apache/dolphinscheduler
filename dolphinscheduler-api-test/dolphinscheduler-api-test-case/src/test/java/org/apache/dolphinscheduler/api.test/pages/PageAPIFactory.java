@@ -48,5 +48,4 @@ public class PageAPIFactory implements IPageAPIFactory {
         return new TokenPageAPI(reqSpec, sessionId);
     }
 
-
 }

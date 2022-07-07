@@ -42,10 +42,10 @@ public class LoginPageAPI implements ILoginPageAPI {
 
     @Override
     public RestResponse<Result> loginUser(RequestSpecification request,
-                                          String User, String Passwd) {
+                                          String user, String password) {
         Response resp = request.
-            formParam(Constants.USER_NAME, User).
-            formParam(Constants.USER_PASSWD_KEY, Passwd).
+            formParam(Constants.USER_NAME, user).
+            formParam(Constants.USER_PASSWD_KEY, password).
             when().
             post(Route.login());
         return new RestResponse<>(Result.class, resp);
