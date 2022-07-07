@@ -22,9 +22,9 @@ import {
   NIcon,
   NSpace,
   NDataTable,
-  NPagination
+  NPagination,
+  NCard
 } from 'naive-ui'
-import Card from '@/components/card'
 import UserDetailModal from './components/user-detail-modal'
 import AuthorizeModal from './components/authorize-modal'
 import { useI18n } from 'vue-i18n'
@@ -65,51 +65,50 @@ const UsersManage = defineComponent({
   },
   render() {
     return (
-      <>
-        <NSpace vertical>
-          <Card>
-            <NSpace justify='space-between'>
-              <NButton
-                onClick={this.onAddUser}
-                type='primary'
-                class='btn-create-user'
-              >
-                {this.t('security.user.create_user')}
+      <NSpace vertical>
+        <NCard size='small'>
+          <NSpace justify='space-between'>
+            <NButton
+              onClick={this.onAddUser}
+              type='primary'
+              class='btn-create-user'
+              size='small'
+            >
+              {this.t('security.user.create_user')}
+            </NButton>
+            <NSpace>
+              <NInput v-model:value={this.searchVal} size='small' clearable />
+              <NButton type='primary' size='small' onClick={this.onUpdatedList}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
-              <NSpace>
-                <NInput v-model:value={this.searchVal} clearable />
-                <NButton type='primary' onClick={this.onUpdatedList}>
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                </NButton>
-              </NSpace>
             </NSpace>
-          </Card>
-          <Card>
-            <NSpace vertical>
-              <NDataTable
-                row-class-name='items'
-                columns={this.columnsRef.columns}
-                data={this.list}
-                loading={this.loading}
-                scrollX={this.columnsRef.tableWidth}
+          </NSpace>
+        </NCard>
+        <NCard size='small'>
+          <NSpace vertical>
+            <NDataTable
+              row-class-name='items'
+              columns={this.columnsRef.columns}
+              data={this.list}
+              loading={this.loading}
+              scrollX={this.columnsRef.tableWidth}
+            />
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                item-count={this.itemCount}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                on-update:page={this.changePage}
+                on-update:page-size={this.changePageSize}
               />
-              <NSpace justify='center'>
-                <NPagination
-                  v-model:page={this.page}
-                  v-model:page-size={this.pageSize}
-                  item-count={this.itemCount}
-                  show-size-picker
-                  page-sizes={[10, 30, 50]}
-                  show-quick-jumper
-                  on-update:page={this.changePage}
-                  on-update:page-size={this.changePageSize}
-                />
-              </NSpace>
             </NSpace>
-          </Card>
-        </NSpace>
+          </NSpace>
+        </NCard>
         <UserDetailModal
           show={this.detailModalShow}
           currentRecord={this.currentRecord}
@@ -122,7 +121,7 @@ const UsersManage = defineComponent({
           userId={this.currentRecord?.id}
           onCancel={this.onAuthorizeModalCancel}
         />
-      </>
+      </NSpace>
     )
   }
 })
