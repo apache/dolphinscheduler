@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -199,10 +198,14 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
-                logger.info("Master success dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
+                logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
+                    taskPriority.getTaskId(),
+                    executionContext.getHost());
                 addDispatchEvent(context, executionContext);
             } else {
-                logger.info("Master failed to dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
+                logger.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
+                    taskPriority.getTaskId(),
+                    executionContext.getHost());
             }
         } catch (RuntimeException | ExecuteException e) {
             logger.error("Master dispatch task to worker error: ", e);

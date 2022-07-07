@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.Date;
@@ -263,13 +263,12 @@ public class ProcessInstance {
      *
      * @param processDefinition processDefinition
      */
-    public ProcessInstance(ProcessDefinition processDefinition) {
+    public ProcessInstance(ProcessDefinition processDefinition) throws CodeGenerateUtils.CodeGenerateException {
         this.processDefinition = processDefinition;
-        // todo: the name is not unique
         this.name = String.join("-",
-                processDefinition.getName(),
-                String.valueOf(processDefinition.getVersion()),
-                DateUtils.getCurrentTimeStamp());
+            processDefinition.getName(),
+            String.valueOf(processDefinition.getVersion()),
+            CodeGenerateUtils.getInstance().toString());
     }
 
     public String getVarPool() {

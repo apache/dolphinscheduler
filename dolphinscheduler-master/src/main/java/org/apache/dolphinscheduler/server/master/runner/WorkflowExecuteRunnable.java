@@ -298,6 +298,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 StateEventHandler stateEventHandler =
                     StateEventHandlerManager.getStateEventHandler(stateEvent.getType())
                         .orElseThrow(() -> new StateEventHandleError("Cannot find handler for the given state event"));
+                logger.info("Begin to handle state event, {}", stateEvent);
                 if (stateEventHandler.handleStateEvent(this, stateEvent)) {
                     this.stateEvents.remove(stateEvent);
                 }

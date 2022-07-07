@@ -98,6 +98,15 @@ public class WorkerFailoverService {
             getServerStartupTime(registryClient.getServerList(NodeType.WORKER), workerHost);
 
         final List<TaskInstance> needFailoverTaskInstanceList = getNeedFailoverTaskInstance(workerHost);
+        if (CollectionUtils.isEmpty(needFailoverTaskInstanceList)) {
+            LOGGER.info("Worker[{}] failover finished there are no taskInstance need to failover", workerHost);
+            return;
+        }
+        LOGGER.info(
+            "Worker[{}] failover there are {} taskInstance may need to failover, will do a deep check, taskInstanceIds: {}",
+            workerHost,
+            needFailoverTaskInstanceList.size(),
+            needFailoverTaskInstanceList.stream().map(TaskInstance::getId).collect(Collectors.toList()));
         final Map<Integer, ProcessInstance> processInstanceCacheMap = new HashMap<>();
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
@@ -110,9 +119,11 @@ public class WorkerFailoverService {
                     LOGGER.info("The current taskInstance doesn't need to failover");
                     continue;
                 }
-                LOGGER.info("Begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE");
+                LOGGER.info(
+                    "Worker[{}] failover: begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE",
+                    workerHost);
                 failoverTaskInstance(processInstance, taskInstance);
-                LOGGER.info("Finish failover taskInstance");
+                LOGGER.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
@@ -188,6 +199,10 @@ public class WorkerFailoverService {
         }
         // only failover the task owned myself if worker down.
         if (!StringUtils.equalsIgnoreCase(processInstance.getHost(), localAddress)) {
+            LOGGER.error(
+                "Master failover task instance error, the taskInstance's processInstance's host: {} is not the current master: {}",
+                processInstance.getHost(),
+                localAddress);
             return false;
         }
         if (taskInstance.getState() != null && taskInstance.getState().typeIsFinished()) {
@@ -201,13 +216,17 @@ public class WorkerFailoverService {
         // The worker is active, may already send some new task to it
         if (taskInstance.getSubmitTime() != null && taskInstance.getSubmitTime()
             .after(needFailoverWorkerStartTime.get())) {
+            LOGGER.info(
+                "The taskInstance's submitTime: {} is after the need failover worker's start time: {}, the taskInstance is newly submit, it doesn't need to failover",
+                taskInstance.getSubmitTime(),
+                needFailoverWorkerStartTime.get());
             return false;
         }
 
         return true;
     }
 
-    public List<TaskInstance> getNeedFailoverTaskInstance(@NonNull String failoverWorkerHost) {
+    private List<TaskInstance> getNeedFailoverTaskInstance(@NonNull String failoverWorkerHost) {
         // we query the task instance from cache, so that we can directly update the cache
         return cacheManager.getAll()
             .stream()
