@@ -61,6 +61,19 @@ DROP PROCEDURE uc_dolphin_T_t_ds_alert_R_sign;
 -- add unique key to t_ds_relation_project_user
 ALTER TABLE t_ds_relation_project_user ADD UNIQUE KEY uniq_uid_pid(user_id,project_id);
 
+-- add unique key to t_ds_project
+ALTER TABLE t_ds_project ADD UNIQUE KEY unique_name(name);
+ALTER TABLE t_ds_project ADD UNIQUE KEY unique_code(code);
+
+-- add unique key to t_ds_queue
+ALTER TABLE t_ds_queue ADD UNIQUE KEY unique_queue_name(queue_name);
+
+-- add unique key to t_ds_udfs
+ALTER TABLE t_ds_udfs ADD UNIQUE KEY unique_func_name(func_name);
+
+-- add unique key to t_ds_tenant
+ALTER TABLE t_ds_tenant ADD UNIQUE KEY unique_tenant_code(tenant_code);
+
 ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;

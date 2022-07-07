@@ -53,10 +53,10 @@ public class UdfFuncMapperTest extends BaseDaoTest {
      *
      * @return UdfFunc
      */
-    private UdfFunc insertOne() {
+    private UdfFunc insertOne(String funcName) {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setUserId(1);
-        udfFunc.setFuncName("dolphin_udf_func");
+        udfFunc.setFuncName(funcName);
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
         udfFunc.setType(UdfType.HIVE);
         udfFunc.setResourceId(1);
@@ -75,7 +75,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     private UdfFunc insertOne(User user) {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setUserId(user.getId());
-        udfFunc.setFuncName("dolphin_udf_func");
+        udfFunc.setFuncName("dolphin_udf_func" + user.getUserName());
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
         udfFunc.setType(UdfType.HIVE);
         udfFunc.setResourceId(1);
@@ -163,7 +163,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     @Test
     public void testUpdate() {
         //insertOne
-        UdfFunc udfFunc = insertOne();
+        UdfFunc udfFunc = insertOne("func1");
         udfFunc.setResourceName("dolphin_resource_update");
         udfFunc.setResourceId(2);
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
@@ -180,7 +180,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     @Test
     public void testDelete() {
         //insertOne
-        UdfFunc udfFunc = insertOne();
+        UdfFunc udfFunc = insertOne("func2");
         //delete
         int delete = udfFuncMapper.deleteById(udfFunc.getId());
         Assert.assertEquals(delete, 1);
@@ -192,9 +192,9 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     @Test
     public void testQueryUdfByIdStr() {
         //insertOne
-        UdfFunc udfFunc = insertOne();
+        UdfFunc udfFunc = insertOne("func3");
         //insertOne
-        UdfFunc udfFunc1 = insertOne();
+        UdfFunc udfFunc1 = insertOne("func4");
         Integer[] idArray = new Integer[]{udfFunc.getId(), udfFunc1.getId()};
         //queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");

@@ -51,6 +51,19 @@ d//
 CREATE UNIQUE INDEX t_ds_relation_project_user_un
     on t_ds_relation_project_user (user_id, project_id);
 
+-- add unique key to t_ds_project
+CREATE UNIQUE INDEX unique_name on t_ds_project (name);
+CREATE UNIQUE INDEX unique_code on t_ds_project (code);
+
+-- add unique key to t_ds_queue
+CREATE UNIQUE INDEX unique_queue_name on t_ds_queue (queue_name);
+
+-- add unique key to t_ds_udfs
+CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
+
+-- add unique key to t_ds_tenant
+CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
+
 delimiter d//
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
