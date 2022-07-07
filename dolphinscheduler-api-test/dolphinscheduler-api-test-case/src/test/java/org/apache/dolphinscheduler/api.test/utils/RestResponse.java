@@ -51,7 +51,7 @@ public class RestResponse<T> implements IRestResponse<T> {
 
     public boolean isSuccessful() {
         int code = response.getStatusCode();
-        return code == 200 || code == 201 || code == 202 || code == 203 || code == 204 || code == 205;
+        return code >= 200 && code <= 300;
     }
 
     public ValidatableResponse isResponseSuccessful() {
