@@ -78,7 +78,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         } else if (checkQueueExist(queue)) {
             throw new ServiceException(Status.QUEUE_VALUE_EXIST, queue);
         } else if (checkQueueNameExist(queueName)) {
-            throw new ServiceException(Status.QUEUE_VALUE_EXIST, queueName);
+            throw new ServiceException(Status.QUEUE_NAME_EXIST, queueName);
         }
     }
 
@@ -205,19 +205,6 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         // whether queue value or queueName is changed
         if (queue.equals(queueObj.getQueue()) && queueName.equals(queueObj.getQueueName())) {
             putMsg(result, Status.NEED_NOT_UPDATE_QUEUE);
-            return result;
-        }
-
-        // check queue name is exist
-        if (!queueName.equals(queueObj.getQueueName())
-                && checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return result;
-        }
-
-        // check queue value is exist
-        if (!queue.equals(queueObj.getQueue()) && checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
             return result;
         }
 
