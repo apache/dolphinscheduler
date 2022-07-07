@@ -571,6 +571,8 @@ CREATE TABLE t_ds_project (
 ) ;
 
 create index user_id_index on t_ds_project (user_id);
+CREATE UNIQUE INDEX unique_name on t_ds_project (name);
+CREATE UNIQUE INDEX unique_code on t_ds_project (code);
 
 --
 -- Table structure for table t_ds_queue
@@ -585,7 +587,8 @@ CREATE TABLE t_ds_queue (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 );
-
+-- add unique key to t_ds_queue
+CREATE UNIQUE INDEX unique_queue_name on t_ds_queue (queue_name);
 
 --
 -- Table structure for table t_ds_relation_datasource_user
@@ -787,6 +790,8 @@ CREATE TABLE t_ds_tenant (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+-- add unique key to t_ds_tenant
+CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
 
 --
 -- Table structure for table t_ds_udfs
@@ -808,6 +813,8 @@ CREATE TABLE t_ds_udfs (
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
 ) ;
+-- add unique key to t_ds_udfs
+CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
 
 --
 -- Table structure for table t_ds_user
