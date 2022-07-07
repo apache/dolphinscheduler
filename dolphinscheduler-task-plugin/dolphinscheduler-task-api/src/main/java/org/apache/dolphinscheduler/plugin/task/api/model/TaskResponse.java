@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
-
+@Data
 public class TaskResponse {
 
     /**
@@ -46,8 +47,6 @@ public class TaskResponse {
      */
     private Process process;
 
-
-
     /**
      * cancel
      */
@@ -59,82 +58,4 @@ public class TaskResponse {
     private volatile int exitStatusCode = -1;
 
     private TaskRunStatus status;
-
-    public String getVarPool() {
-        return varPool;
-    }
-
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public int getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(int processId) {
-        this.processId = processId;
-    }
-
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String resultString) {
-        this.resultString = resultString;
-    }
-
-    public String getAppIds() {
-        return appIds;
-    }
-
-    public void setAppIds(String appIds) {
-        this.appIds = appIds;
-    }
-
-    public boolean isCancel() {
-        return cancel;
-    }
-
-    public void setCancel(boolean cancel) {
-        this.cancel = cancel;
-    }
-
-    public int getExitStatusCode() {
-        return exitStatusCode;
-    }
-
-    public void setExitStatusCode(int exitStatusCode) {
-        this.exitStatusCode = exitStatusCode;
-    }
-
-    public Process getProcess() {
-        return process;
-    }
-
-    public void setProcess(Process process) {
-        this.process = process;
-    }
-
-    public TaskRunStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TaskRunStatus status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskResponse{" +
-                "varPool='" + varPool + '\'' +
-                ", processId=" + processId +
-                ", resultString='" + resultString + '\'' +
-                ", appIds='" + appIds + '\'' +
-                ", process=" + process +
-                ", cancel=" + cancel +
-                ", exitStatusCode=" + exitStatusCode +
-                ", status=" + status +
-                '}';
-    }
 }

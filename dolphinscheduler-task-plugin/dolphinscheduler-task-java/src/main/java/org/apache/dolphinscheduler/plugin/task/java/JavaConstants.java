@@ -25,22 +25,14 @@ public class JavaConstants {
 
     public static final String JAVA_HOME = "JAVA_HOME";
 
-
     public static final String RUN_TYPE_JAVA = "JAVA";
+
     public static final String RUN_TYPE_JAR = "JAR";
-
-//    to be extended.
-//    public static final String RUN_TYPE_JSHELL = "JSHELL";
-//    public static final String RUN_TYPE_INJVM = "INJVM";
-
-
 
     public static final String PATH_SEPARATOR = System.getProperty("path.separator");
 
     public static final String CLASSPATH_CURRENT_DIR = ".";
 
     public static final String JAVA_SOURCE_CODE_NAME_TEMPLATE = "%s/%s.java";
-
-
 
 }

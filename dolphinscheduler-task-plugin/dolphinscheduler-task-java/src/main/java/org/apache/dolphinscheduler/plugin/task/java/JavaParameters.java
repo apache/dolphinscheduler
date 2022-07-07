@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.List;
-
+@Data
 public class JavaParameters extends AbstractParameters {
     /**
      * origin java script
@@ -35,72 +36,13 @@ public class JavaParameters extends AbstractParameters {
     private String mainArgs;
 
     private String jvmArgs;
+
     private boolean isModulePath;
-
-
-    public boolean isModulePath() {
-        return isModulePath;
-    }
-
-    public void setModulePath(boolean modulePath) {
-        isModulePath = modulePath;
-    }
-
-
 
     /**
      * resource list
      */
     private List<ResourceInfo> resourceList;
-
-    public String getRawScript() {
-        return rawScript;
-    }
-
-    public void setRawScript(String rawScript) {
-        this.rawScript = rawScript;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public ResourceInfo getMainJar() {
-        return mainJar;
-    }
-
-    public void setMainJar(ResourceInfo mainJar) {
-        this.mainJar = mainJar;
-    }
-
-    public String getRunType() {
-        return runType;
-    }
-
-    public void setRunType(String runType) {
-        this.runType = runType;
-    }
-
-    public String getMainArgs() {
-        return mainArgs;
-    }
-
-    public void setMainArgs(String mainArgs) {
-        this.mainArgs = mainArgs;
-    }
-
-    public String getJvmArgs() {
-        return jvmArgs;
-    }
-
-    public void setJvmArgs(String jvmArgs) {
-        this.jvmArgs = jvmArgs;
-    }
-
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
 
     @Override
     public boolean checkParameters() {

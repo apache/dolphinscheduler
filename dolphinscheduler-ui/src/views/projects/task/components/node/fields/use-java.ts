@@ -29,16 +29,6 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
         span: 12,
         name: t('project.node.run_type'),
         options: RUN_TYPES,
-        props: {
-          'on-update:value': () => {
-            // if(model.runType=='JAR'){
-            //     model.rawScript=''
-            // }else{
-            //     model.mainJar = null
-            //     model.rawScript=''
-            // }
-          }
-        },
         value: model.runType
       },
       {
@@ -46,8 +36,6 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
           field: 'isModulePath',
           span: 24,
           name: t('project.node.is_module_path'),
-          props: {
-          },
           value: model.isModulePath
       },
       {
