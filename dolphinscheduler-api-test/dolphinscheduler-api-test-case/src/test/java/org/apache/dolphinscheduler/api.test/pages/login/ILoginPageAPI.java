@@ -28,7 +28,7 @@ public interface ILoginPageAPI {
                                    LoginRequestEntity loginRequestEntity);
 
     RestResponse<Result> loginUser(RequestSpecification request,
-                                   String User, String Passwd);
+                                   String user, String password);
 
     RestResponse<Result> loginOut(RequestSpecification request);
 }

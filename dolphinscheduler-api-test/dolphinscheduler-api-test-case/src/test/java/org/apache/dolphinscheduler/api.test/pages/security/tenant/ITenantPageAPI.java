@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.api.test.utils.Result;
 
 public interface ITenantPageAPI extends IPageAPI {
 
-    RestResponse<Result> createTenant( TenantRequestEntity tenantRequestEntity);
+    RestResponse<Result> createTenant(TenantRequestEntity tenantRequestEntity);
 
     RestResponse<Result> updateTenant(TenantRequestEntity tenantUpdateEntity, int tenantId);
 

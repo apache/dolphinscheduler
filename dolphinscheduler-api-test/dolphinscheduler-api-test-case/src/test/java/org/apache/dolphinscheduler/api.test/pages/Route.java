@@ -68,7 +68,6 @@ public class Route {
         return projects() + "/authed-project";
     }
 
-
     public static String authUserByProjectCode(int projectCode) {
         return projects() + "/authed-user";
     }
@@ -84,7 +83,6 @@ public class Route {
     public static String queryUnauthorizedProject(int userId) {
         return projects() + "/unauth-project";
     }
-
 
     public static String queryProjectByCode(int code) {
         return projects() + "/code";
