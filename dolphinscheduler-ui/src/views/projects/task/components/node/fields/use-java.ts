@@ -16,7 +16,7 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCustomParams, useResources ,useMainJar} from '.'
+import { useCustomParams, useResources ,useJavaTaskMainJar} from '.'
 import type { IJsonItem } from '../types'
 
 export function useJava(model: { [field: string]: any }): IJsonItem[] {
@@ -56,7 +56,7 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
           placeholder: t('project.node.jvm_args_tips')
         }
       },
-      useMainJar(model),   
+      useJavaTaskMainJar(model),
     {
       type: 'editor',
       field: 'rawScript',
