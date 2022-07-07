@@ -31,10 +31,9 @@ This node is used to perform java-type tasks and supports the use of single file
 
 ## Example
 
-HTTP defines the different methods of interacting with the server, and the four most basic methods are GET, POST, PUT, and DELETE. Here we use the HTTP task node to demonstrate the use of POST to send a request to the system's login page and submit data.
+Java task types have two modes of execution, which are demonstrated here as an example of a Java mode.
 
 The main configuration parameters are as follows:
-
 - Run Type
 - Module Path
 - Main Parameters
