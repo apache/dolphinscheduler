@@ -604,7 +604,6 @@ CREATE TABLE t_ds_relation_datasource_user (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-;
 
 --
 -- Table structure for table t_ds_relation_process_instance
