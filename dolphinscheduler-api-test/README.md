@@ -9,23 +9,25 @@ Every page of DolphinScheduler's api is abstracted into a class for better maint
 ### Example
 
 The login page's api is abstracted
-as [`LoginPage`](dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/pages/LoginPage.java)
-, with the following fields:
+as [`LoginPage`](dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/pages/login/LoginPageAPI.java)
+, with the following fields,
 
 ```java
-public HttpResponse login(String username, String password) {
-    Map<String, Object> params = new HashMap<>();
+public class LoginPageAPI implements ILoginPageAPI {
 
-    params.put("userName", username);
-    params.put("userPassword", password);
+    public LoginPageAPI() {
+    }
 
-    RequestClient requestClient = new RequestClient();
-
-    return requestClient.post("/login", null, params);
+    @Override
+    public RestResponse<Result> loginUser(RequestSpecification request, LoginRequestEntity loginRequestEntity) {
+        Response resp = request.
+            params(loginRequestEntity.toMap()).
+            when().
+            post(Route.login());
+        return new RestResponse<>(Result.class, resp);
+    }
 }
 ```
-
-where `userName`, `userPassword` are the main elements on UI that we are interested in.
 
 ## Test Environment Setup
 
