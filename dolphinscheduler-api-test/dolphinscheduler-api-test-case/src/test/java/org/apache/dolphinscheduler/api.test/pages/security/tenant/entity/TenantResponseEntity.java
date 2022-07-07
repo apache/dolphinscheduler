@@ -17,34 +17,18 @@
 
 package org.apache.dolphinscheduler.api.test.pages.security.tenant.entity;
 
-import java.util.Objects;
 
-public class TenantResponseEntity extends TenantBaseEntity {
+public class TenantResponseEntity extends TenantRequestEntity {
 
-    /**
-     * id
-     */
     private int id;
 
-    /**
-     * queue name
-     */
     private String queueName;
 
-    /**
-     * queue
-     */
     private String queue;
 
-    /**
-     * create time
-     */
     public String createTime;
-    /**
-     * update time
-     */
-    public String updateTime;
 
+    public String updateTime;
 
     public int getId() {
         return id;
@@ -53,7 +37,6 @@ public class TenantResponseEntity extends TenantBaseEntity {
     public void setId(int id) {
         this.id = id;
     }
-
 
     public String getQueueName() {
         return queueName;
@@ -71,23 +54,20 @@ public class TenantResponseEntity extends TenantBaseEntity {
         this.queue = queue;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        TenantResponseEntity tenant = (TenantResponseEntity) o;
-
-        return id == tenant.id;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }
 

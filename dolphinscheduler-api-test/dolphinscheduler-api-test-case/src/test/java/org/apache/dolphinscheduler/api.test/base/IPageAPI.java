@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.test.base;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.apache.dolphinscheduler.api.test.core.common.FormParam;
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
@@ -34,10 +34,10 @@ public interface IPageAPI {
         return new RestResponse<>(Result.class, response);
     }
 
-    default Response RestRequestByRequestMap(RequestSpecification request, String sessionId,
+    default Response restRequestByRequestMap(RequestSpecification request, String sessionId,
                                              Map<String, ?> map, String url, RequestMethod requestMethod) {
         RequestSpecification rs = request.
-                cookies(FormParam.SESSION_ID.getParam(), sessionId).
+                cookies(Constants.SESSION_ID_KEY, sessionId).
                 formParams(map).
                 when();
 

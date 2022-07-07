@@ -20,11 +20,14 @@ package org.apache.dolphinscheduler.api.test.base;
 
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.token.TokenPageAPI;
 
 public interface IPageAPIFactory {
 
     TenantPageAPI createTenantPageAPI();
 
     LoginPageAPI createLoginPageAPI();
+
+    TokenPageAPI createTokenPageAPI();
 
 }

@@ -22,7 +22,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.dolphinscheduler.api.test.base.IPageAPI;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
-import org.apache.dolphinscheduler.api.test.core.common.FormParam;
 import org.apache.dolphinscheduler.api.test.pages.login.form.LoginFormData;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
@@ -42,7 +41,7 @@ public class PageAPI implements IPageAPI {
     public static RestResponse<Result> releaseSession(RequestSpecification request, RequestSpecification reqSpec, String sessionId) {
         Response resp = request.
                 spec(reqSpec).
-                cookies(FormParam.SESSION_ID.getParam(), sessionId).
+                cookies(Constants.SESSION_ID_KEY, sessionId).
                 when().
                 post(Route.loginOut());
         return new RestResponse<>(Result.class, resp);

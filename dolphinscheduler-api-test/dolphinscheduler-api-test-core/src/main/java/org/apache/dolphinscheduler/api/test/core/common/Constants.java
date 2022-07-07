@@ -58,4 +58,14 @@ public final class Constants {
     public static final String EQUAL_MARK = "=";
 
     public static final String AND_MARK = "&";
+
+    public static final String CODE_KEY = "code";
+
+    public static final String MSG_KEY = "msg";
+
+    public static final String DATA_KEY = "data";
+
+    public static final String SUCCESS_KEY = "success";
+
+    public static final String FAILED_KEY = "failed";
 }

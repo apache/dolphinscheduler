@@ -19,7 +19,7 @@
 package org.apache.dolphinscheduler.api.test.cases;
 
 import org.apache.dolphinscheduler.api.test.base.AbstractAPITest;
-import org.apache.dolphinscheduler.api.test.core.common.FormParam;
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.extensions.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.login.entity.LoginRequestEntity;
@@ -77,10 +77,10 @@ public class LoginAPITest extends AbstractAPITest {
     void testErrorUserLogin(String userName, String userPasswd) {
         loginPageAPI.loginUser(given().spec(reqSpec), userName, userPasswd).getResponse().
                 then().
-                body(FormParam.CODE.getParam(), is(Status.USER_NAME_PASSWD_ERROR.getCode())).
-                body(FormParam.MSG.getParam(), equalTo(Status.USER_NAME_PASSWD_ERROR.getMsg())).
-                body(FormParam.DATA.getParam(), nullValue()).
-                body(FormParam.SUCCESS.getParam(), equalTo(false));
+                body(Constants.CODE_KEY, is(Status.USER_NAME_PASSWD_ERROR.getCode())).
+                body(Constants.MSG_KEY, equalTo(Status.USER_NAME_PASSWD_ERROR.getMsg())).
+                body(Constants.DATA_KEY, nullValue()).
+                body(Constants.SUCCESS_KEY, equalTo(false));
     }
 
     static Stream<Arguments> testErrorUserLoginInfoProvider() {
@@ -95,7 +95,7 @@ public class LoginAPITest extends AbstractAPITest {
     @Test
     void testGetUserSessionToObject() {
         LoginResponseEntity login = loginPageAPI.loginUser(given().spec(reqSpec), loginRequestEntity).
-                getResponse().jsonPath().getObject(FormParam.DATA.getParam(), LoginResponseEntity.class);
+                getResponse().jsonPath().getObject(Constants.DATA_KEY, LoginResponseEntity.class);
 
         assertNotNull(login.getSessionId());
     }

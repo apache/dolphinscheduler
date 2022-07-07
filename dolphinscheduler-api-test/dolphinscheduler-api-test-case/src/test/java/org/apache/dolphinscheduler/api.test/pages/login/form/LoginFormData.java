@@ -20,8 +20,7 @@ package org.apache.dolphinscheduler.api.test.pages.login.form;
 
 public enum LoginFormData {
     USR_NAME("userName", "admin"),
-    USER_PASSWD("userPassword", "dolphinscheduler123"),
-    END_POINT("login", "");
+    USER_PASSWD("userPassword", "dolphinscheduler123");
 
     LoginFormData(String param, String data) {
         this.data = data;

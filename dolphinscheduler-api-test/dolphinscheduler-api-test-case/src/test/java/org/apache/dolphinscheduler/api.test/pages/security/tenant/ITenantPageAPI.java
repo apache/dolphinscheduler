@@ -18,8 +18,7 @@
 package org.apache.dolphinscheduler.api.test.pages.security.tenant;
 
 
-import io.restassured.specification.RequestSpecification;
-import org.apache.dolphinscheduler.api.test.entity.PageParamEntity;
+import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.base.IPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
@@ -31,7 +30,7 @@ public interface ITenantPageAPI extends IPageAPI {
 
     RestResponse<Result> updateTenant(TenantRequestEntity tenantUpdateEntity, int tenantId);
 
-    RestResponse<Result> getTenants(PageParamEntity pageParamEntity);
+    RestResponse<Result> getTenants(PageRequestEntity pageParamEntity);
 
     RestResponse<Result> getTenantsListAll();
 

@@ -1,114 +1,129 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package org.apache.dolphinscheduler.api.test.cases;
 
-import org.apache.dolphinscheduler.api.test.core.extensions.DolphinScheduler;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
-import org.apache.dolphinscheduler.api.test.pages.login.LoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.TenantPageAPI;
-import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
+import com.devskiller.jfairy.Fairy;
+import io.restassured.response.Response;
+import org.apache.dolphinscheduler.api.test.base.AbstractAPITest;
+import org.apache.dolphinscheduler.api.test.core.common.Constants;
+import org.apache.dolphinscheduler.api.test.core.extensions.DolphinScheduler;
+import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
+import org.apache.dolphinscheduler.api.test.entity.PageResponseEntity;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantResponseEntity;
+import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
+import org.apache.dolphinscheduler.api.test.utils.RestResponse;
+import org.apache.dolphinscheduler.api.test.utils.Result;
+import org.apache.dolphinscheduler.api.test.utils.Status;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import static org.hamcrest.Matchers.equalTo;
+
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
-@Slf4j
-public class TenantAPITest {
-    private static final String tenant = System.getProperty("user.name");
-
-    private static final String user = "admin";
-
-    private static final String password = "dolphinscheduler123";
-
-    private static String sessionId = null;
-
-    private static Integer existTenantId = null;
+@DisplayName("Tenant Page API test")
+public class TenantAPITest extends AbstractAPITest {
+    protected final Fairy fairy = Fairy.create();
+    private TenantResponseEntity tenantResponseEntity = null;
+    private TenantPageAPI tenantPageAPI = null;
 
     @BeforeAll
-    public static void setup() {
-        LoginPage loginPage = new LoginPage();
-        HttpResponse loginHttpResponse = loginPage.login(user, password);
-
-        sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
+    public void initTenantPageAPIFactory() {
+        tenantPageAPI = pageAPIFactory.createTenantPageAPI();
     }
 
-    @AfterAll
-    public static void cleanup() {
-        LOGGER.info("success cleanup");
-    }
 
     @Test
     @Order(1)
+    @DisplayName("Test the correct Tenant information to log in to the system")
     public void testCreateTenant() {
-        TenantPageAPI tenantPage = new TenantPageAPI();
-
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
+        TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
+        tenantRequestEntity.setTenantCode(fairy.person().getFullName());
+        tenantRequestEntity.setQueueId(1);
+        tenantRequestEntity.setDescription(fairy.person().getFullName());
+        RestResponse<Result> result = tenantPageAPI.createTenant(tenantRequestEntity);
+        result.isResponseSuccessful();
+        tenantResponseEntity = result.getResponse().jsonPath().getObject(Constants.DATA_KEY, TenantResponseEntity.class);
     }
+
 
     @Test
     @Order(2)
-    public void testDuplicateCreateTenant() {
-        TenantPageAPI tenantPage = new TenantPageAPI();
-
-        HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
-
-        Assertions.assertFalse(createTenantHttpResponse.body().success());
+    public void testUpdateTenant() {
+        testCreateTenant();
+        TenantRequestEntity tenantUpdateEntity = new TenantRequestEntity();
+        tenantUpdateEntity.setId(tenantResponseEntity.getId());
+        tenantUpdateEntity.setTenantCode(tenantResponseEntity.getTenantCode());
+        tenantUpdateEntity.setQueueId(1);
+        tenantUpdateEntity.setDescription(fairy.person().getMobileTelephoneNumber());
+        tenantPageAPI.updateTenant(tenantUpdateEntity, tenantResponseEntity.getId()).isResponseSuccessful();
     }
+
+    @Test
+    @Order(3)
+    @DisplayName("Verify that the existing tenant returns code 10009")
+    public void testVerifyExistTenantCode() {
+        tenantPageAPI.verifyTenantCode(tenantResponseEntity.getTenantCode()).getResponse().then().
+                body(Constants.CODE_KEY, equalTo(Status.OS_TENANT_CODE_EXIST.getCode()));
+    }
+
+
+    @Test
+    @Order(4)
+    public void testQueryTenantlistPaging() {
+        PageRequestEntity pageParamEntity = new PageRequestEntity();
+        pageParamEntity.setPageNo(1);
+        pageParamEntity.setPageSize(10);
+        pageParamEntity.setSearchVal("");
+        tenantPageAPI.getTenants(pageParamEntity).isResponseSuccessful();
+    }
+
 
     @Test
     @Order(5)
-    public void testGetTenantListPaging() {
-        TenantPageAPI tenantPage = new TenantPageAPI();
-
-        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
-        boolean result = false;
-
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.body().data(), TenantListPagingResponseData.class).totalList()) {
-            if (tenantListPagingResponseTotalList.tenantCode().equals(tenant)) {
-                result = true;
-                existTenantId = tenantListPagingResponseTotalList.id();
-                break;
-            }
-        }
-
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
-        Assertions.assertTrue(result);
+    public void testQueryTenantListAll() {
+        tenantPageAPI.getTenantsListAll().isResponseSuccessful();
     }
+
 
     @Test
-    @Order(10)
-    public void testDeleteTenant() {
-        TenantPageAPI tenantPage = new TenantPageAPI();
-
-        HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
-
-        Assertions.assertTrue(deleteTenantHttpResponse.body().success());
+    @Order(6)
+    @DisplayName("Verify that the non-existent tenant returns code 0")
+    public void testVerifyNotExistTenantCode() {
+        TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
+        tenantRequestEntity.setTenantCode(fairy.person().getCompany().getName());
+        tenantPageAPI.verifyTenantCode(tenantRequestEntity.getTenantCode()).isResponseSuccessful();
     }
+
+
+    @Test
+    @Order(7)
+    @DisplayName("delete exist tenant by tenant id")
+    public void testDeleteExistTenantByCode() {
+        tenantPageAPI.deleteTenantById(tenantResponseEntity.getId()).isResponseSuccessful();
+    }
+
 }

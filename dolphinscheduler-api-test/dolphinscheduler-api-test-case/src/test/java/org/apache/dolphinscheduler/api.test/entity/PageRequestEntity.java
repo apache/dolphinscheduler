@@ -16,21 +16,37 @@
  */
 
 
-package org.apache.dolphinscheduler.api.test.core.common;
+package org.apache.dolphinscheduler.api.test.entity;
 
-public enum PageFormParam {
-    PAGE_SIZE("pageSize"),
-    PAGE_NO("pageNo"),
-    SEARCH_VAL("searchVal");
 
-    PageFormParam(String param) {
-        this.param = param;
+import org.apache.dolphinscheduler.api.test.base.AbstractBaseEntity;
 
+public class PageRequestEntity extends AbstractBaseEntity {
+    private int pageSize;
+    private int pageNo;
+    private String searchVal;
+
+    public int getPageSize() {
+        return pageSize;
     }
 
-    private final String param;
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
 
-    public String getParam() {
-        return param;
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
+    }
+
+    public String getSearchVal() {
+        return searchVal;
+    }
+
+    public void setSearchVal(String searchVal) {
+        this.searchVal = searchVal;
     }
 }
