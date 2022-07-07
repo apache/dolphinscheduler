@@ -15,23 +15,22 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.test.base;
 
 import io.restassured.response.Response;
 
-public interface IRestResponse<T>{
-    public T getBody();
+public interface IRestResponse<T> {
+    T getBody();
 
-    public String getContent();
+    String getContent();
 
-    public int getStatusCode();
+    int getStatusCode();
 
-    public boolean isSuccessful();
+    boolean isSuccessful();
 
-    public String getStatusDescription();
+    String getStatusDescription();
 
-    public Response getResponse();
+    Response getResponse();
 
-    public Exception getException();
+    Exception getException();
 }

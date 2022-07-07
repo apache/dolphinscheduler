@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.test.base;
 
-import org.junit.jupiter.api.*;
-
 import java.util.logging.Logger;
+
+import org.junit.jupiter.api.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public interface TestLifecycleLogger {
@@ -39,13 +39,13 @@ public interface TestLifecycleLogger {
     @BeforeEach
     default void beforeEachTest(TestInfo testInfo) {
         logger.info(() -> String.format("About to execute [%s]",
-                testInfo.getDisplayName()));
+            testInfo.getDisplayName()));
     }
 
     @AfterEach
     default void afterEachTest(TestInfo testInfo) {
         logger.info(() -> String.format("Finished executing [%s]",
-                testInfo.getDisplayName()));
+            testInfo.getDisplayName()));
     }
 
 }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
-
 import java.text.MessageFormat;
 
 public class Result<T> {

@@ -17,14 +17,30 @@
 
 package org.apache.dolphinscheduler.api.test.base;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractBaseEntity implements IBaseEntity {
 
     public Map<String, Object> toMap() {
-        ObjectMapper objMapper = new ObjectMapper();
-        return objMapper.convertValue(this, Map.class);
+        Map<String, Object> map = new HashMap<String, Object>();
+        Class<?> cla = this.getClass();
+        Field[] fields = cla.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            String keyName = field.getName();
+            Object value = null;
+            try {
+                value = field.get(this);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            if (value == null) {
+                value = "";
+            }
+            map.put(keyName, value);
+        }
+        return map;
     }
 }

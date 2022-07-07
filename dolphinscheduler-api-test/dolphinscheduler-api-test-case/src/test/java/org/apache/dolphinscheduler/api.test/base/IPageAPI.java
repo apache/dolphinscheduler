@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.test.base;
 
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
+import static io.restassured.RestAssured.given;
+
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
@@ -26,7 +26,8 @@ import org.apache.dolphinscheduler.api.test.utils.Result;
 
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 public interface IPageAPI {
 

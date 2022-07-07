@@ -15,17 +15,16 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.test.pages.login.entity;
 
 public class LoginResponseEntity {
-    private String SessionId;
+    private String sessionId;
 
     public String getSessionId() {
-        return SessionId;
+        return sessionId;
     }
 
     public void setSessionId(String sessionId) {
-        SessionId = sessionId;
+        this.sessionId = sessionId;
     }
 }

@@ -17,41 +17,41 @@
 
 package org.apache.dolphinscheduler.api.test.pages;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.apache.dolphinscheduler.api.test.base.IPageAPI;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
-import org.apache.dolphinscheduler.api.test.pages.login.form.LoginFormData;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 public class PageAPI implements IPageAPI {
+
     public static RestResponse<Result> getSession(RequestSpecification request, RequestSpecification reqSpec) {
         Response resp = request.
-                spec(reqSpec).
-                formParam(LoginFormData.USR_NAME.getParam(), LoginFormData.USR_NAME.getData()).
-                formParam(LoginFormData.USER_PASSWD.getParam(), LoginFormData.USER_PASSWD.getData()).
-                when().
-                post(Route.login());
+            spec(reqSpec).
+            formParam(Constants.USER_NAME_KEY, Constants.USER_NAME).
+            formParam(Constants.USER_PASSWD_KEY, Constants.USER_PASSWD).
+            when().
+            post(Route.login());
         return new RestResponse<>(Result.class, resp);
     }
 
     public static RestResponse<Result> releaseSession(RequestSpecification request, RequestSpecification reqSpec, String sessionId) {
         Response resp = request.
-                spec(reqSpec).
-                cookies(Constants.SESSION_ID_KEY, sessionId).
-                when().
-                post(Route.loginOut());
+            spec(reqSpec).
+            cookies(Constants.SESSION_ID_KEY, sessionId).
+            when().
+            post(Route.loginOut());
         return new RestResponse<>(Result.class, resp);
     }
 
     public static RequestSpecification requestSpec() {
         return new RequestSpecBuilder().
-                setBaseUri(Constants.DOLPHINSCHEDULER_BASE_URL).
-                setPort(Constants.DOLPHINSCHEDULER_API_PORT).
-                setBasePath(Constants.DOLPHINSCHEDULER_BASE_PATH).build();
+            setBaseUri(Constants.DOLPHINSCHEDULER_BASE_URL).
+            setPort(Constants.DOLPHINSCHEDULER_API_PORT).
+            setBasePath(Constants.DOLPHINSCHEDULER_BASE_PATH).build();
     }
 
 }

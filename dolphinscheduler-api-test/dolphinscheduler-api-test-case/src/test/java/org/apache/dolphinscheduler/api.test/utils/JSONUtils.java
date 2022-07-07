@@ -24,8 +24,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import io.restassured.common.mapper.TypeRef;
-import io.restassured.path.json.JsonPath;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 
 import java.io.IOException;
@@ -384,26 +382,4 @@ public class JSONUtils {
         return objectMapper.convertValue(value, targetType);
     }
 
-    /**
-     * jsonToObject
-     *
-     * @param json
-     * @param path       json object access path
-     * @param objectType
-     * @param <T>
-     * @return
-     */
-    public static <T> T jsonToObject(String json, String path, Class<T> objectType) {
-        return JsonPath.from(json).getObject(path, objectType);
-    }
-
-
-    public static <T> List<T> jsonToObjectList(String json, String path, Class<T> objectType) {
-        return JsonPath.from(json).getList(path, objectType);
-    }
-
-
-    public static Map<String, Object> jsonToMap(String json, String path) {
-        return JsonPath.from(json).getObject(path, new TypeRef<Map<String, Object>>() {});
-    }
 }

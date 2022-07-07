@@ -73,7 +73,6 @@ public class Route {
         return projects() + "/authed-user";
     }
 
-
     public static String queryProjectCreatedAndAuthorizedByUser() {
         return projects() + "/created-and-authed";
     }
