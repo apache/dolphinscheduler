@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.api.test.core.extensions;
 
+import java.lang.reflect.Parameter;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import java.lang.reflect.Parameter;
+
 
 public class RandomParametersExtension implements ParameterResolver {
 
