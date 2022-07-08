@@ -70,6 +70,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -545,6 +546,82 @@ public class PythonGateway {
         result.put("id", resource.getId());
         result.put("name", resource.getFullName());
         return result;
+    }
+
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param resourceDir The folder where the resource resides.
+     * @param resourceName The name of resource.Do not include file suffixes.
+     * @param resourceSuffix suffix of resource
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    public Integer createOrUpdateResource(
+            String userName, String resourceDir, String resourceName, String resourceSuffix, String description, String resourceContent) {
+        User user = usersService.queryUser(userName);
+        String fullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
+        Result<Object> existResult = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
+        if (existResult.getCode() == Status.SUCCESS.getCode()) {
+            Resource resource = (Resource) existResult.getData();
+            return this.updateResoure(user, resource.getId(), fullName, resourceContent);
+        } else if (existResult.getCode() == Status.RESOURCE_NOT_EXIST.getCode()) {
+            Result<Object> onlineCreateResourceResult = this.onlineCreateResourceWithDir(
+                    user, resourceName, resourceSuffix, description, resourceContent, resourceDir);
+            if (onlineCreateResourceResult.getCode() == Status.SUCCESS.getCode()) {
+                Map<String, Object> resultMap = (Map<String, Object>) onlineCreateResourceResult.getData();
+                return (int) resultMap.get("id");
+            }
+        }
+        String msg = String.format("Can not create or update resource: %s", fullName);
+        logger.error(msg);
+        throw new IllegalArgumentException(msg);
+    }
+
+    private Result<Object> onlineCreateResourceWithDir(User loginUser, String fileName, String fileSuffix, String desc, String content, String currentDirectory) {
+        String[] dirNames = currentDirectory.split("/");
+        int pid = -1;
+        StringBuilder currDirPath = new StringBuilder();
+        for (String dirName : dirNames) {
+            if (StringUtils.isNotEmpty(dirName)) {
+                pid = queryOrCreateDirId(loginUser, pid, currDirPath.toString(), dirName);
+                currDirPath.append("/").append(dirName);
+            }
+        }
+        return resourceService.onlineCreateResource(
+                loginUser, ResourceType.FILE, fileName, fileSuffix, desc, content, pid, currDirPath.toString());
+    }
+
+    private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
+        String dirFullName = currentDir + "/" + dirName;
+        Result<Object> dirResult = resourceService.queryResource(user, dirFullName, null, ResourceType.FILE);
+        if (dirResult.getCode() == Status.SUCCESS.getCode()) {
+            Resource dirResource = (Resource) dirResult.getData();
+            return dirResource.getId();
+        } else if (dirResult.getCode() == Status.RESOURCE_NOT_EXIST.getCode()) {
+            // create dir
+            Result<Object> createDirResult = resourceService.createDirectory(user, dirName, "", ResourceType.FILE, pid, currentDir);
+            if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
+                Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
+                return (int) resultMap.get("id");
+            }
+        }
+        String msg = String.format("Can not create dir %s", dirFullName);
+        logger.error(msg);
+        throw new IllegalArgumentException(msg);
+    }
+
+    private int updateResoure(User user, int resourceId, String resourceFullName, String resourceContent) {
+        Result<Object> updateResult = resourceService.updateResourceContent(user, resourceId, resourceContent);
+        if (updateResult.getCode() != Status.SUCCESS.getCode()) {
+            String msg = String.format("Can not update resource %s", resourceFullName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        return resourceId;
     }
 
     @PostConstruct
