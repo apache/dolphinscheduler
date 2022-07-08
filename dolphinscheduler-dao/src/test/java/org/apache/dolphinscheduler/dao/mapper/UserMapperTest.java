@@ -303,7 +303,7 @@ public class UserMapperTest extends BaseDaoTest {
         //insertOneAccessToken
         AccessToken accessToken = insertOneAccessToken(user);
         //queryUserByToken
-        User userToken = userMapper.queryUserByToken(accessToken.getToken());
+        User userToken = userMapper.queryUserByToken(accessToken.getToken(), new Date());
         Assert.assertEquals(userToken, user);
 
     }

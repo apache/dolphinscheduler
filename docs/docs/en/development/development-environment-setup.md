@@ -1,13 +1,13 @@
 # DolphinScheduler development
 
-## Software Requests
-
+## Software Requirements
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
-* [Git](https://git-scm.com/downloads): DolphinScheduler version control system
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): DolphinScheduler backend language, have to use version after JDK 1.8
-* [Maven](http://maven.apache.org/download.cgi): Java Package Management System
-* [Node](https://nodejs.org/en/download): DolphinScheduler frontend, have to use version after Node 12.20.2
+* [Git](https://git-scm.com/downloads)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)
+* [Maven](http://maven.apache.org/download.cgi): v3.5+
+* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
+* [Pnpm](https://pnpm.io/installation): v6.x
 
 ### Clone Git Repository
 
@@ -21,7 +21,11 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### compile source code
 
-ii. Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+Supporting system:
+* MacOS
+* Liunx
+
+Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ## Docker image build
 
@@ -99,7 +103,7 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.server.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
 
 ### Start frontend server
 
@@ -158,7 +162,7 @@ We here use MySQL with database, username, password named dolphinscheduler as an
   ```application.yaml
    spring:
      datasource:
-       driver-class-name: com.mysql.jdbc.Driver
+       driver-class-name: com.mysql.cj.jdbc.Driver
        url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
        username: dolphinscheduler
        password: dolphinscheduler

@@ -21,7 +21,6 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME
 export SPRING_DATASOURCE_URL
 export SPRING_DATASOURCE_USERNAME
 export SPRING_DATASOURCE_PASSWORD
@@ -44,5 +43,6 @@ export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export SEATUNNEL_HOME=${SEATUNNEL_HOME:-/opt/soft/seatunnel}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$SEATUNNEL_HOME/bin:$PATH

@@ -22,6 +22,7 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
     Delimiter,
+    ResourceKey,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
@@ -155,7 +156,7 @@ class Task(Base):
 
         # Attribute for task param
         self.local_params = local_params or []
-        self.resource_list = resource_list or []
+        self._resource_list = resource_list or []
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
         self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
@@ -169,6 +170,22 @@ class Task(Base):
     def process_definition(self, process_definition: Optional[ProcessDefinition]):
         """Set attribute process_definition."""
         self._process_definition = process_definition
+
+    @property
+    def resource_list(self) -> List:
+        """Get task define attribute `resource_list`."""
+        resources = set()
+        for resource in self._resource_list:
+            if type(resource) == str:
+                resources.add(self.query_resource(resource).get(ResourceKey.ID))
+            elif type(resource) == dict and resource.get(ResourceKey.ID) is not None:
+                logger.warning(
+                    """`resource_list` should be defined using List[str] with resource paths,
+                       the use of ids to define resources will be remove in version 3.2.0.
+                    """
+                )
+                resources.add(resource.get(ResourceKey.ID))
+        return [{ResourceKey.ID: r} for r in resources]
 
     @property
     def condition_result(self) -> Dict:
@@ -273,8 +290,15 @@ class Task(Base):
         # TODO get code from specific project process definition and task name
         gateway = launch_gateway()
         result = gateway.entry_point.getCodeAndVersion(
-            self.process_definition._project, self.name
+            self.process_definition._project, self.process_definition.name, self.name
         )
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")
+
+    def query_resource(self, full_name):
+        """Get resource info from java gateway, contains resource id, name."""
+        gateway = launch_gateway()
+        return gateway.entry_point.queryResourcesFileInfo(
+            self.process_definition.user.name, full_name
+        )

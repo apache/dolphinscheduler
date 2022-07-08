@@ -1,13 +1,13 @@
 # DolphinScheduler 开发手册
 
-## 前置条件
+## 软件要求
+在搭建 DolphinScheduler 开发环境之前请确保你已经安装以下软件:
 
-在搭建 DolphinScheduler 开发环境之前请确保你已经安装一下软件
-
-* [Git](https://git-scm.com/downloads): 版本控制系统
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): 后端开发，必须使用JDK1.8及以后的版本
-* [Maven](http://maven.apache.org/download.cgi): Java包管理系统
-* [Node](https://nodejs.org/en/download): 前端开发，必须使用Node12.20.2及以后的版本
+* [Git](https://git-scm.com/downloads)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (当前暂不支持 jdk 11)
+* [Maven](http://maven.apache.org/download.cgi): v3.5+
+* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
+* [Pnpm](https://pnpm.io/installation): v6.x
 
 ### 克隆代码库
 
@@ -21,7 +21,11 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### 编译源码
 
-* 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
+支持的系统:
+* MacOS
+* Linux
+
+运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ## Docker镜像构建
 
@@ -95,7 +99,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 ### 启动后端
 
-在 Intellij IDEA 找到并启动类 `org.apache.dolphinscheduler.server.StandaloneServer` 即可完成后端启动
+在 Intellij IDEA 找到并启动类 `org.apache.dolphinscheduler.StandaloneServer` 即可完成后端启动
 
 ### 启动前端
 
@@ -152,7 +156,7 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
   ```application.yaml
    spring:
      datasource:
-       driver-class-name: com.mysql.jdbc.Driver
+       driver-class-name: com.mysql.cj.jdbc.Driver
        url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
        username: dolphinscheduler
        password: dolphinscheduler

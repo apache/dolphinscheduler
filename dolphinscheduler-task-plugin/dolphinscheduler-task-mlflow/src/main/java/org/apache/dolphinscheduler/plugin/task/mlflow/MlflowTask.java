@@ -27,8 +27,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +86,13 @@ public class MlflowTask extends AbstractTaskExecutor {
             // construct process
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
-            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            int exitCode = exitStatusCode;
+            if (mlflowParameters.getIsDeployDocker()){
+                exitCode = checkDockerHealth();
+            }else {
+                exitCode = getExitStatusCode();
+            }
+            setExitStatusCode(exitCode);
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
@@ -101,7 +109,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         shellCommandExecutor.cancelApplication();
     }
 
-    public String buildCommand(){
+    public String buildCommand() {
         String command = "";
         if (mlflowParameters.getMlflowTaskType().equals(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS)) {
             command = buildCommandForMlflowProjects();
@@ -141,8 +149,13 @@ public class MlflowTask extends AbstractTaskExecutor {
             runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
 
 
+        } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT)) {
+            args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));
+
+            runCommand = MlflowConstants.MLFLOW_RUN_CUSTOM_PROJECT;
+            runCommand = String.format(runCommand, mlflowParameters.getParams(), mlflowParameters.getExperimentName(), mlflowParameters.getMlflowProjectVersion());
         } else {
-            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowTaskType());
+            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowJobType());
 
         }
         args.add(runCommand);
@@ -167,11 +180,21 @@ public class MlflowTask extends AbstractTaskExecutor {
 
         } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER)) {
             String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
-            String containerName = "mlflow-" + mlflowParameters.getModelKeyName("-");
+            String containerName = mlflowParameters.getContainerName();
 
             args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
             args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
             args.add(String.format(MlflowConstants.DOCKER_RUN, containerName, mlflowParameters.getDeployPort(), imageName));
+        } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE)) {
+            String templatePath = getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE);
+            args.add(String.format("cp %s %s", templatePath, taskExecutionContext.getExecutePath()));
+            String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
+            String containerName = mlflowParameters.getContainerName();
+
+            args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
+            args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
+            args.add(mlflowParameters.getDockerComposeEnvCommand());
+            args.add(MlflowConstants.DOCKER_COMPOSE_RUN);
         }
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
@@ -180,20 +203,46 @@ public class MlflowTask extends AbstractTaskExecutor {
 
     private Map<String, Property> getParamsMap() {
         // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(taskExecutionContext.getParamsMap());
-        }
-        return paramsMap;
+        return taskExecutionContext.getPrepareParamsMap();
 
     }
+
+    public int checkDockerHealth() throws Exception {
+        logger.info("checking container healthy ... ");
+        int exitCode = -1;
+        String[] command = {"sh", "-c", String.format(MlflowConstants.DOCKER_HEALTH_CHECK, mlflowParameters.getContainerName())};
+        for(int x = 0; x < MlflowConstants.DOCKER_HEALTH_CHECK_TIMEOUT; x = x+1) {
+            String status;
+            try {
+                status = OSUtils.exeShell(command).replace("\n", "").replace("\"", "");
+            } catch (Exception e) {
+                status = String.format("error --- %s", e.getMessage());
+            }
+            logger.info("container healthy status: {}", status);
+
+            if (status.equals("healthy")) {
+                exitCode = 0;
+                logger.info("container is healthy");
+                return exitCode;
+            }else {
+                logger.info("The health check has been running for {} seconds", x * MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL / 1000);
+                ThreadUtils.sleep(MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL);
+            }
+        }
+
+        logger.info("health check fail");
+        return exitCode;
+    }
+
 
     @Override
     public AbstractParameters getParameters() {
         return mlflowParameters;
+    }
+
+    public String getTemplatePath(String template) {
+        String templatePath = MlflowTask.class.getClassLoader().getResource(template).getPath();
+        return templatePath;
     }
 
 }

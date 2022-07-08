@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -35,6 +36,9 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -60,6 +64,24 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         return taskDefinition;
     }
 
+    /**
+     * insert
+     *
+     * @return ProcessDefinition
+     */
+    private ProcessTaskRelation insertTaskRelation(long postTaskCode) {
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        processTaskRelation.setName("def 1");
+        processTaskRelation.setProjectCode(1L);
+        processTaskRelation.setProcessDefinitionCode(1L);
+        processTaskRelation.setPostTaskCode(postTaskCode);
+        processTaskRelation.setPreTaskCode(0L);
+        processTaskRelation.setUpdateTime(new Date());
+        processTaskRelation.setCreateTime(new Date());
+        processTaskRelationMapper.insert(processTaskRelation);
+        return processTaskRelation;
+    }
+
     @Test
     public void testInsert() {
         TaskDefinition taskDefinition = insertOne();
@@ -69,7 +91,8 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByDefinitionName() {
         TaskDefinition taskDefinition = insertOne();
-        TaskDefinition result = taskDefinitionMapper.queryByName(taskDefinition.getProjectCode()
+        ProcessTaskRelation processTaskRelation = insertTaskRelation(taskDefinition.getCode());
+        TaskDefinition result = taskDefinitionMapper.queryByName(taskDefinition.getProjectCode(), processTaskRelation.getProcessDefinitionCode()
                 , taskDefinition.getName());
 
         Assert.assertNotNull(result);
