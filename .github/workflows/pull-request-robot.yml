@@ -18,9 +18,11 @@
 name: "pull-request-robot"
 
 on:
-  workflow_run:
-    workflows: [ "Label when opened" ]
-    types: [ 'requested' ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+#  workflow_run:
+#    workflows: [ "Label when opened" ]
+#    types: [ 'requested' ]
 
 permissions:
   # All other permissions are set to none
