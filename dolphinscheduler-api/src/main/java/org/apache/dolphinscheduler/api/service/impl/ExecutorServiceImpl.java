@@ -988,8 +988,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         HashSet<String> removeDate = new HashSet<String>();
         List<String> resultList = new ArrayList<String>();
         if (StringUtils.isNotEmpty(scheduleTimeList)) {
-            String[] dateArrays = scheduleTimeList.split(COMMA);
-            List<String> dateList = Arrays.asList(dateArrays);
+            List<String> dateList  = Arrays.stream(scheduleTimeList.split(COMMA)).map(String::trim).collect(Collectors.toList());
             removeDate.addAll(dateList);
             resultList.addAll(removeDate);
             return String.join(COMMA, resultList);
