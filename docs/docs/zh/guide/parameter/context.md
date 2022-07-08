@@ -94,5 +94,5 @@ Node_mysql 运行结果如下：
 配置好后的效果
 ![httpParam-3](../../../../img/httpParam/httpParam-3.png)
 
-第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。
+第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。 
 ![httpParam-4](../../../../img/httpParam/httpParam-4.png)
