@@ -166,7 +166,6 @@ jobs:
         run: |
           python -m pip install --upgrade ${{ env.DEPENDENCES }}
       - name: Run Tests Build Docs
-        working-directory: dolphinscheduler-python/pydolphinscheduler
         run: |
           python -m tox -vv -e integrate-test
   result:
