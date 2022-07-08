@@ -127,6 +127,7 @@ public class FailoverServiceTest {
         processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setHost(testMasterHost);
+        processInstance.setStartTime(new Date());
         processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
@@ -163,7 +164,6 @@ public class FailoverServiceTest {
 
         given(registryClient.getServerList(NodeType.WORKER)).willReturn(new ArrayList<>(Arrays.asList(workerServer)));
         given(registryClient.getServerList(NodeType.MASTER)).willReturn(new ArrayList<>(Arrays.asList(masterServer)));
-        ReflectionTestUtils.setField(failoverService, "registryClient", registryClient);
 
         doNothing().when(workflowExecuteThreadPool).submitStateEvent(Mockito.any(StateEvent.class));
     }
