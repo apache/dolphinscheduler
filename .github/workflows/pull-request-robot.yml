@@ -18,7 +18,7 @@
 name: "pull-request-robot"
 
 on:
-  pull_request:
+  pull_request_target:
 
 jobs:
   labelRobot:
@@ -31,5 +31,5 @@ jobs:
         uses: actions/labeler@v4
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: ../actions/labeler.yml
+          configuration-path: ../actions/labeler/labeler.yml
           sync-labels: true
