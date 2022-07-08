@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
@@ -61,7 +62,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
     @Transactional
-    ProcessInstance handleCommand(String host, Command command);
+    ProcessInstance handleCommand(String host, Command command) throws CronParseException;
 
     void moveToErrorCommand(Command command, String message);
 
@@ -81,7 +82,7 @@ public interface ProcessService {
 
     ProcessDefinition findProcessDefineById(int processDefinitionId);
 
-    ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version);
+    ProcessDefinition findProcessDefinition(Long processDefinitionCode, int processDefinitionVersion);
 
     ProcessDefinition findProcessDefinitionByCode(Long processDefinitionCode);
 
@@ -105,7 +106,7 @@ public interface ProcessService {
 
     TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval);
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
@@ -173,7 +174,7 @@ public interface ProcessService {
 
     List<String> queryNeedFailoverProcessInstanceHost();
 
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     void processNeedFailoverProcessInstances(ProcessInstance processInstance);
 
     List<TaskInstance> queryNeedFailoverTaskInstances(String host);

@@ -15,29 +15,17 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
+public class Constants {
 
-    button {
-      margin-left: 10px;
+    private Constants() {
+        throw new IllegalStateException("Utility class");
     }
-  }
-}
 
-.table-card {
-  margin-top: 8px;
+    public static final String CONFIG_OPTIONS = "--config";
+    public static final String DEPLOY_MODE_OPTIONS = "--deploy-mode";
+    public static final String MASTER_OPTIONS = "--master";
+    public static final String QUEUE_OPTIONS = "--queue";
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
 }

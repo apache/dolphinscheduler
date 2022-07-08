@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.corn;
+package org.apache.dolphinscheduler.service.cron;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.day;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.hour;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.min;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
-import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.year;
 
 import static com.cronutils.model.CronType.QUARTZ;
 
@@ -33,26 +33,31 @@ import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
+
+import lombok.NonNull;
 
 /**
  * // todo: this utils is heavy, it rely on quartz and corn-utils.
@@ -74,19 +79,12 @@ public class CronUtils {
      * @param cronExpression cron expression, never null
      * @return Cron instance, corresponding to cron expression received
      */
-    public static Cron parse2Cron(String cronExpression) {
-        return QUARTZ_CRON_PARSER.parse(cronExpression);
-    }
-
-    /**
-     * build a new CronExpression based on the string cronExpression
-     *
-     * @param cronExpression String representation of the cron expression the new object should represent
-     * @return CronExpression
-     * @throws ParseException if the string expression cannot be parsed into a valid
-     */
-    public static CronExpression parse2CronExpression(String cronExpression) throws ParseException {
-        return new CronExpression(cronExpression);
+    public static Cron parse2Cron(String cronExpression) throws CronParseException {
+        try {
+            return QUARTZ_CRON_PARSER.parse(cronExpression);
+        } catch (Exception ex) {
+            throw new CronParseException(String.format("Parse corn expression: [%s] error", cronExpression), ex);
+        }
     }
 
     /**
@@ -106,7 +104,12 @@ public class CronUtils {
      * @return CycleEnum
      */
     public static CycleEnum getMiniCycle(Cron cron) {
-        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).addCycle(year(cron)).getMiniCycle();
+        return min(cron).addCycle(hour(cron))
+            .addCycle(day(cron))
+            .addCycle(week(cron))
+            .addCycle(month(cron))
+            .addCycle(year(cron))
+            .getMiniCycle();
     }
 
     /**
@@ -116,23 +119,41 @@ public class CronUtils {
      * @return CycleEnum
      */
     public static CycleEnum getMaxCycle(String crontab) {
-        return getMaxCycle(parse2Cron(crontab));
+        try {
+            return getMaxCycle(parse2Cron(crontab));
+        } catch (CronParseException ex) {
+            throw new RuntimeException("Get max cycle error", ex);
+        }
+    }
+
+
+    public static List<ZonedDateTime> getFireDateList(@NonNull ZonedDateTime startTime,
+                                                      @NonNull ZonedDateTime endTime,
+                                                      @NonNull String cron) throws CronParseException {
+        return getFireDateList(startTime, endTime, parse2Cron(cron));
     }
 
     /**
      * gets all scheduled times for a period of time based on not self dependency
      *
      * @param startTime startTime
-     * @param endTime endTime
-     * @param cronExpression cronExpression
+     * @param endTime   endTime
+     * @param cron      cron
      * @return date list
      */
-    public static List<Date> getFireDateList(Date startTime, Date endTime, CronExpression cronExpression) {
-        List<Date> dateList = new ArrayList<>();
+    public static List<ZonedDateTime> getFireDateList(@NonNull ZonedDateTime startTime,
+                                                      @NonNull ZonedDateTime endTime,
+                                                      @NonNull Cron cron) {
+        List<ZonedDateTime> dateList = new ArrayList<>();
+        ExecutionTime executionTime = ExecutionTime.forCron(cron);
 
         while (Stopper.isRunning()) {
-            startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime == null || startTime.after(endTime)) {
+            Optional<ZonedDateTime> nextExecutionTimeOptional = executionTime.nextExecution(startTime);
+            if (!nextExecutionTimeOptional.isPresent()) {
+                break;
+            }
+            startTime = nextExecutionTimeOptional.get();
+            if (startTime.isAfter(endTime)) {
                 break;
             }
             dateList.add(startTime);
@@ -142,64 +163,62 @@ public class CronUtils {
     }
 
     /**
-     * gets expect scheduled times for a period of time based on self dependency
+     * Gets expect scheduled times for a period of time based on self dependency
      *
      * @param startTime startTime
-     * @param endTime endTime
-     * @param cronExpression cronExpression
+     * @param endTime   endTime
+     * @param cron      cron
      * @param fireTimes fireTimes
-     * @return date list
+     * @return nextTime execution list
      */
-    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression, int fireTimes) {
-        List<Date> dateList = new ArrayList<>();
+    public static List<ZonedDateTime> getSelfFireDateList(@NonNull ZonedDateTime startTime,
+                                                          @NonNull ZonedDateTime endTime, @NonNull Cron cron,
+                                                          int fireTimes) {
+        List<ZonedDateTime> executeTimes = new ArrayList<>();
+        ExecutionTime executionTime = ExecutionTime.forCron(cron);
         while (fireTimes > 0) {
-            startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
+            Optional<ZonedDateTime> nextTime = executionTime.nextExecution(startTime);
+            if (!nextTime.isPresent()) {
                 break;
             }
-            dateList.add(startTime);
+            startTime = nextTime.get();
+            if (startTime.isAfter(endTime)) {
+                break;
+            }
+            executeTimes.add(startTime);
             fireTimes--;
         }
-
-        return dateList;
+        return executeTimes;
     }
 
-    /**
-     * gets all scheduled times for a period of time based on self dependency
-     *
-     * @param startTime startTime
-     * @param endTime endTime
-     * @param cronExpression cronExpression
-     * @return date list
-     */
-    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression) {
-        List<Date> dateList = new ArrayList<>();
+    public static List<Date> getSelfFireDateList(@NonNull final Date startTime,
+                                                 @NonNull final Date endTime,
+                                                 @NonNull final List<Schedule> schedules) throws CronParseException {
+        ZonedDateTime zonedDateTimeStart = ZonedDateTime.ofInstant(startTime.toInstant(), ZoneId.systemDefault());
+        ZonedDateTime zonedDateTimeEnd = ZonedDateTime.ofInstant(endTime.toInstant(), ZoneId.systemDefault());
 
-        while (Stopper.isRunning()) {
-            startTime = cronExpression.getNextValidTimeAfter(startTime);
-            if (startTime == null || startTime.after(endTime) || startTime.equals(endTime)) {
-                break;
-            }
-            dateList.add(startTime);
-        }
-
-        return dateList;
+        return getSelfFireDateList(zonedDateTimeStart, zonedDateTimeEnd, schedules).stream()
+            .map(zonedDateTime -> new Date(zonedDateTime.toInstant().toEpochMilli()))
+            .collect(Collectors.toList());
     }
 
     /**
      * gets all scheduled times for a period of time based on self dependency
      * if schedulers is empty then default scheduler = 1 day
      */
-    public static List<Date> getSelfFireDateList(final Date startTime, final Date endTime, final List<Schedule> schedules) {
-        List<Date> result = new ArrayList<>();
+    public static List<ZonedDateTime> getSelfFireDateList(@NonNull final ZonedDateTime startTime,
+                                                          @NonNull final ZonedDateTime endTime,
+                                                          @NonNull final List<Schedule> schedules)
+        throws CronParseException {
+        List<ZonedDateTime> result = new ArrayList<>();
         if (startTime.equals(endTime)) {
             result.add(startTime);
             return result;
         }
 
         // support left closed and right closed time interval (startDate <= N <= endDate)
-        Date from = new Date(startTime.getTime() - Constants.SECOND_TIME_MILLIS);
-        Date to = new Date(endTime.getTime() + Constants.SECOND_TIME_MILLIS);
+        ZonedDateTime from = startTime.minusSeconds(1L);
+        ZonedDateTime to = endTime.plusSeconds(1L);
 
         List<Schedule> listSchedule = new ArrayList<>();
         listSchedule.addAll(schedules);
@@ -209,28 +228,9 @@ public class CronUtils {
             listSchedule.add(schedule);
         }
         for (Schedule schedule : listSchedule) {
-            result.addAll(CronUtils.getSelfFireDateList(from, to, schedule.getCrontab()));
+            result.addAll(CronUtils.getFireDateList(from, to, schedule.getCrontab()));
         }
         return result;
-    }
-
-    /**
-     * gets all scheduled times for a period of time based on self dependency
-     *
-     * @param startTime startTime
-     * @param endTime endTime
-     * @param cron cron
-     * @return date list
-     */
-    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, String cron) {
-        CronExpression cronExpression = null;
-        try {
-            cronExpression = parse2CronExpression(cron);
-        } catch (ParseException e) {
-            logger.error(e.getMessage(), e);
-            return Collections.emptyList();
-        }
-        return getSelfFireDateList(startTime, endTime, cronExpression);
     }
 
     /**
@@ -289,15 +289,16 @@ public class CronUtils {
 
     /**
      * get Schedule Date
+     *
      * @param param
-     * @return  date list
+     * @return date list
      */
     public static List<Date> getSelfScheduleDateList(Map<String, String> param) {
         List<Date> result = new ArrayList<>();
         String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
         if (StringUtils.isNotEmpty(scheduleDates)) {
             for (String stringDate : scheduleDates.split(COMMA)) {
-                result.add(DateUtils.stringToDate(stringDate));
+                result.add(DateUtils.stringToDate(stringDate.trim()));
             }
             return result;
         }

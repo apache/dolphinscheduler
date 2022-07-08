@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
@@ -42,7 +43,6 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -129,15 +129,17 @@ import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.corn.CronUtils;
+import org.apache.dolphinscheduler.service.cron.CronUtils;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -277,14 +279,13 @@ public class ProcessServiceImpl implements ProcessService {
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
-     * @param logger  logger
      * @param host    host
      * @param command found command
      * @return process instance
      */
     @Override
     @Transactional
-    public ProcessInstance handleCommand(String host, Command command) {
+    public ProcessInstance handleCommand(String host, Command command) throws CronParseException {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
@@ -731,15 +732,14 @@ public class ProcessServiceImpl implements ProcessService {
      * @param cmdParam cmdParam map
      * @return date
      */
-    private Date getScheduleTime(Command command, Map<String, String> cmdParam) {
+    private Date getScheduleTime(Command command, Map<String, String> cmdParam) throws CronParseException {
         Date scheduleTime = command.getScheduleTime();
-        if (scheduleTime == null
-            && cmdParam != null
-            && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+        if (scheduleTime == null && cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
 
             Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
             Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-            List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+            List<Schedule> schedules =
+                queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
             List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
 
             if (complementDateList.size() > 0) {
@@ -922,12 +922,13 @@ public class ProcessServiceImpl implements ProcessService {
      * @param host    host
      * @return process instance
      */
-    protected ProcessInstance constructProcessInstance(Command command, String host) {
+    protected ProcessInstance constructProcessInstance(Command command, String host) throws CronParseException {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
 
-        processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
+        processDefinition =
+            this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
             return null;
@@ -1122,18 +1123,24 @@ public class ProcessServiceImpl implements ProcessService {
      */
     private void initComplementDataParam(ProcessDefinition processDefinition,
                                          ProcessInstance processInstance,
-                                         Map<String, String> cmdParam) {
+                                         Map<String, String> cmdParam) throws CronParseException {
         if (!processInstance.isComplementData()) {
             return;
         }
 
         Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
         Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-        List<Schedule> listSchedules = queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        List<Date> complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
+        List<Date> complementDate = Lists.newLinkedList();
+        if (start != null && end != null) {
+            List<Schedule> listSchedules =
+                queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+            complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
+        }
+        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+            complementDate = CronUtils.getSelfScheduleDateList(cmdParam);
+        }
 
-        if (complementDate.size() > 0
-            && Flag.NO == processInstance.getIsSubProcess()) {
+        if (complementDate.size() > 0 && Flag.NO == processInstance.getIsSubProcess()) {
             processInstance.setScheduleTime(complementDate.get(0));
         }
 
@@ -1290,7 +1297,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return task instance
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
         logger.info("start submit task : {}, processInstance id:{}, state: {}",
             taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
@@ -1409,8 +1416,14 @@ public class ProcessServiceImpl implements ProcessService {
             Map<String, String> parentParam = JSONUtils.toMap(parentProcessInstance.getCommandParam());
             String endTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
             String startTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
-            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endTime);
-            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
+            String scheduleTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
+            if (StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(endTime)) {
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endTime);
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
+            }
+            if (StringUtils.isNotEmpty(scheduleTime)) {
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, scheduleTime);
+            }
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }
         if (fatherParams.size() != 0) {
@@ -2047,7 +2060,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param processInstance processInstance
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance) {
         //1 update processInstance host is null
         processInstance.setHost(Constants.NULL);
@@ -2063,6 +2076,7 @@ public class ProcessServiceImpl implements ProcessService {
         cmd.setCommandParam(String.format("{\"%s\":%d}", Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
+        cmd.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         createCommand(cmd);
     }
 

@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
@@ -28,6 +27,7 @@ import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotal
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j

@@ -15,36 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+public enum EngineEnum {
 
-import io.netty.channel.Channel;
-import lombok.Data;
+    FLINK("${SEATUNNEL_HOME}/bin/start-seatunnel-flink.sh"),
+    SPARK("${SEATUNNEL_HOME}/bin/start-seatunnel-spark.sh");
 
-/**
- * state event
- */
-@Data
-public class StateEvent {
+    private String command;
 
-    /**
-     * origin_pid-origin_task_id-process_instance_id-task_instance_id
-     */
-    private String key;
+    EngineEnum(String command) {
+        this.command = command;
+    }
 
-    private StateEventType type;
-
-    private ExecutionStatus executionStatus;
-
-    private int taskInstanceId;
-
-    private long taskCode;
-
-    private int processInstanceId;
-
-    private String context;
-
-    private Channel channel;
-
+    public String getCommand() {
+        return command;
+    }
 }

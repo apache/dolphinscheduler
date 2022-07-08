@@ -804,10 +804,10 @@ public final class Constants {
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
-    public static final String K8S = "k8s";
+    public static final String CLUSTER = "cluster";
     public static final String LIMITS_CPU = "limitsCpu";
     public static final String LIMITS_MEMORY = "limitsMemory";
-    public static final String K8S_LOCAL_TEST_CLUSTER = "ds_null_k8s";
+    public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**
      * schedule timezone
@@ -833,4 +833,6 @@ public final class Constants {
     public static final int USER_PASSWORD_MIN_LENGTH = 2;
 
     public static final String FUNCTION_START_WITH = "$";
+
+    public static final Integer DEFAULT_QUEUE_ID = 1;
 }
