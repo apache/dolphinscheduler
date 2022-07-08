@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
+import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -118,7 +119,7 @@ public class JavaTask extends AbstractTaskExecutor {
                     command = buildJarCommand();
                     break;
                 default:
-                    throw new RuntimeException("run type is required, but it is null now.");
+                    throw new RunTypeNotFoundException("run type is required, but it is null now.");
             }
             Preconditions.checkNotNull(command, "command not be null.");
             TaskResponse taskResponse = shellCommandExecutor.run(command);
