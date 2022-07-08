@@ -36,6 +36,12 @@ public class ApiExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
+    @ExceptionHandler(ServiceException.class)
+    public Result exceptionHandler(ServiceException e, HandlerMethod hm) {
+        logger.error("ServiceException: ", e);
+        return new Result(e.getCode(), e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public Result exceptionHandler(Exception e, HandlerMethod hm) {
         ApiException ce = hm.getMethodAnnotation(ApiException.class);

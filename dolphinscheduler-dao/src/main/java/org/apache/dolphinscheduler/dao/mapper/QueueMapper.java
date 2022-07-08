@@ -55,9 +55,10 @@ public interface QueueMapper extends BaseMapper<Queue> {
     Boolean existQueue(@Param("queue") String queue, @Param("queueName") String queueName);
 
     /**
-     * query queue by queue name
+     * query simple queue object by queue name and queue
+     * @param queue queue
      * @param queueName queueName
-     * @return queue list
+     * @return queue object
      */
-    List<Queue> queryQueueName(@Param("queueName") String queueName);
+    Queue queryQueueName(@Param("queue") String queue, @Param("queueName") String queueName);
 }

@@ -42,11 +42,14 @@ import org.springframework.util.MultiValueMap;
 public class QueueControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(QueueControllerTest.class);
 
-    private static final String QUEUE_CREATE_STRING = "queue1";
+    private static final String QUEUE_CREATE_NAME = "queue_create";
+    private static final String QUEUE_MODIFY_NAME = "queue_modify";
+    private static final String QUEUE_NAME_CREATE_NAME = "queue_name_create";
+    private static final String QUEUE_NAME_MODIFY_NAME = "queue_name_modify";
+    private static final String NOT_EXISTS_NAME = "not_exists";
 
     @Test
     public void testQueryList() throws Exception {
-
         MvcResult mvcResult = mockMvc.perform(get("/queues/list")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -54,13 +57,14 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testQueryQueueListPaging() throws Exception {
-
+    public void testQueryQueueListPagingEmpty() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("searchVal","");
         paramsMap.add("pageNo","1");
@@ -73,17 +77,17 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info("query list-paging queue return result:{}", mvcResult.getResponse().getContentAsString());
 
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info("query list-paging queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testCreateQueue() throws Exception {
-
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queue", QUEUE_CREATE_STRING);
-        paramsMap.add("queueName","root.queue1");
+        paramsMap.add("queue", QUEUE_CREATE_NAME);
+        paramsMap.add("queueName", QUEUE_NAME_CREATE_NAME);
 
         MvcResult mvcResult = mockMvc.perform(post("/queues")
                 .header(SESSION_ID, sessionId)
@@ -92,17 +96,18 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUpdateQueue() throws Exception {
-
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","1");
-        paramsMap.add("queue","queue2");
-        paramsMap.add("queueName","root.queue2");
+        paramsMap.add("queue", QUEUE_MODIFY_NAME);
+        paramsMap.add("queueName", QUEUE_NAME_MODIFY_NAME);
 
         MvcResult mvcResult = mockMvc.perform(put("/queues/{id}", 1)
                 .header(SESSION_ID, sessionId)
@@ -111,6 +116,8 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
@@ -120,8 +127,8 @@ public class QueueControllerTest extends AbstractControllerTest {
 
         // queue value exist
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queue",QUEUE_CREATE_STRING);
-        paramsMap.add("queueName","queue.name");
+        paramsMap.add("queue", QUEUE_MODIFY_NAME);
+        paramsMap.add("queueName", NOT_EXISTS_NAME);
 
         MvcResult mvcResult = mockMvc.perform(post("/queues/verify")
                 .header(SESSION_ID, sessionId)
@@ -129,13 +136,32 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
+
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.QUEUE_VALUE_EXIST.getCode(),result.getCode().intValue());
+
+        // queue name exist
+        paramsMap.clear();
+        paramsMap.add("queue", NOT_EXISTS_NAME);
+        paramsMap.add("queueName", QUEUE_NAME_CREATE_NAME);
+
+        mvcResult = mockMvc.perform(post("/queues/verify")
+                        .header(SESSION_ID, sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.QUEUE_NAME_EXIST.getCode(),result.getCode().intValue());
 
         // success
         paramsMap.clear();
-        paramsMap.add("queue","ait123");
-        paramsMap.add("queueName","aitName");
+        paramsMap.add("queue", NOT_EXISTS_NAME);
+        paramsMap.add("queueName", NOT_EXISTS_NAME);
 
         mvcResult = mockMvc.perform(post("/queues/verify")
                 .header(SESSION_ID, sessionId)
@@ -144,6 +170,8 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify queue return result:{}", mvcResult.getResponse().getContentAsString());
