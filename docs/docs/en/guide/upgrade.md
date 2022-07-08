@@ -27,7 +27,7 @@ jar package and add it to the `./tools/libs` directory, then change `./bin/ env/
     ```shell
     export DATABASE=${DATABASE:-mysql}
     export SPRING_PROFILES_ACTIVE=${DATABASE}
-    export SPRING_DATASOURCE_URL=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8"
     export SPRING_DATASOURCE_USERNAME={user}
     export SPRING_DATASOURCE_PASSWORD={password}
     ```
