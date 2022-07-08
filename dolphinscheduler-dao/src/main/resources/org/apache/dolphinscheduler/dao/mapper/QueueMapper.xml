@@ -64,9 +64,13 @@
         select
         <include refid="baseSql"/>
         from t_ds_queue
-        where 1 = 1
-        <if test="queueName != null and queueName != ''">
-            and queue_name =#{queueName}
-        </if>
+        <where>
+            <if test="queue != null and queue != ''">
+                and queue =#{queue}
+            </if>
+            <if test="queueName != null and queueName != ''">
+                and queue_name =#{queueName}
+            </if>
+        </where>
     </select>
 </mapper>
