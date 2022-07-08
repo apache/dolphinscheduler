@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
@@ -113,9 +112,6 @@ public class PythonGateway {
 
     @Autowired
     private UsersService usersService;
-
-    @Autowired
-    private QueueService queueService;
 
     @Autowired
     private ResourcesService resourceService;
@@ -395,37 +391,8 @@ public class PythonGateway {
         }
     }
 
-    public Map<String, Object> createQueue(String name, String queueName) {
-        Result<Object> verifyQueueExists = queueService.verifyQueue(name, queueName);
-        if (verifyQueueExists.getCode() == 0) {
-            return queueService.createQueue(dummyAdminUser, name, queueName);
-        } else {
-            Map<String, Object> result = new HashMap<>();
-            // TODO function putMsg do not work here
-            result.put(Constants.STATUS, Status.SUCCESS);
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            return result;
-        }
-    }
-
-    public Map<String, Object> createTenant(String tenantCode, String desc, String queueName) throws Exception {
-        if (tenantService.checkTenantExists(tenantCode)) {
-            Map<String, Object> result = new HashMap<>();
-            // TODO function putMsg do not work here
-            result.put(Constants.STATUS, Status.SUCCESS);
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            return result;
-        } else {
-            Result<Object> verifyQueueExists = queueService.verifyQueue(queueName, queueName);
-            if (verifyQueueExists.getCode() == 0) {
-                // TODO why create do not return id?
-                queueService.createQueue(dummyAdminUser, queueName, queueName);
-            }
-            Map<String, Object> result = queueService.queryQueueName(queueName);
-            List<Queue> queueList = (List<Queue>) result.get(Constants.DATA_LIST);
-            Queue queue = queueList.get(0);
-            return tenantService.createTenant(dummyAdminUser, tenantCode, queue.getId(), desc);
-        }
+    public Tenant createTenant(String tenantCode, String desc, String queueName) {
+        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
     }
 
     public void createUser(String userName,
