@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
+
+import lombok.Data;
+
 @Data
 public class TaskResponse {
 

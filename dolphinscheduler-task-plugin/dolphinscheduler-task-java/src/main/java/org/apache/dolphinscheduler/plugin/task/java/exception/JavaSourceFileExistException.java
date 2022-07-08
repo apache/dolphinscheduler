@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.java.exception;
 
-public class JavaSourceFileExistException extends RuntimeException{
+public class JavaSourceFileExistException extends RuntimeException {
     public JavaSourceFileExistException() {
     }
 

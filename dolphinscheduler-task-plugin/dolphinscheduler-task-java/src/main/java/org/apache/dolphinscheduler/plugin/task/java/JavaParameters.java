@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.List;
+
 @Data
 public class JavaParameters extends AbstractParameters {
     /**

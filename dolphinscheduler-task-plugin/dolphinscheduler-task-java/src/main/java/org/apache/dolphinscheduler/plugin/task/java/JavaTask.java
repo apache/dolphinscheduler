@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.task.java;
 
 import com.google.common.base.Preconditions;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,7 +46,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 /**
  * java task
@@ -63,7 +64,6 @@ public class JavaTask extends AbstractTaskExecutor {
 
     private TaskExecutionContext taskRequest;
 
-
     /**
      * constructor
      *
@@ -81,7 +81,7 @@ public class JavaTask extends AbstractTaskExecutor {
     public void init() {
         logger.info("java task params {}", taskRequest.getTaskParams());
         javaParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), JavaParameters.class);
-        if (javaParameters==null||!javaParameters.checkParameters()) {
+        if (javaParameters == null || !javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
         }
         if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
@@ -115,6 +115,8 @@ public class JavaTask extends AbstractTaskExecutor {
                 case JavaConstants.RUN_TYPE_JAR:
                     command = buildJarCommand();
                     break;
+                default:
+                    throw new RuntimeException("run type is required, but it is null now.");
             }
             Preconditions.checkNotNull(command, "command not be null.");
             TaskResponse taskResponse = shellCommandExecutor.run(command);
@@ -179,7 +181,6 @@ public class JavaTask extends AbstractTaskExecutor {
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
-        System.out.println(builder.toString());
         return builder.toString();
     }
     
@@ -226,7 +227,6 @@ public class JavaTask extends AbstractTaskExecutor {
         return rawScript;
     }
 
-
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
         logger.info("tenantCode :{}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
 
@@ -246,7 +246,6 @@ public class JavaTask extends AbstractTaskExecutor {
         }
     }
 
-
     protected String buildJavaSourceCodeFileFullName(String publicClassName) {
         return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(), publicClassName);
     }
@@ -255,7 +254,7 @@ public class JavaTask extends AbstractTaskExecutor {
         StringBuilder builder = new StringBuilder();
         if (javaParameters.isModulePath()) {
             builder.append("--module-path");
-        }else{
+        } else {
             builder.append("--class-path");
         }
         builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
@@ -306,8 +305,7 @@ public class JavaTask extends AbstractTaskExecutor {
         return compilerCommand.toString();
     }
 
-
-    protected String buildJavaSourceContent(){
+    protected String buildJavaSourceContent() {
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
         // replace placeholder
 
@@ -322,8 +320,6 @@ public class JavaTask extends AbstractTaskExecutor {
         logger.info("raw java script : {}", javaParameters.getRawScript());
         return rawJavaScript;
     }
-
-
 
     private String getJavaHomeBinAbsolutePath() {
         String javaHomeAbsolutePath = System.getenv(JavaConstants.JAVA_HOME);
