@@ -66,7 +66,6 @@ public class TenantAPITest extends AbstractAPITest {
     @Test
     @Order(2)
     public void testUpdateTenant() {
-        testCreateTenant();
         TenantRequestEntity tenantUpdateEntity = new TenantRequestEntity();
         tenantUpdateEntity.setId(tenantResponseEntity.getId());
         tenantUpdateEntity.setTenantCode(tenantResponseEntity.getTenantCode());
