@@ -79,21 +79,16 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     public void submitTaskEvent(TaskEvent taskEvent) {
         if (!processInstanceExecCacheManager.contains(taskEvent.getProcessInstanceId())) {
-            logger.warn("workflowExecuteThread is null, event: {}", taskEvent);
+            logger.warn("Cannot find workflowExecuteThread from cacheManager, event: {}", taskEvent);
             return;
         }
-        if (!taskExecuteThreadMap.containsKey(taskEvent.getProcessInstanceId())) {
-            TaskExecuteRunnable taskExecuteThread = new TaskExecuteRunnable(
-                    taskEvent.getProcessInstanceId(),
-                    processService, workflowExecuteThreadPool,
-                    processInstanceExecCacheManager,
-                    dataQualityResultOperator);
-            taskExecuteThreadMap.put(taskEvent.getProcessInstanceId(), taskExecuteThread);
-        }
-        TaskExecuteRunnable taskExecuteRunnable= taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
-        if (taskExecuteRunnable != null) {
-            taskExecuteRunnable.addEvent(taskEvent);
-        }
+        TaskExecuteRunnable taskExecuteRunnable = taskExecuteThreadMap.computeIfAbsent(taskEvent.getProcessInstanceId(),
+            (processInstanceId) -> new TaskExecuteRunnable(processInstanceId,
+                processService,
+                workflowExecuteThreadPool,
+                processInstanceExecCacheManager,
+                dataQualityResultOperator));
+        taskExecuteRunnable.addEvent(taskEvent);
     }
 
     public void eventHandler() {
@@ -103,7 +98,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     public void executeEvent(TaskExecuteRunnable taskExecuteThread) {
-        if (taskExecuteThread.eventSize() == 0) {
+        if (taskExecuteThread.isEmpty()) {
             return;
         }
         if (multiThreadFilterMap.containsKey(taskExecuteThread.getKey())) {
@@ -114,20 +109,24 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
-                logger.error("handle event {} failed: {}", taskExecuteThread.getProcessInstanceId(), ex);
-                if (!processInstanceExecCacheManager.contains(taskExecuteThread.getProcessInstanceId())) {
-                    taskExecuteThreadMap.remove(taskExecuteThread.getProcessInstanceId());
-                    logger.info("remove process instance: {}", taskExecuteThread.getProcessInstanceId());
+                Integer processInstanceId = taskExecuteThread.getProcessInstanceId();
+                logger.error("[WorkflowInstance-{}] persist event failed", processInstanceId, ex);
+                if (!processInstanceExecCacheManager.contains(processInstanceId)) {
+                    taskExecuteThreadMap.remove(processInstanceId);
+                    logger.info("[WorkflowInstance-{}] Cannot find processInstance from cacheManager, remove process instance from threadMap",
+                        processInstanceId);
                 }
                 multiThreadFilterMap.remove(taskExecuteThread.getKey());
             }
 
             @Override
             public void onSuccess(Object result) {
-                logger.info("persist events {} succeeded.", taskExecuteThread.getProcessInstanceId());
-                if (!processInstanceExecCacheManager.contains(taskExecuteThread.getProcessInstanceId())) {
-                    taskExecuteThreadMap.remove(taskExecuteThread.getProcessInstanceId());
-                    logger.info("remove process instance: {}", taskExecuteThread.getProcessInstanceId());
+                Integer processInstanceId = taskExecuteThread.getProcessInstanceId();
+                logger.info("[WorkflowInstance-{}] persist events succeeded", processInstanceId);
+                if (!processInstanceExecCacheManager.contains(processInstanceId)) {
+                    taskExecuteThreadMap.remove(processInstanceId);
+                    logger.info("[WorkflowInstance-{}] Cannot find processInstance from cacheManager, remove process instance from threadMap",
+                        processInstanceId);
                 }
                 multiThreadFilterMap.remove(taskExecuteThread.getKey());
             }

@@ -144,9 +144,11 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public void start() {
+        logger.info("Worker manager thread starting");
         Thread thread = new Thread(this, this.getClass().getName());
         thread.setDaemon(true);
         thread.start();
+        logger.info("Worker manager thread started");
     }
 
     @Override
@@ -157,7 +159,6 @@ public class WorkerManagerThread implements Runnable {
             try {
                 if (this.getThreadPoolQueueSize() <= workerExecThreads) {
                     taskExecuteThread = waitSubmitQueue.take();
-                    taskExecuteThread.setStorageOperate(storageOperate);
                     workerExecService.submit(taskExecuteThread);
                 } else {
                     WorkerServerMetrics.incWorkerOverloadCount();

@@ -217,14 +217,7 @@ public class PythonTask extends AbstractTaskExecutor {
 
     protected Map<String, Property> mergeParamsWithContext(AbstractParameters parameters) {
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, parameters);
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
-            paramsMap.putAll(taskRequest.getParamsMap());
-        }
-        return paramsMap;
+        return taskRequest.getPrepareParamsMap();
     }
 
     /**

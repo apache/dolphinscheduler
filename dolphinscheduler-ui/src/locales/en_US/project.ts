@@ -193,9 +193,9 @@ export default {
     project_name: 'Project Name',
     project_tips: 'Please select project name',
     workflow_relation_no_data_result_title:
-      'Can not find any relations of workflows.',
+        'Can not find any relations of workflows.',
     workflow_relation_no_data_result_desc:
-      'There is not any workflows. Please create a workflow, and then visit this page again.'
+        'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
     cancel_full_screen: 'Cancel full screen',
@@ -308,7 +308,7 @@ export default {
     task_priority: 'Task priority',
     worker_group: 'Worker group',
     worker_group_tips:
-      'The Worker group no longer exists, please select the correct Worker group!',
+        'The Worker group no longer exists, please select the correct Worker group!',
     environment_name: 'Environment Name',
     task_group_name: 'Task group name',
     task_group_queue_priority: 'Priority',
@@ -335,11 +335,11 @@ export default {
     success: 'Success',
     failed: 'Failed',
     backfill_tips:
-      'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
+        'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
     task_instance_tips:
-      'The task has not been executed and cannot enter the sub-Process',
+        'The task has not been executed and cannot enter the sub-Process',
     branch_tips:
-      'Cannot select the same node for successful branch flow and failed branch flow',
+        'Cannot select the same node for successful branch flow and failed branch flow',
     timeout_alarm: 'Timeout alarm',
     timeout_strategy: 'Timeout strategy',
     timeout_strategy_tips: 'Timeout strategy must be selected',
@@ -352,6 +352,7 @@ export default {
     init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
     resources_tips: 'Please select resources',
+    resources_limit_tips: 'Please select again, resource limit:',
     non_resources_tips: 'Please delete all non-existent resources',
     useless_resources_tips: 'Unauthorized or deleted resources',
     custom_parameters: 'Custom Parameters',
@@ -398,8 +399,8 @@ export default {
     parallelism_tips: 'Please enter Parallelism',
     parallelism_number_tips: 'Parallelism number should be positive integer',
     parallelism_complement_tips:
-      'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
-      'set the complement task thread to a reasonable value to avoid too large impact on the server.',
+        'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
+        'set the complement task thread to a reasonable value to avoid too large impact on the server.',
     task_manager_number: 'TaskManager Number',
     task_manager_number_tips: 'Please enter TaskManager number',
     http_url: 'Http Url',
@@ -434,7 +435,7 @@ export default {
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
     procedure_method_snippet:
-      '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
+        '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: 'Start',
     edit: 'Edit',
     copy: 'Copy',
@@ -500,7 +501,7 @@ export default {
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: 'Queue',
     sea_tunnel_master_url_tips:
-      'Please enter the master url, e.g., 127.0.0.1:7077',
+        'Please enter the master url, e.g., 127.0.0.1:7077',
     add_pre_task_check_condition: 'Add pre task check condition',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
@@ -615,24 +616,24 @@ export default {
       'Please enter the paragraph id of your zeppelin paragraph',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
-      'Please enter the conda environment name of papermill',
+        'Please enter the conda environment name of papermill',
     jupyter_input_note_path: 'inputNotePath',
     jupyter_input_note_path_tips: 'Please enter the input jupyter note path',
     jupyter_output_note_path: 'outputNotePath',
     jupyter_output_note_path_tips: 'Please enter the output jupyter note path',
     jupyter_parameters: 'parameters',
     jupyter_parameters_tips:
-      'Please enter the parameters for jupyter parameterization',
+        'Please enter the parameters for jupyter parameterization',
     jupyter_kernel: 'kernel',
     jupyter_kernel_tips: 'Please enter the jupyter kernel name',
     jupyter_engine: 'engine',
     jupyter_engine_tips: 'Please enter the engine name',
     jupyter_execution_timeout: 'executionTimeout',
     jupyter_execution_timeout_tips:
-      'Please enter the execution timeout for each jupyter note cell',
+        'Please enter the execution timeout for each jupyter note cell',
     jupyter_start_timeout: 'startTimeout',
     jupyter_start_timeout_tips:
-      'Please enter the start timeout for jupyter kernel',
+        'Please enter the start timeout for jupyter kernel',
     jupyter_others: 'others',
     jupyter_others_tips:
       'Please enter the other options you need for papermill',
@@ -645,7 +646,7 @@ export default {
     mlflow_isSearchParams: 'Search Parameters',
     mlflow_dataPath: 'Data Path',
     mlflow_dataPath_tips:
-      ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
+        ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
     mlflow_dataPath_error_tips: ' data data can not be empty ',
     mlflow_experimentName: 'Experiment Name',
     mlflow_experimentName_tips: 'experiment_001',
@@ -676,6 +677,16 @@ export default {
     openmldb_execute_mode_tips: 'Please select the execute mode',
     openmldb_execute_mode_offline: 'offline',
     openmldb_execute_mode_online: 'online',
+    dvc_task_type: 'DVC Task Type',
+    dvc_repository: 'DVC Repository',
+    dvc_repository_tips: 'please input the url of dvc repository',
+    dvc_version: 'Version',
+    dvc_version_tips: 'data version, will be mark as git tag',
+    dvc_data_location: 'Data Path in DVC Repository',
+    dvc_message: 'Version Message',
+    dvc_load_save_data_path: 'Data Path In Worker',
+    dvc_store_url: 'Store Url',
+    dvc_empty_tips: 'This parameter cannot be empty',
     send_email: 'Send Email',
     log_display: 'Log display',
     rows_of_result: 'rows of result',
@@ -696,6 +707,15 @@ export default {
       'Please select column, only single column is supported',
     please_enter_threshold_number_is_needed:
       'Please enter threshold number is needed',
-    please_enter_comparison_title: 'please select comparison title'
+    please_enter_comparison_title: 'please select comparison title',
+    custom_config: 'Custom Config',
+    engine: 'engine',
+    engine_tips: 'Please select engine',
+    run_mode: 'Run Mode',
+    dinky_address: 'Dinky address',
+    dinky_address_tips: 'Please enter the url of your dinky',
+    dinky_task_id: 'Dinky task id',
+    dinky_task_id_tips: 'Please enter the task id of your dinky',
+    dinky_online: 'Online task'
   }
 }

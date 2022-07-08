@@ -82,6 +82,10 @@ public class JSONUtils {
         throw new UnsupportedOperationException("Construct JSONUtils");
     }
 
+    public static synchronized void setTimeZone(TimeZone timeZone) {
+        objectMapper.setTimeZone(timeZone);
+    }
+
     public static ArrayNode createArrayNode() {
         return objectMapper.createArrayNode();
     }

@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.time.Duration;
 import java.util.regex.Pattern;
 
 /**
@@ -61,14 +62,12 @@ public final class Constants {
 
     public static final String STORAGE_HDFS = "HDFS";
 
-    public static final String BUCKET_NAME = "dolphinscheduler-test";
-
     public static final String EMPTY_STRING = "";
 
     /**
-     * fs.defaultFS
+     * resource.hdfs.fs.defaultFS
      */
-    public static final String FS_DEFAULT_FS = "fs.defaultFS";
+    public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
 
     /**
@@ -96,15 +95,15 @@ public final class Constants {
 
     /**
      * hdfs configuration
-     * hdfs.root.user
+     * resource.hdfs.root.user
      */
-    public static final String HDFS_ROOT_USER = "hdfs.root.user";
+    public static final String HDFS_ROOT_USER = "resource.hdfs.root.user";
 
     /**
      * hdfs/s3 configuration
-     * resource.upload.path
+     * resource.storage.upload.base.path
      */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
     /**
      * data basedir path
@@ -148,7 +147,8 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
-    public static final String AWS_END_POINT = "aws.endpoint";
+    public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
+    public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
     /**
      * comma ,
      */
@@ -380,6 +380,8 @@ public final class Constants {
      * short sleep 100ms
      */
     public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
+
+    public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
 
     /**
      * one second mils
@@ -621,28 +623,31 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
+    public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
+
     /**
      * task log info format
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITING_THREAD.ordinal(),
-            ExecutionStatus.WAITING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[] {
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.DELAY_EXECUTION.ordinal(),
+        ExecutionStatus.READY_PAUSE.ordinal(),
+        ExecutionStatus.READY_STOP.ordinal(),
+        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+        ExecutionStatus.WAITING_THREAD.ordinal(),
+        ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
-    public static final int[] RUNNING_PROCESS_STATE = new int[]{
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.SERIAL_WAIT.ordinal()
+    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.DISPATCH.ordinal(),
+        ExecutionStatus.SERIAL_WAIT.ordinal()
     };
 
     /**
@@ -799,10 +804,10 @@ public final class Constants {
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
-    public static final String K8S = "k8s";
+    public static final String CLUSTER = "cluster";
     public static final String LIMITS_CPU = "limitsCpu";
     public static final String LIMITS_MEMORY = "limitsMemory";
-    public static final String K8S_LOCAL_TEST_CLUSTER = "ds_null_k8s";
+    public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**
      * schedule timezone
@@ -820,4 +825,14 @@ public final class Constants {
      */
     public static final int SCHEDULE_TIME_MAX_LENGTH = 100;
 
+    /**
+     * password max and min LENGTH
+     */
+    public static final int USER_PASSWORD_MAX_LENGTH = 20;
+
+    public static final int USER_PASSWORD_MIN_LENGTH = 2;
+
+    public static final String FUNCTION_START_WITH = "$";
+
+    public static final Integer DEFAULT_QUEUE_ID = 1;
 }

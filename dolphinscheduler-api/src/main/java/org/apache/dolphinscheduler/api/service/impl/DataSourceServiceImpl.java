@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +100,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return create result code
      */
     @Override
+    @Transactional
     public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
         DataSourceUtils.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
@@ -250,11 +252,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         IPage<DataSource> dataSourceList = null;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        if (!canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_LIST)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
         } else {
@@ -310,14 +307,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList = null;
-        
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,DATASOURCE_UPDATE)){
-            datasourceList = dataSourceMapper.queryDataSourceByType(UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), type);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
         }
-
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -392,7 +394,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Result<Object> delete(User loginUser, int datasourceId) {
         Result<Object> result = new Result<>();
         try {

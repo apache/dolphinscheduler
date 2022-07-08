@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -53,7 +54,7 @@ import org.slf4j.Logger;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class, TaskCallbackService.class, WorkerConfig.class, FileUtils.class,
-        JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
+    JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
 @Ignore
 public class TaskExecuteProcessorTest {
 
@@ -62,6 +63,8 @@ public class TaskExecuteProcessorTest {
     private TaskCallbackService taskCallbackService;
 
     private ExecutorService workerExecService;
+
+    private StorageOperate storageOperate;
 
     private WorkerConfig workerConfig;
 
@@ -85,7 +88,7 @@ public class TaskExecuteProcessorTest {
         command = new Command();
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
         ackCommand = new TaskExecuteRunningCommand().convert2Command();
-        taskRequestCommand = new TaskExecuteRequestCommand();
+        taskRequestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
         alertClientService = PowerMockito.mock(AlertClientService.class);
         workerExecService = PowerMockito.mock(ExecutorService.class);
         PowerMockito.when(workerExecService.submit(Mockito.any(TaskExecuteThread.class)))
@@ -99,19 +102,23 @@ public class TaskExecuteProcessorTest {
 
         PowerMockito.mockStatic(SpringApplicationContext.class);
         PowerMockito.when(SpringApplicationContext.getBean(TaskCallbackService.class))
-                .thenReturn(taskCallbackService);
+            .thenReturn(taskCallbackService);
         PowerMockito.when(SpringApplicationContext.getBean(WorkerConfig.class))
-                .thenReturn(workerConfig);
+            .thenReturn(workerConfig);
 
         workerManager = PowerMockito.mock(WorkerManagerThread.class);
-        PowerMockito.when(workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService))).thenReturn(Boolean.TRUE);
+
+        storageOperate = PowerMockito.mock(StorageOperate.class);
+        PowerMockito.when(
+                workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, storageOperate)))
+            .thenReturn(Boolean.TRUE);
 
         PowerMockito.when(SpringApplicationContext.getBean(WorkerManagerThread.class))
-                .thenReturn(workerManager);
+            .thenReturn(workerManager);
 
         PowerMockito.mockStatic(ThreadUtils.class);
         PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()))
-                .thenReturn(workerExecService);
+            .thenReturn(workerExecService);
 
         PowerMockito.mockStatic(JsonSerializer.class);
         PowerMockito.when(JsonSerializer.deserialize(command.getBody(), TaskExecuteRequestCommand.class))
@@ -120,21 +127,20 @@ public class TaskExecuteProcessorTest {
         PowerMockito.mockStatic(JSONUtils.class);
         PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskExecuteRequestCommand.class))
                 .thenReturn(taskRequestCommand);
-        PowerMockito.when(JSONUtils.parseObject(taskRequestCommand.getTaskExecutionContext(), TaskExecutionContext.class))
-                .thenReturn(taskExecutionContext);
 
         PowerMockito.mockStatic(FileUtils.class);
         PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                        taskExecutionContext.getProcessDefineCode(),
-                        taskExecutionContext.getProcessDefineVersion(),
-                        taskExecutionContext.getProcessInstanceId(),
-                        taskExecutionContext.getTaskInstanceId()))
-                .thenReturn(taskExecutionContext.getExecutePath());
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId()))
+            .thenReturn(taskExecutionContext.getExecutePath());
         PowerMockito.doNothing().when(FileUtils.class, "createWorkDirIfAbsent", taskExecutionContext.getExecutePath());
 
-        SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(null, null, null, alertClientService);
+        SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(
+            null, null, null, alertClientService, storageOperate);
         PowerMockito.whenNew(TaskExecuteThread.class).withAnyArguments()
-                .thenReturn(simpleTaskExecuteThread);
+            .thenReturn(simpleTaskExecuteThread);
     }
 
     @Test
@@ -172,8 +178,12 @@ public class TaskExecuteProcessorTest {
 
     private static class SimpleTaskExecuteThread extends TaskExecuteThread {
 
-        public SimpleTaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService, Logger taskLogger, AlertClientService alertClientService) {
-            super(taskExecutionContext, taskCallbackService, alertClientService);
+        public SimpleTaskExecuteThread(TaskExecutionContext taskExecutionContext,
+                                       TaskCallbackService taskCallbackService,
+                                       Logger taskLogger,
+                                       AlertClientService alertClientService,
+                                       StorageOperate storageOperate) {
+            super(taskExecutionContext, taskCallbackService, alertClientService, storageOperate);
         }
 
         @Override

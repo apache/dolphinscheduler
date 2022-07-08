@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -60,7 +61,7 @@ import org.springframework.stereotype.Component;
  * TaskUpdateQueue consumer
  */
 @Component
-public class TaskPriorityQueueConsumer extends Thread {
+public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
     /**
      * logger of TaskUpdateQueueConsumer
@@ -108,10 +109,16 @@ public class TaskPriorityQueueConsumer extends Thread {
      */
     private ThreadPoolExecutor consumerThreadPoolExecutor;
 
+    protected TaskPriorityQueueConsumer() {
+        super("TaskPriorityQueueConsumeThread");
+    }
+
     @PostConstruct
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
+        logger.info("Task priority queue consume thread staring");
         super.start();
+        logger.info("Task priority queue consume thread started");
     }
 
     @Override
@@ -126,9 +133,8 @@ public class TaskPriorityQueueConsumer extends Thread {
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
-                    // If there are tasks in a cycle that cannot find the worker group,
-                    // sleep for 1 second
-                    if (taskPriorityQueue.size() <= failedDispatchTasks.size()) {
+                    // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
+                    if (fetchTaskNum == failedDispatchTasks.size()) {
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
@@ -190,16 +196,16 @@ public class TaskPriorityQueueConsumer extends Thread {
                     return true;
                 }
             }
-
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
+                logger.info("Master success dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
                 addDispatchEvent(context, executionContext);
+            } else {
+                logger.info("Master failed to dispatch task to worker, taskInstanceId: {}", taskPriority.getTaskId());
             }
-        } catch (RuntimeException e) {
-            logger.error("dispatch error: ", e);
-        } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage());
+        } catch (RuntimeException | ExecuteException e) {
+            logger.error("Master dispatch task to worker error: ", e);
         }
         return result;
     }
@@ -213,8 +219,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(taskExecutionContext));
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
         return requestCommand.convert2Command();
     }
 

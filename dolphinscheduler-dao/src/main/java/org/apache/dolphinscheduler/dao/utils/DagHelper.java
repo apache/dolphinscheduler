@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
@@ -375,9 +376,13 @@ public class DagHelper {
         } else {
             conditionTaskList.add(nodeCode);
         }
+        // the skipNodeList maybe null if no next task
+        skipNodeList = Optional.ofNullable(skipNodeList).orElse(new ArrayList<>());
         for (String failedNode : skipNodeList) {
             setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
         }
+        // the conditionTaskList maybe null if no next task
+        conditionTaskList = Optional.ofNullable(conditionTaskList).orElse(new ArrayList<>());
         return conditionTaskList;
     }
 

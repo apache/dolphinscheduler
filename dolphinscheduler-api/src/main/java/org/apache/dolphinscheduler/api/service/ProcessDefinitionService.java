@@ -17,17 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.User;
-
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -48,6 +49,7 @@ public interface ProcessDefinitionService {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @return create result code
      */
     Map<String, Object> createProcessDefinition(User loginUser,
@@ -60,6 +62,7 @@ public interface ProcessDefinitionService {
                                                 String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
+                                                String otherParamsJson,
                                                 ProcessExecutionTypeEnum executionType);
 
     /**
@@ -88,6 +91,7 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param searchVal search value
+     * @param otherParamsJson otherParamsJson handle other params
      * @param pageNo page number
      * @param pageSize page size
      * @param userId user id
@@ -96,6 +100,7 @@ public interface ProcessDefinitionService {
     Result queryProcessDefinitionListPaging(User loginUser,
                                             long projectCode,
                                             String searchVal,
+                                            String otherParamsJson,
                                             Integer userId,
                                             Integer pageNo,
                                             Integer pageSize);
@@ -166,6 +171,7 @@ public interface ProcessDefinitionService {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @return update result code
      */
     Map<String, Object> updateProcessDefinition(User loginUser,
@@ -179,6 +185,7 @@ public interface ProcessDefinitionService {
                                                 String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
+                                                String otherParamsJson,
                                                 ProcessExecutionTypeEnum executionType);
 
     /**
@@ -402,6 +409,7 @@ public interface ProcessDefinitionService {
      * @param timeout timeout
      * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
+     * @param otherParamsJson otherParamsJson handle other params
      * @param executionType executionType
      * @return update result code
      */
@@ -414,6 +422,7 @@ public interface ProcessDefinitionService {
                                                          int timeout,
                                                          String tenantCode,
                                                          String scheduleJson,
+                                                         String otherParamsJson,
                                                          ProcessExecutionTypeEnum executionType);
 
     /**
@@ -429,5 +438,30 @@ public interface ProcessDefinitionService {
                                                    long projectCode,
                                                    long code,
                                                    ReleaseState releaseState);
+
+    /**
+     * delete other relation
+     * @param project
+     * @param result
+     * @param processDefinition
+     */
+    void deleteOtherRelation(Project project, Map<String, Object> result, ProcessDefinition processDefinition);
+
+    /**
+     * save other relation
+     * @param loginUser
+     * @param processDefinition
+     * @param result
+     * @param otherParamsJson
+     */
+    void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson);
+
+    /**
+     * get Json String
+     * @param loginUser
+     * @param processDefinition
+     * @return Json String
+     */
+    String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
 }
 

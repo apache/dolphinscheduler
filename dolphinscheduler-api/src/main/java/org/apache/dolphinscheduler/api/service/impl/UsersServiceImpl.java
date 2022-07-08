@@ -80,6 +80,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
 
 /**
  * users service impl
@@ -145,7 +146,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createUser(User loginUser,
                                           String userName,
                                           String userPassword,
@@ -194,7 +195,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public User createUser(String userName,
                            String userPassword,
                            String email,
@@ -229,7 +230,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * create User for ldap login
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public User createUser(UserType userType, String userId, String email) {
         User user = new User();
         Date now = new Date();
@@ -241,6 +242,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setCreateTime(now);
         user.setUpdateTime(now);
         user.setQueue("");
+        user.setState(Flag.YES.getCode());
 
         // save user
         userMapper.insert(user);
@@ -413,8 +415,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
-            if (!CheckUtils.checkPassword(userPassword)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userPassword);
+            if (!CheckUtils.checkPasswordLength(userPassword)) {
+                putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
                 return result;
             }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
@@ -523,7 +525,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception when operate hdfs
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
         if(resourcePermissionCheckService.functionDisabled()){
@@ -570,7 +572,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -712,7 +714,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>();
 
@@ -810,7 +812,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>();
 
@@ -858,7 +860,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -908,7 +910,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -1217,7 +1219,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
         Map<String, Object> result = new HashMap<>();
 
