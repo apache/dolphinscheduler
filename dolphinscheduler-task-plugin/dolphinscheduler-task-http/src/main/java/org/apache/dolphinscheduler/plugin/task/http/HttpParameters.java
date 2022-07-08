@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.collections4.CollectionUtils;
@@ -160,7 +159,7 @@ public class HttpParameters extends AbstractParameters {
 
         for (Property info : outProperty) {
             for (int i = 0; i < httpMapByString.size() ; i++) {
-                Map<String, String> stringStringMap = httpMapByString.get(i);
+                Map<String, String> stringStringMap=httpMapByString.get(i);
                 info.setValue(stringStringMap.get(info.getProp()));
 
                 // If varPool contains some key objects delete and add again

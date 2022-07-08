@@ -100,10 +100,10 @@ public class HttpParametersTest  {
         property.setValue("");
         localParams.add(property);
         httpParameters.setLocalParams(localParams);
-        String result = httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
-        List<Property> varPool =new ArrayList<>();
+        String result=httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
+        List<Property> varPool=new ArrayList<>();
         httpParameters.setVarPool(varPool.toString());
         httpParameters.dealOutParam(result);
-        Map<String, Property> varPoolMap = httpParameters.getVarPoolMap();
+        Map<String, Property> varPoolMap=httpParameters.getVarPoolMap();
     }
 }
