@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantResponseEntity;
-import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantUpdateEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 import org.apache.dolphinscheduler.api.test.utils.Status;
@@ -41,6 +40,7 @@ import com.devskiller.jfairy.Fairy;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisplayName("Tenant Page API test")
 public class TenantAPITest extends AbstractAPITest {
+    private static final String tenant = System.getProperty("user.name");
     private final Fairy fairy = Fairy.create();
     private TenantResponseEntity tenantResponseEntity = null;
     private TenantPageAPI tenantPageAPI = null;
@@ -67,8 +67,8 @@ public class TenantAPITest extends AbstractAPITest {
     @Test
     @Order(2)
     public void testUpdateTenant() {
-        TenantUpdateEntity tenantUpdateEntity = new TenantUpdateEntity();
-        tenantUpdateEntity.setTenantCode(tenantRequestEntity.getTenantCode());
+        TenantRequestEntity tenantUpdateEntity = tenantRequestEntity;
+        tenantUpdateEntity.setTenantCode(tenant);
         tenantUpdateEntity.setQueueId(1);
         tenantUpdateEntity.setDescription(fairy.person().getMobileTelephoneNumber());
         tenantPageAPI.updateTenant(tenantUpdateEntity, tenantResponseEntity.getId()).isResponseSuccessful();
