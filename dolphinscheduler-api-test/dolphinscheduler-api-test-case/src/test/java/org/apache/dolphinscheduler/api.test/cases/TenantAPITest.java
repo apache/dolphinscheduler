@@ -40,23 +40,24 @@ import com.devskiller.jfairy.Fairy;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisplayName("Tenant Page API test")
 public class TenantAPITest extends AbstractAPITest {
-    protected final Fairy fairy = Fairy.create();
+    private final Fairy fairy = Fairy.create();
     private TenantResponseEntity tenantResponseEntity = null;
     private TenantPageAPI tenantPageAPI = null;
+    private TenantRequestEntity tenantRequestEntity = null;
 
     @BeforeAll
     public void initTenantPageAPIFactory() {
         tenantPageAPI = pageAPIFactory.createTenantPageAPI();
+        tenantRequestEntity = new TenantRequestEntity();
+        tenantRequestEntity.setTenantCode(fairy.person().getFullName());
+        tenantRequestEntity.setQueueId(1);
+        tenantRequestEntity.setDescription(fairy.person().getFullName());
     }
 
     @Test
     @Order(1)
     @DisplayName("Test the correct Tenant information to log in to the system")
     public void testCreateTenant() {
-        TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
-        tenantRequestEntity.setTenantCode(fairy.person().getFullName());
-        tenantRequestEntity.setQueueId(1);
-        tenantRequestEntity.setDescription(fairy.person().getFullName());
         RestResponse<Result> result = tenantPageAPI.createTenant(tenantRequestEntity);
         result.isResponseSuccessful();
         tenantResponseEntity = result.getResponse().jsonPath().getObject(Constants.DATA_KEY, TenantResponseEntity.class);
