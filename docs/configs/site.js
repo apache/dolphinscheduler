@@ -51,7 +51,7 @@ export default {
           {
             key: 'docs1',
             text: '2.0.6',
-            link: '/en-us/docs/user_doc/guide/quick-start.html',
+            link: '/en-us/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',
