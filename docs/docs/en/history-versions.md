@@ -8,6 +8,10 @@
 
 #### Links： [3.0.0-beta-2 Document](../3.0.0/user_doc/about/introduction.md)
 
+### Versions: 2.0.6
+
+#### Links： [2.0.6 Document](../2.0.6/user_doc/guide/quick-start.md)
+
 ### Versions: 2.0.5
 
 #### Links： [2.0.5 Document](../2.0.5/user_doc/guide/quick-start.md)
