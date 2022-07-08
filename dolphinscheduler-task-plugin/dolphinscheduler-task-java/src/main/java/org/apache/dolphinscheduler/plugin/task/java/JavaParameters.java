@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class JavaParameters extends AbstractParameters {

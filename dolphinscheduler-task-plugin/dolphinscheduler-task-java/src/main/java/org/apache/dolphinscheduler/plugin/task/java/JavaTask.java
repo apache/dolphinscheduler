@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -36,6 +33,9 @@ import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExis
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Preconditions;
 
 /**
  * java task

@@ -17,36 +17,40 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAVA;
+
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 public class JavaTaskTest {
+
     @Test
     public void testJavaHome() {
         Assert.assertNotNull(System.getenv().get("JAVA_HOME"));
     }
 
-
     @Test
     public void buildJarCommand() {
         String homePath = System.getenv(JavaConstants.JAVA_HOME);
         Assert.assertNotNull(homePath);
-        String homeBinPath =  homePath+ System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
+        String homeBinPath = homePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
         JavaTask javaTask = runJarType();
         Assert.assertEquals(javaTask.buildJarCommand(), homeBinPath
-                +"java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+                + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     @Test
@@ -66,8 +70,8 @@ public class JavaTaskTest {
             }
             javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
             Assert.assertEquals(homeBinPath
-                    +"javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java", javaTask.buildJavaCompileCommand(fileName, sourceCode));
-
+                            + "javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
+                    javaTask.buildJavaCompileCommand(fileName, sourceCode));
         } finally {
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
@@ -77,12 +81,11 @@ public class JavaTaskTest {
 
     }
 
-
     @Test
     public void buildJavaCommand() throws Exception {
         String homePath = System.getenv(JavaConstants.JAVA_HOME);
         Assert.assertNotNull(homePath);
-        String homeBinPath =  homePath+ System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
+        String homeBinPath = homePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
         JavaTask javaTask = runJavaType();
         String sourceCode = javaTask.buildJavaSourceContent();
         String publicClassName = javaTask.getPublicClassName(sourceCode);
@@ -108,17 +111,7 @@ public class JavaTaskTest {
         ArrayList<ResourceInfo> resourceInfoArrayList = new ArrayList<>();
         resourceInfoArrayList.add(resourceJar);
         javaParameters.setResourceList(resourceInfoArrayList);
-        javaParameters.setRawScript(
-                        "import java.io.IOException;\n" +
-                        "public class JavaTaskTest {\n" +
-                        "    public static void main(String[] args) throws IOException {\n" +
-                        "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" +
-                        "        for (String arg : args) {\n" +
-                        "            builder.append(arg).append(\" \");\n" +
-                        "        }\n" +
-                        "        System.out.println(builder);\n" +
-                        "    }\n" +
-                        "}\n");
+        javaParameters.setRawScript("import java.io.IOException;\n" + "public class JavaTaskTest {\n" + "    public static void main(String[] args) throws IOException {\n" + "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" + "        for (String arg : args) {\n" + "            builder.append(arg).append(\" \");\n" + "        }\n" + "        System.out.println(builder);\n" + "    }\n" + "}\n");
         ArrayList<Property> localParams = new ArrayList<>();
         Property property = new Property();
         property.setProp("name");
@@ -126,7 +119,6 @@ public class JavaTaskTest {
         property.setDirect(IN);
         property.setType(VARCHAR);
         javaParameters.setLocalParams(localParams);
-//        javaParameters.setVarPool("");
         ResourceInfo mainJar = new ResourceInfo();
         mainJar.setId(1);
         mainJar.setResourceName("/opt/share/jar/main.jar");
@@ -154,8 +146,5 @@ public class JavaTaskTest {
         javaTask.init();
         return javaTask;
     }
-
-
-
 
 }
