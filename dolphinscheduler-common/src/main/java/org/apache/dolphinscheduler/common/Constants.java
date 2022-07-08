@@ -52,6 +52,7 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
+    public static final String FORMAT_S_S_COLON = "%s:%s";
     public static final String FOLDER_SEPARATOR = "/";
 
     public static final String RESOURCE_TYPE_FILE = "resources";
