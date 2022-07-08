@@ -984,14 +984,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param scheduleTimeList
      * @return remove duplicate date list
      */
-    private String removeDuplicates(String scheduleTimeList) {
+    private static String removeDuplicates(String scheduleTimeList) {
         HashSet<String> removeDate = new HashSet<String>();
-        List<String> resultList = new ArrayList<String>();
         if (StringUtils.isNotEmpty(scheduleTimeList)) {
-            List<String> dateList  = Arrays.stream(scheduleTimeList.split(COMMA)).map(String::trim).collect(Collectors.toList());
-            removeDate.addAll(dateList);
-            resultList.addAll(removeDate);
-            return String.join(COMMA, resultList);
+            List<String> inputDateList  = Arrays.stream(scheduleTimeList.split(COMMA)).map(String::trim).collect(Collectors.toList());
+            removeDate.addAll(inputDateList);
+            return String.join(COMMA, removeDate.stream().collect(Collectors.toList()));
         }
         return null;
     }
