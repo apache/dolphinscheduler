@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
@@ -49,6 +50,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,11 +115,16 @@ public class WorkerFailoverService {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
             try {
                 ProcessInstance processInstance =
-                    processInstanceCacheMap.computeIfAbsent(taskInstance.getProcessInstanceId(),
-                        k -> cacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId())
-                            .getProcessInstance());
+                    processInstanceCacheMap.computeIfAbsent(taskInstance.getProcessInstanceId(), k -> {
+                        WorkflowExecuteRunnable workflowExecuteRunnable =
+                            cacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
+                        if (workflowExecuteRunnable == null) {
+                            return null;
+                        }
+                        return workflowExecuteRunnable.getProcessInstance();
+                    });
                 if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
-                    LOGGER.info("The current taskInstance doesn't need to failover");
+                    LOGGER.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
                     continue;
                 }
                 LOGGER.info(
@@ -124,6 +132,8 @@ public class WorkerFailoverService {
                     workerHost);
                 failoverTaskInstance(processInstance, taskInstance);
                 LOGGER.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
+            } catch (Exception ex) {
+                LOGGER.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
@@ -184,7 +194,7 @@ public class WorkerFailoverService {
      * @return true if task instance need fail over
      */
     private boolean checkTaskInstanceNeedFailover(Optional<Date> needFailoverWorkerStartTime,
-                                                  ProcessInstance processInstance,
+                                                  @Nullable ProcessInstance processInstance,
                                                   TaskInstance taskInstance) {
         if (processInstance == null) {
             // This case should be happened.
@@ -206,7 +216,8 @@ public class WorkerFailoverService {
             return false;
         }
         if (taskInstance.getState() != null && taskInstance.getState().typeIsFinished()) {
-            // The taskInstance is already finished, don't need to failover
+            // The taskInstance is already finished, doesn't need to failover
+            LOGGER.info("The task is already finished, doesn't need to failover");
             return false;
         }
         if (!needFailoverWorkerStartTime.isPresent()) {
@@ -231,6 +242,7 @@ public class WorkerFailoverService {
         return cacheManager.getAll()
             .stream()
             .flatMap(workflowExecuteRunnable -> workflowExecuteRunnable.getAllTaskInstances().stream())
+            // If the worker is in dispatching and the host is not set
             .filter(taskInstance -> failoverWorkerHost.equals(taskInstance.getHost())
                 && ExecutionStatus.isNeedFailoverWorkflowInstanceState(taskInstance.getState()))
             .collect(Collectors.toList());

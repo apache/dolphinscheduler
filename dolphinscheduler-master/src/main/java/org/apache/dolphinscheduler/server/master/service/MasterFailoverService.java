@@ -121,6 +121,12 @@ public class MasterFailoverService {
         List<ProcessInstance> needFailoverProcessInstanceList =
             processService.queryNeedFailoverProcessInstances(masterHost);
 
+        LOGGER.info(
+            "Master[{}] failover there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
+            masterHost,
+            needFailoverProcessInstanceList.size(),
+            needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
+
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());

@@ -108,6 +108,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 import com.google.common.collect.Lists;
 
@@ -141,7 +142,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * process instance
      */
-    private ProcessInstance processInstance;
+    private final ProcessInstance processInstance;
 
     /**
      * process definition
@@ -484,8 +485,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public void refreshProcessInstance(int processInstanceId) {
         logger.info("process instance update: {}", processInstanceId);
-        processInstance = processService.findProcessInstanceById(processInstanceId);
-        processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+        ProcessInstance newProcessInstance = processService.findProcessInstanceById(processInstanceId);
+        // just update the processInstance field(this is soft copy)
+        BeanUtils.copyProperties(newProcessInstance, processInstance);
+
+        processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+            processInstance.getProcessDefinitionVersion());
         processInstance.setProcessDefinition(processDefinition);
     }
 
@@ -788,40 +793,46 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             List<TaskInstance> validTaskInstanceList =
                 processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance task : validTaskInstanceList) {
-                if (validTaskMap.containsKey(task.getTaskCode())) {
-                    int oldTaskInstanceId = validTaskMap.get(task.getTaskCode());
-                    TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
-                    if (!oldTaskInstance.getState().typeIsFinished() && task.getState().typeIsFinished()) {
-                        task.setFlag(Flag.NO);
-                        processService.updateTaskInstance(task);
+                try {
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
+                    if (validTaskMap.containsKey(task.getTaskCode())) {
+                        int oldTaskInstanceId = validTaskMap.get(task.getTaskCode());
+                        TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
+                        if (!oldTaskInstance.getState().typeIsFinished() && task.getState().typeIsFinished()) {
+                            task.setFlag(Flag.NO);
+                            processService.updateTaskInstance(task);
+                            continue;
+                        }
+                        logger.warn("have same taskCode taskInstance when init task queue, taskCode:{}",
+                            task.getTaskCode());
+                    }
+
+                    validTaskMap.put(task.getTaskCode(), task.getId());
+                    taskInstanceMap.put(task.getId(), task);
+
+                    if (task.isTaskComplete()) {
+                        completeTaskMap.put(task.getTaskCode(), task.getId());
                         continue;
                     }
-                    logger.warn("have same taskCode taskInstance when init task queue, taskCode:{}",
-                        task.getTaskCode());
-                }
-
-                validTaskMap.put(task.getTaskCode(), task.getId());
-                taskInstanceMap.put(task.getId(), task);
-
-                if (task.isTaskComplete()) {
-                    completeTaskMap.put(task.getTaskCode(), task.getId());
-                    continue;
-                }
-                if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
-                    continue;
-                }
-                if (task.taskCanRetry()) {
-                    if (task.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                        // tolerantTaskInstance add to standby list directly
-                        TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
-                        addTaskToStandByList(tolerantTaskInstance);
-                    } else {
-                        retryTaskInstance(task);
+                    if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()),
+                        dag)) {
+                        continue;
                     }
-                    continue;
-                }
-                if (task.getState().typeIsFailure()) {
-                    errorTaskMap.put(task.getTaskCode(), task.getId());
+                    if (task.taskCanRetry()) {
+                        if (task.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
+                            // tolerantTaskInstance add to standby list directly
+                            TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
+                            addTaskToStandByList(tolerantTaskInstance);
+                        } else {
+                            retryTaskInstance(task);
+                        }
+                        continue;
+                    }
+                    if (task.getState().typeIsFailure()) {
+                        errorTaskMap.put(task.getTaskCode(), task.getId());
+                    }
+                } finally {
+                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
         }
@@ -900,6 +911,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
+            // todo: do we need to check the result?
+            boolean dispatchSuccess = taskProcessor.action(TaskAction.DISPATCH);
+            if (!dispatchSuccess) {
+                logger.error("process id:{} name:{} dispatch standby task id:{} name:{} failed!",
+                    processInstance.getId(),
+                    processInstance.getName(),
+                    taskInstance.getId(),
+                    taskInstance.getName());
+                return Optional.empty();
+            }
             taskProcessor.action(TaskAction.RUN);
 
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, taskInstance);

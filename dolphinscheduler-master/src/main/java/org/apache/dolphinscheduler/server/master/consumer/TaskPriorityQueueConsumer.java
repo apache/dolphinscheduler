@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -186,8 +188,22 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         TaskMetrics.incTaskDispatch();
         boolean result = false;
         try {
+            WorkflowExecuteRunnable workflowExecuteRunnable =
+                processInstanceExecCacheManager.getByProcessInstanceId(taskPriority.getProcessInstanceId());
+            if (workflowExecuteRunnable == null) {
+                logger.error("Cannot find the related processInstance of the task, taskPriority: {}", taskPriority);
+                return true;
+            }
+            Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
+            if(!taskInstanceOptional.isPresent()) {
+                logger.error("Cannot find the task instance from related processInstance, taskPriority: {}", taskPriority);
+                // we return true, so that we will drop this task.
+                return true;
+            }
+            TaskInstance taskInstance = taskInstanceOptional.get();
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
-            ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, context.getWorkerGroup());
+            ExecutionContext executionContext =
+                new ExecutionContext(toCommand(context), ExecutorType.WORKER, context.getWorkerGroup(), taskInstance);
 
             if (isTaskNeedToCheck(taskPriority)) {
                 if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
@@ -195,6 +211,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                     return true;
                 }
             }
+
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
@@ -208,7 +225,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                     executionContext.getHost());
             }
         } catch (RuntimeException | ExecuteException e) {
-            logger.error("Master dispatch task to worker error: ", e);
+            logger.error("Master dispatch task to worker error, taskPriority: {}", taskPriority, e);
         }
         return result;
     }

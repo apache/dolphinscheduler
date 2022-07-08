@@ -67,7 +67,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 return true;
             }
         }
-        dispatchTask();
         return true;
     }
 
@@ -167,7 +166,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
 
-            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
+            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
 
             Host host = Host.of(taskInstance.getHost());
             executionContext.setHost(host);

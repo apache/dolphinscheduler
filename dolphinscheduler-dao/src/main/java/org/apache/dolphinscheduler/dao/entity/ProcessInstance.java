@@ -268,7 +268,7 @@ public class ProcessInstance {
         this.name = String.join("-",
             processDefinition.getName(),
             String.valueOf(processDefinition.getVersion()),
-            CodeGenerateUtils.getInstance().toString());
+            String.valueOf(CodeGenerateUtils.getInstance().genCode()));
     }
 
     public String getVarPool() {
