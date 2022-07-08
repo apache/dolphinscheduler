@@ -60,18 +60,18 @@ import org.springframework.util.MultiValueMap;
     public void afterEach() throws Exception {
        after();
     }
-    @Ignore("unknown yourself connection information")
+    //@Ignore("unknown yourself connection information")
     @Test
-    void testCreateDataSource() throws Exception {
+    public void testCreateDataSource() throws Exception {
         HashMap<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("name","mysql");
         paramsMap.put("node","mysql data source test");
         paramsMap.put("type","mysql");
-        paramsMap.put("host","192.168.xxxx.xx");
+        paramsMap.put("host","127.0.0.1");
         paramsMap.put("port",3306);
-        paramsMap.put("database","dolphinscheduler");
+        paramsMap.put("database","mysql");
         paramsMap.put("userName","root");
-        paramsMap.put("password","root@123");
+        paramsMap.put("password","123456");
         paramsMap.put("other",new HashMap<>());
         MvcResult mvcResult = mockMvc.perform(post("/datasources")
                         .header("sessionId", sessionId)
@@ -88,7 +88,7 @@ import org.springframework.util.MultiValueMap;
     @Ignore("unknown yourself connection information")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    void testUpdateDataSource(int args) throws Exception {
+    public void testUpdateDataSource(int args) throws Exception {
         HashMap<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("id",args);
         paramsMap.put("name","mysql");
@@ -115,7 +115,7 @@ import org.springframework.util.MultiValueMap;
     @Ignore("unknown you datasources id")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    void testQueryDataSource(int id) throws Exception {
+    public void testQueryDataSource(int id) throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id)
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
@@ -130,7 +130,7 @@ import org.springframework.util.MultiValueMap;
     @CsvSource({
             "type, MYSQL"
     })
-    void testQueryDataSourceList(String key , String dbType) throws Exception {
+    public void testQueryDataSourceList(String key , String dbType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
@@ -145,7 +145,7 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Test
-    void testQueryDataSourceListPaging() throws Exception {
+    public void testQueryDataSourceListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("searchVal","mysql");
         paramsMap.add("pageNo","1");
@@ -161,21 +161,21 @@ import org.springframework.util.MultiValueMap;
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore("unknown yourself connection information")
+    //@Ignore("unknown yourself connection information")
     @Test
-    void testConnectDataSource() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","hive data source");
-        paramsMap.add("type","HIVE");
-        paramsMap.add("host","192.168.xx.xx");
-        paramsMap.add("port","10000");
-        paramsMap.add("database","default");
-        paramsMap.add("userName","hive");
-        paramsMap.add("password","");
-        paramsMap.add("other","");
+    public void testConnectDataSource() throws Exception {
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name","mysql data source");
+        paramsMap.put("type","mysql");
+        paramsMap.put("host","127.0.0.1");
+        paramsMap.put("port",3306);
+        paramsMap.put("database","mysql");
+        paramsMap.put("userName","root");
+        paramsMap.put("password","123456");
+        paramsMap.put("other",null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
                         .header("sessionId", sessionId)
-                        .params(paramsMap))
+                        .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -184,10 +184,10 @@ import org.springframework.util.MultiValueMap;
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore("unknown your datasource id")
+    //@Ignore("unknown your datasource id")
     @ParameterizedTest
     @ValueSource(ints = {2})
-    void testConnectionTest(int id) throws Exception {
+    public void testConnectionTest(int id) throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id+"/connect-test")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
@@ -200,9 +200,9 @@ import org.springframework.util.MultiValueMap;
 
     @ParameterizedTest
     @CsvSource({
-            "type, MYSQL"
+            "name, sourceName"
     })
-    void testVerifyDataSourceName(String key , String dbType) throws Exception {
+    public void testVerifyDataSourceName(String key , String dbType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
         MvcResult mvcResult = mockMvc.perform(get("/datasources/verify-name")
@@ -217,7 +217,7 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Test
-    void testAuthedDatasource() throws Exception {
+    public void testAuthedDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
@@ -232,7 +232,7 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Test
-    void testUnauthDatasource() throws Exception {
+    public void testUnauthDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")
@@ -247,7 +247,7 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Test
-    void testGetKerberosStartupState(String url) throws Exception {
+    public void testGetKerberosStartupState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
@@ -260,7 +260,7 @@ import org.springframework.util.MultiValueMap;
 
     @Ignore("unknown your datasource id")
     @Test
-    void testDelete() throws Exception {
+    public void testDelete() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
