@@ -19,7 +19,7 @@ name: "pull-request-robot"
 
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
+#    types: [ opened, synchronize, reopened ]
 #  workflow_run:
 #    workflows: [ "Label when opened" ]
 #    types: [ 'requested' ]
@@ -47,5 +47,5 @@ jobs:
         uses: actions/labeler@v4
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: .github/actions/labeler/labeler.yml
+          configuration-path: ./.github/actions/labeler/labeler.yml
           sync-labels: true
