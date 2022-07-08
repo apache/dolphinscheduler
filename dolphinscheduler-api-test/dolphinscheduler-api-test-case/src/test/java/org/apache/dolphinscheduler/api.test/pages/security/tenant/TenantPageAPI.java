@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
 import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.Route;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
-import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantUpdateEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 
@@ -45,7 +44,7 @@ public class TenantPageAPI implements ITenantPageAPI {
     }
 
     @Override
-    public RestResponse<Result> updateTenant(TenantUpdateEntity tenantUpdateEntity, int tenantId) {
+    public RestResponse<Result> updateTenant(TenantRequestEntity tenantUpdateEntity, int tenantId) {
         return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
                 tenantUpdateEntity.toMap(), Route.tenants(tenantId), RequestMethod.PUT));
     }
