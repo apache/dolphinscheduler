@@ -176,6 +176,7 @@ jobs:
     if: always()
     steps:
       - name: Status
+        # We need change CWD to current directory to avoid global default working directory not exists
         working-directory: ./
         run: |
           if [[ ${{ needs.paths-filter.outputs.not-docs }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
