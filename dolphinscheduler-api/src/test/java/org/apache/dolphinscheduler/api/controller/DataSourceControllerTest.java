@@ -60,7 +60,7 @@ import org.springframework.util.MultiValueMap;
     public void afterEach() throws Exception {
        after();
     }
-    //@Ignore("unknown yourself connection information")
+    @Ignore("unknown yourself connection information")
     @Test
     public void testCreateDataSource() throws Exception {
         HashMap<String, Object> paramsMap = new HashMap<>();
@@ -86,11 +86,10 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Ignore("unknown yourself connection information")
-    @ParameterizedTest
-    @ValueSource(ints = {2})
-    public void testUpdateDataSource(int args) throws Exception {
+    @Test
+    public void testUpdateDataSource() throws Exception {
         HashMap<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("id",args);
+        paramsMap.put("id",2);
         paramsMap.put("name","mysql");
         paramsMap.put("node","mysql data source test");
         paramsMap.put("type","mysql");
@@ -101,7 +100,7 @@ import org.springframework.util.MultiValueMap;
         paramsMap.put("userName","root");
         paramsMap.put("password","root@123");
         paramsMap.put("other",new HashMap<>());
-        MvcResult mvcResult = mockMvc.perform(put("/datasources/"+args)
+        MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
                         .header("sessionId", sessionId)
                         .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
@@ -113,10 +112,9 @@ import org.springframework.util.MultiValueMap;
     }
 
     @Ignore("unknown you datasources id")
-    @ParameterizedTest
-    @ValueSource(ints = {2})
-    public void testQueryDataSource(int id) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id)
+    @Test
+    public void testQueryDataSource() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/2")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -161,7 +159,7 @@ import org.springframework.util.MultiValueMap;
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    //@Ignore("unknown yourself connection information")
+    @Ignore("unknown yourself connection information")
     @Test
     public void testConnectDataSource() throws Exception {
         HashMap<String, Object> paramsMap = new HashMap<>();
@@ -184,11 +182,10 @@ import org.springframework.util.MultiValueMap;
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    //@Ignore("unknown your datasource id")
-    @ParameterizedTest
-    @ValueSource(ints = {2})
-    public void testConnectionTest(int id) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/"+id+"/connect-test")
+    @Ignore("unknown your datasource id")
+    @Test
+    public void testConnectionTest() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/2/connect-test")
                         .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
