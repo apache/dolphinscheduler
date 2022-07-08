@@ -66,9 +66,7 @@ public class TenantAPITest extends AbstractAPITest {
     @Test
     @Order(2)
     public void testUpdateTenant() {
-        TenantRequestEntity tenantUpdateEntity = new TenantRequestEntity();
-        tenantUpdateEntity.setTenantCode(tenantResponseEntity.getTenantCode());
-        tenantUpdateEntity.setQueueId(1);
+        TenantRequestEntity tenantUpdateEntity = tenantRequestEntity;
         tenantUpdateEntity.setDescription(fairy.person().getMobileTelephoneNumber());
         tenantPageAPI.updateTenant(tenantUpdateEntity, tenantResponseEntity.getId()).isResponseSuccessful();
     }
