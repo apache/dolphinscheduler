@@ -19,16 +19,6 @@ name: "pull-request-robot"
 
 on:
   pull_request:
-#    types: [ opened, synchronize, reopened ]
-#  workflow_run:
-#    workflows: [ "Label when opened" ]
-#    types: [ 'requested' ]
-
-#permissions:
-#  # All other permissions are set to none
-#  checks: write
-#  contents: read
-#  pull-requests: write
 
 jobs:
   labelRobot:
