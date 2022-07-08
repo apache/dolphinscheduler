@@ -15,29 +15,15 @@
 # limitations under the License.
 #
 
-name: "pull-request-robot"
+name: Label when opened
 
-on:
-  workflow_run:
-    workflows: [ "Label when opened" ]
-    types: [ 'requested' ]
+on: pull_request
 
 jobs:
-  labelRobot:
-    permissions:
-      contents: read
-      pull-requests: write
+
+  label-when-opened:
+    name: "Label PRs when opened"
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout ${{ github.ref }}"
-        uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-          submodules: true
-
-      - name: "Label in pull request"
-        uses: actions/labeler@v4
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: .github/actions/labeler/labeler.yml
-          sync-labels: true
+      - name: "Do nothing. Only trigger corresponding workflow_run event"
+        run: echo
