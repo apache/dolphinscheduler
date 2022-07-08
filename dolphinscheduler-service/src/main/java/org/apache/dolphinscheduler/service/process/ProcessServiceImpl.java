@@ -1032,6 +1032,7 @@ public class ProcessServiceImpl implements ProcessService {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
                 processInstance.setRecovery(Flag.YES);
+                processInstance.setRunTimes(runTime + 1);
                 runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:

@@ -791,13 +791,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         errorTaskMap.clear();
 
         if (!isNewProcessInstance()) {
+            logger.info("The workflowInstance is not a newly running instance, runtimes: {}, recover flag: {}",
+                processInstance.getRunTimes(),
+                processInstance.getRecovery());
             List<TaskInstance> validTaskInstanceList =
                 processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance task : validTaskInstanceList) {
                 try {
                     LoggerUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
                     logger.info(
-                        "The current processInstance is not a new processInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
+                        "Check the taskInstance from a exist workflowInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
                         task.getTaskCode(),
                         task.getState());
                     if (validTaskMap.containsKey(task.getTaskCode())) {
@@ -840,6 +843,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
+        } else {
+            logger.info("The current workflowInstance is a newly running workflowInstance");
         }
 
         if (processInstance.isComplementData() && complementListDate.isEmpty()) {
@@ -1850,14 +1855,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * is new process instance
      */
     private boolean isNewProcessInstance() {
-        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
-            return true;
-        } else if (processInstance.getRecovery().equals(Flag.YES)) {
-            // host is empty use old task instance
-            return false;
-        } else {
+        if (Flag.YES.equals(processInstance.getRecovery())) {
+            logger.info("This workInstance will be recover by this execution");
             return false;
         }
+
+        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
+            return true;
+        }
+        logger.info(
+            "The workflowInstance has been executed before, this execution is to reRun, processInstance status: {}, runTimes: {}",
+            processInstance.getState(),
+            processInstance.getRunTimes());
+        return false;
     }
 
     public void resubmit(long taskCode) throws Exception {

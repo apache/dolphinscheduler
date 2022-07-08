@@ -76,7 +76,7 @@ public class TaskExecuteRunnable implements Runnable {
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 persist(event);
             } catch (Exception e) {
-                logger.error("persist error, event:{}, error: {}", event, e);
+                logger.error("persist task event error, event:{}", event, e);
             } finally {
                 this.events.remove(event);
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
@@ -133,7 +133,7 @@ public class TaskExecuteRunnable implements Runnable {
             case DISPATCH:
                 needToSendEvent = handleDispatchEvent(taskEvent, taskInstance);
                 // dispatch event do not need to submit state event
-                return;
+                break;
             case DELAY:
             case RUNNING:
                 needToSendEvent = handleRunningEvent(taskEvent, taskInstance);
