@@ -194,9 +194,11 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 logger.error("Cannot find the related processInstance of the task, taskPriority: {}", taskPriority);
                 return true;
             }
-            Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
-            if(!taskInstanceOptional.isPresent()) {
-                logger.error("Cannot find the task instance from related processInstance, taskPriority: {}", taskPriority);
+            Optional<TaskInstance> taskInstanceOptional =
+                workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
+            if (!taskInstanceOptional.isPresent()) {
+                logger.error("Cannot find the task instance from related processInstance, taskPriority: {}",
+                    taskPriority);
                 // we return true, so that we will drop this task.
                 return true;
             }

@@ -776,6 +776,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         // generate process dag
         dag = DagHelper.buildDagGraph(processDag);
+        logger.info("Build dag success, dag: {}", dag);
     }
 
     /**
@@ -795,6 +796,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             for (TaskInstance task : validTaskInstanceList) {
                 try {
                     LoggerUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
+                    logger.info(
+                        "The current processInstance is not a new processInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
+                        task.getTaskCode(),
+                        task.getState());
                     if (validTaskMap.containsKey(task.getTaskCode())) {
                         int oldTaskInstanceId = validTaskMap.get(task.getTaskCode());
                         TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
@@ -861,15 +866,22 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
                         processInstance.setScheduleTime(complementListDate.get(0));
-                        String globalParams =
-                            curingParamsService.curingGlobalParams(processInstance.getId(), processDefinition.getGlobalParamMap(), processDefinition.getGlobalParamList(), CommandType.COMPLEMENT_DATA,
-                                processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));
+                        String globalParams = curingParamsService.curingGlobalParams(processInstance.getId(),
+                            processDefinition.getGlobalParamMap(),
+                            processDefinition.getGlobalParamList(),
+                            CommandType.COMPLEMENT_DATA,
+                            processInstance.getScheduleTime(),
+                            cmdParam.get(Constants.SCHEDULE_TIMEZONE));
                         processInstance.setGlobalParams(globalParams);
                         processService.updateProcessInstance(processInstance);
                     }
                 }
             }
         }
+        logger.info("Initialize task queue, dependFailedTaskMap: {}, completeTaskMap: {}, errorTaskMap: {}",
+            dependFailedTaskMap,
+            completeTaskMap,
+            errorTaskMap);
     }
 
     /**

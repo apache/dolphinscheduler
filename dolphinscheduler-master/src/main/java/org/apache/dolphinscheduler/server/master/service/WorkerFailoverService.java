@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.service;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -62,7 +63,7 @@ import lombok.NonNull;
 @Service
 public class WorkerFailoverService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FailoverService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerFailoverService.class);
 
     private final RegistryClient registryClient;
     private final MasterConfig masterConfig;
@@ -178,6 +179,7 @@ public class WorkerFailoverService {
         }
 
         taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
+        taskInstance.setFlag(Flag.NO);
         processService.saveTaskInstance(taskInstance);
 
         StateEvent stateEvent = new StateEvent();
