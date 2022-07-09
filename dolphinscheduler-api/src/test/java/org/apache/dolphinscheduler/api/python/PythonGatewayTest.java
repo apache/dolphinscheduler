@@ -137,7 +137,8 @@ public class PythonGatewayTest {
 
         Result<Object> queryMockResult = new Result<>();
         queryMockResult.setCode(Status.RESOURCE_NOT_EXIST.getCode());
-        Mockito.when(resourcesService.queryResource(user, resourceFullName, null, ResourceType.FILE)).thenReturn(queryMockResult);
+        Mockito.when(resourcesService.queryResource(user, resourceFullName, null, ResourceType.FILE))
+                .thenReturn(queryMockResult);
 
         int resourceId = 3;
         Result<Object> createResourceResult = new Result<>();

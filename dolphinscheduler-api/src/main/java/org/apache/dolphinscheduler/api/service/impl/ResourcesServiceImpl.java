@@ -1153,7 +1153,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return dirResource.getId();
         } else if (dirResult.getCode() == Status.RESOURCE_NOT_EXIST.getCode()) {
             // create dir
-            Result<Object> createDirResult = this.createDirectory(user, dirName, "", ResourceType.FILE, pid, currentDir);
+            Result<Object> createDirResult = this.createDirectory(
+                    user, dirName, "", ResourceType.FILE, pid, currentDir);
             if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
                 Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
                 return (int) resultMap.get("id");
