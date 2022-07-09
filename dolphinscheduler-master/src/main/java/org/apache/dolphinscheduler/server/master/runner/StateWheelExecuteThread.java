@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
@@ -31,13 +30,13 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 
-import org.apache.commons.lang3.ThreadUtils;
-
-import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,9 +90,14 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         super("StateWheelExecuteThread");
     }
 
+    @PostConstruct
+    public void startWheelThread() {
+        super.start();
+    }
+
     @Override
     public void run() {
-        Duration checkInterval = masterConfig.getStateWheelInterval();
+        final long checkInterval = masterConfig.getStateWheelInterval().toMillis();
         while (Stopper.isRunning()) {
             try {
                 checkTask4Timeout();
@@ -104,9 +108,11 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 logger.error("state wheel thread check error:", e);
             }
             try {
-                ThreadUtils.sleep(checkInterval);
+                Thread.sleep(checkInterval);
             } catch (InterruptedException e) {
-                logger.error("state wheel thread sleep error", e);
+                logger.error("state wheel thread sleep error, will close the loop", e);
+                Thread.currentThread().interrupt();
+                break;
             }
         }
     }
@@ -290,15 +296,21 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 }
 
                 if (!taskInstanceOptional.isPresent()) {
-                    logger.warn("Task instance retry check failed, can not find taskInstance from workflowExecuteThread, will remove this check");
+                    logger.warn(
+                        "Task instance retry check failed, can not find taskInstance from workflowExecuteThread, will remove this check");
                     taskInstanceRetryCheckList.remove(taskInstanceKey);
                     continue;
                 }
 
                 TaskInstance taskInstance = taskInstanceOptional.get();
-                if (taskInstance.retryTaskIntervalOverTime()) {
+                // We check the status to avoid when we do worker failover we submit a failover task, this task may be resubmit by this
+                // thread
+                if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE
+                    && taskInstance.retryTaskIntervalOverTime()) {
                     // reset taskInstance endTime and state
                     // todo relative funtion: TaskInstance.retryTaskIntervalOverTime, WorkflowExecuteThread.cloneRetryTaskInstance
+                    logger.info("[TaskInstance-{}]The task instance can retry, will retry this task instance",
+                        taskInstance.getId());
                     taskInstance.setEndTime(null);
                     taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
 

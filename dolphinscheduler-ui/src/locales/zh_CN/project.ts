@@ -348,6 +348,7 @@ export default {
     init_script_tips: '请输入初始化脚本',
     resources: '资源',
     resources_tips: '请选择资源',
+    resources_limit_tips: '请重新选择，资源个数限制:',
     no_resources_tips: '请删除所有未授权或已删除资源',
     useless_resources_tips: '未授权或已删除资源',
     custom_parameters: '自定义参数',
@@ -692,6 +693,15 @@ export default {
     please_enter_filter_expression: '请输入源表过滤条件',
     please_enter_column_only_single_column_is_supported: '请选择源表检测列',
     please_enter_threshold_number_is_needed: '请输入阈值',
-    please_enter_comparison_title: '请选择期望值类型'
+    please_enter_comparison_title: '请选择期望值类型',
+    custom_config: '自定义配置',
+    engine: '引擎',
+    engine_tips: '请选择引擎',
+    run_mode: '运行模式',
+    dinky_address: 'dinky 地址',
+    dinky_address_tips: '请输入 Dinky 地址',
+    dinky_task_id: 'dinky 作业ID',
+    dinky_task_id_tips: '请输入作业 ID',
+    dinky_online: '是否上线作业'
   }
 }

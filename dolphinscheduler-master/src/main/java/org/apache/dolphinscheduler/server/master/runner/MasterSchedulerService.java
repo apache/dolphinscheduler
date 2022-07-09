@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -28,15 +27,15 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -44,13 +43,17 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.NonNull;
 
 /**
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
@@ -71,8 +74,6 @@ public class MasterSchedulerService extends BaseDaemonThread {
 
     @Autowired
     private ProcessAlertManager processAlertManager;
-
-    private NettyRemotingClient nettyRemotingClient;
 
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
@@ -97,6 +98,10 @@ public class MasterSchedulerService extends BaseDaemonThread {
     @Autowired
     private CuringParamsService curingGlobalParamsService;
 
+    private final LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances = new LinkedBlockingQueue<>();
+
+    private Thread failedProcessInstanceResubmitThread;
+
     private String masterAddress;
 
     protected MasterSchedulerService() {
@@ -108,22 +113,23 @@ public class MasterSchedulerService extends BaseDaemonThread {
      */
     public void init() {
         this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
-        NettyClientConfig clientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.failedProcessInstanceResubmitThread = new FailedProcessInstanceResubmitThread(submitFailedProcessInstances);
+        ProcessInstanceMetrics.registerProcessInstanceResubmitGauge(submitFailedProcessInstances::size);
     }
 
     @Override
     public synchronized void start() {
         logger.info("Master schedule service starting..");
-        this.stateWheelExecuteThread.start();
         super.start();
+        this.failedProcessInstanceResubmitThread.start();
         logger.info("Master schedule service started...");
     }
 
     public void close() {
         logger.info("Master schedule service stopping...");
-        nettyRemotingClient.close();
+        // these process instances will be failover, so we can safa clear here
+        submitFailedProcessInstances.clear();
         logger.info("Master schedule service stopped...");
     }
 
@@ -146,7 +152,9 @@ public class MasterSchedulerService extends BaseDaemonThread {
                 Thread.currentThread().interrupt();
                 break;
             } catch (Exception e) {
-                logger.error("Master schedule service loop command error", e);
+                logger.error("Master schedule workflow error", e);
+                // sleep for 1s here to avoid the database down cause the exception boom
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         }
     }
@@ -154,7 +162,7 @@ public class MasterSchedulerService extends BaseDaemonThread {
     /**
      * Query command from database by slot, and transform to workflow instance, then submit to workflowExecuteThreadPool.
      */
-    private void scheduleWorkflow() throws InterruptedException {
+    private void scheduleWorkflow() throws InterruptedException, MasterException {
         List<Command> commands = findCommands();
         if (CollectionUtils.isEmpty(commands)) {
             // indicate that no command ,sleep for 1s
@@ -164,38 +172,53 @@ public class MasterSchedulerService extends BaseDaemonThread {
 
         List<ProcessInstance> processInstances = command2ProcessInstance(commands);
         if (CollectionUtils.isEmpty(processInstances)) {
+            // indicate that the command transform to processInstance error, sleep for 1s
+            Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             return;
         }
         MasterServerMetrics.incMasterConsumeCommand(commands.size());
 
         for (ProcessInstance processInstance : processInstances) {
-            try {
-                LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
-                logger.info("Master schedule service starting workflow instance");
-                final WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
-                    processInstance
-                    , processService
-                    , nettyExecutorManager
-                    , processAlertManager
-                    , masterConfig
-                    , stateWheelExecuteThread
-                    , curingGlobalParamsService);
+            submitProcessInstance(processInstance);
+        }
+    }
 
-                this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
-                if (processInstance.getTimeout() > 0) {
-                    stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
-                }
-                ProcessInstanceMetrics.incProcessInstanceSubmit();
-                workflowExecuteThreadPool.submit(workflowExecuteRunnable);
-                logger.info("Master schedule service started workflow instance");
+    private void submitProcessInstance(@NonNull ProcessInstance processInstance) {
+        try {
+            LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
+            logger.info("Master schedule service starting workflow instance");
+            final WorkflowExecuteRunnable workflowExecuteRunnable = new WorkflowExecuteRunnable(
+                processInstance
+                , processService
+                , nettyExecutorManager
+                , processAlertManager
+                , masterConfig
+                , stateWheelExecuteThread
+                , curingGlobalParamsService);
 
-            } catch (Exception ex) {
-                processInstanceExecCacheManager.removeByProcessInstanceId(processInstance.getId());
-                stateWheelExecuteThread.removeProcess4TimeoutCheck(processInstance.getId());
-                logger.info("Master submit workflow to thread pool failed, will remove workflow runnable from cache manager", ex);
-            } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
+            if (processInstance.getTimeout() > 0) {
+                stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
+            ProcessInstanceMetrics.incProcessInstanceSubmit();
+            CompletableFuture<WorkflowSubmitStatue> workflowSubmitFuture = CompletableFuture.supplyAsync(
+                workflowExecuteRunnable::call, workflowExecuteThreadPool);
+            workflowSubmitFuture.thenAccept(workflowSubmitStatue -> {
+                if (WorkflowSubmitStatue.FAILED == workflowSubmitStatue) {
+                    // submit failed
+                    processInstanceExecCacheManager.removeByProcessInstanceId(processInstance.getId());
+                    stateWheelExecuteThread.removeProcess4TimeoutCheck(processInstance.getId());
+                    submitFailedProcessInstances.add(processInstance);
+                }
+            });
+            logger.info("Master schedule service started workflow instance");
+
+        } catch (Exception ex) {
+            processInstanceExecCacheManager.removeByProcessInstanceId(processInstance.getId());
+            stateWheelExecuteThread.removeProcess4TimeoutCheck(processInstance.getId());
+            logger.info("Master submit workflow to thread pool failed, will remove workflow runnable from cache manager", ex);
+        } finally {
+            LoggerUtils.removeWorkflowInstanceIdMDC();
         }
     }
 
@@ -237,23 +260,27 @@ public class MasterSchedulerService extends BaseDaemonThread {
         return processInstances;
     }
 
-    private List<Command> findCommands() {
-        long scheduleStartTime = System.currentTimeMillis();
-        int thisMasterSlot = ServerNodeManager.getSlot();
-        int masterCount = ServerNodeManager.getMasterSize();
-        if (masterCount <= 0) {
-            logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
-            return Collections.emptyList();
+    private List<Command> findCommands() throws MasterException {
+        try {
+            long scheduleStartTime = System.currentTimeMillis();
+            int thisMasterSlot = ServerNodeManager.getSlot();
+            int masterCount = ServerNodeManager.getMasterSize();
+            if (masterCount <= 0) {
+                logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
+                return Collections.emptyList();
+            }
+            int pageNumber = 0;
+            int pageSize = masterConfig.getFetchCommandNum();
+            final List<Command> result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+            if (CollectionUtils.isNotEmpty(result)) {
+                logger.info("Master schedule service loop command success, command size: {}, current slot: {}, total slot size: {}",
+                    result.size(), thisMasterSlot, masterCount);
+            }
+            ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
+            return result;
+        } catch (Exception ex) {
+            throw new MasterException("Master loop command from database error", ex);
         }
-        int pageNumber = 0;
-        int pageSize = masterConfig.getFetchCommandNum();
-        final List<Command> result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
-        if (CollectionUtils.isNotEmpty(result)) {
-            logger.info("Master schedule service loop command success, command size: {}, current slot: {}, total slot size: {}",
-                result.size(), thisMasterSlot, masterCount);
-        }
-        ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
-        return result;
     }
 
     private SlotCheckState slotCheck(Command command) {
@@ -268,6 +295,36 @@ public class MasterSchedulerService extends BaseDaemonThread {
             state = SlotCheckState.INJECT;
         }
         return state;
+    }
+
+    private class FailedProcessInstanceResubmitThread extends Thread {
+
+        private final LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances;
+
+        public FailedProcessInstanceResubmitThread(LinkedBlockingQueue<ProcessInstance> submitFailedProcessInstances) {
+            logger.info("Starting workflow resubmit thread");
+            this.submitFailedProcessInstances = submitFailedProcessInstances;
+            this.setDaemon(true);
+            this.setName("SubmitFailedProcessInstanceHandleThread");
+            logger.info("Started workflow resubmit thread");
+        }
+
+        @Override
+        public void run() {
+            while (Stopper.isRunning()) {
+                try {
+                    ProcessInstance processInstance = submitFailedProcessInstances.take();
+                    submitProcessInstance(processInstance);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.warn("SubmitFailedProcessInstanceHandleThread has been interrupted, will return");
+                    break;
+                }
+
+                // avoid the failed-fast cause CPU higher
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            }
+        }
     }
 
 }

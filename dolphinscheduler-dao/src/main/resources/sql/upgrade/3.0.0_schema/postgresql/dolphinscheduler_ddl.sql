@@ -60,6 +60,19 @@ d//
 CREATE UNIQUE INDEX t_ds_relation_project_user_un
     on t_ds_relation_project_user (user_id, project_id);
 
+-- add unique key to t_ds_project
+CREATE UNIQUE INDEX unique_name on t_ds_project (name);
+CREATE UNIQUE INDEX unique_code on t_ds_project (code);
+
+-- add unique key to t_ds_queue
+CREATE UNIQUE INDEX unique_queue_name on t_ds_queue (queue_name);
+
+-- add unique key to t_ds_udfs
+CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
+
+-- add unique key to t_ds_tenant
+CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
+
 delimiter d//
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
@@ -229,19 +242,19 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_k8s" (
 
 EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_k8s_namespace" (
    id serial NOT NULL,
+   code       bigint  NOT NULL,
    limits_memory      int DEFAULT NULL ,
    namespace          varchar(100) DEFAULT NULL ,
-   online_job_num     int DEFAULT NULL,
    user_id            int DEFAULT NULL,
    pod_replicas       int DEFAULT NULL,
    pod_request_cpu    NUMERIC(13,4) NULL,
    pod_request_memory int DEFAULT NULL,
    limits_cpu         NUMERIC(13,4) NULL,
-   k8s                varchar(100) DEFAULT NULL,
+   cluster_code       bigint  NOT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
    PRIMARY KEY (id) ,
-   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,cluster_code)
 )';
 
 EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_relation_namespace_user" (

@@ -15,29 +15,20 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
+public enum EngineEnum {
 
-    button {
-      margin-left: 10px;
+    FLINK("${SEATUNNEL_HOME}/bin/start-seatunnel-flink.sh"),
+    SPARK("${SEATUNNEL_HOME}/bin/start-seatunnel-spark.sh");
+
+    private String command;
+
+    EngineEnum(String command) {
+        this.command = command;
     }
-  }
-}
 
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+    public String getCommand() {
+        return command;
+    }
 }

@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowConstants;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowParameters;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowTask;
@@ -40,7 +41,6 @@ import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -129,9 +129,7 @@ public class MlflowTaskTest {
         MlflowTask mlflowTask = initTask(createModelDeplyMlflowParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
                 "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
-                        "mlflow models serve -m runs:/a272ec279fc34a8995121ae04281585f/model " +
-                        "--port 7000 " +
-                        "-h 0.0.0.0");
+                        "mlflow models serve -m models:/model/1 --port 7000 -h 0.0.0.0");
     }
 
     @Test
@@ -139,12 +137,11 @@ public class MlflowTaskTest {
         MlflowTask mlflowTask = initTask(createModelDeplyDockerParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
                 "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
-                        "mlflow models build-docker -m runs:/a272ec279fc34a8995121ae04281585f/model " +
-                        "-n mlflow/a272ec279fc34a8995121ae04281585f:model " +
-                        "--enable-mlserver\n" +
-                        "docker rm -f ds-mlflow-a272ec279fc34a8995121ae04281585f-model\n" +
-                        "docker run --name=ds-mlflow-a272ec279fc34a8995121ae04281585f-model " +
-                        "-p=7000:8080 mlflow/a272ec279fc34a8995121ae04281585f:model");
+                        "mlflow models build-docker -m models:/model/1 -n mlflow/model:1 --enable-mlserver\n" +
+                        "docker rm -f ds-mlflow-model-1\n" +
+                        "docker run -d --name=ds-mlflow-model-1 -p=7000:8080 " +
+                        "--health-cmd \"curl --fail http://127.0.0.1:8080/ping || exit 1\" --health-interval 5s --health-retries 20 " +
+                        "mlflow/model:1");
     }
 
     @Test
@@ -154,16 +151,14 @@ public class MlflowTaskTest {
                 "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
                         "cp " + mlflowTask.getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE) +
                         " /tmp/dolphinscheduler_test\n" +
-                        "mlflow models build-docker -m models:/22222/1 -n mlflow/22222:1 --enable-mlserver\n" +
-                        "export DS_TASK_MLFLOW_IMAGE_NAME=mlflow/22222:1\n" +
-                        "export DS_TASK_MLFLOW_CONTAINER_NAME=ds-mlflow-22222-1\n" +
+                        "mlflow models build-docker -m models:/model/1 -n mlflow/model:1 --enable-mlserver\n" +
+                        "docker rm -f ds-mlflow-model-1\n" +
+                        "export DS_TASK_MLFLOW_IMAGE_NAME=mlflow/model:1\n" +
+                        "export DS_TASK_MLFLOW_CONTAINER_NAME=ds-mlflow-model-1\n" +
                         "export DS_TASK_MLFLOW_DEPLOY_PORT=7000\n" +
                         "export DS_TASK_MLFLOW_CPU_LIMIT=0.5\n" +
                         "export DS_TASK_MLFLOW_MEMORY_LIMIT=200m\n" +
-                        "docker-compose up -d\n" +
-                        "for i in $(seq 1 300); do " +
-                        "[ $(docker inspect --format \"{{json .State.Health.Status }}\" ds-mlflow-22222-1) = '\"healthy\"' ] && exit 0  && break;sleep 1; " +
-                        "done; docker-compose down; exit 1");
+                        "docker-compose up -d");
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {
@@ -172,7 +167,6 @@ public class MlflowTaskTest {
         mlflowTask.init();
         mlflowTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         return mlflowTask;
-
     }
 
     private MlflowParameters createBasicAlgorithmParameters() {
@@ -218,7 +212,7 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
         mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_MLFLOW);
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
-        mlflowParameters.setDeployModelKey("runs:/a272ec279fc34a8995121ae04281585f/model");
+        mlflowParameters.setDeployModelKey("models:/model/1");
         mlflowParameters.setDeployPort("7000");
         return mlflowParameters;
     }
@@ -228,7 +222,7 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
         mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER);
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
-        mlflowParameters.setDeployModelKey("runs:/a272ec279fc34a8995121ae04281585f/model");
+        mlflowParameters.setDeployModelKey("models:/model/1");
         mlflowParameters.setDeployPort("7000");
         return mlflowParameters;
     }
@@ -238,7 +232,7 @@ public class MlflowTaskTest {
         mlflowParameters.setMlflowTaskType(MlflowConstants.MLFLOW_TASK_TYPE_MODELS);
         mlflowParameters.setDeployType(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
         mlflowParameters.setMlflowTrackingUris("http://127.0.0.1:5000");
-        mlflowParameters.setDeployModelKey("models:/22222/1");
+        mlflowParameters.setDeployModelKey("models:/model/1");
         mlflowParameters.setDeployPort("7000");
         mlflowParameters.setCpuLimit("0.5");
         mlflowParameters.setMemoryLimit("200m");

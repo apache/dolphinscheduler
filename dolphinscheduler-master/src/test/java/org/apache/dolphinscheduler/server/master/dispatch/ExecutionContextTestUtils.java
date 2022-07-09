@@ -52,7 +52,7 @@ public class ExecutionContextTestUtils {
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(context);
         Command command = requestCommand.convert2Command();
 
-        ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER);
+        ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(port)));
 
         return executionContext;

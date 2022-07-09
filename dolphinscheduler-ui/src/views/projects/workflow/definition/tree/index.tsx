@@ -133,6 +133,11 @@ export default defineComponent({
         color: '#8c8c8f',
         image: `${import.meta.env.BASE_URL}images/task-icons/seatunnel.png`
       },
+      {
+        taskType: 'DINKY',
+        color: '#d69f5b',
+        image: `${import.meta.env.BASE_URL}images/task-icons/dinky.png`
+      },
       { taskType: 'DAG', color: '#bbdde9' }
     ])
 

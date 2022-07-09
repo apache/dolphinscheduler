@@ -1,7 +1,7 @@
 # Security (Authorization System)
 
-* Only the administrator account in the security center has the authority to operate. It has functions such as queue management, tenant management, user management, alarm group management, worker group management, token management, etc. In the user management module, can authorize to the resources, data sources, projects, etc.
-* Administrator login, the default username and password is `admin/dolphinscheduler123`
+- Only the administrator account in the security center has the authority to operate. It has functions such as queue management, tenant management, user management, alarm group management, worker group management, token management, etc. In the user management module, can authorize to the resources, data sources, projects, etc.
+- Administrator login, the default username and password is `admin/dolphinscheduler123`.
 
 ## Create Queue
 
@@ -50,7 +50,7 @@
 
 ## Token Management
 
-> Since the back-end interface has login check, token management provides a way to execute various operations on the system by calling interfaces.
+Since the back-end interface has login check, token management provides a way to execute various operations on the system by calling interfaces.
 
 - The administrator enters the `Security Center -> Token Management page`, clicks the `Create Token` button, selects the expiration time and user, clicks the `Generate Token` button, and clicks the `Submit` button, then create the selected user's token successfully.
 
@@ -66,7 +66,6 @@
     public  void doPOSTParam()throws Exception{
         // create HttpClient
         CloseableHttpClient httpclient = HttpClients.createDefault();
-
         // create http post request
         HttpPost httpPost = new HttpPost("http://127.0.0.1:12345/escheduler/projects/create");
         httpPost.setHeader("token", "123");
@@ -96,9 +95,9 @@
 
 ## Granted Permissions
 
-    * Granted permissions include project permissions, resource permissions, data source permissions, UDF function permissions.
-    * The administrator can authorize the projects, resources, data sources and UDF functions to normal users which not created by them. Because the way to authorize projects, resources, data sources and UDF functions to users is the same, we take project authorization as an example.
-    * Note: The user has all permissions to the projects created by them. Projects will not be displayed in the project list and the selected project list.
+- Granted permissions include project permissions, resource permissions, data source permissions, UDF function permissions.
+- The administrator can authorize the projects, resources, data sources and UDF functions to normal users which not created by them. Because the way to authorize projects, resources, data sources and UDF functions to users is the same, we take project authorization as an example.
+- Note: The user has all permissions to the projects created by them. Projects will not be displayed in the project list and the selected project list.
 
 - The administrator enters the `Security Center -> User Management` page and clicks the `Authorize` button of the user who needs to be authorized, as shown in the figure below:
  <p align="center">
@@ -145,7 +144,6 @@ worker.groups=default,test
 ![create-environment](../../../img/new_ui/dev/security/create-environment.png)
 
 > Usage environment
-
 - Create a task node in the workflow definition, select the worker group and the environment corresponding to the worker group. When executing the task, the Worker will execute the environment first before executing the task.
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
@@ -153,11 +151,9 @@ worker.groups=default,test
 ## Cluster Management
 
 > Add or update cluster
-
 - Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
 
 > Usage cluster
-
 - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
 
 ![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
@@ -166,10 +162,12 @@ worker.groups=default,test
 
 > Add or update k8s cluster
 
-- First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database, which will be configured later by the web page.
+- First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database for batch job and will removed later, the creation of the namespace now selects the cluster by drop-down options.
 
 > Add or update namespace
 
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
+
+
