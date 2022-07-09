@@ -986,7 +986,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     private String removeDuplicates(String scheduleTimeList) {
         if (StringUtils.isNotEmpty(scheduleTimeList)) {
-            return Arrays.stream(scheduleTimeList.split(COMMA)).map(String::trim).collect(Collectors.joining(COMMA));
+            Set<String> dateSet  = Arrays.stream(scheduleTimeList.split(COMMA)).map(String::trim).collect(Collectors.toSet());
+            return String.join(COMMA, dateSet);
         }
         return null;
     }
