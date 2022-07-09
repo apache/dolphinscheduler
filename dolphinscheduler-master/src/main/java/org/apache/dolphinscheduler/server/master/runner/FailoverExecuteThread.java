@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.service.FailoverService;
+import org.apache.dolphinscheduler.server.master.service.MasterFailoverService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class FailoverExecuteThread extends BaseDaemonThread {
      * failover service
      */
     @Autowired
-    private FailoverService failoverService;
+    private MasterFailoverService masterFailoverService;
 
     protected FailoverExecuteThread() {
         super("FailoverExecuteThread");
@@ -63,7 +64,7 @@ public class FailoverExecuteThread extends BaseDaemonThread {
             try {
                 // todo: DO we need to schedule a task to do this kind of check
                 // This kind of check may only need to be executed when a master server start
-                failoverService.checkMasterFailover();
+                masterFailoverService.checkMasterFailover();
             } catch (Exception e) {
                 logger.error("Master failover thread execute error", e);
             } finally {
