@@ -139,27 +139,6 @@ public class PythonGatewayTest {
         queryMockResult.setCode(Status.RESOURCE_NOT_EXIST.getCode());
         Mockito.when(resourcesService.queryResource(user, resourceFullName, null, ResourceType.FILE)).thenReturn(queryMockResult);
 
-        Result<Object> dir1MockResult = new Result<>();
-        dir1MockResult.setCode(Status.SUCCESS.getCode());
-        Resource dir1 = new Resource();
-        dir1.setFullName("/dir1");
-        dir1.setId(1);
-        dir1MockResult.setData(dir1);
-        Mockito.when(resourcesService.queryResource(user, dir1.getFullName(), null, ResourceType.FILE)).thenReturn(dir1MockResult);
-
-        Result<Object> dir2MockResult = new Result<>();
-        dir2MockResult.setCode(Status.RESOURCE_NOT_EXIST.getCode());
-        Mockito.when(resourcesService.queryResource(user, resourceDir, null, ResourceType.FILE)).thenReturn(dir2MockResult);
-
-        Result<Object> createDir2MockResult = new Result<>();
-        int dir2Id = 2;
-        createDir2MockResult.setCode(Status.SUCCESS.getCode());
-        Map<String, Object> dir2Map = new HashMap<>();
-        dir2Map.put("id", dir2Id);
-        createDir2MockResult.setData(dir2Map);
-        Mockito.when(resourcesService.createDirectory(user, "dir2", "", ResourceType.FILE, dir1.getId(), dir1.getFullName()))
-                .thenReturn(createDir2MockResult);
-
         int resourceId = 3;
         Result<Object> createResourceResult = new Result<>();
         createResourceResult.setCode(Status.SUCCESS.getCode());
@@ -167,7 +146,7 @@ public class PythonGatewayTest {
         resourceMap.put("id", resourceId);
         createResourceResult.setData(resourceMap);
 
-        Mockito.when(resourcesService.onlineCreateResource(user, ResourceType.FILE, resourceName, resourceSuffix, desc, content, dir2Id, resourceDir))
+        Mockito.when(resourcesService.onlineCreateResourceWithDir(user, resourceName, resourceSuffix, desc, content, resourceDir))
                 .thenReturn(createResourceResult);
 
         int id = pythonGateway.createOrUpdateResource(

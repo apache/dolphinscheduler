@@ -1117,6 +1117,53 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return result;
     }
 
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param loginUser user who create or update resource
+     * @param currentDirectory The folder where the resource resides.
+     * @param fileName The name of resource.Do not include file suffixes.
+     * @param fileSuffix suffix of resource
+     * @param desc description of resource
+     * @param content content of resource
+     * @return create result code
+     */
+    @Override
+    @Transactional
+    public Result<Object> onlineCreateResourceWithDir(User loginUser, String fileName, String fileSuffix, String desc, String content, String currentDirectory) {
+        String[] dirNames = currentDirectory.split("/");
+        int pid = -1;
+        StringBuilder currDirPath = new StringBuilder();
+        for (String dirName : dirNames) {
+            if (StringUtils.isNotEmpty(dirName)) {
+                pid = queryOrCreateDirId(loginUser, pid, currDirPath.toString(), dirName);
+                currDirPath.append("/").append(dirName);
+            }
+        }
+        return this.onlineCreateResource(
+                loginUser, ResourceType.FILE, fileName, fileSuffix, desc, content, pid, currDirPath.toString());
+    }
+
+    private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
+        String dirFullName = currentDir + "/" + dirName;
+        Result<Object> dirResult = this.queryResource(user, dirFullName, null, ResourceType.FILE);
+        if (dirResult.getCode() == Status.SUCCESS.getCode()) {
+            Resource dirResource = (Resource) dirResult.getData();
+            return dirResource.getId();
+        } else if (dirResult.getCode() == Status.RESOURCE_NOT_EXIST.getCode()) {
+            // create dir
+            Result<Object> createDirResult = this.createDirectory(user, dirName, "", ResourceType.FILE, pid, currentDir);
+            if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
+                Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
+                return (int) resultMap.get("id");
+            }
+        }
+        String msg = String.format("Can not create dir %s", dirFullName);
+        logger.error(msg);
+        throw new IllegalArgumentException(msg);
+    }
+
     private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
         AuthorizationType authorizationType = resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
         permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), logger);
