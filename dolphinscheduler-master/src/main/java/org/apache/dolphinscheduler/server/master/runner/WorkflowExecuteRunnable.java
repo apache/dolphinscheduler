@@ -119,39 +119,18 @@ import lombok.NonNull;
  */
 public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
-    /**
-     * logger of WorkflowExecuteThread
-     */
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
 
-    /**
-     * process service
-     */
     private final ProcessService processService;
 
-    /**
-     * alert manager
-     */
     private final ProcessAlertManager processAlertManager;
 
-    /**
-     * netty executor manager
-     */
     private final NettyExecutorManager nettyExecutorManager;
 
-    /**
-     * process instance
-     */
     private final ProcessInstance processInstance;
 
-    /**
-     * process definition
-     */
     private ProcessDefinition processDefinition;
 
-    /**
-     * the object of DAG
-     */
     private DAG<String, TaskNode, TaskNodeRelation> dag;
 
     /**
@@ -159,10 +138,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private String key;
 
-    /**
-     * start flag, true: start nodes submit completely
-     */
-    private volatile boolean isStart = false;
+
+    private WorkflowRunnableStatus workflowRunnableStatus = WorkflowRunnableStatus.CREATED;
 
     /**
      * submit failure nodes
@@ -224,7 +201,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private final ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
     /**
-     * ready to submit task queue
+     * The StandBy task list, will be executed, need to know, the taskInstance in this queue may doesn't have id.
      */
     private final PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
 
@@ -234,14 +211,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private final Map<Long, TaskInstance> waitToRetryTaskInstanceMap = new ConcurrentHashMap<>();
 
-    /**
-     * state wheel execute thread
-     */
     private final StateWheelExecuteThread stateWheelExecuteThread;
 
-    /**
-     * curing global params service
-     */
     private final CuringParamsService curingParamsService;
 
     private final String masterAddress;
@@ -276,14 +247,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * the process start nodes are submitted completely.
      */
     public boolean isStart() {
-        return this.isStart;
+        return WorkflowRunnableStatus.STARTED == workflowRunnableStatus;
     }
 
     /**
      * handle event
      */
     public void handleEvents() {
-        if (!isStart) {
+        if (!isStart()) {
             return;
         }
         StateEvent stateEvent = null;
@@ -670,17 +641,24 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     @Override
     public WorkflowSubmitStatue call() {
-        if (this.taskInstanceMap.size() > 0 || isStart) {
-            logger.warn("The workflow has already been started");
+        if (isStart()) {
+            // This case should not been happened
+            logger.warn("[WorkflowInstance-{}] The workflow has already been started", processInstance.getId());
             return WorkflowSubmitStatue.DUPLICATED_SUBMITTED;
         }
 
         try {
             LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
-            buildFlowDag();
-            initTaskQueue();
-            submitPostNode(null);
-            isStart = true;
+            if (workflowRunnableStatus == WorkflowRunnableStatus.CREATED) {
+                buildFlowDag();
+            }
+            if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_DAG) {
+                initTaskQueue();
+            }
+            if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_QUEUE) {
+                submitPostNode(null);
+            }
+            workflowRunnableStatus = WorkflowRunnableStatus.STARTED;
             return WorkflowSubmitStatue.SUCCESS;
         } catch (Exception e) {
             logger.error("Start workflow error", e);
@@ -747,9 +725,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @throws Exception exception
      */
     private void buildFlowDag() throws Exception {
-        if (this.dag != null) {
-            return;
-        }
         processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
         processInstance.setProcessDefinition(processDefinition);
 
@@ -776,6 +751,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         // generate process dag
         dag = DagHelper.buildDagGraph(processDag);
+        workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_DAG;
         logger.info("Build dag success, dag: {}", dag);
     }
 
@@ -883,10 +859,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
             }
         }
+        workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_QUEUE;
         logger.info("Initialize task queue, dependFailedTaskMap: {}, completeTaskMap: {}, errorTaskMap: {}",
-            dependFailedTaskMap,
-            completeTaskMap,
-            errorTaskMap);
+                    dependFailedTaskMap,
+                    completeTaskMap,
+                    errorTaskMap);
     }
 
     /**
@@ -1283,6 +1260,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         submitStandByTask();
         updateProcessInstanceState();
+        workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_QUEUE;
     }
 
     /**
@@ -1923,6 +1901,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
             }
         }
+    }
+
+    private enum WorkflowRunnableStatus {
+        CREATED, INITIALIZE_DAG, INITIALIZE_QUEUE, STARTED,
+        ;
+
     }
 
 }
