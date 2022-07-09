@@ -202,7 +202,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/preview",123)
                 .header(SESSION_ID, sessionId)
-                .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"))
+                .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *','timezoneId':'Asia/Shanghai'}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

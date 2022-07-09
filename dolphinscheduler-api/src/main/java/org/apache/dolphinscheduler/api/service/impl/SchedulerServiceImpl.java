@@ -72,6 +72,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cronutils.model.Cron;
 
+
 /**
  * scheduler service impl
  */
@@ -555,6 +556,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Cron cron;
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
 
+        assert scheduleParam != null;
         ZoneId zoneId = TimeZone.getTimeZone(scheduleParam.getTimezoneId()).toZoneId();
         ZonedDateTime now = ZonedDateTime.now(zoneId);
         ZonedDateTime startTime = ZonedDateTime.ofInstant(scheduleParam.getStartTime().toInstant(), zoneId);
@@ -571,7 +573,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         List<ZonedDateTime> selfFireDateList =
             CronUtils.getSelfFireDateList(startTime, endTime, cron, Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
         List<String> previewDateList =
-            selfFireDateList.stream().map(DateUtils::dateToString).collect(Collectors.toList());
+            selfFireDateList.stream().map(t -> DateUtils.dateToString(t, zoneId)).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, previewDateList);
         putMsg(result, Status.SUCCESS);
         return result;
