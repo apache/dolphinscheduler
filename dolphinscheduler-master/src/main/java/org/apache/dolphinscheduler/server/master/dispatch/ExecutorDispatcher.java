@@ -88,9 +88,6 @@ public class ExecutorDispatcher implements InitializingBean {
                 context.getCommand(), context.getWorkerGroup());
             return false;
         }
-        // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be failovered, due to the taskInstance's host
-        // is not belongs to the down worker ISSUE-10842.
-        context.getTaskInstance().setHost(host.getAddress());
         context.setHost(host);
         executorManager.beforeExecute(context);
         try {
