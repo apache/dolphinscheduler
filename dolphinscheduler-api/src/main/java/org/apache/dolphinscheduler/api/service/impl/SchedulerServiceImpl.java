@@ -571,6 +571,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         Date now = new Date();
 
+        assert scheduleParam != null;
         Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
         Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
         startTime =  now.after(startTime) ? now : startTime;

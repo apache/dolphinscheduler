@@ -160,6 +160,38 @@ public final class DateUtils {
     }
 
     /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime) {
+        return YYYY_MM_DD_HH_MM_SS.format(zonedDateTime);
+    }
+
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @param timezone      time zone
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime, String timezone) {
+        return dateToString(zonedDateTime, ZoneId.of(timezone));
+    }
+
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @param zoneId        zone id
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime, ZoneId zoneId) {
+        return DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS).withZone(zoneId).format(zonedDateTime);
+    }
+
+    /**
      * convert string to date and time
      *
      * @param date   date
