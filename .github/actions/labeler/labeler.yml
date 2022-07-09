@@ -23,18 +23,18 @@ backend:
   - any: ['dolphinscheduler-dao/**/*', 'dolphinscheduler-data-quality/**/*', 'dolphinscheduler-datasource-plugin/**/*']
   - any: ['dolphinscheduler-dist/**/*', 'dolphinscheduler-log-server/**/*', 'dolphinscheduler-master/**/*']
   - any: ['dolphinscheduler-registry/**/*', 'dolphinscheduler-remote/**/*', 'dolphinscheduler-scheduler-plugin/**/*']
-  - any: [ 'dolphinscheduler-server/**/*', 'dolphinscheduler-service/**/*', 'dolphinscheduler-spi/**/*' ]
-  - any: [ 'dolphinscheduler-standalone-server/**/*', 'dolphinscheduler-task-plugin/**/*', 'dolphinscheduler-tools/**/*' ]
-  - any: [ 'dolphinscheduler-worker/**/*', 'script/**/*' ]
+  - any: ['dolphinscheduler-server/**/*', 'dolphinscheduler-service/**/*', 'dolphinscheduler-spi/**/*']
+  - any: ['dolphinscheduler-standalone-server/**/*', 'dolphinscheduler-task-plugin/**/*', 'dolphinscheduler-tools/**/*']
+  - any: ['dolphinscheduler-worker/**/*', 'script/**/*']
 
 document:
   - any: ['docs/**/*']
 
 CI&CD:
-  - any: [.github/**/*]
+  - any: ['.github/**/*']
 
 docker:
-  - any: [.deploy/**/*]
+  - any: ['.deploy/**/*']
 
 UI:
   - any: ['dolphinscheduler-ui/**/*']
