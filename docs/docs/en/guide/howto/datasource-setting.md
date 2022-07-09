@@ -64,7 +64,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 After the above steps done you would create a new database for DolphinScheduler, then run the Shell script to init database:
 
 ```shell
-sh tools/bin/upgrade-schema.sh
+bash tools/bin/upgrade-schema.sh
 ```
 
 ## DataSource Center

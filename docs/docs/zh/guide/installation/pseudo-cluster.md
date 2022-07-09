@@ -146,7 +146,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 使用上面创建的**部署用户**运行以下命令完成部署，部署后的运行日志将存放在 logs 文件夹内
 
 ```shell
-sh ./bin/install.sh
+bash ./bin/install.sh
 ```
 
 > **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，次为非重要信息直接忽略即可
@@ -159,26 +159,26 @@ sh ./bin/install.sh
 
 ```shell
 # 一键停止集群所有服务
-sh ./bin/stop-all.sh
+bash ./bin/stop-all.sh
 
 # 一键开启集群所有服务
-sh ./bin/start-all.sh
+bash ./bin/start-all.sh
 
 # 启停 Master
-sh ./bin/dolphinscheduler-daemon.sh stop master-server
-sh ./bin/dolphinscheduler-daemon.sh start master-server
+bash ./bin/dolphinscheduler-daemon.sh stop master-server
+bash ./bin/dolphinscheduler-daemon.sh start master-server
 
 # 启停 Worker
-sh ./bin/dolphinscheduler-daemon.sh start worker-server
-sh ./bin/dolphinscheduler-daemon.sh stop worker-server
+bash ./bin/dolphinscheduler-daemon.sh start worker-server
+bash ./bin/dolphinscheduler-daemon.sh stop worker-server
 
 # 启停 Api
-sh ./bin/dolphinscheduler-daemon.sh start api-server
-sh ./bin/dolphinscheduler-daemon.sh stop api-server
+bash ./bin/dolphinscheduler-daemon.sh start api-server
+bash ./bin/dolphinscheduler-daemon.sh stop api-server
 
 # 启停 Alert
-sh ./bin/dolphinscheduler-daemon.sh start alert-server
-sh ./bin/dolphinscheduler-daemon.sh stop alert-server
+bash ./bin/dolphinscheduler-daemon.sh start alert-server
+bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
 > **_注意1:_**: 每个服务在路径 `<server-name>/conf/dolphinscheduler_env.sh` 中都有 `dolphinscheduler_env.sh` 文件，这是可以为微

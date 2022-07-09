@@ -64,7 +64,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
 
 ```shell
-sh tools/bin/upgrade-schema.sh
+bash tools/bin/upgrade-schema.sh
 ```
 
 ## 数据源中心

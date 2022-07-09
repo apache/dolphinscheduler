@@ -22,7 +22,7 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 # 解压并运行 Standalone Server
 tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
 cd apache-dolphinscheduler-*-bin
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```
 
 ### 登录 DolphinScheduler
@@ -35,9 +35,9 @@ sh ./bin/dolphinscheduler-daemon.sh start standalone-server
 
 ```shell
 # 启动 Standalone Server 服务
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 # 停止 Standalone Server 服务
-sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
+bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ```
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html

@@ -22,7 +22,7 @@ There is a standalone startup script in the binary compressed package, which can
 # Extract and start Standalone Server
 tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
 cd apache-dolphinscheduler-*-bin
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```
 
 ### Login DolphinScheduler
@@ -35,9 +35,9 @@ The script `./bin/dolphinscheduler-daemon.sh`can be used not only quickly start 
 
 ```shell
 # Start Standalone Server
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 # Stop Standalone Server
-sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
+bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ```
 
 > Note: Python gateway service is started along with the api-server, and if you do not want to start Python gateway
