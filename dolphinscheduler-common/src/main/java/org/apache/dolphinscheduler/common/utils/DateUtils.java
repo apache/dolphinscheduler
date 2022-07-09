@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.StringUtils;
-
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,12 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class DateUtils {
 
@@ -164,8 +161,36 @@ public final class DateUtils {
         return format(date, YYYY_MM_DD_HH_MM_SS, timezone);
     }
 
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @return zone date time string
+     */
     public static String dateToString(ZonedDateTime zonedDateTime) {
         return YYYY_MM_DD_HH_MM_SS.format(zonedDateTime);
+    }
+
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @param timezone      time zone
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime, String timezone) {
+        return dateToString(zonedDateTime, ZoneId.of(timezone));
+    }
+
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @param zoneId        zone id
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime, ZoneId zoneId) {
+        return DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS).withZone(zoneId).format(zonedDateTime);
     }
 
     /**
