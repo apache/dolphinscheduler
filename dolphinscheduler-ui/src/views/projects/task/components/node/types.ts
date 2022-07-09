@@ -256,7 +256,6 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
-  segmentSeparator?: string
   sendEmail?: boolean
   displayRows?: number
   title?: string
