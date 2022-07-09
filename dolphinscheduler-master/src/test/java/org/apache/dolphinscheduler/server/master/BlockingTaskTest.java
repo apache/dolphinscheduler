@@ -266,5 +266,4 @@ public class BlockingTaskTest {
         ExecutionStatus status = processInstance.getState();
         Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, status);
     }
-
 }
