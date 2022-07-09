@@ -149,7 +149,7 @@ Follow the instructions in [datasource-setting](../howto/datasource-setting.md) 
 Use **deployment user** you created above, running the following command to complete the deployment, and the server log will be stored in the logs folder.
 
 ```shell
-sh ./bin/install.sh
+bash ./bin/install.sh
 ```
 
 > **_Note:_** For the first time deployment, there maybe occur five times of `sh: bin/dolphinscheduler-daemon.sh: No such file or directory` in the terminal,
@@ -163,26 +163,26 @@ Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinSch
 
 ```shell
 # Stop all DolphinScheduler server
-sh ./bin/stop-all.sh
+bash ./bin/stop-all.sh
 
 # Start all DolphinScheduler server
-sh ./bin/start-all.sh
+bash ./bin/start-all.sh
 
 # Start or stop DolphinScheduler Master
-sh ./bin/dolphinscheduler-daemon.sh stop master-server
-sh ./bin/dolphinscheduler-daemon.sh start master-server
+bash ./bin/dolphinscheduler-daemon.sh stop master-server
+bash ./bin/dolphinscheduler-daemon.sh start master-server
 
 # Start or stop DolphinScheduler Worker
-sh ./bin/dolphinscheduler-daemon.sh start worker-server
-sh ./bin/dolphinscheduler-daemon.sh stop worker-server
+bash ./bin/dolphinscheduler-daemon.sh start worker-server
+bash ./bin/dolphinscheduler-daemon.sh stop worker-server
 
 # Start or stop DolphinScheduler Api
-sh ./bin/dolphinscheduler-daemon.sh start api-server
-sh ./bin/dolphinscheduler-daemon.sh stop api-server
+bash ./bin/dolphinscheduler-daemon.sh start api-server
+bash ./bin/dolphinscheduler-daemon.sh stop api-server
 
 # Start or stop Alert
-sh ./bin/dolphinscheduler-daemon.sh start alert-server
-sh ./bin/dolphinscheduler-daemon.sh stop alert-server
+bash ./bin/dolphinscheduler-daemon.sh start alert-server
+bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
 > **_Note1:_**: Each server have `dolphinscheduler_env.sh` file in path `<server-name>/conf/dolphinscheduler_env.sh` which
