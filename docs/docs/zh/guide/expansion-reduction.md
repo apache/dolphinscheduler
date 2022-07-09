@@ -136,19 +136,19 @@ sudo chown -R dolphinscheduler:dolphinscheduler dolphinscheduler
 停止命令:
 bin/stop-all.sh 停止所有服务
 
-sh bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
-sh bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
-sh bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
-sh bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
+bash bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
+bash bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
+bash bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
+bash bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
 
 
 启动命令:
 bin/start-all.sh 启动所有服务
 
-sh bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
-sh bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
-sh bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
-sh bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
+bash bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
+bash bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
+bash bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
+bash bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 
 ```
 
@@ -191,19 +191,19 @@ sh bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 停止命令:
 bin/stop-all.sh 停止所有服务
 
-sh bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
-sh bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
-sh bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
-sh bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
+bash bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
+bash bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
+bash bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
+bash bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
 
 
 启动命令:
 bin/start-all.sh 启动所有服务
 
-sh bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
-sh bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
-sh bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
-sh bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
+bash bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
+bash bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
+bash bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
+bash bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 
 ```
 
