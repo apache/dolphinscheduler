@@ -303,6 +303,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 }
 
                 TaskInstance taskInstance = taskInstanceOptional.get();
+                // We check the status to avoid when we do worker failover we submit a failover task, this task may be resubmit by this
+                // thread
                 if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE
                     && taskInstance.retryTaskIntervalOverTime()) {
                     // reset taskInstance endTime and state
