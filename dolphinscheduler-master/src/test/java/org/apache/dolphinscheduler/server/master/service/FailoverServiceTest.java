@@ -26,13 +26,14 @@ import static org.mockito.Mockito.doNothing;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -98,9 +99,17 @@ public class FailoverServiceTest {
         springApplicationContext.setApplicationContext(applicationContext);
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
-        failoverService = new FailoverService(registryClient, masterConfig, processService, workflowExecuteThreadPool, cacheManager);
+        MasterFailoverService masterFailoverService =
+            new MasterFailoverService(registryClient, masterConfig, processService);
+        WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
+            masterConfig,
+            processService,
+            workflowExecuteThreadPool,
+            cacheManager);
 
-        testMasterHost = failoverService.getLocalAddress();
+        failoverService = new FailoverService(masterFailoverService, workerFailoverService);
+
+        testMasterHost = NetUtils.getAddr(masterConfig.getListenPort());
         String ip = testMasterHost.split(":")[0];
         int port = Integer.valueOf(testMasterHost.split(":")[1]);
         Assert.assertEquals(masterPort, port);
@@ -118,6 +127,7 @@ public class FailoverServiceTest {
         processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setHost(testMasterHost);
+        processInstance.setStartTime(new Date());
         processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
@@ -154,14 +164,8 @@ public class FailoverServiceTest {
 
         given(registryClient.getServerList(NodeType.WORKER)).willReturn(new ArrayList<>(Arrays.asList(workerServer)));
         given(registryClient.getServerList(NodeType.MASTER)).willReturn(new ArrayList<>(Arrays.asList(masterServer)));
-        ReflectionTestUtils.setField(failoverService, "registryClient", registryClient);
 
         doNothing().when(workflowExecuteThreadPool).submitStateEvent(Mockito.any(StateEvent.class));
-    }
-
-    @Test
-    public void checkMasterFailoverTest() {
-        failoverService.checkMasterFailover();
     }
 
     @Test

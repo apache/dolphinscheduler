@@ -67,7 +67,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 return true;
             }
         }
-        dispatchTask();
         return true;
     }
 
@@ -119,7 +118,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
-            logger.info("task ready to submit: taskInstanceId: {}", taskInstance.getId());
+            logger.info("task ready to dispatch to worker: taskInstanceId: {}", taskInstance.getId());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
@@ -167,7 +166,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
 
-            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
+            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
 
             Host host = Host.of(taskInstance.getHost());
             executionContext.setHost(host);

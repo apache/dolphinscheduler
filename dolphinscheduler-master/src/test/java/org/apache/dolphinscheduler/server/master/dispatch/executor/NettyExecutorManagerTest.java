@@ -70,7 +70,7 @@ public class NettyExecutorManagerTest {
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
-        ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER);
+        ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(serverConfig.getListenPort())));
         Boolean execute = nettyExecutorManager.execute(executionContext);
         Assert.assertTrue(execute);
@@ -89,7 +89,7 @@ public class NettyExecutorManagerTest {
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
-        ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER);
+        ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(4444)));
         nettyExecutorManager.execute(executionContext);
 

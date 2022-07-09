@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.Event;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -27,6 +26,7 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
@@ -76,7 +76,7 @@ public class TaskExecuteRunnable implements Runnable {
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 persist(event);
             } catch (Exception e) {
-                logger.error("persist error, event:{}, error: {}", event, e);
+                logger.error("persist task event error, event:{}", event, e);
             } finally {
                 this.events.remove(event);
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
@@ -114,36 +114,43 @@ public class TaskExecuteRunnable implements Runnable {
      *
      * @param taskEvent taskEvent
      */
-    private void persist(TaskEvent taskEvent) {
+    private void persist(TaskEvent taskEvent) throws Exception {
         Event event = taskEvent.getEvent();
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         Optional<TaskInstance> taskInstance;
-        WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        WorkflowExecuteRunnable workflowExecuteRunnable =
+            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable != null && workflowExecuteRunnable.checkTaskInstanceById(taskInstanceId)) {
             taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
         } else {
             taskInstance = Optional.ofNullable(processService.findTaskInstanceById(taskInstanceId));
         }
 
+        boolean needToSendEvent = true;
         switch (event) {
             case DISPATCH:
-                handleDispatchEvent(taskEvent, taskInstance);
+                needToSendEvent = handleDispatchEvent(taskEvent, taskInstance);
                 // dispatch event do not need to submit state event
-                return;
+                break;
             case DELAY:
             case RUNNING:
-                handleRunningEvent(taskEvent, taskInstance);
+                needToSendEvent = handleRunningEvent(taskEvent, taskInstance);
                 break;
             case RESULT:
-                handleResultEvent(taskEvent, taskInstance);
+                needToSendEvent = handleResultEvent(taskEvent, taskInstance);
                 break;
             case WORKER_REJECT:
-                handleWorkerRejectEvent(taskEvent.getChannel(), taskInstance, workflowExecuteRunnable);
+                needToSendEvent =
+                    handleWorkerRejectEvent(taskEvent.getChannel(), taskInstance, workflowExecuteRunnable);
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
+        }
+        if (!needToSendEvent) {
+            logger.info("Handle task event: {} success, there is no need to send a StateEvent", taskEvent);
+            return;
         }
 
         StateEvent stateEvent = new StateEvent();
@@ -157,101 +164,101 @@ public class TaskExecuteRunnable implements Runnable {
     /**
      * handle dispatch event
      */
-    private void handleDispatchEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
+    private boolean handleDispatchEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
         if (!taskInstanceOptional.isPresent()) {
             logger.error("taskInstance is null");
-            return;
+            return false;
         }
         TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
-            return;
+            return false;
         }
         taskInstance.setState(ExecutionStatus.DISPATCH);
         taskInstance.setHost(taskEvent.getWorkerAddress());
         processService.saveTaskInstance(taskInstance);
+        return true;
     }
 
     /**
      * handle running event
      */
-    private void handleRunningEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
+    private boolean handleRunningEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
         Channel channel = taskEvent.getChannel();
-        try {
-            if (taskInstanceOptional.isPresent()) {
-                TaskInstance taskInstance = taskInstanceOptional.get();
-                if (taskInstance.getState().typeIsFinished()) {
-                    logger.warn("task is finish, running event is meaningless, taskInstanceId:{}, state:{}", taskInstance.getId(), taskInstance.getState());
-                } else {
-                    taskInstance.setState(taskEvent.getState());
-                    taskInstance.setStartTime(taskEvent.getStartTime());
-                    taskInstance.setHost(taskEvent.getWorkerAddress());
-                    taskInstance.setLogPath(taskEvent.getLogPath());
-                    taskInstance.setExecutePath(taskEvent.getExecutePath());
-                    taskInstance.setPid(taskEvent.getProcessId());
-                    taskInstance.setAppLink(taskEvent.getAppIds());
-                    processService.saveTaskInstance(taskInstance);
-                }
-            }
-            // if taskInstance is null (maybe deleted) or finish. retry will be meaningless . so ack success
-            // send ack to worker
-            TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
-            channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
-        } catch (Exception e) {
-            logger.error("handle worker ack master error", e);
-            TaskExecuteRunningAckCommand taskExecuteRunningAckCommand = new TaskExecuteRunningAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
-            channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
-        }
-    }
-
-    /**
-     * handle result event
-     */
-    private void handleResultEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
-        Channel channel = taskEvent.getChannel();
-        try {
-            if (taskInstanceOptional.isPresent()) {
-                TaskInstance taskInstance = taskInstanceOptional.get();
-                dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
-
+        if (taskInstanceOptional.isPresent()) {
+            TaskInstance taskInstance = taskInstanceOptional.get();
+            if (taskInstance.getState().typeIsFinished()) {
+                logger.warn("task is finish, running event is meaningless, taskInstanceId:{}, state:{}",
+                    taskInstance.getId(),
+                    taskInstance.getState());
+                return false;
+            } else {
+                taskInstance.setState(taskEvent.getState());
                 taskInstance.setStartTime(taskEvent.getStartTime());
                 taskInstance.setHost(taskEvent.getWorkerAddress());
                 taskInstance.setLogPath(taskEvent.getLogPath());
                 taskInstance.setExecutePath(taskEvent.getExecutePath());
                 taskInstance.setPid(taskEvent.getProcessId());
                 taskInstance.setAppLink(taskEvent.getAppIds());
-                taskInstance.setState(taskEvent.getState());
-                taskInstance.setEndTime(taskEvent.getEndTime());
-                taskInstance.setVarPool(taskEvent.getVarPool());
-                processService.changeOutParam(taskInstance);
                 processService.saveTaskInstance(taskInstance);
             }
-            // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
-            TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
-            channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
-        } catch (Exception e) {
-            logger.error("handle worker response master error", e);
-            TaskExecuteResponseAckCommand taskExecuteResponseAckCommand = new TaskExecuteResponseAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
-            channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
         }
+        // if taskInstance is null (maybe deleted) or finish. retry will be meaningless . so ack success
+        // send ack to worker
+        TaskExecuteRunningAckCommand taskExecuteRunningAckCommand =
+            new TaskExecuteRunningAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
+        channel.writeAndFlush(taskExecuteRunningAckCommand.convert2Command());
+        return true;
     }
 
     /**
      * handle result event
      */
-    private void handleWorkerRejectEvent(Channel channel, Optional<TaskInstance> taskInstanceOptional, WorkflowExecuteRunnable executeThread) {
-        TaskInstance taskInstance = taskInstanceOptional.orElseThrow(() -> new RuntimeException("taskInstance is null"));
-        try {
-            if (executeThread != null) {
-                executeThread.resubmit(taskInstance.getTaskCode());
+    private boolean handleResultEvent(TaskEvent taskEvent, Optional<TaskInstance> taskInstanceOptional) {
+        Channel channel = taskEvent.getChannel();
+        if (taskInstanceOptional.isPresent()) {
+            TaskInstance taskInstance = taskInstanceOptional.get();
+            if (taskInstance.getState().typeIsFinished()) {
+                logger.warn("The current taskInstance has already been finished, taskEvent: {}", taskEvent);
+                return false;
             }
-            if (channel != null) {
-                TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.SUCCESS.getCode(), taskInstance.getId());
-                channel.writeAndFlush(taskRecallAckCommand.convert2Command());
-            }
-        } catch (Exception e) {
-            logger.error("handle worker reject error", e);
-            TaskRecallAckCommand taskRecallAckCommand = new TaskRecallAckCommand(ExecutionStatus.FAILURE.getCode(), taskInstance.getId());
+
+            dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
+
+            taskInstance.setStartTime(taskEvent.getStartTime());
+            taskInstance.setHost(taskEvent.getWorkerAddress());
+            taskInstance.setLogPath(taskEvent.getLogPath());
+            taskInstance.setExecutePath(taskEvent.getExecutePath());
+            taskInstance.setPid(taskEvent.getProcessId());
+            taskInstance.setAppLink(taskEvent.getAppIds());
+            taskInstance.setState(taskEvent.getState());
+            taskInstance.setEndTime(taskEvent.getEndTime());
+            taskInstance.setVarPool(taskEvent.getVarPool());
+            processService.changeOutParam(taskInstance);
+            processService.saveTaskInstance(taskInstance);
+        }
+        // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
+        TaskExecuteResponseAckCommand taskExecuteResponseAckCommand =
+            new TaskExecuteResponseAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
+        channel.writeAndFlush(taskExecuteResponseAckCommand.convert2Command());
+        return true;
+    }
+
+    /**
+     * handle result event
+     */
+    private boolean handleWorkerRejectEvent(Channel channel,
+                                            Optional<TaskInstance> taskInstanceOptional,
+                                            WorkflowExecuteRunnable executeThread) throws Exception {
+        TaskInstance taskInstance =
+            taskInstanceOptional.orElseThrow(() -> new RuntimeException("taskInstance is null"));
+        if (executeThread != null) {
+            executeThread.resubmit(taskInstance.getTaskCode());
+        }
+        if (channel != null) {
+            TaskRecallAckCommand taskRecallAckCommand =
+                new TaskRecallAckCommand(ExecutionStatus.SUCCESS.getCode(), taskInstance.getId());
             channel.writeAndFlush(taskRecallAckCommand.convert2Command());
         }
+        return true;
     }
 }
