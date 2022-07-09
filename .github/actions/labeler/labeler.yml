@@ -19,13 +19,26 @@ Python:
   - any: ['dolphinscheduler-python/**/*']
 
 backend:
-  - any: ['dolphinscheduler-alert/**/*', 'dolphinscheduler-api/**/*', 'dolphinscheduler-common/**/*']
-  - any: ['dolphinscheduler-dao/**/*', 'dolphinscheduler-data-quality/**/*', 'dolphinscheduler-datasource-plugin/**/*']
-  - any: ['dolphinscheduler-dist/**/*', 'dolphinscheduler-log-server/**/*', 'dolphinscheduler-master/**/*']
-  - any: ['dolphinscheduler-registry/**/*', 'dolphinscheduler-remote/**/*', 'dolphinscheduler-scheduler-plugin/**/*']
-  - any: ['dolphinscheduler-server/**/*', 'dolphinscheduler-service/**/*', 'dolphinscheduler-spi/**/*']
-  - any: ['dolphinscheduler-standalone-server/**/*', 'dolphinscheduler-task-plugin/**/*', 'dolphinscheduler-tools/**/*']
-  - any: ['dolphinscheduler-worker/**/*', 'script/**/*']
+  - 'dolphinscheduler-alert/**/*'
+  - 'dolphinscheduler-api/**/*'
+  - 'dolphinscheduler-common/**/*'
+  - 'dolphinscheduler-dao/**/*'
+  - 'dolphinscheduler-data-quality/**/*'
+  - 'dolphinscheduler-datasource-plugin/**/*'
+  - 'dolphinscheduler-dist/**/*'
+  - 'dolphinscheduler-log-server/**/*'
+  - 'dolphinscheduler-master/**/*'
+  - 'dolphinscheduler-registry/**/*'
+  - 'dolphinscheduler-remote/**/*'
+  - 'dolphinscheduler-scheduler-plugin/**/*'
+  - 'dolphinscheduler-server/**/*'
+  - 'dolphinscheduler-service/**/*'
+  - 'dolphinscheduler-spi/**/*'
+  - 'dolphinscheduler-standalone-server/**/*'
+  - 'dolphinscheduler-task-plugin/**/*'
+  - 'dolphinscheduler-tools/**/*'
+  - 'dolphinscheduler-worker/**/*'
+  - 'script/**/*'
 
 document:
   - any: ['docs/**/*']
