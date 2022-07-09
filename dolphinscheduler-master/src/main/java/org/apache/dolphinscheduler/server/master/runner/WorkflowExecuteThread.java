@@ -720,7 +720,9 @@ public class WorkflowExecuteThread {
             return false;
         }
 
-        if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+        // when the serial complement is executed, the next complement instance is created,
+        // and this method does not need to be executed when the parallel complement is used.
+        if (processInstance.getState() == ExecutionStatus.READY_STOP || !processInstance.getState().typeIsFinished()) {
             return false;
         }
 
