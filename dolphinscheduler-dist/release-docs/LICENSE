@@ -342,9 +342,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     snakeyaml 1.28: https://mvnrepository.com/artifact/org.yaml/snakeyaml/1.28, Apache 2.0
     snappy 0.2: https://mvnrepository.com/artifact/org.iq80.snappy/snappy/0.2, Apache 2.0
     snappy-java 1.0.4.1: https://github.com/xerial/snappy-java, Apache 2.0
-    SparseBitSet 1.2: https://mvnrepository.com/artifact/com.zaxxer/SparseBitSet, Apache 2.0
+    SparseBitSet 1.2: https://mvnrepository.com/artifact/com.zaxxer/SparseBitSet/1.2, Apache 2.0
     spring-aop 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-aop/5.3.12, Apache 2.0
-    spring-beans 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-beans/5.3.12, Apache 2.0
+    spring-beans 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-beans/5.3.19, Apache 2.0
     spring-boot 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot/2.5.6, Apache 2.0
     spring-boot-actuator 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator/2.5.6, Apache 2.0
     spring-boot-actuator-autoconfigure 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator-autoconfigure/2.5.6, Apache 2.0
@@ -360,22 +360,22 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-boot-starter-quartz 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz/2.5.6, Apache 2.0
     spring-boot-starter-web 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.5.6, Apache 2.0
     spring-boot-starter-cache 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache/2.5.6, Apache 2.0
-    spring-context 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.12, Apache 2.0
+    spring-context 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.19, Apache 2.0
     spring-context-support 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.12, Apache 2.0
-    spring-core 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-core, Apache 2.0
-    spring-expression 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-expression, Apache 2.0
-    springfox-core 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-core, Apache 2.0
-    springfox-schema 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-schema, Apache 2.0
-    springfox-spi 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-spi, Apache 2.0
+    spring-core 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.19, Apache 2.0
+    spring-expression 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-expression/5.3.12, Apache 2.0
+    springfox-core 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-core/2.9.2, Apache 2.0
+    springfox-schema 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-schema/2.9.2, Apache 2.0
+    springfox-spi 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-spi/2.9.2, Apache 2.0
     springfox-spring-web 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-spring-web/2.9.2, Apache 2.0
     springfox-swagger2 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-swagger2/2.9.2, Apache 2.0
     springfox-swagger-common 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-swagger-common/2.9.2, Apache 2.0
     springfox-swagger-ui 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui/2.9.2, Apache 2.0
     spring-jcl 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-jcl/5.3.12, Apache 2.0
-    spring-jdbc 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-jdbc/5.3.12, Apache 2.0
+    spring-jdbc 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-jdbc/5.3.19, Apache 2.0
     spring-plugin-core 1.2.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core/1.2.0.RELEASE, Apache 2.0
     spring-plugin-metadata 1.2.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-metadata/1.2.0.RELEASE, Apache 2.0
-    spring-tx 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.12, Apache 2.0
+    spring-tx 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.19, Apache 2.0
     spring-web 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-web/5.3.12, Apache 2.0
     spring-webmvc 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.3.12, Apache 2.0
     swagger-annotations 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/1.5.20, Apache 2.0
