@@ -22,8 +22,6 @@ on:
     paths:
       - 'dolphinscheduler-python/**'
   pull_request:
-    paths:
-      - 'dolphinscheduler-python/**'
 
 concurrency:
   group: py-${{ github.event.pull_request.number || github.ref }}
@@ -38,9 +36,27 @@ env:
   DEPENDENCES: pip setuptools wheel tox
 
 jobs:
+  paths-filter:
+    name: Python-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-docs: ${{ steps.filter.outputs.not-docs }}
+      py-change: ${{ steps.filter.outputs.py-change }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-docs:
+              - '!(docs/**)'
+            py-change:
+              - 'dolphinscheduler-python/pydolphinscheduler'
   lint:
     name: Lint
+    if: ${{ (needs.paths-filter.outputs.py-change == 'true') || (github.event_name == 'push') }}
     timeout-minutes: 15
+    needs: paths-filter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -112,14 +128,12 @@ jobs:
       - name: Run Tests Build Docs
         run: |
           python -m tox -vv -e local-ci
-  build-image:
-    name: Build Image
+  integrate-test:
+    name: Integrate Test
+    if: ${{ (needs.paths-filter.outputs.not-docs == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
-    # Switch to project root directory to run mvnw command
-    defaults:
-      run:
-        working-directory: ./
-    timeout-minutes: 20
+    needs: paths-filter
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
         with:
@@ -134,7 +148,9 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
+      # Switch to project root directory to run mvnw command
       - name: Build Image
+        working-directory: ./
         run: |
           ./mvnw -B clean install \
           -Dmaven.test.skip \
@@ -142,32 +158,6 @@ jobs:
           -Dcheckstyle.skip=true \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
-      - name: Export Docker Images
-        run: |
-          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
-          && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v2
-        name: Upload Docker Images
-        with:
-          name: standalone-image
-          path: /tmp/standalone-image.tar
-          retention-days: 1
-  integrate-test:
-    name: Integrate Test
-    timeout-minutes: 20
-    needs:
-      - build-image
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        name: Download Docker Images
-        with:
-          name: standalone-image
-          path: /tmp
-      - name: Load Docker Images
-        run: |
-          docker load -i /tmp/standalone-image.tar
       - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
@@ -178,3 +168,26 @@ jobs:
       - name: Run Tests Build Docs
         run: |
           python -m tox -vv -e integrate-test
+  result:
+    name: Python
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ paths-filter, local-ci, integrate-test ]
+    if: always()
+    steps:
+      - name: Status
+        # We need change CWD to current directory to avoid global default working directory not exists
+        working-directory: ./
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-docs }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Only document change, skip both python unit and integrate test!"
+            exit 0
+          fi
+          if [[ ${{ needs.paths-filter.outputs.py-change }} == 'false' && ${{ needs.integrate-test.result }} == 'success' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "No python code change, and integrate test pass!"
+            exit 0
+          fi
+          if [[ ${{ needs.integrate-test.result }} != 'success' || ${{ needs.local-ci.result }} != 'success' ]]; then
+            echo "py-ci Failed!"
+            exit -1
+          fi
