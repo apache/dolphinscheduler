@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.api.test.base;
 
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.projects.project.ProjectPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.projects.workflow.WorkFlowPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
 
 public interface IPageAPIFactory {
@@ -25,5 +27,9 @@ public interface IPageAPIFactory {
     TenantPageAPI createTenantPageAPI();
 
     LoginPageAPI createLoginPageAPI();
+
+    ProjectPageAPI createProjectPageAPI();
+
+    WorkFlowPageAPI createWorkFlowPageAPI();
 
 }

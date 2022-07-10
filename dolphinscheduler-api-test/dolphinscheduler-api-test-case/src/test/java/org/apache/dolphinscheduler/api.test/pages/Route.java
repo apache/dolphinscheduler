@@ -20,6 +20,10 @@ package org.apache.dolphinscheduler.api.test.pages;
 public class Route {
     private static final String SEPARATE = "/";
 
+    /**
+     * login page api
+     */
+
     public static String login() {
         return "/login";
     }
@@ -27,6 +31,10 @@ public class Route {
     public static String loginOut() {
         return "/signOut";
     }
+
+    /**
+     * tenants
+     */
 
     public static String tenants() {
         return "/tenants";
@@ -44,6 +52,10 @@ public class Route {
         return "/tenants/verify-code";
     }
 
+    /**
+     * token page api
+     */
+
     public static String accessTokens() {
         return "/access-tokens";
     }
@@ -59,6 +71,10 @@ public class Route {
     public static String generateAccessToken() {
         return accessTokens() + "/generate";
     }
+
+    /**
+     * project page api
+     */
 
     public static String projects() {
         return "/projects";
@@ -88,24 +104,45 @@ public class Route {
         return projects() + "/code";
     }
 
-    public static String saveWorkFlowRelation(int projectCode) {
+    /**
+     * workflow relation page api
+     */
+
+    public static String saveWorkFlowRelation(String projectCode) {
         return projects() + SEPARATE + projectCode + SEPARATE + "process-task-relation";
     }
 
-    public static String deleteWorkFlowEdge(int projectCode, int processDefinitionCode, int preTaskCode, int postTaskCode) {
+    public static String deleteWorkFlowEdge(String projectCode, int processDefinitionCode, int preTaskCode, int postTaskCode) {
         return saveWorkFlowRelation(projectCode) + SEPARATE + processDefinitionCode + SEPARATE + preTaskCode + SEPARATE + postTaskCode;
     }
 
-    public static String deleteWorkFlowRelation(int projectCode, int taskCode) {
+    public static String deleteWorkFlowRelation(String projectCode, int taskCode) {
         return saveWorkFlowRelation(projectCode) + SEPARATE + "process-task-relation" + SEPARATE + taskCode;
     }
 
-    public static String queryWorkFlowDownstreamRelation(int projectCode, int taskCode) {
+    public static String queryWorkFlowDownstreamRelation(String projectCode, int taskCode) {
         return deleteWorkFlowRelation(projectCode, taskCode) + SEPARATE + "/downstream";
     }
 
-    public static String queryWorkFlowUpstreamRelation(int projectCode, int taskCode) {
+    public static String queryWorkFlowUpstreamRelation(String projectCode, int taskCode) {
         return deleteWorkFlowRelation(projectCode, taskCode) + SEPARATE + "/upstream";
     }
+
+    /*
+     * workflow definition page api
+     */
+
+    public static String workFlowDefinition(String projectCode) {
+        return projects() + SEPARATE + projectCode + SEPARATE + "process-definition";
+    }
+
+    public static String workFlowDefinition(String projectCode, String workFlowDefinitionCode) {
+        return workFlowDefinition(projectCode) + SEPARATE + workFlowDefinitionCode + SEPARATE + "release";
+    }
+
+    public static String workFlowRun(String projectCode) {
+        return projects() + SEPARATE + projectCode + SEPARATE + "/executors/start-process-instance";
+    }
+
 
 }

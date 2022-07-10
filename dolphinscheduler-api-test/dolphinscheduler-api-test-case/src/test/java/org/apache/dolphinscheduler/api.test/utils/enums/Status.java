@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.utils;
+package org.apache.dolphinscheduler.api.test.utils.enums;
 
 import java.util.Optional;
 

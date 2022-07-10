@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
+import org.apache.dolphinscheduler.api.test.utils.enums.Status;
+
 import java.text.MessageFormat;
 
 public class Result<T> {
