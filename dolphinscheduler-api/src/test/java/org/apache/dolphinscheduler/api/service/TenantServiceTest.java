@@ -166,10 +166,17 @@ public class TenantServiceTest {
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
 
+        // update not exists tenant
         Throwable exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc));
         Assertions.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
 
+        // success
         Map<String, Object> result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // success update with same tenant code
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
