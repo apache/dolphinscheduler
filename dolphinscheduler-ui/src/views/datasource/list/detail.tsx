@@ -32,7 +32,6 @@ import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import { useForm, datasourceType, datasourceTypeList } from './use-form'
 import { useDetail } from './use-detail'
-import { IDataBase } from './types'
 
 const props = {
   show: {
