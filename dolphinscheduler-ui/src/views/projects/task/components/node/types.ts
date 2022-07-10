@@ -295,6 +295,7 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  stepsDefineJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
   noteId?: string

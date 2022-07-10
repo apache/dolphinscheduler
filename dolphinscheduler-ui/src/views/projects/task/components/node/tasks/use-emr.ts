@@ -44,6 +44,7 @@ export function useEmr({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
+    programType: 'ADD_JOB_FLOW_STEPS',
     timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
