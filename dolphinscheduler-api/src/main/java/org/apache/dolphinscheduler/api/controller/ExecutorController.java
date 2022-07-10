@@ -368,9 +368,9 @@ public class ExecutorController extends BaseController {
     /**
      * query execute data of processInstance from master
      */
-    @ApiOperation(value = "queryExecuteData", notes = "QUERY_PROCESS_INSTANCE_EXECUTE_DATA")
+    @ApiOperation(value = "queryExecutingWorkflow", notes = "QUERY_WORKFLOW_EXECUTE_DATA")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "subId", value = "SUB_PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/query-executing-workflow")
     @ResponseStatus(HttpStatus.OK)
