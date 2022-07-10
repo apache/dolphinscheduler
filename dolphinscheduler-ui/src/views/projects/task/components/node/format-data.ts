@@ -321,7 +321,9 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'EMR') {
     taskParams.type = data.type
+    taskParams.programType = data.programType
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
+    taskParams.stepsDefineJson = data.stepsDefineJson
   }
 
   if (data.taskType === 'ZEPPELIN') {
