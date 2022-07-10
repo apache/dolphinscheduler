@@ -17,11 +17,17 @@
 
 package org.apache.dolphinscheduler.remote.processor;
 
+import static org.apache.dolphinscheduler.common.Constants.HTTP_CONNECTION_REQUEST_TIMEOUT;
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.util.Optional;
@@ -111,17 +117,6 @@ public class StateEventCallbackService {
     }
 
     /**
-     * Send the command to target address, this method doesn't guarantee the command send success.
-     *
-     * @param command command need tp send
-     */
-    public void sendResult(String address, int port, Command command) {
-        logger.info("send result, host:{}, command:{}", address, command.toString());
-        Host host = new Host(address, port);
-        sendResult(host, command);
-    }
-
-    /**
      * Send the command to target host, this method doesn't guarantee the command send success.
      *
      * @param host    target host
@@ -132,5 +127,24 @@ public class StateEventCallbackService {
         newRemoteChannel(host).ifPresent(nettyRemoteChannel -> {
             nettyRemoteChannel.writeAndFlush(command);
         });
+    }
+
+    /**
+     * send sync and return response command
+     * @param host
+     * @param requestCommand
+     * @return
+     * @throws RemotingException
+     * @throws InterruptedException
+     */
+    public Command sendSync(Host host, Command requestCommand) {
+        try {
+            return this.nettyRemotingClient.sendSync(host, requestCommand, HTTP_CONNECTION_REQUEST_TIMEOUT);
+        } catch (InterruptedException | RemotingException e) {
+            logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
+        } finally {
+            this.nettyRemotingClient.closeChannel(host);
+        }
+        return null;
     }
 }

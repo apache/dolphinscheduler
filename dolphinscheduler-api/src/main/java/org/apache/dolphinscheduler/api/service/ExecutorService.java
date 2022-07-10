@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import java.util.Map;
 
@@ -111,4 +113,11 @@ public interface ExecutorService {
      * @return
      */
     Map<String, Object> forceStartTaskInstance(User loginUser, int queueId);
+
+    /**
+     * query executing workflow data in Master memory
+     * @param processInstanceId
+     * @return
+     */
+    WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
 }
