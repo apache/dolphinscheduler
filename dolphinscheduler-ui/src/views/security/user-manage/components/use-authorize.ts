@@ -17,7 +17,8 @@
 import { reactive } from 'vue'
 import {
   queryAuthorizedProject,
-  queryUnauthorizedProject
+  queryUnauthorizedProject,
+  queryProjectWithAuthorizedLevel
 } from '@/service/modules/projects'
 import {
   authedDatasource,
@@ -41,12 +42,17 @@ import {
   grantNamespaceFunc
 } from '@/service/modules/users'
 import utils from '@/utils'
-import type { TAuthType, IResourceOption, IOption } from '../types'
+import type { TAuthType, IResourceOption, IOption, IRecord } from '../types'
+import type {ProjectList} from '../../../../service/modules/projects/types'
+import { parseTime } from '@/common/common'
+import { format } from 'date-fns'
 
 export function useAuthorize() {
   const state = reactive({
     saving: false,
     loading: false,
+    currentRecord: {} as IRecord | null,
+    projectWithAuthorizedLevel: [],
     authorizedProjects: [] as number[],
     unauthorizedProjects: [] as IOption[],
     authorizedDatasources: [] as number[],
@@ -62,23 +68,39 @@ export function useAuthorize() {
     authorizedUdfResources: [] as number[]
   })
 
+  const onOperationClick = (
+    data: { rowData: IRecord; key?: TAuthType },
+    type: 'authorize' | 'edit' | 'delete'
+  ) => {
+    // state.currentRecord = data.rowData
+    // if (type === 'edit') {
+    //   state.detailModalShow = true
+    // }
+    // if (type === 'authorize' && data.key) {
+    //   state.authorizeModalShow = true
+    //   state.authorizeType = data.key
+    // }
+  }
+
   const getProjects = async (userId: number) => {
     if (state.loading) return
     state.loading = true
-    const projects = await Promise.all([
-      queryAuthorizedProject({ userId }),
-      queryUnauthorizedProject({ userId })
-    ])
+    
+    const projectsList = await queryProjectWithAuthorizedLevel({
+      userId
+    })
     state.loading = false
-    state.authorizedProjects = projects[0].map(
-      (item: { name: string; id: number }) => item.id
-    )
-    state.unauthorizedProjects = [...projects[0], ...projects[1]].map(
-      (item: { name: string; id: number }) => ({
-        label: item.name,
-        value: item.id
-      })
-    )
+    if (!projectsList) throw Error()
+    state.projectWithAuthorizedLevel = projectsList.map((record: ProjectList) => {
+      record.createTime = record.createTime
+        ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')
+        : ''
+      record.updateTime = record.updateTime
+        ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
+        : ''
+      return record
+    })
+    
   }
 
   const getDatasources = async (userId: number) => {
@@ -281,5 +303,5 @@ export function useAuthorize() {
     return true
   }
 
-  return { state, onInit, onSave }
+  return { state, onInit, onSave, onOperationClick }
 }

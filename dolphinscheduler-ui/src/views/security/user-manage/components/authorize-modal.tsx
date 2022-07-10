@@ -18,16 +18,22 @@
 import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
+  NInput,
+  NButton,
+  NIcon,
   NTransfer,
   NSpace,
   NRadioGroup,
   NRadioButton,
-  NTreeSelect
+  NTreeSelect,
+  NDataTable
 } from 'naive-ui'
 import { useAuthorize } from './use-authorize'
 import Modal from '@/components/modal'
 import styles from '../index.module.scss'
 import type { TAuthType } from '../types'
+import { useColumns } from './use-columns'
+import { SearchOutlined } from '@vicons/antd'
 
 const props = {
   show: {
@@ -50,7 +56,7 @@ export const AuthorizeModal = defineComponent({
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave } = useAuthorize()
+    const { state, onInit, onSave, onOperationClick } = useAuthorize()
     const onCancel = () => {
       ctx.emit('cancel')
     }
@@ -58,6 +64,8 @@ export const AuthorizeModal = defineComponent({
       const result = await onSave(props.type, props.userId)
       if (result) onCancel()
     }
+    // 新增部分
+    const { columnsRef } = useColumns(onOperationClick)
 
     watch(
       () => props.show,
@@ -70,6 +78,7 @@ export const AuthorizeModal = defineComponent({
 
     return {
       t,
+      columnsRef,
       ...toRefs(state),
       onCancel,
       onConfirm
@@ -88,7 +97,7 @@ export const AuthorizeModal = defineComponent({
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
       >
-        {type === 'authorize_project' && (
+        {/* {type === 'authorize_project' && (
           <NTransfer
             virtualScroll
             options={this.unauthorizedProjects}
@@ -96,6 +105,43 @@ export const AuthorizeModal = defineComponent({
             v-model={[this.authorizedProjects, 'value']}
             class={styles.transfer}
           />
+        )} */}
+        {type === 'authorize_project' && (
+
+          <NSpace vertical>
+            <NSpace>
+              <NButton size='small' type='primary' >
+                撤销权限
+              </NButton>
+              <NButton size='small' type='primary' >
+                授予读权限
+              </NButton>
+              <NButton size='small' type='primary' >
+                授予读写权限
+              </NButton>
+              <NInput
+                size='small'
+                // v-model={[this.searchVal, 'value']}s
+                placeholder={t('project.list.project_tips')}
+                clearable
+              />
+              {/* <NButton size='small' type='primary' onClick={this.handleSearch}> */}
+              <NButton size='small' type='primary' >
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
+            </NSpace>
+          <NDataTable
+            virtualScroll
+            row-class-name='items'
+            columns={this.columnsRef.columns}
+            data={this.projectWithAuthorizedLevel}
+            loading={this.loading}
+            // scrollX={this.columnsRef.tableWidth}
+            max-height="250"
+          />
+          </NSpace>
         )}
         {type === 'authorize_datasource' && (
           <NTransfer
