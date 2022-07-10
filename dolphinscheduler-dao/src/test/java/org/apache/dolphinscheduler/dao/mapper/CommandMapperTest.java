@@ -161,7 +161,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
 
-        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectCodeArray);
+        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime, projectCodeArray);
 
         assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
     }

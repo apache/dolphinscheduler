@@ -283,15 +283,15 @@ public class DataAnalysisServiceTest {
         CommandCount commandCount = new CommandCount();
         commandCount.setCommandType(CommandType.START_PROCESS);
         commandCounts.add(commandCount);
-        Mockito.when(commandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
-        Mockito.when(errorCommandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
+        Mockito.when(commandMapper.countCommandState(null, null, new Long[]{1L})).thenReturn(commandCounts);
+        Mockito.when(errorCommandMapper.countCommandState(null, null, new Long[]{1L})).thenReturn(commandCounts);
 
         Map<String, Object> result = dataAnalysisServiceImpl.countCommandState(user);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         // when no command found then return all count are 0
-        Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
-        Mockito.when(errorCommandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
+        Mockito.when(commandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());
+        Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1, serviceLogger)).thenReturn(projectIds());
 
         Map<String, Object> result5 = dataAnalysisServiceImpl.countCommandState(user);
@@ -306,8 +306,8 @@ public class DataAnalysisServiceTest {
         CommandCount errorCommandCount = new CommandCount();
         errorCommandCount.setCommandType(CommandType.START_PROCESS);
         errorCommandCount.setCount(5);
-        Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.singletonList(normalCommandCount));
-        Mockito.when(errorCommandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.singletonList(errorCommandCount));
+        Mockito.when(commandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.singletonList(normalCommandCount));
+        Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.singletonList(errorCommandCount));
 
         Map<String, Object> result6 = dataAnalysisServiceImpl.countCommandState(user);
 
