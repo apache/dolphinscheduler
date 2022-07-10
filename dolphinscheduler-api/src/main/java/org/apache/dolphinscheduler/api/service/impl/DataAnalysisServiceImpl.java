@@ -258,15 +258,13 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return result;
         }
         Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
-        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
-
         // count normal command state
-        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(userId, start, end, projectCodeArray)
+        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
-        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(userId, start, end, projectCodeArray)
+        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
