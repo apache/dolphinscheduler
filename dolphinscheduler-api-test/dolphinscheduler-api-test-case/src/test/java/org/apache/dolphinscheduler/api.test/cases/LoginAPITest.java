@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.test.core.extensions.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.login.entity.LoginRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.login.entity.LoginResponseEntity;
-import org.apache.dolphinscheduler.api.test.utils.Status;
+import org.apache.dolphinscheduler.api.test.utils.enums.Status;
 
 import java.util.stream.Stream;
 

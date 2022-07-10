@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.test.pages;
 
 import org.apache.dolphinscheduler.api.test.base.IPageAPIFactory;
 import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.projects.project.ProjectPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.projects.workflow.WorkFlowPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
 
 import io.restassured.specification.RequestSpecification;
@@ -40,6 +42,16 @@ public class PageAPIFactory implements IPageAPIFactory {
     @Override
     public LoginPageAPI createLoginPageAPI() {
         return new LoginPageAPI();
+    }
+
+    @Override
+    public ProjectPageAPI createProjectPageAPI() {
+        return new ProjectPageAPI(reqSpec, sessionId);
+    }
+
+    @Override
+    public WorkFlowPageAPI createWorkFlowPageAPI() {
+        return new WorkFlowPageAPI(reqSpec, sessionId);
     }
 
 }
