@@ -72,6 +72,27 @@ public class Tenant {
      */
     private Date updateTime;
 
+    public Tenant() {
+    }
+
+    public Tenant(String tenantCode, String description, int queueId) {
+        Date now = new Date();
+        this.tenantCode = tenantCode;
+        this.description = description;
+        this.queueId = queueId;
+        this.createTime = now;
+        this.updateTime = now;
+    }
+
+    public Tenant(int id, String tenantCode, String description, int queueId) {
+        Date now = new Date();
+        this.id = id;
+        this.tenantCode = tenantCode;
+        this.description = description;
+        this.queueId = queueId;
+        this.createTime = now;
+        this.updateTime = now;
+    }
 
     public int getId() {
         return id;
