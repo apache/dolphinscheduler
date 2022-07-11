@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.test.cases;
 
 import org.apache.dolphinscheduler.api.test.base.AbstractAPITest;
