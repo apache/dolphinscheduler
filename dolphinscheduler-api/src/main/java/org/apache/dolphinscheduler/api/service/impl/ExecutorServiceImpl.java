@@ -985,14 +985,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return remove duplicate date list
      */
     private String removeDuplicates(String scheduleTimeList) {
-        HashSet<String> removeDate = new HashSet<String>();
-        List<String> resultList = new ArrayList<String>();
         if (StringUtils.isNotEmpty(scheduleTimeList)) {
-            String[] dateArrays = scheduleTimeList.split(COMMA);
-            List<String> dateList = Arrays.asList(dateArrays);
-            removeDate.addAll(dateList);
-            resultList.addAll(removeDate);
-            return String.join(COMMA, resultList);
+            Set<String> dateSet  = Arrays.stream(scheduleTimeList.split(COMMA)).map(String::trim).collect(Collectors.toSet());
+            return String.join(COMMA, dateSet);
         }
         return null;
     }

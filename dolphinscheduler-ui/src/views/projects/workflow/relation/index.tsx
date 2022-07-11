@@ -79,6 +79,7 @@ const workflowRelation = defineComponent({
                 <Graph
                   seriesData={this.seriesData}
                   labelShow={this.labelShow}
+                  links={this.links}
                 />
               ),
             'header-extra': () => (

@@ -17,28 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.emr;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
-import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
-
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.HashSet;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.amazonaws.SdkBaseException;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
-import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
 import com.amazonaws.services.elasticmapreduce.model.ClusterState;
 import com.amazonaws.services.elasticmapreduce.model.ClusterStateChangeReason;
 import com.amazonaws.services.elasticmapreduce.model.ClusterStateChangeReasonCode;
@@ -50,23 +35,9 @@ import com.amazonaws.services.elasticmapreduce.model.RunJobFlowResult;
 import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsRequest;
 import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.google.common.collect.Sets;
 
-public class EmrTask extends AbstractTaskExecutor {
-
-    /**
-     * taskExecutionContext
-     */
-    private final TaskExecutionContext taskExecutionContext;
-    /**
-     * emr parameters
-     */
-    private EmrParameters emrParameters;
-    private AmazonElasticMapReduce emrClient;
-
-    private String clusterId;
+public class EmrJobFlowTask extends AbstractEmrTask {
 
     private final HashSet<String> waitingStateSet = Sets.newHashSet(
         ClusterState.STARTING.toString(),
@@ -75,39 +46,12 @@ public class EmrTask extends AbstractTaskExecutor {
     );
 
     /**
-     * config ObjectMapper features and propertyNamingStrategy
-     * use UpperCamelCaseStrategy support capital letters parse
-     * @see PropertyNamingStrategy.UpperCamelCaseStrategy
-     */
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-        .setTimeZone(TimeZone.getDefault())
-        .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
-
-    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
      */
-    protected EmrTask(TaskExecutionContext taskExecutionContext) {
-
+    protected EmrJobFlowTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.taskExecutionContext = taskExecutionContext;
-    }
-
-    @Override
-    public void init() {
-
-        final String taskParams = taskExecutionContext.getTaskParams();
-        logger.info("emr task params:{}", taskParams);
-        emrParameters = JSONUtils.parseObject(taskParams, EmrParameters.class);
-        if (emrParameters == null || !emrParameters.checkParameters()) {
-            throw new EmrTaskException("emr task params is not valid");
-        }
-        emrClient = createEmrClient();
     }
 
     @Override
@@ -120,7 +64,7 @@ public class EmrTask extends AbstractTaskExecutor {
             RunJobFlowResult result = emrClient.runJobFlow(runJobFlowRequest);
 
             clusterId = result.getJobFlowId();
-            // TODO: Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
+            // Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
             setAppIds(clusterId);
 
             clusterStatus = getClusterStatus();
@@ -197,30 +141,6 @@ public class EmrTask extends AbstractTaskExecutor {
         logger.info("emr cluster [clusterId:{}] running with status:{}", clusterId, clusterStatus);
         return clusterStatus;
 
-    }
-
-    @Override
-    public AbstractParameters getParameters() {
-        return emrParameters;
-    }
-
-    /**
-     * create emr client from BasicAWSCredentials
-     *
-     * @return AmazonElasticMapReduce
-     */
-    private AmazonElasticMapReduce createEmrClient() {
-
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
-        final BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
-        final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
-        // create an EMR client
-        return AmazonElasticMapReduceClientBuilder.standard()
-            .withCredentials(awsCredentialsProvider)
-            .withRegion(awsRegion)
-            .build();
     }
 
     @Override
