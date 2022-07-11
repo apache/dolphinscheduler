@@ -136,9 +136,13 @@ public class StateEventCallbackService {
     public Command sendSync(Host host, Command requestCommand) {
         try {
             return this.nettyRemotingClient.sendSync(host, requestCommand, HTTP_CONNECTION_REQUEST_TIMEOUT);
-        } catch (InterruptedException | RemotingException e) {
+        } catch (InterruptedException e) {
             logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
-        } finally {
+            Thread.currentThread().interrupt();
+        } catch (RemotingException e) {
+            logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
+        }
+        finally {
             this.nettyRemotingClient.closeChannel(host);
         }
         return null;
