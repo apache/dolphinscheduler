@@ -566,6 +566,9 @@ public class PythonGateway {
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
+        if (!fullName.startsWith("/")) {
+            fullName = "/" + fullName;
+        }
         String resourceSuffix = fullName.substring(fullName.indexOf(".") + 1);
         String fileNameWithSuffix = fullName.substring(fullName.lastIndexOf("/") + 1);
         String resourceDir = fullName.replace(fileNameWithSuffix, "");

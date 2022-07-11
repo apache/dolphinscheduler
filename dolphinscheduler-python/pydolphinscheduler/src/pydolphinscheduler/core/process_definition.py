@@ -416,7 +416,7 @@ class ProcessDefinition(Base):
         if len(self.resource_list) > 0:
             for res in self.resource_list:
                 gateway.entry_point.createOrUpdateResource(
-                    self.user,
+                    self._user,
                     res.name,
                     res.description,
                     res.content,
