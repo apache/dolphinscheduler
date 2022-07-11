@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.master.controller;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/workflow-execute")
+@RequestMapping("/workflow/execute")
 public class WorkflowExecuteController {
 
     @Autowired
@@ -37,12 +39,13 @@ public class WorkflowExecuteController {
 
     /**
      * query workflow execute data in memory
-     * @param id
+     * @param processInstanceId
      * @return
      */
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public WorkflowExecuteDto queryExecuteData(@RequestParam("id") int id) {
-        return executingService.queryWorkflowExecutingData(id);
+    public WorkflowExecuteDto queryExecuteData(@RequestParam("id") int processInstanceId) {
+        Optional<WorkflowExecuteDto> workflowExecuteDtoOptional = executingService.queryWorkflowExecutingData(processInstanceId);
+        return workflowExecuteDtoOptional.orElse(null);
     }
 }

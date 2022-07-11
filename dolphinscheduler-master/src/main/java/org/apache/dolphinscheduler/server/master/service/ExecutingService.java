@@ -30,6 +30,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +48,11 @@ public class ExecutingService {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    public WorkflowExecuteDto queryWorkflowExecutingData(Integer processInstanceId) {
+    public Optional<WorkflowExecuteDto> queryWorkflowExecutingData(Integer processInstanceId) {
         WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             logger.info("workflow execute data not found, maybe it has finished, workflow id:{}", processInstanceId);
-            return null;
+            return Optional.empty();
         }
         try {
             WorkflowExecuteDto workflowExecuteDto = new WorkflowExecuteDto();
@@ -65,10 +66,10 @@ public class ExecutingService {
                 }
             }
             workflowExecuteDto.setTaskInstances(taskInstanceList);
-            return workflowExecuteDto;
+            return Optional.of(workflowExecuteDto);
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("query workflow execute data fail, workflow id:{}", processInstanceId, e);
         }
-        return null;
+        return Optional.empty();
     }
 }

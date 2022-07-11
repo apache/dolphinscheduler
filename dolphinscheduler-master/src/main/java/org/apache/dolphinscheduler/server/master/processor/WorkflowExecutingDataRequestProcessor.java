@@ -35,6 +35,8 @@ import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 
+import java.util.Optional;
+
 /**
  * workflow executing data process from api/master
  */
@@ -54,11 +56,10 @@ public class WorkflowExecutingDataRequestProcessor implements NettyRequestProces
 
         logger.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
 
-        WorkflowExecuteDto workflowExecuteDto = executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
+        Optional<WorkflowExecuteDto> workflowExecuteDtoOptional = executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
 
         WorkflowExecutingDataResponseCommand responseCommand = new WorkflowExecutingDataResponseCommand();
-        responseCommand.setWorkflowExecuteDto(workflowExecuteDto);
-
+        workflowExecuteDtoOptional.ifPresent(responseCommand::setWorkflowExecuteDto);
         channel.writeAndFlush(responseCommand.convert2Command(command.getOpaque()));
     }
 }

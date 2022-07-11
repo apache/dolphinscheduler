@@ -24,11 +24,9 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import java.util.Date;
 import java.util.Map;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class TaskInstanceExecuteDto {
 
     private int id;
