@@ -40,23 +40,17 @@ public class WorkerServerMetrics {
             .description("full worker submit queues count")
             .register(Metrics.globalRegistry);
 
-    private static final Counter WORKER_RESOURCE_DOWNLOAD_COUNTER =
+    private static final Counter WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER =
             Counter.builder("ds.worker.resource.download.count")
-                    .description("worker resource download count")
+                    .tag("status", "success")
+                    .description("worker resource download success count")
                     .register(Metrics.globalRegistry);
 
-//    private static final Counter WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER =
-//            Counter.builder("ds.worker.resource.download.count")
-//                    .tag("status", "success")
-//                    .description("worker resource download success count")
-//                    .register(Metrics.globalRegistry);
-//
-//    private static final Counter WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER =
-//            Counter.builder("ds.worker.resource.download.count")
-//                    .tag("status", "fail")
-//                    .description("worker resource download failure count")
-//                    .register(Metrics.globalRegistry);
-
+    private static final Counter WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER =
+            Counter.builder("ds.worker.resource.download.count")
+                    .tag("status", "fail")
+                    .description("worker resource download failure count")
+                    .register(Metrics.globalRegistry);
 
     private static final Timer WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER =
             Timer.builder("ds.worker.resource.download.duration")
@@ -81,15 +75,13 @@ public class WorkerServerMetrics {
         WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
     }
 
-    public static void incWorkerResourceDownloadCountByStatus(final String status) {
-        Metrics.globalRegistry.counter("ds.worker.resource.download.count", "status", status).increment();
+    public static void incWorkerResourceDownloadSuccessCount() {
+        WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER.increment();
     }
 
-//    public static void incWorkerResourceDownloadSuccessCount() {
-//        WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER.increment();
-//    }
-
-//    public static void incWorkerResourceDownloadFailureCount() { WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER.increment(); }
+    public static void incWorkerResourceDownloadFailureCount() {
+        WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER.increment();
+    }
 
     public static void recordWorkerResourceDownloadTime(final long milliseconds) {
         WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);

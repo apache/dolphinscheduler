@@ -172,7 +172,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": false
       },
-      "pluginVersion": "9.0.0-beta2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -488,7 +488,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.0-beta2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -544,7 +544,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.0.0-beta2",
+      "pluginVersion": "8.5.3",
       "targets": [
         {
           "datasource": {
@@ -599,7 +599,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.0.0-beta2",
+      "pluginVersion": "8.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -699,7 +699,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.0.0-beta2",
+      "pluginVersion": "8.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -851,7 +851,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_worker_resource_download_success_count_total{}[5m]))",
+          "expr": "increase(ds_worker_resource_download_count_total{status=\"success\"}[5m])",
           "hide": false,
           "refId": "B"
         },
@@ -860,7 +860,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_worker_resource_download_failure_count_total{}[5m]))",
+          "expr": "increase(ds_worker_resource_download_count_total{status=\"fail\"}[5m])",
           "hide": false,
           "refId": "C"
         }
@@ -1121,7 +1121,7 @@
       "legend": {
         "show": false
       },
-      "pluginVersion": "9.0.0-beta2",
+      "pluginVersion": "8.5.3",
       "reverseYBuckets": false,
       "targets": [
         {
@@ -1964,7 +1964,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
+  "refresh": "30s",
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -1979,6 +1979,6 @@
   "timezone": "",
   "title": "Worker",
   "uid": "6wXtd3r7k",
-  "version": 1,
+  "version": 7,
   "weekStart": ""
 }
