@@ -244,15 +244,4 @@ public class FileUtils {
         }
     }
 
-    /**
-     * Get file size in Byte
-     *
-     * @param filename String type of filename
-     * @return file size in Byte
-     */
-    public static long getFileSizeInByte(String filename) {
-        File file = new File(filename);
-        return file.length();
-    }
-
 }

@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredEx
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -48,7 +47,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -284,7 +285,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                 WorkerServerMetrics.recordWorkerResourceDownloadSize(
-                        FileUtils.getFileSizeInByte(execLocalPath + File.separator + fullName));
+                        Files.size(Paths.get(execLocalPath, fullName)));
                 WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
             } catch (Exception e) {
                 WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
