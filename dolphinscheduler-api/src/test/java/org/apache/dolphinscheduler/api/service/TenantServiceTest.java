@@ -175,7 +175,6 @@ public class TenantServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         // success update with same tenant code
-        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
