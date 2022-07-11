@@ -251,7 +251,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return file size in KB
      */
-    public static double getFileSizeInKB(String filename){
+    public static double getFileSizeInKB(String filename) {
         File file = new File(filename);
         return ((double) file.length()) / ONE_KB;
     }
