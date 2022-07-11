@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
-import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
+import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -59,7 +59,7 @@ public class MasterServer implements IStoppable {
     private TaskPluginManager taskPluginManager;
 
     @Autowired
-    private MasterSchedulerService masterSchedulerService;
+    private MasterSchedulerBootstrap masterSchedulerBootstrap;
 
     @Autowired
     private Scheduler scheduler;
@@ -94,8 +94,8 @@ public class MasterServer implements IStoppable {
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.masterSchedulerService.init();
-        this.masterSchedulerService.start();
+        this.masterSchedulerBootstrap.init();
+        this.masterSchedulerBootstrap.start();
 
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
@@ -129,7 +129,7 @@ public class MasterServer implements IStoppable {
             // thread sleep 3 seconds for thread quietly stop
             ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
             // close
-            this.masterSchedulerService.close();
+            this.masterSchedulerBootstrap.close();
             this.masterRPCServer.close();
             this.masterRegistryClient.closeRegistry();
             // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.

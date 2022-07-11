@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
-import org.apache.dolphinscheduler.common.enums.Event;
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -227,7 +227,7 @@ public class TaskCallbackService {
     public void sendTaskExecuteRunningCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteRunningCommand command = buildTaskExecuteRunningCommand(taskExecutionContext);
         // add response cache
-        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), command.convert2Command(), Event.RUNNING);
+        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), command.convert2Command(), TaskEventType.RUNNING);
         send(taskExecutionContext.getTaskInstanceId(), command.convert2Command());
     }
 
@@ -247,7 +247,7 @@ public class TaskCallbackService {
     public void sendTaskExecuteResponseCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteResponseCommand command = buildTaskExecuteResponseCommand(taskExecutionContext);
         // add response cache
-        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), command.convert2Command(), Event.RESULT);
+        ResponseCache.get().cache(taskExecutionContext.getTaskInstanceId(), command.convert2Command(), TaskEventType.RESULT);
         send(taskExecutionContext.getTaskInstanceId(), command.convert2Command());
     }
 

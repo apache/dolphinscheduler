@@ -1250,8 +1250,8 @@ public class ProcessServiceImpl implements ProcessService {
                     break;
                 }
                 logger.error(
-                    "task commit to db failed , taskId {} has already retry {} times, please check the database",
-                    taskInstance.getId(),
+                    "task commit to db failed , taskCode: {} has already retry {} times, please check the database",
+                    taskInstance.getTaskCode(),
                     retryTimes);
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
@@ -1264,6 +1264,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
+     * // todo: This method need to refactor, we find when the db down, but the taskInstanceId is not 0. It's better to change to void, rather than return TaskInstance
      * submit task to db
      * submit sub process to command
      *
@@ -1283,7 +1284,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (task == null) {
             logger.error("Save taskInstance to db error, task name:{}, process id:{} state: {} ",
                          taskInstance.getName(),
-                         taskInstance.getProcessInstance(),
+                         taskInstance.getProcessInstance().getId(),
                          processInstance.getState());
             return null;
         }
@@ -1294,8 +1295,8 @@ public class ProcessServiceImpl implements ProcessService {
 
         logger.info(
             "End save taskInstance to db successfully:{}, taskInstanceName: {}, taskInstance state:{}, processInstanceId:{}, processInstanceState: {}",
-            taskInstance.getId(),
-            taskInstance.getName(),
+            task.getId(),
+            task.getName(),
             task.getState(),
             processInstance.getId(),
             processInstance.getState());
@@ -1524,7 +1525,10 @@ public class ProcessServiceImpl implements ProcessService {
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.typeIsFinished() || processInstanceState == ExecutionStatus.READY_STOP) {
-            logger.warn("processInstance {} was {}, skip submit task", processInstance.getProcessDefinitionCode(), processInstanceState);
+            logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
+                        processInstance.getId(),
+                        processInstanceState,
+                        taskInstance.getTaskCode());
             return null;
         }
         if (processInstanceState == ExecutionStatus.READY_PAUSE) {
