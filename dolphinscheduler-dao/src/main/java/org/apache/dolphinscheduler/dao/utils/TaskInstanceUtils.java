@@ -72,8 +72,6 @@ public class TaskInstanceUtils {
         target.setDelayTime(source.getDelayTime());
         target.setDryRun(source.getDryRun());
         target.setTaskGroupId(source.getTaskGroupId());
-        target.setCpuQuota(source.getCpuQuota());
-        target.setMemoryMax(source.getMemoryMax());
     }
 
 }
