@@ -617,6 +617,10 @@ export default {
     zeppelin_paragraph_id: 'zeppelinParagraphId',
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
+    zeppelin_parameters: 'parameters',
+    zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
+    zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+    zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',
