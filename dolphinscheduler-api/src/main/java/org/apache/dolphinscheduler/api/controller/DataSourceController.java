@@ -339,7 +339,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
-        return success(Status.SUCCESS.getMsg(), true);
+        return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
 
     @ApiOperation(value = "tables", notes = "GET_DATASOURCE_TABLES_NOTES")
