@@ -36,6 +36,7 @@ import {
 } from '@/service/modules/k8s-namespace'
 import {
   grantProject,
+  grantProjectWithReadPerm,
   grantResource,
   grantDataSource,
   grantUDFFunc,
@@ -131,6 +132,19 @@ export function useAuthorize() {
       projectIds: projectIds
     })
     // if (!res) throw Error()
+    console.log('res', res)
+    await getProjects(userId)
+  }
+
+  const grantProjectWithReadPermRequest = async (userId: number, projectIds: string) => {
+    // if (state.loading) return
+    // state.loading = true
+    const res = await grantProjectWithReadPerm({
+      userId,
+      projectIds: projectIds
+    })
+    // if (!res) throw Error()
+    console.log('res', res)
     await getProjects(userId)
   }
 
@@ -334,5 +348,5 @@ export function useAuthorize() {
     return true
   }
 
-  return { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest }
+  return { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest }
 }

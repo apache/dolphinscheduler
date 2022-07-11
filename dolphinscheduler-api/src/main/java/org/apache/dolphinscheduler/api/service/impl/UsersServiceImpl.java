@@ -571,6 +571,51 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if(resourcePermissionCheckService.functionDisabled()){
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        //check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        projectUserMapper.deleteProjectRelation(0, userId);
+
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            return result;
+        }
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            Date now = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setPerm(Constants.READ_PERMISSION);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+        });
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
      * grant project
      *
      * @param loginUser  login user

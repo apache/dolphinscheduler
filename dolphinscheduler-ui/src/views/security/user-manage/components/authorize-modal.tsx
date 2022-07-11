@@ -56,7 +56,7 @@ export const AuthorizeModal = defineComponent({
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest } = useAuthorize()
+    const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest } = useAuthorize()
     console.log('state', state.pagination)
     const onCancel = () => {
       ctx.emit('cancel')
@@ -93,7 +93,8 @@ export const AuthorizeModal = defineComponent({
       getProjects,
       revokeProjectByIdRequest,
       handleCheck,
-      grantProjectRequest
+      grantProjectRequest,
+      grantProjectWithReadPermRequest
     }
   },
   render(props: { type: TAuthType, userId: number }) {
@@ -125,7 +126,7 @@ export const AuthorizeModal = defineComponent({
               <NButton size='small' type='primary' onClick={() => this.revokeProjectByIdRequest(userId, projectIds)}>
                 撤销权限
               </NButton>
-              <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, projectIds)}>
+              <NButton size='small' type='primary' onClick={() => this.grantProjectWithReadPermRequest(userId, projectIds)}>
                 授予读权限
               </NButton>
               <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, projectIds)}>

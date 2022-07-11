@@ -101,15 +101,17 @@ export function useColumns(onCallback: Function) {
         ...COLUMN_WIDTH_CONFIG['checkbox']
       },
       {
-        title: 'project-name',
+        title: t('project.list.project_name'),
         key: 'name',
+        ...COLUMN_WIDTH_CONFIG['size']
       },
       {
         title: '权限等级',
         key: 'perm',
         render: (record: any):any => {
           return PERM_LIST.filter(item => item.value == record.perm).map(item => item.label)
-        }
+        },
+        ...COLUMN_WIDTH_CONFIG['index']
       }
       // 下面是尝试实现的单选版本
       // {
@@ -150,78 +152,6 @@ export function useColumns(onCallback: Function) {
       //     })
       //   }
       // },
-
-      // 下面是原有的按钮实现
-      // {
-      //   title: t('project.list.operation'),
-      //   key: 'actions',
-      //   ...COLUMN_WIDTH_CONFIG['operation'](2),
-      //   render(row: any) {
-      //     return h(NSpace, null, {
-      //       default: () => [
-      //         h(
-      //           NTooltip,
-      //           {},
-      //           {
-      //             trigger: () =>
-      //               h(
-      //                 NButton,
-      //                 {
-      //                   circle: true,
-      //                   type: 'info',
-      //                   size: 'small',
-      //                   class: 'edit',
-      //                   onClick: () => {
-      //                     // handleEdit(row)
-      //                   }
-      //                 },
-      //                 {
-      //                   icon: () =>
-      //                     h(NIcon, null, { default: () => h(EditOutlined) })
-      //                 }
-      //               ),
-      //             default: () => t('project.list.edit')
-      //           }
-      //         ),
-      //         h(
-      //           NPopconfirm,
-      //           {
-      //             onPositiveClick: () => {
-      //               // handleDelete(row)
-      //             }
-      //           },
-      //           {
-      //             trigger: () =>
-      //               h(
-      //                 NTooltip,
-      //                 {},
-      //                 {
-      //                   trigger: () =>
-      //                     h(
-      //                       NButton,
-      //                       {
-      //                         circle: true,
-      //                         type: 'error',
-      //                         size: 'small',
-      //                         class: 'delete'
-      //                       },
-      //                       {
-      //                         icon: () =>
-      //                           h(NIcon, null, {
-      //                             default: () => h(DeleteOutlined)
-      //                           })
-      //                       }
-      //                     ),
-      //                   default: () => t('project.list.delete')
-      //                 }
-      //               ),
-      //             default: () => t('project.list.delete_confirm')
-      //           }
-      //         )
-      //       ]
-      //     })
-      //   }
-      // }
     ]
     columnsRef.value = {
       columns,

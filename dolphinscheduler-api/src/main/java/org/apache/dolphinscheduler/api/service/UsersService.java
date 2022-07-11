@@ -152,6 +152,15 @@ public interface UsersService {
      */
     Map<String, Object> grantProject(User loginUser, int userId, String projectIds);
 
+    /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds);
 
     /**
      * grant project by code

@@ -240,6 +240,30 @@ public class UsersController extends BaseController {
     }
 
     /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @ApiOperation(value = "grantProjectWithReadPerm", notes = "GRANT_PROJECT_WITH_READ_PERM_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS", required = true, type = "String")
+    })
+    @PostMapping(value = "/grant-project-with-read-perm")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_PROJECT_ERROR)
+    @AccessLogAnnotation
+    public Result grantProjectWithReadPerm(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                               @RequestParam(value = "userId") int userId,
+                               @RequestParam(value = "projectIds") String projectIds) {
+        Map<String, Object> result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        return returnDataList(result);
+    }
+
+    /**
      * grant project
      *
      * @param loginUser login user
