@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NInput,
@@ -49,14 +49,15 @@ const props = {
     default: 'auth_project'
   }
 }
-
+let projectIds: string
 export const AuthorizeModal = defineComponent({
   name: 'authorize-project-modal',
   props,
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave, onOperationClick } = useAuthorize()
+    const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest } = useAuthorize()
+    console.log('state', state.pagination)
     const onCancel = () => {
       ctx.emit('cancel')
     }
@@ -64,9 +65,15 @@ export const AuthorizeModal = defineComponent({
       const result = await onSave(props.type, props.userId)
       if (result) onCancel()
     }
+
     // 新增部分
     const { columnsRef } = useColumns(onOperationClick)
-
+    // const checkedRowKeysRef = ref<any[]>([])
+    const handleCheck = (rowKeys: Array<number>) => {
+      console.log('rowKeys', rowKeys)
+      projectIds = rowKeys.join()
+      // checkedRowKeysRef.value = rowKeys
+    }
     watch(
       () => props.show,
       () => {
@@ -79,14 +86,19 @@ export const AuthorizeModal = defineComponent({
     return {
       t,
       columnsRef,
+      rowKey: (row: any) => row.id,
       ...toRefs(state),
       onCancel,
-      onConfirm
+      onConfirm,
+      getProjects,
+      revokeProjectByIdRequest,
+      handleCheck,
+      grantProjectRequest
     }
   },
-  render(props: { type: TAuthType }) {
+  render(props: { type: TAuthType, userId: number }) {
     const { t } = this
-    const { type } = props
+    const { type, userId } = props
     return (
       <Modal
         show={this.show}
@@ -110,13 +122,13 @@ export const AuthorizeModal = defineComponent({
 
           <NSpace vertical>
             <NSpace>
-              <NButton size='small' type='primary' >
+              <NButton size='small' type='primary' onClick={() => this.revokeProjectByIdRequest(userId, projectIds)}>
                 撤销权限
               </NButton>
-              <NButton size='small' type='primary' >
+              <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, projectIds)}>
                 授予读权限
               </NButton>
-              <NButton size='small' type='primary' >
+              <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, projectIds)}>
                 授予读写权限
               </NButton>
               <NInput
@@ -124,9 +136,10 @@ export const AuthorizeModal = defineComponent({
                 // v-model={[this.searchVal, 'value']}s
                 placeholder={t('project.list.project_tips')}
                 clearable
+                v-model:value={this.searchVal}
               />
               {/* <NButton size='small' type='primary' onClick={this.handleSearch}> */}
-              <NButton size='small' type='primary' >
+              <NButton size='small' type='primary' onClick={() => this.getProjects(userId)}>
                 <NIcon>
                   <SearchOutlined />
                 </NIcon>
@@ -139,7 +152,10 @@ export const AuthorizeModal = defineComponent({
             data={this.projectWithAuthorizedLevel}
             loading={this.loading}
             // scrollX={this.columnsRef.tableWidth}
+            pagination={this.pagination}
             max-height="250"
+            row-key={this.rowKey}
+            on-update:checked-row-keys={this.handleCheck}
           />
           </NSpace>
         )}

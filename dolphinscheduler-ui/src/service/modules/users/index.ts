@@ -97,6 +97,14 @@ export function grantResource(data: GrantResourceReq) {
   })
 }
 
+export function revokeProjectById(data: GrantProject) {
+  return axios({
+    url: '/users/revoke-project-by-id',
+    method: 'post',
+    data
+  })
+}
+
 export function grantProject(data: GrantProject) {
   return axios({
     url: '/users/grant-project',

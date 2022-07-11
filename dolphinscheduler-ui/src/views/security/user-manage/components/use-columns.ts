@@ -28,7 +28,8 @@ import {
   NTag,
   NDropdown,
   NPopconfirm,
-  NRadio
+  NRadio,
+  NText
 } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
 import {
@@ -37,6 +38,23 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { TableColumns, InternalRowData } from '../types'
+import { absolute } from '@antv/x6/lib/registry/port-layout/absolute'
+
+const PERM_LIST = [
+  {
+    label: '无权限',
+    value: 0
+  },
+  {
+    label: '读权限',
+    value: 2
+  },
+  {
+    label: '读写权限',
+    value: 7
+  }
+]
+  
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
@@ -52,29 +70,47 @@ export function useColumns(onCallback: Function) {
 
   const createColumns = () => {
     const columns = [
+      // {
+      //   //加上type之后xx
+      //   type: 'selection',
+      //   key: 'selection',
+      //   ...COLUMN_WIDTH_CONFIG['checkbox']
+      // },
+      // {
+      //   title: '#',
+      //   key: 'id',
+      //   // render: (unused: any, index: number) => index + 1,
+      //   ...COLUMN_WIDTH_CONFIG['index']
+      // },
+      // {
+      //   title: t('project.list.project_name'),
+      //   key: 'name',
+      //   className: 'project-name',
+      //   ...COLUMN_WIDTH_CONFIG['size'],
+      // },
+      // {
+      //   // title: t('project.list.perm'),
+      //   title: '权限等级',
+      //   key: 'perm',
+      //   ...COLUMN_WIDTH_CONFIG['index'],
+      // },
       {
+        //加上type之后xx
         type: 'selection',
         key: 'selection',
         ...COLUMN_WIDTH_CONFIG['checkbox']
       },
       {
-        title: '#',
-        key: 'id',
-        // render: (unused: any, index: number) => index + 1,
-        ...COLUMN_WIDTH_CONFIG['index']
-      },
-      {
-        title: t('project.list.project_name'),
+        title: 'project-name',
         key: 'name',
-        className: 'project-name',
-        ...COLUMN_WIDTH_CONFIG['size'],
       },
       {
-        // title: t('project.list.perm'),
         title: '权限等级',
         key: 'perm',
-        ...COLUMN_WIDTH_CONFIG['index'],
-      },
+        render: (record: any):any => {
+          return PERM_LIST.filter(item => item.value == record.perm).map(item => item.label)
+        }
+      }
       // 下面是尝试实现的单选版本
       // {
       //   title: t('project.list.operation'),

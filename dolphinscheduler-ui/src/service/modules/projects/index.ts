@@ -26,6 +26,14 @@ export function queryProjectListPaging(params: ListReq): any {
   })
 }
 
+export function queryProjectWithAuthorizedLevelListPaging(params: any): any {
+  return axios({
+    url: '/projects/project-with-authorized-level-list-paging',
+    method: 'get',
+    params
+  })
+}
+
 export function createProject(data: ProjectsReq): any {
   return axios({
     url: '/projects',

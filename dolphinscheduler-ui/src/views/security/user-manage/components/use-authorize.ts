@@ -18,7 +18,7 @@ import { reactive } from 'vue'
 import {
   queryAuthorizedProject,
   queryUnauthorizedProject,
-  queryProjectWithAuthorizedLevel
+  queryProjectWithAuthorizedLevelListPaging
 } from '@/service/modules/projects'
 import {
   authedDatasource,
@@ -39,7 +39,8 @@ import {
   grantResource,
   grantDataSource,
   grantUDFFunc,
-  grantNamespaceFunc
+  grantNamespaceFunc,
+  revokeProjectById,
 } from '@/service/modules/users'
 import utils from '@/utils'
 import type { TAuthType, IResourceOption, IOption, IRecord } from '../types'
@@ -65,7 +66,11 @@ export function useAuthorize() {
     fileResources: [] as IResourceOption[],
     udfResources: [] as IResourceOption[],
     authorizedFileResources: [] as number[],
-    authorizedUdfResources: [] as number[]
+    authorizedUdfResources: [] as number[],
+    pagination: {
+      pageSize: 5,
+    },
+    searchVal: '',
   })
 
   const onOperationClick = (
@@ -86,21 +91,47 @@ export function useAuthorize() {
     if (state.loading) return
     state.loading = true
     
-    const projectsList = await queryProjectWithAuthorizedLevel({
-      userId
+    const projectsList = await queryProjectWithAuthorizedLevelListPaging({
+      userId,
+      searchVal: state.searchVal,
+      pageSize: 10,
+      pageNo: 1
     })
     state.loading = false
     if (!projectsList) throw Error()
-    state.projectWithAuthorizedLevel = projectsList.map((record: ProjectList) => {
-      record.createTime = record.createTime
-        ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')
-        : ''
-      record.updateTime = record.updateTime
-        ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
-        : ''
-      return record
-    })
+    // state.projectWithAuthorizedLevel = projectsList.map((record: ProjectList) => {
+    //   record.createTime = record.createTime
+    //     ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')
+    //     : ''
+    //   record.updateTime = record.updateTime
+    //     ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
+    //     : ''
+    //   return record
+    // })
+    state.projectWithAuthorizedLevel = projectsList.totalList
+    return state.projectWithAuthorizedLevel
     
+  }
+
+  const revokeProjectByIdRequest = async (userId: number, projectIds: string) => {
+    const res = await revokeProjectById({
+      userId,
+      projectIds: projectIds
+    })
+    // if (!res) throw Error()
+    console.log('res', res)
+    await getProjects(userId)
+  }
+
+  const grantProjectRequest = async (userId: number, projectIds: string) => {
+    // if (state.loading) return
+    // state.loading = true
+    const res = await grantProject({
+      userId,
+      projectIds: projectIds
+    })
+    // if (!res) throw Error()
+    await getProjects(userId)
   }
 
   const getDatasources = async (userId: number) => {
@@ -303,5 +334,5 @@ export function useAuthorize() {
     return true
   }
 
-  return { state, onInit, onSave, onOperationClick }
+  return { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest }
 }
