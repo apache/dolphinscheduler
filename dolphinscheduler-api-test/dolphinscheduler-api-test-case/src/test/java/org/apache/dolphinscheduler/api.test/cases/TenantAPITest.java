@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantR
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantResponseEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
-import org.apache.dolphinscheduler.api.test.utils.Status;
+import org.apache.dolphinscheduler.api.test.utils.enums.Status;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -68,7 +68,6 @@ public class TenantAPITest extends AbstractAPITest {
     @Order(2)
     public void testUpdateTenant() {
         TenantRequestEntity tenantUpdateEntity = tenantRequestEntity;
-        tenantUpdateEntity.setTenantCode(tenant);
         tenantUpdateEntity.setQueueId(1);
         tenantUpdateEntity.setDescription(fairy.person().getMobileTelephoneNumber());
         tenantPageAPI.updateTenant(tenantUpdateEntity, tenantResponseEntity.getId()).isResponseSuccessful();
