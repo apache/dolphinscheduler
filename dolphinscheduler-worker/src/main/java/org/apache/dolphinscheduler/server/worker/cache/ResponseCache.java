@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.cache;
 
-import org.apache.dolphinscheduler.common.enums.Event;
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.remote.command.Command;
 
 import java.util.Map;
@@ -48,7 +48,7 @@ public class ResponseCache {
      * @param command command
      * @param event event ACK/RESULT
      */
-    public void cache(Integer taskInstanceId, Command command, Event event) {
+    public void cache(Integer taskInstanceId, Command command, TaskEventType event) {
         switch (event) {
             case RUNNING:
                 runningCache.put(taskInstanceId, command);

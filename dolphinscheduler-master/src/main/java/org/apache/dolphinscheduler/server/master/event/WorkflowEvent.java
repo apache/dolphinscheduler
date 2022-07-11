@@ -15,34 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.server.master.event;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public enum StateEventType {
+@Data
+@AllArgsConstructor
+public class WorkflowEvent {
 
-    PROCESS_STATE_CHANGE(0, "process state change"),
-    TASK_STATE_CHANGE(1, "task state change"),
-    PROCESS_TIMEOUT(2, "process timeout"),
-    TASK_TIMEOUT(3, "task timeout"),
-    WAIT_TASK_GROUP(4, "wait task group"),
-    TASK_RETRY(5, "task retry"),
-    PROCESS_BLOCKED(6, "process blocked");
+    private WorkflowEventType workflowEventType;
 
-    StateEventType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
+    private int workflowInstanceId;
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }

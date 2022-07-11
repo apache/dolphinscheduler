@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
