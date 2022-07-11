@@ -83,6 +83,7 @@ public class RetryReportTaskStatusThread extends BaseDaemonThread {
     private void retryRunningCommand(ResponseCache instance) {
         if (!instance.getRunningCache().isEmpty()) {
             Map<Integer, Command> runningCache = instance.getRunningCache();
+            logger.info("Send task running retry command starting, waiting to retry size: {}", runningCache.size());
             for (Map.Entry<Integer, Command> entry : runningCache.entrySet()) {
                 Integer taskInstanceId = entry.getKey();
                 Command runningCommand = entry.getValue();
@@ -92,12 +93,14 @@ public class RetryReportTaskStatusThread extends BaseDaemonThread {
                     logger.error("Retry send running command to master error, taskInstanceId: {}, command: {}", taskInstanceId, runningCommand);
                 }
             }
+            logger.info("Send task running retry command finished, waiting to retry size: {}", runningCache.size());
         }
     }
 
     private void retryResponseCommand(ResponseCache instance) {
-        if (!instance.getResponseCache().isEmpty()) {
-            Map<Integer, Command> responseCache = instance.getResponseCache();
+        Map<Integer, Command> responseCache = instance.getResponseCache();
+        if (!responseCache.isEmpty()) {
+            logger.info("Send task response retry command starting, waiting to retry size: {}", responseCache.size());
             for (Map.Entry<Integer, Command> entry : responseCache.entrySet()) {
                 Integer taskInstanceId = entry.getKey();
                 Command responseCommand = entry.getValue();
@@ -107,6 +110,7 @@ public class RetryReportTaskStatusThread extends BaseDaemonThread {
                     logger.error("Retry send response command to master error, taskInstanceId: {}, command: {}", taskInstanceId, responseCommand);
                 }
             }
+            logger.info("Send task response retry command finished, waiting to retry size: {}", responseCache.size());
         }
     }
 

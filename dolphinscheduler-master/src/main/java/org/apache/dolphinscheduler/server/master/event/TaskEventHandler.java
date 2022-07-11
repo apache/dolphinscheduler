@@ -15,34 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.server.master.event;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 
-public enum StateEventType {
+public interface TaskEventHandler {
 
-    PROCESS_STATE_CHANGE(0, "process state change"),
-    TASK_STATE_CHANGE(1, "task state change"),
-    PROCESS_TIMEOUT(2, "process timeout"),
-    TASK_TIMEOUT(3, "task timeout"),
-    WAIT_TASK_GROUP(4, "wait task group"),
-    TASK_RETRY(5, "task retry"),
-    PROCESS_BLOCKED(6, "process blocked");
+    /**
+     * Handle the task event
+     *
+     * @throws TaskEventHandleError     this exception means we will discord this event.
+     * @throws TaskEventHandleException this exception means we need to retry this event
+     */
+    void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError, TaskEventHandleException;
 
-    StateEventType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
+    TaskEventType getHandleEventType();
 }

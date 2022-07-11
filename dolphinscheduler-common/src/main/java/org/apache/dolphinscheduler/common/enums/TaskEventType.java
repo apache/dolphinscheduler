@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-public enum Event {
+public enum TaskEventType {
     DISPATCH,
     DELAY,
     RUNNING,

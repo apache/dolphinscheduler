@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import io.micrometer.core.annotation.Counted;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
@@ -32,6 +30,8 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+
+import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -51,7 +51,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -128,13 +127,15 @@ import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
+import org.apache.dolphinscheduler.service.cron.CronUtils;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -152,7 +153,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,6 +163,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
+
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -272,10 +274,12 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private CuringParamsService curingGlobalParamsService;
 
+    @Autowired
+    private ProcessService processService;
+
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
-     * @param logger  logger
      * @param host    host
      * @param command found command
      * @return process instance
@@ -405,7 +409,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return create result
      */
     @Override
-    @Counted("dolphinscheduler_create_command_count")
+    @Counted("ds.workflow.create.command.count")
     public int createCommand(Command command) {
         int result = 0;
         if (command != null) {
@@ -921,7 +925,8 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
 
-        processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
+        processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(),
+                                                       command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
             return null;
@@ -1021,6 +1026,7 @@ public class ProcessServiceImpl implements ProcessService {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
                 processInstance.setRecovery(Flag.YES);
+                processInstance.setRunTimes(runTime + 1);
                 runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:
@@ -1266,11 +1272,15 @@ public class ProcessServiceImpl implements ProcessService {
         while (retryTimes <= commitRetryTimes) {
             try {
                 // submit task to db
-                task = SpringApplicationContext.getBean(ProcessService.class).submitTask(processInstance, taskInstance);
+                // Only want to use transaction here
+                task = processService.submitTask(processInstance, taskInstance);
                 if (task != null && task.getId() != 0) {
                     break;
                 }
-                logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
+                logger.error(
+                    "task commit to db failed , taskCode: {} has already retry {} times, please check the database",
+                    taskInstance.getTaskCode(),
+                    retryTimes);
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
                 logger.error("task commit to db failed", e);
@@ -1281,6 +1291,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
+     * // todo: This method need to refactor, we find when the db down, but the taskInstanceId is not 0. It's better to change to void, rather than return TaskInstance
      * submit task to db
      * submit sub process to command
      *
@@ -1291,13 +1302,17 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     @Transactional
     public TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
-        logger.info("start submit task : {}, processInstance id:{}, state: {}",
-            taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
+        logger.info("Start save taskInstance to database : {}, processInstance id:{}, state: {}",
+                    taskInstance.getName(),
+                    taskInstance.getProcessInstanceId(),
+                    processInstance.getState());
         //submit to db
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
         if (task == null) {
-            logger.error("end submit task to db error, task name:{}, process id:{} state: {} ",
-                taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
+            logger.error("Save taskInstance to db error, task name:{}, process id:{} state: {} ",
+                         taskInstance.getName(),
+                         taskInstance.getProcessInstance().getId(),
+                         processInstance.getState());
             return null;
         }
 
@@ -1305,8 +1320,13 @@ public class ProcessServiceImpl implements ProcessService {
             createSubWorkProcess(processInstance, task);
         }
 
-        logger.info("end submit task to db successfully:{} {} state:{} complete, instance id:{} state: {}  ",
-            taskInstance.getId(), taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
+        logger.info(
+            "End save taskInstance to db successfully:{}, taskInstanceName: {}, taskInstance state:{}, processInstanceId:{}, processInstanceState: {}",
+            task.getId(),
+            task.getName(),
+            task.getState(),
+            processInstance.getId(),
+            processInstance.getState());
         return task;
     }
 
@@ -1538,7 +1558,10 @@ public class ProcessServiceImpl implements ProcessService {
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.typeIsFinished() || processInstanceState == ExecutionStatus.READY_STOP) {
-            logger.warn("processInstance {} was {}, skip submit task", processInstance.getProcessDefinitionCode(), processInstanceState);
+            logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
+                        processInstance.getId(),
+                        processInstanceState,
+                        taskInstance.getTaskCode());
             return null;
         }
         if (processInstanceState == ExecutionStatus.READY_PAUSE) {

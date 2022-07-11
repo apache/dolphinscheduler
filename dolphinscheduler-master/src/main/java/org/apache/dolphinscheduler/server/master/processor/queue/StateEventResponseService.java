@@ -41,9 +41,6 @@ import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
-/**
- * task manager
- */
 @Component
 public class StateEventResponseService {
 
@@ -96,7 +93,7 @@ public class StateEventResponseService {
     /**
      * put task to attemptQueue
      */
-    public void addResponse(StateEvent stateEvent) {
+    public void addStateChangeEvent(StateEvent stateEvent) {
         try {
             // check the event is validated
             eventQueue.put(stateEvent);
@@ -150,6 +147,7 @@ public class StateEventResponseService {
             }
 
             WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            // We will refresh the task instance status first, if the refresh failed the event will not be removed
             switch (stateEvent.getType()) {
                 case TASK_STATE_CHANGE:
                     workflowExecuteThread.refreshTaskInstance(stateEvent.getTaskInstanceId());
