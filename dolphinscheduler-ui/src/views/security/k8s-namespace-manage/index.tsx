@@ -115,13 +115,9 @@ const k8sNamespaceManage = defineComponent({
                 placeholder={t('security.k8s_namespace.search_tips')}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>
