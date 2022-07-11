@@ -82,6 +82,7 @@ public class QueueServiceTest {
     private static final String QUEUE_NAME = "queueName";
     private static final String EXISTS = "exists";
     private static final String NOT_EXISTS = "not_exists";
+    private static final String NOT_EXISTS_FINAL = "not_exists_final";
 
     @Before
     public void setUp() {
@@ -169,6 +170,16 @@ public class QueueServiceTest {
         //success
         Mockito.when(userMapper.existUser(Mockito.anyString())).thenReturn(false);
         Map<String, Object> result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS);
+        Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+
+        // success update with same queue name
+        Mockito.when(queueMapper.existQueue(NOT_EXISTS_FINAL, null)).thenReturn(false);
+        result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS_FINAL, NOT_EXISTS);
+        Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+
+        // success update with same queue value
+        Mockito.when(queueMapper.existQueue(null, NOT_EXISTS_FINAL)).thenReturn(false);
+        result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS_FINAL);
         Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
     }
 
