@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import java.util.Map;
 
