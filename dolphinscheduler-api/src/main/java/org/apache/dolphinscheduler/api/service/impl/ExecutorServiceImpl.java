@@ -64,6 +64,9 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
+import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
+import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
@@ -950,5 +953,27 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return String.join(COMMA, dateSet);
         }
         return null;
+    }
+
+    /**
+     * query executing data of processInstance by master
+     * @param processInstanceId
+     * @return
+     */
+    @Override
+    public WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
+        if (processInstance == null) {
+            return null;
+        }
+        Host host = new Host(processInstance.getHost());
+        WorkflowExecutingDataRequestCommand requestCommand = new WorkflowExecutingDataRequestCommand();
+        requestCommand.setProcessInstanceId(processInstanceId);
+        org.apache.dolphinscheduler.remote.command.Command command = stateEventCallbackService.sendSync(host, requestCommand.convert2Command());
+        if (command == null) {
+            return null;
+        }
+        WorkflowExecutingDataResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponseCommand.class);
+        return responseCommand.getWorkflowExecuteDto();
     }
 }

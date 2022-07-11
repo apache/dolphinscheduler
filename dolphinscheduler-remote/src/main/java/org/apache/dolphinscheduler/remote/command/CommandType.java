@@ -148,5 +148,15 @@ public enum CommandType {
     /**
      * task state event request
      */
-    TASK_WAKEUP_EVENT_REQUEST;
+    TASK_WAKEUP_EVENT_REQUEST,
+
+    /**
+     * workflow executing data request, from api to master
+     */
+    WORKFLOW_EXECUTING_DATA_REQUEST,
+
+    /**
+     * workflow executing data response, from master to api
+     */
+    WORKFLOW_EXECUTING_DATA_RESPONSE;
 }
