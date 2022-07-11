@@ -1,6 +1,9 @@
 package org.apache.dolphinscheduler.api.controller;
 
-import java.util.Map;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
@@ -13,6 +16,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +37,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
-
 /**
  * project controller
  */
@@ -50,7 +51,7 @@ public class ProjectV2Controller extends BaseController {
     /**
      * create project
      *
-     * @param loginUser   login user
+     * @param loginUser            login user
      * @param projectCreateRequest projectCreateRequest
      * @return ProjectResponse ProjectResponse
      */
@@ -62,15 +63,15 @@ public class ProjectV2Controller extends BaseController {
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestBody ProjectCreateRequest projectCreateRequest) {
         Map<String, Object> result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
-                projectCreateRequest.getDescription());
+            projectCreateRequest.getDescription());
         return new ProjectResponse(returnDataList(result));
     }
 
     /**
      * update project
      *
-     * @param loginUser login user
-     * @param code project code
+     * @param loginUser        login user
+     * @param code             project code
      * @param projectUpdateReq projectUpdateRequest
      * @return result Result
      */
@@ -83,7 +84,7 @@ public class ProjectV2Controller extends BaseController {
                                 @PathVariable("code") Long code,
                                 @RequestBody ProjectUpdateRequest projectUpdateReq) {
         Map<String, Object> result = projectService.update(loginUser, code, projectUpdateReq.getProjectName(),
-                projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
+            projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
         return returnDataList(result);
     }
 
@@ -91,12 +92,12 @@ public class ProjectV2Controller extends BaseController {
      * query project details by project code
      *
      * @param loginUser login user
-     * @param code project code
+     * @param code      project code
      * @return project detail information
      */
     @ApiOperation(value = "queryProjectByCode", notes = "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
     })
     @GetMapping(value = "/{code}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
@@ -111,7 +112,7 @@ public class ProjectV2Controller extends BaseController {
     /**
      * query project list paging
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param projectQueryReq projectQueryReq
      * @return project list which the login user have permission to see
      */
@@ -128,7 +129,7 @@ public class ProjectV2Controller extends BaseController {
         }
         String searchVal = ParameterUtils.handleEscapes(projectQueryReq.getSearchVal());
         result = projectService.queryProjectListPaging(loginUser, projectQueryReq.getPageSize(),
-                projectQueryReq.getPageNo(), searchVal);
+            projectQueryReq.getPageNo(), searchVal);
         return result;
     }
 }

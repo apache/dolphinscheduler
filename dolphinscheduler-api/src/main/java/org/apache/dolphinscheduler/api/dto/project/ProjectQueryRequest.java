@@ -1,9 +1,9 @@
 package org.apache.dolphinscheduler.api.dto.project;
 
+import org.apache.dolphinscheduler.api.dto.PageQueryDto;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import org.apache.dolphinscheduler.api.dto.PageQueryDto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
