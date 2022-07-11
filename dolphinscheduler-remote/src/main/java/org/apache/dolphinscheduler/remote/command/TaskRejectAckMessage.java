@@ -19,39 +19,28 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-/**
- * db task final result response command
- */
-public class StateEventResponseCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskRejectAckMessage extends BaseMessage {
 
-    private String key;
+    private int taskInstanceId;
     private int status;
 
-    public StateEventResponseCommand() {
-        super();
-    }
-
-    public StateEventResponseCommand(int status, String key) {
+    public TaskRejectAckMessage(int status,
+                                int taskInstanceId,
+                                String messageSenderAddress,
+                                String messageReceiverAddress,
+                                long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
         this.status = status;
-        this.key = key;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+        this.taskInstanceId = taskInstanceId;
     }
 
     /**
@@ -61,18 +50,10 @@ public class StateEventResponseCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
+        command.setType(CommandType.TASK_REJECT_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "StateEventResponseCommand{"
-                + "key=" + key
-                + ", status=" + status
-                + '}';
     }
 
 }

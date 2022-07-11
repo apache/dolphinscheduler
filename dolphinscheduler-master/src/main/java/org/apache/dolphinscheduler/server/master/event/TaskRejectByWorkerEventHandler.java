@@ -20,8 +20,9 @@ package org.apache.dolphinscheduler.server.master.event;
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskRecallAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRejectAckMessage;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
@@ -34,13 +35,16 @@ public class TaskRejectByWorkerEventHandler implements TaskEventHandler {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     @Override
     public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(
+            processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
@@ -65,9 +69,12 @@ public class TaskRejectByWorkerEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        TaskRecallAckCommand taskRecallAckCommand =
-            new TaskRecallAckCommand(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
-        taskEvent.getChannel().writeAndFlush(taskRecallAckCommand.convert2Command());
+        TaskRejectAckMessage taskRejectAckMessage = new TaskRejectAckMessage(ExecutionStatus.SUCCESS.getCode(),
+                                                                             taskEvent.getTaskInstanceId(),
+                                                                             masterConfig.getMasterAddress(),
+                                                                             taskEvent.getWorkerAddress(),
+                                                                             System.currentTimeMillis());
+        taskEvent.getChannel().writeAndFlush(taskRejectAckMessage.convert2Command());
     }
 
     @Override

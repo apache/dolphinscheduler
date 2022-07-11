@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningMessage;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -44,7 +44,7 @@ public class TaskAckProcessorTest {
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
     private TaskEventService taskEventService;
     private ProcessService processService;
-    private TaskExecuteRunningCommand taskExecuteRunningCommand;
+    private TaskExecuteRunningMessage taskExecuteRunningMessage;
     private TaskEvent taskResponseEvent;
     private Channel channel;
 
@@ -63,14 +63,16 @@ public class TaskAckProcessorTest {
         channel = PowerMockito.mock(Channel.class);
         taskResponseEvent = PowerMockito.mock(TaskEvent.class);
 
-        taskExecuteRunningCommand = new TaskExecuteRunningCommand();
-        taskExecuteRunningCommand.setStatus(1);
-        taskExecuteRunningCommand.setExecutePath("/dolphinscheduler/worker");
-        taskExecuteRunningCommand.setHost("localhost");
-        taskExecuteRunningCommand.setLogPath("/temp/worker.log");
-        taskExecuteRunningCommand.setStartTime(new Date());
-        taskExecuteRunningCommand.setTaskInstanceId(1);
-        taskExecuteRunningCommand.setProcessInstanceId(1);
+        taskExecuteRunningMessage = new TaskExecuteRunningMessage("127.0.0.1:5678",
+                                                                  " 127.0.0.1:1234",
+                                                                  System.currentTimeMillis());
+        taskExecuteRunningMessage.setStatus(1);
+        taskExecuteRunningMessage.setExecutePath("/dolphinscheduler/worker");
+        taskExecuteRunningMessage.setHost("localhost");
+        taskExecuteRunningMessage.setLogPath("/temp/worker.log");
+        taskExecuteRunningMessage.setStartTime(new Date());
+        taskExecuteRunningMessage.setTaskInstanceId(1);
+        taskExecuteRunningMessage.setProcessInstanceId(1);
     }
 
     @Test

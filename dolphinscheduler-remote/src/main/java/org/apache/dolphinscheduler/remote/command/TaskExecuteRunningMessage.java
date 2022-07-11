@@ -19,60 +19,82 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import java.util.Date;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * task execute response ack command
- * from master to worker
+ * Task running message, means the task is running in worker.
  */
-public class TaskExecuteResponseAckCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteRunningMessage extends BaseMessage {
 
+    /**
+     * taskInstanceId
+     */
     private int taskInstanceId;
+
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    /**
+     * startTime
+     */
+    private Date startTime;
+
+    /**
+     * host
+     */
+    private String host;
+
+    /**
+     * status
+     */
     private int status;
 
-    public TaskExecuteResponseAckCommand() {
-        super();
-    }
+    /**
+     * logPath
+     */
+    private String logPath;
 
-    public TaskExecuteResponseAckCommand(int status, int taskInstanceId) {
-        this.status = status;
-        this.taskInstanceId = taskInstanceId;
-    }
+    /**
+     * executePath
+     */
+    private String executePath;
 
-    public int getStatus() {
-        return status;
-    }
+    /**
+     * processId
+     */
+    private int processId;
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
+    /**
+     * appIds
+     */
+    private String appIds;
 
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
+    public TaskExecuteRunningMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
     }
 
     /**
-     * package response command
+     * package request command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RESPONSE_ACK);
+        command.setType(CommandType.TASK_EXECUTE_RUNNING);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "TaskExecuteResponseAckCommand{"
-            + "taskInstanceId=" + taskInstanceId
-            + ", status=" + status
-            + '}';
-    }
 }

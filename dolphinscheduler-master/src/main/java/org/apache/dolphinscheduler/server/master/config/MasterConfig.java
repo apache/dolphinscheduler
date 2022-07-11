@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
@@ -82,6 +83,10 @@ public class MasterConfig implements Validator {
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killYarnJobWhenTaskFailover = true;
+    /**
+     * ip:listenPort
+     */
+    private String masterAddress;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -124,5 +129,6 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
+        masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
     }
 }

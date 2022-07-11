@@ -19,41 +19,82 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import java.util.Date;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * task execute running ack command
- * from master to worker
+ * execute task response command
  */
-public class TaskExecuteRunningAckCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteResultMessage extends BaseMessage {
 
+    public TaskExecuteResultMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+    }
+
+    /**
+     * task instance id
+     */
     private int taskInstanceId;
+
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    /**
+     * status
+     */
     private int status;
 
-    public TaskExecuteRunningAckCommand() {
-        super();
-    }
+    /**
+     * startTime
+     */
+    private Date startTime;
 
-    public TaskExecuteRunningAckCommand(int status, int taskInstanceId) {
-        this.status = status;
-        this.taskInstanceId = taskInstanceId;
-    }
+    /**
+     * host
+     */
+    private String host;
 
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
+    /**
+     * logPath
+     */
+    private String logPath;
 
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
+    /**
+     * executePath
+     */
+    private String executePath;
 
-    public int getStatus() {
-        return status;
-    }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
+    /**
+     * end time
+     */
+    private Date endTime;
+
+
+    /**
+     * processId
+     */
+    private int processId;
+
+    /**
+     * appIds
+     */
+    private String appIds;
+
+    /**
+     * varPool string
+     */
+    private String varPool;
 
     /**
      * package response command
@@ -62,14 +103,9 @@ public class TaskExecuteRunningAckCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RUNNING_ACK);
+        command.setType(CommandType.TASK_EXECUTE_RESULT);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
     }
 }

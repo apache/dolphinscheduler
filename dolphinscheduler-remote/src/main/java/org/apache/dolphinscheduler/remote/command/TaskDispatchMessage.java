@@ -18,57 +18,41 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 
 /**
- * task recall ack command
+ * The task dispatch message, means dispatch a task to worker.
  */
-public class TaskRecallAckCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskDispatchMessage extends BaseMessage {
 
-    private int taskInstanceId;
-    private int status;
+    private static final long serialVersionUID = -1L;
 
-    public TaskRecallAckCommand() {
-        super();
+    private TaskExecutionContext taskExecutionContext;
+
+    public TaskDispatchMessage(TaskExecutionContext taskExecutionContext,
+                               String messageSenderAddress,
+                               String messageReceiverAddress,
+                               long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
-    public TaskRecallAckCommand(int status, int taskInstanceId) {
-        this.status = status;
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    /**
-     * package response command
-     *
-     * @return command
-     */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_RECALL_ACK);
+        command.setType(CommandType.TASK_DISPATCH_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "TaskRecallAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
-    }
 }

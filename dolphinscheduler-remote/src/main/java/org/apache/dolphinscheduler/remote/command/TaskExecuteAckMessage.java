@@ -19,39 +19,32 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * db task final result response command
+ * task execute response ack command
+ * from master to worker
  */
-public class StateEventResponseCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteAckMessage extends BaseMessage {
 
-    private String key;
+    private int taskInstanceId;
     private int status;
 
-    public StateEventResponseCommand() {
-        super();
-    }
-
-    public StateEventResponseCommand(int status, String key) {
+    public TaskExecuteAckMessage(int status,
+                                 int taskInstanceId,
+                                 String sourceServerAddress,
+                                 String messageReceiverAddress,
+                                 long messageSendTime) {
+        super(sourceServerAddress, messageReceiverAddress, messageSendTime);
         this.status = status;
-        this.key = key;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+        this.taskInstanceId = taskInstanceId;
     }
 
     /**
@@ -66,13 +59,4 @@ public class StateEventResponseCommand implements Serializable {
         command.setBody(body);
         return command;
     }
-
-    @Override
-    public String toString() {
-        return "StateEventResponseCommand{"
-                + "key=" + key
-                + ", status=" + status
-                + '}';
-    }
-
 }

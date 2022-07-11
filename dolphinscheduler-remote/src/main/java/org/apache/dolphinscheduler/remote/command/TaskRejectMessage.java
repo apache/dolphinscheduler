@@ -19,60 +19,49 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * db task final result response command
+ * Task reject message, means the task has been rejected by the worker.
  */
-public class StateEventResponseCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskRejectMessage extends BaseMessage {
 
-    private String key;
-    private int status;
+    /**
+     * taskInstanceId
+     */
+    private int taskInstanceId;
 
-    public StateEventResponseCommand() {
-        super();
-    }
+    /**
+     * host
+     */
+    private String host;
 
-    public StateEventResponseCommand(int status, String key) {
-        this.status = status;
-        this.key = key;
-    }
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    public TaskRejectMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
     }
 
     /**
-     * package response command
+     * package request command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
+        command.setType(CommandType.TASK_REJECT);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
-
-    @Override
-    public String toString() {
-        return "StateEventResponseCommand{"
-                + "key=" + key
-                + ", status=" + status
-                + '}';
-    }
-
 }

@@ -15,32 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command;
+package org.apache.dolphinscheduler.server.worker.message;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.remote.command.BaseMessage;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
-import java.io.Serializable;
+public interface MessageSender<T extends BaseMessage> {
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+    /**
+     * Send the message
+     *
+     * @throws RemotingException Cannot connect to the target host.
+     */
+    void sendMessage(T message) throws RemotingException;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TaskExecuteRequestCommand implements Serializable {
+    /**
+     * Build the message from task context and message received address.
+     */
+    T buildMessage(TaskExecutionContext taskExecutionContext, String messageReceiverAddress);
 
-    private static final long serialVersionUID = -1L;
-
-    private TaskExecutionContext taskExecutionContext;
-
-    public Command convert2Command() {
-        Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_REQUEST);
-        byte[] body = JSONUtils.toJsonByteArray(this);
-        command.setBody(body);
-        return command;
-    }
-
+    /**
+     * The message type can be sent by this sender.
+     */
+    CommandType getMessageType();
 }

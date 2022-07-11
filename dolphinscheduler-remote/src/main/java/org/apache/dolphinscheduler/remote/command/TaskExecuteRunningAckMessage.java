@@ -22,24 +22,22 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.io.Serializable;
 
 /**
- * kill task recall command
+ * task execute running ack command
+ * from master to worker
  */
-public class TaskRecallCommand implements Serializable {
+public class TaskExecuteRunningAckMessage implements Serializable {
 
-    /**
-     * taskInstanceId
-     */
     private int taskInstanceId;
+    private int status;
 
-    /**
-     * host
-     */
-    private String host;
+    public TaskExecuteRunningAckMessage() {
+        super();
+    }
 
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
+    public TaskExecuteRunningAckMessage(int status, int taskInstanceId) {
+        this.status = status;
+        this.taskInstanceId = taskInstanceId;
+    }
 
     public int getTaskInstanceId() {
         return taskInstanceId;
@@ -49,30 +47,22 @@ public class TaskRecallCommand implements Serializable {
         this.taskInstanceId = taskInstanceId;
     }
 
-    public String getHost() {
-        return host;
+    public int getStatus() {
+        return status;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     /**
-     * package request command
+     * package response command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_RECALL);
+        command.setType(CommandType.TASK_EXECUTE_RUNNING_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
@@ -80,10 +70,6 @@ public class TaskRecallCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskRecallCommand{"
-            + "taskInstanceId=" + taskInstanceId
-            + ", host='" + host + '\''
-            + ", processInstanceId=" + processInstanceId
-            + '}';
+        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
     }
 }
