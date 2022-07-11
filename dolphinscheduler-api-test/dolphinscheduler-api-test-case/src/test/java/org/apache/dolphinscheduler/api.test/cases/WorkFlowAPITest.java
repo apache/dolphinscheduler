@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.api.test.pages.projects.workflow.entity.WorkF
 import org.apache.dolphinscheduler.api.test.pages.projects.workflow.entity.WorkFlowDefinitionResponseEntity;
 import org.apache.dolphinscheduler.api.test.pages.projects.workflow.entity.WorkFlowReleaseRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.projects.workflow.entity.WorkFlowRunRequestEntity;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
@@ -62,17 +64,25 @@ import io.restassured.response.Response;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisplayName("WorkFlow Page API test")
 public class WorkFlowAPITest extends AbstractAPITest {
+    private static final String tenant = System.getProperty("user.name");
     private final Fairy fairy = Fairy.create();
     private ProjectPageAPI projectPageAPI;
     private WorkFlowPageAPI workFlowPageAPI;
+    private TenantPageAPI tenantPageAPI;
     private ProjectRequestEntity projectRequestEntity = null;
     private ProjectResponseEntity projectResponseEntity = null;
+    private TenantRequestEntity tenantRequestEntity = null;
     private WorkFlowDefinitionResponseEntity workFlowDefinitionResponseEntity = null;
 
     @BeforeAll
     public void initWorkFlowAPIFactory() {
+        tenantPageAPI = pageAPIFactory.createTenantPageAPI();
         projectPageAPI = pageAPIFactory.createProjectPageAPI();
         workFlowPageAPI = pageAPIFactory.createWorkFlowPageAPI();
+        tenantRequestEntity = new TenantRequestEntity();
+        tenantRequestEntity.setTenantCode(tenant);
+        tenantRequestEntity.setQueueId(1);
+        tenantPageAPI.createTenant(tenantRequestEntity).isResponseSuccessful();
         projectRequestEntity = new ProjectRequestEntity();
         projectRequestEntity.setProjectName(fairy.person().getCompany().getName() + "1");
         projectRequestEntity.setDescription(fairy.person().getFullName());
