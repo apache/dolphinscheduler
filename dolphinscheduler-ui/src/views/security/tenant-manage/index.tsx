@@ -25,12 +25,10 @@ import {
   NCard,
   NSpace
 } from 'naive-ui'
-import styles from './index.module.scss'
 import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
 import TenantModal from './components/tenant-modal'
 import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
 
 const tenementManage = defineComponent({
   name: 'tenement-manage',
@@ -93,9 +91,9 @@ const tenementManage = defineComponent({
   render() {
     const { t, loadingRef } = this
     return (
-      <div class={styles.container}>
-        <NCard>
-          <div class={styles.header}>
+      <NSpace vertical>
+        <NCard size='small'>
+          <NSpace justify='space-between'>
             <NButton
               size='small'
               onClick={this.handleModalChange}
@@ -117,32 +115,31 @@ const tenementManage = defineComponent({
                 </NIcon>
               </NButton>
             </NSpace>
-          </div>
+          </NSpace>
         </NCard>
-        <Card
-          title={t('security.tenant.tenant_manage')}
-          class={styles['table-card']}
-        >
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            row-class-name='items'
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+        <NCard size='small'>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              row-class-name='items'
+              scrollX={this.tableWidth}
             />
-          </div>
-        </Card>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </NCard>
         <TenantModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
@@ -150,7 +147,7 @@ const tenementManage = defineComponent({
           onCancelModal={this.onCancelModal}
           onConfirmModal={this.onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })
