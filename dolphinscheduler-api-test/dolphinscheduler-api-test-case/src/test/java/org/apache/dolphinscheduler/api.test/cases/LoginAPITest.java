@@ -68,7 +68,7 @@ public class LoginAPITest extends AbstractAPITest {
     @DisplayName("Test getting user session")
     void testGetUserSession() {
         loginPageAPI.loginUser(given().spec(reqSpec), loginRequestEntity).
-            getResponse()
+             getResponse()
             .then()
             .body("data.sessionId", notNullValue());
 
