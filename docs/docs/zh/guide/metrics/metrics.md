@@ -106,7 +106,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 - ds.worker.full.submit.queue.count: (counter) worker提交队列全满次数
 - ds.worker.resource.download.count: (counter) worker下载资源文件的次数，可由`status`标签切分
 - ds.worker.resource.download.duration: (histogram) worker下载资源文件时花费的时间分布
-- ds.worker.resource.download.size: (histogram) worker下载资源文件大小的分布（KB）
+- ds.worker.resource.download.size: (histogram) worker下载资源文件大小的分布（bytes）
 
 ### Api Server指标
 

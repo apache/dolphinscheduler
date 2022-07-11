@@ -1033,7 +1033,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "increase(ds_worker_resource_download_size_KB[5m])",
+          "expr": "increase(ds_worker_resource_download_size_bytes[5m])",
           "refId": "A"
         }
       ],
@@ -1074,7 +1074,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "histogram_quantile(0.75, sum(increase(ds_worker_resource_download_size_KB_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.75, sum(increase(ds_worker_resource_download_size_bytes_bucket[5m])) by (le))",
           "refId": "A"
         }
       ],
@@ -1972,13 +1972,13 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Worker",
   "uid": "6wXtd3r7k",
-  "version": 7,
+  "version": 11,
   "weekStart": ""
 }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.commons.io.FileUtils.ONE_KB;
 import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES;
@@ -246,14 +245,14 @@ public class FileUtils {
     }
 
     /**
-     * Get file size in KB
+     * Get file size in Byte
      *
      * @param filename String type of filename
-     * @return file size in KB
+     * @return file size in Byte
      */
-    public static double getFileSizeInKB(String filename) {
+    public static long getFileSizeInByte(String filename) {
         File file = new File(filename);
-        return ((double) file.length()) / ONE_KB;
+        return file.length();
     }
 
 }

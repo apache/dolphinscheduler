@@ -284,7 +284,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                 WorkerServerMetrics.recordWorkerResourceDownloadSize(
-                        FileUtils.getFileSizeInKB(execLocalPath + File.separator + fullName));
+                        FileUtils.getFileSizeInByte(execLocalPath + File.separator + fullName));
                 WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
             } catch (Exception e) {
                 WorkerServerMetrics.incWorkerResourceDownloadFailureCount();

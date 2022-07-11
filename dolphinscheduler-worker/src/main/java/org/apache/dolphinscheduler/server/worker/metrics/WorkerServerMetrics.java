@@ -61,7 +61,7 @@ public class WorkerServerMetrics {
 
     private static final DistributionSummary WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION =
             DistributionSummary.builder("ds.worker.resource.download.size")
-            .baseUnit("KB")
+            .baseUnit("bytes")
             .publishPercentiles(0.5, 0.75, 0.95, 0.99)
             .publishPercentileHistogram()
             .description("size of downloaded resource files on worker")
@@ -87,7 +87,7 @@ public class WorkerServerMetrics {
         WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static void recordWorkerResourceDownloadSize(final double size) {
+    public static void recordWorkerResourceDownloadSize(final long size) {
         WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION.record(size);
     }
 
