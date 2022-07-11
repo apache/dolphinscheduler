@@ -1147,22 +1147,22 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
         String dirFullName = currentDir + "/" + dirName;
-        Result<Object> dirResult = this.queryResource(user, dirFullName, null, ResourceType.FILE);
-        if (dirResult.getCode() == Status.SUCCESS.getCode()) {
-            Resource dirResource = (Resource) dirResult.getData();
-            return dirResource.getId();
-        } else if (dirResult.getCode() == Status.RESOURCE_NOT_EXIST.getCode()) {
+        if (checkResourceExists(dirFullName, ResourceType.FILE.ordinal())) {
+            List<Resource> resourceList = resourcesMapper.queryResource(dirFullName, ResourceType.FILE.ordinal());
+            return resourceList.get(0).getId();
+        } else {
             // create dir
             Result<Object> createDirResult = this.createDirectory(
                     user, dirName, "", ResourceType.FILE, pid, currentDir);
             if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
                 Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
                 return (int) resultMap.get("id");
+            } else {
+                String msg = String.format("Can not create dir %s", dirFullName);
+                logger.error(msg);
+                throw new IllegalArgumentException(msg);
             }
         }
-        String msg = String.format("Can not create dir %s", dirFullName);
-        logger.error(msg);
-        throw new IllegalArgumentException(msg);
     }
 
     private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {

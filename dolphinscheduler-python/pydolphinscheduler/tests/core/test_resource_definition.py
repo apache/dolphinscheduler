@@ -17,30 +17,21 @@
 
 """Test resource definition."""
 
-from pydolphinscheduler.core.resource_definition import ResourceDefinition
+from pydolphinscheduler.core.resource import Resource
 
 
 def test_sql_get_define():
     """Test resource set attributes which get with same type."""
-    user = "admin"
-    name = "test"
-    suffix = "py"
-    current_dir = "/dev"
+    name = "/dev/test.py"
     content = """print("hello world")"""
     description = "hello world"
     expect = {
-        "user": user,
         "name": name,
-        "suffix": suffix,
-        "currentDir": current_dir,
         "content": content,
         "description": description,
     }
-    resourceDefinition = ResourceDefinition(
-        user=user,
+    resourceDefinition = Resource(
         name=name,
-        suffix=suffix,
-        current_dir=current_dir,
         content=content,
         description=description,
     )

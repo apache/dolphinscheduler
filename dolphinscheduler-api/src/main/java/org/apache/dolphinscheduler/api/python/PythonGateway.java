@@ -552,17 +552,24 @@ public class PythonGateway {
      * If the folder is not already created, it will be
      *
      * @param userName user who create or update resource
-     * @param resourceDir The folder where the resource resides.
-     * @param resourceName The name of resource.Do not include file suffixes.
-     * @param resourceSuffix suffix of resource
+     * @param fullName The fullname of resource.Includes path and suffix.
      * @param description description of resource
      * @param resourceContent content of resource
      * @return id of resource
      */
     public Integer createOrUpdateResource(
-            String userName, String resourceDir, String resourceName, String resourceSuffix, String description, String resourceContent) {
+            String userName, String fullName, String description, String resourceContent) {
         User user = usersService.queryUser(userName);
-        String fullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
+        int suffixLabelIndex = fullName.indexOf(".");
+        if (suffixLabelIndex == -1) {
+            String msg = String.format("The suffix of file can not be empty: %s", fullName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        String resourceSuffix = fullName.substring(fullName.indexOf(".") + 1);
+        String fileNameWithSuffix = fullName.substring(fullName.lastIndexOf("/") + 1);
+        String resourceDir = fullName.replace(fileNameWithSuffix, "");
+        String resourceName = fileNameWithSuffix.replace("." + resourceSuffix, "");
         Result<Object> existResult = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
         if (existResult.getCode() == Status.SUCCESS.getCode()) {
             Resource resource = (Resource) existResult.getData();

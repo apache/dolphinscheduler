@@ -20,47 +20,24 @@
 from typing import Optional
 
 from pydolphinscheduler.core.base import Base
-from pydolphinscheduler.java_gateway import launch_gateway
 
 
-class ResourceDefinition(Base):
+class Resource(Base):
     """resource object, will define the resources that you want to create or update.
 
-    :param user: The user who create or update resource.
-    :param name: The name of resource.Do not include file suffixes.
-    :param suffix: The suffix of resource.
-    :param current_dir: The folder where the resource resides.
+    :param name: The fullname of resource.Includes path and suffix.
     :param content: The description of resource.
     :param description: The description of resource.
     """
 
-    _DEFINE_ATTR = {"user", "name", "suffix", "current_dir", "content", "description"}
+    _DEFINE_ATTR = {"name", "content", "description"}
 
     def __init__(
         self,
-        user: str,
         name: str,
-        suffix: str,
-        current_dir: str,
         content: str,
         description: Optional[str] = None,
     ):
         super().__init__(name, description)
-        self.user = user
-        self.suffix = suffix
-        self.current_dir = current_dir
         self.content = content
         self._resource_code = None
-
-    def submit(self) -> int:
-        """Submit resource to java gateway."""
-        gateway = launch_gateway()
-        self._resource_code = gateway.entry_point.createOrUpdateResource(
-            self.user,
-            self.current_dir,
-            self.name,
-            self.suffix,
-            self.description,
-            self.content,
-        )
-        return self._resource_code

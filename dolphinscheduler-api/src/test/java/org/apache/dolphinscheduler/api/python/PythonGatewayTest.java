@@ -102,10 +102,10 @@ public class PythonGatewayTest {
         User user = getTestUser();
         Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
 
-        String resourceDir = "/dev";
+        String resourceDir = "/dev/";
         String resourceName = "test";
         String resourceSuffix = "py";
-        String resourceFullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
+        String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
         Result<Object> queryMockResult = new Result<>();
         queryMockResult.setCode(Status.SUCCESS.getCode());
@@ -119,7 +119,7 @@ public class PythonGatewayTest {
         Mockito.when(resourcesService.updateResourceContent(user, resource.getId(), "")).thenReturn(updateMockResult);
 
         int id = pythonGateway.createOrUpdateResource(
-                user.getUserName(), resourceDir, resourceName, resourceSuffix, "", "");
+                user.getUserName(), resourceFullName, "", "");
         Assert.assertEquals(id, resource.getId());
     }
 
@@ -128,12 +128,12 @@ public class PythonGatewayTest {
         User user = getTestUser();
         Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
 
-        String resourceDir = "/dir1/dir2";
+        String resourceDir = "/dir1/dir2/";
         String resourceName = "test";
         String resourceSuffix = "py";
         String desc = "desc";
         String content = "content";
-        String resourceFullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
+        String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
         Result<Object> queryMockResult = new Result<>();
         queryMockResult.setCode(Status.RESOURCE_NOT_EXIST.getCode());
@@ -151,7 +151,7 @@ public class PythonGatewayTest {
                 .thenReturn(createResourceResult);
 
         int id = pythonGateway.createOrUpdateResource(
-                user.getUserName(), resourceDir, resourceName, resourceSuffix, desc, content);
+                user.getUserName(), resourceFullName, desc, content);
         Assert.assertEquals(id, resourceId);
     }
 
