@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * workflow executing data response, from master to api
