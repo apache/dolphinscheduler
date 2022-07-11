@@ -88,14 +88,14 @@ jobs:
     strategy:
       matrix:
         case:
-          - name: Login
+          - name: LoginAPITest
             class: org.apache.dolphinscheduler.api.test.cases.LoginAPITest
-          - name: Tenant
+          - name: TenantAPITest
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
-          - name: Project
-              class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
+          - name: ProjectAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
           - name: WorkFlowAPITest
-              class: org.apache.dolphinscheduler.api.test.cases.WorkFlowAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.WorkFlowAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
