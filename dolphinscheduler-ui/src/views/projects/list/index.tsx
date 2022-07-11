@@ -16,6 +16,7 @@
  */
 
 import Card from '@/components/card'
+import totalCount from '@/utils/tableTotalCount'
 import { SearchOutlined } from '@vicons/antd'
 import {
   NButton,
@@ -138,6 +139,7 @@ const list = defineComponent({
               show-size-picker
               page-sizes={[10, 30, 50]}
               show-quick-jumper
+              prefix={totalCount}
               onUpdatePage={this.requestData}
               onUpdatePageSize={this.handleChangePageSize}
             />

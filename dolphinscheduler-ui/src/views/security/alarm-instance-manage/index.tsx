@@ -118,10 +118,7 @@ const AlarmInstanceManage = defineComponent({
                     {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
                 )}
-                <NSpace
-                  justify='end'
-                  wrap={false}
-                >
+                <NSpace justify='end' wrap={false}>
                   <NInput
                     v-model={[this.searchVal, 'value']}
                     size='small'
@@ -141,7 +138,12 @@ const AlarmInstanceManage = defineComponent({
         </NCard>
         <NCard size='small'>
           <NSpace vertical>
-            <NDataTable columns={columns} data={list} loading={loading} striped />
+            <NDataTable
+              columns={columns}
+              data={list}
+              loading={loading}
+              striped
+            />
             <NSpace justify='center'>
               <NPagination
                 page={page}

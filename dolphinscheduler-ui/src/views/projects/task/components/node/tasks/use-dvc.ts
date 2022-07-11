@@ -44,7 +44,7 @@ export function useDvc({
     delayTime: 0,
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
-    dvcTaskType: 'Upload',
+    dvcTaskType: 'Upload'
   } as INodeData)
 
   let extra: IJsonItem[] = []

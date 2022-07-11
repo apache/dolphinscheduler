@@ -36,7 +36,8 @@ export default {
     delete: 'Delete',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    delete_confirm: 'Delete?'
+    delete_confirm: 'Delete?',
+    total_items: 'The total is'
   },
   workflow: {
     workflow_relation: 'Workflow Relation',
@@ -193,9 +194,9 @@ export default {
     project_name: 'Project Name',
     project_tips: 'Please select project name',
     workflow_relation_no_data_result_title:
-        'Can not find any relations of workflows.',
+      'Can not find any relations of workflows.',
     workflow_relation_no_data_result_desc:
-        'There is not any workflows. Please create a workflow, and then visit this page again.'
+      'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
     cancel_full_screen: 'Cancel full screen',
@@ -308,7 +309,7 @@ export default {
     task_priority: 'Task priority',
     worker_group: 'Worker group',
     worker_group_tips:
-        'The Worker group no longer exists, please select the correct Worker group!',
+      'The Worker group no longer exists, please select the correct Worker group!',
     environment_name: 'Environment Name',
     task_group_name: 'Task group name',
     task_group_queue_priority: 'Priority',
@@ -335,11 +336,11 @@ export default {
     success: 'Success',
     failed: 'Failed',
     backfill_tips:
-        'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
+      'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
     task_instance_tips:
-        'The task has not been executed and cannot enter the sub-Process',
+      'The task has not been executed and cannot enter the sub-Process',
     branch_tips:
-        'Cannot select the same node for successful branch flow and failed branch flow',
+      'Cannot select the same node for successful branch flow and failed branch flow',
     timeout_alarm: 'Timeout alarm',
     timeout_strategy: 'Timeout strategy',
     timeout_strategy_tips: 'Timeout strategy must be selected',
@@ -399,8 +400,8 @@ export default {
     parallelism_tips: 'Please enter Parallelism',
     parallelism_number_tips: 'Parallelism number should be positive integer',
     parallelism_complement_tips:
-        'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
-        'set the complement task thread to a reasonable value to avoid too large impact on the server.',
+      'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
+      'set the complement task thread to a reasonable value to avoid too large impact on the server.',
     task_manager_number: 'TaskManager Number',
     task_manager_number_tips: 'Please enter TaskManager number',
     http_url: 'Http Url',
@@ -435,7 +436,7 @@ export default {
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
     procedure_method_snippet:
-        '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
+      '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: 'Start',
     edit: 'Edit',
     copy: 'Copy',
@@ -501,7 +502,7 @@ export default {
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: 'Queue',
     sea_tunnel_master_url_tips:
-        'Please enter the master url, e.g., 127.0.0.1:7077',
+      'Please enter the master url, e.g., 127.0.0.1:7077',
     add_pre_task_check_condition: 'Add pre task check condition',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
@@ -618,24 +619,24 @@ export default {
       'Please enter the paragraph id of your zeppelin paragraph',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
-        'Please enter the conda environment name of papermill',
+      'Please enter the conda environment name of papermill',
     jupyter_input_note_path: 'inputNotePath',
     jupyter_input_note_path_tips: 'Please enter the input jupyter note path',
     jupyter_output_note_path: 'outputNotePath',
     jupyter_output_note_path_tips: 'Please enter the output jupyter note path',
     jupyter_parameters: 'parameters',
     jupyter_parameters_tips:
-        'Please enter the parameters for jupyter parameterization',
+      'Please enter the parameters for jupyter parameterization',
     jupyter_kernel: 'kernel',
     jupyter_kernel_tips: 'Please enter the jupyter kernel name',
     jupyter_engine: 'engine',
     jupyter_engine_tips: 'Please enter the engine name',
     jupyter_execution_timeout: 'executionTimeout',
     jupyter_execution_timeout_tips:
-        'Please enter the execution timeout for each jupyter note cell',
+      'Please enter the execution timeout for each jupyter note cell',
     jupyter_start_timeout: 'startTimeout',
     jupyter_start_timeout_tips:
-        'Please enter the start timeout for jupyter kernel',
+      'Please enter the start timeout for jupyter kernel',
     jupyter_others: 'others',
     jupyter_others_tips:
       'Please enter the other options you need for papermill',
@@ -648,7 +649,7 @@ export default {
     mlflow_isSearchParams: 'Search Parameters',
     mlflow_dataPath: 'Data Path',
     mlflow_dataPath_tips:
-        ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
+      ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
     mlflow_dataPath_error_tips: ' data data can not be empty ',
     mlflow_experimentName: 'Experiment Name',
     mlflow_experimentName_tips: 'experiment_001',

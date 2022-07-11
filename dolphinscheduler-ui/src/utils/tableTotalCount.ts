@@ -15,26 +15,14 @@
  * limitations under the License.
  */
 
-import mapping from './mapping'
-import regex from './regex'
-import truncateText from './truncate-text'
-import log from './log'
-import downloadFile from './downloadFile'
-import copy from './clipboard'
-import removeUselessChildren from './tree-format'
-import isJson from './json'
-import totalCount from './tableTotalCount'
+import { useI18n } from 'vue-i18n'
+import { RenderPrefix } from 'naive-ui/es/pagination/src/interface'
 
-const utils = {
-  mapping,
-  regex,
-  truncateText,
-  log,
-  downloadFile,
-  copy,
-  removeUselessChildren,
-  isJson,
-  totalCount
+export default function totalCount(params: Parameters<RenderPrefix>[0]) {
+  const { t } = useI18n()
+
+  const prefix = t('project.list.total_items')
+  const count = Number.prototype.toLocaleString.call(params?.itemCount ?? 0)
+
+  return `${prefix} ${count}`
 }
-
-export default utils
