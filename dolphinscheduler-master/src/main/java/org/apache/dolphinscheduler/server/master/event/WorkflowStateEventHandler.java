@@ -41,15 +41,14 @@ public class WorkflowStateEventHandler implements StateEventHandler {
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
 
-        logger.info("process:{} state {} change to {}",
-            processInstance.getId(),
-            processInstance.getState(),
-            stateEvent.getExecutionStatus());
+        logger.info(
+            "Handle workflow instance state event, the current workflow instance state {} will be changed to {}",
+            processInstance.getState(), stateEvent.getExecutionStatus());
 
         if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
             // serial wait execution type needs to wake up the waiting process
             if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
-                .typeIsSerialPriority()) {
+                                                                                            .typeIsSerialPriority()) {
                 workflowExecuteRunnable.endProcess();
                 return true;
             }
