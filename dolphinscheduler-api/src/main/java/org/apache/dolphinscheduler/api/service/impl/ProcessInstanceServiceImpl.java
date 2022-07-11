@@ -829,5 +829,4 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     public List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size) {
         return processInstanceMapper.queryByProcessDefineCode(processDefinitionCode, size);
     }
-
 }

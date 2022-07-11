@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -27,8 +26,10 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang.StringUtils;
@@ -45,8 +46,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
-
-import com.google.common.base.Strings;
 
 import lombok.NonNull;
 
@@ -191,11 +190,9 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(), taskInstance.getId());
             return;
         }
-        String address = host.split(":")[0];
-        int port = Integer.parseInt(host.split(":")[1]);
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                 finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(), taskInstance.getId()
         );
-        stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+        stateEventCallbackService.sendResult(new Host(host), stateEventChangeCommand.convert2Command());
     }
 }
