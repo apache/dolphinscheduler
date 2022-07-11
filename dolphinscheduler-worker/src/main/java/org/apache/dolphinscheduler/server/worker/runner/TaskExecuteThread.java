@@ -275,7 +275,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
     public void downloadResource(String execLocalPath, Logger logger, List<Pair<String, String>> fileDownloads) {
         for (Pair<String, String> fileDownload : fileDownloads) {
             try {
-                WorkerServerMetrics.incWorkerResourceDownloadCount();
+//                WorkerServerMetrics.incWorkerResourceDownloadCount();
                 // query the tenant code of the resource according to the name of the resource
                 String fullName = fileDownload.getLeft();
                 String tenantCode = fileDownload.getRight();
@@ -286,9 +286,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                 WorkerServerMetrics.recordWorkerResourceDownloadSize(
                         FileUtils.getFileSizeInKB(execLocalPath + File.separator + fullName));
-                WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
+//                WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
+                WorkerServerMetrics.incWorkerResourceDownloadCountByStatus("success");
             } catch (Exception e) {
-                WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
+//                WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
+                WorkerServerMetrics.incWorkerResourceDownloadCountByStatus("fail");
                 logger.error(e.getMessage(), e);
                 throw new ServiceException(e.getMessage());
             }

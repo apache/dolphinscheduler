@@ -20,7 +20,11 @@ package org.apache.dolphinscheduler.server.worker.metrics;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import io.micrometer.core.instrument.*;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -41,15 +45,18 @@ public class WorkerServerMetrics {
                     .description("worker resource download count")
                     .register(Metrics.globalRegistry);
 
-    private static final Counter WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER =
-            Counter.builder("ds.worker.resource.download.success.count")
-                    .description("worker resource download success count")
-                    .register(Metrics.globalRegistry);
+//    private static final Counter WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER =
+//            Counter.builder("ds.worker.resource.download.count")
+//                    .tag("status", "success")
+//                    .description("worker resource download success count")
+//                    .register(Metrics.globalRegistry);
+//
+//    private static final Counter WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER =
+//            Counter.builder("ds.worker.resource.download.count")
+//                    .tag("status", "fail")
+//                    .description("worker resource download failure count")
+//                    .register(Metrics.globalRegistry);
 
-    private static final Counter WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER =
-            Counter.builder("ds.worker.resource.download.failure.count")
-                    .description("worker resource download failure count")
-                    .register(Metrics.globalRegistry);
 
     private static final Timer WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER =
             Timer.builder("ds.worker.resource.download.duration")
@@ -74,29 +81,28 @@ public class WorkerServerMetrics {
         WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
     }
 
-    public static void incWorkerResourceDownloadCount() {
-        WORKER_RESOURCE_DOWNLOAD_COUNTER.increment();
+    public static void incWorkerResourceDownloadCountByStatus(final String status) {
+        Metrics.globalRegistry.counter("ds.worker.resource.download.count", "status", status).increment();
     }
 
-    public static void incWorkerResourceDownloadSuccessCount() {
-        WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER.increment();
-    }
+//    public static void incWorkerResourceDownloadSuccessCount() {
+//        WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER.increment();
+//    }
 
-    public static void incWorkerResourceDownloadFailureCount() { WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER.increment(); }
+//    public static void incWorkerResourceDownloadFailureCount() { WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER.increment(); }
 
-    public static void recordWorkerResourceDownloadTime(long milliseconds) {
+    public static void recordWorkerResourceDownloadTime(final long milliseconds) {
         WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static void recordWorkerResourceDownloadSize(double size) {
+    public static void recordWorkerResourceDownloadSize(final double size) {
         WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION.record(size);
     }
 
-    public static void registerWorkerRunningTaskGauge(Supplier<Number> supplier) {
+    public static void registerWorkerRunningTaskGauge(final Supplier<Number> supplier) {
         Gauge.builder("ds.task.running", supplier)
             .description("number of running tasks on workers")
             .register(Metrics.globalRegistry);
-
     }
 
 }
