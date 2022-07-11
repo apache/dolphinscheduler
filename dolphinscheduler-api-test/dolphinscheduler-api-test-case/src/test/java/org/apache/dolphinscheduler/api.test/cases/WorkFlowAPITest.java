@@ -96,7 +96,7 @@ public class WorkFlowAPITest extends AbstractAPITest {
     public void testCreateWorkFlow() {
         WorkFlowDefinitionRequestEntity workFlowDefinitionRequestEntity = new WorkFlowDefinitionRequestEntity();
         workFlowDefinitionRequestEntity.setName(fairy.person().getFirstName());
-        workFlowDefinitionRequestEntity.setTenantCode("default");
+        workFlowDefinitionRequestEntity.setTenantCode(tenant);
         workFlowDefinitionRequestEntity.setExecutionType(ProcessExecutionTypeEnum.PARALLEL);
         workFlowDefinitionRequestEntity.setDescription("");
         workFlowDefinitionRequestEntity.setTimeout(0);
