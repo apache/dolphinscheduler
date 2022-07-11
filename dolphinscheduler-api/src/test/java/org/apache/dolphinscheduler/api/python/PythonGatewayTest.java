@@ -98,32 +98,6 @@ public class PythonGatewayTest {
     }
 
     @Test
-    public void testUpdateResource() {
-        User user = getTestUser();
-        Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
-
-        String resourceDir = "/dev/";
-        String resourceName = "test";
-        String resourceSuffix = "py";
-        String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
-
-        Result<Object> queryMockResult = new Result<>();
-        queryMockResult.setCode(Status.SUCCESS.getCode());
-        Resource resource = getTestResource();
-        queryMockResult.setData(resource);
-        Mockito.when(resourcesService.queryResource(user, resourceFullName, null, ResourceType.FILE)).thenReturn(queryMockResult);
-
-        Result<Object> updateMockResult = new Result<>();
-        updateMockResult.setCode(Status.SUCCESS.getCode());
-
-        Mockito.when(resourcesService.updateResourceContent(user, resource.getId(), "")).thenReturn(updateMockResult);
-
-        int id = pythonGateway.createOrUpdateResource(
-                user.getUserName(), resourceFullName, "", "");
-        Assert.assertEquals(id, resource.getId());
-    }
-
-    @Test
     public void testCreateResource() {
         User user = getTestUser();
         Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
@@ -135,11 +109,6 @@ public class PythonGatewayTest {
         String content = "content";
         String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
-        Result<Object> queryMockResult = new Result<>();
-        queryMockResult.setCode(Status.RESOURCE_NOT_EXIST.getCode());
-        Mockito.when(resourcesService.queryResource(user, resourceFullName, null, ResourceType.FILE))
-                .thenReturn(queryMockResult);
-
         int resourceId = 3;
         Result<Object> createResourceResult = new Result<>();
         createResourceResult.setCode(Status.SUCCESS.getCode());
@@ -147,7 +116,7 @@ public class PythonGatewayTest {
         resourceMap.put("id", resourceId);
         createResourceResult.setData(resourceMap);
 
-        Mockito.when(resourcesService.onlineCreateResourceWithDir(user, resourceName, resourceSuffix, desc, content, resourceDir))
+        Mockito.when(resourcesService.onlineCreateOrUpdateResourceWithDir(user, resourceFullName, desc, content))
                 .thenReturn(createResourceResult);
 
         int id = pythonGateway.createOrUpdateResource(

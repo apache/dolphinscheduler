@@ -569,21 +569,11 @@ public class PythonGateway {
         if (!fullName.startsWith("/")) {
             fullName = "/" + fullName;
         }
-        String resourceSuffix = fullName.substring(fullName.indexOf(".") + 1);
-        String fileNameWithSuffix = fullName.substring(fullName.lastIndexOf("/") + 1);
-        String resourceDir = fullName.replace(fileNameWithSuffix, "");
-        String resourceName = fileNameWithSuffix.replace("." + resourceSuffix, "");
-        Result<Object> existResult = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
-        if (existResult.getCode() == Status.SUCCESS.getCode()) {
-            Resource resource = (Resource) existResult.getData();
-            return this.updateResoure(user, resource.getId(), fullName, resourceContent);
-        } else if (existResult.getCode() == Status.RESOURCE_NOT_EXIST.getCode()) {
-            Result<Object> onlineCreateResourceResult = resourceService.onlineCreateResourceWithDir(
-                    user, resourceName, resourceSuffix, description, resourceContent, resourceDir);
-            if (onlineCreateResourceResult.getCode() == Status.SUCCESS.getCode()) {
-                Map<String, Object> resultMap = (Map<String, Object>) onlineCreateResourceResult.getData();
-                return (int) resultMap.get("id");
-            }
+        Result<Object> createResult = resourceService.onlineCreateOrUpdateResourceWithDir(
+                user, fullName, description, resourceContent);
+        if (createResult.getCode() == Status.SUCCESS.getCode()) {
+            Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
+            return (int) resultMap.get("id");
         }
         String msg = String.format("Can not create or update resource: %s", fullName);
         logger.error(msg);

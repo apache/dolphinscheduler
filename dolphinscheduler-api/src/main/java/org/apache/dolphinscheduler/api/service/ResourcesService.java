@@ -173,14 +173,12 @@ public interface ResourcesService {
      * If the folder is not already created, it will be
      *
      * @param loginUser user who create or update resource
-     * @param currentDirectory The folder where the resource resides.
-     * @param fileName The name of resource.Do not include file suffixes.
-     * @param fileSuffix suffix of resource
+     * @param fileFullName The full name of resource.Includes path and suffix.
      * @param desc description of resource
      * @param content content of resource
      * @return create result code
      */
-    Result<Object> onlineCreateResourceWithDir(User loginUser, String fileName, String fileSuffix, String desc, String content, String currentDirectory);
+    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content);
 
     /**
      * updateProcessInstance resource

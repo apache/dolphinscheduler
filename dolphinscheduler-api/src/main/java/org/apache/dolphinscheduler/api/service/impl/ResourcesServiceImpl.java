@@ -1122,27 +1122,45 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * If the folder is not already created, it will be
      *
      * @param loginUser user who create or update resource
-     * @param currentDirectory The folder where the resource resides.
-     * @param fileName The name of resource.Do not include file suffixes.
-     * @param fileSuffix suffix of resource
+     * @param fileFullName The full name of resource.Includes path and suffix.
      * @param desc description of resource
      * @param content content of resource
      * @return create result code
      */
     @Override
     @Transactional
-    public Result<Object> onlineCreateResourceWithDir(User loginUser, String fileName, String fileSuffix, String desc, String content, String currentDirectory) {
-        String[] dirNames = currentDirectory.split("/");
-        int pid = -1;
-        StringBuilder currDirPath = new StringBuilder();
-        for (String dirName : dirNames) {
-            if (StringUtils.isNotEmpty(dirName)) {
-                pid = queryOrCreateDirId(loginUser, pid, currDirPath.toString(), dirName);
-                currDirPath.append("/").append(dirName);
+    public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content) {
+        if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
+            Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
+            Result<Object> result = this.updateResourceContent(loginUser, resource.getId(), content);
+            if (result.getCode() == Status.SUCCESS.getCode()) {
+                resource.setDescription(desc);
+                Map<String, Object> resultMap = new HashMap<>();
+                for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
+                    if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                        resultMap.put(entry.getKey().toString(), entry.getValue());
+                    }
+                }
+                result.setData(resultMap);
             }
+            return result;
+        } else {
+            String resourceSuffix = fileFullName.substring(fileFullName.indexOf(".") + 1);
+            String fileNameWithSuffix = fileFullName.substring(fileFullName.lastIndexOf("/") + 1);
+            String resourceDir = fileFullName.replace(fileNameWithSuffix, "");
+            String resourceName = fileNameWithSuffix.replace("." + resourceSuffix, "");
+            String[] dirNames = resourceDir.split("/");
+            int pid = -1;
+            StringBuilder currDirPath = new StringBuilder();
+            for (String dirName : dirNames) {
+                if (StringUtils.isNotEmpty(dirName)) {
+                    pid = queryOrCreateDirId(loginUser, pid, currDirPath.toString(), dirName);
+                    currDirPath.append("/").append(dirName);
+                }
+            }
+            return this.onlineCreateResource(
+                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content, pid, currDirPath.toString());
         }
-        return this.onlineCreateResource(
-                loginUser, ResourceType.FILE, fileName, fileSuffix, desc, content, pid, currDirPath.toString());
     }
 
     private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {

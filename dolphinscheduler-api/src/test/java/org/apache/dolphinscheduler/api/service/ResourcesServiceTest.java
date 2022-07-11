@@ -617,6 +617,7 @@ public class ResourcesServiceTest {
         String resourceSuffix = "py";
         String desc = "desc";
         String content = "content";
+        String fullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
 
         Resource dir1 = new Resource();
         dir1.setFullName(dir1Path);
@@ -658,7 +659,7 @@ public class ResourcesServiceTest {
         Mockito.when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
         PowerMockito.when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
-        Result<Object> result = resourcesService.onlineCreateResourceWithDir(user, resourceName, resourceSuffix, desc, content, resourceDir);
+        Result<Object> result = resourcesService.onlineCreateOrUpdateResourceWithDir(user, fullName, desc, content);
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
