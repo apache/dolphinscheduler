@@ -87,6 +87,11 @@ public class StateWheelExecuteThread extends Thread {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
+    @PostConstruct
+    public void startWheelThread() {
+        super.start();
+    }
+
     @Override
     public void run() {
         while (Stopper.isRunning()) {
