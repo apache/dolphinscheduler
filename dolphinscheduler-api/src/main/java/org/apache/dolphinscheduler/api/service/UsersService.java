@@ -164,6 +164,15 @@ public interface UsersService {
     Map<String, Object> grantProjectByCode(User loginUser, int userId, long projectCode);
 
     /**
+     * revoke the project permission for specified user by id
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectIds   project id array
+     * @return
+     */
+    Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds);
+
+    /**
      * revoke the project permission for specified user.
      * @param loginUser     Login user
      * @param userId        User id

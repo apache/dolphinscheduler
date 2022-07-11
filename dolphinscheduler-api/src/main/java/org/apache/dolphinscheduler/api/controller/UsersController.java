@@ -216,6 +216,30 @@ public class UsersController extends BaseController {
     }
 
     /**
+     * revoke project By Id
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return revoke result code
+     */
+    @ApiOperation(value = "revokeProjectById", notes = "REVOKE_PROJECT_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS", required = true, type = "String")
+    })
+    @PostMapping(value = "/revoke-project-by-id")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(REVOKE_PROJECT_ERROR)
+    @AccessLogAnnotation
+    public Result revokeProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                               @RequestParam(value = "userId") int userId,
+                               @RequestParam(value = "projectIds") String projectIds) {
+        Map<String, Object> result = usersService.revokeProjectById(loginUser, userId, projectIds);
+        return returnDataList(result);
+    }
+
+    /**
      * grant project
      *
      * @param loginUser login user

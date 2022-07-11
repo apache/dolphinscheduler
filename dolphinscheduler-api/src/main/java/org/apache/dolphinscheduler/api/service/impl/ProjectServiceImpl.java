@@ -308,6 +308,48 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
+     * admin can view all projects
+     *
+     * @param userId user id
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which with the login user's authorized level
+     */
+    @Override
+    public Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
+        Result result = new Result();
+        PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<Project> page = new Page<>(pageNo, pageSize);
+        Set<Integer> allProjectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        Set<Integer> userProjectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, logger);
+        if (allProjectIds.isEmpty()) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
+
+        List<Project> projectList = projectIPage.getRecords();
+
+        for (Project project : projectList) {
+            if(userProjectIds.contains(project.getId())){
+                project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
+            }
+            else{
+                project.setPerm(0);
+            }
+        }
+
+        pageInfo.setTotal((int) projectIPage.getTotal());
+        pageInfo.setTotalList(projectList);
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * delete project by code
      *
      * @param loginUser login user

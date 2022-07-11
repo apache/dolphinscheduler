@@ -93,6 +93,18 @@ public interface ProjectService {
     Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
 
     /**
+     * admin can view all projects
+     *
+     * @param userId user id
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which with the login user's authorized level
+     */
+    Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo, String searchVal);
+
+    /**
      * delete project by code
      *
      * @param loginUser login user

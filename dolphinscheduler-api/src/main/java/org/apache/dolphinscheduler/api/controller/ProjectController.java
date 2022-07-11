@@ -176,6 +176,43 @@ public class ProjectController extends BaseController {
     }
 
     /**
+     * query project with authorized level list paging
+     *
+     * @param userId user id
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which with the login user's authorized level
+     */
+    @ApiOperation(value = "queryProjectWithAuthorizedLevelListPaging", notes = "QUERY_PROJECT_WITH_AUTH_LEVEL_LIST_PAGING_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+    })
+    @GetMapping(value = "/project-with-authorized-level-list-paging")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProjectWithAuthorizedLevelListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @RequestParam("userId") Integer userId,
+                                         @RequestParam(value = "searchVal", required = false) String searchVal,
+                                         @RequestParam("pageSize") Integer pageSize,
+                                         @RequestParam("pageNo") Integer pageNo
+    ) {
+
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+        }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo, searchVal);
+        return result;
+    }
+
+    /**
      * delete project by code
      *
      * @param loginUser login user
