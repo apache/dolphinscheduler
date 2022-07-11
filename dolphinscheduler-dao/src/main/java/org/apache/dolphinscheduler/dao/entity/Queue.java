@@ -51,6 +51,26 @@ public class Queue {
      */
     private Date updateTime;
 
+    public Queue() {
+    }
+
+    public Queue(String queueName, String queue) {
+        Date now = new Date();
+        this.queueName = queueName;
+        this.queue = queue;
+        this.createTime = now;
+        this.updateTime = now;
+    }
+
+    public Queue(int id, String queueName, String queue) {
+        Date now = new Date();
+        this.id = id;
+        this.queueName = queueName;
+        this.queue = queue;
+        this.createTime = now;
+        this.updateTime = now;
+    }
+
     public int getId() {
         return id;
     }
