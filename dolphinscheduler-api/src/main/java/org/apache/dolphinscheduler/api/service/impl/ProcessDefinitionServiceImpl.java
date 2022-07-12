@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
+import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -70,6 +71,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -109,6 +111,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -193,6 +197,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private TaskPluginManager taskPluginManager;
+
+    @Autowired
+    private WorkFlowLineageService workFlowLineageService;
 
     /**
      * create process definition
@@ -600,7 +607,32 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
     }
 
-    private Map<String, Object> updateDagDefine(User loginUser,
+    /**
+     * Task want to delete whether used in other task, should throw exception when have be used.
+     *
+     * This function avoid delete task already dependencies by other tasks by accident.
+     *
+     * @param processDefinition ProcessDefinition you change task definition and task relation
+     * @param taskRelationList All the latest task relation list from process definition
+     */
+    private void taskUsedInOtherTaskValid(ProcessDefinition processDefinition, List<ProcessTaskRelationLog> taskRelationList) {
+        List<ProcessTaskRelation> oldProcessTaskRelationList = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        Set<ProcessTaskRelationLog> oldProcessTaskRelationSet = oldProcessTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toSet());
+        StringBuilder sb = new StringBuilder();
+        for (ProcessTaskRelationLog oldProcessTaskRelation: oldProcessTaskRelationSet) {
+            boolean oldTaskExists = taskRelationList.stream().anyMatch(relation -> oldProcessTaskRelation.getPostTaskCode() == relation.getPostTaskCode());
+            if (!oldTaskExists) {
+                Optional<String> taskDepMsg = workFlowLineageService.taskDepOnTaskMsg(
+                        processDefinition.getProjectCode(), oldProcessTaskRelation.getProcessDefinitionCode(), oldProcessTaskRelation.getPostTaskCode());
+                taskDepMsg.ifPresent(sb::append);
+            }
+            if (sb.length() != 0) {
+                throw new ServiceException(sb.toString());
+            }
+        }
+    }
+
+    protected Map<String, Object> updateDagDefine(User loginUser,
                                                 List<ProcessTaskRelationLog> taskRelationList,
                                                 ProcessDefinition processDefinition,
                                                 ProcessDefinition processDefinitionDeepCopy,
@@ -641,6 +673,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
+
+            taskUsedInOtherTaskValid(processDefinition, taskRelationList);
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
             if (insertResult == Constants.EXIT_CODE_SUCCESS) {
@@ -687,6 +721,35 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
+     * Process definition want to delete whether used in other task, should throw exception when have be used.
+     *
+     * This function avoid delete process definition already dependencies by other tasks by accident.
+     *
+     * @param processDefinition ProcessDefinition you change task definition and task relation
+     */
+    private void processDefinitionUsedInOtherTaskValid(ProcessDefinition processDefinition) {
+        // check process definition is already online
+        if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+            throw new ServiceException(Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
+        }
+
+        // check process instances is already running
+        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
+        if (CollectionUtils.isNotEmpty(processInstances)) {
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
+        }
+
+        // check process used by other task, including subprocess and dependent task type
+        Set<TaskMainInfo> taskDepOnProcess = workFlowLineageService.queryTaskDepOnProcess(processDefinition.getProjectCode(), processDefinition.getCode());
+        if (CollectionUtils.isNotEmpty(taskDepOnProcess)) {
+            String taskDepDetail = taskDepOnProcess.stream()
+                    .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(), task.getTaskName()))
+                    .collect(Collectors.joining(Constants.COMMA));
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, taskDepDetail);
+        }
+    }
+
+    /**
      * delete process definition by code
      *
      * @param loginUser login user
@@ -715,17 +778,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        // check process definition is already online
-        if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
-            return result;
-        }
-        // check process instances is already running
-        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
-        if (CollectionUtils.isNotEmpty(processInstances)) {
-            putMsg(result, Status.DELETE_PROCESS_DEFINITION_BY_CODE_FAIL, processInstances.size());
-            return result;
-        }
+        processDefinitionUsedInOtherTaskValid(processDefinition);
 
         // get the timing according to the process definition
         Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(code);
@@ -928,6 +981,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Transactional
     public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
+
+        Project project = projectMapper.queryByCode(projectCode);
+        result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
         String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
         int index = processDefinitionName.lastIndexOf(".");
         if (index > 0) {
