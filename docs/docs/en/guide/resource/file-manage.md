@@ -1,6 +1,6 @@
 # File Management
 
-When third party jars are used in the scheduling process or user defined scripts are required, these can be created from this page. The types of files that can be created include: txt, log, sh, conf, py, java and so on. Files can be edited, renamed, downloaded and deleted.
+When the third-party jar needs to be used in the scheduling process or the user needs to customize the script, the related operations can be completed on this page. The file types that can be created include: `txt`, `log`, `sh`, `conf`, `py`, `java` etc. And you can edit, rename, download and delete files.
 
 ![file-manage](../../../../img/new_ui/dev/resource/file-manage.png)
 
@@ -10,27 +10,33 @@ When third party jars are used in the scheduling process or user defined scripts
 
 ## Basic Operations
 
-### Create a File
+### Create File 
 
 The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
 
 ![create-file](../../../../img/new_ui/dev/resource/create-file.png)
 
-### Upload Files
+### Upload File
 
 Click the "Upload File" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
 
 ![upload-file](../../../../img/new_ui/dev/resource/upload-file.png)
 
-### View File Content
+### Re-upload file
 
- For the files that can be viewed, click the file name to view the file details.
+Click the "Re-upload File" button in the file list to re-upload the file, drag and drop the file to the upload area, and the file name will be automatically completed with the uploaded file name.
+
+![reuplod_file](../../../../img/reupload_file_en.png)
+
+### View File
+
+For viewable file types, click the file name to view the file details.
 
 ![file_detail](../../../../img/tasks/demo/file_detail.png)
 
-### Download file
+### Download File
 
-> Click the "Download" button in the file list to download the file or click the "Download" button in the upper right corner of the file details to download the file.
+Click the "Download" button in the file list to download the file or click the "Download" button in the upper right corner of the file details to download the file.
 
 ### Rename File
 
@@ -40,18 +46,12 @@ Click the "Upload File" button to upload, drag the file to the upload area, the 
 
 File list -> Click the "Delete" button to delete the specified file.
 
-### Re-upload file
-
-Click the "Re-upload File" button to upload a new file to replace the old file, drag the file to the re-upload area, the file name will be automatically completed with the new uploaded file name.
-
-![reuplod_file](../../../../img/reupload_file_en.png)
-
 > Note: File name or source name of your local file can not contain specific characters like `.` or `/` when you trying to
 > upload, create or rename file in resource center.
 
 ## Example
 
-The example uses a simple shell script to demonstrate the use of resource center files in workflow definitions. The same is true for tasks such as MR and Spark, which require jar packages.
+This sample mainly uses a simple shell script to demonstrate how to use Content Center files in a workflow definition. The same is true for tasks such as MR and Spark that require jar packages.
 
 ### Create a shell file
 
@@ -59,7 +59,7 @@ Create a shell file, print `hello world`.
 
 ![create-shell](../../../../img/new_ui/dev/resource/demo/file-demo01.png)
 
-Create the workflow execution shell
+### Create the workflow execution shell
 
 In the workflow definition module of project Manage, create a new workflow using a shell task.
 
@@ -70,6 +70,6 @@ In the workflow definition module of project Manage, create a new workflow using
 
 ### View the results
 
-You can view the log results of running the node in the workflow example. The diagram below:
+You can view the log results of the node running in the workflow instance. As shown below:
 
 ![log-shell](../../../../img/new_ui/dev/resource/demo/file-demo03.png)

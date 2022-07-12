@@ -4,7 +4,9 @@ DolphinScheduler has three parameter types:
 
 * [Global Parameter](global.md): parameters defined at the workflow define page.
 * [Parameter Context](context.md): parameters passed by upstream task nodes.
-* [Local Parameter](local.md): parameters belong to its node, which is the parameters defined by the user in [Custom Parameters]. The user can define part of the parameters when creating workflow definitions.
+* [Local Parameter](local.md): parameters belong to its node, which is the parameters defined by the user in [Custom Parameters].
+
+The user can define part of the parameters when creating workflow definitions.
 
 As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Local Parameter > Parameter Context > Global Parameter`.
 
