@@ -63,6 +63,9 @@ class ProcessDefinition(Base):
         thought Web UI after it :func:`submit` or :func:`run`. It will create a new project belongs to
         ``user`` if it does not exists. And when ``project`` exists but project's create do not belongs
         to ``user``, will grant `project` to ``user`` automatically.
+    :param resource_list: Resource files required by the current process definition.You can create and modify
+        resource files from this field. When the process definition is submitted, these resource files are also
+        submitted along with it.
     """
 
     # key attribute for identify ProcessDefinition object
@@ -88,6 +91,7 @@ class ProcessDefinition(Base):
         "tasks",
         "task_definition_json",
         "task_relation_json",
+        "resource_list",
     }
 
     def __init__(
@@ -107,6 +111,7 @@ class ProcessDefinition(Base):
         timeout: Optional[int] = 0,
         release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
+        resource_list: Optional[List] = None,
     ):
         super().__init__(name, description)
         self.schedule = schedule
@@ -132,6 +137,7 @@ class ProcessDefinition(Base):
         # TODO how to fix circle import
         self._task_relations: set["TaskRelation"] = set()  # noqa: F821
         self._process_definition_code = None
+        self.resource_list = resource_list or []
 
     def __enter__(self) -> "ProcessDefinition":
         ProcessDefinitionContext.set(self)
@@ -407,6 +413,14 @@ class ProcessDefinition(Base):
             None,
             None,
         )
+        if len(self.resource_list) > 0:
+            for res in self.resource_list:
+                gateway.entry_point.createOrUpdateResource(
+                    self._user,
+                    res.name,
+                    res.description,
+                    res.content,
+                )
         return self._process_definition_code
 
     def start(self) -> None:

@@ -85,10 +85,12 @@ import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.Constants.CONTENT;
+import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.Constants.JAR;
+import static org.apache.dolphinscheduler.common.Constants.PERIOD;
 
 /**
  * resources service impl
@@ -1115,6 +1117,96 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(result.getMsg());
         }
         return result;
+    }
+
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param loginUser user who create or update resource
+     * @param fileFullName The full name of resource.Includes path and suffix.
+     * @param desc description of resource
+     * @param content content of resource
+     * @return create result code
+     */
+    @Override
+    @Transactional
+    public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content) {
+        if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
+            Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
+            Result<Object> result = this.updateResourceContent(loginUser, resource.getId(), content);
+            if (result.getCode() == Status.SUCCESS.getCode()) {
+                resource.setDescription(desc);
+                Map<String, Object> resultMap = new HashMap<>();
+                for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
+                    if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                        resultMap.put(entry.getKey().toString(), entry.getValue());
+                    }
+                }
+                result.setData(resultMap);
+            }
+            return result;
+        } else {
+            String resourceSuffix = fileFullName.substring(fileFullName.indexOf(PERIOD) + 1);
+            String fileNameWithSuffix = fileFullName.substring(fileFullName.lastIndexOf(FOLDER_SEPARATOR) + 1);
+            String resourceDir = fileFullName.replace(fileNameWithSuffix, EMPTY_STRING);
+            String resourceName = fileNameWithSuffix.replace(PERIOD + resourceSuffix, EMPTY_STRING);
+            String[] dirNames = resourceDir.split(FOLDER_SEPARATOR);
+            int pid = -1;
+            StringBuilder currDirPath = new StringBuilder();
+            for (String dirName : dirNames) {
+                if (StringUtils.isNotEmpty(dirName)) {
+                    pid = queryOrCreateDirId(loginUser, pid, currDirPath.toString(), dirName);
+                    currDirPath.append(FOLDER_SEPARATOR).append(dirName);
+                }
+            }
+            return this.onlineCreateResource(
+                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content, pid, currDirPath.toString());
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent) {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        int suffixLabelIndex = fullName.indexOf(PERIOD);
+        if (suffixLabelIndex == -1) {
+            String msg = String.format("The suffix of file can not be empty : %s", fullName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        if (!fullName.startsWith(FOLDER_SEPARATOR)) {
+            fullName = FOLDER_SEPARATOR + fullName;
+        }
+        Result<Object> createResult = onlineCreateOrUpdateResourceWithDir(
+                user, fullName, description, resourceContent);
+        if (createResult.getCode() == Status.SUCCESS.getCode()) {
+            Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
+            return (int) resultMap.get("id");
+        }
+        String msg = String.format("Can not create or update resource : %s", fullName);
+        logger.error(msg);
+        throw new IllegalArgumentException(msg);
+    }
+
+    private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
+        String dirFullName = currentDir + FOLDER_SEPARATOR + dirName;
+        if (checkResourceExists(dirFullName, ResourceType.FILE.ordinal())) {
+            List<Resource> resourceList = resourcesMapper.queryResource(dirFullName, ResourceType.FILE.ordinal());
+            return resourceList.get(0).getId();
+        } else {
+            // create dir
+            Result<Object> createDirResult = this.createDirectory(
+                    user, dirName, EMPTY_STRING, ResourceType.FILE, pid, currentDir);
+            if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
+                Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
+                return (int) resultMap.get("id");
+            } else {
+                String msg = String.format("Can not create dir %s", dirFullName);
+                logger.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+        }
     }
 
     private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
