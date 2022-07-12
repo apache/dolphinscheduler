@@ -98,16 +98,16 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskDispatchCommand taskDispatchMessage = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
+        TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
-        if (taskDispatchMessage == null) {
-            logger.error("task execute request message content is null");
+        if (taskDispatchCommand == null) {
+            logger.error("task execute request command content is null");
             return;
         }
-        final String masterAddress = taskDispatchMessage.getMessageSenderAddress();
-        logger.info("task execute request message: {}", taskDispatchMessage);
+        final String masterAddress = taskDispatchCommand.getMessageSenderAddress();
+        logger.info("task execute request message: {}", taskDispatchCommand);
 
-        TaskExecutionContext taskExecutionContext = taskDispatchMessage.getTaskExecutionContext();
+        TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
 
         if (taskExecutionContext == null) {
             logger.error("task execution context is null");
@@ -150,9 +150,9 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                     TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                     taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
                     taskExecutionContext.setEndTime(new Date());
-                    workerMessageSender.sendMessageNeedAck(taskExecutionContext,
-                                                           masterAddress,
-                                                           CommandType.TASK_EXECUTE_RESULT);
+                    workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                             masterAddress,
+                                                             CommandType.TASK_EXECUTE_RESULT);
                     return;
                 }
 
@@ -170,9 +170,9 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                                  ex);
                     TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                     taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-                    workerMessageSender.sendMessageNeedAck(taskExecutionContext,
-                                                           masterAddress,
-                                                           CommandType.TASK_EXECUTE_RESULT);
+                    workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                             masterAddress,
+                                                             CommandType.TASK_EXECUTE_RESULT);
                     return;
                 }
             }
@@ -200,7 +200,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
                             workerManager.getWaitSubmitQueueSize(),
                             taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageNeedAck(taskExecutionContext, masterAddress, CommandType.TASK_REJECT);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_REJECT);
             }
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();

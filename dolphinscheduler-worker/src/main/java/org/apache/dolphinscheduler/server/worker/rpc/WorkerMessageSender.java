@@ -58,9 +58,9 @@ public class WorkerMessageSender {
     }
 
     // todo: use message rather than context
-    public void sendMessageNeedAck(@NonNull TaskExecutionContext taskExecutionContext,
-                                   @NonNull String messageReceiverAddress,
-                                   @NonNull CommandType messageType) {
+    public void sendMessageWithRetry(@NonNull TaskExecutionContext taskExecutionContext,
+                                     @NonNull String messageReceiverAddress,
+                                     @NonNull CommandType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);

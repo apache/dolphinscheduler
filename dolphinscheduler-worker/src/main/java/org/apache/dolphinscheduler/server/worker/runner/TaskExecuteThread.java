@@ -143,9 +143,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 taskExecutionContext.setStartTime(new Date());
                 taskExecutionContext.setEndTime(new Date());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageNeedAck(taskExecutionContext,
-                                                       masterAddress,
-                                                       CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                         masterAddress,
+                                                         CommandType.TASK_EXECUTE_RESULT);
                 logger.info("Task dry run success");
                 return;
             }
@@ -163,9 +163,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // callback task execute running
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            workerMessageSender.sendMessageNeedAck(taskExecutionContext,
-                                                   masterAddress,
-                                                   CommandType.TASK_EXECUTE_RUNNING);
+            workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                     masterAddress,
+                                                     CommandType.TASK_EXECUTE_RUNNING);
 
             // copy hdfs/minio file to local
             List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(),
@@ -225,9 +225,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setAppIds(this.task.getAppIds());
         } finally {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            workerMessageSender.sendMessageNeedAck(taskExecutionContext,
-                                                   masterAddress,
-                                                   CommandType.TASK_EXECUTE_RESULT);
+            workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                     masterAddress,
+                                                     CommandType.TASK_EXECUTE_RESULT);
             clearTaskExecPath();
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }

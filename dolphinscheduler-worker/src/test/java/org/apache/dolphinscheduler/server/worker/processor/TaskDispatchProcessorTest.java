@@ -49,13 +49,14 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * test task execute processor
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SpringApplicationContext.class, TaskCallbackService.class, WorkerConfig.class, FileUtils.class,
-    JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
+@PrepareForTest({SpringApplicationContext.class, WorkerConfig.class, FileUtils.class, JsonSerializer.class,
+    JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
 @Ignore
 public class TaskDispatchProcessorTest {
 
@@ -141,10 +142,11 @@ public class TaskDispatchProcessorTest {
             taskExecutionContext.getExecutePath());
         PowerMockito.doNothing().when(FileUtils.class, "createWorkDirIfAbsent", taskExecutionContext.getExecutePath());
 
-        SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(null,
-                                                                                      null,
+        SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(new TaskExecutionContext(),
+                                                                                      workerMessageSender,
                                                                                       "127.0.0.1:5678",
-                                                                                      null,
+                                                                                      LoggerFactory.getLogger(
+                                                                                          TaskDispatchProcessorTest.class),
                                                                                       alertClientService,
                                                                                       storageOperate);
         PowerMockito.whenNew(TaskExecuteThread.class).withAnyArguments().thenReturn(simpleTaskExecuteThread);
