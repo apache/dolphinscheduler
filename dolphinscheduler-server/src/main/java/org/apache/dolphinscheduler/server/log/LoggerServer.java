@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.log;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -25,10 +26,12 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
+
 /**
  *  logger server
  */
-public class LoggerServer {
+public class LoggerServer implements IStoppable {
 
     private static  final Logger logger = LoggerFactory.getLogger(LoggerServer.class);
 
@@ -70,6 +73,7 @@ public class LoggerServer {
     /**
      * server start
      */
+    @PostConstruct
     public void start()  {
         this.server.start();
         logger.info("logger server started, listening on port : {}", Constants.RPC_PORT);
@@ -89,4 +93,8 @@ public class LoggerServer {
         logger.info("logger server shut down");
     }
 
+    @Override
+    public void stop(String cause) {
+        this.stop();
+    }
 }
