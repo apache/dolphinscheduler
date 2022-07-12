@@ -383,6 +383,10 @@ export function formatParams(data: INodeData): {
     taskParams.dvcStoreUrl = data.dvcStoreUrl
   }
 
+  if (data.taskType === 'SAGEMAKER') {
+    taskParams.sagemakerRequestJson = data.sagemakerRequestJson
+  }
+
   if (data.taskType === 'DINKY') {
     taskParams.address = data.address
     taskParams.taskId = data.taskId

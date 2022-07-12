@@ -357,6 +357,7 @@ interface ITaskParams {
   address?: string
   taskId?: string
   online?: boolean
+  sagemakerRequestJson?: string
 }
 
 interface INodeData

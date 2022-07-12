@@ -57,5 +57,6 @@
         <module>dolphinscheduler-task-openmldb</module>
         <module>dolphinscheduler-task-dvc</module>
         <module>dolphinscheduler-task-dinky</module>
+        <module>dolphinscheduler-task-sagemaker</module>
     </modules>
 </project>
