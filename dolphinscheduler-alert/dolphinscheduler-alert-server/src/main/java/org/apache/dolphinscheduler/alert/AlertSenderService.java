@@ -235,6 +235,9 @@ public final class AlertSenderService extends Thread {
                         CompletableFuture.supplyAsync(() -> alertChannel.get().process(alertInfo));
                 alertResult = future.get(waitTimeout, TimeUnit.MILLISECONDS);
             }
+        } catch (InterruptedException e) {
+            alertResult = new AlertResult("false", e.getMessage());
+            logger.error("send alert error alert data id :{},", alertData.getId(), e);
         } catch (Exception e) {
             alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
