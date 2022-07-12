@@ -15,24 +15,36 @@
  * limitations under the License.
  */
 
-.container {
-  width: 100%;
+package org.apache.dolphinscheduler.remote.command;
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-  }
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-  .table-card {
-    margin-top: 8px;
+import java.io.Serializable;
 
-    .pagination {
-      margin-top: 20px;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * workflow executing data request, from api to master
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowExecutingDataRequestCommand implements Serializable {
+
+    private Integer processInstanceId;
+
+    /**
+     * package request command
+     *
+     * @return command
+     */
+    public Command convert2Command() {
+        Command command = new Command();
+        command.setType(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST);
+        byte[] body = JSONUtils.toJsonByteArray(this);
+        command.setBody(body);
+        return command;
     }
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-  }
 }
