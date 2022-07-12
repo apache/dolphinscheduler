@@ -1,6 +1,8 @@
 # DingTalk
 
-If you need to use `DingTalk` for alerting, create an alert instance in the alert instance management and select the `DingTalk` plugin. The following shows the `DingTalk` configuration example:
+If you need to use `DingTalk` for alerting, create an alert instance in the alert instance management and select the `DingTalk` plugin.
+
+The following shows the `DingTalk` configuration example:
 
 ![alert-dingtalk](/img/new_ui/dev/alert/alert_dingtalk.png)
 

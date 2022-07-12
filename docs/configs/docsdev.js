@@ -29,7 +29,7 @@ export default {
                     },
                     {
                         title: 'Features',
-                        link: '/en-us/docs/dev/user_doc/about/feature.html',
+                        link: '/en-us/docs/dev/user_doc/about/features.html',
                     },
                     {
                         title: 'Hardware Environment',
@@ -204,10 +204,6 @@ export default {
                         title: 'Data Source',
                         children: [
                             {
-                                title: 'Introduction',
-                                link: '/en-us/docs/dev/user_doc/guide/datasource/introduction.html',
-                            },
-                            {
                                 title: 'MySQL',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/mysql.html',
                             },
@@ -222,6 +218,30 @@ export default {
                             {
                                 title: 'Spark',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/spark.html',
+                            },
+                            {
+                                title: 'Presto',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/presto.html',
+                            },
+                            {
+                                title: 'SQL SERVER',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/sqlserver.html',
+                            },
+                            {
+                                title: 'Amazon Redshift',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/redshift.html',
+                            },
+                            {
+                                title: 'ClickHouse',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/clickhouse.html',
+                            },
+                            {
+                                title: 'IBM DB2',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/db2.html',
+                            },
+                            {
+                                title: 'Oracle',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
                             },
                         ],
                     },
@@ -421,7 +441,7 @@ export default {
                     },
                     {
                         title: '特性',
-                        link: '/zh-cn/docs/dev/user_doc/about/feature.html',
+                        link: '/zh-cn/docs/dev/user_doc/about/features.html',
                     },
                     {
                         title: '建议配置',
@@ -595,10 +615,6 @@ export default {
                     {
                         title: '数据源中心',
                         children: [
-                            {
-                                title: '简介',
-                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/introduction.html',
-                            },
                             {
                                 title: 'MySQL',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/mysql.html',
