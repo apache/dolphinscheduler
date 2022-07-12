@@ -68,8 +68,10 @@ public class WorkerExecService {
 
             @Override
             public void onFailure(Throwable throwable) {
-                logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}", taskExecuteThread.getTaskExecutionContext().getProcessInstanceId()
-                    , taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(), throwable);
+                logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}",
+                             taskExecuteThread.getTaskExecutionContext().getProcessInstanceId(),
+                             taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(),
+                             throwable);
                 taskExecuteThreadMap.remove(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId());
             }
         };

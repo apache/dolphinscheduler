@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+
 import java.time.Duration;
 import java.util.Set;
 
@@ -46,6 +48,10 @@ public class WorkerConfig implements Validator {
     private Set<String> groups = Sets.newHashSet("default");
     private String alertListenHost = "localhost";
     private int alertListenPort = 50052;
+    /**
+     * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
+     */
+    private String workerAddress;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -64,6 +70,6 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-
+        workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
     }
 }

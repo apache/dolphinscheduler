@@ -64,9 +64,9 @@ public enum CommandType {
     MASTER_RESPONSE,
 
     /**
-     * execute task request
+     * dispatch task request
      */
-    TASK_EXECUTE_REQUEST,
+    TASK_DISPATCH_REQUEST,
 
     /**
      * task execute running, from worker to master
@@ -81,56 +81,29 @@ public enum CommandType {
     /**
      * task execute response, from worker to master
      */
-    TASK_EXECUTE_RESPONSE,
+    TASK_EXECUTE_RESULT,
 
     /**
      * task execute response ack, from master to worker
      */
-    TASK_EXECUTE_RESPONSE_ACK,
+    TASK_EXECUTE_RESULT_ACK,
 
-    /**
-     * kill task
-     */
     TASK_KILL_REQUEST,
 
-    /**
-     * kill task response
-     */
     TASK_KILL_RESPONSE,
 
-    /**
-     * task recall
-     */
-    TASK_RECALL,
+    TASK_REJECT,
 
-    /**
-     * task recall ack
-     */
-    TASK_RECALL_ACK,
+    TASK_REJECT_ACK,
 
-    /**
-     * HEART_BEAT
-     */
     HEART_BEAT,
 
-    /**
-     * ping
-     */
     PING,
 
-    /**
-     * pong
-     */
     PONG,
 
-    /**
-     * alert send request
-     */
     ALERT_SEND_REQUEST,
 
-    /**
-     * alert send response
-     */
     ALERT_SEND_RESPONSE,
 
     /**

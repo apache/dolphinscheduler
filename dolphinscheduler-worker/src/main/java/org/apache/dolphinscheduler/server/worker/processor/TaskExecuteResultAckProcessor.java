@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -36,37 +36,47 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- * task execute running ack processor
+ * task execute running ack, from master to worker
  */
 @Component
-public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
+public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningAckProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteResultAckProcessor.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING_ACK == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT_ACK == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteRunningAckMessage runningAckCommand = JSONUtils.parseObject(command.getBody(),
-                                                                               TaskExecuteRunningAckMessage.class);
-        if (runningAckCommand == null) {
-            logger.error("task execute running ack command is null");
+        TaskExecuteAckCommand taskExecuteAckMessage = JSONUtils.parseObject(command.getBody(),
+                                                                            TaskExecuteAckCommand.class);
+
+        if (taskExecuteAckMessage == null) {
+            logger.error("task execute response ack command is null");
             return;
         }
-        try {
-            LoggerUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
-            logger.info("task execute running ack command : {}", runningAckCommand);
+        logger.info("task execute response ack command : {}", taskExecuteAckMessage);
 
-            if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-                messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),
-                                                      CommandType.TASK_EXECUTE_RUNNING);
+        try {
+            LoggerUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId());
+            if (taskExecuteAckMessage.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+                messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
+                                                      CommandType.TASK_EXECUTE_RESULT);
+                logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
+            } else if (taskExecuteAckMessage.getStatus() == ExecutionStatus.FAILURE.getCode()) {
+                // master handle worker response error, will still retry
+                logger.error("Receive task execute result ack message, the message status is not success, message: {}",
+                             taskExecuteAckMessage);
+            } else {
+                throw new IllegalArgumentException("Invalid task execute response ack status: "
+                                                       + taskExecuteAckMessage.getStatus());
             }
         } finally {
             LoggerUtils.removeTaskInstanceIdMDC();
+
         }
     }
 

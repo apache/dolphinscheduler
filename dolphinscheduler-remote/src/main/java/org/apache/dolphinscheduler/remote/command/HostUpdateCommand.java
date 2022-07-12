@@ -26,9 +26,6 @@ import java.io.Serializable;
  */
 public class HostUpdateCommand implements Serializable {
 
-    /**
-     * task id
-     */
     private int taskInstanceId;
 
     private String processHost;

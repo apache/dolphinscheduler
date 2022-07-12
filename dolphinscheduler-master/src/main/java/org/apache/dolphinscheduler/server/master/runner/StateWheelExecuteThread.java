@@ -126,8 +126,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstanceId);
         if (removeFlag) {
             logger.info("Success remove workflow instance from timeout check list");
-        } else {
-            logger.warn("Failed to remove workflow instance from timeout check list");
         }
     }
 

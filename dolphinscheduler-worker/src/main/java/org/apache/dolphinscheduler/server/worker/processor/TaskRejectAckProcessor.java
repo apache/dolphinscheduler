@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
+import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,40 +35,36 @@ import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 
-/**
- * task execute response processor
- */
 @Component
-public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
+public class TaskRejectAckProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteResponseProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskRejectAckProcessor.class);
 
     @Autowired
-    private TaskEventService taskEventService;
+    private MessageRetryRunner messageRetryRunner;
 
-    /**
-     * task final result response
-     * need master process , state persistence
-     *
-     * @param channel channel
-     * @param command command
-     */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_REJECT_ACK == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteResultCommand taskExecuteResultMessage = JSONUtils.parseObject(command.getBody(),
-                                                                                  TaskExecuteResultCommand.class);
-        TaskEvent taskResultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage, channel);
+        TaskRejectAckCommand taskRejectAckMessage = JSONUtils.parseObject(command.getBody(),
+                                                                          TaskRejectAckCommand.class);
+        if (taskRejectAckMessage == null) {
+            return;
+        }
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),
-                                                        taskResultEvent.getTaskInstanceId());
-            logger.info("Received task execute result, event: {}", taskResultEvent);
-
-            taskEventService.addEvent(taskResultEvent);
+            LoggerUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
+            if (taskRejectAckMessage.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+                messageRetryRunner.removeRetryMessage(taskRejectAckMessage.getTaskInstanceId(),
+                                                      CommandType.TASK_REJECT);
+                logger.debug("removeRecallCache: task instance id:{}", taskRejectAckMessage.getTaskInstanceId());
+            } else {
+                logger.error("Receive task reject ack message, the message status is not success, message: {}",
+                             taskRejectAckMessage);
+            }
         } finally {
-            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LoggerUtils.removeTaskInstanceIdMDC();
         }
     }
 }

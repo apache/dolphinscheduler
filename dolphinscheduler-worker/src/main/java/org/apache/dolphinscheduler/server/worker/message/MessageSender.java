@@ -15,41 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command;
+package org.apache.dolphinscheduler.server.worker.message;
 
-import java.io.Serializable;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.remote.command.BaseCommand;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
-import lombok.Data;
-
-/**
- *  command header
- */
-@Data
-public class CommandHeader implements Serializable {
+public interface MessageSender<T extends BaseCommand> {
 
     /**
-     * type
+     * Send the message
+     *
+     * @throws RemotingException Cannot connect to the target host.
      */
-    private byte type;
+    void sendMessage(T message) throws RemotingException;
 
     /**
-     * request unique identification
+     * Build the message from task context and message received address.
      */
-    private long opaque;
+    T buildMessage(TaskExecutionContext taskExecutionContext, String messageReceiverAddress);
 
     /**
-     * context length
+     * The message type can be sent by this sender.
      */
-    private int contextLength;
-
-    /**
-     * context
-     */
-    private byte[] context;
-
-    /**
-     *  body length
-     */
-    private int bodyLength;
-
+    CommandType getMessageType();
 }

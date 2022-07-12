@@ -19,17 +19,45 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import java.util.Date;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * kill task recall command
+ * execute task response command
  */
-public class TaskRecallCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteResultCommand extends BaseCommand {
+
+    public TaskExecuteResultCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+    }
 
     /**
-     * taskInstanceId
+     * task instance id
      */
     private int taskInstanceId;
+
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    /**
+     * status
+     */
+    private int status;
+
+    /**
+     * startTime
+     */
+    private Date startTime;
 
     /**
      * host
@@ -37,53 +65,47 @@ public class TaskRecallCommand implements Serializable {
     private String host;
 
     /**
-     * process instance id
+     * logPath
      */
-    private int processInstanceId;
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
+    private String logPath;
 
     /**
-     * package request command
+     * executePath
+     */
+    private String executePath;
+
+
+    /**
+     * end time
+     */
+    private Date endTime;
+
+
+    /**
+     * processId
+     */
+    private int processId;
+
+    /**
+     * appIds
+     */
+    private String appIds;
+
+    /**
+     * varPool string
+     */
+    private String varPool;
+
+    /**
+     * package response command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_RECALL);
+        command.setType(CommandType.TASK_EXECUTE_RESULT);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskRecallCommand{"
-            + "taskInstanceId=" + taskInstanceId
-            + ", host='" + host + '\''
-            + ", processInstanceId=" + processInstanceId
-            + '}';
     }
 }
