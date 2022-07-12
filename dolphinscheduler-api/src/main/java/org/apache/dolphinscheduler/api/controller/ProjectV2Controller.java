@@ -85,7 +85,7 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProjectResponse createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestBody ProjectCreateRequest projectCreateRequest) {
         Map<String, Object> result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
             projectCreateRequest.getDescription());
@@ -128,7 +128,7 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProjectResponse queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable("code") long code) {
         Map<String, Object> result = projectService.queryByCode(loginUser, code);
         return new ProjectResponse(returnDataList(result));
@@ -194,7 +194,7 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProjectListResponse queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
         Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, userId);
         return new ProjectListResponse(returnDataList(result));
@@ -215,7 +215,7 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProjectListResponse queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
         Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
         return new ProjectListResponse(returnDataList(result));
@@ -253,7 +253,7 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public ProjectListResponse queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return new ProjectListResponse(returnDataList(result));
     }
@@ -269,7 +269,7 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public ProjectListResponse queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = projectService.queryAllProjectList(loginUser);
         return new ProjectListResponse(returnDataList(result));
     }
