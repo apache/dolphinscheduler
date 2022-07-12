@@ -18,29 +18,58 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.io.Serializable;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+/**
+ * task execute running ack command
+ * from master to worker
+ */
+public class TaskExecuteRunningAckMessage implements Serializable {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TaskExecuteRequestCommand implements Serializable {
+    private int taskInstanceId;
+    private int status;
 
-    private static final long serialVersionUID = -1L;
+    public TaskExecuteRunningAckMessage() {
+        super();
+    }
 
-    private TaskExecutionContext taskExecutionContext;
+    public TaskExecuteRunningAckMessage(int status, int taskInstanceId) {
+        this.status = status;
+        this.taskInstanceId = taskInstanceId;
+    }
 
+    public int getTaskInstanceId() {
+        return taskInstanceId;
+    }
+
+    public void setTaskInstanceId(int taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    /**
+     * package response command
+     *
+     * @return command
+     */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_REQUEST);
+        command.setType(CommandType.TASK_EXECUTE_RUNNING_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
 
+    @Override
+    public String toString() {
+        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
+    }
 }
