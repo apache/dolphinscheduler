@@ -559,35 +559,7 @@ public class PythonGateway {
      */
     public Integer createOrUpdateResource(
             String userName, String fullName, String description, String resourceContent) {
-        User user = usersService.queryUser(userName);
-        int suffixLabelIndex = fullName.indexOf(".");
-        if (suffixLabelIndex == -1) {
-            String msg = String.format("The suffix of file can not be empty: %s", fullName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        if (!fullName.startsWith("/")) {
-            fullName = "/" + fullName;
-        }
-        Result<Object> createResult = resourceService.onlineCreateOrUpdateResourceWithDir(
-                user, fullName, description, resourceContent);
-        if (createResult.getCode() == Status.SUCCESS.getCode()) {
-            Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
-            return (int) resultMap.get("id");
-        }
-        String msg = String.format("Can not create or update resource: %s", fullName);
-        logger.error(msg);
-        throw new IllegalArgumentException(msg);
-    }
-
-    private int updateResoure(User user, int resourceId, String resourceFullName, String resourceContent) {
-        Result<Object> updateResult = resourceService.updateResourceContent(user, resourceId, resourceContent);
-        if (updateResult.getCode() != Status.SUCCESS.getCode()) {
-            String msg = String.format("Can not update resource %s", resourceFullName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        return resourceId;
+        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
     }
 
     @PostConstruct

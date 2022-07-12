@@ -100,8 +100,6 @@ public class PythonGatewayTest {
     @Test
     public void testCreateResource() {
         User user = getTestUser();
-        Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
-
         String resourceDir = "/dir1/dir2/";
         String resourceName = "test";
         String resourceSuffix = "py";
@@ -110,14 +108,9 @@ public class PythonGatewayTest {
         String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
         int resourceId = 3;
-        Result<Object> createResourceResult = new Result<>();
-        createResourceResult.setCode(Status.SUCCESS.getCode());
-        Map<String, Object> resourceMap = new HashMap<>();
-        resourceMap.put("id", resourceId);
-        createResourceResult.setData(resourceMap);
 
-        Mockito.when(resourcesService.onlineCreateOrUpdateResourceWithDir(user, resourceFullName, desc, content))
-                .thenReturn(createResourceResult);
+        Mockito.when(resourcesService.createOrUpdateResource(user.getUserName(), resourceFullName, desc, content))
+                .thenReturn(resourceId);
 
         int id = pythonGateway.createOrUpdateResource(
                 user.getUserName(), resourceFullName, desc, content);

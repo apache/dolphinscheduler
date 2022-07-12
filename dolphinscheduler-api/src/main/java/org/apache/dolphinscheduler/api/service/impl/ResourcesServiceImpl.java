@@ -83,12 +83,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.common.Constants.ALIAS;
-import static org.apache.dolphinscheduler.common.Constants.CONTENT;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_SS;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.JAR;
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * resources service impl
@@ -1148,7 +1143,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             String resourceSuffix = fileFullName.substring(fileFullName.indexOf(".") + 1);
             String fileNameWithSuffix = fileFullName.substring(fileFullName.lastIndexOf("/") + 1);
             String resourceDir = fileFullName.replace(fileNameWithSuffix, "");
-            String resourceName = fileNameWithSuffix.replace("." + resourceSuffix, "");
+            String resourceName = fileNameWithSuffix.replace("." + resourceSuffix, EMPTY_STRING);
             String[] dirNames = resourceDir.split("/");
             int pid = -1;
             StringBuilder currDirPath = new StringBuilder();
@@ -1161,6 +1156,29 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return this.onlineCreateResource(
                     loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content, pid, currDirPath.toString());
         }
+    }
+
+    @Override
+    public Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent) {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        int suffixLabelIndex = fullName.indexOf(".");
+        if (suffixLabelIndex == -1) {
+            String msg = String.format("The suffix of file can not be empty: %s", fullName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        if (!fullName.startsWith("/")) {
+            fullName = "/" + fullName;
+        }
+        Result<Object> createResult = onlineCreateOrUpdateResourceWithDir(
+                user, fullName, description, resourceContent);
+        if (createResult.getCode() == Status.SUCCESS.getCode()) {
+            Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
+            return (int) resultMap.get("id");
+        }
+        String msg = String.format("Can not create or update resource: %s", fullName);
+        logger.error(msg);
+        throw new IllegalArgumentException(msg);
     }
 
     private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {

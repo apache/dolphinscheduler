@@ -20,7 +20,7 @@
 from pydolphinscheduler.core.resource import Resource
 
 
-def test_sql_get_define():
+def test_resource():
     """Test resource set attributes which get with same type."""
     name = "/dev/test.py"
     content = """print("hello world")"""
