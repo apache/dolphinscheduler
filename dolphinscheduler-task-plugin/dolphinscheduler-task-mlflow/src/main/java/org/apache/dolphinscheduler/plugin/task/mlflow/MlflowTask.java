@@ -86,11 +86,11 @@ public class MlflowTask extends AbstractTaskExecutor {
             // construct process
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
-            int exitCode = exitStatusCode;
+            int exitCode;
             if (mlflowParameters.getIsDeployDocker()){
                 exitCode = checkDockerHealth();
             }else {
-                exitCode = getExitStatusCode();
+                exitCode = commandExecuteResult.getExitStatusCode();
             }
             setExitStatusCode(exitCode);
             setAppIds(commandExecuteResult.getAppIds());
