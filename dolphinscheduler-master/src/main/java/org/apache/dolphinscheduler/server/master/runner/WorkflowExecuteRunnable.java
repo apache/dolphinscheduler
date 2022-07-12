@@ -30,7 +30,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -1301,10 +1300,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             if (allProperty.size() > 0) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
-                Map<String, Object> taskParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                });
-                taskParams.put("varPool", JSONUtils.toJsonString(allProperty.values()));
-                taskInstance.setTaskParams(JSONUtils.toJsonString(taskParams));
             }
         } else {
             if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
