@@ -1129,7 +1129,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return create result code
      */
     @Override
-    @Transactional
     public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content) {
         if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
             Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
@@ -1165,6 +1164,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     @Override
+    @Transactional
     public Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent) {
         User user = userMapper.queryByUserNameAccurately(userName);
         int suffixLabelIndex = fullName.indexOf(".");
