@@ -208,7 +208,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * update process definition
+     * update process definition, with whole process definition object including task definition, task relation and location.
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -791,7 +791,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * update process definition basic info
+     * update process definition basic info, not including task definition, task relation and location.
      *
      * @param loginUser login user
      * @param projectCode project code
