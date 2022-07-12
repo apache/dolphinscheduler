@@ -22,14 +22,11 @@ import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,6 +50,9 @@ public class PythonGatewayTest {
 
     @Mock
     private ProjectMapper projectMapper;
+
+    @Mock
+    private TenantMapper tenantMapper;
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -96,6 +96,88 @@ public class PythonGatewayTest {
         Assert.assertEquals((long) result.get("taskDefinitionCode"), taskDefinition.getCode());
     }
 
+    @Test
+    public void testQueryProjectByName() {
+        Project project = getTestProject();
+        Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
+        Project result = pythonGateway.queryProjectByName(project.getUserName() ,project.getName());
+        Assert.assertEquals(result.getName(), project.getName());
+    }
+
+    @Test
+    public void testUpdateProject() {
+        Project project = getTestProject();
+        Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
+        pythonGateway.updateProject("test-proj-user-name", project.getCode(), "test-proj-name", "test-proj-desc");
+        Project result = projectMapper.queryByCode(project.getCode());
+        Assert.assertEquals(result.getName(), project.getName());
+        Assert.assertEquals(result.getDescription(), project.getDescription());
+        Assert.assertEquals(result.getUserName(), project.getUserName());
+    }
+
+    @Test
+    public void testDeleteProject() {
+        Project project = getTestProject();
+        Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
+        pythonGateway.deleteProject(project.getUserName(), project.getCode());
+        Project result = projectMapper.queryByCode(project.getCode());
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testCreateTenant() {
+        String tenantCode = "test-tenant-code";
+        String tenantName = "test-tenant-name";
+        String tenantDesc = "test-tenant-desc";
+        pythonGateway.createTenant(tenantCode, tenantName, tenantDesc);
+        Tenant result = tenantMapper.queryByTenantCode(tenantCode);
+        Assert.assertEquals(result.getDescription(), tenantDesc);
+    }
+
+    @Test
+    public void testUpdateTenant() throws Exception {
+        String tenantCode = "test-tenant-code";
+        String tenantDesc = "test-tenant-desc";
+        Tenant tenant = getTestTenant();
+        User user = getTestUser();
+        User user1 = getTestUser();
+        tenant.setId(user.getId());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(tenant);
+        pythonGateway.updateTenant(user1.getUserName(), user1.getId(), tenantCode, 1, tenantDesc);
+        Tenant result = tenantMapper.queryByTenantCode(tenantCode);
+        Assert.assertEquals(result.getDescription(), tenantDesc);
+        Assert.assertEquals(result.getId(), user1.getId());
+        Assert.assertEquals(result.getQueueId(), 1);
+        Assert.assertEquals(result.getDescription(), tenantDesc);
+    }
+
+    @Test
+    public void testDeleteTenantById() throws Exception {
+        Tenant tenant = getTestTenant();
+        User user = getTestUser();
+        tenant.setId(user.getId());
+        Mockito.when(tenantMapper.queryByTenantCode(tenant.getTenantCode())).thenReturn(tenant);
+        pythonGateway.deleteTenantById(user.getUserName(), tenant.getTenantCode());
+        Tenant result = tenantMapper.queryByTenantCode(tenant.getTenantCode());
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testQueryUser() {
+        User user = getTestUser();
+        Mockito.when(usersService.queryUser(user.getId())).thenReturn(user);
+        User result = pythonGateway.queryUser(user.getId());
+        Assert.assertEquals(result.getUserName(), user.getUserName());
+    }
+
+    @Test
+    public void testDeleteUser() throws Exception {
+        User user = getTestUser();
+        Mockito.when(usersService.queryUser(user.getId())).thenReturn(user);
+        pythonGateway.deleteUser(user.getUserName(), user.getId());
+        User result = usersService.queryUser(user.getId());
+        Assert.assertNull(result);
+    }
 
     @Test
     public void testQueryResourcesFileInfo() {
@@ -131,10 +213,20 @@ public class PythonGatewayTest {
         Project project = new Project();
         project.setName("ut-project");
         project.setUserId(111);
+        project.setUserName("user111");
         project.setCode(1L);
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());
         return project;
+    }
+
+    private Tenant getTestTenant() {
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("ut-tenant-code");
+        tenant.setDescription("ut-tenant-desc");
+        tenant.setCreateTime(new Date());
+        tenant.setUpdateTime(new Date());
+        return tenant;
     }
 
     private ProcessDefinition getTestProcessDefinition() {
