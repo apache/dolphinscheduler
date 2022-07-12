@@ -1170,7 +1170,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.queryByUserNameAccurately(userName);
         int suffixLabelIndex = fullName.indexOf(".");
         if (suffixLabelIndex == -1) {
-            String msg = String.format("The suffix of file can not be empty: %s", fullName);
+            String msg = String.format("The suffix of file can not be empty : %s", fullName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
