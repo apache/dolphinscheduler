@@ -1183,7 +1183,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
             return (int) resultMap.get("id");
         }
-        String msg = String.format("Can not create or update resource: %s", fullName);
+        String msg = String.format("Can not create or update resource : %s", fullName);
         logger.error(msg);
         throw new IllegalArgumentException(msg);
     }
