@@ -56,7 +56,7 @@ class Git:
             raise RuntimeError("Cherry-pick SHA %s error beacuse SHA not exists, please make sure you local default branch is up-to-date", sha)
         if self.has_commit_current(sha):
             print("SHA %s already in current active branch, skip it.", sha)
-        self.repo.git.cherry_pick(sha)
+        self.repo.git.cherry_pick('-x', sha)
         # popen = Popen(f"git cherry-pick -x {sha}", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         # stdout, nothing = popen.communicate()
         # if stdout:
