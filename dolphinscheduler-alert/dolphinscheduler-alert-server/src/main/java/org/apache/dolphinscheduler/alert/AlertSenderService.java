@@ -238,6 +238,7 @@ public final class AlertSenderService extends Thread {
         } catch (InterruptedException e) {
             alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
