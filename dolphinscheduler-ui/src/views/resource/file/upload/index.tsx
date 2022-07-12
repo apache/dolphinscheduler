@@ -44,9 +44,7 @@ export default defineComponent({
     const customRequest = ({ file }: any) => {
       state.uploadForm.name = file.name
       state.uploadForm.file = file.file
-      state.uploadFormNameRef.validate({
-        trigger: 'input'
-      })
+      state.uploadFormRef.validate()
     }
 
     const handleFile = () => {
@@ -55,6 +53,8 @@ export default defineComponent({
 
     const removeFile = () => {
       state.uploadForm.name = ''
+      state.uploadForm.file = ''
+      state.uploadFormRef.validate()
     }
 
     return {

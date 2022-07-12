@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, watch } from 'vue'
+import { defineComponent, toRefs, PropType, watch, computed } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -62,8 +62,10 @@ export default defineComponent({
         state.folderForm.description = props.row.description
       }
     )
+    const fileEdit = computed(() => props.row.id && !props.row.directory)
 
     return {
+      fileEdit,
       hideModal,
       handleCreate,
       handleRename,
@@ -76,7 +78,9 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('resource.udf.create_folder')}
+        title={
+          this.row.id ? t('resource.udf.edit') : t('resource.udf.create_folder')
+        }
         onCancel={this.hideModal}
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
         confirmClassName='btn-submit'
@@ -84,7 +88,14 @@ export default defineComponent({
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='folderFormRef'>
-          <NFormItem label={t('resource.udf.folder_name')} path='name'>
+          <NFormItem
+            label={
+              this.fileEdit
+                ? t('resource.udf.file_name')
+                : t('resource.udf.folder_name')
+            }
+            path='name'
+          >
             <NInput
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}

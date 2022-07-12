@@ -92,7 +92,7 @@ export default defineComponent({
       () => props.row,
       () => {
         variables.uploadShow = false
-        state.functionForm.type = props.row.type
+        state.functionForm.type = props.row.type || 'HIVE'
         state.functionForm.funcName = props.row.funcName
         state.functionForm.className = props.row.className
         state.functionForm.resourceId = props.row.resourceId || -1
