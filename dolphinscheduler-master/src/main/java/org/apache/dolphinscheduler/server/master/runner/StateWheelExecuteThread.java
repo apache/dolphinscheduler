@@ -103,7 +103,7 @@ public class StateWheelExecuteThread extends Thread {
             } catch (Exception e) {
                 logger.error("state wheel thread check error:", e);
             }
-            ThreadUtil.sleepAtLeastIgnoreInterrupts((long) masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
+            ThreadUtil.sleepAtLeastIgnoreInterrupts(masterConfig.getStateWheelInterval().toMillis());
         }
     }
 
@@ -116,8 +116,6 @@ public class StateWheelExecuteThread extends Thread {
         boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstanceId);
         if (removeFlag) {
             logger.info("Success remove workflow instance from timeout check list");
-        } else {
-            logger.warn("Failed to remove workflow instance from timeout check list");
         }
     }
 

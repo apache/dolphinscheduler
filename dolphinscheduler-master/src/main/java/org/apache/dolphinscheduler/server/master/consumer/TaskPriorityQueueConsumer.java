@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -232,7 +232,11 @@ public class TaskPriorityQueueConsumer extends Thread {
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand(taskExecutionContext);
+        // todo: we didn't set the host here, since right now we didn't need to retry this message.
+        TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
+                                                                     masterConfig.getMasterAddress(),
+                                                                     taskExecutionContext.getHost(),
+                                                                     System.currentTimeMillis());
         return requestCommand.convert2Command();
     }
 

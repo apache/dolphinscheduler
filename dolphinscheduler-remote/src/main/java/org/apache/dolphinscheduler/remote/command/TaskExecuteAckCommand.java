@@ -19,39 +19,31 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * task execute response ack command
  * from master to worker
  */
-public class TaskExecuteResponseAckCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteAckCommand extends BaseCommand {
 
     private int taskInstanceId;
     private int status;
 
-    public TaskExecuteResponseAckCommand() {
-        super();
-    }
-
-    public TaskExecuteResponseAckCommand(int status, int taskInstanceId) {
+    public TaskExecuteAckCommand(int status,
+                                 int taskInstanceId,
+                                 String sourceServerAddress,
+                                 String messageReceiverAddress,
+                                 long messageSendTime) {
+        super(sourceServerAddress, messageReceiverAddress, messageSendTime);
         this.status = status;
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
         this.taskInstanceId = taskInstanceId;
     }
 
@@ -62,17 +54,9 @@ public class TaskExecuteResponseAckCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RESPONSE_ACK);
+        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskExecuteResponseAckCommand{"
-            + "taskInstanceId=" + taskInstanceId
-            + ", status=" + status
-            + '}';
     }
 }

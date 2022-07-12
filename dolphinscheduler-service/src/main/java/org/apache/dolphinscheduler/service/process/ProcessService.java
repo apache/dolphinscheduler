@@ -105,7 +105,7 @@ public interface ProcessService {
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, int commitInterval);
+    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval);
 
     @Transactional
     TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);

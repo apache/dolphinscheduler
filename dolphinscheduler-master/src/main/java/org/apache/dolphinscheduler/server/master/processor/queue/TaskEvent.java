@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 
@@ -119,7 +119,7 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newResultEvent(TaskExecuteResponseCommand command, Channel channel) {
+    public static TaskEvent newResultEvent(TaskExecuteResultCommand command, Channel channel) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
