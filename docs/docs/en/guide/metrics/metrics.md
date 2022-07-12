@@ -74,7 +74,7 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.task.execution.count.by.type: (counter) the number of task executions grouped by tag `task_type`
 - ds.task.running: (gauge) the number of running tasks 
 - ds.task.prepared: (gauge) the number of tasks prepared for task queue 
-- ds.task.execution.count: (histogram) the number of executed tasks  
+- ds.task.execution.count: (counter) the number of executed tasks  
 - ds.task.execution.duration: (histogram) duration of task executions
 
 
@@ -103,6 +103,9 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 - ds.worker.overload.count: (counter) the number of times the worker overloaded
 - ds.worker.full.submit.queue.count: (counter) the number of times the worker's submit queue being full
+- ds.worker.resource.download.count: (counter) the number of downloaded resource files on workers, sliced by tag `status`
+- ds.worker.resource.download.duration: (histogram) the time cost of resource download on workers
+- ds.worker.resource.download.size: (histogram) the sizes of downloaded resource files on workers (bytes)
 
 ### Api Server Metrics
 

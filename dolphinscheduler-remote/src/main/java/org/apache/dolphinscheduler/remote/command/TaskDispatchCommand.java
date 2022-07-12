@@ -18,80 +18,38 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.Date;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+
 /**
- * Task running message, means the task is running in worker.
+ * The task dispatch message, means dispatch a task to worker.
  */
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskExecuteRunningCommand extends BaseCommand {
+public class TaskDispatchCommand extends BaseCommand {
 
-    /**
-     * taskInstanceId
-     */
-    private int taskInstanceId;
+    private static final long serialVersionUID = -1L;
 
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
+    private TaskExecutionContext taskExecutionContext;
 
-    /**
-     * startTime
-     */
-    private Date startTime;
-
-    /**
-     * host
-     */
-    private String host;
-
-    /**
-     * status
-     */
-    private int status;
-
-    /**
-     * logPath
-     */
-    private String logPath;
-
-    /**
-     * executePath
-     */
-    private String executePath;
-
-    /**
-     * processId
-     */
-    private int processId;
-
-    /**
-     * appIds
-     */
-    private String appIds;
-
-    public TaskExecuteRunningCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+    public TaskDispatchCommand(TaskExecutionContext taskExecutionContext,
+                               String messageSenderAddress,
+                               String messageReceiverAddress,
+                               long messageSendTime) {
         super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
-    /**
-     * package request command
-     *
-     * @return command
-     */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RUNNING);
+        command.setType(CommandType.TASK_DISPATCH_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
