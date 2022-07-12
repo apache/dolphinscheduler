@@ -89,7 +89,7 @@ import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.JAR;;
+import static org.apache.dolphinscheduler.common.Constants.JAR;
 
 /**
  * resources service impl
