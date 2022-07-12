@@ -134,7 +134,7 @@ master:
   # master heartbeat interval
   heartbeat-interval: 10s
   # master commit task retry times
-  task-commit-retry-times: 5
+  task-commit-retry-times: 5s
   # master commit task interval
   task-commit-interval: 1s
   state-wheel-interval: 5
