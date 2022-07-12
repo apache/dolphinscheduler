@@ -69,7 +69,7 @@ export function useColumns(onCallback: Function) {
   }
 
   const createColumns = () => {
-    const columns = [
+    const columns: any = [
       // {
       //   //加上type之后xx
       //   type: 'selection',

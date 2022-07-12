@@ -70,8 +70,11 @@ export function useAuthorize() {
     authorizedUdfResources: [] as number[],
     pagination: {
       pageSize: 5,
+      page: 1,
+      totalPage: 0
     },
     searchVal: '',
+    userId: 0
   })
 
   const onOperationClick = (
@@ -91,12 +94,15 @@ export function useAuthorize() {
   const getProjects = async (userId: number) => {
     if (state.loading) return
     state.loading = true
+    if (userId) {
+      state.userId = userId
+    }
     
     const projectsList = await queryProjectWithAuthorizedLevelListPaging({
       userId,
       searchVal: state.searchVal,
-      pageSize: 10,
-      pageNo: 1
+      pageSize: state.pagination.pageSize,
+      pageNo: state.pagination.page
     })
     state.loading = false
     if (!projectsList) throw Error()
@@ -109,9 +115,20 @@ export function useAuthorize() {
     //     : ''
     //   return record
     // })
+    state.pagination.totalPage = projectsList.totalPage
     state.projectWithAuthorizedLevel = projectsList.totalList
     return state.projectWithAuthorizedLevel
-    
+  }
+
+  const requestData = async (page: number) => {
+    state.pagination.page = page
+    await getProjects(state.userId)
+  }
+
+  const handleChangePageSize = async (pageSize: number) => {
+    state.pagination.page = 1
+    state.pagination.pageSize = pageSize
+    await getProjects(state.userId)
   }
 
   const revokeProjectByIdRequest = async (userId: number, projectIds: string) => {
@@ -348,5 +365,5 @@ export function useAuthorize() {
     return true
   }
 
-  return { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest }
+  return { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize }
 }

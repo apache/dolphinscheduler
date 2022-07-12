@@ -26,7 +26,8 @@ import {
   NRadioGroup,
   NRadioButton,
   NTreeSelect,
-  NDataTable
+  NDataTable,
+  NPagination
 } from 'naive-ui'
 import { useAuthorize } from './use-authorize'
 import Modal from '@/components/modal'
@@ -56,7 +57,7 @@ export const AuthorizeModal = defineComponent({
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest } = useAuthorize()
+    const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize } = useAuthorize()
     console.log('state', state.pagination)
     const onCancel = () => {
       ctx.emit('cancel')
@@ -94,7 +95,9 @@ export const AuthorizeModal = defineComponent({
       revokeProjectByIdRequest,
       handleCheck,
       grantProjectRequest,
-      grantProjectWithReadPermRequest
+      grantProjectWithReadPermRequest,
+      requestData, 
+      handleChangePageSize
     }
   },
   render(props: { type: TAuthType, userId: number }) {
@@ -153,11 +156,22 @@ export const AuthorizeModal = defineComponent({
             data={this.projectWithAuthorizedLevel}
             loading={this.loading}
             // scrollX={this.columnsRef.tableWidth}
-            pagination={this.pagination}
             max-height="250"
             row-key={this.rowKey}
             on-update:checked-row-keys={this.handleCheck}
           />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.pagination.page}
+              v-model:page-size={this.pagination.pageSize}
+              page-count={this.pagination.totalPage}
+              show-size-picker
+              page-sizes={[5, 10]}
+              show-quick-jumper
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
+            />
+          </div>
           </NSpace>
         )}
         {type === 'authorize_datasource' && (
