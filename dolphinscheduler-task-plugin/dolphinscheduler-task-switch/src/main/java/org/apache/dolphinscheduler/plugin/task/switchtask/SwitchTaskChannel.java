@@ -17,30 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.task.switchtask;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
-
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import java.util.List;
+public class SwitchTaskChannel implements TaskChannel {
 
-import com.google.auto.service.AutoService;
-
-@AutoService(TaskChannelFactory.class)
-public class SubProcessTaskChannelFactory implements TaskChannelFactory {
     @Override
-    public TaskChannel create() {
-        return new SubProcessTaskChannel();
+    public void cancelApplication(boolean status) {
+
     }
 
     @Override
-    public String getName() {
-        return TASK_TYPE_SWITCH;
+    public AbstractTask createTask(TaskExecutionContext taskRequest) {
+        return null;
     }
 
     @Override
-    public List<PluginParams> getParams() {
+    public AbstractParameters parseParameters(ParametersNode parametersNode) {
+        return JSONUtils.parseObject(parametersNode.getTaskParams(), SwitchParameters.class);
+    }
+
+    @Override
+    public ResourceParametersHelper getResources(String parameters) {
         return null;
     }
 }
