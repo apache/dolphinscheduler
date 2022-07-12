@@ -18,50 +18,41 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+
 /**
- * Task reject message, means the task has been rejected by the worker.
+ * The task dispatch message, means dispatch a task to worker.
  */
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskRejectMessage extends BaseMessage {
+public class TaskDispatchCommand extends BaseCommand {
 
-    /**
-     * taskInstanceId
-     */
-    private int taskInstanceId;
+    private static final long serialVersionUID = -1L;
 
-    /**
-     * host
-     */
-    private String host;
+    private TaskExecutionContext taskExecutionContext;
 
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
-
-    public TaskRejectMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+    public TaskDispatchCommand(TaskExecutionContext taskExecutionContext,
+                               String messageSenderAddress,
+                               String messageReceiverAddress,
+                               long messageSendTime) {
         super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
-    /**
-     * package request command
-     *
-     * @return command
-     */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_REJECT);
+        command.setType(CommandType.TASK_DISPATCH_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
+
 }

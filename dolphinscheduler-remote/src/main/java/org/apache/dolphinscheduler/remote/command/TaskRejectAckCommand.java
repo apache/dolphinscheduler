@@ -28,12 +28,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskRejectAckMessage extends BaseMessage {
+public class TaskRejectAckCommand extends BaseCommand {
 
     private int taskInstanceId;
     private int status;
 
-    public TaskRejectAckMessage(int status,
+    public TaskRejectAckCommand(int status,
                                 int taskInstanceId,
                                 String messageSenderAddress,
                                 String messageReceiverAddress,

@@ -27,20 +27,16 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * execute task response command
+ * Task running message, means the task is running in worker.
  */
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskExecuteResultMessage extends BaseMessage {
-
-    public TaskExecuteResultMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
-        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
-    }
+public class TaskExecuteRunningCommand extends BaseCommand {
 
     /**
-     * task instance id
+     * taskInstanceId
      */
     private int taskInstanceId;
 
@@ -48,11 +44,6 @@ public class TaskExecuteResultMessage extends BaseMessage {
      * process instance id
      */
     private int processInstanceId;
-
-    /**
-     * status
-     */
-    private int status;
 
     /**
      * startTime
@@ -65,6 +56,11 @@ public class TaskExecuteResultMessage extends BaseMessage {
     private String host;
 
     /**
+     * status
+     */
+    private int status;
+
+    /**
      * logPath
      */
     private String logPath;
@@ -73,13 +69,6 @@ public class TaskExecuteResultMessage extends BaseMessage {
      * executePath
      */
     private String executePath;
-
-
-    /**
-     * end time
-     */
-    private Date endTime;
-
 
     /**
      * processId
@@ -91,21 +80,21 @@ public class TaskExecuteResultMessage extends BaseMessage {
      */
     private String appIds;
 
-    /**
-     * varPool string
-     */
-    private String varPool;
+    public TaskExecuteRunningCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+    }
 
     /**
-     * package response command
+     * package request command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RESULT);
+        command.setType(CommandType.TASK_EXECUTE_RUNNING);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
+
 }

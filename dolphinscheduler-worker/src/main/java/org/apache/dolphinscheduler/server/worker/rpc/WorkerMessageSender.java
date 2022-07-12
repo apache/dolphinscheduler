@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.BaseMessage;
+import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
@@ -65,12 +65,12 @@ public class WorkerMessageSender {
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseMessage baseMessage = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
         try {
-            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseMessage);
-            messageSender.sendMessage(baseMessage);
+            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseCommand);
+            messageSender.sendMessage(baseCommand);
         } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseMessage);
+            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
         }
     }
 
@@ -81,11 +81,11 @@ public class WorkerMessageSender {
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseMessage baseMessage = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
         try {
-            messageSender.sendMessage(baseMessage);
+            messageSender.sendMessage(baseCommand);
         } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseMessage);
+            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
         }
     }
 

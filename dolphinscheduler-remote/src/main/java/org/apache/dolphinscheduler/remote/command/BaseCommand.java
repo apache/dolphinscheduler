@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public abstract class BaseMessage implements Serializable {
+public abstract class BaseCommand implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
@@ -49,7 +49,7 @@ public abstract class BaseMessage implements Serializable {
 
     protected long messageSendTime;
 
-    protected BaseMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+    protected BaseCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
         this.messageSenderAddress = messageSenderAddress;
         this.messageReceiverAddress = messageReceiverAddress;
         this.messageSendTime = messageSendTime;

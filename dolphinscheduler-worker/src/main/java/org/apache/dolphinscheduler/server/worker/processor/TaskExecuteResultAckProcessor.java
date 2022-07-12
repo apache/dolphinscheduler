@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -51,8 +51,8 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT_ACK == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteAckMessage taskExecuteAckMessage = JSONUtils.parseObject(command.getBody(),
-                                                                            TaskExecuteAckMessage.class);
+        TaskExecuteAckCommand taskExecuteAckMessage = JSONUtils.parseObject(command.getBody(),
+                                                                            TaskExecuteAckCommand.class);
 
         if (taskExecuteAckMessage == null) {
             logger.error("task execute response ack command is null");

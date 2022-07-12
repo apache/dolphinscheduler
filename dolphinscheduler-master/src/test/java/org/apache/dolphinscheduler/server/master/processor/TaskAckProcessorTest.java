@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -44,7 +44,7 @@ public class TaskAckProcessorTest {
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
     private TaskEventService taskEventService;
     private ProcessService processService;
-    private TaskExecuteRunningMessage taskExecuteRunningMessage;
+    private TaskExecuteRunningCommand taskExecuteRunningMessage;
     private TaskEvent taskResponseEvent;
     private Channel channel;
 
@@ -63,7 +63,7 @@ public class TaskAckProcessorTest {
         channel = PowerMockito.mock(Channel.class);
         taskResponseEvent = PowerMockito.mock(TaskEvent.class);
 
-        taskExecuteRunningMessage = new TaskExecuteRunningMessage("127.0.0.1:5678",
+        taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                                                                   " 127.0.0.1:1234",
                                                                   System.currentTimeMillis());
         taskExecuteRunningMessage.setStatus(1);

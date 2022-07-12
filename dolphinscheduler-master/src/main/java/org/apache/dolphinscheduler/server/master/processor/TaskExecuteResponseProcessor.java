@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResultMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -58,8 +58,8 @@ public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteResultMessage taskExecuteResultMessage = JSONUtils.parseObject(command.getBody(),
-                                                                                  TaskExecuteResultMessage.class);
+        TaskExecuteResultCommand taskExecuteResultMessage = JSONUtils.parseObject(command.getBody(),
+                                                                                  TaskExecuteResultCommand.class);
         TaskEvent taskResultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage, channel);
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),

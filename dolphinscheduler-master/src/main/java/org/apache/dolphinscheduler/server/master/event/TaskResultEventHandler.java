@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -110,7 +110,7 @@ public class TaskResultEventHandler implements TaskEventHandler {
 
     public void sendAckToWorker(TaskEvent taskEvent) {
         // we didn't set the receiver address, since the ack doen's need to retry
-        TaskExecuteAckMessage taskExecuteAckMessage = new TaskExecuteAckMessage(ExecutionStatus.SUCCESS.getCode(),
+        TaskExecuteAckCommand taskExecuteAckMessage = new TaskExecuteAckCommand(ExecutionStatus.SUCCESS.getCode(),
                                                                                 taskEvent.getTaskInstanceId(),
                                                                                 masterConfig.getMasterAddress(),
                                                                                 taskEvent.getWorkerAddress(),

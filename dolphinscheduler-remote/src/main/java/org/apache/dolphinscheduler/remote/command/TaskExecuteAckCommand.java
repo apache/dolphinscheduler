@@ -19,82 +19,44 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.util.Date;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Task running message, means the task is running in worker.
+ * task execute response ack command
+ * from master to worker
  */
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskExecuteRunningMessage extends BaseMessage {
+public class TaskExecuteAckCommand extends BaseCommand {
 
-    /**
-     * taskInstanceId
-     */
     private int taskInstanceId;
-
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
-
-    /**
-     * startTime
-     */
-    private Date startTime;
-
-    /**
-     * host
-     */
-    private String host;
-
-    /**
-     * status
-     */
     private int status;
 
-    /**
-     * logPath
-     */
-    private String logPath;
-
-    /**
-     * executePath
-     */
-    private String executePath;
-
-    /**
-     * processId
-     */
-    private int processId;
-
-    /**
-     * appIds
-     */
-    private String appIds;
-
-    public TaskExecuteRunningMessage(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
-        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
+    public TaskExecuteAckCommand(int status,
+                                 int taskInstanceId,
+                                 String sourceServerAddress,
+                                 String messageReceiverAddress,
+                                 long messageSendTime) {
+        super(sourceServerAddress, messageReceiverAddress, messageSendTime);
+        this.status = status;
+        this.taskInstanceId = taskInstanceId;
     }
 
     /**
-     * package request command
+     * package response command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RUNNING);
+        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
-
 }

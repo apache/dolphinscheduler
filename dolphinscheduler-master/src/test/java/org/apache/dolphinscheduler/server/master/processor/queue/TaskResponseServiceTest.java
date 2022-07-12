@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResultMessage;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
@@ -77,7 +77,7 @@ public class TaskResponseServiceTest {
 
         Mockito.when(channel.remoteAddress()).thenReturn(InetSocketAddress.createUnresolved("127.0.0.1", 1234));
 
-        TaskExecuteRunningMessage taskExecuteRunningMessage = new TaskExecuteRunningMessage("127.0.0.1:5678",
+        TaskExecuteRunningCommand taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                                                                                             "127.0.0.1:1234",
                                                                                             System.currentTimeMillis());
         taskExecuteRunningMessage.setProcessId(1);
@@ -90,7 +90,7 @@ public class TaskResponseServiceTest {
 
         ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage, channel);
 
-        TaskExecuteResultMessage taskExecuteResultMessage = new TaskExecuteResultMessage(NetUtils.getAddr(1234),
+        TaskExecuteResultCommand taskExecuteResultMessage = new TaskExecuteResultCommand(NetUtils.getAddr(1234),
                                                                                          NetUtils.getAddr(5678),
                                                                                          System.currentTimeMillis());
         taskExecuteResultMessage.setProcessInstanceId(1);

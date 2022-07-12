@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskRejectMessage;
+import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskRejectMessageSender implements MessageSender<TaskRejectMessage> {
+public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand> {
 
     @Autowired
     private WorkerRpcClient workerRpcClient;
@@ -38,12 +38,12 @@ public class TaskRejectMessageSender implements MessageSender<TaskRejectMessage>
     private WorkerConfig workerConfig;
 
     @Override
-    public void sendMessage(TaskRejectMessage message) throws RemotingException {
+    public void sendMessage(TaskRejectCommand message) throws RemotingException {
         workerRpcClient.send(Host.of(message.getMessageReceiverAddress()), message.convert2Command());
     }
 
-    public TaskRejectMessage buildMessage(TaskExecutionContext taskExecutionContext, String masterAddress) {
-        TaskRejectMessage taskRejectMessage = new TaskRejectMessage(workerConfig.getWorkerAddress(),
+    public TaskRejectCommand buildMessage(TaskExecutionContext taskExecutionContext, String masterAddress) {
+        TaskRejectCommand taskRejectMessage = new TaskRejectCommand(workerConfig.getWorkerAddress(),
                                                                     masterAddress,
                                                                     System.currentTimeMillis());
         taskRejectMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());

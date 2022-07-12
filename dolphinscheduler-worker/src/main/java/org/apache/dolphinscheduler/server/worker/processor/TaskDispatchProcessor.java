@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchMessage;
+import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -98,7 +98,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskDispatchMessage taskDispatchMessage = JSONUtils.parseObject(command.getBody(), TaskDispatchMessage.class);
+        TaskDispatchCommand taskDispatchMessage = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
         if (taskDispatchMessage == null) {
             logger.error("task execute request message content is null");

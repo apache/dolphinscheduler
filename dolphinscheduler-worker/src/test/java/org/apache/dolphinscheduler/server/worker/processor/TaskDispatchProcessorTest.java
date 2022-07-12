@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchMessage;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningMessage;
+import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -73,7 +73,7 @@ public class TaskDispatchProcessorTest {
 
     private Command ackCommand;
 
-    private TaskDispatchMessage taskRequestCommand;
+    private TaskDispatchCommand taskRequestCommand;
 
     private AlertClientService alertClientService;
 
@@ -88,10 +88,10 @@ public class TaskDispatchProcessorTest {
         workerConfig.setListenPort(1234);
         command = new Command();
         command.setType(CommandType.TASK_DISPATCH_REQUEST);
-        ackCommand = new TaskExecuteRunningMessage("127.0.0.1:1234",
+        ackCommand = new TaskExecuteRunningCommand("127.0.0.1:1234",
                                                    "127.0.0.1:5678",
                                                    System.currentTimeMillis()).convert2Command();
-        taskRequestCommand = new TaskDispatchMessage(taskExecutionContext,
+        taskRequestCommand = new TaskDispatchCommand(taskExecutionContext,
                                                      "127.0.0.1:5678",
                                                      "127.0.0.1:1234",
                                                      System.currentTimeMillis());
@@ -125,11 +125,11 @@ public class TaskDispatchProcessorTest {
             workerExecService);
 
         PowerMockito.mockStatic(JsonSerializer.class);
-        PowerMockito.when(JsonSerializer.deserialize(command.getBody(), TaskDispatchMessage.class)).thenReturn(
+        PowerMockito.when(JsonSerializer.deserialize(command.getBody(), TaskDispatchCommand.class)).thenReturn(
             taskRequestCommand);
 
         PowerMockito.mockStatic(JSONUtils.class);
-        PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskDispatchMessage.class)).thenReturn(
+        PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class)).thenReturn(
             taskRequestCommand);
 
         PowerMockito.mockStatic(FileUtils.class);

@@ -25,36 +25,41 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * task execute response ack command
- * from master to worker
+ * Task reject message, means the task has been rejected by the worker.
  */
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskExecuteAckMessage extends BaseMessage {
+public class TaskRejectCommand extends BaseCommand {
 
+    /**
+     * taskInstanceId
+     */
     private int taskInstanceId;
-    private int status;
 
-    public TaskExecuteAckMessage(int status,
-                                 int taskInstanceId,
-                                 String sourceServerAddress,
-                                 String messageReceiverAddress,
-                                 long messageSendTime) {
-        super(sourceServerAddress, messageReceiverAddress, messageSendTime);
-        this.status = status;
-        this.taskInstanceId = taskInstanceId;
+    /**
+     * host
+     */
+    private String host;
+
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    public TaskRejectCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
     }
 
     /**
-     * package response command
+     * package request command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
+        command.setType(CommandType.TASK_REJECT);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;

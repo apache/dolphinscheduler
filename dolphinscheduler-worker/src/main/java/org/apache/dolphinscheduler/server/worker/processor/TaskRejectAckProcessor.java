@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskRejectAckMessage;
+import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -48,8 +48,8 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_REJECT_ACK == command.getType(),
                                     String.format("invalid command type : %s", command.getType()));
 
-        TaskRejectAckMessage taskRejectAckMessage = JSONUtils.parseObject(command.getBody(),
-                                                                          TaskRejectAckMessage.class);
+        TaskRejectAckCommand taskRejectAckMessage = JSONUtils.parseObject(command.getBody(),
+                                                                          TaskRejectAckCommand.class);
         if (taskRejectAckMessage == null) {
             return;
         }

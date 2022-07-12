@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResultMessage;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskExecuteResultMessageSender implements MessageSender<TaskExecuteResultMessage> {
+public class TaskExecuteResultMessageSender implements MessageSender<TaskExecuteResultCommand> {
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -38,14 +38,14 @@ public class TaskExecuteResultMessageSender implements MessageSender<TaskExecute
     private WorkerRpcClient workerRpcClient;
 
     @Override
-    public void sendMessage(TaskExecuteResultMessage message) throws RemotingException {
+    public void sendMessage(TaskExecuteResultCommand message) throws RemotingException {
         workerRpcClient.send(Host.of(message.getMessageReceiverAddress()), message.convert2Command());
     }
 
-    public TaskExecuteResultMessage buildMessage(TaskExecutionContext taskExecutionContext,
+    public TaskExecuteResultCommand buildMessage(TaskExecutionContext taskExecutionContext,
                                                  String messageReceiverAddress) {
-        TaskExecuteResultMessage taskExecuteResultMessage
-            = new TaskExecuteResultMessage(workerConfig.getWorkerAddress(),
+        TaskExecuteResultCommand taskExecuteResultMessage
+            = new TaskExecuteResultCommand(workerConfig.getWorkerAddress(),
                                            messageReceiverAddress,
                                            System.currentTimeMillis());
         taskExecuteResultMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());

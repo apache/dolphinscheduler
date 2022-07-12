@@ -18,41 +18,94 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-
 /**
- * The task dispatch message, means dispatch a task to worker.
+ * execute task response command
  */
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TaskDispatchMessage extends BaseMessage {
+public class TaskExecuteResultCommand extends BaseCommand {
 
-    private static final long serialVersionUID = -1L;
-
-    private TaskExecutionContext taskExecutionContext;
-
-    public TaskDispatchMessage(TaskExecutionContext taskExecutionContext,
-                               String messageSenderAddress,
-                               String messageReceiverAddress,
-                               long messageSendTime) {
+    public TaskExecuteResultCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
         super(messageSenderAddress, messageReceiverAddress, messageSendTime);
-        this.taskExecutionContext = taskExecutionContext;
     }
 
+    /**
+     * task instance id
+     */
+    private int taskInstanceId;
+
+    /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    /**
+     * status
+     */
+    private int status;
+
+    /**
+     * startTime
+     */
+    private Date startTime;
+
+    /**
+     * host
+     */
+    private String host;
+
+    /**
+     * logPath
+     */
+    private String logPath;
+
+    /**
+     * executePath
+     */
+    private String executePath;
+
+
+    /**
+     * end time
+     */
+    private Date endTime;
+
+
+    /**
+     * processId
+     */
+    private int processId;
+
+    /**
+     * appIds
+     */
+    private String appIds;
+
+    /**
+     * varPool string
+     */
+    private String varPool;
+
+    /**
+     * package response command
+     *
+     * @return command
+     */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_DISPATCH_REQUEST);
+        command.setType(CommandType.TASK_EXECUTE_RESULT);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
-
 }
