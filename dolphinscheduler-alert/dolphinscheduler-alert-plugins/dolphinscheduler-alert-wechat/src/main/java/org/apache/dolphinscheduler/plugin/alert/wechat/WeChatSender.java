@@ -17,10 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
+import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO;
+import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.WE_CHAT_ENABLE_ID_TRANS;
+import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.WE_CHAT_MESSAGE_SAFE_PUBLICITY;
+
+import static java.util.Objects.requireNonNull;
+
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,8 +36,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,9 +45,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
-import static java.util.Objects.requireNonNull;
-import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class WeChatSender {
     private static final Logger logger = LoggerFactory.getLogger(WeChatSender.class);

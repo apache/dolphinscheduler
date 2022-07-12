@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -34,8 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class JSONUtilsTest {
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public class JSONUtilsTest {
 
     @Test
     public void createObjectNodeTest() {
@@ -58,7 +58,6 @@ public class JSONUtilsTest {
         Assert.assertEquals("Jobs", models.get("name"));
 
     }
-
 
     @Test
     public void string2MapTest() {
@@ -95,7 +94,6 @@ public class JSONUtilsTest {
         Assert.assertNull(JSONUtils.parseObject(""));
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
     }
-
 
     @Test
     public void testJsonByteArray() {

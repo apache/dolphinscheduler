@@ -192,7 +192,6 @@ public class DateUtils {
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
-
     /**
      * compare two dates
      *
