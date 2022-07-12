@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
@@ -46,7 +47,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -278,8 +281,14 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 String tenantCode = fileDownload.getRight();
                 String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
                 logger.info("get resource file from hdfs :{}", resHdfsPath);
+                long resourceDownloadStartTime = System.currentTimeMillis();
                 storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
+                WorkerServerMetrics.recordWorkerResourceDownloadSize(
+                        Files.size(Paths.get(execLocalPath, fullName)));
+                WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
             } catch (Exception e) {
+                WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
                 logger.error(e.getMessage(), e);
                 throw new ServiceException(e.getMessage());
             }
