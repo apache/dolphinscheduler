@@ -1129,6 +1129,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return create result code
      */
     @Override
+    @Transactional
     public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content) {
         if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
             Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
