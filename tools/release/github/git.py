@@ -20,8 +20,6 @@ from typing import Optional, Iterator, Dict
 from git import Repo, Commit
 from pathlib import Path
 
-from subprocess import Popen, PIPE, STDOUT
-
 git_dir_path: Path = Path(__file__).parent.parent.parent.parent.joinpath(".git")
 
 
@@ -57,7 +55,3 @@ class Git:
         if self.has_commit_current(sha):
             print("SHA %s already in current active branch, skip it.", sha)
         self.repo.git.cherry_pick('-x', sha)
-        # popen = Popen(f"git cherry-pick -x {sha}", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-        # stdout, nothing = popen.communicate()
-        # if stdout:
-        #     raise RuntimeError("Cherry-pick SHA: %s error with message %s, please make sure you local default branch is up-to-date", (sha, stdout))

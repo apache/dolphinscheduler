@@ -86,9 +86,7 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
-    # TODO
-    args = arg_parser.parse_args(["cherry-pick"])
-    # args = arg_parser.parse_args()
+    args = arg_parser.parse_args()
 
     ENV_ACCESS_TOKEN = os.environ.get("GH_ACCESS_TOKEN", None)
     ENV_MILESTONE = os.environ.get("GH_REPO_MILESTONE", None)
