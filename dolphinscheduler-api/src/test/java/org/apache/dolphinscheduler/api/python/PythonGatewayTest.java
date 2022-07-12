@@ -179,6 +179,25 @@ public class PythonGatewayTest {
         Assert.assertNull(result);
     }
 
+    public void testCreateResource() {
+        User user = getTestUser();
+        String resourceDir = "/dir1/dir2/";
+        String resourceName = "test";
+        String resourceSuffix = "py";
+        String desc = "desc";
+        String content = "content";
+        String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
+
+        int resourceId = 3;
+
+        Mockito.when(resourcesService.createOrUpdateResource(user.getUserName(), resourceFullName, desc, content))
+                .thenReturn(resourceId);
+
+        int id = pythonGateway.createOrUpdateResource(
+                user.getUserName(), resourceFullName, desc, content);
+        Assert.assertEquals(id, resourceId);
+    }
+
     @Test
     public void testQueryResourcesFileInfo() {
         User user = getTestUser();
