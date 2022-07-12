@@ -17,33 +17,40 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * access token service impl
@@ -69,14 +76,13 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     public Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Page<AccessToken> page = new Page<>(pageNo, pageSize);
-        int userId = loginUser.getId();
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            userId = 0;
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), logger);
+        if (!ids.isEmpty()) {
+            Page<AccessToken> page = new Page<>(pageNo, pageSize);
+            IPage<AccessToken> accessTokenList = accessTokenMapper.selectAccessTokenPage(page, new ArrayList<>(ids), searchVal);
+            pageInfo.setTotal((int) accessTokenList.getTotal());
+            pageInfo.setTotalList(accessTokenList.getRecords());
         }
-        IPage<AccessToken> accessTokenList = accessTokenMapper.selectAccessTokenPage(page, searchVal, userId);
-        pageInfo.setTotal((int) accessTokenList.getTotal());
-        pageInfo.setTotalList(accessTokenList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -93,14 +99,11 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     public Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        // no permission
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER) && loginUser.getId() != userId) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+        List<AccessToken> accessTokenList = Collections.EMPTY_LIST;
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), logger);
+        if (!ids.isEmpty()) {
+            accessTokenList = this.accessTokenMapper.selectBatchIds(ids);
         }
-        userId = loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId;
-        // query access token for specified user
-        List<AccessToken> accessTokenList = this.accessTokenMapper.queryAccessTokenByUser(userId);
         result.put(Constants.DATA_LIST, accessTokenList);
         this.putMsg(result, Status.SUCCESS);
         return result;
@@ -152,6 +155,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         if (insert > 0) {
             result.setData(accessToken);
             putMsg(result, Status.SUCCESS);
+            resourcePermissionCheckService.postHandle(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), new ArrayList<>(accessToken.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
@@ -170,10 +174,6 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         String token = EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
         result.put(Constants.DATA_LIST, token);
         putMsg(result, Status.SUCCESS);
@@ -190,16 +190,16 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
+        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
 
         if (accessToken == null) {
             logger.error("access token not exist,  access token id {}", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
-            return result;
-        }
-        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 

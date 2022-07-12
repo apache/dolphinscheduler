@@ -31,8 +31,10 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -139,7 +141,8 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Map<Integer, AccessToken> accessTokenMap = createAccessTokens(count, userName);
 
         Page page = new Page(offset, size);
-        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
+        List<Integer> tokenIds = accessTokenMap.entrySet().stream().map(acc -> acc.getValue().getId()).collect(Collectors.toList());
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, tokenIds, userName);
 
         assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()), size);
 
