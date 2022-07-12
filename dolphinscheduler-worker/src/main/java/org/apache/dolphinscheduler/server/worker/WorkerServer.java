@@ -25,9 +25,10 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.prc.WorkerRpcServer;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
-import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -72,9 +73,6 @@ public class WorkerServer implements IStoppable {
     private AlertClientService alertClientService;
 
     @Autowired
-    private RetryReportTaskStatusThread retryReportTaskStatusThread;
-
-    @Autowired
     private WorkerManagerThread workerManagerThread;
 
     /**
@@ -89,6 +87,12 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerRpcServer workerRpcServer;
 
+    @Autowired
+    private WorkerRpcClient workerRpcClient;
+
+    @Autowired
+    private MessageRetryRunner messageRetryRunner;
+
     /**
      * worker server startup, not use web service
      *
@@ -102,7 +106,7 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         this.workerRpcServer.start();
-
+        this.workerRpcClient.start();
         this.taskPluginManager.installPlugin();
 
         this.workerRegistryClient.registry();
@@ -112,7 +116,7 @@ public class WorkerServer implements IStoppable {
 
         this.workerManagerThread.start();
 
-        this.retryReportTaskStatusThread.start();
+        this.messageRetryRunner.start();
 
         /*
          * registry hooks, which are called before the process exits

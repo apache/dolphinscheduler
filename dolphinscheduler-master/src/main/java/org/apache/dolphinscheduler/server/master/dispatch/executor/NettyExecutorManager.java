@@ -83,8 +83,6 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     @PostConstruct
     public void init() {
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
     }
 

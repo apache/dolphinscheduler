@@ -30,7 +30,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
+import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
 import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
@@ -156,8 +158,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
                                                                                                nettyExecutorManager,
                                                                                                processAlertManager,
                                                                                                masterConfig,
-                                                                                               stateWheelExecuteThread,
-                                                                                               curingGlobalParamsService);
+                                                                                               stateWheelExecuteThread);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
                                                                       processInstance.getId()));

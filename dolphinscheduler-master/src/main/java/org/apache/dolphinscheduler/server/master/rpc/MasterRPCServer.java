@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 
 import javax.annotation.PostConstruct;
 
@@ -69,9 +68,6 @@ public class MasterRPCServer implements AutoCloseable {
     private TaskKillResponseProcessor taskKillResponseProcessor;
 
     @Autowired
-    private TaskRecallProcessor taskRecallProcessor;
-
-    @Autowired
     private LoggerRequestProcessor loggerRequestProcessor;
 
     @PostConstruct
@@ -80,14 +76,13 @@ public class MasterRPCServer implements AutoCloseable {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT, taskExecuteResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, taskEventProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, taskEventProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL, taskRecallProcessor);
 
         // logger server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
