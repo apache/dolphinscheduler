@@ -276,7 +276,7 @@ public class ProcessServiceImpl implements ProcessService {
     private CuringParamsService curingGlobalParamsService;
 
     @Autowired
-    private ProcessService processService;
+    private ProcessServiceImpl processService;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -289,7 +289,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Transactional
     public ProcessInstance handleCommand(String host, Command command) throws CronParseException,
         CodeGenerateException {
-        ProcessInstance processInstance = constructProcessInstance(command, host);
+        ProcessInstance processInstance = processService.constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
             logger.error("scan command, command parameter is error: {}", command);
@@ -299,25 +299,27 @@ public class ProcessServiceImpl implements ProcessService {
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         //if the processDefinition is serial
-        ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+        ProcessDefinition processDefinition
+            = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                                                   processInstance.getProcessDefinitionVersion());
         if (processDefinition.getExecutionType().typeIsSerial()) {
-            saveSerialProcess(processInstance, processDefinition);
+            processService.saveSerialProcess(processInstance, processDefinition);
             if (processInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
-                setSubProcessParam(processInstance);
-                deleteCommandWithCheck(command.getId());
+                processService.setSubProcessParam(processInstance);
+                processService.deleteCommandWithCheck(command.getId());
                 return null;
             }
         } else {
-            saveProcessInstance(processInstance);
+            processService.saveProcessInstance(processInstance);
         }
-        setSubProcessParam(processInstance);
-        deleteCommandWithCheck(command.getId());
+        processService.setSubProcessParam(processInstance);
+        processService.deleteCommandWithCheck(command.getId());
         return processInstance;
     }
 
     protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         processInstance.setState(ExecutionStatus.SERIAL_WAIT);
-        saveProcessInstance(processInstance);
+        processService.saveProcessInstance(processInstance);
         //serial wait
         //when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
@@ -326,7 +328,7 @@ public class ProcessServiceImpl implements ProcessService {
                         processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
                 if (CollectionUtils.isEmpty(runningProcessInstances)) {
                     processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-                    saveProcessInstance(processInstance);
+                    processService.saveProcessInstance(processInstance);
                     return;
                 }
                 ProcessInstance runningProcess = runningProcessInstances.get(0);
@@ -339,17 +341,17 @@ public class ProcessServiceImpl implements ProcessService {
                     processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.STOP);
-                saveProcessInstance(processInstance);
+                processService.saveProcessInstance(processInstance);
                 return;
             }
             processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-            saveProcessInstance(processInstance);
+            processService.saveProcessInstance(processInstance);
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                     processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-                saveProcessInstance(processInstance);
+                processService.saveProcessInstance(processInstance);
                 return;
             }
             for (ProcessInstance info : runningProcessInstances) {
@@ -359,7 +361,7 @@ public class ProcessServiceImpl implements ProcessService {
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(ExecutionStatus.READY_STOP);
-                int update = updateProcessInstance(info);
+                int update = processService.updateProcessInstance(info);
                 // determine whether the process is normal
                 if (update > 0) {
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
@@ -931,8 +933,8 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
 
-        processDefinition =
-            this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
+        processDefinition = processService.findProcessDefinition(command.getProcessDefinitionCode(),
+                                                                 command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
             return null;
@@ -942,7 +944,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (processInstanceId == 0) {
             processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
         } else {
-            processInstance = this.findProcessInstanceDetailById(processInstanceId);
+            processInstance = processService.findProcessInstanceDetailById(processInstanceId);
             if (processInstance == null) {
                 return null;
             }
@@ -1003,7 +1005,7 @@ public class ProcessServiceImpl implements ProcessService {
                 failedList.addAll(killedList);
                 failedList.addAll(toleranceList);
                 for (Integer taskId : failedList) {
-                    initTaskInstance(this.findTaskInstanceById(taskId));
+                    processService.initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
                     String.join(Constants.COMMA, convertIntListToString(failedList)));
@@ -1023,7 +1025,7 @@ public class ProcessServiceImpl implements ProcessService {
                 suspendedNodeList.addAll(stopNodeList);
                 for (Integer taskId : suspendedNodeList) {
                     // initialize the pause state
-                    initTaskInstance(this.findTaskInstanceById(taskId));
+                    processService.initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING, String.join(",", convertIntListToString(suspendedNodeList)));
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
@@ -1041,7 +1043,7 @@ public class ProcessServiceImpl implements ProcessService {
                     List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
-                        this.updateTaskInstance(taskInstance);
+                        processService.updateTaskInstance(taskInstance);
                     }
                 }
                 break;
@@ -1055,13 +1057,13 @@ public class ProcessServiceImpl implements ProcessService {
                 List<TaskInstance> validTaskList = findValidTaskListByProcessId(processInstance.getId());
                 for (TaskInstance taskInstance : validTaskList) {
                     taskInstance.setFlag(Flag.NO);
-                    updateTaskInstance(taskInstance);
+                    processService.updateTaskInstance(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
                 processInstance.setRestartTime(processInstance.getStartTime());
                 processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime + 1);
-                initComplementDataParam(processDefinition, processInstance, cmdParam);
+                processService.initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case SCHEDULER:
                 break;
@@ -3090,12 +3092,13 @@ public class ProcessServiceImpl implements ProcessService {
         return this.processInstanceMapper.loadNextProcess4Serial(code, state, id);
     }
 
-    protected void deleteCommandWithCheck(int commandId) {
+    public void deleteCommandWithCheck(int commandId) {
         int delete = this.commandMapper.deleteById(commandId);
         if (delete != 1) {
             throw new ServiceException("delete command fail, id:" + commandId);
         }
     }
+
     /**
      * find k8s config yaml by clusterName
      *
