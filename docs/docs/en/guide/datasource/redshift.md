@@ -15,6 +15,7 @@
 | Password | Set the password for Redshift connection. |
 | Database Name | Enter the database name of the Redshift connection. |
 | jdbc connect parameters | Parameter settings for Redshift connection, in JSON format. |
+
 ## Native Supported
 
 Yes, could use this datasource by default.
