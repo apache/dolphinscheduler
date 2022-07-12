@@ -1012,7 +1012,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (taskInstance != null) {
             return taskInstance;
         }
-
         return newTaskInstance(processInstance, taskNode);
     }
 
