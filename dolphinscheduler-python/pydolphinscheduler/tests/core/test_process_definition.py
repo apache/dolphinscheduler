@@ -18,7 +18,7 @@
 """Test process definition."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, List
 from unittest.mock import patch
 
 import pytest
@@ -26,6 +26,7 @@ from freezegun import freeze_time
 
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.process_definition import ProcessDefinition
+from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
@@ -90,6 +91,11 @@ def test_process_definition_default_value(name, value):
         ("warning_group_id", int, 1),
         ("timeout", int, 1),
         ("param", dict, {"key": "value"}),
+        (
+            "resource_list",
+            List,
+            [Resource(name="/dev/test.py", content="hello world", description="desc")],
+        ),
     ],
 )
 def test_set_attr(name, cls, expect):
@@ -321,6 +327,7 @@ def test_process_definition_get_define_without_task():
         "tasks": {},
         "taskDefinitionJson": [{}],
         "taskRelationJson": [{}],
+        "resourceList": [],
     }
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         assert pd.get_define() == expect

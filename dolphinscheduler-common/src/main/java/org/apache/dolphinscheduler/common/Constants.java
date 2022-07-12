@@ -162,6 +162,11 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
+     * period .
+     */
+    public static final String PERIOD = ".";
+
+    /**
      * QUESTION ?
      */
     public static final String QUESTION = "?";
