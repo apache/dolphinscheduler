@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -344,7 +345,11 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return Collections.emptySet();
+            List<Environment> environments = environmentMapper.queryAllEnvironmentList();
+            if (environments.isEmpty()) {
+                return Collections.emptySet();
+            }
+            return environments.stream().map(Environment::getId).collect(Collectors.toSet());
         }
     }
 
