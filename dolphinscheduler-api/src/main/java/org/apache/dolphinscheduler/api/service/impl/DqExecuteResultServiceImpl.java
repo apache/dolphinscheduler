@@ -88,6 +88,7 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
                         page,
                         searchVal,
                         loginUser.getId(),
+                        loginUser.getUserType().getCode(),
                         statusArray,
                         ruleType,
                         start,

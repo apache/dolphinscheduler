@@ -37,6 +37,7 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
      * @param page page
      * @param searchVal searchVal
      * @param userId userId
+     * @param userTypeCode userTypeCode
      * @param statusArray states
      * @param ruleType ruleType
      * @param startTime startTime
@@ -45,6 +46,7 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
     IPage<DqExecuteResult> queryResultListPaging(IPage<DqExecuteResult> page,
                                                  @Param("searchVal") String searchVal,
                                                  @Param("userId") int userId,
+                                                 @Param("userTypeCode") int userTypeCode,
                                                  @Param("states") int[] statusArray,
                                                  @Param("ruleType") int ruleType,
                                                  @Param("startTime") Date startTime,
