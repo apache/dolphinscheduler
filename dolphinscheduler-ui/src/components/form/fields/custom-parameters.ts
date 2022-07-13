@@ -36,27 +36,31 @@ const CustomParameters = defineComponent({
   },
   render() {
     const { disabled, $slots, onAdd } = this
-    return h(NSpace, null, {
-      default: () => {
-        return [
-          renderSlot($slots, 'default', { disabled }),
-          h(
-            NButton,
-            {
-              circle: true,
-              size: 'small',
-              type: 'info',
-              class: 'btn-create-custom-parameter',
-              disabled,
-              onClick: onAdd
-            },
-            {
-              icon: () => h(PlusOutlined)
-            }
-          )
-        ]
+    return h(
+      NSpace,
+      { vertical: true, style: { width: '100%' } },
+      {
+        default: () => {
+          return [
+            renderSlot($slots, 'default', { disabled }),
+            h(
+              NButton,
+              {
+                circle: true,
+                size: 'small',
+                type: 'info',
+                class: 'btn-create-custom-parameter',
+                disabled,
+                onClick: onAdd
+              },
+              {
+                icon: () => h(PlusOutlined)
+              }
+            )
+          ]
+        }
       }
-    })
+    )
   }
 })
 
