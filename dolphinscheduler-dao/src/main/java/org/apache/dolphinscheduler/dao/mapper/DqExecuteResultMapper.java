@@ -32,7 +32,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
 
     /**
-     * data quality task execute result page
+     * data quality  task execute result page
      *
      * @param page page
      * @param searchVal searchVal
