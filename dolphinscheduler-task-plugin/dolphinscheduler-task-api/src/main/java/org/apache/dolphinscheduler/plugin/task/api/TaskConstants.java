@@ -313,11 +313,6 @@ public class TaskConstants {
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
     /**
-     * resource storage type
-     */
-   // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
-
-    /**
      * kerberos
      */
     public static final String KERBEROS = "kerberos";

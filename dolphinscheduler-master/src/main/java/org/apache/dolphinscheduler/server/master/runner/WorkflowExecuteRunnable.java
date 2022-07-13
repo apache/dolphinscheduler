@@ -1814,7 +1814,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
             if (ArrayUtils.isNotEmpty(idList)) {
-                List<Integer> taskInstanceIds = Arrays.stream(idList).filter(StringUtils::isNotEmpty).map(Integer::valueOf).collect(Collectors.toList());
+                List<Integer> taskInstanceIds = Arrays.stream(idList).map(Integer::valueOf).collect(Collectors.toList());
                 return processService.findTaskInstanceByIdList(taskInstanceIds);
             }
         }

@@ -29,8 +29,8 @@ public class WechatAppMessage {
     private Map<String, String> text;
     private Map<String, String> markdown;
     private Integer safe;
-    private Integer enable_id_trans;
-    private Integer enable_duplicate_check;
+    private Integer enableIdTrans;
+    private Integer enableDuplicateCheck;
 
     public String getTouser() {
         return touser;
@@ -72,20 +72,20 @@ public class WechatAppMessage {
         this.safe = safe;
     }
 
-    public Integer getEnable_id_trans() {
-        return enable_id_trans;
+    public Integer getEnableIdTrans() {
+        return enableIdTrans;
     }
 
-    public void setEnable_id_trans(Integer enable_id_trans) {
-        this.enable_id_trans = enable_id_trans;
+    public void setEnableIdTrans(Integer enableIdTrans) {
+        this.enableIdTrans = enableIdTrans;
     }
 
-    public Integer getEnable_duplicate_check() {
-        return enable_duplicate_check;
+    public Integer getEnableDuplicateCheck() {
+        return enableDuplicateCheck;
     }
 
-    public void setEnable_duplicate_check(Integer enable_duplicate_check) {
-        this.enable_duplicate_check = enable_duplicate_check;
+    public void setEnableDuplicateCheck(Integer enableDuplicateCheck) {
+        this.enableDuplicateCheck = enableDuplicateCheck;
     }
 
     public Map<String, String> getMarkdown() {
@@ -109,7 +109,7 @@ public class WechatAppMessage {
             this.text = contentMap;
         }
         this.safe = safe;
-        this.enable_id_trans = enableIdTrans;
-        this.enable_duplicate_check = enableDuplicateCheck;
+        this.enableIdTrans = enableIdTrans;
+        this.enableDuplicateCheck = enableDuplicateCheck;
     }
 }

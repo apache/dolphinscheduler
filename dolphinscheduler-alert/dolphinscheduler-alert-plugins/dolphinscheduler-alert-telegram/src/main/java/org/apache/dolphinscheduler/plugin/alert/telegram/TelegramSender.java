@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.telegram;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -37,13 +37,16 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class TelegramSender {
 
@@ -68,7 +71,6 @@ public final class TelegramSender {
     private String user;
 
     private String password;
-
 
     TelegramSender(Map<String, String> config) {
         url = config.get(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK);
@@ -132,14 +134,13 @@ public final class TelegramSender {
         return result;
     }
 
-
     private String sendInvoke(String title, String content) throws IOException {
         HttpPost httpPost = buildHttpPost(url, buildMsgJsonStr(content));
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
             if (StringUtils.isNotEmpty(user) && StringUtils.isNotEmpty(password)) {
                 httpClient = getProxyClient(proxy, port, user, password);
-            }else {
+            } else {
                 httpClient = getDefaultClient();
             }
             RequestConfig rcf = getProxyConfig(proxy, port);

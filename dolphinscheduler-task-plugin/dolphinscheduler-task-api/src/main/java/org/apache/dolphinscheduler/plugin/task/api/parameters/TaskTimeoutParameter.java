@@ -73,10 +73,6 @@ public class TaskTimeoutParameter {
 
     @Override
     public String toString() {
-        return "TaskTimeoutParameter{" +
-                "enable=" + enable +
-                ", strategy=" + strategy +
-                ", interval=" + interval +
-                '}';
+        return "enable=" + "TaskTimeoutParameter{" + enable + ", strategy=" + strategy + ", interval=" + interval + '}';
     }
 }

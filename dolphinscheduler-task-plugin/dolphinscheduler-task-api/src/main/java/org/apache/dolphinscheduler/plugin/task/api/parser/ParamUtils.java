@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
 import java.util.HashMap;
 import java.util.Iterator;

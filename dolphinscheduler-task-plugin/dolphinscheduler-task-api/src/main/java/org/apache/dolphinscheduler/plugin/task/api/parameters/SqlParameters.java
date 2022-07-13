@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 

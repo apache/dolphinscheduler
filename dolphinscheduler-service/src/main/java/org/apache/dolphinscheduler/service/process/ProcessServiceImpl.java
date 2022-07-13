@@ -156,8 +156,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -2009,11 +2007,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (intList == null) {
             return new ArrayList<>();
         }
-        List<String> result = new ArrayList<>(intList.size());
-        for (Integer intVar : intList) {
-            result.add(String.valueOf(intVar));
-        }
-        return result;
+        return intList.stream().map(String::valueOf).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
     }
 
     /**

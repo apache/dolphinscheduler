@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 public enum WeChatType {

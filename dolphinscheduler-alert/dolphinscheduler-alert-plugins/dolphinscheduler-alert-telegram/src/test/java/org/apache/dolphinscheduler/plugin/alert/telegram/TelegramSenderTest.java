@@ -19,12 +19,13 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class TelegramSenderTest {
 
@@ -41,7 +42,6 @@ public class TelegramSenderTest {
         telegramConfig.put(
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
     }
-
 
     @Test
     public void testSendMessageFailByParamToken() {
@@ -67,8 +67,6 @@ public class TelegramSenderTest {
         AlertResult result = telegramSender.sendMessage(alertData);
         Assert.assertEquals("false", result.getStatus());
     }
-
-
 
     @Test
     public void testSendMessage() {
@@ -106,6 +104,4 @@ public class TelegramSenderTest {
         Assert.assertEquals("false", result.getStatus());
 
     }
-
-
 }

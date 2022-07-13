@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * udf function
