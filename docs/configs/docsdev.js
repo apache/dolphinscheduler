@@ -361,6 +361,10 @@ export default {
                         title: 'Kubernetes Deployment',
                         link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
+                    {
+                        title: 'Rainbond Deployment',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/rainbond.html',
+                    },
                 ],
             },
             {
@@ -756,6 +760,10 @@ export default {
                     {
                         title: 'Kubernetes部署(Kubernetes)',
                         link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
+                    },
+                    {
+                        title: '基于Rainbond部署(Cluster)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/rainbond.html',
                     },
                 ],
             },
