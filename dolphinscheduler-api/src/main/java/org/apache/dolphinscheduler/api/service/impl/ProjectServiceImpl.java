@@ -244,12 +244,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (project == null) {
             logger.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!canOperatorPermissions(loginUser, new Object[] {project.getId()}, AuthorizationType.PROJECTS,
-                permission)) {
-            logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.", permission, loginUser.getUserName(), project.getCode());
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         } else {
-            checkResult = true;
+            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+            if (projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+                logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.", permission, loginUser.getUserName(), project.getCode());
+                putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+            } else {
+                checkResult = true;
+            }
         }
         return checkResult;
     }
@@ -367,6 +369,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result deleteProject(User loginUser, Long projectCode) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
+
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result,PROJECT_UPDATE);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
 
         checkProjectAndAuth(result, loginUser, project, project == null ? 0L : project.getCode(), PROJECT_DELETE);
         if (result.getCode() != Status.SUCCESS.getCode()) {
