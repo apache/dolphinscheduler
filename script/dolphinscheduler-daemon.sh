@@ -95,6 +95,7 @@ elif [ "$command" = "logger-server" ]; then
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $LOGGER_SERVER_OPTS"
 elif [ "$command" = "standalone-server" ]; then
+  LOG_FILE="-Dlogging.config=classpath:logback-standalone.xml"
   CLASS=org.apache.dolphinscheduler.server.StandaloneServer
   export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},standalone,${DATABASE_TYPE}"
 elif [ "$command" = "python-gateway-server" ]; then

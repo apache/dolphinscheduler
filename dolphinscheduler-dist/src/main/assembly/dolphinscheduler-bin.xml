@@ -109,6 +109,7 @@
             <directory>${basedir}/../dolphinscheduler-standalone-server/src/main/resources</directory>
             <includes>
                 <include>**/*.yaml</include>
+                <include>**/*.xml</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
