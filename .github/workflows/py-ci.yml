@@ -165,7 +165,7 @@ jobs:
       - name: Install Dependences
         run: |
           python -m pip install --upgrade ${{ env.DEPENDENCES }}
-      - name: Run Tests Build Docs
+      - name: Run Integrate Tests
         run: |
           python -m tox -vv -e integrate-test
   result:
