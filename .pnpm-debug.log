@@ -1,0 +1,14 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_PKG_MANIFEST",
+    "err": {
+      "name": "pnpm",
+      "message": "No package.json found in /Users/mac/学习/open_source/dolphinscheduler",
+      "code": "ERR_PNPM_NO_PKG_MANIFEST",
+      "stack": "pnpm: No package.json found in /Users/mac/学习/open_source/dolphinscheduler\n    at handler (/usr/local/Cellar/pnpm/7.5.0/libexec/lib/node_modules/pnpm/dist/pnpm.cjs:127622:17)\n    at async /usr/local/Cellar/pnpm/7.5.0/libexec/lib/node_modules/pnpm/dist/pnpm.cjs:192593:21\n    at async run (/usr/local/Cellar/pnpm/7.5.0/libexec/lib/node_modules/pnpm/dist/pnpm.cjs:192567:34)\n    at async runPnpm (/usr/local/Cellar/pnpm/7.5.0/libexec/lib/node_modules/pnpm/dist/pnpm.cjs:192785:5)\n    at async /usr/local/Cellar/pnpm/7.5.0/libexec/lib/node_modules/pnpm/dist/pnpm.cjs:192777:7"
+    }
+  }
+}

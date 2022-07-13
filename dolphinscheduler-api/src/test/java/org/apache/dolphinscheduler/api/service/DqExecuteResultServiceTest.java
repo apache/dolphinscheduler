@@ -76,7 +76,7 @@ public class DqExecuteResultServiceTest {
         page.setTotal(1);
         page.setRecords(getExecuteResultList());
         when(dqExecuteResultMapper.queryResultListPaging(
-                any(IPage.class), eq(""), eq(loginUser.getId()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
+                any(IPage.class), eq(""), eq(loginUser.getId()), eq(loginUser.getUserType().getCode()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
         Result result = dqExecuteResultService.queryResultListPaging(
                 loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
