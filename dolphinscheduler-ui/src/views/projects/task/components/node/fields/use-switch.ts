@@ -104,13 +104,13 @@ export function useSwitch(
             autosize: { minRows: 2 }
           }
         },
-        (i = 0) => ({
+        {
           type: 'select',
           field: 'nextNode',
           span: 22,
           name: t('project.node.switch_branch_flow'),
           options: branchFlowOptions
-        })
+        }
       ]
     },
     {
