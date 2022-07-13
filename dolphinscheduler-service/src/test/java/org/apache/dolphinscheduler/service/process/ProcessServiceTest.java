@@ -292,7 +292,12 @@ public class ProcessServiceTest {
                                     + "\":\"111\",\""
                                     + CMD_PARAM_SUB_PROCESS_DEFINE_CODE
                                     + "\":\"222\"}");
-        Assert.assertNull(processService.handleCommand(host, command));
+        try {
+            Assert.assertNull(processService.handleCommand(host, command));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            // assert throw illegalArgumentException here since the definition is null
+            Assert.assertTrue(true);
+        }
 
         int definitionVersion = 1;
         long definitionCode = 123;
