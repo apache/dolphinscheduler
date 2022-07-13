@@ -50,11 +50,11 @@
   * 点击工作流定义->创建工作流定义->上线工作流定义
 
 <p align="center">
-   <img src="/img/dag1.png" width="60%" />
+   <img src="/img/process_definition_en.png" width="60%" />
  </p>
 
   * 运行工作流定义->点击工作流实例->点击工作流实例名称->双击任务节点->查看任务执行日志
 
  <p align="center">
-   <img src="/img/task-log.png" width="60%" />
+   <img src="/img/log_en.png" width="60%" />
 </p>
