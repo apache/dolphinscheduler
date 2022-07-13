@@ -69,18 +69,22 @@ public class ZeppelinParameters extends AbstractParameters {
         this.parameters = parameters;
     }
 
-    public String getRestEndpoint() { return restEndpoint; }
+    public String getRestEndpoint() {
+        return restEndpoint;
+    }
 
-    public void setRestEndpoint(String restEndpoint) { this.restEndpoint = restEndpoint; }
+    public void setRestEndpoint(String restEndpoint) {
+        this.restEndpoint = restEndpoint;
+    }
 
     @Override
     public String toString() {
-        return "ZeppelinParameters{" +
-                "noteId='" + noteId + '\'' +
-                ", paragraphId='" + paragraphId + '\'' +
-                ", restEndpoint='" + restEndpoint + '\'' +
-                ", parameters='" + parameters + '\'' +
-                '}';
+        return "ZeppelinParameters{"
+               + "noteId='" + noteId + '\''
+               + ", paragraphId='" + paragraphId + '\''
+               + ", restEndpoint='" + restEndpoint + '\''
+               + ", parameters='" + parameters + '\''
+               + '}';
     }
 
 }
