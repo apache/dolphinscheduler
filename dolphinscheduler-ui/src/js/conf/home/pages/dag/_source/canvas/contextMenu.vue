@@ -114,9 +114,9 @@
         const targetNode = nodes.find(
           (node) => node.id === this.currentTask.code
         )
-        const targetTask = this.tasks.find(
+        const targetTask = JSON.parse(JSON.stringify(this.tasks.find(
           (task) => task.code === this.currentTask.code
-        )
+        )))
 
         if (!targetNode || !targetTask) return
 
