@@ -17,8 +17,8 @@
 
 """Test whether success submit examples DAG to PythonGatewayService."""
 
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 import pytest
 
