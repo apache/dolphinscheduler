@@ -29,8 +29,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -137,7 +139,8 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Map<Integer, AccessToken> accessTokenMap = createAccessTokens(count, userName);
 
         Page page = new Page(offset, size);
-        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
+        List<Integer> tokenIds = accessTokenMap.values().stream().map(AccessToken::getId).collect(Collectors.toList());
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, tokenIds, userName);
 
         assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()), size);
 

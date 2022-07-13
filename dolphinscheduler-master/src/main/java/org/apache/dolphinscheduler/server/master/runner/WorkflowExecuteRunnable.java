@@ -1540,6 +1540,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (state == ExecutionStatus.READY_BLOCK) {
             ExecutionStatus executionStatus = processReadyBlock();
             logger.info("The workflowInstance is ready to block, the workflowInstance status is {}", executionStatus);
+            return executionStatus;
         }
 
         // waiting thread
@@ -1571,6 +1572,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 executionStatus = ExecutionStatus.SUCCESS;
             }
             logger.info("The workflowInstance is ready to stop, the workflow status is {}", executionStatus);
+            return executionStatus;
         }
 
         // process failure
