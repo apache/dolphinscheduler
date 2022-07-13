@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.avro.generic.GenericData;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -90,14 +88,14 @@ public class HttpParametersTest  {
         HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
 
-        String body="{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
+        String body = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
                 + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
 
         //Set custom parameters
-        List<Property> localParams=new ArrayList<>();
+        List<Property> localParams = new ArrayList<>();
 
         //Setting output Parameters
-        Property property=new Property();
+        Property property = new Property();
         property.setProp("body");
         property.setDirect(Direct.OUT);
         property.setType(DataType.VARCHAR);
@@ -106,17 +104,9 @@ public class HttpParametersTest  {
         httpParameters.setLocalParams(localParams);
 
         String result = httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
-        List<Property> varPool =new ArrayList<>();
+        List<Property> varPool = new ArrayList<>();
         httpParameters.setVarPool(varPool.toString());
         httpParameters.dealOutParam(result);
-
-
         Map<String, Property> varPoolMap = httpParameters.getVarPoolMap();
-
-        for (Map.Entry<String, Property> stringPropertyEntry : varPoolMap.entrySet()) {
-            System.out.println("To get the key----"+stringPropertyEntry.getKey());
-            System.out.println("Results obtained----"+stringPropertyEntry.getValue());
-        }
-
     }
 }
