@@ -90,12 +90,9 @@ export function useSwitch(
 
   return [
     {
-      type: 'multi-condition',
+      type: 'custom-parameters',
       field: 'dependTaskList',
       name: t('project.node.switch_condition'),
-      validate: {
-        required: true
-      },
       children: [
         {
           type: 'input',
@@ -105,23 +102,22 @@ export function useSwitch(
             loading: loading,
             type: 'textarea',
             autosize: { minRows: 2 }
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true
           }
         },
-        {
+        (i = 0) => ({
           type: 'select',
           field: 'nextNode',
-          span: 18,
+          span: 22,
           name: t('project.node.switch_branch_flow'),
           options: branchFlowOptions,
           validate: {
             trigger: ['input', 'blur'],
-            required: true
+            validator: (unuse: any, value: string) => {
+              if (model.dependTaskList[i].condition && !value)
+                return new Error(t('project.node.switch_branch_flow_tips'))
+            }
           }
-        }
+        })
       ]
     },
     {
@@ -132,7 +128,12 @@ export function useSwitch(
       props: {
         loading: loading
       },
-      options: branchFlowOptions
+      options: branchFlowOptions,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        message: t('project.node.switch_branch_flow_tips')
+      }
     }
   ]
 }
