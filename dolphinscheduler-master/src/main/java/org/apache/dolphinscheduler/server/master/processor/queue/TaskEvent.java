@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
-import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 
 import java.util.Date;
 
@@ -106,7 +105,7 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newRunningEvent(TaskExecuteRunningCommand command, Channel channel) {
+    public static TaskEvent newRunningEvent(TaskExecuteRunningCommand command, Channel channel, String workerAddress) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
@@ -115,12 +114,12 @@ public class TaskEvent {
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
         event.setChannel(channel);
-        event.setWorkerAddress(ChannelUtils.toAddress(channel).getAddress());
+        event.setWorkerAddress(workerAddress);
         event.setEvent(TaskEventType.RUNNING);
         return event;
     }
 
-    public static TaskEvent newResultEvent(TaskExecuteResultCommand command, Channel channel) {
+    public static TaskEvent newResultEvent(TaskExecuteResultCommand command, Channel channel, String workerAddress) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
@@ -133,7 +132,7 @@ public class TaskEvent {
         event.setAppIds(command.getAppIds());
         event.setVarPool(command.getVarPool());
         event.setChannel(channel);
-        event.setWorkerAddress(ChannelUtils.toAddress(channel).getAddress());
+        event.setWorkerAddress(workerAddress);
         event.setEvent(TaskEventType.RESULT);
         return event;
     }
