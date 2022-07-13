@@ -189,7 +189,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getUserType().equals(UserType.ADMIN_USER) ? 1 : loginUser.getId(), name, status);
+        return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), name, status);
     }
 
     /**
