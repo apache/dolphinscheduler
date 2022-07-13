@@ -17,15 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_UPDATE;
-
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -40,13 +37,11 @@ import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
@@ -68,7 +63,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AccessTokenServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceTest.class);
-    private static final Logger serviceLogger = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     @InjectMocks
     private AccessTokenServiceImpl accessTokenService;
@@ -88,10 +82,7 @@ public class AccessTokenServiceTest {
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        Set<Integer> tokenIds = new HashSet<>();
-        tokenIds.add(1);
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, user.getId(), serviceLogger)).thenReturn(tokenIds);
-        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), Collections.singletonList(1), "zhangsan")).thenReturn(tokenPage);
+        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
 
         Result result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
         PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.getData();

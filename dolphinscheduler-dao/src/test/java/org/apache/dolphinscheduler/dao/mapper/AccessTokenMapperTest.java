@@ -141,8 +141,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Map<Integer, AccessToken> accessTokenMap = createAccessTokens(count, userName);
 
         Page page = new Page(offset, size);
-        List<Integer> tokenIds = accessTokenMap.values().stream().map(AccessToken::getId).collect(Collectors.toList());
-        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, tokenIds, userName);
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
 
         assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()), size);
 
