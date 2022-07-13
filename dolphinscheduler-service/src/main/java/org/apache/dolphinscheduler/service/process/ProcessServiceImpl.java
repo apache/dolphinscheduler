@@ -935,7 +935,7 @@ public class ProcessServiceImpl implements ProcessService {
             this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
-            return null;
+            throw new IllegalArgumentException("Cannot find the process definition for this workflowInstance");
         }
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
         int processInstanceId = command.getProcessInstanceId();
