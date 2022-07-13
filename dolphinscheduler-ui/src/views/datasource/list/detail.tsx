@@ -30,7 +30,7 @@ import {
 } from 'naive-ui'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
-import { useForm, datasourceTypeList } from './use-form'
+import { useForm, datasourceType, datasourceTypeList } from './use-form'
 import { useDetail } from './use-detail'
 
 const props = {
@@ -88,6 +88,12 @@ const DetailModal = defineComponent({
       () => props.show,
       async () => {
         props.show && props.id && setFieldsValue(await queryById(props.id))
+        props.show &&
+          state.detailForm.type &&
+          changeType(
+            state.detailForm.type,
+            datasourceType[state.detailForm.type]
+          )
       }
     )
 

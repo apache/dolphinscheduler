@@ -2,7 +2,8 @@
 ## Introduction
 
 The data quality task is used to check the data accuracy during the integration and processing of data. Data quality tasks in this release include single-table checking, single-table custom SQL checking, multi-table accuracy, and two-table value comparisons. The running environment of the data quality task is Spark 2.4.0, and other versions have not been verified, and users can verify by themselves.
-The execution flow of the data quality task is as follows: 
+
+The execution logic of the data quality task is as follows:
 
 - The user defines the task in the interface, and the user input value is stored in `TaskParam`.
 - When running a task, `Master` will parse `TaskParam`, encapsulate the parameters required by `DataQualityTask` and send it to `Worker`.
@@ -39,9 +40,12 @@ In the example, assuming that the actual value is 10, the operator is >, and the
 # Task Operation Guide
 
 ## Null Value Check for Single Table Check
+
 ### Inspection Introduction
+
 The goal of the null value check is to check the number of empty rows in the specified column. The number of empty rows can be compared with the total number of rows or a specified threshold. If it is greater than a certain threshold, it will be judged as failure.
-- Calculate the SQL statement that the specified column is empty as follows:
+
+- The SQL statement that calculates the null of the specified column is as follows:
 
   ```sql
   SELECT COUNT(*) AS miss FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '') AND (${src_filter})
@@ -121,7 +125,7 @@ The goal of field length verification is to check whether the length of the sele
 ## Uniqueness Check for Single Table Check
 
 ### Inspection Introduction
-The goal of the uniqueness check is to check whether the field is duplicated. It is generally used to check whether the primary key is duplicated. If there is duplication and the threshold is reached, the check task will be judged to be failed.
+The goal of the uniqueness check is to check whether the fields are duplicated. It is generally used to check whether the primary key is duplicated. If there are duplicates and the threshold is reached, the check task will be judged to be failed.
 
 ### Interface Operation Guide
 
@@ -165,7 +169,7 @@ The goal of regular expression verification is to check whether the format of th
 
 ## Enumeration Value Validation for Single Table Check
 ### Inspection Introduction
-The goal of enumeration value verification is to check whether the value of a field is within the range of enumeration values. If there is data that is not in the range of enumeration values ​​and exceeds the threshold, the task will be judged to fail
+The goal of enumeration value verification is to check whether the value of a field is within the range of the enumeration value. If there is data that is not in the range of the enumeration value and exceeds the threshold, the task will be judged to fail.
 
 ### Interface Operation Guide
 

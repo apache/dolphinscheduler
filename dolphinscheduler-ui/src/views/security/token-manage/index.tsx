@@ -120,13 +120,9 @@ const tokenManage = defineComponent({
                 placeholder={t('security.token.search_tips')}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>

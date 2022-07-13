@@ -16,7 +16,6 @@
 | Database Name | Enter the database name of the SQLSERVER connection. |
 | jdbc connect parameters | Parameter settings for SQLSERVER connection, in JSON format. |
 
-
 ## Native Supported
 
 Yes, could use this datasource by default.

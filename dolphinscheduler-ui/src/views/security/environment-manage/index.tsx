@@ -120,13 +120,9 @@ const environmentManage = defineComponent({
                 placeholder={t('security.environment.search_tips')}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>

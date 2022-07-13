@@ -1,6 +1,6 @@
 # Task Group Settings
 
-The task group is mainly used to control the concurrency of task instances and is designed to control the pressure of other resources (it can also control the pressure of the Hadoop cluster, the cluster will have queue control it). When creating a new task definition, you can configure the corresponding task group and configure the priority of the task running in the task group. 
+The task group is mainly used to control the concurrency of task instances, and is designed to control the pressure of other resources (it can also control the pressure of the Hadoop cluster, the cluster will have queue control it). When creating a new task definition, you can configure the corresponding task group and configure the priority of the task running in the task group. 
 
 ## Task Group Configuration 
 
@@ -8,17 +8,15 @@ The task group is mainly used to control the concurrency of task instances and i
 
 ![create-taskGroup](../../../../img/new_ui/dev/resource/create-taskGroup.png)
 
-The user clicks [Resources] - [Task Group Management] - [Task Group option] - [Create Task Group] 
+The user clicks `Resources -> Task Group Management -> Task Group option -> Create Task Group` 
 
 ![create-taskGroup](../../../../img/new_ui/dev/resource/create-taskGroup.png) 
 
 You need to enter the information inside the picture:
 
-- Task group name: the name displayed of the task group
-
-- Project name: the project range that the task group functions, this item is optional, if not selected, all the projects in the whole system can use this task group.
-
-- Resource pool size: The maximum number of concurrent task instances allowed.
+- **Task group name**: The name displayed when the task group is used
+- **Project name**: The project that the task group functions, this item is optional, if not selected, all the projects in the whole system can use this task group.
+- **Resource pool size**: The maximum number of concurrent task instances allowed.
 
 ### View Task Group Queue 
 
@@ -30,7 +28,9 @@ Click the button to view task group usage information:
 
 ### Use of Task Groups 
 
-**Note**: The usage of task groups is applicable to tasks executed by workers, such as [switch] nodes, [condition] nodes, [sub_process] and other node types executed by the master are not controlled by the task group. Let's take the shell node as an example: 
+**Note**: The use of task groups is applicable to tasks executed by workers, such as `switch` nodes, `condition` nodes, `sub_process` and other node types executed by the master are not controlled by the task group.
+
+Let's take the shell node as an example:
 
 ![use-queue](../../../../img/new_ui/dev/resource/use-queue.png)                 
 

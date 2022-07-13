@@ -32,7 +32,7 @@ Condition is a conditional node, that determines which downstream task should ru
 
 This sample demonstrates the operation of the Condition task by using the [Shell](shell.md) task.
 
-### 1. Create workflow
+### Create workflow
 
 Go to the workflow definition page, and then create the following task nodes:
 
@@ -43,7 +43,7 @@ Go to the workflow definition page, and then create the following task nodes:
 
 ![condition_task01](../../../../img/tasks/demo/condition_task01.png)
 
-### 2. View the execution result
+### View the execution result
 
 After you finish creating the workflow, you can run the workflow online. You can view the execution status of each task on the workflow instance page. As shown below:
 
