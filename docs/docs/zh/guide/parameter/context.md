@@ -76,8 +76,6 @@ Node_mysql 运行结果如下：
 
 虽然在 Node_A 的脚本中为 output 赋值为 1，但日志中显示的值仍然为 100。但根据[参数优先级](priority.md)的原则：`本地参数 > 上游任务传递的参数 > 全局参数`，在 Node_B 中输出的值为 1。则证明 output 参数参照预期的值在该工作流中传递，并在 Node_mysql 中使用该值完成查询操作。
 
-<img src="../../../../img/globalParam/image-20210723102522383.png" alt="image-20210723102522383" style="zoom:50%;" />
-
 但是 value 的值却只有在 Node_A 中输出为 66，其原因为 value 的方向选择为 IN，只有当方向为 OUT 时才会被定义为变量输出。
 
 
@@ -85,16 +83,16 @@ Node_mysql 运行结果如下：
 
 第一步:拖一个http类型的任务，在自定义参数中KEY的位置填写body ,在IN/OUT的部分选择OUT,在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
 
-<img src="../../../../img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
+![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
 第二步:在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了，
 
-<img src="../../../../img/httpParam/httpParam-2.png" alt="httpParam-2.png" style="zoom:50%;" />
+![httpParam-2](../../../../img/httpParam/httpParam-2.png)
 
 参数名可以写任意，可以body也可以是别的，类型选择parameter,value的取值一定是你上一个节点设置输出的key,如:我上一个节点设置的输出key是body，那我下一个节点就要这样取值${body}
 
 配置好后的效果
-<img src="../../../../img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
+![httpParam-3](../../../../img/httpParam/httpParam-3.png)
 
-第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。
-<img src="../../../../img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />
+第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。 
+![httpParam-4](../../../../img/httpParam/httpParam-4.png)

@@ -29,14 +29,20 @@
     MasterServer provides monitoring services based on netty.
 
     #### The Service Mainly Includes:
+  
+    - **DistributedQuartz** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
 
-    - **Distributed Quartz** distributed scheduling component, which is mainly responsible for the start and stop operations of schedule tasks. When Quartz starts the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task.
+    - **MasterSchedulerService** is a scanning thread that regularly scans the `t_ds_command` table in the database, runs different business operations according to different **command types**;
 
-    - **MasterSchedulerThread** is a scanning thread that regularly scans the **command** table in the database and runs different business operations according to different **command types**.
+    - **WorkflowExecuteRunnable** is mainly responsible for DAG task segmentation, task submission monitoring, and logical processing of different event types;
 
-    - **MasterExecThread** is mainly responsible for DAG task segmentation, task submission monitoring, and logical processing to different command types.
+    - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the process instance;
 
-    - **MasterTaskExecThread** is mainly responsible for the persistence to tasks.
+    - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instances;
+
+    - **StateWheelExecuteThread** is mainly responsible for process instance and task timeout, task retry, task-dependent polling, and generates the corresponding process instance or task event and submits it to the event queue of the process instance;
+
+    - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
 
 * **WorkerServer** 
 
@@ -46,8 +52,12 @@
      Server provides monitoring services based on netty.
   
      #### The Service Mainly Includes:
-  
-     - **Fetch TaskThread** is mainly responsible for continuously getting tasks from the **Task Queue**, and calling **TaskScheduleThread** corresponding executor according to different task types.
+
+    - **WorkerManagerThread** is mainly responsible for the submission of the task queue, continuously receives tasks from the task queue, and submits them to the thread pool for processing;
+
+    - **TaskExecuteThread** is mainly responsible for the process of task execution, and the actual processing of tasks according to different task types;
+
+    - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
 * **ZooKeeper** 
 
@@ -55,18 +65,13 @@
 
     We have also implemented queues based on Redis, but we hope DolphinScheduler depends on as few components as possible, so we finally removed the Redis implementation.
 
-* **Task Queue** 
+* **AlertServer** 
 
-    Provide task queue operation, the current queue is also implement base on ZooKeeper. Due to little information stored in the queue, there is no need to worry about excessive data in the queue. In fact, we have tested the millions of data storage in queues, which has no impact on system stability and performance.
-
-* **Alert** 
-
-    Provide alarm related interface, the interface mainly includes **alarm** two types of alarm data storage, query and notification functions. Among them, there are **email notification** and **SNMP (not yet implemented)**.
+  Provides alarm services, and implements rich alarm methods through alarm plugins.
 
 * **API** 
 
     The API interface layer is mainly responsible for processing requests from the front-end UI layer. The service uniformly provides RESTful APIs to provide request services to external.
-    Interfaces include workflow creation, definition, query, modification, release, logoff, manual start, stop, pause, resume, start execution from specific node, etc.
 
 * **UI** 
 
@@ -101,41 +106,6 @@ Problems in centralized thought design:
 - The core design of decentralized design is that there is no distinct "manager" different from other nodes in the entire distributed system, so there is no single point failure. However, because there is no "manager" node, each node needs to communicate with other nodes to obtain the necessary machine information, and the unreliability of distributed system communication greatly increases the difficulty to implement the above functions.
 - In fact, truly decentralized distributed systems are rare. Instead, dynamic centralized distributed systems are constantly pouring out. Under this architecture, the managers in the cluster are dynamically selected, rather than preset, and when the cluster fails, the nodes of the cluster will automatically hold "meetings" to elect new "managers" To preside over the work. The most typical case is Etcd implemented by ZooKeeper and Go language.
 - The decentralization of DolphinScheduler is that the Master and Worker register in ZooKeeper, for implement the centerless feature to Master cluster and Worker cluster. Use the ZooKeeper distributed lock to elect one of the Master or Worker as the "manager" to perform the task.
-
-#### Distributed Lock Practice
-
-DolphinScheduler uses ZooKeeper distributed lock to implement only one Master executes Scheduler at the same time, or only one Worker executes the submission of tasks.
-1. The following shows the core process algorithm for acquiring distributed locks:
- <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/distributed_lock.png" alt="Obtain distributed lock process"  width="50%" />
- </p>
-
-2. Flow diagram of implementation of Scheduler thread distributed lock in DolphinScheduler:
- <p align="center">
-   <img src="../../../img/distributed_lock_procss.png" alt="Obtain distributed lock process"  width="50%" />
- </p>
-
-
-#### Insufficient Thread Loop Waiting Problem
-
--  If there is no sub-process in a DAG, when the number of data in the Command is greater than the threshold set by the thread pool, the process directly waits or fails.
--  If a large DAG nests many sub-processes, there will produce a "dead" state as the following figure:
-
- <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/lack_thread.png" alt="Insufficient threads waiting loop problem"  width="50%" />
- </p>
-In the above figure, MainFlowThread waits for the end of SubFlowThread1, SubFlowThread1 waits for the end of SubFlowThread2, SubFlowThread2 waits for the end of SubFlowThread3, and SubFlowThread3 waits for a new thread in the thread pool, then the entire DAG process cannot finish, and the threads cannot be released. In this situation, the state of the child-parent process loop waiting is formed. At this moment, unless a new Master is started and add threads to break such a "stalemate", the scheduling cluster will no longer use.
-
-It seems a bit unsatisfactory to start a new Master to break the deadlock, so we proposed the following three solutions to reduce this risk:
-
-1. Calculate the sum of all Master threads, and then calculate the number of threads required for each DAG, that is, pre-calculate before the DAG process executes. Because it is a multi-master thread pool, it is unlikely to obtain the total number of threads in real time. 
-2. Judge whether the single-master thread pool is full, let the thread fail directly when fulfilled.
-3. Add a Command type with insufficient resources. If the thread pool is insufficient, suspend the main process. In this way, there are new threads in the thread pool, which can make the process suspended by insufficient resources wake up to execute again.
-
-Note: The Master Scheduler thread executes by FIFO when acquiring the Command.
-
-So we choose the third way to solve the problem of insufficient threads.
-
 
 #### Fault-Tolerant Design
 
@@ -188,11 +158,11 @@ Here we must first distinguish the concepts of task failure retry, process failu
 
 Next to the main point, we divide the task nodes in the workflow into two types.
 
-- One is a business node, which corresponds to an actual script or process command, such as shell node, MR node, Spark node, and dependent node.
+- One is a business task, which corresponds to an actual script or process command, such as Shell task, SQL task, and Spark task.
 
-- Another is a logical node, which does not operate actual script or process command, but only logical processing to the entire process flow, such as sub-process sections.
+- Another is a logical task, which does not operate actual script or process command, but only logical processing to the entire process flow, such as sub-process task, dependent task.
 
-Each **business node** can configure the number of failed retries. When the task node fails, it will automatically retry until it succeeds or exceeds the retry times. **Logical node** failure retry is not supported, but the tasks in the logical node support.
+**Business node** can configure the number of failed retries. When the task node fails, it will automatically retry until it succeeds or exceeds the retry times. **Logical node** failure retry is not supported.
 
 If there is a task failure in the workflow that reaches the maximum retry times, the workflow will fail and stop, and the failed workflow can be manually re-run or process recovery operations.
 
@@ -225,55 +195,29 @@ In the early schedule design, if there is no priority design and use the fair sc
    <img src="https://analysys.github.io/easyscheduler_docs_cn/images/grpc.png" alt="grpc remote access"  width="50%" />
  </p>
 
-- We use the customized FileAppender and Filter functions from Logback to implement each task instance generates one log file.
-- The following is the FileAppender implementation：
+- For details, please refer to the logback configuration of Master and Worker, as shown in the following example:
 
-```java
- /**
-  * task log appender
-  */
- public class TaskLogAppender extends FileAppender<ILoggingEvent> {
- 
-     ...
-
-    @Override
-    protected void append(ILoggingEvent event) {
-
-        if (currentlyActiveFile == null){
-            currentlyActiveFile = getFile();
-        }
-        String activeFile = currentlyActiveFile;
-        // thread name： taskThreadName-processDefineId_processInstanceId_taskInstanceId
-        String threadName = event.getThreadName();
-        String[] threadNameArr = threadName.split("-");
-        // logId = processDefineId_processInstanceId_taskInstanceId
-        String logId = threadNameArr[1];
-        ...
-        super.subAppend(event);
-    }
-}
-```
-
-Generate logs in the form of /process definition id /process instance id /task instance id.log
-
-- Filter to match the thread name starting with TaskLogInfo:
-
-- The following shows the TaskLogFilter implementation:
-
- ```java
- /**
- *  task log filter
- */
-public class TaskLogFilter extends Filter<ILoggingEvent> {
-
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("TaskLogInfo-")){
-            return FilterReply.ACCEPT;
-        }
-        return FilterReply.DENY;
-    }
-}
+```xml
+<conversionRule conversionWord="messsage" converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+<appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
+    <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+        <key>taskAppId</key>
+        <logBase>${log.base}</logBase>
+    </Discriminator>
+    <sift>
+        <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
+            <file>${log.base}/${taskAppId}.log</file>
+            <encoder>
+                <pattern>
+                            [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %messsage%n
+                </pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+            <append>true</append>
+        </appender>
+    </sift>
+</appender>
 ```
 
 ## Sum Up

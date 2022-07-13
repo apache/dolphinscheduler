@@ -166,8 +166,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = null;
         Date end = null;
         if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
+            start = DateUtils.stringToDate(startDate);
+            end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
@@ -258,12 +258,6 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return result;
         }
         Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
-
-        // admin can view all
-        if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_ANALYSIS, ApiFuncIdentificationConstant.MONITOR_STATISTICS_VIEW)){
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
-            return result;
-        }
         int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
 
         // count normal command state

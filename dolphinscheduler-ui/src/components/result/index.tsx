@@ -43,7 +43,7 @@ const props = {
   },
   contentStyle: {
     type: String as PropType<string | CSSProperties>,
-    default: defaultContentStyle
+    default: JSON.stringify(defaultContentStyle)
   }
 }
 

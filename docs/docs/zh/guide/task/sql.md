@@ -6,7 +6,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ## 创建数据源
 
-可参考[数据源中心介绍](../datasource/introduction.md)。
+可参考 [数据源配置](../howto/datasource-setting.md) `数据源中心`。
 
 ## 创建任务
 
@@ -31,17 +31,25 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ## 任务样例
 
-### 在hive中创建临时表并写入数据
+### Hive表创建示例
+
+#### 在hive中创建临时表并写入数据
 
 该样例向hive中创建临时表`tmp_hello_world`并写入一行数据。选择SQL类型为非查询，在创建临时表之前需要确保该表不存在，所以我们使用自定义参数，在每次运行时获取当天时间作为表名后缀，这样这个任务就可以每天运行。创建的表名格式为：`tmp_hello_world_{yyyyMMdd}`。
 
 ![hive-sql](../../../../img/tasks/demo/hive-sql.png)
 
-### 运行该任务成功之后在hive中查询结果
+#### 运行该任务成功之后在hive中查询结果
 
 登录集群使用`hive`命令或使用`beeline`、`JDBC`等方式连接`apache hive`进行查询，查询SQL为`select * from tmp_hello_world_{yyyyMMdd}`，请将`{yyyyMMdd}`替换为运行当天的日期，查询截图如下：
 
 ![hive-sql](../../../../img/tasks/demo/hive-result.png)
+
+### 使用前置sql和后置sql示例
+
+在前置sql中执行建表操作，在sql语句中执行操作，在后置sql中执行清理操作
+
+![pre_post_sql](../../../../img/tasks/demo/pre_post_sql.png)
 
 ## 注意事项
 

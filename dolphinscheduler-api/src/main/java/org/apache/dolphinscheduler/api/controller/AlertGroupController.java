@@ -109,7 +109,7 @@ public class AlertGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = alertGroupService.queryAlertgroup();
+        Map<String, Object> result = alertGroupService.queryAlertgroup(loginUser);
         return returnDataList(result);
     }
 

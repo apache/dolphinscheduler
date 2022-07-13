@@ -54,6 +54,8 @@ jobs:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
@@ -65,7 +67,7 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dmaven.checkstyle.skip \
+          -Dcheckstyle.skip=true \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Export Docker Images
@@ -98,6 +100,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
           - name: Environment
             class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
+          - name: Cluster
+            class: org.apache.dolphinscheduler.e2e.cases.ClusterE2ETest
           - name: Token
             class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
           - name: Workflow

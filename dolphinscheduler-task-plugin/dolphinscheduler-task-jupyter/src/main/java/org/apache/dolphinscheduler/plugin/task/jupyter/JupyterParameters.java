@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
+import java.util.List;
 
 /**
  * jupyter parameters
@@ -69,6 +72,10 @@ public class JupyterParameters extends AbstractParameters {
      */
     private String others;
 
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
     public String getCondaEnvName() {
         return condaEnvName;
@@ -140,6 +147,19 @@ public class JupyterParameters extends AbstractParameters {
 
     public void setOthers(String others) {
         this.others = others;
+    }
+
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
+
+    @Override
+    public List<ResourceInfo> getResourceFilesList() {
+        return resourceList;
     }
 
     @Override

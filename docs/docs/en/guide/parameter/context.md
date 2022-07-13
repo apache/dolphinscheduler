@@ -1,4 +1,4 @@
-# Refer to Parameter Context
+# Parameter Context
 
 DolphinScheduler provides the ability to refer to each other between parameters, including local parameters refer to global parameters and upstream and downstream parameter transfer. Due to the existence of references, it involves the priority of parameters when the parameter names are the same. see also [Parameter Priority](priority.md)
 
@@ -75,24 +75,22 @@ The result of Node_mysql is as follows:
 
 Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
 
-![png10](../../../../img/globalParam/image-20210723102522383.png)
-
 But the output value 66 only shows in the Node_A, the reason is that the direction of value is selected as IN, and only when the direction is OUT will it be defined as a variable output.
 
 ### HTTP
 
 Step 1: Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
 
-<img src="../../../../img/httpParam/httpParam-1.png" alt="httpParam-1.png" style="zoom:50%;" />
+![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
 Step 2: After adding an HTTP task type node, accept the parameters passed upstream. This time just add it in the Request Parameters section,
 
-<img src="../../../../img/httpParam/httpParam-2.png" alt="httpParam-2.png" style="zoom:50%;" />
+![httpParam-2](../../../../img/httpParam/httpParam-2.png)
 
 It can be anything, it can be body, it can be anything, parameter,value, it must be the key that you pass upstream. In this case, the key that you pass upstream is body, so we use ${body}
 
 The configuration is complete
-<img src="../../../../img/httpParam/httpParam-3.png" alt="httpParam-3.png" style="zoom:50%;" />
+![httpParam-3](../../../../img/httpParam/httpParam-3.png)
 
 Step 3: You can write a test interface to test whether our parameters are passed successfully.
-<img src="../../../../img/httpParam/httpParam-4.png" alt="httpParam-4.png" style="zoom:50%;" />
+![httpParam-4](../../../../img/httpParam/httpParam-4.png)
