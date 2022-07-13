@@ -550,8 +550,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     }
 
     public Optional<TaskInstance> getActiveTaskInstanceByTaskCode(long taskCode) {
-        if (activeTaskProcessorMaps.containsKey(taskCode)) {
-            return Optional.ofNullable(activeTaskProcessorMaps.get(taskCode).taskInstance());
+        Integer taskInstanceId = validTaskMap.get(taskCode);
+        if (taskInstanceId != null) {
+            return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
         }
         return Optional.empty();
     }
