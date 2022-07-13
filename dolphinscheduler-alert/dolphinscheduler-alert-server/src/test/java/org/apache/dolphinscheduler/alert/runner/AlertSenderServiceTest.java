@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.alert.runner;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.alert.AlertConfig;
 import org.apache.dolphinscheduler.alert.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.AlertSenderService;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
@@ -55,6 +56,8 @@ public class AlertSenderServiceTest {
     private PluginDao pluginDao;
     @Mock
     private AlertPluginManager alertPluginManager;
+    @Mock
+    private AlertConfig alertConfig;
 
     @InjectMocks
     private AlertSenderService alertSenderService;
@@ -73,6 +76,7 @@ public class AlertSenderServiceTest {
 
         //1.alert instance does not exist
         when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(null);
+        when(alertConfig.getWaitTimeout()).thenReturn(0);
 
         AlertSendResponseCommand alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
@@ -102,6 +106,7 @@ public class AlertSenderServiceTest {
         AlertChannel alertChannelMock = mock(AlertChannel.class);
         when(alertChannelMock.process(Mockito.any())).thenReturn(null);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
+        when(alertConfig.getWaitTimeout()).thenReturn(0);
 
         alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
@@ -126,6 +131,7 @@ public class AlertSenderServiceTest {
         alertResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
+        when(alertConfig.getWaitTimeout()).thenReturn(5000);
 
         alertSendResponseCommand = alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assert.assertTrue(alertSendResponseCommand.getResStatus());
