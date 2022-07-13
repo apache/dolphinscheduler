@@ -115,10 +115,10 @@ public class WorkerFailoverService {
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
             try {
-                ProcessInstance processInstance =
-                    processInstanceCacheMap.computeIfAbsent(taskInstance.getProcessInstanceId(), k -> {
-                        WorkflowExecuteRunnable workflowExecuteRunnable =
-                            cacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
+                ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
+                    taskInstance.getProcessInstanceId(), k -> {
+                        WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
+                            taskInstance.getProcessInstanceId());
                         if (workflowExecuteRunnable == null) {
                             return null;
                         }
@@ -167,6 +167,7 @@ public class WorkerFailoverService {
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
                 .create();
 
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {
