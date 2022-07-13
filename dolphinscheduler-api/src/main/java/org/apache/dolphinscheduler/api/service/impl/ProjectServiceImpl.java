@@ -245,6 +245,15 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             logger.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else {
+            // case 1: user is admin
+            if (loginUser.getUserType() == UserType.ADMIN_USER) {
+                return true;
+            }
+            // case 2: user is project owner
+            if (project.getUserId() == loginUser.getId()) {
+                return true;
+            }
+            // case 3: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
             if (projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
                 logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.", permission, loginUser.getUserName(), project.getCode());
@@ -340,7 +349,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
                 if (projectUser == null) {
                     // in this case, the user is the project owner, maybe it's better to set it to ALL_PERMISSION.
-                    project.setPerm(0);
+                    project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
                 }
                 else {
                     project.setPerm(projectUser.getPerm());
