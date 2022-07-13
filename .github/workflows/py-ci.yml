@@ -51,7 +51,7 @@ jobs:
             not-docs:
               - '!(docs/**)'
             py-change:
-              - 'dolphinscheduler-python/pydolphinscheduler'
+              - 'dolphinscheduler-python/pydolphinscheduler/**'
   lint:
     name: Lint
     if: ${{ (needs.paths-filter.outputs.py-change == 'true') || (github.event_name == 'push') }}
