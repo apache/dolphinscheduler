@@ -41,7 +41,6 @@
         and td.name = #{name}
         and ptr.process_definition_code = #{processCode}
         and td.code = ptr.post_task_code
-        limit 1
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
