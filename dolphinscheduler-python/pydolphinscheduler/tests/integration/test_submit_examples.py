@@ -42,3 +42,12 @@ def test_exec_white_list_example(example_path: Path):
         Popen(["python", str(example_path)])
     except Exception:
         raise Exception("Run example %s failed.", example_path.stem)
+
+
+def test_exec_multiple_times():
+    """Test whether process definition can be executed more than one times."""
+    tutorial_path = path_example.joinpath("tutorial.py")
+    try:
+        Popen(["python", str(tutorial_path)])
+    except Exception:
+        raise Exception("Run example %s failed.", tutorial_path.stem)
