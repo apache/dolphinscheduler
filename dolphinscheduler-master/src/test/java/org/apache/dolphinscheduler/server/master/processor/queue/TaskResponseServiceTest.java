@@ -75,8 +75,6 @@ public class TaskResponseServiceTest {
     public void before() {
         taskEventService.start();
 
-        Mockito.when(channel.remoteAddress()).thenReturn(InetSocketAddress.createUnresolved("127.0.0.1", 1234));
-
         TaskExecuteRunningCommand taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                                                                                             "127.0.0.1:1234",
                                                                                             System.currentTimeMillis());
