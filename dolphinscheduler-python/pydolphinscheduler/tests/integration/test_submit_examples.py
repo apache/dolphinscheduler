@@ -49,5 +49,6 @@ def test_exec_multiple_times():
     tutorial_path = path_example.joinpath("tutorial.py")
     try:
         Popen(["python", str(tutorial_path)])
+        Popen(["python", str(tutorial_path)])
     except Exception:
         raise Exception("Run example %s failed.", tutorial_path.stem)
