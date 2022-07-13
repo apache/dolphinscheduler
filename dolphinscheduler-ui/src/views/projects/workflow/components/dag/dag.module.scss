@@ -176,6 +176,9 @@ $bgLight: #ffffff;
     &.icon-dinky {
       background-image: url('/images/task-icons/dinky.png');
     }
+    &.icon-chunjun {
+      background-image: url('/images/task-icons/chunjun.png');
+    }
   }
 
   &:hover {
@@ -254,6 +257,9 @@ $bgLight: #ffffff;
       }
       &.icon-dinky {
         background-image: url('/images/task-icons/dinky_hover.png');
+      }
+      &.icon-chunjun {
+        background-image: url('/images/task-icons/chunjun_hover.png');
       }
     }
   }
