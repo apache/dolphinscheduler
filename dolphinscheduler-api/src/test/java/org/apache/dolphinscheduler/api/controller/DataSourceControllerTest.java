@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,18 +47,19 @@ import org.springframework.util.MultiValueMap;
 /**
  * data source controller test
  */
- public class DataSourceControllerTest extends AbstractControllerTest{
+public class DataSourceControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
 
     @BeforeEach
-    public void initSetUp(){
+    public void initSetUp() {
         setUp();
     }
 
     @AfterEach
     public void afterEach() throws Exception {
-       after();
+        after();
     }
+
     @Ignore("unknown yourself connection information")
     @Test
     public void testCreateDataSource() throws Exception {
@@ -73,12 +74,12 @@ import org.springframework.util.MultiValueMap;
         paramsMap.put("password","123456");
         paramsMap.put("other",new HashMap<>());
         MvcResult mvcResult = mockMvc.perform(post("/datasources")
-                        .header("sessionId", sessionId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(JSONUtils.toJsonString(paramsMap)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
+            .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -100,11 +101,11 @@ import org.springframework.util.MultiValueMap;
         paramsMap.put("password","root@123");
         paramsMap.put("other",new HashMap<>());
         MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
-                        .header("sessionId", sessionId)
-                        .content(JSONUtils.toJsonString(paramsMap)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .content(JSONUtils.toJsonString(paramsMap)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -114,10 +115,10 @@ import org.springframework.util.MultiValueMap;
     @Test
     public void testQueryDataSource() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/2")
-                        .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -125,17 +126,17 @@ import org.springframework.util.MultiValueMap;
 
     @ParameterizedTest
     @CsvSource({
-            "type, MYSQL"
+        "type, MYSQL"
     })
-    public void testQueryDataSourceList(String key , String dbType) throws Exception {
+    public void testQueryDataSourceList(String key, String dbType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -148,11 +149,11 @@ import org.springframework.util.MultiValueMap;
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","1");
         MvcResult mvcResult = mockMvc.perform(get("/datasources")
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -171,11 +172,11 @@ import org.springframework.util.MultiValueMap;
         paramsMap.put("password","123456");
         paramsMap.put("other",null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
-                        .header("sessionId", sessionId)
-                        .content(JSONUtils.toJsonString(paramsMap)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .content(JSONUtils.toJsonString(paramsMap)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -185,10 +186,10 @@ import org.springframework.util.MultiValueMap;
     @Test
     public void testConnectionTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/2/connect-test")
-                        .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -196,17 +197,17 @@ import org.springframework.util.MultiValueMap;
 
     @ParameterizedTest
     @CsvSource({
-            "name, sourceName"
+        "name, sourceName"
     })
-    public void testVerifyDataSourceName(String key , String dbType) throws Exception {
+    public void testVerifyDataSourceName(String key, String dbType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key,dbType);
         MvcResult mvcResult = mockMvc.perform(get("/datasources/verify-name")
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -217,11 +218,11 @@ import org.springframework.util.MultiValueMap;
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -232,11 +233,11 @@ import org.springframework.util.MultiValueMap;
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")
-                        .header("sessionId", sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -245,10 +246,10 @@ import org.springframework.util.MultiValueMap;
     @Test
     public void testGetKerberosStartupState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
-                        .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -258,10 +259,10 @@ import org.springframework.util.MultiValueMap;
     @Test
     public void testDelete() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
-                        .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+                .header("sessionId", sessionId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
