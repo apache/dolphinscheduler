@@ -63,7 +63,3 @@ Worker 服务默认安装了 Python3，使用时可以添加环境变量  `PYTHO
 3. 更新组件，初始化插件会自动下载 `Datax` 并解压到 `/opt/soft`目录下。
 ![](https://static.goodrain.com/wechat/dolphinscheduler/7.png)
 ---
-
-
-
-
