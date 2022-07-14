@@ -8,9 +8,9 @@ This article describes the one-click deployment of highly available DolphinSched
 
 ## DolphinScheduler Cluster One-click Deployment 
 
-* Docking and accessing the built-in open source app store,Search the keyword `dolp` to find App DolphinScheduler.
+* Docking and accessing the built-in open source app store,Search the keyword `dolphinscheduler` to find App DolphinScheduler.
 
-![](https://static.goodrain.com/wechat/dolphinscheduler/1.png)
+![](img/rainbond/appstore-dolphinscheduler.png)
 
 * Click install on the right side of DolphinScheduler to go to the installation page,Fill in the corresponding information,Click OK to start the installation,Automatically jump to the application view.
 
@@ -21,15 +21,15 @@ This article describes the one-click deployment of highly available DolphinSched
 | Select app   | select application                   |
 | app version  | select DolphinScheduler version      |
 
-![](https://static.goodrain.com/wechat/dolphinscheduler/2.png)
+![](img/rainbond/install-dolphinscheduler.png)
 
 * Wait a few minutes,DolphinScheduler Installation is complete and running.
 
-![](https://static.goodrain.com/wechat/dolphinscheduler/3.png)
+![](img/rainbond/topology-dolphinscheduler.png)
 
 * Access DolphinScheduler-API components,The default user password is `admin` / `dolphinscheduler123`.
 
-![](https://static.goodrain.com/wechat/dolphinscheduler/4.png)
+![](img/rainbond/homepage-dolphinscheduler.png)
 
 ## API Master Worker Node Telescopic
 
@@ -37,12 +37,11 @@ DolphinScheduler API、Master、Worker Both support scaling multiple instances,M
 
 Take worker as an example,Enter into the component -> Telescopic,Set the number of instances.
 
-![](https://static.goodrain.com/wechat/dolphinscheduler/5.png)
+![](img/rainbond/dolpscheduler-worker.png)
 
 Verify Worker Node,Enter DolphinScheduler UI -> Monitoring -> Worker View node information.
 
-![](https://static.goodrain.com/wechat/dolphinscheduler/6.png)
-
+![](img/rainbond/monitor-dolphinscheduler.png)
 ## Configuration file
 
 API and Worker Service sharing `/opt/dolphinscheduler/conf/common.properties` ,To modify the configuration, you only need to modify the configuration file of the API service.
@@ -55,11 +54,11 @@ Worker service is installed by default Python3，You can add environment variabl
 
 Take Datax as an example:
 
-1. Install the plugin。Rainbond Team View -> Plugin -> Install plugin from the App Store -> search `通用数据初始化插件` Install.
-2. Open plugin.enter Worker component -> plugin -> open `通用数据初始化插件` And modify the configuration.
+1. Install the plugin。Rainbond Team View -> Plugin -> Install plugin from the App Store -> search `initialization plugin` Install.
+2. Open plugin.enter Worker component -> plugin -> open `initialization plugin` And modify the configuration.
    * FILE_URL：http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
    * FILE_PATH：/opt/soft
    * LOCK_PATH：/opt/soft
 3. Update component,The initialization plug-in will be downloaded automatically `Datax` and decompress to `/opt/soft`
-![](https://static.goodrain.com/wechat/dolphinscheduler/7.png)
+![](img/rainbond/plugin.png)
 ---
