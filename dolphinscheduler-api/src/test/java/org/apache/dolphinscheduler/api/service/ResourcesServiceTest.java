@@ -606,6 +606,64 @@ public class ResourcesServiceTest {
     }
 
     @Test
+    public void testOnlineCreateResourceWithDir() {
+        User user = getUser();
+        user.setId(1);
+
+        String dir1Path = "/dir1";
+        String dir2Path = "/dir2";
+        String resourceDir = dir1Path + dir2Path;
+        String resourceName = "test";
+        String resourceSuffix = "py";
+        String desc = "desc";
+        String content = "content";
+        String fullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
+
+        Resource dir1 = new Resource();
+        dir1.setFullName(dir1Path);
+        dir1.setId(1);
+        dir1.setUserId(user.getId());
+        Resource dir2 = new Resource();
+        dir2.setFullName(resourceDir);
+        dir2.setUserId(user.getId());
+        Mockito.when(resourcesMapper.queryResource(dir1.getFullName(), ResourceType.FILE.ordinal())).thenReturn(Collections.singletonList(dir1));
+        Mockito.when(resourcesMapper.queryResource(resourceDir, ResourceType.FILE.ordinal())).thenReturn(null);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, new Object[]{dir1.getId()}, 1, serviceLogger)).thenReturn(true);
+
+        Tenant tenant = getTenant();
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
+        try {
+            PowerMockito.when(storageOperate.mkdir(tenant.getTenantCode(), null)).thenReturn(true);
+        } catch (IOException e) {
+            logger.error("storage error", e);
+        }
+
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        Mockito.when(resourcesMapper.selectById(dir1.getId())).thenReturn(dir1);
+        Mockito.when(resourcesMapper.selectById(dir2.getId())).thenReturn(dir2);
+        Mockito.when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
+        PowerMockito.when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+
+        Result<Object> result = resourcesService.onlineCreateOrUpdateResourceWithDir(user, fullName, desc, content);
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+    }
+
+    @Test
     public void testUpdateResourceContent() {
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
@@ -896,7 +954,7 @@ public class ResourcesServiceTest {
         return resource;
     }
 
-    private Resource getResource(int resourceId,ResourceType type) {
+    private Resource getResource(int resourceId, ResourceType type) {
 
         Resource resource = new Resource();
         resource.setId(resourceId);

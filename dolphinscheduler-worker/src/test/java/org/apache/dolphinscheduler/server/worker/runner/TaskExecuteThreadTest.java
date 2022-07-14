@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClientTest;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -48,7 +48,7 @@ public class TaskExecuteThreadTest {
     private TaskExecutionContext taskExecutionContext;
 
     @Mock
-    private TaskCallbackService taskCallbackService;
+    private WorkerMessageSender workerMessageSender;
 
     @Mock
     private AlertClientService alertClientService;
@@ -61,8 +61,12 @@ public class TaskExecuteThreadTest {
 
     @Test
     public void checkTest() {
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService,
-            alertClientService, taskPluginManager, storageOperate);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext,
+                                                                    "127.0.0.1:5678",
+                                                                    workerMessageSender,
+                                                                    alertClientService,
+                                                                    taskPluginManager,
+                                                                    storageOperate);
 
         String path = "/";
         Map<String, String> projectRes = new HashMap<>();

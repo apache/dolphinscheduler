@@ -547,6 +547,21 @@ public class PythonGateway {
         return result;
     }
 
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    public Integer createOrUpdateResource(
+            String userName, String fullName, String description, String resourceContent) {
+        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
+    }
+
     @PostConstruct
     public void init() {
         if (pythonGatewayConfiguration.getEnabled()) {

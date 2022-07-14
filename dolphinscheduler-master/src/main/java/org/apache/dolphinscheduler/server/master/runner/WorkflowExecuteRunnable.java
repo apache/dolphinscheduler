@@ -550,8 +550,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     }
 
     public Optional<TaskInstance> getActiveTaskInstanceByTaskCode(long taskCode) {
-        if (activeTaskProcessorMaps.containsKey(taskCode)) {
-            return Optional.ofNullable(activeTaskProcessorMaps.get(taskCode).taskInstance());
+        Integer taskInstanceId = validTaskMap.get(taskCode);
+        if (taskInstanceId != null) {
+            return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
         }
         return Optional.empty();
     }
@@ -1522,6 +1523,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (state == ExecutionStatus.READY_BLOCK) {
             ExecutionStatus executionStatus = processReadyBlock();
             logger.info("The workflowInstance is ready to block, the workflowInstance status is {}", executionStatus);
+            return executionStatus;
         }
 
         // waiting thread
@@ -1550,6 +1552,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 executionStatus = ExecutionStatus.SUCCESS;
             }
             logger.info("The workflowInstance is ready to stop, the workflow status is {}", executionStatus);
+            return executionStatus;
         }
 
         // process failure
