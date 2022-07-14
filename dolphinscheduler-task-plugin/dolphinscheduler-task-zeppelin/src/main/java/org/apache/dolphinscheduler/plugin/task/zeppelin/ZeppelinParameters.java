@@ -37,7 +37,7 @@ public class ZeppelinParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(this.noteId);
+        return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.restEndpoint);
     }
 
     @Override
