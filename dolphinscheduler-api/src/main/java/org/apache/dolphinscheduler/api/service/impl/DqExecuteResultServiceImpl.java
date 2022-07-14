@@ -87,12 +87,11 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
                 dqExecuteResultMapper.queryResultListPaging(
                         page,
                         searchVal,
-                        loginUser.getId(),
+                        loginUser,
                         statusArray,
                         ruleType,
                         start,
                         end);
-
         pageInfo.setTotal((int) dqsResultPage.getTotal());
         pageInfo.setTotalList(dqsResultPage.getRecords());
         result.setData(pageInfo);
