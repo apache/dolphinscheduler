@@ -103,7 +103,7 @@ public class TaskDefinition {
     private List<Property> taskParamList;
 
     /**
-     * user define parameter map
+     * user defined parameter map
      */
     @TableField(exist = false)
     private Map<String, String> taskParamMap;
