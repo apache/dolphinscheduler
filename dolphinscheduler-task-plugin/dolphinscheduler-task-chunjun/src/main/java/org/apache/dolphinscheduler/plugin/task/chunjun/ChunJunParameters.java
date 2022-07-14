@@ -102,7 +102,6 @@ public class ChunJunParameters extends AbstractParameters {
      */
     private int jobSpeedRecord;
 
-
     public int getCustomConfig() {
         return customConfig;
     }
