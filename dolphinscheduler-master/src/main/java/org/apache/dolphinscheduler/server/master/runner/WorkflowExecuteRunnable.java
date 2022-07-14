@@ -112,6 +112,8 @@ import org.springframework.beans.BeanUtils;
 
 import com.google.common.collect.Lists;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import lombok.NonNull;
 
 /**
@@ -1166,12 +1168,21 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             if (allProperty.size() > 0) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
+                setVarPool(taskInstance, allProperty);
             }
         } else {
             if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
                 taskInstance.setVarPool(processInstance.getVarPool());
+                setVarPool(taskInstance, allProperty);
             }
         }
+    }
+
+    private void setVarPool(TaskInstance taskInstance, Map<String, Property> allProperty) {
+        Map<String, Object> taskParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+        });
+        taskParams.put("varPool", JSONUtils.toJsonString(allProperty.values()));
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParams));
     }
 
     public Collection<TaskInstance> getAllTaskInstances() {
