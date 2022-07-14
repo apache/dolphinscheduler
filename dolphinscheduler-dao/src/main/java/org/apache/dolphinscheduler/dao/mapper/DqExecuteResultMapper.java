@@ -37,7 +37,7 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
      *
      * @param page page
      * @param searchVal searchVal
-     * @param user user
+     * @param user  user
      * @param statusArray states
      * @param ruleType ruleType
      * @param startTime startTime
