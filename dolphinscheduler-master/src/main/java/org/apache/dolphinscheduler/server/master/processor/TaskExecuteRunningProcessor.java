@@ -57,7 +57,9 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
         TaskExecuteRunningCommand taskExecuteRunningMessage = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
         logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
 
-        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage, channel);
+        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
+                                                        channel,
+                                                        taskExecuteRunningMessage.getMessageSenderAddress());
         taskEventService.addEvent(taskEvent);
     }
 
