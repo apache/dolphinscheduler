@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,17 +22,17 @@ import java.util.concurrent.CountDownLatch;
 public class EtcdRegistryTest {
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
-//    @RegisterExtension
-//    static final EtcdCluster server = new EtcdClusterExtension("test-etcd", 1);
+    @RegisterExtension
+    static final EtcdCluster server = new EtcdClusterExtension("test-etcd", 1);
 
     EtcdRegistry registry;
 
     @Before
     public void before() {
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
-//        server.start();
+        server.start();
 
-        properties.setEndpoints("http://localhost:2379");
+        properties.setEndpoints(String.valueOf(server.getClientEndpoints()));
         registry = new EtcdRegistry(properties);
 
         registry.put("/sub", "", false);
@@ -115,6 +114,6 @@ public class EtcdRegistryTest {
     @After
     public void after() throws IOException {
         registry.close();
-//        server.close();
+        server.close();
     }
 }

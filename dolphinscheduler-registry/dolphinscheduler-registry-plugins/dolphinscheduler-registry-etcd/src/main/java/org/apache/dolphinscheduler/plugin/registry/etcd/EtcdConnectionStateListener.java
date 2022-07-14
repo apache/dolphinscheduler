@@ -7,8 +7,6 @@ import io.grpc.ManagedChannel;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,6 +27,7 @@ public class EtcdConnectionStateListener implements AutoCloseable{
     private ConnectionState connectionState;
     public EtcdConnectionStateListener(Client client) {
         this.client = client;
+        channel = new AtomicReference<>();
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
                 1,
                 new ThreadFactoryBuilder().setNameFormat("EphemeralDateTermRefreshThread").setDaemon(true).build());

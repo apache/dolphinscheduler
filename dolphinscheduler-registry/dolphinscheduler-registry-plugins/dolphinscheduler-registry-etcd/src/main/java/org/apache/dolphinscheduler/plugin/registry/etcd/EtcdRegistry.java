@@ -8,8 +8,6 @@ import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
 import io.etcd.jetcd.watch.WatchEvent;
-import io.grpc.ConnectivityState;
-import io.grpc.ManagedChannel;
 import org.apache.dolphinscheduler.registry.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +16,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -27,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
@@ -47,6 +42,7 @@ public class EtcdRegistry implements Registry {
 
     private static Long TIME_TO_LIVE_SECONDS=30L;
     public EtcdRegistry(EtcdRegistryProperties registryProperties) {
+        LOGGER.info("Starting Etcd Registry...");
         ClientBuilder clientBuilder = Client.builder()
                 .endpoints(registryProperties.getEndpoints())
                 .namespace(byteSequence(registryProperties.getNamespace()))
@@ -55,7 +51,7 @@ public class EtcdRegistry implements Registry {
                 .retryDelay(registryProperties.getRetryDelay())
                 .retryMaxDelay(registryProperties.getRetryMaxDelay())
                 .retryMaxDuration(registryProperties.getRetryMaxDuration());
-        if(!Strings.isNullOrEmpty(registryProperties.getUser())){
+        if(!Strings.isNullOrEmpty(registryProperties.getUser())&&(!Strings.isNullOrEmpty(registryProperties.getPassword()))){
             clientBuilder.user(byteSequence(registryProperties.getUser()));
             clientBuilder.password(byteSequence(registryProperties.getPassword()));
         }
@@ -66,15 +62,18 @@ public class EtcdRegistry implements Registry {
             clientBuilder.authority(registryProperties.getAuthority());
         }
         client = clientBuilder.build();
+        LOGGER.info("Started Etcd Registry...");
         etcdConnectionStateListener = new EtcdConnectionStateListener(client);
-        LOGGER.info("Initialize Etcd Registry...");
     }
 
+    /**
+     * Start the etcd Connection stateListeer
+     */
     @PostConstruct
     public void start() {
-        LOGGER.info("Starting Etcd Registry...");
+        LOGGER.info("Starting Etcd ConnectionListener...");
         etcdConnectionStateListener.start();
-        LOGGER.info("Started Etcd Registry...");
+        LOGGER.info("Started Etcd ConnectionListener...");
     }
     @Override
     public boolean subscribe(String path, SubscribeListener listener) {
@@ -114,7 +113,7 @@ public class EtcdRegistry implements Registry {
             List<KeyValue> keyValues = client.getKVClient().get(byteSequence(key)).get().getKvs();
             return keyValues.iterator().next().getValue().toString(StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RegistryException("zookeeper get data error", e);
+            throw new RegistryException("etcd get data error", e);
         }
     }
 
@@ -156,7 +155,7 @@ public class EtcdRegistry implements Registry {
             List<KeyValue> keyValues = client.getKVClient().get(byteSequence(prefix),getOption).get().getKvs();
             return keyValues.stream().map(e -> getSubNodeKeyName(prefix, e.getKey().toString(StandardCharsets.UTF_8))).distinct().collect(Collectors.toList());
         } catch (Exception e){
-            throw new RegistryException("zookeeper get children error", e);
+            throw new RegistryException("etcd get children error", e);
         }
     }
 
@@ -172,7 +171,7 @@ public class EtcdRegistry implements Registry {
             if (client.getKVClient().get(byteSequence(key),getOption).get().getCount() >= 1)
                 return true;
         }catch (Exception e) {
-            throw new RegistryException("zookeeper check key is existed error", e);
+            throw new RegistryException("etcd check key is existed error", e);
         }
         return false;
     }
@@ -196,7 +195,7 @@ public class EtcdRegistry implements Registry {
             threadLocalLockMap.get().put(key,leaseId);
             return true;
         } catch (Exception e) {
-            throw new RegistryException("zookeeper get lock error", e);
+            throw new RegistryException("etcd get lock error", e);
         }
     }
 
@@ -210,7 +209,7 @@ public class EtcdRegistry implements Registry {
                 threadLocalLockMap.remove();
             }
         } catch (Exception e){
-            throw new RegistryException("zookeeper release lock error", e);
+            throw new RegistryException("etcd release lock error", e);
         }
         return true;
     }
