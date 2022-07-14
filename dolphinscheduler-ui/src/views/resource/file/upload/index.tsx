@@ -38,9 +38,7 @@ export default defineComponent({
     const { handleUploadFile } = useUpload(state)
 
     const hideModal = () => {
-      state.uploadForm.name = ''
-      state.uploadForm.description = ''
-      state.uploadForm.file = ''
+      resetForm()
       ctx.emit('update:show')
     }
 
