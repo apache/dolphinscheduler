@@ -68,6 +68,7 @@ const FormModal = defineComponent({
     })
 
     const onConfirm = async () => {
+      await state.formRef.validate()
       if (state.saving) return
       state.saving = true
       try {
@@ -101,11 +102,6 @@ const FormModal = defineComponent({
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        confirmDisabled={
-          !this.formData.name ||
-          !this.formData.groupSize ||
-          !this.formData.description
-        }
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
