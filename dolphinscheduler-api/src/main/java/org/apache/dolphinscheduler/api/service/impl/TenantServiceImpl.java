@@ -366,8 +366,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return tenantMapper.queryByTenantCode(tenantCode);
         }
 
-        Queue newQueue = queueService.createQueueIfNotExists(queue, queueName);
-        Tenant tenant = new Tenant(tenantCode, desc, newQueue.getId());
+        Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
+        Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
         return tenant;

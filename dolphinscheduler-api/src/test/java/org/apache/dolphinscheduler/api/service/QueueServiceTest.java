@@ -215,6 +215,21 @@ public class QueueServiceTest {
         Assert.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
     }
 
+    @Test
+    public void testCreateQueueIfNotExists() {
+        Queue queue;
+
+        // queue exists
+        Mockito.when(queueMapper.queryQueueName(QUEUE, QUEUE_NAME)).thenReturn(getQUEUE());
+        queue = queueService.createQueueIfNotExists(QUEUE, QUEUE_NAME);
+        Assert.assertEquals(getQUEUE(), queue);
+
+        // queue not exists
+        Mockito.when(queueMapper.queryQueueName(QUEUE, QUEUE_NAME)).thenReturn(null);
+        queue = queueService.createQueueIfNotExists(QUEUE, QUEUE_NAME);
+        Assert.assertEquals(new Queue(QUEUE_NAME, QUEUE), queue);
+    }
+
     /**
      * create admin user
      */
