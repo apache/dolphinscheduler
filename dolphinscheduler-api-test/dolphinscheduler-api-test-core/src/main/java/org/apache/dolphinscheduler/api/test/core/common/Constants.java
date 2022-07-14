@@ -53,6 +53,12 @@ public final class Constants {
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
     /**
+     * date format of yyyyMMddHHmmssSSS
+     */
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+
+
+    /**
      * docker compose default healthy timeout
      */
     public static final Integer DOCKER_COMPOSE_DEFAULT_TIMEOUT = 180;

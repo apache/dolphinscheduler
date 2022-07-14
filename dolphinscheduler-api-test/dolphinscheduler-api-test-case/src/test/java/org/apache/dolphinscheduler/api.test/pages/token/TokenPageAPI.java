@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
 import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.Route;
+import org.apache.dolphinscheduler.api.test.pages.token.entity.TokenGenerateEntity;
 import org.apache.dolphinscheduler.api.test.pages.token.entity.TokenRequestEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
@@ -35,6 +36,12 @@ public class TokenPageAPI implements ITokenPageAPI {
     public TokenPageAPI(RequestSpecification reqSpec, String sessionId) {
         this.reqSpec = reqSpec;
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public RestResponse<Result> generateToken(TokenGenerateEntity tokenGenerateEntity) {
+        return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
+            tokenGenerateEntity.toMap(), Route.generateAccessToken(), RequestMethod.POST));
     }
 
     @Override

@@ -15,24 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.base;
+package org.apache.dolphinscheduler.api.test.core.common;
 
-import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
-import org.apache.dolphinscheduler.api.test.pages.projects.project.ProjectPageAPI;
-import org.apache.dolphinscheduler.api.test.pages.projects.workflow.WorkFlowPageAPI;
-import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
-import org.apache.dolphinscheduler.api.test.pages.token.TokenPageAPI;
+/**
+ * thread local context
+ */
+public class ThreadLocalContext {
 
-public interface IPageAPIFactory {
+    public static final ThreadLocal<String> timezoneThreadLocal = new ThreadLocal<>();
 
-    TenantPageAPI createTenantPageAPI();
-
-    LoginPageAPI createLoginPageAPI();
-
-    ProjectPageAPI createProjectPageAPI();
-
-    WorkFlowPageAPI createWorkFlowPageAPI();
-
-    TokenPageAPI createTokenPageAPI();
-
+    public static ThreadLocal<String> getTimezoneThreadLocal() {
+        return timezoneThreadLocal;
+    }
 }
