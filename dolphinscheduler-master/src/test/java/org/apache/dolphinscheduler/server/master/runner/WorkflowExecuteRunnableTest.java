@@ -183,6 +183,7 @@ public class WorkflowExecuteRunnableTest {
             preTaskName.add(Long.toString(2));
 
             TaskInstance taskInstance = new TaskInstance();
+            taskInstance.setTaskParams("{}");
 
             TaskInstance taskInstance1 = new TaskInstance();
             taskInstance1.setId(1);
