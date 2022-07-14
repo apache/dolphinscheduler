@@ -445,6 +445,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       options: memoryLimitOptions,
       value: 1
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
