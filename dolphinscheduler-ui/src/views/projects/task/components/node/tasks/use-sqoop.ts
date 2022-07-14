@@ -65,6 +65,7 @@ export function useSqoop({
     targetHiveDropDelimiter: false,
     targetHiveOverWrite: true,
     concurrency: 1,
+    splitBy: '',
     timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 

@@ -63,6 +63,10 @@ public class SqoopParameters  extends AbstractParameters {
      */
     private int concurrency;
     /**
+     * split by
+     */
+    private String splitBy;
+    /**
      * source type
      */
     private String sourceType;
@@ -103,6 +107,12 @@ public class SqoopParameters  extends AbstractParameters {
 
     public void setConcurrency(int concurrency) {
         this.concurrency = concurrency;
+    }
+
+    public String getSplitBy() { return splitBy; }
+
+    public void setSplitBy(String splitBy) {
+        this.splitBy = splitBy;
     }
 
     public String getSourceType() {
