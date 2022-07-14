@@ -52,12 +52,19 @@ export default defineComponent({
     const customRequest = ({ file }: any) => {
       state.uploadForm.name = file.name
       state.uploadForm.file = file.file
+      state.uploadFormRef.validate()
+    }
+
+    const removeFile = () => {
+      state.uploadForm.name = ''
+      state.uploadForm.file = ''
     }
 
     return {
       hideModal,
       handleFolder,
       customRequest,
+      removeFile,
       ...toRefs(state)
     }
   },
@@ -93,7 +100,9 @@ export default defineComponent({
             <NUpload
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
+              max={1}
               class='btn-upload'
+              onRemove={this.removeFile}
             >
               <NButton>
                 {t('resource.udf.upload')}
