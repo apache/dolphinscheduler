@@ -282,14 +282,14 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     @Override
     public Queue createQueueIfNotExists(String queue, String queueName) {
+        Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
+        if (!Objects.isNull(existsQueue)) {
+            return existsQueue;
+        }
         Queue queueObj = new Queue(queueName, queue);
         createQueueValid(queueObj);
-        Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
-        if (Objects.isNull(existsQueue)) {
-            queueMapper.insert(queueObj);
-            return queueObj;
-        }
-        return existsQueue;
+        queueMapper.insert(queueObj);
+        return queueObj;
     }
 
 }
