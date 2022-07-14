@@ -18,7 +18,6 @@
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
@@ -29,6 +28,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import TokenModal from './components/token-modal'
+import Card from '@/components/card'
 
 const tokenManage = defineComponent({
   name: 'token-manage',
@@ -102,7 +102,7 @@ const tokenManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               class='btn-create-token'
@@ -126,8 +126,8 @@ const tokenManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.token_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -148,7 +148,7 @@ const tokenManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <TokenModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

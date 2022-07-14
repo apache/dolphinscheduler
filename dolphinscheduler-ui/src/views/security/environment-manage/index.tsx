@@ -18,7 +18,6 @@
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
@@ -29,6 +28,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import EnvironmentModal from './components/environment-modal'
+import Card from '@/components/card'
 
 const environmentManage = defineComponent({
   name: 'environment-manage',
@@ -102,7 +102,7 @@ const environmentManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               size='small'
@@ -126,8 +126,8 @@ const environmentManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.environment_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -149,7 +149,7 @@ const environmentManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <EnvironmentModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

@@ -22,15 +22,15 @@ import {
   NIcon,
   NSpace,
   NDataTable,
-  NPagination,
-  NCard
+  NPagination
 } from 'naive-ui'
-import UserDetailModal from './components/user-detail-modal'
-import AuthorizeModal from './components/authorize-modal'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
+import UserDetailModal from './components/user-detail-modal'
+import AuthorizeModal from './components/authorize-modal'
+import Card from '@/components/card'
 
 const UsersManage = defineComponent({
   name: 'user-manage',
@@ -66,7 +66,7 @@ const UsersManage = defineComponent({
   render() {
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               onClick={this.onAddUser}
@@ -85,8 +85,8 @@ const UsersManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={this.t('menu.user_manage')}>
           <NSpace vertical>
             <NDataTable
               row-class-name='items'
@@ -108,7 +108,7 @@ const UsersManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <UserDetailModal
           show={this.detailModalShow}
           currentRecord={this.currentRecord}
