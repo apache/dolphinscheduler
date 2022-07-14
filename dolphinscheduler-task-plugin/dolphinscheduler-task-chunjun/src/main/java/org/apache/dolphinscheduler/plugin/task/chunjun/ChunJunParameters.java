@@ -20,14 +20,12 @@ package org.apache.dolphinscheduler.plugin.task.chunjun;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * chunjun parameters
@@ -35,64 +33,14 @@ import java.util.Objects;
 public class ChunJunParameters extends AbstractParameters {
 
     /**
-     * if custom json config，eg  0, 1
+     * custom json config，default 1, support custom json
      */
     private int customConfig;
 
     /**
-     * if customConfig eq 1 ,then json is usable
+     * custom config json
      */
     private String json;
-
-    /**
-     * data source type，eg  MYSQL, POSTGRES ...
-     */
-    private String dsType;
-
-    /**
-     * datasource id
-     */
-    private int dataSource;
-
-    /**
-     * data target type，eg  MYSQL, POSTGRES ...
-     */
-    private String dtType;
-
-    /**
-     * datatarget id
-     */
-    private int dataTarget;
-
-    /**
-     * sql
-     */
-    private String sql;
-
-    /**
-     * target table
-     */
-    private String targetTable;
-
-    /**
-     * Pre Statements
-     */
-    private List<String> preStatements;
-
-    /**
-     * Post Statements
-     */
-    private List<String> postStatements;
-
-    /**
-     * speed byte num
-     */
-    private int jobSpeedByte;
-
-    /**
-     * speed record count
-     */
-    private int jobSpeedRecord;
 
     /**
      * other arguments -confProp "{\"flink.checkpoint.interval\":60000}"
@@ -103,6 +51,57 @@ public class ChunJunParameters extends AbstractParameters {
      * deploy mode local standlone yarn-session yarn-per-job
      */
     private String deployMode;
+
+    /**
+     * customConfig value is 0, datasource type，eg mysql
+     */
+    private String dsType;
+
+    /**
+     * customConfig value is 0, datasource id int
+     */
+    private int dataSource;
+
+    /**
+     * customConfig value is 0, datasource targetType，eg  MYSQL, POSTGRES
+     */
+    private String dtType;
+
+    /**
+     * customConfig value is 0, data target id
+     */
+    private int dataTarget;
+
+    /**
+     * customConfig value is 0, sql
+     */
+    private String sql;
+
+    /**
+     * customConfig value is 0, target table
+     */
+    private String targetTable;
+
+    /**
+     * pre statements
+     */
+    private List<String> preStatements;
+
+    /**
+     * post statements
+     */
+    private List<String> postStatements;
+
+    /**
+     * customConfig value is 0, job speed byte
+     */
+    private int jobSpeedByte;
+
+    /**
+     * customConfig value is 0, job speed record count
+     */
+    private int jobSpeedRecord;
+
 
     public int getCustomConfig() {
         return customConfig;
@@ -239,8 +238,7 @@ public class ChunJunParameters extends AbstractParameters {
     @Override
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
-            return dataSource != 0
-                && dataTarget != 0
+            return dataSource != 0 && dataTarget != 0
                 && StringUtils.isNotEmpty(sql)
                 && StringUtils.isNotEmpty(targetTable);
         } else {
@@ -263,29 +261,5 @@ public class ChunJunParameters extends AbstractParameters {
         resources.put(ResourceType.DATASOURCE, dataSource);
         resources.put(ResourceType.DATASOURCE, dataTarget);
         return resources;
-    }
-
-    public ChunJunTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
-        ChunJunTaskExecutionContext chunjunTaskExecutionContext = new ChunJunTaskExecutionContext();
-
-        if (customConfig == Flag.YES.ordinal()) {
-            return chunjunTaskExecutionContext;
-        }
-
-        DataSourceParameters dbSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataSource);
-        DataSourceParameters dbTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataTarget);
-
-        if (Objects.nonNull(dbSource)) {
-            chunjunTaskExecutionContext.setDataSourceId(dataSource);
-            chunjunTaskExecutionContext.setSourcetype(dbSource.getType());
-            chunjunTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());
-        }
-
-        if (Objects.nonNull(dbTarget)) {
-            chunjunTaskExecutionContext.setDataTargetId(dataTarget);
-            chunjunTaskExecutionContext.setTargetType(dbTarget.getType());
-            chunjunTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());
-        }
-        return chunjunTaskExecutionContext;
     }
 }
