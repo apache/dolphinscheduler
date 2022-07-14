@@ -58,7 +58,6 @@ export default defineComponent({
     const removeFile = () => {
       state.uploadForm.name = ''
       state.uploadForm.file = ''
-      state.uploadFormRef.validate()
     }
 
     return {
