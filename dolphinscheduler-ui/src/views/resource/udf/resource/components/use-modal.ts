@@ -105,7 +105,7 @@ export function useModal(
       ctx.emit('updateList')
       ctx.emit('update:show')
       resetUploadForm()
-    } catch (err) {
+    } finally {
       state.saving = false
     }
   }
