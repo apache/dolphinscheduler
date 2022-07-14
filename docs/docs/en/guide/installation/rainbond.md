@@ -62,9 +62,6 @@ Take Datax as an example:
    * LOCK_PATH：/opt/soft
 3. Update component,The initialization plug-in will be downloaded automatically `Datax` and decompress to `/opt/soft`
 ![](https://static.goodrain.com/wechat/dolphinscheduler/7.png)
-
-
-
 ---
 
 
