@@ -162,7 +162,9 @@
 
     <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
-        <include refid="baseSql"/>
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
         from t_ds_project p
         <if test="userId != 0">
             right join t_ds_relation_project_user rpu on p.id = rpu.project_id
