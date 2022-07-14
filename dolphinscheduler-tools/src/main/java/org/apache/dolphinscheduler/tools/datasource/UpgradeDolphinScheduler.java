@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-//@SpringBootApplication
+@SpringBootApplication
 public class UpgradeDolphinScheduler {
     public static void main(String[] args) {
         SpringApplication.run(UpgradeDolphinScheduler.class, args);

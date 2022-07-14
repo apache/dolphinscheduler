@@ -50,7 +50,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-//@SpringBootApplication
+@SpringBootApplication
 @EnableTransactionManagement
 @ComponentScan(basePackages = "org.apache.dolphinscheduler",
         excludeFilters = {
