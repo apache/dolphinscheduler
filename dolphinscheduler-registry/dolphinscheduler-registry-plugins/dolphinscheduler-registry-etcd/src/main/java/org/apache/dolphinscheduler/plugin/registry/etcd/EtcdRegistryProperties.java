@@ -17,7 +17,7 @@ public class EtcdRegistryProperties {
     private Duration connectionTimeout = Duration.ofSeconds(9);
 
     // auth
-    private String User;
+    private String user;
     private String password;
     private String authority;
 

@@ -1,5 +1,6 @@
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import io.etcd.jetcd.*;
 import io.etcd.jetcd.options.DeleteOption;
@@ -44,7 +45,7 @@ public class EtcdRegistry implements Registry {
     public EtcdRegistry(EtcdRegistryProperties registryProperties) {
         LOGGER.info("Starting Etcd Registry...");
         ClientBuilder clientBuilder = Client.builder()
-                .endpoints(registryProperties.getEndpoints())
+                .endpoints(Util.toURIs(Splitter.on(",").trimResults().splitToList(registryProperties.getEndpoints())))
                 .namespace(byteSequence(registryProperties.getNamespace()))
                 .connectTimeout(registryProperties.getConnectionTimeout())
                 .retryChronoUnit(ChronoUnit.MILLIS)
