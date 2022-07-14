@@ -8,11 +8,18 @@ import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
 import io.etcd.jetcd.watch.WatchEvent;
+import io.grpc.ConnectivityState;
+import io.grpc.ManagedChannel;
 import org.apache.dolphinscheduler.registry.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -20,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
@@ -28,8 +36,9 @@ import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
 public class EtcdRegistry implements Registry {
+    private static Logger LOGGER = LoggerFactory.getLogger(EtcdRegistry.class);
     private final Client client;
-
+    private EtcdConnectionStateListener etcdConnectionStateListener;
     // save the lock info for thread
     // key:lockKey Value:leaseId
     private static final ThreadLocal<Map<String, Long>> threadLocalLockMap = new ThreadLocal<>();
@@ -57,6 +66,15 @@ public class EtcdRegistry implements Registry {
             clientBuilder.authority(registryProperties.getAuthority());
         }
         client = clientBuilder.build();
+        etcdConnectionStateListener = new EtcdConnectionStateListener(client);
+        LOGGER.info("Initialize Etcd Registry...");
+    }
+
+    @PostConstruct
+    public void start() {
+        LOGGER.info("Starting Etcd Registry...");
+        etcdConnectionStateListener.start();
+        LOGGER.info("Started Etcd Registry...");
     }
     @Override
     public boolean subscribe(String path, SubscribeListener listener) {
@@ -86,8 +104,9 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public void addConnectionStateListener(ConnectionListener listener) {
-
+        etcdConnectionStateListener.addConnectionListener(listener);
     }
+
 
     @Override
     public String get(String key) {
