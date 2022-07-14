@@ -64,8 +64,8 @@ class ProcessDefinition(Base):
         ``user`` if it does not exists. And when ``project`` exists but project's create do not belongs
         to ``user``, will grant `project` to ``user`` automatically.
     :param resource_list: Resource files required by the current process definition.You can create and modify
-        resource files from this field. When the process definition is submitted, these resource files are also
-        submitted along with it.
+        resource files from this field. When the process definition is submitted, these resource files are
+        also submitted along with it.
     """
 
     # key attribute for identify ProcessDefinition object
