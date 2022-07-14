@@ -518,6 +518,8 @@ export default {
     datax_job_runtime_memory_xms: '最小内存',
     datax_job_runtime_memory_xmx: '最大内存',
     datax_job_runtime_memory_unit: 'G',
+    chunjun_custom_template: '自定义模板',
+    chunjun_json_template: 'JSON',
     current_hour: '当前小时',
     last_1_hour: '前1小时',
     last_2_hour: '前2小时',
