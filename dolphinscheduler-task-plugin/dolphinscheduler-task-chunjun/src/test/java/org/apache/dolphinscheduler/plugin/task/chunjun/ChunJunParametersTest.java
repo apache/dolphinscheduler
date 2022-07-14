@@ -65,4 +65,14 @@ public class ChunJunParametersTest {
     public void testCheckParameters() {
         Assert.assertFalse(chunJunParameters.checkParameters());
     }
+
+    @Test
+    public void testGetResourceFilesList() {
+        Assert.assertNotNull(chunJunParameters.getResourceFilesList());
+    }
+
+    @Test
+    public void testGetResources() {
+        Assert.assertNotNull(chunJunParameters.getResources());
+    }
 }
