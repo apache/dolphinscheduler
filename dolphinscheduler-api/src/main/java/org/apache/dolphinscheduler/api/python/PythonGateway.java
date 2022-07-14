@@ -171,6 +171,7 @@ public class PythonGateway {
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        // In the case project exists, but current process definition still not created, we should also return the init version of it
         if (processDefinition == null) {
             result.put("code", CodeGenerateUtils.getInstance().genCode());
             result.put("version", 0L);
