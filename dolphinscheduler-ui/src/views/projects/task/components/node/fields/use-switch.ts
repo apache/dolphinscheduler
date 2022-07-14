@@ -104,20 +104,13 @@ export function useSwitch(
             autosize: { minRows: 2 }
           }
         },
-        (i = 0) => ({
+        {
           type: 'select',
           field: 'nextNode',
           span: 22,
           name: t('project.node.switch_branch_flow'),
-          options: branchFlowOptions,
-          validate: {
-            trigger: ['input', 'blur'],
-            validator: (unuse: any, value: string) => {
-              if (model.dependTaskList[i].condition && !value)
-                return new Error(t('project.node.switch_branch_flow_tips'))
-            }
-          }
-        })
+          options: branchFlowOptions
+        }
       ]
     },
     {
@@ -128,12 +121,7 @@ export function useSwitch(
       props: {
         loading: loading
       },
-      options: branchFlowOptions,
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        message: t('project.node.switch_branch_flow_tips')
-      }
+      options: branchFlowOptions
     }
   ]
 }
