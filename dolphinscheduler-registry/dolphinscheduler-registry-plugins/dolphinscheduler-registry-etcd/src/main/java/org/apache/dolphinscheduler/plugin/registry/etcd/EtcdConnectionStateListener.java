@@ -18,19 +18,27 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Get the connection status by listening to the Client's Channel
+ */
 public class EtcdConnectionStateListener implements AutoCloseable{
-
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
+    // A thread pool that periodically obtains connection status
     private final ScheduledExecutorService scheduledExecutorService;
+    // Client's Channel
     private AtomicReference<ManagedChannel> channel;
+    // monitored client
     private Client client;
+    // The state of the last monitor
     private ConnectionState connectionState;
+    private long initialDelay = 500L;
+    private long delay = 500L;
     public EtcdConnectionStateListener(Client client) {
         this.client = client;
         channel = new AtomicReference<>();
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
                 1,
-                new ThreadFactoryBuilder().setNameFormat("EphemeralDateTermRefreshThread").setDaemon(true).build());
+                new ThreadFactoryBuilder().setNameFormat("EtcdConnectionStateListenerThread").setDaemon(true).build());
     }
 
     public void addConnectionListener(ConnectionListener connectionListener) {
@@ -88,7 +96,9 @@ public class EtcdConnectionStateListener implements AutoCloseable{
         return ConnectionState.DISCONNECTED;
     }
 
-
+    /**
+     * Periodically execute thread to get connection status
+     */
     public void start(){
         this.scheduledExecutorService.scheduleWithFixedDelay(()->{
             ConnectionState currentConnectionState = isConnected();
@@ -110,10 +120,11 @@ public class EtcdConnectionStateListener implements AutoCloseable{
                         triggerListener(connectionState);
                     }
                 },
-                500,
-                500,
+                initialDelay,
+                delay,
                 TimeUnit.MILLISECONDS);
     }
+    // notify all listeners
     private void triggerListener(ConnectionState connectionState) {
         for (ConnectionListener connectionListener : connectionListeners) {
             connectionListener.onUpdate(connectionState);

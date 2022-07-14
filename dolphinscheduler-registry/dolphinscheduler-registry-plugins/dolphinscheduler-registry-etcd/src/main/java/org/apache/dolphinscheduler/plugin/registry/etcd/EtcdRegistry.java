@@ -75,6 +75,13 @@ public class EtcdRegistry implements Registry {
         etcdConnectionStateListener.start();
         LOGGER.info("Started Etcd ConnectionListener...");
     }
+
+    /**
+     *
+     * @param path The prefix of the key being listened to
+     * @param listener
+     * @return if subcribe Returns true if no exception was thrown
+     */
     @Override
     public boolean subscribe(String path, SubscribeListener listener) {
         try {
@@ -91,6 +98,10 @@ public class EtcdRegistry implements Registry {
         return true;
     }
 
+    /**
+     * @throws throws an exception if the unsubscribe path does not exist
+     * @param path The prefix of the key being listened to
+     */
     @Override
     public void unsubscribe(String path) {
         try {
@@ -106,7 +117,12 @@ public class EtcdRegistry implements Registry {
         etcdConnectionStateListener.addConnectionListener(listener);
     }
 
-
+    /**
+     *
+     * @param key
+     * @return Returns the value corresponding to the key
+     * @throws throws an exception if the key does not exist
+     */
     @Override
     public String get(String key) {
         try {
@@ -117,6 +133,12 @@ public class EtcdRegistry implements Registry {
         }
     }
 
+    /**
+     *
+     * @param key
+     * @param value
+     * @param deleteOnDisconnect Does the put data disappear when the client disconnects
+     */
     @Override
     public void put(String key, String value, boolean deleteOnDisconnect) {
         try{
@@ -135,6 +157,10 @@ public class EtcdRegistry implements Registry {
         }
     }
 
+    /**
+     * delete all keys that contain the prefix
+     * @param key the prrefix
+     */
     @Override
     public void delete(String key) {
         try {
@@ -145,6 +171,11 @@ public class EtcdRegistry implements Registry {
         }
     }
 
+    /**
+     * Get all child objects, split by "/"
+     * @param key
+     * @return
+     */
     @Override
     public Collection<String> children(String key) {
         // Make sure the string end with '/'
@@ -159,11 +190,22 @@ public class EtcdRegistry implements Registry {
         }
     }
 
+    /**
+     * If "/" exists in the child object, get the string prefixed with "/"
+     * @param prefix
+     * @param fullPath
+     * @return
+     */
     private String getSubNodeKeyName(final String prefix, final String fullPath) {
         String pathWithoutPrefix = fullPath.substring(prefix.length());
         return pathWithoutPrefix.contains(FOLDER_SEPARATOR) ? pathWithoutPrefix.substring(0, pathWithoutPrefix.indexOf(FOLDER_SEPARATOR)) : pathWithoutPrefix;
     }
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     @Override
     public boolean exists(String key) {
         GetOption getOption = GetOption.newBuilder().withCountOnly(true).build();
@@ -176,6 +218,11 @@ public class EtcdRegistry implements Registry {
         return false;
     }
 
+    /**
+     * get the lock with a lease
+     * @param key
+     * @return
+     */
     @Override
     public boolean acquireLock(String key) {
         Lock lockClient = client.getLockClient();
@@ -199,6 +246,11 @@ public class EtcdRegistry implements Registry {
         }
     }
 
+    /**
+     * release the lock by revoking the leaseId
+     * @param key
+     * @return
+     */
     @Override
     public boolean releaseLock(String key) {
         try {
