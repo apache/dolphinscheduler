@@ -25,9 +25,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>dolphinscheduler-task-java</artifactId>
-
     <packaging>jar</packaging>
 
     <dependencies>
@@ -41,6 +39,7 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

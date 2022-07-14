@@ -38,21 +38,26 @@ import org.junit.Test;
 
 public class JavaTaskTest {
 
-    @Test
-    public void testJavaHome() {
-        Assert.assertNotNull(System.getenv().get("JAVA_HOME"));
-    }
-
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: void
+     **/
     @Test
     public void buildJarCommand() {
-        String homePath = System.getenv(JavaConstants.JAVA_HOME);
-        Assert.assertNotNull(homePath);
-        String homeBinPath = homePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
+        String homeBinPath = JavaConstants.JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
         JavaTask javaTask = runJarType();
         Assert.assertEquals(javaTask.buildJarCommand(), homeBinPath
                 + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: void
+     **/
     @Test
     public void buildJavaCompileCommand() throws IOException {
         JavaTask javaTask = runJavaType();
@@ -61,9 +66,7 @@ public class JavaTaskTest {
         Assert.assertEquals("JavaTaskTest", publicClassName);
         String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
         try {
-            String homePath = System.getenv(JavaConstants.JAVA_HOME);
-            Assert.assertNotNull(homePath);
-            String homeBinPath = homePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
+            String homeBinPath = JavaConstants.JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
                 Files.delete(path);
@@ -81,11 +84,15 @@ public class JavaTaskTest {
 
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: void
+     **/
     @Test
     public void buildJavaCommand() throws Exception {
-        String homePath = System.getenv(JavaConstants.JAVA_HOME);
-        Assert.assertNotNull(homePath);
-        String homeBinPath = homePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
+        String homeBinPath = JavaConstants.JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
         JavaTask javaTask = runJavaType();
         String sourceCode = javaTask.buildJavaSourceContent();
         String publicClassName = javaTask.getPublicClassName(sourceCode);
@@ -98,6 +105,12 @@ public class JavaTaskTest {
         Assert.assertEquals(javaTask.buildJavaCommand(), homeBinPath + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:39 AM
+     * @param: [java.lang.String]
+     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaParameters
+     **/
     public JavaParameters createJavaParametersObject(String runType) {
         JavaParameters javaParameters = new JavaParameters();
         javaParameters.setRunType(runType);
@@ -127,6 +140,12 @@ public class JavaTaskTest {
         return javaParameters;
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:39 AM
+     * @param: []
+     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
+     **/
     public JavaTask runJavaType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAVA)));
@@ -137,6 +156,12 @@ public class JavaTaskTest {
         return javaTask;
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:39 AM
+     * @param: []
+     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
+     **/
     public JavaTask runJarType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAR)));

@@ -27,16 +27,34 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class JavaTaskChannelFactory implements TaskChannelFactory {
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: org.apache.dolphinscheduler.plugin.task.api.TaskChannel
+     **/
     @Override
     public TaskChannel create() {
         return new JavaTaskChannel();
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: java.lang.String
+     **/
     @Override
     public String getName() {
         return "JAVA";
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: java.util.List<org.apache.dolphinscheduler.spi.params.base.PluginParams>
+     **/
     @Override
     public List<PluginParams> getParams() {
         return null;

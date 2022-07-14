@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -73,17 +74,16 @@ public class JavaTask extends AbstractTaskExecutor {
     private TaskExecutionContext taskRequest;
 
     /**
-     * task execution context
+     * class name regex pattern
      */
-    private TaskExecutionContext taskRequest;
-
     private static final Pattern classNamePattern = Pattern.compile(PUBLIC_CLASS_NAME_REGEX);
 
     /**
-     * constructor
-     *
-     * @param taskRequest taskRequest
-     */
+     * @description:
+     * @date: 7/22/22 2:36 AM
+     * @param: [org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext]
+     * @return: JavaTask
+     **/
     public JavaTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskRequest = taskRequest;
@@ -92,6 +92,12 @@ public class JavaTask extends AbstractTaskExecutor {
                 logger);
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:36 AM
+     * @param: []
+     * @return: void
+     **/
     @Override
     public void init() {
         logger.info("java task params {}", taskRequest.getTaskParams());
@@ -104,6 +110,12 @@ public class JavaTask extends AbstractTaskExecutor {
         }
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:36 AM
+     * @param: []
+     * @return: java.lang.String
+     **/
     @Override
     public String getPreScript() {
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
@@ -115,13 +127,19 @@ public class JavaTask extends AbstractTaskExecutor {
         return rawJavaScript;
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:36 AM
+     * @param: []
+     * @return: void
+     **/
     @Override
     public void handle() throws Exception {
         try {
-            // Step 1 judge if is java or jar run type.
-            // The  jar run type builds the command directly, adding resource to the java -jar class when building the command
-            // The java run type, first replace the custom parameters, then compile the code, and then build the command will add resource
-            // To run the coma
+            // Step 1: judge if is java or jar run type.
+            // Step 2 case1: The jar run type builds the command directly, adding resource to the java -jar class when building the command
+            // Step 2 case2: The java run type, first replace the custom parameters, then compile the code, and then build the command will add resource
+            // Step 3: To run the command
             String command = null;
             switch (javaParameters.getRunType()) {
                 case JavaConstants.RUN_TYPE_JAVA:
@@ -151,11 +169,17 @@ public class JavaTask extends AbstractTaskExecutor {
         }
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:36 AM
+     * @param: []
+     * @return: java.lang.String
+     **/
     protected String buildJavaCommand() throws Exception {
         String sourceCode = buildJavaSourceContent();
         String className = compilerRawScript(sourceCode);
         StringBuilder builder = new StringBuilder();
-        builder.append(getJavaHomeBinAbsolutePath())
+        builder.append(getJavaCommandPath())
                 .append("java").append(" ")
                 .append(buildResourcePath())
                 .append(" ")
@@ -188,7 +212,7 @@ public class JavaTask extends AbstractTaskExecutor {
         String mainJarName = fullName.substring(0, fullName.lastIndexOf('.'));
         mainJarName = mainJarName.substring(mainJarName.lastIndexOf('.') + 1) + ".jar";
         StringBuilder builder = new StringBuilder();
-        builder.append(getJavaHomeBinAbsolutePath())
+        builder.append(getJavaCommandPath())
                 .append("java").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
@@ -212,7 +236,6 @@ public class JavaTask extends AbstractTaskExecutor {
 
     /**
      * convertJavaScriptPlaceholders
-     *
      * @param rawScript rawScript
      * @return String
      * @throws StringIndexOutOfBoundsException StringIndexOutOfBoundsException
@@ -299,6 +322,12 @@ public class JavaTask extends AbstractTaskExecutor {
         return publicClassName;
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:36 AM
+     * @param: []
+     * @return: void
+     **/
     private void dropShellCommandFile() throws IOException {
         String commandFilePath = String.format("%s/%s.%s"
                 , taskRequest.getExecutePath()
@@ -310,16 +339,28 @@ public class JavaTask extends AbstractTaskExecutor {
         }
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:35 AM
+     * @param: [java.lang.String, java.lang.String]
+     * @return: java.lang.String
+     **/
     protected String buildJavaCompileCommand(String fileName, String sourceCode) throws IOException {
 
         StringBuilder compilerCommand = new StringBuilder()
-                .append(getJavaHomeBinAbsolutePath())
+                .append(getJavaCommandPath())
                 .append("javac").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append(fileName);
         return compilerCommand.toString();
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:35 AM
+     * @param: []
+     * @return: java.lang.String
+     **/
     protected String buildJavaSourceContent() {
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
         // replace placeholder
@@ -336,12 +377,22 @@ public class JavaTask extends AbstractTaskExecutor {
         return rawJavaScript;
     }
 
-    private String getJavaHomeBinAbsolutePath() {
-        String javaHomeAbsolutePath = System.getenv(JavaConstants.JAVA_HOME);
-        Preconditions.checkNotNull(javaHomeAbsolutePath, "not find the java home in the version. ");
-        return javaHomeAbsolutePath + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator");
+    /**
+     * @description:
+     * @date: 7/22/22 2:35 AM
+     * @param: []
+     * @return: java.lang.String
+     **/
+    private String getJavaCommandPath() {
+        return JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:35 AM
+     * @param: [java.lang.String]
+     * @return: java.lang.String
+     **/
     public String getPublicClassName(String sourceCode) {
         Matcher matcher = classNamePattern.matcher(sourceCode);
         if (!matcher.find()) {

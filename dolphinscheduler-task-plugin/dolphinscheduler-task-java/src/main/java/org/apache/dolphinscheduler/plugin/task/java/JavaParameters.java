@@ -22,9 +22,13 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import java.util.List;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 public class JavaParameters extends AbstractParameters {
     /**
      * origin java script
@@ -41,10 +45,19 @@ public class JavaParameters extends AbstractParameters {
      */
     private String runType;
 
+    /**
+     * main method args
+     **/
     private String mainArgs;
 
+    /**
+     * jvm args
+     **/
     private String jvmArgs;
 
+    /**
+     * module path or class path flag
+     **/
     private boolean isModulePath;
 
     /**
@@ -52,11 +65,23 @@ public class JavaParameters extends AbstractParameters {
      */
     private List<ResourceInfo> resourceList;
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:35 AM
+     * @param: []
+     * @return: boolean
+     **/
     @Override
     public boolean checkParameters() {
         return runType != null && (rawScript != null && !rawScript.isEmpty()) || mainJar != null;
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:34 AM
+     * @param: []
+     * @return: java.util.List<org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo>
+     **/
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return this.resourceList;

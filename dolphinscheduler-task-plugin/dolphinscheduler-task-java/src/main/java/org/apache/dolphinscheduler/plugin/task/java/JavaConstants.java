@@ -23,18 +23,44 @@ public class JavaConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String JAVA_HOME = "JAVA_HOME";
+    /**
+     * constant ${JAVA_HOME}
+     **/
+    public static final String JAVA_HOME_VAR = "${JAVA_HOME}";
 
+    /**
+     * constant RUN_TYPE_JAVA
+     **/
     public static final String RUN_TYPE_JAVA = "JAVA";
 
+    /**
+     * constant RUN_TYPE_JAR
+     **/
     public static final String RUN_TYPE_JAR = "JAR";
 
+    /**
+     * constant PATH_SEPARATOR
+     **/
     public static final String PATH_SEPARATOR = System.getProperty("path.separator");
 
+    /**
+     * constant FILE_SEPARATOR
+     **/
+    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
+    /**
+     * constant CLASSPATH_CURRENT_DIR
+     **/
     public static final String CLASSPATH_CURRENT_DIR = ".";
 
+    /**
+     * constant JAVA_SOURCE_CODE_NAME_TEMPLATE
+     **/
     public static final String JAVA_SOURCE_CODE_NAME_TEMPLATE = "%s/%s.java";
 
+    /**
+     * constant PUBLIC_CLASS_NAME_REGEX
+     **/
     public static final String PUBLIC_CLASS_NAME_REGEX = "(.*\\s+public\\s+class\\s+)([a-zA-Z_]+[//w_]*)([.\\s\\S]*)";
 
 

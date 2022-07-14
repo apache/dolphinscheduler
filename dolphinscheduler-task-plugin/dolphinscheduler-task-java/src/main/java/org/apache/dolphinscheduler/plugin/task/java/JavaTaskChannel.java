@@ -25,21 +25,46 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class JavaTaskChannel implements TaskChannel {
+
+    /**
+     * @description:
+     * @date: 7/22/22 2:37 AM
+     * @param: [boolean]
+     * @return: void
+     **/
     @Override
     public void cancelApplication(boolean status) {
 
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:37 AM
+     * @param: [org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext]
+     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
+     **/
     @Override
     public JavaTask createTask(TaskExecutionContext taskRequest) {
         return new JavaTask(taskRequest);
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:37 AM
+     * @param: [org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode]
+     * @return: org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
+     **/
     @Override
     public AbstractParameters parseParameters(ParametersNode parametersNode) {
         return JSONUtils.parseObject(parametersNode.getTaskParams(), JavaParameters.class);
     }
 
+    /**
+     * @description:
+     * @date: 7/22/22 2:37 AM
+     * @param: [java.lang.String]
+     * @return: org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper
+     **/
     @Override
     public ResourceParametersHelper getResources(String parameters) {
         return null;
