@@ -395,9 +395,17 @@ export function formatParams(data: INodeData): {
     taskParams.sql = data.sql
   }
 
+  if (data.taskType === 'CHUNJUN') {
+    taskParams.customConfig = data.customConfig ? 1 : 0
+    taskParams.json = data.json
+    taskParams.deployMode = data.deployMode
+    taskParams.others = data.others
+  }
+
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
