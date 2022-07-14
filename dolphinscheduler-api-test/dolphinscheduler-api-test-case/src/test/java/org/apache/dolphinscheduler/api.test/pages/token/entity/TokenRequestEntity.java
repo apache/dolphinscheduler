@@ -20,15 +20,15 @@ package org.apache.dolphinscheduler.api.test.pages.token.entity;
 import org.apache.dolphinscheduler.api.test.base.AbstractBaseEntity;
 
 public class TokenRequestEntity extends AbstractBaseEntity {
-    private String userId;
+    private int userId;
     private String token;
     private String expireTime;
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

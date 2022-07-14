@@ -144,4 +144,19 @@ public class Route {
         return projects() + SEPARATE + projectCode + SEPARATE + "/executors/start-process-instance";
     }
 
+    /**
+     * user manage page api
+     */
+
+    public static String createUser() {
+        return "/users/create";
+    }
+
+    public static String listUser() {
+        return "/users/List";
+    }
+
+    public static String queryUserList() {
+        return "/users/list-paging";
+    }
 }

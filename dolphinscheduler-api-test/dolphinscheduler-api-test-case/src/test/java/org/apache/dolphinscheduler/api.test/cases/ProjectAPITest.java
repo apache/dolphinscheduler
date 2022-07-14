@@ -45,7 +45,7 @@ public class ProjectAPITest extends AbstractAPITest {
     public void initProjectAPIFactory() {
         projectPageAPI = pageAPIFactory.createProjectPageAPI();
         projectRequestEntity = new ProjectRequestEntity();
-        projectRequestEntity.setProjectName(fairy.person().getCompany().getName() + "1");
+        projectRequestEntity.setProjectName(fairy.person().getCompany().getName());
         projectRequestEntity.setDescription(fairy.person().getFullName());
     }
 
