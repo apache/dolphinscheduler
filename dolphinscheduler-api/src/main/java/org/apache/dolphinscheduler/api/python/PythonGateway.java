@@ -172,9 +172,9 @@ public class PythonGateway {
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
         if (processDefinition == null) {
-            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("version", 0L);
+            return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
