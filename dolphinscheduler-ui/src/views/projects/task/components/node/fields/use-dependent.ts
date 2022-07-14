@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, watch, h } from 'vue'
+import { ref, onMounted, watch, h, VNode } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon } from 'naive-ui'
+import { NIcon, NTooltip, SelectOption } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryAllProjectList } from '@/service/modules/projects'
@@ -308,7 +308,18 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                   processCode
                 )
                 item.depTaskCode = 0
-              }
+              },
+              renderOption: ({
+                node,
+                option
+              }: {
+                node: VNode
+                option: SelectOption
+              }) =>
+                h(NTooltip, null, {
+                  trigger: () => node,
+                  default: () => option.label
+                })
             },
             options:
               model.dependTaskList[i]?.dependItemList[j]
@@ -330,7 +341,18 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 24,
             name: t('project.node.task_name'),
             props: {
-              filterable: true
+              filterable: true,
+              renderOption: ({
+                node,
+                option
+              }: {
+                node: VNode
+                option: SelectOption
+              }) =>
+                h(NTooltip, null, {
+                  trigger: () => node,
+                  default: () => option.label
+                })
             },
             options:
               model.dependTaskList[i]?.dependItemList[j]?.depTaskCodeOptions ||
