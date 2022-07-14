@@ -180,27 +180,34 @@ public class ChunJunTask extends AbstractTaskExecutor {
 
         sbr.append(CHUNJUN_PATH);
         sbr.append(" ");
-        sbr.append("-mode ");
+        sbr.append("-mode");
+        sbr.append(" ");
         sbr.append(getExecMode(chunJunParameters));
         sbr.append(" ");
-        sbr.append("-jobType sync ");
-        sbr.append("-job ");
+        sbr.append("-jobType sync");
+        sbr.append(" ");
+        sbr.append("-job");
+        sbr.append(" ");
         sbr.append(jobConfigFilePath);
         sbr.append(" ");
-        sbr.append("-chunjunDistDir ");
+        sbr.append("-chunjunDistDir");
+        sbr.append(" ");
         sbr.append(CHUNJUN_DIST_DIR);
 
         if (!"local".equalsIgnoreCase(getExecMode(chunJunParameters))) {
             sbr.append(" ");
-            sbr.append("-flinkConfDir ");
+            sbr.append("-flinkConfDir");
+            sbr.append(" ");
             sbr.append(ChunJunConstants.FLINK_CONF_DIR);
 
             sbr.append(" ");
-            sbr.append("-flinkLibDir  ");
+            sbr.append("-flinkLibDir");
+            sbr.append(" ");
             sbr.append(ChunJunConstants.FLINK_LIB_DIR);
 
             sbr.append(" ");
-            sbr.append("-hadoopConfDir ");
+            sbr.append("-hadoopConfDir");
+            sbr.append(" ");
             sbr.append(ChunJunConstants.HADOOP_CONF_DIR);
         }
 

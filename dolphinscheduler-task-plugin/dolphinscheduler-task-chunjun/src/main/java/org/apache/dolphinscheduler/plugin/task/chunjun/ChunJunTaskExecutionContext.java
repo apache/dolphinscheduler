@@ -21,9 +21,12 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.Serializable;
 
+import lombok.Data;
+
 /**
  * chunjun  taskExecutionContext
  */
+@Data
 public class ChunJunTaskExecutionContext implements Serializable {
 
     /**
@@ -56,63 +59,4 @@ public class ChunJunTaskExecutionContext implements Serializable {
      */
     private String targetConnectionParams;
 
-    public int getDataSourceId() {
-        return dataSourceId;
-    }
-
-    public void setDataSourceId(int dataSourceId) {
-        this.dataSourceId = dataSourceId;
-    }
-
-    public DbType getSourcetype() {
-        return sourcetype;
-    }
-
-    public void setSourcetype(DbType sourcetype) {
-        this.sourcetype = sourcetype;
-    }
-
-    public String getSourceConnectionParams() {
-        return sourceConnectionParams;
-    }
-
-    public void setSourceConnectionParams(String sourceConnectionParams) {
-        this.sourceConnectionParams = sourceConnectionParams;
-    }
-
-    public int getDataTargetId() {
-        return dataTargetId;
-    }
-
-    public void setDataTargetId(int dataTargetId) {
-        this.dataTargetId = dataTargetId;
-    }
-
-    public DbType getTargetType() {
-        return targetType;
-    }
-
-    public void setTargetType(DbType targetType) {
-        this.targetType = targetType;
-    }
-
-    public String getTargetConnectionParams() {
-        return targetConnectionParams;
-    }
-
-    public void setTargetConnectionParams(String targetConnectionParams) {
-        this.targetConnectionParams = targetConnectionParams;
-    }
-
-    @Override
-    public String toString() {
-        return "ChunJunTaskExecutionContext{"
-            + "dataSourceId=" + dataSourceId
-            + ", sourcetype=" + sourcetype
-            + ", sourceConnectionParams='" + sourceConnectionParams + '\''
-            + ", dataTargetId=" + dataTargetId
-            + ", targetType=" + targetType
-            + ", targetConnectionParams='" + targetConnectionParams + '\''
-            + '}';
-    }
 }
