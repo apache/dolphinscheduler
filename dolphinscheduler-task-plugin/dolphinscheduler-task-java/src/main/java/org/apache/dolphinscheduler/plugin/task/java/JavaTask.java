@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -65,7 +67,17 @@ public class JavaTask extends AbstractTaskExecutor {
      */
     private ShellCommandExecutor shellCommandExecutor;
 
+    /**
+     * task execution context
+     */
     private TaskExecutionContext taskRequest;
+
+    /**
+     * task execution context
+     */
+    private TaskExecutionContext taskRequest;
+
+    private static final Pattern classNamePattern = Pattern.compile(PUBLIC_CLASS_NAME_REGEX);
 
     /**
      * constructor
@@ -331,9 +343,7 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     public String getPublicClassName(String sourceCode) {
-        String pattern = "(.*\\s+public\\s+class\\s+)([a-zA-Z_]+[//w_]*)([.\\s\\S]*)";
-        Pattern compile = Pattern.compile(pattern);
-        Matcher matcher = compile.matcher(sourceCode);
+        Matcher matcher = classNamePattern.matcher(sourceCode);
         if (!matcher.find()) {
             throw new PublicClassNotFoundException("public class is not be found in sourcecode : " + sourceCode);
         }

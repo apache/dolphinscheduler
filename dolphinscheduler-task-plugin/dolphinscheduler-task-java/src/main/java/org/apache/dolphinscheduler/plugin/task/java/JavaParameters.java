@@ -31,8 +31,14 @@ public class JavaParameters extends AbstractParameters {
      */
     private String rawScript;
 
+    /**
+     * run in jar file
+     */
     private ResourceInfo mainJar;
 
+    /**
+     * run type is JAVA or JAR
+     */
     private String runType;
 
     private String mainArgs;
