@@ -75,8 +75,6 @@ public class TaskResponseServiceTest {
     public void before() {
         taskEventService.start();
 
-        Mockito.when(channel.remoteAddress()).thenReturn(InetSocketAddress.createUnresolved("127.0.0.1", 1234));
-
         TaskExecuteRunningCommand taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                                                                                             "127.0.0.1:1234",
                                                                                             System.currentTimeMillis());
@@ -88,7 +86,9 @@ public class TaskResponseServiceTest {
         taskExecuteRunningMessage.setHost("127.*.*.*");
         taskExecuteRunningMessage.setStartTime(new Date());
 
-        ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage, channel);
+        ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
+                                             channel,
+                                             taskExecuteRunningMessage.getMessageSenderAddress());
 
         TaskExecuteResultCommand taskExecuteResultMessage = new TaskExecuteResultCommand(NetUtils.getAddr(1234),
                                                                                          NetUtils.getAddr(5678),
@@ -100,7 +100,9 @@ public class TaskResponseServiceTest {
         taskExecuteResultMessage.setVarPool("varPol");
         taskExecuteResultMessage.setAppIds("ids");
         taskExecuteResultMessage.setProcessId(1);
-        resultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage, channel);
+        resultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
+                                               channel,
+                                               taskExecuteResultMessage.getMessageSenderAddress());
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);
