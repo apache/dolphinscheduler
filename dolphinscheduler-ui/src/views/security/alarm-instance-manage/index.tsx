@@ -22,10 +22,10 @@ import {
   NIcon,
   NDataTable,
   NPagination,
-  NSpace,
-  NCard
+  NSpace
 } from 'naive-ui'
 import DetailModal from './detail'
+import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useUserInfo } from './use-userinfo'
@@ -109,7 +109,7 @@ const AlarmInstanceManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           {{
             default: () => (
               <NSpace justify='space-between'>
@@ -138,8 +138,8 @@ const AlarmInstanceManage = defineComponent({
               </NSpace>
             )
           }}
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.alarm_instance_manage')}>
           <NSpace vertical>
             <NDataTable columns={columns} data={list} loading={loading} striped />
             <NSpace justify='center'>
@@ -153,7 +153,7 @@ const AlarmInstanceManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         {IS_ADMIN && (
           <DetailModal
             show={showDetailModal}

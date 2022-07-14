@@ -18,7 +18,6 @@
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
@@ -29,6 +28,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import AlarmGroupModal from './components/alarm-group-modal'
+import Card from '@/components/card'
 
 const alarmGroupManage = defineComponent({
   name: 'alarm-group-manage',
@@ -102,7 +102,7 @@ const alarmGroupManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton size='small' type='primary' onClick={handleModalChange}>
               {t('security.alarm_group.create_alarm_group')}
@@ -121,8 +121,8 @@ const alarmGroupManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.alarm_group_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -142,7 +142,7 @@ const alarmGroupManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <AlarmGroupModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
