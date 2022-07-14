@@ -35,7 +35,7 @@ import java.util.Objects;
 /**
  * sqoop parameters
  */
-public class SqoopParameters  extends AbstractParameters {
+public class SqoopParameters extends AbstractParameters {
 
     /**
      * sqoop job type:
@@ -109,7 +109,9 @@ public class SqoopParameters  extends AbstractParameters {
         this.concurrency = concurrency;
     }
 
-    public String getSplitBy() { return splitBy; }
+    public String getSplitBy() {
+        return splitBy;
+    }
 
     public void setSplitBy(String splitBy) {
         this.splitBy = splitBy;
@@ -198,16 +200,16 @@ public class SqoopParameters  extends AbstractParameters {
 
         if (SqoopJobType.TEMPLATE.getDescp().equals(jobType)) {
             sqoopParamsCheck = StringUtils.isEmpty(customShell)
-                    && StringUtils.isNotEmpty(modelType)
-                    && StringUtils.isNotEmpty(jobName)
-                    && concurrency != 0
-                    && StringUtils.isNotEmpty(sourceType)
-                    && StringUtils.isNotEmpty(targetType)
-                    && StringUtils.isNotEmpty(sourceParams)
-                    && StringUtils.isNotEmpty(targetParams);
+                && StringUtils.isNotEmpty(modelType)
+                && StringUtils.isNotEmpty(jobName)
+                && concurrency != 0
+                && StringUtils.isNotEmpty(sourceType)
+                && StringUtils.isNotEmpty(targetType)
+                && StringUtils.isNotEmpty(sourceParams)
+                && StringUtils.isNotEmpty(targetParams);
         } else if (SqoopJobType.CUSTOM.getDescp().equals(jobType)) {
             sqoopParamsCheck = StringUtils.isNotEmpty(customShell)
-                    && StringUtils.isEmpty(jobName);
+                && StringUtils.isEmpty(jobName);
         }
 
         return sqoopParamsCheck;
