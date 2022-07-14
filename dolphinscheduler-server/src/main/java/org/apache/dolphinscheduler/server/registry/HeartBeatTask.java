@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,8 @@ public class HeartBeatTask implements Runnable {
     private int workerWaitingTaskCount;
     private final String serverType;
     private final HeartBeat heartBeat;
+
+    private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
     public HeartBeatTask(long startupTime,
                          double maxCpuloadAvg,
@@ -88,8 +92,13 @@ public class HeartBeatTask implements Runnable {
             for (String heartBeatPath : heartBeatPaths) {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
+            heartBeatErrorTimes.set(0);
         } catch (Throwable ex) {
             logger.error("HeartBeat task execute failed", ex);
+            if (heartBeatErrorTimes.incrementAndGet() >= Constants.REGISTRY_HEART_BEAT_ERROR_THRESHOLD) {
+                registryClient.getStoppable()
+                              .stop("HeartBeat task connect to zk failed too much times: " + heartBeatErrorTimes);
+            }
         }
     }
 }

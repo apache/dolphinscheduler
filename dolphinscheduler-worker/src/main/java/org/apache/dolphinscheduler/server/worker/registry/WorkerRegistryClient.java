@@ -54,7 +54,7 @@ import com.google.common.collect.Sets;
  * worker registry
  */
 @Service
-public class WorkerRegistryClient {
+public class WorkerRegistryClient implements AutoCloseable {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerRegistryClient.class);
 
@@ -147,8 +147,10 @@ public class WorkerRegistryClient {
             logger.error("remove worker zk path exception", ex);
         }
 
-        this.heartBeatExecutor.shutdownNow();
-        logger.info("heartbeat executor shutdown");
+        if (heartBeatExecutor != null) {
+            heartBeatExecutor.shutdownNow();
+            logger.info("Heartbeat executor shutdown");
+        }
 
         registryClient.close();
         logger.info("registry client closed");
@@ -175,8 +177,9 @@ public class WorkerRegistryClient {
         return workerPaths;
     }
 
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) {
-        registryClient.handleDeadServer(nodeSet, nodeType, opType);
+    public void handleDeadServer() {
+        Set<String> workerZkPaths = getWorkerZkPaths();
+        registryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
     }
 
     /**
@@ -188,6 +191,11 @@ public class WorkerRegistryClient {
 
     public void setRegistryStoppable(IStoppable stoppable) {
         registryClient.setStoppable(stoppable);
+    }
+
+    @Override
+    public void close() throws IOException {
+        unRegistry();
     }
 
 }
