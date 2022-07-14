@@ -29,10 +29,12 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
+import org.apache.dolphinscheduler.api.dto.project.ProjectListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateRequest;
+import org.apache.dolphinscheduler.api.dto.user.UserListResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -86,7 +88,7 @@ public class ProjectV2Controller extends BaseController {
     @ApiException(CREATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectResponse createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestBody ProjectCreateRequest projectCreateRequest) {
+                                         @RequestBody ProjectCreateRequest projectCreateRequest) {
         Map<String, Object> result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
             projectCreateRequest.getDescription());
         return new ProjectResponse(returnDataList(result));
@@ -129,7 +131,7 @@ public class ProjectV2Controller extends BaseController {
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectResponse queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @PathVariable("code") long code) {
+                                              @PathVariable("code") long code) {
         Map<String, Object> result = projectService.queryByCode(loginUser, code);
         return new ProjectResponse(returnDataList(result));
     }
@@ -146,16 +148,16 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         ProjectQueryRequest projectQueryReq) {
+    public ProjectListPagingResponse queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                            ProjectQueryRequest projectQueryReq) {
         Result result = checkPageParams(projectQueryReq.getPageNo(), projectQueryReq.getPageSize());
         if (!result.checkResult()) {
-            return result;
+            return new ProjectListPagingResponse(result);
         }
         String searchVal = ParameterUtils.handleEscapes(projectQueryReq.getSearchVal());
         result = projectService.queryProjectListPaging(loginUser, projectQueryReq.getPageSize(),
             projectQueryReq.getPageNo(), searchVal);
-        return result;
+        return new ProjectListPagingResponse(result);
     }
 
     /**
@@ -195,7 +197,7 @@ public class ProjectV2Controller extends BaseController {
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectListResponse queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @RequestParam("userId") Integer userId) {
+                                                        @RequestParam("userId") Integer userId) {
         Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, userId);
         return new ProjectListResponse(returnDataList(result));
     }
@@ -216,7 +218,7 @@ public class ProjectV2Controller extends BaseController {
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectListResponse queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam("userId") Integer userId) {
+                                                      @RequestParam("userId") Integer userId) {
         Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
         return new ProjectListResponse(returnDataList(result));
     }
@@ -236,10 +238,10 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_USER)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAuthorizedUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("projectCode") Long projectCode) {
+    public UserListResponse queryAuthorizedUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam("projectCode") Long projectCode) {
         Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, projectCode);
-        return returnDataList(result);
+        return new UserListResponse(returnDataList(result));
     }
 
     /**

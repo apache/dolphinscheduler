@@ -17,24 +17,31 @@
 
 package org.apache.dolphinscheduler.api.dto.project;
 
-import org.apache.dolphinscheduler.api.dto.PageQueryDto;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.Project;
 
 /**
- * project query request
+ * project List paging response
  */
-@ApiModel("PROJECT-QUERY")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Data
-public class ProjectQueryRequest extends PageQueryDto {
+public class ProjectListPagingResponse extends Result {
 
-    @ApiModelProperty(example = "pro123")
-    private String searchVal;
+    private PageInfo<Project> data;
+
+    public ProjectListPagingResponse(Result result) {
+        super();
+        this.setCode(result.getCode());
+        this.setMsg(result.getMsg());
+        this.setData(result.getData());
+    }
+
+    @Override
+    public PageInfo<Project> getData() {
+        return data;
+    }
+
+    public void setData(PageInfo<Project> data) {
+        this.data = data;
+    }
+
 }

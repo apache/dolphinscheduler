@@ -27,6 +27,7 @@ import java.util.List;
  * project List response
  */
 public class ProjectListResponse extends Result {
+
     private List<Project> data;
 
     public ProjectListResponse(Result result) {

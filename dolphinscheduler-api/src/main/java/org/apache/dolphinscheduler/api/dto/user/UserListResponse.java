@@ -15,31 +15,44 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.project;
+package org.apache.dolphinscheduler.api.dto.user;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * project response
+ * user List response
  */
-public class ProjectResponse extends Result {
+public class UserListResponse extends Result {
 
-    private Project data;
+    private List<User> data;
 
-    public ProjectResponse(Result result) {
+    public UserListResponse(Result result) {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
-        this.setData((Project) result.getData());
+        this.setData(objToList(result.getData()));
     }
 
     @Override
-    public Project getData() {
+    public List<User> getData() {
         return data;
     }
 
-    public void setData(Project data) {
+    public void setData(List<User> data) {
         this.data = data;
+    }
+
+    public List<User> objToList(Object obj) {
+        List<User> list = new ArrayList<>();
+        if (obj instanceof List<?>) {
+            for (Object o : (List<?>) obj) {
+                list.add((User) o);
+            }
+        }
+        return list;
     }
 }
