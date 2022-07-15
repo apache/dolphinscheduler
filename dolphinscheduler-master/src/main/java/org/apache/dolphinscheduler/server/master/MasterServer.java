@@ -125,6 +125,7 @@ public class MasterServer implements IStoppable {
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
         try (SchedulerApi closedSchedulerApi = schedulerApi;
              MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
+             MasterRPCServer closedRpcServer = masterRPCServer;
              MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
              // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
              // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
