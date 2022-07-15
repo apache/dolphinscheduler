@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -111,8 +110,7 @@ public class WorkerServer implements IStoppable {
 
         this.workerRegistryClient.registry();
         this.workerRegistryClient.setRegistryStoppable(this);
-        Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
-        this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
+        this.workerRegistryClient.handleDeadServer();
 
         this.workerManagerThread.start();
 
@@ -129,37 +127,24 @@ public class WorkerServer implements IStoppable {
     }
 
     public void close(String cause) {
-        try {
-            // execute only once
-            // set stop signal is true
-            if (!Stopper.stop()) {
-                logger.warn("WorkerServer is already stopped, current cause: {}", cause);
-                return;
-            }
+        if (!Stopper.stop()) {
+            logger.warn("WorkerServer is already stopped, current cause: {}", cause);
+            return;
+        }
+        ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
+        try (WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
+             WorkerRegistryClient closedRegistryClient = workerRegistryClient;
+             AlertClientService closedAlertClientService = alertClientService;
+             SpringApplicationContext closedSpringContext = springApplicationContext;) {
             logger.info("Worker server is stopping, current cause : {}", cause);
-
-            try {
-                // thread sleep 3 seconds for thread quitely stop
-                Thread.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
-            } catch (Exception e) {
-                logger.warn("Worker server close wait error", e);
-            }
-
-            // close
-            this.workerRpcServer.close();
-            this.workerRegistryClient.unRegistry();
-            this.alertClientService.close();
-
             // kill running tasks
             this.killAllRunningTasks();
-
-            // close the application context
-            this.springApplicationContext.close();
-            logger.info("Worker server stopped, current cause: {}", cause);
         } catch (Exception e) {
             logger.error("Worker server stop failed, current cause: {}", cause, e);
+            return;
         }
+        logger.info("Worker server stopped, current cause: {}", cause);
     }
 
     @Override

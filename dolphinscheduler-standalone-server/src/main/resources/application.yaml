@@ -116,6 +116,8 @@ master:
   host-selector: lower_weight
   # master heartbeat interval
   heartbeat-interval: 10s
+  # Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
+  heartbeat-error-threshold: 5
   # master commit task retry times
   task-commit-retry-times: 5
   # master commit task interval
@@ -137,6 +139,8 @@ worker:
   exec-threads: 10
   # worker heartbeat interval
   heartbeat-interval: 10s
+  # Worker heart beat task error threshold, if the continuous error count exceed this count, the worker will close.
+  heartbeat-error-threshold: 5
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
   # worker tenant auto create

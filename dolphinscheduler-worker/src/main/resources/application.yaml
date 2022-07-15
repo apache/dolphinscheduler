@@ -60,6 +60,8 @@ worker:
   exec-threads: 100
   # worker heartbeat interval
   heartbeat-interval: 10s
+  # Worker heart beat task error threshold, if the continuous error count exceed this count, the worker will close.
+  heartbeat-error-threshold: 5
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
   # worker tenant auto create
