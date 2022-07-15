@@ -100,7 +100,7 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null, 1, baseServiceLogger)).thenReturn(true);
         Result result = projectService.createProject(loginUser, projectName, getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 10001);
 
         //project name exist
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject());
