@@ -44,7 +44,7 @@ public interface ExecutorService {
      * @param processDefinitionCode process definition code
      * @param cronTime cron time
      * @param commandType command type
-     * @param failureStrategy failuer strategy
+     * @param failureStrategy failure strategy
      * @param startNodeList start nodelist
      * @param taskDependType node dependency type
      * @param warningType warning type
