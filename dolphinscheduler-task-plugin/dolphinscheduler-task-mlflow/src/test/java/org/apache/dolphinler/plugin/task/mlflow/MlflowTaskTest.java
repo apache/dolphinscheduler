@@ -82,16 +82,16 @@ public class MlflowTaskTest {
         MlflowTask mlflowTask = initTask(createBasicAlgorithmParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
                 "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
-                        "data_path=/data/iris.csv\n" +
-                        "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-BasicAlgorithm\n" +
-                        "mlflow run $repo " +
-                        "-P algorithm=xgboost " +
-                        "-P data_path=$data_path " +
-                        "-P params=\"n_estimators=100\" " +
-                        "-P search_params=\"\" " +
-                        "-P model_name=\"BasicAlgorithm\" " +
-                        "--experiment-name=\"BasicAlgorithm\" " +
-                        "--version=main ");
+                    "data_path=/data/iris.csv\n" +
+                    "repo=dolphinscheduler-mlflow#Project-BasicAlgorithm\n" +
+                    "git clone https://github.com/apache/dolphinscheduler-mlflow dolphinscheduler-mlflow\n" +
+                    "mlflow run $repo " +
+                    "-P algorithm=xgboost " +
+                    "-P data_path=$data_path " +
+                    "-P params=\"n_estimators=100\" " +
+                    "-P search_params=\"\" " +
+                    "-P model_name=\"BasicAlgorithm\" " +
+                    "--experiment-name=\"BasicAlgorithm\"");
     }
 
     @Test
@@ -99,15 +99,15 @@ public class MlflowTaskTest {
         MlflowTask mlflowTask = initTask(createAutoMLParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
                 "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n" +
-                        "data_path=/data/iris.csv\n" +
-                        "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-AutoML\n" +
-                        "mlflow run $repo " +
-                        "-P tool=autosklearn " +
-                        "-P data_path=$data_path " +
-                        "-P params=\"time_left_for_this_task=30\" " +
-                        "-P model_name=\"AutoML\" " +
-                        "--experiment-name=\"AutoML\" " +
-                        "--version=main ");
+                    "data_path=/data/iris.csv\n" +
+                    "repo=dolphinscheduler-mlflow#Project-AutoML\n" +
+                    "git clone https://github.com/apache/dolphinscheduler-mlflow dolphinscheduler-mlflow\n" +
+                    "mlflow run $repo " +
+                    "-P tool=autosklearn " +
+                    "-P data_path=$data_path " +
+                    "-P params=\"time_left_for_this_task=30\" " +
+                    "-P model_name=\"AutoML\" " +
+                    "--experiment-name=\"AutoML\"");
     }
 
     @Test

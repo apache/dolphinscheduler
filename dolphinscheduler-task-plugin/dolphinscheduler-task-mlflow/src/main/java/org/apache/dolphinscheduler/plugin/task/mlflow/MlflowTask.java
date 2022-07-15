@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.jna.platform.unix.solaris.LibKstat;
+
 /**
  * shell task
  */
@@ -136,6 +138,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
             args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
             args.add(String.format(MlflowConstants.SET_REPOSITORY, MlflowConstants.PRESET_BASIC_ALGORITHM_PROJECT));
+            args.add(String.format(MlflowConstants.GIT_CLONE_REPO, MlflowConstants.PRESET_REPOSITORY, MlflowConstants.PRESET_PATH));
 
 
             runCommand = MlflowConstants.MLFLOW_RUN_BASIC_ALGORITHM;
@@ -144,6 +147,7 @@ public class MlflowTask extends AbstractTaskExecutor {
         } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_AUTOML)) {
             args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
             args.add(String.format(MlflowConstants.SET_REPOSITORY, MlflowConstants.PRESET_AUTOML_PROJECT));
+            args.add(String.format(MlflowConstants.GIT_CLONE_REPO, MlflowConstants.PRESET_REPOSITORY, MlflowConstants.PRESET_PATH));
 
             runCommand = MlflowConstants.MLFLOW_RUN_AUTOML_PROJECT;
             runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());

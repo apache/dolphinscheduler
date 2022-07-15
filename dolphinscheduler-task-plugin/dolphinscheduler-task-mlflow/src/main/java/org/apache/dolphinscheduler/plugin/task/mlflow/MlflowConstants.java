@@ -30,11 +30,13 @@ public class MlflowConstants {
 
     public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
 
+    public static final String PRESET_PATH = "dolphinscheduler-mlflow";
+
     public static final String PRESET_REPOSITORY_VERSION = "main";
 
-    public static final String PRESET_AUTOML_PROJECT = PRESET_REPOSITORY + "#Project-AutoML";
+    public static final String PRESET_AUTOML_PROJECT = PRESET_PATH + "#Project-AutoML";
 
-    public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_REPOSITORY + "#Project-BasicAlgorithm";
+    public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_PATH + "#Project-BasicAlgorithm";
 
     public static final String MLFLOW_TASK_TYPE_PROJECTS = "MLflow Projects";
 
@@ -68,16 +70,14 @@ public class MlflowConstants {
             "-P params=\"%s\" " +
             "-P search_params=\"%s\" " +
             "-P model_name=\"%s\" " +
-            "--experiment-name=\"%s\" " +
-            "--version=main ";
+            "--experiment-name=\"%s\"";
 
     public static final String MLFLOW_RUN_AUTOML_PROJECT = "mlflow run $repo " +
             "-P tool=%s " +
             "-P data_path=$data_path " +
             "-P params=\"%s\" " +
             "-P model_name=\"%s\" " +
-            "--experiment-name=\"%s\" " +
-            "--version=main ";
+            "--experiment-name=\"%s\"";
 
     public static final String MLFLOW_RUN_CUSTOM_PROJECT = "mlflow run $repo " +
             "%s " +
@@ -108,4 +108,6 @@ public class MlflowConstants {
     public static final int DOCKER_HEALTH_CHECK_TIMEOUT = 20;
 
     public static final int DOCKER_HEALTH_CHECK_INTERVAL = 5000;
+
+    public static final String GIT_CLONE_REPO  = "git clone %s %s";
 }
