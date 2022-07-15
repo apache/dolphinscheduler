@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineComponent, toRefs, PropType } from 'vue'
+import { defineComponent, toRefs, PropType, getCurrentInstance } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NUpload } from 'naive-ui'
 
 import { useI18n } from 'vue-i18n'
@@ -57,12 +57,15 @@ export default defineComponent({
       state.uploadForm.file = ''
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     return {
       hideModal,
       customRequest,
       handleFile,
       removeFile,
-      ...toRefs(state)
+      ...toRefs(state),
+      trim
     }
   },
   render() {
@@ -84,6 +87,7 @@ export default defineComponent({
             ref='uploadFormNameRef'
           >
             <NInput
+                  allowInput={this.trim}
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-file-name'
@@ -91,6 +95,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
+                  allowInput={this.trim}
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}
