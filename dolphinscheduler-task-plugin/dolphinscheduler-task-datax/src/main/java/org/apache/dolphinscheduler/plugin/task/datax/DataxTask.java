@@ -82,6 +82,8 @@ public class DataxTask extends AbstractTaskExecutor {
      * jvm parameters
      */
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+
+    public static final String CUSTOM_PARAM = " -D%s=%s";
     /**
      * python process(datax only supports version 2.7 by default)
      */
@@ -392,6 +394,8 @@ public class DataxTask extends AbstractTaskExecutor {
         sbr.append(DATAX_PATH);
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
+        sbr.append(addCustomParameters(paramsMap));
+        sbr.append(" ");
         sbr.append(jobConfigFilePath);
 
         // replace placeholder
@@ -412,6 +416,15 @@ public class DataxTask extends AbstractTaskExecutor {
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
+    }
+
+    private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
+        StringBuilder customParameters = new StringBuilder("-p\"");
+        for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
+        }
+        customParameters.append("\"");
+        return customParameters;
     }
 
     public String getPythonCommand() {

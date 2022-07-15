@@ -20,6 +20,7 @@ import type { IJsonItem } from '../types'
 import { find } from 'lodash'
 import { TypeReq } from '@/service/modules/data-source/types'
 import { queryDataSourceList } from '@/service/modules/data-source'
+import {useCustomParams} from "."
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -443,6 +444,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       span: 12,
       options: memoryLimitOptions,
       value: 1
-    }
+    },
+    ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
