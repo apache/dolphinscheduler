@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import {
   NSpace,
   NInput,
@@ -57,6 +57,8 @@ const AuditLog = defineComponent({
       requestTableData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -71,7 +73,8 @@ const AuditLog = defineComponent({
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -82,6 +85,7 @@ const AuditLog = defineComponent({
         <Card>
           <NSpace justify='end'>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.userName, 'value']}
               size='small'
               placeholder={t('monitor.audit_log.user_name')}

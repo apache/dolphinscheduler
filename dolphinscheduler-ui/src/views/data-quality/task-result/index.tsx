@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import {
   NSpace,
   NInput,
@@ -59,6 +59,8 @@ const TaskResult = defineComponent({
       requestTableData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -73,7 +75,8 @@ const TaskResult = defineComponent({
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -84,6 +87,7 @@ const TaskResult = defineComponent({
         <NCard>
           <NSpace justify='end'>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.searchVal, 'value']}
               size='small'
               placeholder={t('data_quality.task_result.task_name')}
