@@ -308,6 +308,9 @@ public class JSONUtils {
      */
     public static String toJsonString(Object object) {
         try {
+            if (Objects.isNull(object)) {
+                return null;
+            }
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException("Object json deserialization exception.", e);
