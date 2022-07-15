@@ -137,6 +137,7 @@ public class ScheduleVo {
         this.setWarningType(schedule.getWarningType());
         this.setWarningGroupId(schedule.getWarningGroupId());
         this.setUserId(schedule.getUserId());
+        this.setCreateTime(schedule.getCreateTime());
         this.setUpdateTime(schedule.getUpdateTime());
         this.setTimezoneId(schedule.getTimezoneId());
         this.setReleaseState(schedule.getReleaseState());

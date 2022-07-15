@@ -15,32 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
-@Component
-@ConfigurationProperties("alert")
-public final class AlertConfig {
-    private int port;
-
-    private int waitTimeout;
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(final int port) {
-        this.port = port;
-    }
-
-    public int getWaitTimeout() {
-        return waitTimeout;
-    }
-
-    public void setWaitTimeout(final int waitTimeout) {
-        this.waitTimeout = waitTimeout;
-    }
-
+const trim = (value: string) => {
+  return !value.startsWith(' ') && !value.endsWith(' ')
 }
+
+export default trim
