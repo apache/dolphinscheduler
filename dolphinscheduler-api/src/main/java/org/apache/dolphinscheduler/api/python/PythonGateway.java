@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
@@ -112,9 +111,6 @@ public class PythonGateway {
     private UsersService usersService;
 
     @Autowired
-    private QueueService queueService;
-
-    @Autowired
     private ResourcesService resourceService;
 
     @Autowired
@@ -175,10 +171,11 @@ public class PythonGateway {
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        // In the case project exists, but current process definition still not created, we should also return the init version of it
         if (processDefinition == null) {
-            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("version", 0L);
+            return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
@@ -394,37 +391,8 @@ public class PythonGateway {
         }
     }
 
-    public Map<String, Object> createQueue(String name, String queueName) {
-        Result<Object> verifyQueueExists = queueService.verifyQueue(name, queueName);
-        if (verifyQueueExists.getCode() == 0) {
-            return queueService.createQueue(dummyAdminUser, name, queueName);
-        } else {
-            Map<String, Object> result = new HashMap<>();
-            // TODO function putMsg do not work here
-            result.put(Constants.STATUS, Status.SUCCESS);
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            return result;
-        }
-    }
-
-    public Map<String, Object> createTenant(String tenantCode, String desc, String queueName) throws Exception {
-        if (tenantService.checkTenantExists(tenantCode)) {
-            Map<String, Object> result = new HashMap<>();
-            // TODO function putMsg do not work here
-            result.put(Constants.STATUS, Status.SUCCESS);
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            return result;
-        } else {
-            Result<Object> verifyQueueExists = queueService.verifyQueue(queueName, queueName);
-            if (verifyQueueExists.getCode() == 0) {
-                // TODO why create do not return id?
-                queueService.createQueue(dummyAdminUser, queueName, queueName);
-            }
-            Map<String, Object> result = queueService.queryQueueName(queueName);
-            List<Queue> queueList = (List<Queue>) result.get(Constants.DATA_LIST);
-            Queue queue = queueList.get(0);
-            return tenantService.createTenant(dummyAdminUser, tenantCode, queue.getId(), desc);
-        }
+    public Tenant createTenant(String tenantCode, String desc, String queueName) {
+        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
     }
 
     public void createUser(String userName,
@@ -578,6 +546,21 @@ public class PythonGateway {
         result.put("id", resource.getId());
         result.put("name", resource.getFullName());
         return result;
+    }
+
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    public Integer createOrUpdateResource(
+            String userName, String fullName, String description, String resourceContent) {
+        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
     }
 
     @PostConstruct

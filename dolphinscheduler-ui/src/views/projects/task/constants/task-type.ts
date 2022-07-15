@@ -39,6 +39,7 @@ export type TaskType =
   | 'MLFLOW'
   | 'OPENMLDB'
   | 'DVC'
+  | 'DINKY'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -122,6 +123,10 @@ export const TASK_TYPES_MAP = {
   },
   DVC: {
     alias: 'DVC',
+    helperLinkDisable: true
+  },
+  DINKY: {
+    alias: 'DINKY',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

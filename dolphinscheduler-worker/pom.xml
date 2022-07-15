@@ -36,8 +36,8 @@
             <artifactId>dolphinscheduler-service</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-quartz</artifactId>
+                    <groupId>org.apache.dolphinscheduler</groupId>
+                    <artifactId>dolphinscheduler-dao</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

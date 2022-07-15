@@ -7,22 +7,27 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 ## Create Task
 
-- Click Project Management-Project Name-Workflow Definition, and click the "Create Workflow" button to enter the DAG editing page.
+- Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag <img src="../../../../img/tasks/icons/zeppelin.png" width="15"/> from the toolbar to the canvas.
 
-## Task Parameter
+## Task Parameters
 
-- Node name: The node name in a workflow definition is unique.
-- Run flag: Identifies whether this node can be scheduled normally, if it does not need to be executed, you can turn on the prohibition switch.
-- Descriptive information: Describe the function of the node.
-- Task priority: When the number of worker threads is insufficient, execute in the order of priority from high to low, and tasks with the same priority will execute in a first-in first-out order.
-- Worker grouping: Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution.
-- Number of failed retry attempts: The failure task resubmitting times. It supports drop-down and hand-filling.
-- Failed retry interval: The time interval for resubmitting the task after a failed task. It supports drop-down and hand-filling.
-- Timeout alarm: Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will send and the task execution will fail.
-- Zeppelin Note ID: The unique note id for a zeppelin notebook note.
-- Zeppelin Paragraph ID: The unique paragraph id for a zeppelin notebook paragraph. If you want to schedule a whole note at a time, leave this field blank.
-- Zeppelin Parameters: Parameters in json format used for zeppelin dynamic form.
+| **Parameter** | **Description** |
+| ------- | ---------- |
+| Node Name | Set the name of the task. Node names within a workflow definition are unique. |
+| Run flag | Indicates whether the node can be scheduled normally. If it is not necessary to execute, you can turn on the prohibiting execution switch. |
+| Description | Describes the function of this node. |
+| Task priority | When the number of worker threads is insufficient, they are executed in order from high to low according to the priority, and they are executed according to the first-in, first-out principle when the priority is the same. |
+| Worker group | The task is assigned to the machines in the worker group for execution. If Default is selected, a worker machine will be randomly selected for execution. |
+| Task group name | The group in Resources, if not configured, it will not be used. | 
+| Environment Name | Configure the environment in which to run the script. |
+| Number of failed retries | The number of times the task is resubmitted after failure. It supports drop-down and manual filling. | 
+| Failure Retry Interval | The time interval for resubmitting the task if the task fails. It supports drop-down and manual filling. | 
+| Timeout alarm | Check Timeout Alarm and Timeout Failure. When the task exceeds the "timeout duration", an alarm email will be sent and the task execution will fail. |
+| Zeppelin Note ID | The unique note id for a zeppelin notebook note. |
+| Zeppelin Paragraph ID | The unique paragraph id for a zeppelin notebook paragraph. If you want to schedule a whole note at a time, leave this field blank. |
+| Zeppelin Rest Endpoint | The REST endpoint of your zeppelin server |
+| Zeppelin Parameters | Parameters in json format used for zeppelin dynamic form. |
 
 ## Task Example
 

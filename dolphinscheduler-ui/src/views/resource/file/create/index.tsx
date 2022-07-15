@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, getCurrentInstance, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { NForm, NFormItem, NInput, NSelect, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -54,11 +54,14 @@ export default defineComponent({
       router.push({ name, params: { id } })
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     return {
       fileSuffixOptions,
       handleFile,
       handleReturn,
-      ...toRefs(state)
+      ...toRefs(state),
+      trim
     }
   },
   render() {
@@ -72,6 +75,7 @@ export default defineComponent({
         >
           <NFormItem label={t('resource.file.file_name')} path='fileName'>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.fileForm.fileName, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               style={{ width: '300px' }}
@@ -89,6 +93,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
+                  allowInput={this.trim}
               type='textarea'
               v-model={[this.fileForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}

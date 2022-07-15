@@ -63,6 +63,8 @@ jobs:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v2
         with:

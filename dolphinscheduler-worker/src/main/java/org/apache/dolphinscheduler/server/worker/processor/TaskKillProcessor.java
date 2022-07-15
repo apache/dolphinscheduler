@@ -28,15 +28,17 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
-import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
+import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +49,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 /**
  * task kill processor
@@ -58,16 +63,13 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
     /**
-     * task callback service
-     */
-    @Autowired
-    private TaskCallbackService taskCallbackService;
-
-    /**
      * task execute manager
      */
     @Autowired
     private WorkerManagerThread workerManager;
+
+    @Autowired
+    private MessageRetryRunner messageRetryRunner;
 
     /**
      * task kill process
@@ -77,7 +79,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(),
+                                    String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
         if (killCommand == null) {
             logger.error("task kill request command is null");
@@ -86,7 +89,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         logger.info("task kill command : {}", killCommand);
 
         int taskInstanceId = killCommand.getTaskInstanceId();
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        TaskExecutionContext taskExecutionContext
+            = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
             logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
             return;
@@ -96,23 +100,41 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         if (processId == 0) {
             this.cancelApplication(taskInstanceId);
             workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.KILL);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+            sendTaskKillResponseCommand(channel, taskExecutionContext);
             logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
             return;
         }
 
         Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
 
-        taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
-
-        taskExecutionContext.setCurrentExecutionStatus(result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
+        taskExecutionContext.setCurrentExecutionStatus(
+            result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
+        sendTaskKillResponseCommand(channel, taskExecutionContext);
 
-        taskCallbackService.sendTaskKillResponseCommand(taskExecutionContext);
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
 
         logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
+    }
+
+    private void sendTaskKillResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {
+        TaskKillResponseCommand taskKillResponseCommand = new TaskKillResponseCommand();
+        taskKillResponseCommand.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());
+        taskKillResponseCommand.setAppIds(Arrays.asList(taskExecutionContext.getAppIds().split(TaskConstants.COMMA)));
+        taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskKillResponseCommand.setHost(taskExecutionContext.getHost());
+        taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
+        channel.writeAndFlush(taskKillResponseCommand.convert2Command()).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (!future.isSuccess()) {
+                    logger.error("Submit kill response to master error, kill command: {}", taskKillResponseCommand);
+                }
+            }
+        });
     }
 
     /**

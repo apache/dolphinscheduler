@@ -31,9 +31,12 @@ echo '=== Distributed dependencies: ' && find dist -name "*.jar" -exec basename 
 echo '=== Third party dependencies: ' && grep -vf self-modules.txt all-dependencies.txt | sort | uniq | tee third-party-dependencies.txt
 
 # 1. Compare the third-party dependencies with known dependencies, expect that all third-party dependencies are KNOWN
-# and the exit code of the command is 0, otherwise we should add its license to LICENSE file and add the dependency to
-# known-dependencies.txt. 2. Unify the `sort` behaviour: here we'll sort them again in case that the behaviour of `sort`
-# command in target OS is different from what we used to sort the file `known-dependencies.txt`, i.e. "sort the two file
+# and the exit code of the command is 0, otherwise we should add its license to LICENSE file
+# [dolphinscheduler-dist/release-docs/LICENSE] and [dolphinscheduler-dist/release-docs/licenses/]
+# and add the dependency to known-dependencies.txt.
+#
+# 2. Unify the `sort` behaviour: here we'll sort them again in case that the behaviour of `sort` command in
+# target OS is different from what we used to sort the file `known-dependencies.txt`, i.e. "sort the two file
 # using the same command (and default arguments)"
 
 diff -w -B -U0 <(sort < tools/dependencies/known-dependencies.txt) <(sort < third-party-dependencies.txt)

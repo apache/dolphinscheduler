@@ -10,38 +10,39 @@ Spark task type for executing Spark application. When executing the Spark task, 
 
 ## Create Task
 
-- Click `Project -> Management-Project -> Name-Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
+- Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
 - Drag from the toolbar <img src="../../../../img/tasks/icons/spark.png" width="15"/> to the canvas.
 
-## Task Parameter
+## Task Parameters
 
-- **Node name**: The node name in a workflow definition is unique.
-- **Run flag**: Identifies whether this node schedules normally, if it does not need to execute, select the `prohibition execution`.
-- **Descriptive information**: Describe the function of the node.
-- **Task priority**: When the number of worker threads is insufficient, execute in the order of priority from high to low, and tasks with the same priority will execute in a first-in first-out order.
-- **Worker grouping**: Assign tasks to the machines of the worker group to execute. If `Default` is selected, randomly select a worker machine for execution.
-- **Environment Name**: Configure the environment name in which run the script.
-- **Times of failed retry attempts**: The number of times the task failed to resubmit.
-- **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
-- **Delayed execution time**: The time (unit minute) that a task delays in execution.
-- **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm email will send and the task execution will fail.
-- **Program type**: Supports Java, Scala, Python and SQL.
-- **Spark version**: Support Spark1 and Spark2.
-- **The class of main function**: The **full path** of Main Class, the entry point of the Spark program.
-- **Main jar package**: The Spark jar package (upload by Resource Center).
-- **SQL scripts**: SQL statements in .sql files that Spark sql runs.
-- **Deployment mode**: (1) spark submit supports three modes: yarn-clusetr, yarn-client and local.
-                       (2) spark sql supports yarn-client and local modes.
-- **Task name** (optional): Spark task name.
-- **Driver core number**: Set the number of Driver core, which can be set according to the actual production environment.
-- **Driver memory size**: Set the size of Driver memories, which can be set according to the actual production environment.
-- **Number of Executor**: Set the number of Executor, which can be set according to the actual production environment.
-- **Executor memory size**: Set the size of Executor memories, which can be set according to the actual production environment.
-- **Main program parameters**: Set the input parameters of the Spark program and support the substitution of custom parameter variables.
-- **Optional parameters**: support `--jars`, `--files`,` --archives`, `--conf` format.
-- **Resource**: Appoint resource files in the `Resource` if parameters refer to them.
-- **Custom parameter**: It is a local user-defined parameter for Spark, and will replace the content with `${variable}` in the script.
-- **Predecessor task**: Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task.
+| **Parameter** | **Description** |
+| ------- | ---------- |
+| Node Name | Set the name of the task. Node names within a workflow definition are unique. |
+| Run flag | Indicates whether the node can be scheduled normally. If it is not necessary to execute, you can turn on the prohibiting execution switch. |
+| Description | Describes the function of this node. |
+| Task priority | When the number of worker threads is insufficient, they are executed in order from high to low according to the priority, and they are executed according to the first-in, first-out principle when the priority is the same. |
+| Worker group | The task is assigned to the machines in the worker group for execution. If Default is selected, a worker machine will be randomly selected for execution. |
+| Task group name | The group in Resources, if not configured, it will not be used. | 
+| Environment Name | Configure the environment in which to run the script. |
+| Number of failed retries | The number of times the task is resubmitted after failure. It supports drop-down and manual filling. | 
+| Failure Retry Interval | The time interval for resubmitting the task if the task fails. It supports drop-down and manual filling. | 
+| Timeout alarm | Check Timeout Alarm and Timeout Failure. When the task exceeds the "timeout duration", an alarm email will be sent and the task execution will fail. |
+| Program type | Supports Java, Scala, Python, and SQL. |
+| Spark version | Support Spark1 and Spark2. |
+| The class of main function | The **full path** of Main Class, the entry point of the Spark program. |
+| Main jar package | The Spark jar package (upload by Resource Center). |
+| SQL scripts | SQL statements in .sql files that Spark sql runs. |
+| Deployment mode | <ul><li>spark submit supports three modes: yarn-clusetr, yarn-client and local.</li><li>spark sql supports yarn-client and local modes.</li></ul> |
+| Task name | Spark task name. |
+| Driver core number | Set the number of Driver core, which can be set according to the actual production environment. |
+| Driver memory size | Set the size of Driver memories, which can be set according to the actual production environment. |
+| Number of Executor | Set the number of Executor, which can be set according to the actual production environment. |
+| Executor memory size | Set the size of Executor memories, which can be set according to the actual production environment. |
+| Main program parameters | Set the input parameters of the Spark program and support the substitution of custom parameter variables. |
+| Optional parameters | Support `--jars`, `--files`,` --archives`, `--conf` format. |
+| Resource | Appoint resource files in the `Resource` if parameters refer to them. |
+| Custom parameter | It is a local user-defined parameter for Spark, and will replace the content with `${variable}` in the script. |
+| Predecessor task | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task. |
 
 ## Task Example
 
@@ -71,7 +72,7 @@ Configure the required content according to the parameter descriptions above.
 
 ![demo-spark-simple](../../../../img/tasks/demo/spark_task02.png)
 
-### spark sql
+### Spark sql
 
 #### Execute DDL and DML statements
 
@@ -79,7 +80,7 @@ This case is to create a view table terms and write three rows of data and a tab
 
 ![spark_sql](../../../../img/tasks/demo/spark_sql.png)
 
-## Notice
+## Note
 
 JAVA and Scala are only used for identification, and there is no difference when you use the Spark task. If your application is developed by Python, you could just ignore the parameter **Main Class** in the form. Parameter **SQL scripts** is only for SQL type and could be ignored in JAVA, Scala and Python.
 

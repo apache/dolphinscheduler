@@ -33,6 +33,11 @@ public class K8sNamespace {
     private Integer id;
 
     /**
+     * cluster code
+     */
+    private Long code;
+
+    /**
      * namespace name
      */
     @TableField(value = "namespace")
@@ -92,16 +97,16 @@ public class K8sNamespace {
     private Integer podReplicas = 0;
 
     /**
-     * online job
+     * cluster code
      */
-    @TableField("online_job_num")
-    private Integer onlineJobNum = 0;
+    @TableField("cluster_code")
+    private Long clusterCode;
 
     /**
      * k8s name
      */
-    @TableField("k8s")
-    private String k8s;
+    @TableField(exist = false)
+    private String clusterName;
 
     public Integer getId() {
         return id;
@@ -175,20 +180,20 @@ public class K8sNamespace {
         this.podReplicas = podReplicas;
     }
 
-    public Integer getOnlineJobNum() {
-        return onlineJobNum;
+    public Long getClusterCode() {
+        return clusterCode;
     }
 
-    public void setOnlineJobNum(Integer onlineJobNum) {
-        this.onlineJobNum = onlineJobNum;
+    public void setClusterCode(Long clusterCode) {
+        this.clusterCode = clusterCode;
     }
 
-    public String getK8s() {
-        return k8s;
+    public String getClusterName() {
+        return clusterName;
     }
 
-    public void setK8s(String k8s) {
-        this.k8s = k8s;
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
     }
 
     public Double getPodRequestCpu() {
@@ -211,14 +216,14 @@ public class K8sNamespace {
     public String toString() {
         return "K8sNamespace{" +
             "id=" + id +
+            "code=" + code +
             ", namespace=" + namespace +
             ", limitsCpu=" + limitsCpu +
             ", limitsMemory=" + limitsMemory +
-            ", userId=" + userId +
             ", podRequestCpu=" + podRequestCpu +
             ", podRequestMemory=" + podRequestMemory +
             ", podReplicas=" + podReplicas +
-            ", k8s=" + k8s +
+            ", clusterCode=" + clusterCode +
             ", createTime=" + createTime +
             ", updateTime=" + updateTime +
             '}';
@@ -239,13 +244,21 @@ public class K8sNamespace {
             return true;
         }
 
-        return namespace.equals(k8sNamespace.namespace) && k8s.equals(k8sNamespace.k8s);
+        return namespace.equals(k8sNamespace.namespace) && clusterName.equals(k8sNamespace.clusterName);
     }
 
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (k8s+namespace).hashCode();
+        result = 31 * result + (clusterName + namespace).hashCode();
         return result;
+    }
+
+    public Long getCode() {
+        return code;
+    }
+
+    public void setCode(Long code) {
+        this.code = code;
     }
 }
