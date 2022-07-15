@@ -19,6 +19,10 @@
 
 package org.apache.dolphinscheduler.registry.api;
 
+/**
+ * when the connect state between client and registry center changed,
+ * the onupdate function is triggered
+ */
 @FunctionalInterface
 public interface ConnectionListener {
     void onUpdate(ConnectionState newState);

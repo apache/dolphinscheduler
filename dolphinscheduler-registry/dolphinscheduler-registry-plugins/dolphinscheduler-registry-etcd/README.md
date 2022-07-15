@@ -14,8 +14,8 @@ registry:
   namespace: dolphinscheduler
   connectionTimeout: 9s
   # The unit is milliseconds
-  retryDelay: 60L
-  retryMaxDelay: 300L
+  retryDelay: 60ms
+  retryMaxDelay: 300ms
   retryMaxDuration: 1500ms
   # The following options are set according to personal needs
   user: ""

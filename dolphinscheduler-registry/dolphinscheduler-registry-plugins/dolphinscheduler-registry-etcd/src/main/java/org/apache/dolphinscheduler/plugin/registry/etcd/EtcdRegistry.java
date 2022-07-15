@@ -44,7 +44,10 @@ import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 
-
+/**
+ * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd CLuster to
+ * store the DolphinScheduler master/worker's metadata and do the server registry/unRegistry.
+ */
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
 public class EtcdRegistry implements Registry {

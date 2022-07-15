@@ -70,6 +70,7 @@ public class EtcdConnectionStateListener implements AutoCloseable{
      */
     private ConnectionState isConnected() {
         try {
+            // Use Get() to ensure Future completes
             client.getLeaseClient().grant(1).get().getID();
             return ConnectionState.CONNECTED;
         } catch (Exception e) {
