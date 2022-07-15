@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -78,6 +79,9 @@ public class TenantServiceTest {
     private TenantServiceImpl tenantService;
 
     @Mock
+    private QueueService queueService;
+
+    @Mock
     private TenantMapper tenantMapper;
 
     @Mock
@@ -94,6 +98,8 @@ public class TenantServiceTest {
 
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
+    private static final String queue = "queue";
+    private static final String queueName = "queue_name";
 
     @Test
     public void testCreateTenant() throws Exception {
@@ -229,6 +235,23 @@ public class TenantServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
+    @Test
+    public void testCreateTenantIfNotExists() {
+        Tenant tenant;
+
+        // Tenant exists
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
+        Assert.assertEquals(getTenant(), tenant);
+
+        // Tenant not exists
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(false);
+        Mockito.when(queueService.createQueueIfNotExists(queue, queueName)).thenReturn(getQueue());
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
+        Assert.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId()), tenant);
+    }
+
     /**
      * get user
      */
@@ -282,6 +305,12 @@ public class TenantServiceTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinitions.add(processDefinition);
         return processDefinitions;
+    }
+
+    private Queue getQueue() {
+        Queue queue = new Queue();
+        queue.setId(1);
+        return queue;
     }
 
 }
