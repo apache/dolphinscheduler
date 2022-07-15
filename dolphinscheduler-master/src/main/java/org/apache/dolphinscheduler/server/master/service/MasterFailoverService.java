@@ -28,8 +28,12 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
@@ -63,13 +67,17 @@ public class MasterFailoverService {
     private final ProcessService processService;
     private final String localAddress;
 
+    private final NettyExecutorManager nettyExecutorManager;
+
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
-                                 @NonNull ProcessService processService) {
+                                 @NonNull ProcessService processService,
+                                 @NonNull NettyExecutorManager nettyExecutorManager) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
         this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.nettyExecutorManager = nettyExecutorManager;
 
     }
 
@@ -220,6 +228,17 @@ public class MasterFailoverService {
                 // only kill yarn job if exists , the local thread has exited
                 LOGGER.info("TaskInstance failover begin kill the task related yarn job");
                 ProcessUtils.killYarnJob(taskExecutionContext);
+            }
+            // kill worker task, When the master failover and worker failover happened in the same time,
+            // the task may not be failover if we don't set NEED_FAULT_TOLERANCE.
+            // This can be improved if we can load all task when cache a workflowInstance in memory
+            try {
+                TaskKillRequestCommand killCommand = new TaskKillRequestCommand(taskInstance.getId());
+                Host workerHost = Host.of(taskInstance.getHost());
+                nettyExecutorManager.doExecute(workerHost, killCommand.convert2Command());
+                LOGGER.info("Failover task success, has killed the task in worker: {}", taskInstance.getHost());
+            } catch (ExecuteException e) {
+                LOGGER.error("Kill task failed", e);
             }
         } else {
             LOGGER.info("The failover taskInstance is a master task");
