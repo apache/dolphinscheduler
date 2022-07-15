@@ -127,7 +127,7 @@
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <janino.version>3.1.6</janino.version>
-        <kubernetes.version>5.8.0</kubernetes.version>
+        <kubernetes.version>5.8.1</kubernetes.version>
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
         <aws.sdk.version>1.12.160</aws.sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
