@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.BooleanResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
@@ -41,8 +42,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,9 +88,9 @@ public class ProjectV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectResponse createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestBody ProjectCreateRequest projectCreateRequest) {
-        Map<String, Object> result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
+        Result result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
             projectCreateRequest.getDescription());
-        return new ProjectResponse(returnDataList(result));
+        return new ProjectResponse(result);
     }
 
     /**
@@ -107,12 +106,12 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable("code") Long code,
-                                @RequestBody ProjectUpdateRequest projectUpdateReq) {
-        Map<String, Object> result = projectService.update(loginUser, code, projectUpdateReq.getProjectName(),
+    public ProjectResponse updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @PathVariable("code") Long code,
+                                         @RequestBody ProjectUpdateRequest projectUpdateReq) {
+        Result result = projectService.update(loginUser, code, projectUpdateReq.getProjectName(),
             projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
-        return returnDataList(result);
+        return new ProjectResponse(result);
     }
 
     /**
@@ -132,8 +131,8 @@ public class ProjectV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectResponse queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @PathVariable("code") long code) {
-        Map<String, Object> result = projectService.queryByCode(loginUser, code);
-        return new ProjectResponse(returnDataList(result));
+        Result result = projectService.queryByCode(loginUser, code);
+        return new ProjectResponse(result);
     }
 
     /**
@@ -175,10 +174,10 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable("code") Long code) {
-        Map<String, Object> result = projectService.deleteProject(loginUser, code);
-        return returnDataList(result);
+    public BooleanResponse deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @PathVariable("code") Long code) {
+        Result result = projectService.deleteProject(loginUser, code);
+        return new BooleanResponse(result);
     }
 
     /**
@@ -198,8 +197,8 @@ public class ProjectV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectListResponse queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, userId);
-        return new ProjectListResponse(returnDataList(result));
+        Result result = projectService.queryUnauthorizedProject(loginUser, userId);
+        return new ProjectListResponse(result);
     }
 
     /**
@@ -219,8 +218,8 @@ public class ProjectV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectListResponse queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
-        return new ProjectListResponse(returnDataList(result));
+        Result result = projectService.queryAuthorizedProject(loginUser, userId);
+        return new ProjectListResponse(result);
     }
 
     /**
@@ -240,8 +239,8 @@ public class ProjectV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public UserListResponse queryAuthorizedUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @RequestParam("projectCode") Long projectCode) {
-        Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, projectCode);
-        return new UserListResponse(returnDataList(result));
+        Result result = projectService.queryAuthorizedUser(loginUser, projectCode);
+        return new UserListResponse(result);
     }
 
     /**
@@ -256,8 +255,8 @@ public class ProjectV2Controller extends BaseController {
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectListResponse queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
-        return new ProjectListResponse(returnDataList(result));
+        Result result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
+        return new ProjectListResponse(result);
     }
 
     /**
@@ -272,7 +271,7 @@ public class ProjectV2Controller extends BaseController {
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProjectListResponse queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = projectService.queryAllProjectList(loginUser);
-        return new ProjectListResponse(returnDataList(result));
+        Result result = projectService.queryAllProjectList(loginUser);
+        return new ProjectListResponse(result);
     }
 }
