@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -65,6 +65,8 @@ const AlarmInstanceManage = defineComponent({
       currentRecord.value = {}
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       changePage(1)
       columns.value = getColumns()
@@ -85,7 +87,8 @@ const AlarmInstanceManage = defineComponent({
       changePageSize,
       onCreate,
       onCloseModal,
-      onUpdatedList: updateList
+      onUpdatedList: updateList,
+      trim
     }
   },
   render() {
@@ -123,6 +126,7 @@ const AlarmInstanceManage = defineComponent({
                   wrap={false}
                 >
                   <NInput
+                  allowInput={this.trim}
                     v-model={[this.searchVal, 'value']}
                     size='small'
                     placeholder={`${t(

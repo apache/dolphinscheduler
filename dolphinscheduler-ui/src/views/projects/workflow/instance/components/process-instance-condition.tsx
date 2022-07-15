@@ -25,7 +25,7 @@ import {
   NSelect,
   NIcon
 } from 'naive-ui'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, getCurrentInstance, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
 import { stateType } from '@/common/common'
@@ -64,13 +64,16 @@ export default defineComponent({
       })
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     return {
       searchValRef,
       executorNameRef,
       hostRef,
       stateTypeRef,
       startEndTimeRef,
-      handleSearch
+      handleSearch,
+      trim
     }
   },
   render() {
@@ -80,18 +83,21 @@ export default defineComponent({
       <NGrid xGap={6} cols={24}>
         <NGridItem offset={5} span={3}>
           <NInput
+                  allowInput={this.trim}
             v-model:value={this.searchValRef}
             placeholder={t('project.workflow.name')}
           />
         </NGridItem>
         <NGridItem span={3}>
           <NInput
+                  allowInput={this.trim}
             v-model:value={this.executorNameRef}
             placeholder={t('project.workflow.executor')}
           />
         </NGridItem>
         <NGridItem span={3}>
           <NInput
+                  allowInput={this.trim}
             v-model:value={this.hostRef}
             placeholder={t('project.workflow.host')}
           />
