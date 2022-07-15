@@ -11,11 +11,6 @@
 
     <artifactId>dolphinscheduler-registry-etcd</artifactId>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
@@ -33,6 +28,7 @@
         <dependency>
             <groupId>io.etcd</groupId>
             <artifactId>jetcd-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
