@@ -24,14 +24,12 @@ import {
   NButton,
   NIcon,
   NDataTable,
-  NPagination,
-  NCard
+  NPagination
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import styles from './index.module.scss'
 
 const AuditLog = defineComponent({
   name: 'audit-log',
@@ -80,8 +78,8 @@ const AuditLog = defineComponent({
     const { t, requestTableData, onUpdatePageSize, onSearch, loadingRef } = this
 
     return (
-      <>
-        <NCard>
+      <NSpace vertical>
+        <Card>
           <NSpace justify='end'>
             <NInput
               v-model={[this.userName, 'value']}
@@ -128,36 +126,34 @@ const AuditLog = defineComponent({
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>
-              {{
-                icon: () => (
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                )
-              }}
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
             </NButton>
           </NSpace>
-        </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestTableData}
-              onUpdatePageSize={onUpdatePageSize}
-            />
-          </div>
         </Card>
-      </>
+        <Card title={t('menu.audit_log')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+            />
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestTableData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </Card>
+      </NSpace>
     )
   }
 })
