@@ -81,15 +81,18 @@ public interface ProjectService {
      */
     boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
 
-    /**
-     * admin can view all projects
-     *
-     * @param loginUser login user
-     * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
-     * @return project list which the login user have permission to see
-     */
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
+
+
+        /**
+         * admin can view all projects
+         *
+         * @param loginUser login user
+         * @param searchVal search value
+         * @param pageSize page size
+         * @param pageNo page number
+         * @return project list which the login user have permission to see
+         */
     Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
 
     /**
