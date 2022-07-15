@@ -87,7 +87,7 @@ public class MasterServer implements IStoppable {
         this.masterRPCServer.start();
 
         // install task plugin
-        this.taskPluginManager.installPlugin();
+        this.taskPluginManager.loadPlugin();
 
         // self tolerant
         this.masterRegistryClient.init();

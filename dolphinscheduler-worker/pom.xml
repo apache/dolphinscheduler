@@ -34,6 +34,12 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-service</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.dolphinscheduler</groupId>
+                    <artifactId>dolphinscheduler-dao</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
