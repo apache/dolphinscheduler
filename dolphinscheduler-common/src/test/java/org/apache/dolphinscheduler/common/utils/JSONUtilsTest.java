@@ -215,8 +215,7 @@ public class JSONUtilsTest {
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
                 JSONUtils.toJsonString(map));
-        Assert.assertEquals(String.valueOf((Object) null),
-                JSONUtils.toJsonString(null));
+        Assert.assertNull(JSONUtils.toJsonString(null));
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
                 JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
