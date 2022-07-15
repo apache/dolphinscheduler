@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, getCurrentInstance, toRefs } from 'vue'
 import {
   NButton,
   NInput,
@@ -50,6 +50,7 @@ const UsersManage = defineComponent({
     const onAuthorizeModalCancel = () => {
       state.authorizeModalShow = false
     }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
       t,
@@ -60,7 +61,8 @@ const UsersManage = defineComponent({
       onAddUser,
       onUpdatedList: updateList,
       onDetailModalCancel,
-      onAuthorizeModalCancel
+      onAuthorizeModalCancel,
+      trim
     }
   },
   render() {
@@ -77,7 +79,8 @@ const UsersManage = defineComponent({
               {this.t('security.user.create_user')}
             </NButton>
             <NSpace>
-              <NInput v-model:value={this.searchVal} size='small' clearable />
+              <NInput
+                  allowInput={this.trim} v-model:value={this.searchVal} size='small' clearable />
               <NButton type='primary' size='small' onClick={this.onUpdatedList}>
                 <NIcon>
                   <SearchOutlined />

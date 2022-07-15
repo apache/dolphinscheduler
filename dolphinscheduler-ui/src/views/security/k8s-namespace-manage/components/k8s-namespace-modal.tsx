@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
 import {
   NForm,
@@ -64,6 +64,8 @@ const K8sNamespaceModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
         () => props.showModalRef,
         () => {
@@ -103,7 +105,7 @@ const K8sNamespaceModal = defineComponent({
         }
     )
 
-    return { t, ...toRefs(variables), cancelModal, confirmModal }
+    return { t, ...toRefs(variables), cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -133,6 +135,7 @@ const K8sNamespaceModal = defineComponent({
                         path='namespace'
                     >
                       <NInput
+                  allowInput={this.trim}
                           placeholder={t('security.k8s_namespace.k8s_namespace_tips')}
                           v-model={[this.model.namespace, 'value']}
                           disabled={this.statusRef !== 0}
@@ -155,6 +158,7 @@ const K8sNamespaceModal = defineComponent({
                     >
                       <NInputGroup>
                         <NInput
+                  allowInput={this.trim}
                             placeholder={t('security.k8s_namespace.limit_cpu_tips')}
                             v-model={[this.model.limitsCpu, 'value']}
                         />
@@ -167,6 +171,7 @@ const K8sNamespaceModal = defineComponent({
                     >
                       <NInputGroup>
                         <NInput
+                  allowInput={this.trim}
                             placeholder={t(
                                 'security.k8s_namespace.limit_memory_tips'
                             )}

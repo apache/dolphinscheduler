@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted } from 'vue'
+import { ref, defineComponent, toRefs, reactive, onMounted, getCurrentInstance } from 'vue'
 import {
   NButton,
   NIcon,
@@ -105,6 +105,8 @@ const taskGroupOption = defineComponent({
       showModalRef.value = true
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       requestData()
     })
@@ -122,7 +124,8 @@ const taskGroupOption = defineComponent({
       modelStatusRef,
       onCancel,
       onConfirm,
-      updateItemData
+      updateItemData,
+      trim
     }
   },
   render() {
@@ -157,6 +160,7 @@ const taskGroupOption = defineComponent({
             </div>
             <div class={styles.right}>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 v-model={[this.name, 'value']}
                 placeholder={t(

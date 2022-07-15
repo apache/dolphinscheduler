@@ -22,7 +22,8 @@ import {
   h,
   onMounted,
   ref,
-  watch
+  watch,
+  getCurrentInstance
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -183,6 +184,8 @@ export default defineComponent({
       variables.startParamsList.splice(index, 1)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       getWorkerGroups()
       getAlertGroups()
@@ -214,7 +217,8 @@ export default defineComponent({
       updateParamsList,
       ...toRefs(variables),
       ...toRefs(startState),
-      ...toRefs(props)
+      ...toRefs(props),
+      trim
     }
   },
 
@@ -357,6 +361,7 @@ export default defineComponent({
                       {t('project.workflow.custom_parallelism')}
                     </NCheckbox>
                     <NInput
+                  allowInput={this.trim}
                       disabled={!this.parallelismRef}
                       placeholder={t(
                         'project.workflow.please_enter_parallelism'
@@ -395,6 +400,7 @@ export default defineComponent({
                       />
                     ) : (
                       <NInput
+                  allowInput={this.trim}
                         clearable
                         type='textarea'
                         v-model:value={this.startForm.scheduleTime}
@@ -420,6 +426,7 @@ export default defineComponent({
                 {this.startParamsList.map((item, index) => (
                   <NSpace class={styles.startup} key={Date.now() + index}>
                     <NInput
+                  allowInput={this.trim}
                       pair
                       separator=':'
                       placeholder={['prop', 'value']}

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, onMounted, watch } from 'vue'
+import { defineComponent, toRefs, onMounted, watch, getCurrentInstance } from 'vue'
 import {
   NButton,
   NInput,
@@ -68,6 +68,8 @@ const tenementManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,7 +87,8 @@ const tenementManage = defineComponent({
       onCancelModal,
       onConfirmModal,
       handleSearch,
-      handleChangePageSize
+      handleChangePageSize,
+      trim
     }
   },
   render() {
@@ -104,6 +107,7 @@ const tenementManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.tenant.search_tips')}

@@ -27,7 +27,7 @@ import {
   NTooltip,
   NPopconfirm
 } from 'naive-ui'
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import ImportModal from './components/import-modal'
@@ -87,6 +87,7 @@ export default defineComponent({
         path: `/projects/${projectCode}/workflow/definitions/create`
       })
     }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(useI18n().locale, () => {
       createColumns(variables)
@@ -107,7 +108,8 @@ export default defineComponent({
       batchExportWorkflow,
       batchCopyWorkflow,
       handleCopyUpdateList,
-      ...toRefs(variables)
+      ...toRefs(variables),
+      trim
     }
   },
   render() {
@@ -141,6 +143,7 @@ export default defineComponent({
                 </div>
                 <div class={styles.list}>
                   <NInput
+                  allowInput={this.trim}
                     placeholder={t('resource.function.enter_keyword_tips')}
                     v-model={[this.searchVal, 'value']}
                   />

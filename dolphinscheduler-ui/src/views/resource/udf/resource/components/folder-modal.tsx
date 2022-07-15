@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, watch, computed } from 'vue'
+import { defineComponent, toRefs, PropType, watch, computed, getCurrentInstance } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -55,6 +55,8 @@ export default defineComponent({
       handleRenameResource(props.row.id)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.row,
       () => {
@@ -69,7 +71,8 @@ export default defineComponent({
       hideModal,
       handleCreate,
       handleRename,
-      ...toRefs(state)
+      ...toRefs(state),
+      trim
     }
   },
   render() {
@@ -97,6 +100,7 @@ export default defineComponent({
             path='name'
           >
             <NInput
+                  allowInput={this.trim}
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
               class='input-directory-name'
@@ -104,6 +108,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
             <NInput
+                  allowInput={this.trim}
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}

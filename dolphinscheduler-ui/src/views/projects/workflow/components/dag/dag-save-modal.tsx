@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref, computed, onMounted, watch } from 'vue'
+import { defineComponent, PropType, ref, computed, onMounted, watch, getCurrentInstance } from 'vue'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import {
@@ -172,6 +172,8 @@ export default defineComponent({
       }
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => updateModalData())
 
     watch(
@@ -189,10 +191,12 @@ export default defineComponent({
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput v-model:value={formValue.value.name} class='input-name' />
+            <NInput
+                  allowInput={trim} v-model:value={formValue.value.name} class='input-name' />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
+                  allowInput={trim}
               type='textarea'
               v-model:value={formValue.value.description}
               class='input-description'

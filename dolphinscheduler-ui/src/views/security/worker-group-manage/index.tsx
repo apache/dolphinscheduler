@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import {
   NButton,
   NDataTable,
@@ -68,6 +68,8 @@ const workerGroupManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,7 +87,8 @@ const workerGroupManage = defineComponent({
       onConfirmModal,
       onUpdatePageSize,
       handleModalChange,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -114,6 +117,7 @@ const workerGroupManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 clearable
                 v-model={[this.searchVal, 'value']}

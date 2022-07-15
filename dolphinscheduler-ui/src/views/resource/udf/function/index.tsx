@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef, watch } from 'vue'
+import { defineComponent, Ref, toRefs, onMounted, toRef, watch, getCurrentInstance } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -68,6 +68,8 @@ export default defineComponent({
       handleShowModal(toRef(variables, 'showRef'))
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(useI18n().locale, () => {
       createColumns(variables)
     })
@@ -83,7 +85,8 @@ export default defineComponent({
       handleUpdateList,
       handleCreateFolder,
       handleChangePageSize,
-      ...toRefs(variables)
+      ...toRefs(variables),
+      trim
     }
   },
   render() {
@@ -114,6 +117,7 @@ export default defineComponent({
                 </div>
                 <div class={styles.list}>
                   <NInput
+                  allowInput={this.trim}
                     placeholder={t('resource.function.enter_keyword_tips')}
                     v-model={[this.searchVal, 'value']}
                   />

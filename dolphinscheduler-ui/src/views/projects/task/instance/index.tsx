@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import {
   NSpace,
   NInput,
@@ -99,6 +99,8 @@ const TaskInstance = defineComponent({
       getLogs(row)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -130,7 +132,8 @@ const TaskInstance = defineComponent({
       onUpdatePageSize,
       onSearch,
       onConfirmModal,
-      refreshLogs
+      refreshLogs,
+      trim
     }
   },
   render() {
@@ -149,24 +152,28 @@ const TaskInstance = defineComponent({
         <NCard>
           <NSpace justify='end' wrap={false}>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.searchVal, 'value']}
               size='small'
               placeholder={t('project.task.task_name')}
               clearable
             />
             <NInput
+                  allowInput={this.trim}
               v-model={[this.processInstanceName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
             />
             <NInput
+                  allowInput={this.trim}
               v-model={[this.executorName, 'value']}
               size='small'
               placeholder={t('project.task.executor')}
               clearable
             />
             <NInput
+                  allowInput={this.trim}
               v-model={[this.host, 'value']}
               size='small'
               placeholder={t('project.task.host')}

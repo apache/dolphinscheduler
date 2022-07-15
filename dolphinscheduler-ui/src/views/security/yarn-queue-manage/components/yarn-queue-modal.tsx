@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -54,6 +54,8 @@ const YarnQueueModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.statusRef,
       () => {
@@ -77,7 +79,7 @@ const YarnQueueModal = defineComponent({
       }
     )
 
-    return { t, ...toRefs(variables), cancelModal, confirmModal }
+    return { t, ...toRefs(variables), cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -109,6 +111,7 @@ const YarnQueueModal = defineComponent({
                   path='queueName'
                 >
                   <NInput
+                  allowInput={this.trim}
                     class='input-queue-name'
                     placeholder={t('security.yarn_queue.queue_name_tips')}
                     v-model={[this.model.queueName, 'value']}
@@ -119,6 +122,7 @@ const YarnQueueModal = defineComponent({
                   path='queue'
                 >
                   <NInput
+                  allowInput={this.trim}
                     class='input-queue-value'
                     placeholder={t('security.yarn_queue.queue_value_tips')}
                     v-model={[this.model.queue, 'value']}
