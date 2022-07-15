@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.server.master.utils;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
