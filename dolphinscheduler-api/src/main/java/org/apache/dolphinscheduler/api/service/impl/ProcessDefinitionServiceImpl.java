@@ -258,10 +258,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+
+        //check if user have write perm for project
         Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
         if (checkDescriptionLength(description)) {
@@ -749,12 +751,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        //check if user have write perm for project
         Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
+
         if (checkDescriptionLength(description)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
@@ -2401,12 +2405,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     public Map<String, Object> deleteProcessDefinitionVersion(User loginUser, long projectCode, long code,
                                                               int version) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        //check if user have write perm for project
         Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_DELETE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_DELETE);
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
+
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
 
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
@@ -2463,10 +2469,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             String scheduleJson,
                                                             ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        //check if user have write perm for project
         Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
         if (checkDescriptionLength(description)) {
@@ -2610,10 +2617,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                 String otherParamsJson,
                                                                 ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        //check if user have write perm for project
         Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
         if (checkDescriptionLength(description)) {
