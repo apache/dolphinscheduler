@@ -23,6 +23,7 @@
 - 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 - Zeppelin Note ID：Zeppelin Note对应的唯一ID。
 - Zeppelin Paragraph ID：Zeppelin Paragraph对应的唯一ID。如果你想一次性调度整个note，这一栏不填即可。
+- Zeppelin Rest Endpoint：您的Zeppelin服务的REST Endpoint。
 - Zeppelin Parameters: 用于传入Zeppelin Dynamic Form的参数。
 
 ## Task Example
