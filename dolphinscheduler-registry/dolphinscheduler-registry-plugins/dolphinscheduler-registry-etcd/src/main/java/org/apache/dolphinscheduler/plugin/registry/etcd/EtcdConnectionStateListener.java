@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.etcd.jetcd.Client;
-import io.grpc.ManagedChannel;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 
@@ -30,10 +28,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import io.etcd.jetcd.Client;
+import io.grpc.ManagedChannel;
+
 /**
  * Get the connection status by listening to the Client's Channel
  */
-public class EtcdConnectionStateListener implements AutoCloseable{
+public class EtcdConnectionStateListener implements AutoCloseable {
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
     // A thread pool that periodically obtains connection status
     private final ScheduledExecutorService scheduledExecutorService;
@@ -81,31 +84,32 @@ public class EtcdConnectionStateListener implements AutoCloseable{
     /**
      * Periodically execute thread to get connection status
      */
-    public void start(){
-        this.scheduledExecutorService.scheduleWithFixedDelay(()->{
+    public void start() {
+        this.scheduledExecutorService.scheduleWithFixedDelay(() -> {
             ConnectionState currentConnectionState = isConnected();
-            if(currentConnectionState == connectionState){
+            if (currentConnectionState == connectionState) {
                 return;
             }
             if (connectionState == ConnectionState.CONNECTED) {
-                        if (currentConnectionState == ConnectionState.DISCONNECTED) {
-                            connectionState = ConnectionState.DISCONNECTED;
-                            triggerListener(ConnectionState.DISCONNECTED);
-                        }
-                    } else if (connectionState == ConnectionState.DISCONNECTED) {
-                        if (currentConnectionState == ConnectionState.CONNECTED) {
-                            connectionState = ConnectionState.CONNECTED;
-                            triggerListener(ConnectionState.RECONNECTED);
-                        }
-                    } else if (connectionState == null) {
-                        connectionState = currentConnectionState;
-                        triggerListener(connectionState);
-                    }
-                },
+                if (currentConnectionState == ConnectionState.DISCONNECTED) {
+                    connectionState = ConnectionState.DISCONNECTED;
+                    triggerListener(ConnectionState.DISCONNECTED);
+                }
+            } else if (connectionState == ConnectionState.DISCONNECTED) {
+                if (currentConnectionState == ConnectionState.CONNECTED) {
+                    connectionState = ConnectionState.CONNECTED;
+                    triggerListener(ConnectionState.RECONNECTED);
+                }
+            } else if (connectionState == null) {
+                connectionState = currentConnectionState;
+                triggerListener(connectionState);
+            }
+        },
                 initialDelay,
                 delay,
                 TimeUnit.MILLISECONDS);
     }
+
     // notify all listeners
     private void triggerListener(ConnectionState connectionState) {
         for (ConnectionListener connectionListener : connectionListeners) {

@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
-import lombok.Data;
+import java.time.Duration;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.Duration;
+import lombok.Data;
 
 @Data
 @Configuration
@@ -29,7 +31,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "registry")
 public class EtcdRegistryProperties {
     private String endpoints;
-    private String namespace="dolphinscheduler";
+    private String namespace = "dolphinscheduler";
     private Duration connectionTimeout = Duration.ofSeconds(9);
 
     // auth
@@ -38,9 +40,9 @@ public class EtcdRegistryProperties {
     private String authority;
 
     // RetryPolicy
-    private Duration retryDelay=Duration.ofMillis(60);
-    private Duration retryMaxDelay=Duration.ofMillis(300);
-    private Duration retryMaxDuration=Duration.ofMillis(1500);;
+    private Duration retryDelay = Duration.ofMillis(60);
+    private Duration retryMaxDelay = Duration.ofMillis(300);
+    private Duration retryMaxDuration = Duration.ofMillis(1500);
 
     // loadBalancerPolicy
     private String loadBalancerPolicy;

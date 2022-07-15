@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;

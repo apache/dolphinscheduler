@@ -14,13 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
-
-import io.etcd.jetcd.launcher.EtcdCluster;
-import io.etcd.jetcd.test.EtcdClusterExtension;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,11 +34,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import io.etcd.jetcd.launcher.EtcdCluster;
+import io.etcd.jetcd.test.EtcdClusterExtension;
 
 public class EtcdRegistryTest {
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
@@ -65,7 +67,6 @@ public class EtcdRegistryTest {
         registry.delete("/nodes");
         Assert.assertFalse(registry.exists("/nodes/m1"));
     }
-
 
     @Test
     public void lockTest() throws InterruptedException {
