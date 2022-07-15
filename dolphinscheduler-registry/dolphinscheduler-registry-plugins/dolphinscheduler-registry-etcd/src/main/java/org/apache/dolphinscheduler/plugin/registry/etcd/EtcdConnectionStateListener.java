@@ -18,14 +18,10 @@ package org.apache.dolphinscheduler.plugin.registry.etcd;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.etcd.jetcd.Client;
-import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.registry.api.RegistryException;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -68,48 +64,17 @@ public class EtcdConnectionStateListener implements AutoCloseable{
     }
 
     /**
-     * try to get jetcd client ManagedChannel
-     * @param client the etcd client
-     * @return current connection channel
-     */
-    private ManagedChannel newChannel(Client client) {
-        try {
-            Field connectField =client.getClass().getDeclaredField("connectManager");
-            if(!connectField.isAccessible()){
-                connectField.setAccessible(true);
-            }
-            Object connection = connectField.get(client);
-            Method channel = connection.getClass().getDeclaredMethod("getChannel");
-            if (!channel.isAccessible()) {
-                channel.setAccessible(true);
-            }
-            return (ManagedChannel) channel.invoke(connection);
-        } catch (Exception e) {
-            throw new RegistryException("Failed to get the etcd client channel", e);
-        }
-    }
-
-    /**
-     * try to get the current channel
-     * @return connected channel
-     */
-    private ManagedChannel getChannel(){
-        if(channel.get() == null||(channel.get().isShutdown() || channel.get().isTerminated())){
-            channel.set(newChannel(client));
-        }
-        return channel.get();
-    }
-
-    /**
-     * if channel state is in [READY,IDLE],channel is connected
+     * Apply for a lease through the client, if there is no exception, the connection is normal
      * @return the current connection state
+     * @throws if there is a exception, return is DISCONNECTED
      */
     private ConnectionState isConnected() {
-        if(ConnectivityState.READY == (getChannel().getState(false))
-                || ConnectivityState.IDLE == (getChannel().getState(false))){
+        try {
+            client.getLeaseClient().grant(1).get().getID();
             return ConnectionState.CONNECTED;
+        } catch (Exception e) {
+            return ConnectionState.DISCONNECTED;
         }
-        return ConnectionState.DISCONNECTED;
     }
 
     /**
