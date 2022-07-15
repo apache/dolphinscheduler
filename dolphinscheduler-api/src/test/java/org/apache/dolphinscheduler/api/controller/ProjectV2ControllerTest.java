@@ -75,14 +75,12 @@ public class ProjectV2ControllerTest {
         result.put("projectId", 1);
 
         long projectCode = 1L;
-        String projectName = "test";
-        String desc = "";
-        String userName = "jack";
         ProjectUpdateRequest projectUpdateReq = new ProjectUpdateRequest();
         projectUpdateReq.setProjectName("james");
         projectUpdateReq.setDescription("james lbj");
         projectUpdateReq.setUserName("admin");
-        Mockito.when(projectService.update(user, projectCode, projectName, desc, userName)).thenReturn(result);
+        Mockito.when(projectService.update(user, projectCode, projectUpdateReq.getProjectName(),
+            projectUpdateReq.getDescription(), projectUpdateReq.getUserName())).thenReturn(result);
         Result response = projectV2Controller.updateProject(user, projectCode, projectUpdateReq);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
@@ -100,15 +98,14 @@ public class ProjectV2ControllerTest {
 
     @Test
     public void testQueryProjectListPaging() {
-        int pageNo = 1;
-        int pageSize = 10;
-        String searchVal = "";
-        Result result = Result.success(new PageInfo<Resource>(1, 10));
-        Mockito.when(projectService.queryProjectListPaging(user, pageSize, pageNo, searchVal)).thenReturn(result);
         ProjectQueryRequest projectQueryReq = new ProjectQueryRequest();
         projectQueryReq.setSearchVal("james");
         projectQueryReq.setPageNo(1);
         projectQueryReq.setPageSize(10);
+
+        Result result = Result.success(new PageInfo<Resource>(1, 10));
+        Mockito.when(projectService.queryProjectListPaging(user, projectQueryReq.getPageSize(),
+            projectQueryReq.getPageNo(), projectQueryReq.getSearchVal())).thenReturn(result);
         Result response = projectV2Controller.queryProjectListPaging(user, projectQueryReq);
         Assert.assertTrue(response != null && response.isSuccess());
     }
