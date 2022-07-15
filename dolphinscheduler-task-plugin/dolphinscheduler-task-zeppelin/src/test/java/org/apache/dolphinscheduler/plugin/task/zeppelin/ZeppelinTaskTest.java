@@ -61,6 +61,7 @@ public class ZeppelinTaskTest {
     private static final String MOCK_NOTE_ID = "2GYJR92R7";
     private static final String MOCK_PARAGRAPH_ID = "paragraph_1648793472526_1771221396";
     private static final String MOCK_PARAMETERS = "{\"key1\": \"value1\", \"key2\": \"value2\"}";
+    private static final String MOCK_REST_ENDPOINT = "localhost:8080";
     private final ObjectMapper mapper = new ObjectMapper();
 
     private ZeppelinClient zClient;
@@ -164,6 +165,7 @@ public class ZeppelinTaskTest {
         ZeppelinParameters zeppelinParameters = new ZeppelinParameters();
         zeppelinParameters.setNoteId(MOCK_NOTE_ID);
         zeppelinParameters.setParagraphId(MOCK_PARAGRAPH_ID);
+        zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
 
         return JSONUtils.toJsonString(zeppelinParameters);
@@ -173,6 +175,7 @@ public class ZeppelinTaskTest {
         ZeppelinParameters zeppelinParameters = new ZeppelinParameters();
         zeppelinParameters.setNoteId(MOCK_NOTE_ID);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
+        zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }

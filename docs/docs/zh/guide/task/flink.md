@@ -28,7 +28,7 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点：
 - 程序类型：支持 Java、Scala、 Python 和 SQL 四种语言。
 - 主函数的 Class：Flink 程序的入口 Main Class 的**全路径**。
 - 主程序包：执行 Flink 程序的 jar 包（通过资源中心上传）。
-- 部署方式：支持 cluster 和 local 两种模式的部署。
+- 部署方式：支持 cluster、 local 和 application （Flink 1.11和之后的版本支持，参见 [Run an application in Application Mode](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/yarn_setup.html#run-an-application-in-application-mode)） 三种模式的部署。
 - 初始化脚本：用于初始化会话上下文的脚本文件。
 - 脚本：用户开发的应该执行的 SQL 脚本文件。
 - Flink 版本：根据所需环境选择对应的版本即可。

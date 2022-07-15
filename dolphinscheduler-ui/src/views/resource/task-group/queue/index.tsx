@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted, Ref } from 'vue'
+import { ref, defineComponent, toRefs, reactive, onMounted, Ref, getCurrentInstance } from 'vue'
 import {
   NButton,
   NIcon,
@@ -99,6 +99,8 @@ const taskGroupQueue = defineComponent({
       resetTableData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       const taskGroupOptionsParams = {
         pageNo: 1,
@@ -134,7 +136,8 @@ const taskGroupQueue = defineComponent({
       onConfirm,
       showModalRef,
       updateItemData,
-      taskGroupOptions
+      taskGroupOptions,
+      trim
     }
   },
   render() {
@@ -168,6 +171,7 @@ const taskGroupQueue = defineComponent({
                 placeholder={t('resource.task_group_queue.task_group_name')}
               />
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 v-model={[this.searchParamRef.processName, 'value']}
                 placeholder={t(
@@ -175,6 +179,7 @@ const taskGroupQueue = defineComponent({
                 )}
               ></NInput>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 v-model={[this.searchParamRef.instanceName, 'value']}
                 placeholder={t('resource.task_group_queue.task_instance_name')}
