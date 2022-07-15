@@ -129,7 +129,7 @@
         <janino.version>3.1.6</janino.version>
         <kubernetes.version>5.8.0</kubernetes.version>
         <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
-        <aws.sdk.version>1.12.160</aws.sdk.version>
+        <aws.sdk.version>1.12.261</aws.sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
         <owasp-dependency-check-maven.version>7.0.4</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
