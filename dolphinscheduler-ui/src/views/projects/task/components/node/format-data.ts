@@ -329,6 +329,7 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'ZEPPELIN') {
     taskParams.noteId = data.zeppelinNoteId
     taskParams.paragraphId = data.zeppelinParagraphId
+    taskParams.restEndpoint = data.zeppelinRestEndpoint
     taskParams.parameters = data.parameters
   }
 

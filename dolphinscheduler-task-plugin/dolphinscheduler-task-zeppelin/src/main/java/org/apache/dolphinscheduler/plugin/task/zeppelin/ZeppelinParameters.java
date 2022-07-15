@@ -32,11 +32,12 @@ public class ZeppelinParameters extends AbstractParameters {
      */
     private String noteId;
     private String paragraphId;
+    private String restEndpoint;
     private String parameters;
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(this.noteId);
+        return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.restEndpoint);
     }
 
     @Override
@@ -68,13 +69,22 @@ public class ZeppelinParameters extends AbstractParameters {
         this.parameters = parameters;
     }
 
+    public String getRestEndpoint() {
+        return restEndpoint;
+    }
+
+    public void setRestEndpoint(String restEndpoint) {
+        this.restEndpoint = restEndpoint;
+    }
+
     @Override
     public String toString() {
-        return "ZeppelinParameters{" +
-                "noteId='" + noteId + '\'' +
-                ", paragraphId='" + paragraphId + '\'' +
-                ", parameters='" + parameters + '\'' +
-                '}';
+        return "ZeppelinParameters{"
+               + "noteId='" + noteId + '\''
+               + ", paragraphId='" + paragraphId + '\''
+               + ", restEndpoint='" + restEndpoint + '\''
+               + ", parameters='" + parameters + '\''
+               + '}';
     }
 
 }

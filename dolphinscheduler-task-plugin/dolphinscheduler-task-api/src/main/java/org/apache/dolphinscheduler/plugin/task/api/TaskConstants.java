@@ -421,10 +421,6 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
-    /**
-     * zeppelin config
-     */
-    public static final String ZEPPELIN_REST_URL = "zeppelin.rest.url";
 
     /**
      * conda config used by jupyter task plugin
