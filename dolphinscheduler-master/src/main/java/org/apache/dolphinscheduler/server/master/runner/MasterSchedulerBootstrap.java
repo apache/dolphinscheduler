@@ -58,7 +58,7 @@ import org.springframework.stereotype.Service;
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
 @Service
-public class MasterSchedulerBootstrap extends BaseDaemonThread {
+public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerBootstrap.class);
 
@@ -116,6 +116,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
         logger.info("Master schedule bootstrap started...");
     }
 
+    @Override
     public void close() {
         logger.info("Master schedule bootstrap stopping...");
         logger.info("Master schedule bootstrap stopped...");

@@ -68,6 +68,10 @@ public class MasterConfig implements Validator {
      */
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     /**
+     * Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
+     */
+    private int heartbeatErrorThreshold = 5;
+    /**
      * task submit max retry times.
      */
     private int taskCommitRetryTimes = 5;
@@ -128,6 +132,9 @@ public class MasterConfig implements Validator {
         }
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
+        }
+        if (masterConfig.getHeartbeatErrorThreshold() <= 0) {
+            errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
         }
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
     }

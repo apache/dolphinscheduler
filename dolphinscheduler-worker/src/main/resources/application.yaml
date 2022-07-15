@@ -60,6 +60,8 @@ worker:
   exec-threads: 100
   # worker heartbeat interval
   heartbeat-interval: 10s
+  # Worker heart beat task error threshold, if the continuous error count exceed this count, the worker will close.
+  heartbeat-error-threshold: 5
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
   # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.

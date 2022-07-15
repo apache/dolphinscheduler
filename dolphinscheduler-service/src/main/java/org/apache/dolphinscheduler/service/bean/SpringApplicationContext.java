@@ -24,7 +24,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SpringApplicationContext implements ApplicationContextAware {
+public class SpringApplicationContext implements ApplicationContextAware, AutoCloseable {
 
     private static ApplicationContext applicationContext;
 
@@ -36,6 +36,7 @@ public class SpringApplicationContext implements ApplicationContextAware {
     /**
      * Close this application context, destroying all beans in its bean factory.
      */
+    @Override
     public void close() {
         ((AbstractApplicationContext)applicationContext).close();
     }
