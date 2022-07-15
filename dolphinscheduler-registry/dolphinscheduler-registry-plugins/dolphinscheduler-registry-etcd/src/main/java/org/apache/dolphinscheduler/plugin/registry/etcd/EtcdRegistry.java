@@ -65,8 +65,8 @@ public class EtcdRegistry implements Registry {
                 .namespace(byteSequence(registryProperties.getNamespace()))
                 .connectTimeout(registryProperties.getConnectionTimeout())
                 .retryChronoUnit(ChronoUnit.MILLIS)
-                .retryDelay(registryProperties.getRetryDelay())
-                .retryMaxDelay(registryProperties.getRetryMaxDelay())
+                .retryDelay(registryProperties.getRetryDelay().toMillis())
+                .retryMaxDelay(registryProperties.getRetryMaxDelay().toMillis())
                 .retryMaxDuration(registryProperties.getRetryMaxDuration());
         if(!Strings.isNullOrEmpty(registryProperties.getUser())&&(!Strings.isNullOrEmpty(registryProperties.getPassword()))){
             clientBuilder.user(byteSequence(registryProperties.getUser()));
@@ -160,7 +160,7 @@ public class EtcdRegistry implements Registry {
     public void put(String key, String value, boolean deleteOnDisconnect) {
         try{
             if(deleteOnDisconnect) {
-                // keep the key by lease, if disconnected, the lease will ,the key will delete
+                // keep the key by lease, if disconnected, the lease will expire and the key will delete
                 long leaseId = client.getLeaseClient().grant(TIME_TO_LIVE_SECONDS).get().getID();
                 client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
                 }));

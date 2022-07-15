@@ -38,8 +38,8 @@ public class EtcdRegistryProperties {
     private String authority;
 
     // RetryPolicy
-    private Long retryDelay=60L;
-    private Long retryMaxDelay=300L;
+    private Duration retryDelay=Duration.ofMillis(60);
+    private Duration retryMaxDelay=Duration.ofMillis(300);
     private Duration retryMaxDuration=Duration.ofMillis(1500);;
 
     // loadBalancerPolicy
