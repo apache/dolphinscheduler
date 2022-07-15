@@ -181,6 +181,10 @@ export default {
                                 title: 'Dinky',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
+                            {
+                                title: 'ChunJun',
+                                link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
                         ],
                     },
                     {
@@ -600,6 +604,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'ChunJun',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
                             },
                         ],
                     },

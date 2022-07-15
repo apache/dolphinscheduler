@@ -1,8 +1,8 @@
-# CHUNJUN 节点
+# ChunJun节点
 
 ## 综述
 
-CHUNJUN 任务类型，用于执行 CHUNJUN 程序。对于 CHUNJUN 节点，worker 会通过执行 `${CHUNJUN_HOME}/bin/start-chunjun` 来解析传入的 json 文件。
+ChunJun 任务类型，用于执行 ChunJun 程序。对于 ChunJun 节点，worker 会通过执行 `${CHUNJUN_HOME}/bin/start-chunjun` 来解析传入的 json 文件。
 
 ## 创建任务
 
@@ -23,10 +23,10 @@ CHUNJUN 任务类型，用于执行 CHUNJUN 程序。对于 CHUNJUN 节点，wor
 - 失败重试间隔：任务失败重新提交任务的时间间隔，以分为单位。
 - 延时执行时间：任务延迟执行的时间，以分为单位。
 - 超时警告：勾选超时警告、超时失败，当任务超过“超时时长”后，会发送告警邮件并且任务执行失败。
-- 自定义模板：自定义 chunjun 节点的 json 配置文件内容，当前支持此种方式。
-- json：CHUNJUN 同步的 json 配置文件。
+- 自定义模板：自定义 ChunJun 节点的 json 配置文件内容，当前支持此种方式。
+- json：ChunJun 同步的 json 配置文件。
 - 自定义参数：sql 任务类型，而存储过程是自定义参数顺序的给方法设置值自定义参数类型和数据类型同存储过程任务类型一样。区别在于SQL任务类型自定义参数会替换 sql 语句中 ${变量}。
-- 部署方式： 执行CHUNJUN任务的方式，比如local，standalone等。
+- 部署方式： 执行ChunJun任务的方式，比如local，standalone等。
 - 选项参数： 支持 `-confProp "{\"flink.checkpoint.interval\":60000}"` 格式。
 - 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
 
@@ -34,34 +34,14 @@ CHUNJUN 任务类型，用于执行 CHUNJUN 程序。对于 CHUNJUN 节点，wor
 
 该样例演示为从 Hive 数据导入到 MySQL 中。
 
-### 在 DolphinScheduler 中配置 CHUNJUN 环境
+### 在 DolphinScheduler 中配置 ChunJun 环境
 
-若生产环境中要是使用到 CHUNJUN 任务类型，则需要先配置好所需的环境。配置文件如下：`/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
+若生产环境中要是使用到 ChunJun 任务类型，则需要先配置好所需的环境。配置文件如下：`/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
 
 ![chunjun_task01](../../../../img/tasks/demo/chunjun_task01.png)
 
 当环境配置完成之后，需要重启 DolphinScheduler。
 
-### 配置 CHUNJUN 任务节点
+### 配置 ChunJun 任务节点
 
-从 Hive 中读取数据，所以需要自定义 json，可参考：chunjun安装包 chunjun/chunjun-examples/json/hive/下的json模板。
-
-在编写好所需的 json 之后，可按照下图步骤进行配置节点内容。
-
-![chunjun_task02](../../../../img/tasks/demo/chunjun_task02.png)
-
-### 查看运行结果
-
-![chunjun_task03](../../../../img/tasks/demo/chunjun_task03.png)
-
-## 注意事项：
-
-在执行 ${CHUNJUN_HOME}/bin/start-chunjun 之前，需要修改CHUNJUN安装包bin目录下的脚本start-chunjun，该脚本最后一行 & 得去掉，这样就不会是后台执行。
-
-即：
-
-`nohup $JAVA_RUN -cp $JAR_DIR $CLASS_NAME $@ &`
-
-改为：
- 
- `nohup $JAVA_RUN -cp $JAR_DIR $CLASS_NAME $@`
+从 Hive 中读取数据，所以需要自定义 json，可参考：[Hive Json Template](https://github.com/DTStack/chunjun/blob/master/chunjun-examples/json/hive/binlog_hive.json)

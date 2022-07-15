@@ -1,8 +1,8 @@
-# CHUNJUN
+# ChunJun
 
 ## Overview
 
-CHUNJUN task type for executing CHUNJUN programs. For CHUNJUN nodes, the worker will execute `${CHUNJUN_HOME}/bin/start-chunjun` to analyze the input json file.
+ChunJun task type for executing ChunJun programs. For ChunJun nodes, the worker will execute `${CHUNJUN_HOME}/bin/start-chunjun` to analyze the input json file.
 
 ## Create Task
 
@@ -25,8 +25,8 @@ CHUNJUN task type for executing CHUNJUN programs. For CHUNJUN nodes, the worker 
 | Priority | The task priority. |
 | Delayed execution time |  The time, in cents, that a task is delayed in execution. |
 | Timeout alarm | Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will be sent and the task execution will fail. |
-| Custom template | Custom the content of the CHUNJUN node's json profile. |
-| json | json configuration file for CHUNJUN synchronization. |
+| Custom template | Custom the content of the ChunJun node's json profile. |
+| json | json configuration file for ChunJun synchronization. |
 | Custom parameters | SQL task type, and stored procedure is a custom parameter order to set values for the method. The custom parameter type and data type are the same as the stored procedure task type. The difference is that the SQL task type custom parameter will replace the \${variable} in the SQL statement. |
 | Deploy mode | Execute chunjun task mode, eg local standalone. |
 | Option Parameters | Support such as `-confProp "{\"flink.checkpoint.interval\":60000}"` |
@@ -36,17 +36,17 @@ CHUNJUN task type for executing CHUNJUN programs. For CHUNJUN nodes, the worker 
 
 This example demonstrates importing data from Hive into MySQL.
 
-### Configuring the CHUNJUN environment in DolphinScheduler
+### Configuring the ChunJun environment in DolphinScheduler
 
-If you are using the CHUNJUN task type in a production environment, it is necessary to configure the required environment first. The configuration file is as follows: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+If you are using the ChunJun task type in a production environment, it is necessary to configure the required environment first. The configuration file is as follows: `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
 
 ![chunjun_task01](../../../../img/tasks/demo/chunjun_task01.png)
 
 After the environment has been configured, DolphinScheduler needs to be restarted.
 
-### Configuring CHUNJUN Task Node
+### Configuring ChunJun Task Node
 
-As the data to be read from Hive, a custom json is required, refer to: the template json in directory chunjun/chunjun-examples/json/hive.
+As the data to be read from Hive, a custom json is required, refer to: [Hive Json Template](https://github.com/DTStack/chunjun/blob/master/chunjun-examples/json/hive/binlog_hive.json).
 
 After writing the required json file, you can configure the node content by following the steps in the diagram below.
 

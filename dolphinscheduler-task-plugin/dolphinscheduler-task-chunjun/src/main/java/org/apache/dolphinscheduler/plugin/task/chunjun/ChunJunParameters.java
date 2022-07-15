@@ -27,9 +27,12 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * chunjun parameters
  */
+@Data
 public class ChunJunParameters extends AbstractParameters {
 
     /**
@@ -101,138 +104,6 @@ public class ChunJunParameters extends AbstractParameters {
      * customConfig value is 0, job speed record count
      */
     private int jobSpeedRecord;
-
-    public int getCustomConfig() {
-        return customConfig;
-    }
-
-    public void setCustomConfig(int customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public String getDsType() {
-        return dsType;
-    }
-
-    public void setDsType(String dsType) {
-        this.dsType = dsType;
-    }
-
-    public int getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(int dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public String getDtType() {
-        return dtType;
-    }
-
-    public void setDtType(String dtType) {
-        this.dtType = dtType;
-    }
-
-    public int getDataTarget() {
-        return dataTarget;
-    }
-
-    public void setDataTarget(int dataTarget) {
-        this.dataTarget = dataTarget;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public String getTargetTable() {
-        return targetTable;
-    }
-
-    public void setTargetTable(String targetTable) {
-        this.targetTable = targetTable;
-    }
-
-    public List<String> getPreStatements() {
-        return preStatements;
-    }
-
-    public void setPreStatements(List<String> preStatements) {
-        this.preStatements = preStatements;
-    }
-
-    public List<String> getPostStatements() {
-        return postStatements;
-    }
-
-    public void setPostStatements(List<String> postStatements) {
-        this.postStatements = postStatements;
-    }
-
-    public int getJobSpeedByte() {
-        return jobSpeedByte;
-    }
-
-    public void setJobSpeedByte(int jobSpeedByte) {
-        this.jobSpeedByte = jobSpeedByte;
-    }
-
-    public int getJobSpeedRecord() {
-        return jobSpeedRecord;
-    }
-
-    public void setJobSpeedRecord(int jobSpeedRecord) {
-        this.jobSpeedRecord = jobSpeedRecord;
-    }
-
-    public String getOthers() {
-        return others;
-    }
-
-    public void setOthers(String others) {
-        this.others = others;
-    }
-
-    public String getDeployMode() {
-        return deployMode;
-    }
-
-    public void setDeployMode(String deployMode) {
-        this.deployMode = deployMode;
-    }
-
-    @Override
-    public String toString() {
-        return "ChunJunParameters{"
-            + "customConfig=" + customConfig
-            + ", json='" + json + '\''
-            + ", dsType='" + dsType + '\''
-            + ", dataSource=" + dataSource
-            + ", dtType='" + dtType + '\''
-            + ", dataTarget=" + dataTarget
-            + ", sql='" + sql + '\''
-            + ", targetTable='" + targetTable + '\''
-            + ", preStatements=" + preStatements
-            + ", postStatements=" + postStatements
-            + ", jobSpeedByte=" + jobSpeedByte
-            + ", jobSpeedRecord=" + jobSpeedRecord
-            + ", others=" + others
-            + ", deployMode=" + deployMode
-            + '}';
-    }
 
     @Override
     public boolean checkParameters() {
