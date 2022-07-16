@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
