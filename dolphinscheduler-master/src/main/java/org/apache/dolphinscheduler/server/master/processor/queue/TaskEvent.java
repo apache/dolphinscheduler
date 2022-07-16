@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import io.netty.channel.Channel;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
@@ -26,6 +24,9 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
 
 import java.util.Date;
+
+import io.netty.channel.Channel;
+import lombok.Data;
 
 /**
  * task event

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
@@ -25,8 +24,11 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import lombok.NonNull;
 
 @Component
 public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecuteRunningCommand> {
