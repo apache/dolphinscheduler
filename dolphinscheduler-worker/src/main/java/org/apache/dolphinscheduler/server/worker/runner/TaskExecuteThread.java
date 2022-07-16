@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-
+import com.google.common.base.Strings;
+import lombok.NonNull;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
@@ -41,9 +43,8 @@ import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,12 +59,7 @@ import java.util.Map;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-
-import lombok.NonNull;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 /**
  * task scheduler thread

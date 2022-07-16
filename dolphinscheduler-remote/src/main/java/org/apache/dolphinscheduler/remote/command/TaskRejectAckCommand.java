@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 @Data

@@ -30,11 +30,10 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class TaskResultEventHandler implements TaskEventHandler {
