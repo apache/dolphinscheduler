@@ -76,15 +76,10 @@ public final class MailSender {
     private final String sslTrust;
     private final String showType;
     private final AlertTemplate alertTemplate;
-    private final String mustNotNull = " must not be null";
     private String xlsFilePath;
 
     public MailSender(Map<String, String> config) {
         String receiversConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS);
-        if (receiversConfig == null || "".equals(receiversConfig)) {
-            throw new AlertEmailException(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS + mustNotNull);
-        }
-
         receivers = Arrays.asList(receiversConfig.split(","));
 
         String receiverCcsConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS);
@@ -95,31 +90,23 @@ public final class MailSender {
         }
 
         mailSmtpHost = config.get(MailParamsConstants.NAME_MAIL_SMTP_HOST);
-        requireNonNull(mailSmtpHost, MailParamsConstants.NAME_MAIL_SMTP_HOST + mustNotNull);
 
         mailSmtpPort = config.get(MailParamsConstants.NAME_MAIL_SMTP_PORT);
-        requireNonNull(mailSmtpPort, MailParamsConstants.NAME_MAIL_SMTP_PORT + mustNotNull);
 
         mailSenderEmail = config.get(MailParamsConstants.NAME_MAIL_SENDER);
-        requireNonNull(mailSenderEmail, MailParamsConstants.NAME_MAIL_SENDER + mustNotNull);
 
         enableSmtpAuth = config.get(MailParamsConstants.NAME_MAIL_SMTP_AUTH);
 
         if (Boolean.TRUE.toString().equalsIgnoreCase(enableSmtpAuth)) {
             mailUser = config.get(MailParamsConstants.NAME_MAIL_USER);
-            requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
 
             mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
-            requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
 
             mailUseStartTLS = config.get(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE);
-            requireNonNull(mailUseStartTLS, MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
 
             mailUseSSL = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE);
-            requireNonNull(mailUseSSL, MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE + mustNotNull);
 
             sslTrust = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST);
-            requireNonNull(sslTrust, MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST + mustNotNull);
         } else {
             //make compiler happy
             mailUser = null;
@@ -130,7 +117,6 @@ public final class MailSender {
         }
 
         showType = config.get(AlertConstants.NAME_SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + mustNotNull);
 
         xlsFilePath = config.get(EmailConstants.XLS_FILE_PATH);
         if (StringUtils.isBlank(xlsFilePath)) {
