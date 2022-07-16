@@ -25,6 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 /**
  * Task running message, means the task is running in worker.
@@ -58,7 +59,7 @@ public class TaskExecuteRunningCommand extends BaseCommand {
     /**
      * status
      */
-    private int status;
+    private ExecutionStatus status;
 
     /**
      * logPath

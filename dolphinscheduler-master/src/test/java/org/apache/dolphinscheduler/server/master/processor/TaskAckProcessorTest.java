@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -66,7 +67,7 @@ public class TaskAckProcessorTest {
         taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                                                                   " 127.0.0.1:1234",
                                                                   System.currentTimeMillis());
-        taskExecuteRunningMessage.setStatus(1);
+        taskExecuteRunningMessage.setStatus(ExecutionStatus.SUBMITTED_SUCCESS);
         taskExecuteRunningMessage.setExecutePath("/dolphinscheduler/worker");
         taskExecuteRunningMessage.setHost("localhost");
         taskExecuteRunningMessage.setLogPath("/temp/worker.log");

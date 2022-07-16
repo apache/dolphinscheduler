@@ -23,6 +23,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 @Data
 @NoArgsConstructor
@@ -31,9 +32,9 @@ import lombok.ToString;
 public class TaskRejectAckCommand extends BaseCommand {
 
     private int taskInstanceId;
-    private int status;
+    private ExecutionStatus status;
 
-    public TaskRejectAckCommand(int status,
+    public TaskRejectAckCommand(ExecutionStatus status,
                                 int taskInstanceId,
                                 String messageSenderAddress,
                                 String messageReceiverAddress,

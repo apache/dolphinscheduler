@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 
@@ -28,13 +29,13 @@ import java.io.Serializable;
 public class TaskExecuteRunningAckMessage implements Serializable {
 
     private int taskInstanceId;
-    private int status;
+    private ExecutionStatus status;
 
     public TaskExecuteRunningAckMessage() {
         super();
     }
 
-    public TaskExecuteRunningAckMessage(int status, int taskInstanceId) {
+    public TaskExecuteRunningAckMessage(ExecutionStatus status, int taskInstanceId) {
         this.status = status;
         this.taskInstanceId = taskInstanceId;
     }
@@ -47,11 +48,11 @@ public class TaskExecuteRunningAckMessage implements Serializable {
         this.taskInstanceId = taskInstanceId;
     }
 
-    public int getStatus() {
+    public ExecutionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(ExecutionStatus status) {
         this.status = status;
     }
 
@@ -70,6 +71,6 @@ public class TaskExecuteRunningAckMessage implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
+        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status.getDescp() + '}';
     }
 }
