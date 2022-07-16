@@ -33,6 +33,7 @@ public class ZeppelinParameters extends AbstractParameters {
     private String noteId;
     private String paragraphId;
     private String restEndpoint;
+    private String productionNoteDirectory;
     private String parameters;
 
     @Override
@@ -77,12 +78,21 @@ public class ZeppelinParameters extends AbstractParameters {
         this.restEndpoint = restEndpoint;
     }
 
+    public String getproductionNoteDirectory() {
+        return productionNoteDirectory;
+    }
+
+    public void setproductionNoteDirectory(String productionNoteDirectory) {
+        this.productionNoteDirectory = productionNoteDirectory;
+    }
+
     @Override
     public String toString() {
         return "ZeppelinParameters{"
                + "noteId='" + noteId + '\''
-               + ", paragraphId='" + paragraphId + '\''
+               + ", paragraphId='" + paragraphId + '\'' 
                + ", restEndpoint='" + restEndpoint + '\''
+               + ", productionNoteDirectory='" + productionNoteDirectory + '\''
                + ", parameters='" + parameters + '\''
                + '}';
     }

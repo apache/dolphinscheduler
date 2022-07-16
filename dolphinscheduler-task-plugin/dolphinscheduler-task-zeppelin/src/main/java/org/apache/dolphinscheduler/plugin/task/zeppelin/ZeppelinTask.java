@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
@@ -76,9 +77,11 @@ public class ZeppelinTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         try {
-            final String noteId = this.zeppelinParameters.getNoteId();
             final String paragraphId = this.zeppelinParameters.getParagraphId();
+            final String productionNoteDirectory = this.zeppelinParameters.getproductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();
+            // noteId may be replaced with cloned noteId
+            String noteId = this.zeppelinParameters.getNoteId();
             Map<String, String> zeppelinParamsMap = new HashMap<>();
             if (parameters != null) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -88,6 +91,16 @@ public class ZeppelinTask extends AbstractTaskExecutor {
             // Submit zeppelin task
             String resultContent;
             Status status = Status.FINISHED;
+            // If in production, clone the note and run the cloned one for stability
+            if (productionNoteDirectory != null) {
+                final String cloneNotePath = String.format(
+                        "%s%s_%s",
+                        productionNoteDirectory,
+                        noteId,
+                        DateUtils.getTimestampString());
+                noteId = this.zClient.cloneNote(noteId, cloneNotePath);
+            }
+
             if (paragraphId == null) {
                 final NoteResult noteResult = this.zClient.executeNote(noteId, zeppelinParamsMap);
                 final List<ParagraphResult> paragraphResultList = noteResult.getParagraphResultList();
@@ -105,11 +118,17 @@ public class ZeppelinTask extends AbstractTaskExecutor {
                         break;
                     }
                 }
+
                 resultContent = resultContentBuilder.toString();
             } else {
                 final ParagraphResult paragraphResult = this.zClient.executeParagraph(noteId, paragraphId, zeppelinParamsMap);
                 resultContent = paragraphResult.getResultInText();
                 status = paragraphResult.getStatus();
+            }
+
+            // Delete cloned note
+            if (productionNoteDirectory != null) {
+                this.zClient.deleteNote(noteId);
             }
 
             // Use noteId-paragraph-Id as app id
@@ -121,6 +140,7 @@ public class ZeppelinTask extends AbstractTaskExecutor {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             logger.error("zeppelin task submit failed with error", e);
         }
+
     }
 
     /**
