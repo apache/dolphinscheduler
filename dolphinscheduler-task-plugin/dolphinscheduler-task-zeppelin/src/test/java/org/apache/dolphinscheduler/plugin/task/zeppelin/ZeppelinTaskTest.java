@@ -52,10 +52,10 @@ import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
-        ZeppelinTask.class,
-        ZeppelinClient.class,
-        ObjectMapper.class,
-        DateUtils.class
+    ZeppelinTask.class,
+    ZeppelinClient.class,
+    ObjectMapper.class,
+    DateUtils.class
 })
 @PowerMockIgnore({"javax.*"})
 public class ZeppelinTaskTest {
@@ -168,7 +168,7 @@ public class ZeppelinTaskTest {
     @Test
     public void testHandleWithNoteExecutionSuccessWithProductionSetting() throws Exception {
         String zeppelinParametersWithNoParagraphId = buildZeppelinTaskParametersWithProductionSetting();
-        TaskExecutionContext taskExecutionContext= PowerMockito.mock(TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         PowerMockito.mockStatic(DateUtils.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));

@@ -330,6 +330,7 @@ export function formatParams(data: INodeData): {
     taskParams.noteId = data.zeppelinNoteId
     taskParams.paragraphId = data.zeppelinParagraphId
     taskParams.restEndpoint = data.zeppelinRestEndpoint
+    taskParams.zeppelinProductionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
   }
 
