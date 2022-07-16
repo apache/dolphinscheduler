@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
 
-@ExtendWith({DolphinSchedulerExtension.class})
+//@ExtendWith({DolphinSchedulerExtension.class})
 public abstract class AbstractAPITest implements TestLifecycleLogger {
     protected RequestSpecification reqSpec = null;
     protected RequestSpecification request = RestAssured.given();

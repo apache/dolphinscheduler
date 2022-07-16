@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
 import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.Route;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantResponseEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 
@@ -29,6 +30,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public class TenantPageAPI implements ITenantPageAPI {
+    private static final String tenant = System.getProperty("user.name");
     private final RequestSpecification reqSpec;
     private final String sessionId;
 
@@ -40,46 +42,74 @@ public class TenantPageAPI implements ITenantPageAPI {
     @Override
     public RestResponse<Result> createTenant(TenantRequestEntity tenantRequestEntity) {
         return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
-                tenantRequestEntity.toMap(), Route.tenants(), RequestMethod.POST));
+            tenantRequestEntity.toMap(), Route.tenants(), RequestMethod.POST));
     }
 
     @Override
     public RestResponse<Result> updateTenant(TenantRequestEntity tenantUpdateEntity, int tenantId) {
         return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
-                tenantUpdateEntity.toMap(), Route.tenants(tenantId), RequestMethod.PUT));
+            tenantUpdateEntity.toMap(), Route.tenants(tenantId), RequestMethod.PUT));
     }
 
     @Override
     public RestResponse<Result> getTenants(PageRequestEntity pageParamEntity) {
         Response resp = getRequestNewInstance().spec(reqSpec).
-                cookies(Constants.SESSION_ID_KEY, sessionId).
-                params(pageParamEntity.toMap()).
-                when().get(Route.tenants());
+            cookies(Constants.SESSION_ID_KEY, sessionId).
+            params(pageParamEntity.toMap()).
+            when().get(Route.tenants());
         return toResponse(resp);
     }
 
     @Override
     public RestResponse<Result> getTenantsListAll() {
         Response resp = getRequestNewInstance().spec(reqSpec).
-                cookies(Constants.SESSION_ID_KEY, sessionId).
-                when().get(Route.tenantsList());
+            cookies(Constants.SESSION_ID_KEY, sessionId).
+            when().get(Route.tenantsList());
         return toResponse(resp);
     }
 
     @Override
     public RestResponse<Result> verifyTenantCode(String tenantCode) {
         Response resp = getRequestNewInstance().spec(reqSpec).
-                cookies(Constants.SESSION_ID_KEY, sessionId).
-                queryParam(Constants.TENANT_CODE_KEY, tenantCode).
-                when().get(Route.tenantsVerifyCode());
+            cookies(Constants.SESSION_ID_KEY, sessionId).
+            queryParam(Constants.TENANT_CODE_KEY, tenantCode).
+            when().get(Route.tenantsVerifyCode());
         return toResponse(resp);
     }
 
     @Override
     public RestResponse<Result> deleteTenantById(int tenantId) {
         Response resp = getRequestNewInstance().spec(reqSpec).
-                cookies(Constants.SESSION_ID_KEY, sessionId).
-                when().delete(Route.tenants(tenantId));
+            cookies(Constants.SESSION_ID_KEY, sessionId).
+            when().delete(Route.tenants(tenantId));
         return toResponse(resp);
+    }
+
+    @Override
+    public TenantResponseEntity createTenant() {
+        TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
+        tenantRequestEntity.setTenantCode(tenant);
+        tenantRequestEntity.setQueueId(1);
+        return createTenantByTenantEntity(tenantRequestEntity);
+    }
+
+    @Override
+    public TenantResponseEntity createTenantByTenantEntity(TenantRequestEntity tenantRequestEntity) {
+        return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
+            tenantRequestEntity.toMap(), Route.tenants(), RequestMethod.POST)).
+            getResponse().jsonPath().getObject(Constants.DATA_KEY, TenantResponseEntity.class);
+    }
+
+    @Override
+    public TenantRequestEntity getTenantEntityInstance() {
+        return getTenantEntityInstance(tenant, 1);
+    }
+
+    @Override
+    public TenantRequestEntity getTenantEntityInstance(String tenantCode, int queueId) {
+        TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
+        tenantRequestEntity.setTenantCode(tenantCode);
+        tenantRequestEntity.setQueueId(queueId);
+        return tenantRequestEntity;
     }
 }

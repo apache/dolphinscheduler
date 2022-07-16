@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.test.pages.security.tenant;
 import org.apache.dolphinscheduler.api.test.base.IPageAPI;
 import org.apache.dolphinscheduler.api.test.entity.PageRequestEntity;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantRequestEntity;
+import org.apache.dolphinscheduler.api.test.pages.security.tenant.entity.TenantResponseEntity;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 
@@ -36,4 +37,13 @@ public interface ITenantPageAPI extends IPageAPI {
     RestResponse<Result> verifyTenantCode(String tenantCode);
 
     RestResponse<Result> deleteTenantById(int tenantId);
+
+    TenantResponseEntity createTenant();
+
+    TenantResponseEntity createTenantByTenantEntity(TenantRequestEntity tenantRequestEntity);
+
+    TenantRequestEntity getTenantEntityInstance();
+
+    TenantRequestEntity getTenantEntityInstance(String tenantCode, int queueId);
+
 }

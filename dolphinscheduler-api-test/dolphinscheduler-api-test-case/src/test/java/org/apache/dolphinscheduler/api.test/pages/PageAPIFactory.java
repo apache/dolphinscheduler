@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.projects.project.ProjectPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.projects.workflow.WorkFlowPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.security.user.UserPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.token.TokenPageAPI;
 
 import io.restassured.specification.RequestSpecification;
@@ -59,5 +60,11 @@ public class PageAPIFactory implements IPageAPIFactory {
     public TokenPageAPI createTokenPageAPI() {
         return new TokenPageAPI(reqSpec, sessionId);
     }
+
+    @Override
+    public UserPageAPI createUserPageAPI() {
+        return new UserPageAPI(reqSpec, sessionId);
+    }
+
 
 }

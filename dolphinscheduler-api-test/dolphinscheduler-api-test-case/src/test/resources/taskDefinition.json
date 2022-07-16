@@ -1,0 +1,25 @@
+[
+  {
+    "code": 6121450382016,
+    "delayTime": "0",
+    "description": "",
+    "environmentCode": -1,
+    "failRetryInterval": "1",
+    "failRetryTimes": "0",
+    "flag": "YES",
+    "name": "qqq",
+    "taskParams": {
+      "localParams": [],
+      "rawScript": "echo qqqq",
+      "resourceList": []
+    },
+    "taskPriority": "MEDIUM",
+    "taskType": "SHELL",
+    "timeout": 0,
+    "timeoutFlag": "CLOSE",
+    "timeoutNotifyStrategy": "",
+    "workerGroup": "default",
+    "cpuQuota": -1,
+    "memoryMax": -1
+  }
+]

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.test.pages.login.LoginPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.projects.project.ProjectPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.projects.workflow.WorkFlowPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.security.tenant.TenantPageAPI;
+import org.apache.dolphinscheduler.api.test.pages.security.user.UserPageAPI;
 import org.apache.dolphinscheduler.api.test.pages.token.TokenPageAPI;
 
 public interface IPageAPIFactory {
@@ -34,5 +35,7 @@ public interface IPageAPIFactory {
     WorkFlowPageAPI createWorkFlowPageAPI();
 
     TokenPageAPI createTokenPageAPI();
+
+    UserPageAPI createUserPageAPI();
 
 }
