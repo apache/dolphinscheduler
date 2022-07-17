@@ -36,7 +36,11 @@ export default {
     delete: 'Delete',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    delete_confirm: 'Delete?'
+    delete_confirm: 'Delete?',
+    authorize_level:'Authorize Level',
+    no_permission: 'No Permission',
+    read_permission: 'Read Permission',
+    all_permission: 'All Permission',
   },
   workflow: {
     on_line: 'Online',

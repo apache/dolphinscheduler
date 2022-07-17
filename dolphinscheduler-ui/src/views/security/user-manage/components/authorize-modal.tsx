@@ -127,13 +127,13 @@ export const AuthorizeModal = defineComponent({
           <NSpace vertical>
             <NSpace>
               <NButton size='small' type='primary' onClick={() => this.revokeProjectByIdRequest(userId, projectIds)}>
-                撤销权限
+                {t('security.user.revoke_auth')}
               </NButton>
               <NButton size='small' type='primary' onClick={() => this.grantProjectWithReadPermRequest(userId, projectIds)}>
-                授予读权限
+              {t('security.user.grant_read')}
               </NButton>
               <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, projectIds)}>
-                授予读写权限
+              {t('security.user.grant_all')}
               </NButton>
               <NInput
                 size='small'

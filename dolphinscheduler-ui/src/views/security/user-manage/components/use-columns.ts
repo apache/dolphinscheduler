@@ -40,17 +40,18 @@ import {
 import type { TableColumns, InternalRowData } from '../types'
 import { absolute } from '@antv/x6/lib/registry/port-layout/absolute'
 
+// const { t } = useI18n()
 const PERM_LIST = [
   {
-    label: '无权限',
+    label: 'project.list.no_permission',
     value: 0
   },
   {
-    label: '读权限',
+    label: 'project.list.read_permission',
     value: 2
   },
   {
-    label: '读写权限',
+    label: 'project.list.all_permission',
     value: 7
   }
 ]
@@ -70,32 +71,7 @@ export function useColumns(onCallback: Function) {
 
   const createColumns = () => {
     const columns: any = [
-      // {
-      //   //加上type之后xx
-      //   type: 'selection',
-      //   key: 'selection',
-      //   ...COLUMN_WIDTH_CONFIG['checkbox']
-      // },
-      // {
-      //   title: '#',
-      //   key: 'id',
-      //   // render: (unused: any, index: number) => index + 1,
-      //   ...COLUMN_WIDTH_CONFIG['index']
-      // },
-      // {
-      //   title: t('project.list.project_name'),
-      //   key: 'name',
-      //   className: 'project-name',
-      //   ...COLUMN_WIDTH_CONFIG['size'],
-      // },
-      // {
-      //   // title: t('project.list.perm'),
-      //   title: '权限等级',
-      //   key: 'perm',
-      //   ...COLUMN_WIDTH_CONFIG['index'],
-      // },
       {
-        //加上type之后xx
         type: 'selection',
         key: 'selection',
         ...COLUMN_WIDTH_CONFIG['checkbox']
@@ -106,52 +82,13 @@ export function useColumns(onCallback: Function) {
         ...COLUMN_WIDTH_CONFIG['size']
       },
       {
-        title: '权限等级',
+        title: t('project.list.authorize_level'),
         key: 'perm',
         render: (record: any):any => {
-          return PERM_LIST.filter(item => item.value == record.perm).map(item => item.label)
+          return PERM_LIST.filter(item => item.value == record.perm).map(item => t(item.label))
         },
         ...COLUMN_WIDTH_CONFIG['index']
       }
-      // 下面是尝试实现的单选版本
-      // {
-      //   title: t('project.list.operation'),
-      //   key: 'actions',
-      //   ...COLUMN_WIDTH_CONFIG['linkName'],
-      //   render(row: any) {
-      //     return h(NRadioGroup, null, {
-      //       default: () => [
-      //         h(
-      //           NRadio,
-      //           {
-      //             label: '无权限',
-      //             onUpdateChecked: () => {
-      //               handleClick(row)
-      //             }
-      //           },
-
-
-      //         ),
-      //         h(
-      //           NRadio,
-      //           {
-      //             label: '读权限'
-      //           },
-
-
-      //         ),
-      //         h(
-      //           NRadio,
-      //           {
-      //             label: '读写权限'
-      //           },
-
-
-      //         )
-      //       ]
-      //     })
-      //   }
-      // },
     ]
     columnsRef.value = {
       columns,
