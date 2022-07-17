@@ -46,19 +46,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler",
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                        "org.apache.dolphinscheduler.service.process.*",
-                        "org.apache.dolphinscheduler.service.queue.*",
-                })
-        }
-)
+@ComponentScan(basePackages = "org.apache.dolphinscheduler")
 public class WorkerServer implements IStoppable {
 
     /**
