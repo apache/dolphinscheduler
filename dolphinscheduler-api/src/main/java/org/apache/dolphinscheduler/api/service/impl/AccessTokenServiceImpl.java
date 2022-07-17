@@ -158,7 +158,6 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
-
         return result;
     }
 
