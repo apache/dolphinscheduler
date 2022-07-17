@@ -71,6 +71,6 @@ public class TaskExecuteRunningAckMessage implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status.getDescp() + '}';
+        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
     }
 }

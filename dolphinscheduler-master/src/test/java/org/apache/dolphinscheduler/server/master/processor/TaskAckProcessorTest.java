@@ -67,7 +67,7 @@ public class TaskAckProcessorTest {
         taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                                                                   " 127.0.0.1:1234",
                                                                   System.currentTimeMillis());
-        taskExecuteRunningMessage.setStatus(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskExecuteRunningMessage.setStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskExecuteRunningMessage.setExecutePath("/dolphinscheduler/worker");
         taskExecuteRunningMessage.setHost("localhost");
         taskExecuteRunningMessage.setLogPath("/temp/worker.log");

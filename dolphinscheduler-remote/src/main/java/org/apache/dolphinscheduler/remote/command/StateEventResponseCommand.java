@@ -72,7 +72,7 @@ public class StateEventResponseCommand implements Serializable {
     public String toString() {
         return "StateEventResponseCommand{"
                 + "key=" + key
-                + ", status=" + status.getDescp()
+                + ", status=" + status
                 + '}';
     }
 
