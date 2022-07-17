@@ -102,6 +102,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.plugin.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -338,6 +339,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                     return result;
                 }
+                this.converSrcTableFormat(taskDefinitionLog);
             }
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
@@ -345,6 +347,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             result.put(Constants.MSG, e.getMessage());
         }
         return result;
+    }
+
+    private void converSrcTableFormat(TaskDefinitionLog taskDefinitionLog) {
+        DataQualityParameters dataQualityParameters = JSONUtils
+                .parseObject(taskDefinitionLog.getTaskParams(), DataQualityParameters.class);
+        if (null != dataQualityParameters) {
+            Map<String, String> ruleInputParameter = dataQualityParameters.getRuleInputParameter();
+            if (null != ruleInputParameter) {
+                String srcTableValue = ruleInputParameter.get("src_table");
+                if (null != srcTableValue) {
+                    ruleInputParameter.put("src_table", "[" + srcTableValue + "]");
+                    taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(dataQualityParameters));
+                }
+            }
+        }
     }
 
     private Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs) {
