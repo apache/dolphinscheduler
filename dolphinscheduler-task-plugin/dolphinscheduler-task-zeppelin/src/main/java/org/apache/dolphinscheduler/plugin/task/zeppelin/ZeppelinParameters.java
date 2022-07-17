@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-
 import lombok.Data;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -26,7 +25,6 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-
 
 @Data
 public class ZeppelinParameters extends AbstractParameters {
