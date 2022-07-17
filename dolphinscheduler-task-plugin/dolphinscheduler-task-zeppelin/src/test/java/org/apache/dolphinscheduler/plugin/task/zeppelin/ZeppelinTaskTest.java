@@ -220,7 +220,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setNoteId(MOCK_NOTE_ID);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
-        zeppelinParameters.setproductionNoteDirectory(MOCK_PRODUCTION_DIRECTORY);
+        zeppelinParameters.setProductionNoteDirectory(MOCK_PRODUCTION_DIRECTORY);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }

@@ -78,7 +78,7 @@ public class ZeppelinTask extends AbstractTaskExecutor {
     public void handle() throws Exception {
         try {
             final String paragraphId = this.zeppelinParameters.getParagraphId();
-            final String productionNoteDirectory = this.zeppelinParameters.getproductionNoteDirectory();
+            final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();
             // noteId may be replaced with cloned noteId
             String noteId = this.zeppelinParameters.getNoteId();
