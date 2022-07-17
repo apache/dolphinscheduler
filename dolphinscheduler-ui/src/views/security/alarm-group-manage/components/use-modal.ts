@@ -39,6 +39,7 @@ export function useModal(
       groupName: ref(''),
       alertInstanceIds: ref<Array<number>>([]),
       description: ref(''),
+      recvFaultTolWarn: ref(false),
       generalOptions: []
     },
     saving: false,
@@ -106,13 +107,15 @@ export function useModal(
       const data = {
         groupName: variables.model.groupName,
         alertInstanceIds: variables.model.alertInstanceIds.toString(),
-        description: variables.model.description
+        description: variables.model.description,
+        recvFaultTolWarn: variables.model.recvFaultTolWarn
       }
 
       createAlertGroup(data).then(() => {
         variables.model.groupName = ''
         variables.model.alertInstanceIds = []
         variables.model.description = ''
+        variables.model.recvFaultTolWarn = false
         ctx.emit('confirmModal', props.showModalRef)
       })
     })
@@ -122,7 +125,8 @@ export function useModal(
     const data = {
       groupName: variables.model.groupName,
       alertInstanceIds: variables.model.alertInstanceIds.toString(),
-      description: variables.model.description
+      description: variables.model.description,
+      recvFaultTolWarn: variables.model.recvFaultTolWarn
     }
 
     updateAlertGroup(data, { id: variables.model.id }).then(() => {

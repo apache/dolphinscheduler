@@ -305,13 +305,14 @@ CREATE TABLE `t_ds_alert` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup`(
-  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
-  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
-  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
-  `description`    varchar(255) DEFAULT NULL,
-  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
-  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
+  `id`                  int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `alert_instance_ids`  varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
+  `create_user_id`      int(11)       DEFAULT NULL COMMENT 'create user id',
+  `group_name`          varchar(255)  DEFAULT NULL COMMENT 'group name',
+  `description`         varchar(255)  DEFAULT NULL,
+  `recv_fault_tol_warn` boolean       DEFAULT FALSE COMMENT 'receive fault tolerance warnings',
+  `create_time`         datetime      DEFAULT NULL COMMENT 'create time',
+  `update_time`         datetime      DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_alertgroup_name_un` (`group_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -981,8 +982,8 @@ INSERT IGNORE INTO `t_ds_version` VALUES ('1', '2.0.2');
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
-INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', current_timestamp, current_timestamp);
+INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, recv_fault_tol_warn, create_time, update_time)
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', true, current_timestamp, current_timestamp);
 
 -- ----------------------------
 -- Records of t_ds_user

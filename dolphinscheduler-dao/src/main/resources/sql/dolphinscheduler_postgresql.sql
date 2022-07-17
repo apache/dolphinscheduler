@@ -233,13 +233,14 @@ create index idx_sign on t_ds_alert (sign);
 
 DROP TABLE IF EXISTS t_ds_alertgroup;
 CREATE TABLE t_ds_alertgroup(
-  id             int NOT NULL,
-  alert_instance_ids varchar (255) DEFAULT NULL,
-  create_user_id int4         DEFAULT NULL,
-  group_name     varchar(255) DEFAULT NULL,
-  description    varchar(255) DEFAULT NULL,
-  create_time    timestamp    DEFAULT NULL,
-  update_time    timestamp    DEFAULT NULL,
+  id                  int NOT NULL,
+  alert_instance_ids  varchar (255) DEFAULT NULL,
+  create_user_id      int4          DEFAULT NULL,
+  group_name          varchar(255)  DEFAULT NULL,
+  description         varchar(255)  DEFAULT NULL,
+  recv_fault_tol_warn boolean       DEFAULT FALSE,
+  create_time         timestamp     DEFAULT NULL,
+  update_time         timestamp     DEFAULT NULL,
   PRIMARY KEY (id),
   CONSTRAINT t_ds_alertgroup_name_un UNIQUE (group_name)
 ) ;
@@ -978,8 +979,8 @@ INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_
 VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', 'Asia/Shanghai');
 
 -- Records of t_ds_alertgroup, default admin warning group
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, recv_fault_tol_warn, create_time, update_time)
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', true, '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)

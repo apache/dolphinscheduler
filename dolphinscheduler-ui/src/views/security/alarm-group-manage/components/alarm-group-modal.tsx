@@ -17,7 +17,7 @@
 
 import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
-import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
+import { NCheckbox, NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
 import { useI18n } from 'vue-i18n'
 
@@ -47,6 +47,7 @@ const AlarmGroupModal = defineComponent({
         variables.model.groupName = ''
         variables.model.alertInstanceIds = []
         variables.model.description = ''
+        variables.model.recvFaultTolWarn = false
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -71,6 +72,7 @@ const AlarmGroupModal = defineComponent({
           variables.model.groupName = ''
           variables.model.alertInstanceIds = []
           variables.model.description = ''
+          variables.model.recvFaultTolWarn = false
         } else {
           variables.model.id = props.row.id
           variables.model.groupName = props.row.groupName
@@ -78,6 +80,7 @@ const AlarmGroupModal = defineComponent({
             .split(',')
             .map((item: string) => Number(item))
           variables.model.description = props.row.description
+          variables.model.recvFaultTolWarn = props.row.recvFaultTolWarn
         }
       }
     )
@@ -91,6 +94,7 @@ const AlarmGroupModal = defineComponent({
           .split(',')
           .map((item: string) => Number(item))
         variables.model.description = props.row.description
+        variables.model.recvFaultTolWarn = props.row.recvFaultTolWarn
       }
     )
 
@@ -144,6 +148,19 @@ const AlarmGroupModal = defineComponent({
                     )}
                     options={this.model.generalOptions}
                     v-model={[this.model.alertInstanceIds, 'value']}
+                  />
+                </NFormItem>
+                <NFormItem
+                  label={t(
+                    'security.alarm_group.receive_fault_tolerance_warnings'
+                  )}
+                  path='recvFaultTolWarn'
+                >
+                  <NCheckbox
+                    label={t(
+                      'security.alarm_group.receive_fault_tolerance_warnings_tips'
+                    )}
+                    v-model={[this.model.recvFaultTolWarn, 'checked']}
                   />
                 </NFormItem>
                 <NFormItem

@@ -19,9 +19,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper">
     <sql id="baseSql">
-        id
-        , group_name, description,alert_instance_ids, create_user_id,create_time, update_time
+        id, group_name, description, recv_fault_tol_warn, alert_instance_ids, create_user_id, create_time, update_time
     </sql>
+
     <select id="queryAlertGroupPage" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
         <include refid="baseSql"/>
@@ -87,6 +87,11 @@
     <select id="queryAlertGroupInstanceIdsById" resultType="String">
         select alert_instance_ids  from t_ds_alertgroup
         where id = #{alertGroupId}
+    </select>
+
+    <select id="listAlertGroupsReceivingFaultToleranceWarning" resultType="Integer">
+        select id from t_ds_alertgroup
+        where recv_fault_tol_warn
     </select>
 
     <select id="listAuthorizedAlertGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">

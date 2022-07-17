@@ -41,6 +41,8 @@ export default {
     alert_group_name_tips: '请输入告警组名称',
     alarm_plugin_instance: '告警组实例',
     alarm_plugin_instance_tips: '请选择告警组实例',
+    receive_fault_tolerance_warnings: '容错告警',
+    receive_fault_tolerance_warnings_tips: '接收容错告警',
     alarm_group_description_tips: '请输入告警组描述',
     alert_group_name: '告警组名称',
     alarm_group_description: '告警组描述',

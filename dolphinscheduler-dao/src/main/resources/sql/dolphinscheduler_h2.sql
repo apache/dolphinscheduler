@@ -298,13 +298,14 @@ CREATE TABLE t_ds_alert
 DROP TABLE IF EXISTS t_ds_alertgroup CASCADE;
 CREATE TABLE t_ds_alertgroup
 (
-    id                 int(11) NOT NULL AUTO_INCREMENT,
-    alert_instance_ids varchar(255) DEFAULT NULL,
-    create_user_id     int(11) DEFAULT NULL,
-    group_name         varchar(255) DEFAULT NULL,
-    description        varchar(255) DEFAULT NULL,
-    create_time        datetime     DEFAULT NULL,
-    update_time        datetime     DEFAULT NULL,
+    id                   int(11) NOT NULL AUTO_INCREMENT,
+    alert_instance_ids   varchar(255) DEFAULT NULL,
+    create_user_id       int(11)      DEFAULT NULL,
+    group_name           varchar(255) DEFAULT NULL,
+    description          varchar(255) DEFAULT NULL,
+    recv_fault_tol_warn  boolean      DEFAULT FALSE,
+    create_time          datetime     DEFAULT NULL,
+    update_time          datetime     DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_alertgroup_name_un (group_name)
 );
@@ -990,8 +991,8 @@ VALUES ('1', '1.4.0');
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, recv_fault_tol_warn, create_time, update_time)
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', true, '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
 -- ----------------------------

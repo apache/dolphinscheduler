@@ -136,13 +136,13 @@ public class AlertDao {
     }
 
     /**
-     * MasterServer or WorkerServer stopped
+     * Sends 'Fault tolerance warning' to all alert groups that set to receive it
+     * on MasterServer or WorkerServer stopped.
      *
-     * @param alertGroupId alertGroupId
      * @param host host
      * @param serverType serverType
      */
-    public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
+    public void sendServerStoppedAlert(String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
                 type(serverType)
                 .host(host)
@@ -156,15 +156,21 @@ public class AlertDao {
         alert.setWarningType(WarningType.FAILURE);
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alert.setContent(content);
-        alert.setAlertGroupId(alertGroupId);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
         alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
         alert.setSign(generateSign(alert));
-        // we use this method to avoid insert duplicate alert(issue #5525)
-        // we modified this method to optimize performance(issue #9174)
+
+        List<Integer> alertGroupIds = alertGroupMapper.listAlertGroupsReceivingFaultToleranceWarning();
         Date crashAlarmSuppressionStartTime = Date.from(LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
-        alertMapper.insertAlertWhenServerCrash(alert, crashAlarmSuppressionStartTime);
+
+        alertGroupIds.stream()
+                .forEach(ag -> {
+                    alert.setAlertGroupId(ag);
+                    // we use this method to avoid insert duplicate alert(issue #5525)
+                    // we modified this method to optimize performance(issue #9174)
+                    alertMapper.insertAlertWhenServerCrash(alert, crashAlarmSuppressionStartTime);
+                });
     }
 
     /**

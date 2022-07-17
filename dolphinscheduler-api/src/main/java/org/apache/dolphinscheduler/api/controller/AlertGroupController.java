@@ -76,13 +76,15 @@ public class AlertGroupController extends BaseController {
      * @param loginUser login user
      * @param groupName group name
      * @param description description
+     * @param recvFaultTolWarn receive fault tolerance warnings
      * @return create result code
      */
     @ApiOperation(value = "createAlertgroup", notes = "CREATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
+        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "recvFaultTolWarn", value = "RECV_FAULT_TOL_WARN", dataType = "boolean")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -91,8 +93,9 @@ public class AlertGroupController extends BaseController {
     public Result createAlertgroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
-                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
+                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds,
+                                   @RequestParam(value = "recvFaultTolWarn") boolean recvFaultTolWarn) {
+        Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds, recvFaultTolWarn);
         return returnDataList(result);
     }
 
@@ -174,6 +177,7 @@ public class AlertGroupController extends BaseController {
      * @param id alert group id
      * @param groupName group name
      * @param description description
+     * @param recvFaultTolWarn receive fault tolerance warnings
      * @return update result code
      */
     @ApiOperation(value = "updateAlertgroup", notes = "UPDATE_ALERT_GROUP_NOTES")
@@ -181,7 +185,8 @@ public class AlertGroupController extends BaseController {
         @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
+        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "recvFaultTolWarn", value = "RECV_FAULT_TOL_WARN", dataType = "boolean")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -191,9 +196,10 @@ public class AlertGroupController extends BaseController {
                                    @PathVariable(value = "id") int id,
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
-                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds,
+                                   @RequestParam(value = "recvFaultTolWarn") boolean recvFaultTolWarn) {
 
-        Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
+        Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds, recvFaultTolWarn);
         return returnDataList(result);
     }
 

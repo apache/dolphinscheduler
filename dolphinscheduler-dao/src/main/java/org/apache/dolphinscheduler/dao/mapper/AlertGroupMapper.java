@@ -94,6 +94,12 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
     <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")List<Integer> alertGroupsIds);
 
     /**
+     * Lists alert groups' id that set to receive fault tolerance warnings
+     * @return list
+     */
+    List<Integer> listAlertGroupsReceivingFaultToleranceWarning();
+
+    /**
      * queryAlertGroupPageByIds
      * @param page
      * @param ids

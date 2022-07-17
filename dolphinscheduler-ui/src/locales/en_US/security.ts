@@ -41,6 +41,8 @@ export default {
     alert_group_name_tips: 'Please enter your alert group name',
     alarm_plugin_instance: 'Alarm Plugin Instance',
     alarm_plugin_instance_tips: 'Please select alert plugin instance',
+    receive_fault_tolerance_warnings: 'Fault Tolerance Warnings',
+    receive_fault_tolerance_warnings_tips: 'Receive fault tolerance warnings',
     alarm_group_description_tips: 'Please enter your alarm group description',
     alert_group_name: 'Alert Group Name',
     alarm_group_description: 'Alarm Group Description',

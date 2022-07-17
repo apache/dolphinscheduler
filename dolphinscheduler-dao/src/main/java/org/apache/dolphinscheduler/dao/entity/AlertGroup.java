@@ -46,6 +46,11 @@ public class AlertGroup {
     @TableField(value = "description")
     private String description;
     /**
+     * recv_fault_tol_warn
+     */
+    @TableField(value = "recv_fault_tol_warn")
+    private boolean recvFaultTolWarn;
+    /**
      * create_time
      */
     @TableField(value = "create_time")
@@ -102,6 +107,14 @@ public class AlertGroup {
         this.description = description;
     }
 
+    public boolean getRecvFaultTolWarn() {
+        return recvFaultTolWarn;
+    }
+
+    public void setRecvFaultTolWarn(boolean recvFaultTolWarn) {
+        this.recvFaultTolWarn = recvFaultTolWarn;
+    }
+
     public int getCreateUserId() {
         return createUserId;
     }
@@ -144,6 +157,9 @@ public class AlertGroup {
         if (description != null ? !description.equals(that.description) : that.description != null) {
             return false;
         }
+        if (recvFaultTolWarn != that.recvFaultTolWarn) {
+            return false;
+        }
         return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) && !(updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null);
 
     }
@@ -157,6 +173,7 @@ public class AlertGroup {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + Boolean.hashCode(recvFaultTolWarn);
         return result;
     }
 
@@ -167,6 +184,7 @@ public class AlertGroup {
             + "createUserId=" + createUserId
             + ", groupName='" + groupName + '\''
             + ", description='" + description + '\''
+            + ", recvFaultTolWarn=" + recvFaultTolWarn
             + ", createTime=" + createTime
             + ", updateTime=" + updateTime
             + '}';

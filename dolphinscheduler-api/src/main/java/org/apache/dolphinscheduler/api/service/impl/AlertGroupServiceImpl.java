@@ -157,11 +157,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param groupName group name
      * @param desc description
      * @param alertInstanceIds alertInstanceIds
+     * @param recvFaultTolWarn receive fault tolerance warnings
      * @return create result code
      */
     @Override
     @Transactional
-    public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
+    public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds, boolean recvFaultTolWarn) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
@@ -175,6 +176,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         alertGroup.setGroupName(groupName);
         alertGroup.setAlertInstanceIds(alertInstanceIds);
         alertGroup.setDescription(desc);
+        alertGroup.setRecvFaultTolWarn(recvFaultTolWarn);
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
         alertGroup.setCreateUserId(loginUser.getId());
@@ -205,10 +207,11 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param groupName group name
      * @param desc description
      * @param alertInstanceIds alertInstanceIds
+     * @param recvFaultTolWarn receive fault tolerance warnings
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
+    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds, boolean recvFaultTolWarn) {
         Map<String, Object> result = new HashMap<>();
 
         if (!canOperatorPermissions(loginUser, new Object[]{id},AuthorizationType.ALERT_GROUP,ALERT_GROUP_UPDATE)) {
@@ -233,6 +236,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         alertGroup.setUpdateTime(now);
         alertGroup.setCreateUserId(loginUser.getId());
         alertGroup.setAlertInstanceIds(alertInstanceIds);
+        alertGroup.setRecvFaultTolWarn(recvFaultTolWarn);
         try {
             alertGroupMapper.updateById(alertGroup);
             putMsg(result, Status.SUCCESS);

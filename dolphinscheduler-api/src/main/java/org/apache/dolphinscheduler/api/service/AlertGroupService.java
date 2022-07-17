@@ -62,9 +62,10 @@ public interface AlertGroupService {
      * @param groupName group name
      * @param desc description
      * @param alertInstanceIds alertInstanceIds
+     * @param recvFaultTolWarn receive fault tolerance warnings
      * @return create result code
      */
-    Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds);
+    Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds, boolean recvFaultTolWarn);
 
     /**
      * updateProcessInstance alert group
@@ -74,9 +75,10 @@ public interface AlertGroupService {
      * @param groupName group name
      * @param desc description
      * @param alertInstanceIds alertInstanceIds
+     * @param recvFaultTolWarn receive fault tolerance warnings
      * @return update result code
      */
-    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds);
+    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds, boolean recvFaultTolWarn);
 
     /**
      * delete alert group by id

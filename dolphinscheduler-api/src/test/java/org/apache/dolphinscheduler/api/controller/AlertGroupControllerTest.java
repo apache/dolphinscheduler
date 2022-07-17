@@ -77,6 +77,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("groupType", "email");
         paramsMap.add("description", "cxc junit test alert description");
         paramsMap.add("alertInstanceIds", "");
+        paramsMap.add("recvFaultTolWarn", "true");
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -146,6 +147,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("groupType", "email");
         paramsMap.add("description", "update alter group");
         paramsMap.add("alertInstanceIds", "");
+        paramsMap.add("recvFaultTolWarn", "true");
         MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + entityId)
                 .header("sessionId", sessionId)
                 .params(paramsMap))

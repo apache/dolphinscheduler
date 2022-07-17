@@ -250,7 +250,7 @@ public class ServerNodeManager implements InitializingBean {
                         String group = parseGroup(path);
                         Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
-                        alertDao.sendServerStoppedAlert(1, path, "WORKER");
+                        alertDao.sendServerStoppedAlert(path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
                         String group = parseGroup(path);
@@ -301,7 +301,7 @@ public class ServerNodeManager implements InitializingBean {
                     if (type.equals(Type.REMOVE)) {
                         logger.info("master node : {} down.", path);
                         updateMasterNodes();
-                        alertDao.sendServerStoppedAlert(1, path, "MASTER");
+                        alertDao.sendServerStoppedAlert(path, "MASTER");
                     }
                 } catch (Exception ex) {
                     logger.error("MasterNodeListener capture data change and get data failed.", ex);
