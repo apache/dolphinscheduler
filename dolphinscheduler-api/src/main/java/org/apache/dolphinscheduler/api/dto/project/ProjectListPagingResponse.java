@@ -21,9 +21,12 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 
+import lombok.Data;
+
 /**
  * project List paging response
  */
+@Data
 public class ProjectListPagingResponse extends Result {
 
     private PageInfo<Project> data;
@@ -34,14 +37,4 @@ public class ProjectListPagingResponse extends Result {
         this.setMsg(result.getMsg());
         this.setData(result.getData());
     }
-
-    @Override
-    public PageInfo<Project> getData() {
-        return data;
-    }
-
-    public void setData(PageInfo<Project> data) {
-        this.data = data;
-    }
-
 }

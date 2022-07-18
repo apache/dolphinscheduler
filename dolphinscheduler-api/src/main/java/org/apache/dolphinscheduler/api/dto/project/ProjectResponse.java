@@ -20,9 +20,12 @@ package org.apache.dolphinscheduler.api.dto.project;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 
+import lombok.Data;
+
 /**
  * project response
  */
+@Data
 public class ProjectResponse extends Result {
 
     private Project data;
@@ -32,14 +35,5 @@ public class ProjectResponse extends Result {
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
         this.setData((Project) result.getData());
-    }
-
-    @Override
-    public Project getData() {
-        return data;
-    }
-
-    public void setData(Project data) {
-        this.data = data;
     }
 }

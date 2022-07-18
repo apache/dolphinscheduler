@@ -18,14 +18,17 @@
 package org.apache.dolphinscheduler.api.dto.project;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
 
 /**
  * project List response
  */
+@Data
 public class ProjectListResponse extends Result {
 
     private List<Project> data;
@@ -34,25 +37,6 @@ public class ProjectListResponse extends Result {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
-        this.setData(objToList(result.getData()));
-    }
-
-    @Override
-    public List<Project> getData() {
-        return data;
-    }
-
-    public void setData(List<Project> data) {
-        this.data = data;
-    }
-
-    public List<Project> objToList(Object obj) {
-        List<Project> list = new ArrayList<>();
-        if (obj instanceof List<?>) {
-            for (Object o : (List<?>) obj) {
-                list.add((Project) o);
-            }
-        }
-        return list;
+        this.setData(JSONUtils.toList(JSONUtils.toJsonString(result.getData()), Project.class));
     }
 }

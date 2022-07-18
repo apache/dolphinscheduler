@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.api.dto.project;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 
+import lombok.Data;
+
 /**
  * boolean response
  */
+@Data
 public class ProjectDeleteBooleanResponse extends Result {
 
     private Boolean data;
@@ -31,14 +34,5 @@ public class ProjectDeleteBooleanResponse extends Result {
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
         this.setData((Boolean) result.getData());
-    }
-
-    @Override
-    public Boolean getData() {
-        return data;
-    }
-
-    public void setData(Boolean data) {
-        this.data = data;
     }
 }
