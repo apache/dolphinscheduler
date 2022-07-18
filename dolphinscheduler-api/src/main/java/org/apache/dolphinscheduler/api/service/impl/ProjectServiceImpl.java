@@ -563,17 +563,17 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check project and authorization
      *
-     * @param result  result
-     * @param loginUser login user
-     * @param project project
+     * @param result      result
+     * @param loginUser   login user
+     * @param project     project
      * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
     @Override
-    public void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm) {
+    public void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String permission) {
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_EXIST);
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,perm)) {
+        } else if (!canOperatorPermissions(loginUser, new Object[] {project.getId()}, AuthorizationType.PROJECTS, permission)) {
             // check read permission
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
         } else {
