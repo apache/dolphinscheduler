@@ -28,8 +28,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.dto.BooleanResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
+import org.apache.dolphinscheduler.api.dto.project.ProjectDeleteBooleanResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryRequest;
@@ -123,9 +123,9 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryProjectByCode", notes = "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456", required = true)
     })
-    @GetMapping(value = "/{code}", consumes = {"application/json"})
+    @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -143,6 +143,11 @@ public class ProjectV2Controller extends BaseController {
      * @return project list which the login user have permission to see
      */
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String", example = "test"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+    })
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
@@ -168,16 +173,16 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "delete", notes = "DELETE_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456", required = true)
     })
-    @DeleteMapping(value = "/{code}", consumes = {"application/json"})
+    @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public BooleanResponse deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable("code") Long code) {
+    public ProjectDeleteBooleanResponse deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                      @PathVariable("code") Long code) {
         Result result = projectService.deleteProject(loginUser, code);
-        return new BooleanResponse(result);
+        return new ProjectDeleteBooleanResponse(result);
     }
 
     /**
@@ -189,9 +194,9 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100", required = true)
     })
-    @GetMapping(value = "/unauth-project", consumes = {"application/json"})
+    @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -210,9 +215,9 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedProject", notes = "QUERY_AUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100", required = true)
     })
-    @GetMapping(value = "/authed-project", consumes = {"application/json"})
+    @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -231,9 +236,9 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedUser", notes = "QUERY_AUTHORIZED_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100", required = true)
     })
-    @GetMapping(value = "/authed-user", consumes = {"application/json"})
+    @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_USER)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -250,7 +255,10 @@ public class ProjectV2Controller extends BaseController {
      * @return projects which the user create and authorized
      */
     @ApiOperation(value = "queryProjectCreatedAndAuthorizedByUser", notes = "QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_NOTES")
-    @GetMapping(value = "/created-and-authed", consumes = {"application/json"})
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "loginUser", value = "LOGIN_USER", dataType = "Object", example = "\"{id:100}\"", required = true)
+    })
+    @GetMapping(value = "/created-and-authed")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -266,7 +274,10 @@ public class ProjectV2Controller extends BaseController {
      * @return all project list
      */
     @ApiOperation(value = "queryAllProjectList", notes = "QUERY_ALL_PROJECT_LIST_NOTES")
-    @GetMapping(value = "/list", consumes = {"application/json"})
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "loginUser", value = "LOGIN_USER", dataType = "Object", example = "\"{id:100}\"", required = true)
+    })
+    @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

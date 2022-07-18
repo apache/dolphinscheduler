@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api.dto.project;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 
 /**
  * boolean response
  */
-public class BooleanResponse extends Result {
+public class ProjectDeleteBooleanResponse extends Result {
 
     private Boolean data;
 
-    public BooleanResponse(Result result) {
+    public ProjectDeleteBooleanResponse(Result result) {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
