@@ -47,6 +47,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -704,6 +705,30 @@ public class UsersServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
+    }
+
+    @Test
+    public void testCreateUserIfNotExists() throws IOException {
+        User user;
+        String userName = "userTest0001";
+        String userPassword = "userTest";
+        String email = "abc@x.com";
+        String phone = "123456789";
+        String tenantCode = "tenantCode";
+        int stat = 1;
+
+        // User exists
+        Mockito.when(userMapper.existUser(userName)).thenReturn(true);
+        Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
+        Assert.assertEquals(getUser(), user);
+
+        // User not exists
+        Mockito.when(userMapper.existUser(userName)).thenReturn(false);
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
+        Assert.assertNotNull(user);
     }
 
     /**

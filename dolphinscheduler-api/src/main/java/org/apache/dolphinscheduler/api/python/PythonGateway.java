@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.python;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -421,11 +422,9 @@ public class PythonGateway {
         tenantService.updateTenant(user, id, tenantCode, queueId, desc);
     }
 
-    public void deleteTenantById(String userName, String tenantCode) throws Exception {
+    public void deleteTenantById(String userName, Integer tenantId) throws Exception {
         User user = usersService.queryUser(userName);
-        Map<String, Object> tenantResult = tenantService.queryByTenantCode(tenantCode);
-        Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
-        tenantService.deleteTenantById(user, tenant.getId());
+        tenantService.deleteTenantById(user, tenantId);
     }
 
     public void createUser(String userName,
@@ -434,13 +433,8 @@ public class PythonGateway {
                            String phone,
                            String tenantCode,
                            String queue,
-                           int state) {
-        User user = usersService.queryUser(userName);
-        if (Objects.isNull(user)) {
-            Map<String, Object> tenantResult = tenantService.queryByTenantCode(tenantCode);
-            Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
-            usersService.createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
-        }
+                           int state) throws IOException {
+        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
     }
 
     public User queryUser(int id) {
@@ -448,10 +442,7 @@ public class PythonGateway {
     }
 
     public void updateUser(String userName, int id, String userPassword, String email, String phone, String tenantCode, String queue, int state, String timeZone) throws Exception {
-        User user = usersService.queryUser(userName);
-        Map<String, Object> tenantResult = tenantService.queryByTenantCode(tenantCode);
-        Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
-        usersService.updateUser(user, id, userName, userPassword, email, tenant.getId(), phone, queue, state, timeZone);
+        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
     }
 
     public void deleteUser(String userName, int id) throws Exception {
