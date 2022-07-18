@@ -16,7 +16,6 @@
  */
 
 package org.apache.dolphinscheduler.alert;
-
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
@@ -36,12 +35,11 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +91,13 @@ public final class AlertSenderService extends Thread {
                 continue;
             }
             AlertData alertData = new AlertData();
+            if (Objects.nonNull(alert.getContent())) {
+                if (alert.getContent().charAt(0) != '[') {
+                    ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
+                    String content = JSONUtils.toJsonString(Arrays.asList(jsonNodes));
+                    alert.setContent(content);
+                }
+            }
             alertData.setId(alertId)
                     .setContent(alert.getContent())
                     .setLog(alert.getLog())
