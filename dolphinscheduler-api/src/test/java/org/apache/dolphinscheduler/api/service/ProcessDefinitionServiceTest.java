@@ -58,7 +58,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -89,6 +91,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -128,6 +131,9 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private ProjectServiceImpl projectService;
+
+    @Mock
+    private TaskPluginManager taskPluginManager;
 
     @Mock
     private ScheduleMapper scheduleMapper;
@@ -683,8 +689,14 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE)).thenReturn(result);
 
+        String taskDefinitionJson = "[{\"code\":6235374872064,\"delayTime\":\"0\",\"description\":\"\",\"environmentCode\":-1,\"failRetryInterval\":\"1\",\"failRetryTimes\":\"0\",\"flag\":\"YES\",\"name\":\"111\","
+                + "\"taskParams\":{\"localParams\":[],\"resourceList\":[],\"ruleId\":1,\"ruleInputParameter\":{\"check_type\":\"0\",\"failure_strategy\":\"0\",\"operator\":\"0\",\"src_connector_type\":0,\"src_datasource_id\":1,\"src_field\":null,\"src_table\":\"command table\",\"threshold\":\"1\"},"
+                + "\"sparkParameters\":{\"deployMode\":\"cluster\",\"driverCores\":1,\"driverMemory\":\"512M\",\"executorCores\":2,\"executorMemory\":\"2G\",\"numExecutors\":2,\"others\":\"--conf spark.yarn.maxAppAttempts=1\"}},\"taskPriority\":\"MEDIUM\",\"taskType\":\"DATA_QUALITY\",\"timeout\":0,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"workerGroup\":\"default\",\"cpuQuota\":-1,\"memoryMax\":-1}]";
+
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
+
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
-                "", "", "", 0, "root", null,"",null, ProcessExecutionTypeEnum.PARALLEL);
+                "", "", "", 0, "root", null,taskDefinitionJson,null, ProcessExecutionTypeEnum.PARALLEL);
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
     }
 
