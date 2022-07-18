@@ -416,7 +416,6 @@ public class PythonGateway {
         return tenantService.queryTenantList(user, searchVal, pageNo, pageSize);
     }
 
-    // updateTenant
     public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
         User user = usersService.queryUser(userName);
         tenantService.updateTenant(user, id, tenantCode, queueId, desc);
