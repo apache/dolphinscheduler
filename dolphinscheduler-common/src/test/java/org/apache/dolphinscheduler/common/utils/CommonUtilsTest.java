@@ -88,4 +88,10 @@ public class CommonUtilsTest {
         Assert.assertTrue(true);
     }
 
+    @Test
+    public void getHdfsTenantDir(){
+        logger.info(HadoopUtils.getHdfsTenantDir("1234"));
+        Assert.assertTrue(true);
+    }
+
 }
