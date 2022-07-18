@@ -40,7 +40,7 @@ public class ChunJunTaskChannelFactory implements TaskChannelFactory {
      * plugin name
      * Must be UNIQUE .
      *
-     * @return this alert plugin name
+     * @return this task plugin name
      */
     @Override
     public String getName() {
@@ -50,7 +50,7 @@ public class ChunJunTaskChannelFactory implements TaskChannelFactory {
     /**
      * Returns the configurable parameters that this plugin needs to display on the web ui
      *
-     * @return this alert plugin params
+     * @return this plugin params
      */
     @Override
     public List<PluginParams> getParams() {

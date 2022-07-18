@@ -38,9 +38,9 @@ public class ChunJunConstantsTest {
 
     @Test
     public void testEqualsString() {
-        Assert.assertEquals(flinkConfDir, ChunJunConstants.FLINK_CONF_DIR);
-        Assert.assertEquals(flinkLibDir, ChunJunConstants.FLINK_LIB_DIR);
-        Assert.assertEquals(hadoopConfDir, ChunJunConstants.HADOOP_CONF_DIR);
+        Assert.assertEquals(ChunJunConstants.FLINK_CONF_DIR, flinkConfDir);
+        Assert.assertEquals(ChunJunConstants.FLINK_LIB_DIR, flinkLibDir);
+        Assert.assertEquals(ChunJunConstants.HADOOP_CONF_DIR, hadoopConfDir);
     }
 
 }
