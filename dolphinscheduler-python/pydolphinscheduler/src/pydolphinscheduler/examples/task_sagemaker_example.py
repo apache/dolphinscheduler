@@ -16,6 +16,7 @@
 # under the License.
 
 # [start workflow_declare]
+"""A example workflow for task sagemaker."""
 import json
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
@@ -32,7 +33,10 @@ sagemaker_request_data = {
     ],
 }
 
-with ProcessDefinition(name="task_sagemaker_example", tenant="tenant_exists",) as pd:
+with ProcessDefinition(
+    name="task_sagemaker_example",
+    tenant="tenant_exists",
+) as pd:
     task_sagemaker = SageMaker(
         name="task_sagemaker",
         sagemaker_request_json=json.dumps(sagemaker_request_data, indent=2),
