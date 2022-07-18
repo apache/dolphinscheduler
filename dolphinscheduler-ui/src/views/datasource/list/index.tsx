@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -61,6 +61,8 @@ const list = defineComponent({
       showDetailModal.value = true
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       changePage(1)
       columns.value = getColumns()
@@ -79,7 +81,8 @@ const list = defineComponent({
       changePage,
       changePageSize,
       onCreate,
-      onUpdatedList: updateList
+      onUpdatedList: updateList,
+      trim
     }
   },
   render() {
@@ -119,6 +122,7 @@ const list = defineComponent({
                 >
                   <div class={styles['conditions-search-input']}>
                     <NInput
+                  allowInput={this.trim}
                       v-model={[this.searchVal, 'value']}
                       placeholder={`${t('datasource.search_input_tips')}`}
                     />

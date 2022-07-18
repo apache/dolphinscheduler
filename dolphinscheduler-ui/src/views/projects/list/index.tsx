@@ -26,7 +26,7 @@ import {
   NPagination,
   NSpace
 } from 'naive-ui'
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProjectModal from './components/project-modal'
 import styles from './index.module.scss'
@@ -70,6 +70,8 @@ const list = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -87,7 +89,8 @@ const list = defineComponent({
       handleSearch,
       onCancelModal,
       onConfirmModal,
-      handleChangePageSize
+      handleChangePageSize,
+      trim
     }
   },
   render() {
@@ -106,6 +109,7 @@ const list = defineComponent({
             </NButton>
             <NSpace>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('project.list.project_tips')}

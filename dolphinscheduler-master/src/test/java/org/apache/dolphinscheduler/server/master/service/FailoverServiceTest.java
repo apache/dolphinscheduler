@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
@@ -82,6 +83,9 @@ public class FailoverServiceTest {
     @Mock
     private ProcessInstanceExecCacheManager cacheManager;
 
+    @Mock
+    private NettyExecutorManager nettyExecutorManager;
+
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -100,7 +104,7 @@ public class FailoverServiceTest {
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
         MasterFailoverService masterFailoverService =
-            new MasterFailoverService(registryClient, masterConfig, processService);
+            new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
             masterConfig,
             processService,
