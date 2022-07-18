@@ -31,7 +31,6 @@ import { useTable } from './use-table'
 import { DefaultTableWidth } from '@/common/column-width-config'
 import Card from '@/components/card'
 import DetailModal from './detail'
-import styles from './index.module.scss'
 import type { TableColumns } from './types'
 
 const list = defineComponent({
