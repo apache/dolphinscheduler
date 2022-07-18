@@ -181,17 +181,17 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check project and authorization
      *
-     * @param loginUser login user
-     * @param project project
+     * @param loginUser   login user
+     * @param project     project
      * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
     @Override
-    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,String perm) {
+    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String permission) {
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_EXIST);
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,perm)) {
+        } else if (!canOperatorPermissions(loginUser, new Object[] {project.getId()}, AuthorizationType.PROJECTS, permission)) {
             // check read permission
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
         } else {
