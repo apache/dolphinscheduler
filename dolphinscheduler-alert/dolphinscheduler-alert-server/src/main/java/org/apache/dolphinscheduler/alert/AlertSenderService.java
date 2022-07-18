@@ -16,7 +16,6 @@
  */
 
 package org.apache.dolphinscheduler.alert;
-
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
