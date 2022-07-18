@@ -150,7 +150,6 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         accessToken.setUpdateTime(new Date());
 
         int insert = accessTokenMapper.insert(accessToken);
-
         if (insert > 0) {
             result.setData(accessToken);
             putMsg(result, Status.SUCCESS);
