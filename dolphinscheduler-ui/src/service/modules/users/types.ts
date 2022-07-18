@@ -100,6 +100,7 @@ interface UserInfoRes extends UserReq, IdReq {
   alertGroup?: any
   createTime: string
   updateTime: string
+  securityConfigType: 'PASSWORD' | 'LDAP'
 }
 
 interface UserListRes {
