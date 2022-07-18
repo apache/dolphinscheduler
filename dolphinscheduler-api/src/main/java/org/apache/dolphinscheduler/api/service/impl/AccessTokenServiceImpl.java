@@ -153,7 +153,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         if (insert > 0) {
             result.setData(accessToken);
             putMsg(result, Status.SUCCESS);
-            resourcePermissionCheckService.postHandle(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), Collections.singletonList(accessToken.getId()), logger);
+            permissionPostHandle(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), Collections.singletonList(accessToken.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
