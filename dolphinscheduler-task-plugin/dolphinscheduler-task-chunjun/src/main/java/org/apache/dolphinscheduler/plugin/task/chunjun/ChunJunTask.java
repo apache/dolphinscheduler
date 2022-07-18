@@ -42,6 +42,8 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -175,48 +177,36 @@ public class ChunJunTask extends AbstractTaskExecutor {
         }
 
         // chunjun command
-        StringBuilder sbr = new StringBuilder();
+        List<String> args = new ArrayList<>();
 
-        sbr.append(CHUNJUN_PATH);
-        sbr.append(" ");
-        sbr.append("-mode");
-        sbr.append(" ");
-        sbr.append(getExecMode(chunJunParameters));
-        sbr.append(" ");
-        sbr.append("-jobType sync");
-        sbr.append(" ");
-        sbr.append("-job");
-        sbr.append(" ");
-        sbr.append(jobConfigFilePath);
-        sbr.append(" ");
-        sbr.append("-chunjunDistDir");
-        sbr.append(" ");
-        sbr.append(CHUNJUN_DIST_DIR);
+        args.add(CHUNJUN_PATH);
+        args.add("-mode");
+        args.add(getExecMode(chunJunParameters));
+        args.add("-jobType sync");
+        args.add("-job");
+        args.add(jobConfigFilePath);
+        args.add("-chunjunDistDir");
+        args.add(CHUNJUN_DIST_DIR);
 
         if (!"local".equalsIgnoreCase(getExecMode(chunJunParameters))) {
-            sbr.append(" ");
-            sbr.append("-flinkConfDir");
-            sbr.append(" ");
-            sbr.append(ChunJunConstants.FLINK_CONF_DIR);
+            args.add("-flinkConfDir");
+            args.add(ChunJunConstants.FLINK_CONF_DIR);
 
-            sbr.append(" ");
-            sbr.append("-flinkLibDir");
-            sbr.append(" ");
-            sbr.append(ChunJunConstants.FLINK_LIB_DIR);
+            args.add("-flinkLibDir");
+            args.add(ChunJunConstants.FLINK_LIB_DIR);
 
-            sbr.append(" ");
-            sbr.append("-hadoopConfDir");
-            sbr.append(" ");
-            sbr.append(ChunJunConstants.HADOOP_CONF_DIR);
+            args.add("-hadoopConfDir");
+            args.add(ChunJunConstants.HADOOP_CONF_DIR);
         }
 
         if (chunJunParameters.getOthers() != null) {
-            sbr.append(" ");
-            sbr.append(chunJunParameters.getOthers());
+            args.add(chunJunParameters.getOthers());
         }
 
+        String command = String.join(" ", args);
+
         // replace placeholder
-        String chunjunCommand = ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        String chunjunCommand = ParameterUtils.convertParameterPlaceholders(command, ParamUtils.convert(paramsMap));
 
         logger.info("raw script : {}", chunjunCommand);
 
