@@ -22,11 +22,14 @@ import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,9 +53,6 @@ public class PythonGatewayTest {
 
     @Mock
     private ProjectMapper projectMapper;
-
-    @Mock
-    private TenantMapper tenantMapper;
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -96,6 +96,7 @@ public class PythonGatewayTest {
         Assert.assertEquals((long) result.get("taskDefinitionCode"), taskDefinition.getCode());
     }
 
+    @Test
     public void testCreateResource() {
         User user = getTestUser();
         String resourceDir = "/dir1/dir2/";
@@ -114,6 +115,7 @@ public class PythonGatewayTest {
                 user.getUserName(), resourceFullName, desc, content);
         Assert.assertEquals(id, resourceId);
     }
+
 
     @Test
     public void testQueryResourcesFileInfo() {
@@ -149,7 +151,6 @@ public class PythonGatewayTest {
         Project project = new Project();
         project.setName("ut-project");
         project.setUserId(111);
-        project.setUserName("user111");
         project.setCode(1L);
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());
