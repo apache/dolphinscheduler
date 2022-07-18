@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, withKeys } from 'vue'
+import { defineComponent, getCurrentInstance, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
 import {
   NInput,
@@ -47,9 +47,11 @@ const login = defineComponent({
       themeStore.setDarkTheme()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     cookies.set('language', localesStore.getLocales, { path: '/' })
 
-    return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
+    return { t, handleChange, handleLogin, ...toRefs(state), localesStore, trim }
   },
   render() {
     return (
@@ -79,6 +81,7 @@ const login = defineComponent({
                 path='userName'
               >
                 <NInput
+                  allowInput={this.trim}
                   class='input-user-name'
                   type='text'
                   size='large'
@@ -94,6 +97,7 @@ const login = defineComponent({
                 path='userPassword'
               >
                 <NInput
+                  allowInput={this.trim}
                   class='input-password'
                   type='password'
                   size='large'
