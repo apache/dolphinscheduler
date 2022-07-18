@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
 import java.util.Date;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 /**
  * Task running message, means the task is running in worker.
