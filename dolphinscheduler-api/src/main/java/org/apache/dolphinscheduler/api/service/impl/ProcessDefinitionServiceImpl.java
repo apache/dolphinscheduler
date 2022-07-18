@@ -339,6 +339,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                     return result;
                 }
+
                 this.converSrcTableFormat(taskDefinitionLog);
             }
             putMsg(result, Status.SUCCESS);
