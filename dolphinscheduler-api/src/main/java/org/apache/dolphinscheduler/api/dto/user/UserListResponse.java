@@ -18,14 +18,17 @@
 package org.apache.dolphinscheduler.api.dto.user;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
 
 /**
  * user List response
  */
+@Data
 public class UserListResponse extends Result {
 
     private List<User> data;
@@ -34,25 +37,6 @@ public class UserListResponse extends Result {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
-        this.setData(objToList(result.getData()));
-    }
-
-    @Override
-    public List<User> getData() {
-        return data;
-    }
-
-    public void setData(List<User> data) {
-        this.data = data;
-    }
-
-    public List<User> objToList(Object obj) {
-        List<User> list = new ArrayList<>();
-        if (obj instanceof List<?>) {
-            for (Object o : (List<?>) obj) {
-                list.add((User) o);
-            }
-        }
-        return list;
+        this.setData(JSONUtils.toList(JSONUtils.toJsonString(result.getData()), User.class));
     }
 }
