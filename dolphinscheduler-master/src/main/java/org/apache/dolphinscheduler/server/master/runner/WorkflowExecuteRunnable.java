@@ -18,11 +18,14 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
@@ -1930,7 +1933,7 @@ public class WorkflowExecuteRunnable implements Runnable {
         Map<String, String> paramMap = JSONUtils.toMap(cmdParam);
 
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
+            String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(COMMA);
             instanceList = getRecoverTaskInstanceList(idList);
         }
         return instanceList;
@@ -1949,7 +1952,7 @@ public class WorkflowExecuteRunnable implements Runnable {
             return startNodeNameList;
         }
         if (paramMap.containsKey(CMD_PARAM_START_NODES)) {
-            startNodeNameList = Arrays.asList(paramMap.get(CMD_PARAM_START_NODES).split(Constants.COMMA));
+            startNodeNameList = Arrays.asList(paramMap.get(CMD_PARAM_START_NODES).split(COMMA));
         }
         return startNodeNameList;
     }
