@@ -89,6 +89,15 @@ public class WorkFlowPageAPI implements IWorkFlowPageAPI {
             workFlowDefinitionRequestEntityInstance.toMap(), Route.workFlowDefinition(projectCode), RequestMethod.POST));
     }
 
+    public RestResponse<Result> createWorkFlowDefinitionByTenant(String taskDefinitionName,
+                                                                 String rawScript,
+                                                                 String taskType) {
+        String projectCode = getProjectCode();
+        WorkFlowDefinitionRequestEntity workFlowDefinitionRequestEntityInstance = getWorkFlowDefinitionRequestEntityInstance(taskDefinitionName, rawScript, taskType, projectCode);
+        return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
+            workFlowDefinitionRequestEntityInstance.toMap(), Route.workFlowDefinition(projectCode), RequestMethod.POST));
+    }
+
     public RestResponse<Result> createWorkFlowDefinitionByTenantAndProjectName(String taskDefinitionName,
                                                                                String rawScript,
                                                                                String taskType,

@@ -37,7 +37,6 @@ import com.devskiller.jfairy.Fairy;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisplayName("WorkFlow Page API test")
 public class WorkFlowAPITest extends AbstractAPITest {
-    private static final String tenant = System.getProperty("user.name");
     private final Fairy fairy = Fairy.create();
     private WorkFlowPageAPI workFlowPageAPI;
 
@@ -50,7 +49,7 @@ public class WorkFlowAPITest extends AbstractAPITest {
     @DisplayName("Test shell workflowBasic workflow")
     public void testRunWorkFlow() {
         WorkFlowDefinitionResponseEntity workFlowDefinitionResponseEntity = workFlowPageAPI.createWorkFlowDefinitionByTenant(
-            "shell", "echo 123", "SHELL", tenant).getResponseDataObject(WorkFlowDefinitionResponseEntity.class);
+            "shell", "echo 123", "SHELL").getResponseDataObject(WorkFlowDefinitionResponseEntity.class);
         workFlowPageAPI.releaseWorkFlowDefinition(workFlowDefinitionResponseEntity.getName(), ReleaseState.ONLINE,
             workFlowDefinitionResponseEntity.getProjectCode(), workFlowDefinitionResponseEntity.getCode()).isResponseSuccessful();
         WorkFlowRunRequestEntity workFlowRunRequestEntity = workFlowPageAPI.getWorkFlowRunRequestEntityInstance(workFlowDefinitionResponseEntity.getCode(), new Date(), new Date());
