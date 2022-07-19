@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
@@ -30,8 +31,6 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
-
-import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -63,6 +62,7 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
+import org.apache.dolphinscheduler.dao.entity.K8s;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -318,7 +318,7 @@ public class ProcessServiceImpl implements ProcessService {
         //when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+                processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
                 saveProcessInstance(processInstance);
@@ -332,7 +332,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
+                processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
                 saveProcessInstance(processInstance);
@@ -349,13 +349,13 @@ public class ProcessServiceImpl implements ProcessService {
                 // determine whether the process is normal
                 if (update > 0) {
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                            info.getId(), 0, info.getState(), info.getId(), 0
+                        info.getId(), 0, info.getState(), info.getId(), 0
                     );
                     try {
                         Host host = new Host(info.getHost());
                         stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
                     } catch (Exception e) {
-                        logger.error("sendResultError",e );
+                        logger.error("sendResultError", e);
                     }
                 }
             }
@@ -791,10 +791,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                getCommandTypeIfComplement(processInstance, command),
-                processInstance.getScheduleTime(), timezoneId);
+            processDefinition.getGlobalParamMap(),
+            processDefinition.getGlobalParamList(),
+            getCommandTypeIfComplement(processInstance, command),
+            processInstance.getScheduleTime(), timezoneId);
         processInstance.setGlobalParams(globalParams);
 
         // set process instance priority
@@ -944,10 +944,10 @@ public class ProcessServiceImpl implements ProcessService {
 
             // Recalculate global parameters after rerun.
             String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    commandTypeIfComplement,
-                    processInstance.getScheduleTime(), timezoneId);
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                commandTypeIfComplement,
+                processInstance.getScheduleTime(), timezoneId);
             processInstance.setGlobalParams(globalParams);
             processInstance.setProcessDefinition(processDefinition);
         }
@@ -1138,9 +1138,9 @@ public class ProcessServiceImpl implements ProcessService {
         String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
         String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId);
+            processDefinition.getGlobalParamMap(),
+            processDefinition.getGlobalParamList(),
+            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), timezoneId);
         processInstance.setGlobalParams(globalParams);
     }
 
@@ -1304,9 +1304,9 @@ public class ProcessServiceImpl implements ProcessService {
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
         if (task == null) {
             logger.error("Save taskInstance to db error, task name:{}, process id:{} state: {} ",
-                         taskInstance.getName(),
-                         taskInstance.getProcessInstance().getId(),
-                         processInstance.getState());
+                taskInstance.getName(),
+                taskInstance.getProcessInstance().getId(),
+                processInstance.getState());
             return null;
         }
 
@@ -1553,9 +1553,9 @@ public class ProcessServiceImpl implements ProcessService {
         ExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.typeIsFinished() || processInstanceState == ExecutionStatus.READY_STOP) {
             logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
-                        processInstance.getId(),
-                        processInstanceState,
-                        taskInstance.getTaskCode());
+                processInstance.getId(),
+                processInstanceState,
+                taskInstance.getTaskCode());
             return null;
         }
         if (processInstanceState == ExecutionStatus.READY_PAUSE) {
@@ -2980,7 +2980,7 @@ public class ProcessServiceImpl implements ProcessService {
             return null;
         }
         try {
-            while (taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(), taskGroup.getUseSize()
+            while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode() && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(), taskGroup.getUseSize()
                 , thisTaskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1) {
                 thisTaskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
                 if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.RELEASE) {
