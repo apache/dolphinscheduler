@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
@@ -29,6 +28,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import ClusterModal from './components/cluster-modal'
+import Card from '@/components/card'
 
 const clusterManage = defineComponent({
   name: 'cluster-manage',
@@ -68,6 +68,8 @@ const clusterManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,7 +87,8 @@ const clusterManage = defineComponent({
       onConfirmModal,
       onUpdatePageSize,
       handleModalChange,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -102,7 +105,7 @@ const clusterManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               size='small'
@@ -114,6 +117,7 @@ const clusterManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 clearable
                 v-model={[this.searchVal, 'value']}
@@ -126,8 +130,8 @@ const clusterManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.cluster_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -149,7 +153,7 @@ const clusterManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <ClusterModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

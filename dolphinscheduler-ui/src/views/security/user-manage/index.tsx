@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, getCurrentInstance, toRefs } from 'vue'
 import {
   NButton,
   NInput,
   NIcon,
   NSpace,
   NDataTable,
-  NPagination,
-  NCard
+  NPagination
 } from 'naive-ui'
-import UserDetailModal from './components/user-detail-modal'
-import AuthorizeModal from './components/authorize-modal'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
+import UserDetailModal from './components/user-detail-modal'
+import AuthorizeModal from './components/authorize-modal'
+import Card from '@/components/card'
 
 const UsersManage = defineComponent({
   name: 'user-manage',
@@ -50,6 +50,7 @@ const UsersManage = defineComponent({
     const onAuthorizeModalCancel = () => {
       state.authorizeModalShow = false
     }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
       t,
@@ -60,13 +61,14 @@ const UsersManage = defineComponent({
       onAddUser,
       onUpdatedList: updateList,
       onDetailModalCancel,
-      onAuthorizeModalCancel
+      onAuthorizeModalCancel,
+      trim
     }
   },
   render() {
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               onClick={this.onAddUser}
@@ -77,7 +79,8 @@ const UsersManage = defineComponent({
               {this.t('security.user.create_user')}
             </NButton>
             <NSpace>
-              <NInput v-model:value={this.searchVal} size='small' clearable />
+              <NInput
+                  allowInput={this.trim} v-model:value={this.searchVal} size='small' clearable />
               <NButton type='primary' size='small' onClick={this.onUpdatedList}>
                 <NIcon>
                   <SearchOutlined />
@@ -85,8 +88,8 @@ const UsersManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={this.t('menu.user_manage')}>
           <NSpace vertical>
             <NDataTable
               row-class-name='items'
@@ -108,7 +111,7 @@ const UsersManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <UserDetailModal
           show={this.detailModalShow}
           currentRecord={this.currentRecord}

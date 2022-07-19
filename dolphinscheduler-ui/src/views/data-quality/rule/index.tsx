@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, ref, toRefs } from 'vue'
 import {
   NSpace,
   NInput,
@@ -73,6 +73,8 @@ const TaskResult = defineComponent({
       ruleEntryData.value = ruleJson
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       requestTableData()
     })
@@ -87,7 +89,8 @@ const TaskResult = defineComponent({
       onConfirm,
       onSearch,
       ruleEntryData,
-      viewRuleEntry
+      viewRuleEntry,
+      trim
     }
   },
   render() {
@@ -111,6 +114,7 @@ const TaskResult = defineComponent({
         <NCard>
           <NSpace justify='end'>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.searchVal, 'value']}
               size='small'
               placeholder={t('data_quality.rule.name')}

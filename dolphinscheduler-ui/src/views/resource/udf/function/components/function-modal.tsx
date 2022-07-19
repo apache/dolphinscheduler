@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, watch, onMounted, ref } from 'vue'
+import { defineComponent, toRefs, PropType, watch, onMounted, ref, getCurrentInstance } from 'vue'
 import {
   NUpload,
   NIcon,
@@ -84,6 +84,8 @@ export default defineComponent({
       uploadState.uploadForm.file = file.file
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       getUdfList()
     })
@@ -92,7 +94,7 @@ export default defineComponent({
       () => props.row,
       () => {
         variables.uploadShow = false
-        state.functionForm.type = props.row.type
+        state.functionForm.type = props.row.type || 'HIVE'
         state.functionForm.funcName = props.row.funcName
         state.functionForm.className = props.row.className
         state.functionForm.resourceId = props.row.resourceId || -1
@@ -108,7 +110,8 @@ export default defineComponent({
       handleUpload,
       ...toRefs(state),
       ...toRefs(uploadState),
-      ...toRefs(variables)
+      ...toRefs(variables),
+      trim
     }
   },
   render() {
@@ -143,6 +146,7 @@ export default defineComponent({
             path='funcName'
           >
             <NInput
+                  allowInput={this.trim}
               v-model={[this.functionForm.funcName, 'value']}
               placeholder={t('resource.function.enter_udf_unction_name_tips')}
               class='input-function-name'
@@ -153,6 +157,7 @@ export default defineComponent({
             path='className'
           >
             <NInput
+                  allowInput={this.trim}
               v-model={[this.functionForm.className, 'value']}
               placeholder={t('resource.function.enter_package_name_tips')}
               class='input-class-name'
@@ -212,6 +217,7 @@ export default defineComponent({
               >
                 <NInputGroup>
                   <NInput
+                  allowInput={this.trim}
                     v-model={[this.uploadForm.name, 'value']}
                     placeholder={t('resource.function.enter_name_tips')}
                   />
@@ -237,6 +243,7 @@ export default defineComponent({
                 style={{ marginBottom: '5px' }}
               >
                 <NInput
+                  allowInput={this.trim}
                   type='textarea'
                   v-model={[this.uploadForm.description, 'value']}
                   placeholder={t('resource.function.enter_description_tips')}
@@ -256,6 +263,7 @@ export default defineComponent({
             path='description'
           >
             <NInput
+                  allowInput={this.trim}
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}

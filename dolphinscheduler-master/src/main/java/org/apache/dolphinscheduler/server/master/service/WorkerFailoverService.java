@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
@@ -115,10 +115,10 @@ public class WorkerFailoverService {
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
             try {
-                ProcessInstance processInstance =
-                    processInstanceCacheMap.computeIfAbsent(taskInstance.getProcessInstanceId(), k -> {
-                        WorkflowExecuteRunnable workflowExecuteRunnable =
-                            cacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
+                ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
+                    taskInstance.getProcessInstanceId(), k -> {
+                        WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
+                            taskInstance.getProcessInstanceId());
                         if (workflowExecuteRunnable == null) {
                             return null;
                         }
@@ -167,6 +167,7 @@ public class WorkerFailoverService {
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
                 .create();
 
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {

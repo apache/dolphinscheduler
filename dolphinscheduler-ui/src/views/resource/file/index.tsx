@@ -16,7 +16,7 @@
  */
 
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, reactive, Ref } from 'vue'
+import { defineComponent, onMounted, ref, reactive, Ref, getCurrentInstance } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -167,6 +167,8 @@ export default defineComponent({
       }
     ])
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       const currFileId = Number(router.currentRoute.value.params.id) || -1
       if (currFileId === -1) {
@@ -235,7 +237,8 @@ export default defineComponent({
       handleGoRoot,
       pagination: paginationReactive,
       renameInfo,
-      breadcrumbItemsRef
+      breadcrumbItemsRef,
+      trim
     }
   },
   render() {
@@ -282,6 +285,7 @@ export default defineComponent({
                 </div>
                 <div class={styles.list}>
                   <NInput
+                  allowInput={this.trim}
                     placeholder={t('resource.file.enter_keyword_tips')}
                     v-model={[this.searchRef, 'value']}
                   />

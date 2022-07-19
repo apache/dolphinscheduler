@@ -15,12 +15,8 @@
  * limitations under the License.
  */
 
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+const trim = (value: string) => {
+  return !value.startsWith(' ') && !value.endsWith(' ')
 }
+
+export default trim

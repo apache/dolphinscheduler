@@ -23,12 +23,17 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
@@ -62,13 +67,17 @@ public class MasterFailoverService {
     private final ProcessService processService;
     private final String localAddress;
 
+    private final NettyExecutorManager nettyExecutorManager;
+
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
-                                 @NonNull ProcessService processService) {
+                                 @NonNull ProcessService processService,
+                                 @NonNull NettyExecutorManager nettyExecutorManager) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
         this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.nettyExecutorManager = nettyExecutorManager;
 
     }
 
@@ -114,16 +123,18 @@ public class MasterFailoverService {
      * @param masterHost master host
      */
     private void doFailoverMaster(@NonNull String masterHost) {
-        LOGGER.info("Master[{}] failover starting, need to failover process", masterHost);
         StopWatch failoverTimeCost = StopWatch.createStarted();
 
-        Optional<Date> masterStartupTimeOptional =
-            getServerStartupTime(registryClient.getServerList(NodeType.MASTER), masterHost);
-        List<ProcessInstance> needFailoverProcessInstanceList =
-            processService.queryNeedFailoverProcessInstances(masterHost);
+        Optional<Date> masterStartupTimeOptional = getServerStartupTime(registryClient.getServerList(NodeType.MASTER),
+                                                                        masterHost);
+        List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(
+            masterHost);
+        if (CollectionUtils.isEmpty(needFailoverProcessInstanceList)) {
+            return;
+        }
 
         LOGGER.info(
-            "Master[{}] failover there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
+            "Master[{}] failover starting there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
             masterHost,
             needFailoverProcessInstanceList.size(),
             needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
@@ -136,6 +147,11 @@ public class MasterFailoverService {
                     LOGGER.info("WorkflowInstance doesn't need to failover");
                     continue;
                 }
+                // todo: use batch query
+                ProcessDefinition processDefinition
+                    = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                                                           processInstance.getProcessDefinitionVersion());
+                processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstanceId);
                 for (TaskInstance taskInstance : taskInstanceList) {
@@ -205,12 +221,24 @@ public class MasterFailoverService {
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
                 .create();
 
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {
                 // only kill yarn job if exists , the local thread has exited
                 LOGGER.info("TaskInstance failover begin kill the task related yarn job");
                 ProcessUtils.killYarnJob(taskExecutionContext);
+            }
+            // kill worker task, When the master failover and worker failover happened in the same time,
+            // the task may not be failover if we don't set NEED_FAULT_TOLERANCE.
+            // This can be improved if we can load all task when cache a workflowInstance in memory
+            try {
+                TaskKillRequestCommand killCommand = new TaskKillRequestCommand(taskInstance.getId());
+                Host workerHost = Host.of(taskInstance.getHost());
+                nettyExecutorManager.doExecute(workerHost, killCommand.convert2Command());
+                LOGGER.info("Failover task success, has killed the task in worker: {}", taskInstance.getHost());
+            } catch (ExecuteException e) {
+                LOGGER.error("Kill task failed", e);
             }
         } else {
             LOGGER.info("The failover taskInstance is a master task");

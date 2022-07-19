@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, onMounted, watch } from 'vue'
+import { defineComponent, toRefs, onMounted, watch, getCurrentInstance } from 'vue'
 import {
   NButton,
   NInput,
   NIcon,
   NDataTable,
   NPagination,
-  NCard,
   NSpace
 } from 'naive-ui'
 import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
-import TenantModal from './components/tenant-modal'
 import { useI18n } from 'vue-i18n'
+import TenantModal from './components/tenant-modal'
+import Card from '@/components/card'
 
 const tenementManage = defineComponent({
   name: 'tenement-manage',
@@ -68,6 +68,8 @@ const tenementManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,14 +87,15 @@ const tenementManage = defineComponent({
       onCancelModal,
       onConfirmModal,
       handleSearch,
-      handleChangePageSize
+      handleChangePageSize,
+      trim
     }
   },
   render() {
     const { t, loadingRef } = this
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               size='small'
@@ -104,6 +107,7 @@ const tenementManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.tenant.search_tips')}
@@ -116,8 +120,8 @@ const tenementManage = defineComponent({
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.tenant_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -139,7 +143,7 @@ const tenementManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <TenantModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

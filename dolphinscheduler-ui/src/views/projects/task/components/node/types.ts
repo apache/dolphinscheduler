@@ -298,6 +298,8 @@ interface ITaskParams {
   stepsDefineJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
+  zeppelinRestEndpoint?: string
+  restEndpoint?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
