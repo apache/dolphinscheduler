@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.alert.runner;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.AlertConfig;
 import org.apache.dolphinscheduler.alert.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.AlertSenderService;
@@ -34,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -144,7 +147,10 @@ public class AlertSenderServiceTest {
     public void testRun() {
         int alertGroupId = 1;
         String title = "alert mail test title";
-        String content = "alert mail test content";
+        String content = "{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
+                + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
+                + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
+                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}";
         List<Alert> alertList = new ArrayList<>();
         Alert alert = new Alert();
         alert.setAlertGroupId(alertGroupId);
@@ -176,6 +182,7 @@ public class AlertSenderServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
         Assert.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
+        when(alertDao.listInstanceByAlertGroupId(anyInt())).thenReturn(Collections.singletonList(new AlertPluginInstance()));
         alertSenderService.send(alertList);
     }
 }
