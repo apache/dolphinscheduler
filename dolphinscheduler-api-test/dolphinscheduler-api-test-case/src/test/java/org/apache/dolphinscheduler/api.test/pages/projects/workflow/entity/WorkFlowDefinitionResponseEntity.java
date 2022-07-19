@@ -34,7 +34,7 @@ public class WorkFlowDefinitionResponseEntity extends AbstractBaseEntity {
     /**
      * code
      */
-    private long code;
+    private String code;
 
     /**
      * name
@@ -54,7 +54,7 @@ public class WorkFlowDefinitionResponseEntity extends AbstractBaseEntity {
     /**
      * project code
      */
-    private long projectCode;
+    private String projectCode;
 
     /**
      * description
@@ -159,12 +159,20 @@ public class WorkFlowDefinitionResponseEntity extends AbstractBaseEntity {
         this.id = id;
     }
 
-    public long getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(long code) {
+    public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(String projectCode) {
+        this.projectCode = projectCode;
     }
 
     public String getName() {
@@ -189,14 +197,6 @@ public class WorkFlowDefinitionResponseEntity extends AbstractBaseEntity {
 
     public void setReleaseState(ReleaseState releaseState) {
         this.releaseState = releaseState;
-    }
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
     }
 
     public String getDescription() {

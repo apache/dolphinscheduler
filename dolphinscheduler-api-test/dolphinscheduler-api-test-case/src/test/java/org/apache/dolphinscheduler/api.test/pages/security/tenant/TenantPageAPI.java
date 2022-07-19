@@ -87,17 +87,15 @@ public class TenantPageAPI implements ITenantPageAPI {
 
     @Override
     public TenantResponseEntity createTenant() {
-        TenantRequestEntity tenantRequestEntity = new TenantRequestEntity();
-        tenantRequestEntity.setTenantCode(tenant);
-        tenantRequestEntity.setQueueId(1);
-        return createTenantByTenantEntity(tenantRequestEntity);
+        return createTenantByTenantEntity(getTenantEntityInstance(tenant, 1));
     }
 
     @Override
     public TenantResponseEntity createTenantByTenantEntity(TenantRequestEntity tenantRequestEntity) {
-        return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
-            tenantRequestEntity.toMap(), Route.tenants(), RequestMethod.POST)).
-            getResponse().jsonPath().getObject(Constants.DATA_KEY, TenantResponseEntity.class);
+        RestResponse<Result> resultRestResponse = toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
+            tenantRequestEntity.toMap(), Route.tenants(), RequestMethod.POST));
+        resultRestResponse.isResponseSuccessful();
+        return resultRestResponse.getResponse().jsonPath().getObject(Constants.DATA_KEY, TenantResponseEntity.class);
     }
 
     @Override

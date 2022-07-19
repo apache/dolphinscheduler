@@ -34,8 +34,9 @@ public final class Constants {
     public static final int DOLPHINSCHEDULER_API_PORT = 12345;
 
     public static final String USER_NAME = "admin";
-
     public static final String USER_PASSWD = "dolphinscheduler123";
+
+    public static final String USER_EMAIL = "admin@dolphinscheduler.com";
 
     /**
      * backend api request header's content type

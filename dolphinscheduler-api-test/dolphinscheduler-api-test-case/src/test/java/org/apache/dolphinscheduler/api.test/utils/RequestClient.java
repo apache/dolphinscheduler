@@ -20,8 +20,6 @@
 package org.apache.dolphinscheduler.api.test.utils;
 
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
 
 import java.util.HashMap;
 import java.util.Map;

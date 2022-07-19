@@ -28,6 +28,8 @@ public interface IProjectPageAPI extends IPageAPI {
 
     ProjectResponseEntity createProject();
 
+    ProjectResponseEntity createProject(String projectName);
+
     ProjectResponseEntity createProjectByProjectEntity(ProjectRequestEntity projectRequestEntity);
 
     ProjectRequestEntity  getProjectEntityInstance();

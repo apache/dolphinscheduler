@@ -21,6 +21,7 @@ import static io.restassured.RestAssured.given;
 
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.core.common.RequestMethod;
+import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
 import org.apache.dolphinscheduler.api.test.utils.Result;
 
@@ -38,9 +39,9 @@ public interface IPageAPI {
     default Response restRequestByRequestMap(RequestSpecification request, String sessionId,
                                              Map<String, ?> map, String url, RequestMethod requestMethod) {
         RequestSpecification rs = request.
-                cookies(Constants.SESSION_ID_KEY, sessionId).
-                formParams(map).
-                when();
+            cookies(Constants.SESSION_ID_KEY, sessionId).
+            formParams(map).
+            when();
 
         if (requestMethod == RequestMethod.PUT) {
             return rs.put(url);
@@ -53,4 +54,7 @@ public interface IPageAPI {
         return given();
     }
 
+    default String entityToJson(Object object) {
+        return JSONUtils.toJsonString(object);
+    }
 }

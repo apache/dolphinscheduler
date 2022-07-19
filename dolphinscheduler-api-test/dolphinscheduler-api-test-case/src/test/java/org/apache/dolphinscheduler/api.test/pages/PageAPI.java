@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.test.pages;
 
+import static io.restassured.RestAssured.given;
+
 import org.apache.dolphinscheduler.api.test.base.IPageAPI;
 import org.apache.dolphinscheduler.api.test.core.common.Constants;
 import org.apache.dolphinscheduler.api.test.utils.RestResponse;
@@ -36,6 +38,16 @@ public class PageAPI implements IPageAPI {
             when().
             post(Route.login());
         return new RestResponse<>(Result.class, resp);
+    }
+
+    public static String getSessionId() {
+        Response resp = given().
+            spec(requestSpec()).
+            formParam(Constants.USER_NAME_KEY, Constants.USER_NAME).
+            formParam(Constants.USER_PASSWD_KEY, Constants.USER_PASSWD).
+            when().
+            post(Route.login());
+        return new RestResponse<>(Result.class, resp).getResponse().getCookie(Constants.SESSION_ID_KEY);
     }
 
     public static RestResponse<Result> releaseSession(RequestSpecification request, RequestSpecification reqSpec, String sessionId) {

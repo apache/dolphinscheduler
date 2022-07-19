@@ -56,7 +56,7 @@ public class RestResponse<T> implements IRestResponse<T> {
 
     public ValidatableResponse isResponseSuccessful() {
         return response.then().
-                body(Constants.CODE_KEY, equalTo(0));
+            body(Constants.CODE_KEY, equalTo(0));
     }
 
     public String getStatusDescription() {
@@ -69,6 +69,10 @@ public class RestResponse<T> implements IRestResponse<T> {
 
     public Object getResponseData() {
         return Objects.requireNonNull(JSONUtils.parseObject(getContent(), Result.class)).getData();
+    }
+
+    public <T> T getResponseDataObject(Class<T> objectType) {
+        return getResponse().jsonPath().getObject(Constants.DATA_KEY, objectType);
     }
 
     public <T> T getResponseJsonData(Class<T> targetType) {

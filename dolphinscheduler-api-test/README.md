@@ -41,6 +41,6 @@ the `docker-compose.yaml` files to automatically set up the environment in the t
 ```java
 
 @DolphinScheduler(composeFiles = "docker/tenant/docker-compose.yaml")
-class TenantAPITest {
+class LoginAPITest {
 }
 ```

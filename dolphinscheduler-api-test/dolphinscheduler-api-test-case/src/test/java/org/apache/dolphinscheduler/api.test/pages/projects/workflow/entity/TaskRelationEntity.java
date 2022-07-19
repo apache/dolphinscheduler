@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.test.pages.projects.workflow.entity;
 
 import org.apache.dolphinscheduler.api.test.base.AbstractBaseEntity;
+import org.apache.dolphinscheduler.api.test.utils.enums.ConditionType;
 
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class TaskRelationEntity extends AbstractBaseEntity {
 
     public int postTaskVersion;
 
-    public String conditionType;
+    public ConditionType conditionType;
 
     public Map<String, String> conditionParams;
 
@@ -76,11 +77,11 @@ public class TaskRelationEntity extends AbstractBaseEntity {
         this.postTaskVersion = postTaskVersion;
     }
 
-    public String getConditionType() {
+    public ConditionType getConditionType() {
         return conditionType;
     }
 
-    public void setConditionType(String conditionType) {
+    public void setConditionType(ConditionType conditionType) {
         this.conditionType = conditionType;
     }
 

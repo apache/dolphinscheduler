@@ -52,10 +52,19 @@ public class ProjectPageAPI implements IProjectPageAPI {
     }
 
     @Override
+    public ProjectResponseEntity createProject(String projectName) {
+        ProjectRequestEntity projectEntityInstance = getProjectEntityInstance(projectName);
+        return createProjectByProjectEntity(projectEntityInstance);
+    }
+
+    @Override
     public ProjectResponseEntity createProjectByProjectEntity(ProjectRequestEntity projectRequestEntity) {
-        return toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
-            projectRequestEntity.toMap(), Route.projects(), RequestMethod.POST)).
-            getResponse().jsonPath().getObject(Constants.DATA_KEY, ProjectResponseEntity.class);
+        RestResponse<Result> resultRestResponse = toResponse(restRequestByRequestMap(getRequestNewInstance().spec(reqSpec), sessionId,
+            projectRequestEntity.toMap(), Route.projects(), RequestMethod.POST));
+
+        resultRestResponse.isResponseSuccessful();
+
+        return resultRestResponse.getResponse().jsonPath().getObject(Constants.DATA_KEY, ProjectResponseEntity.class);
     }
 
     @Override
