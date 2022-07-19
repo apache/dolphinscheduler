@@ -371,7 +371,7 @@ public class ProcessServiceTest {
         command5.setCommandType(CommandType.START_PROCESS);
         command5.setDryRun(Constants.DRY_RUN_FLAG_NO);
         Mockito.when(commandMapper.deleteById(5)).thenReturn(1);
-        ProcessInstance processInstance1 = processService.handleCommand(logger, host, command5);
+        ProcessInstance processInstance1 = processService.handleCommand(host, command5);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
 
         ProcessDefinition processDefinition1 = new ProcessDefinition();
@@ -426,7 +426,7 @@ public class ProcessServiceTest {
         command7.setProcessDefinitionVersion(1);
         Mockito.when(commandMapper.deleteById(7)).thenReturn(1);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1, Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
-        ProcessInstance processInstance8 = processService.handleCommand(logger, host, command7);
+        ProcessInstance processInstance8 = processService.handleCommand(host, command7);
         Assert.assertTrue(processInstance8 == null);
 
         ProcessDefinition processDefinition2 = new ProcessDefinition();
