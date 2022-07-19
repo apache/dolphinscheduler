@@ -115,8 +115,7 @@ public class SeatunnelTask extends AbstractTaskExecutor {
         args.addAll(buildOptions());
 
         String command = String.join(" ", args);
-        String engineType = seatunnelParameters.getEngine().name().toLowerCase();
-        logger.info("SeaTunnel {} task command: {}", engineType, command);
+        logger.info("SeaTunnel task command: {}", command);
 
         return command;
     }
