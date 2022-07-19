@@ -73,7 +73,7 @@ public class SecurityConfig {
         return authenticator;
     }
 
-    public String getType(){
+    public String getType() {
         return type;
     }
 }
