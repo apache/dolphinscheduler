@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.AlertConfig;
 import org.apache.dolphinscheduler.alert.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.AlertSenderService;

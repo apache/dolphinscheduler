@@ -38,6 +38,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,7 +101,7 @@ public final class AlertSenderService extends Thread {
             if (Objects.nonNull(alert.getContent())) {
                 if (alert.getContent().charAt(0) != '[') {
                     ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
-                    String content = JSONUtils.toJsonString(Arrays.asList(jsonNodes));
+                    String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
                     alert.setContent(content);
                 }
             }
