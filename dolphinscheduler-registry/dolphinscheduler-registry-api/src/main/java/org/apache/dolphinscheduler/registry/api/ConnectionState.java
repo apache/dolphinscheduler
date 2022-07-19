@@ -20,7 +20,7 @@
 package org.apache.dolphinscheduler.registry.api;
 
 /**
- * Connection State Between client and registry center(Etcd,MySql,Zookeeper)
+ * Connection state between client and registry center(Etcd, MySql, Zookeeper)
  */
 public enum ConnectionState {
     CONNECTED,

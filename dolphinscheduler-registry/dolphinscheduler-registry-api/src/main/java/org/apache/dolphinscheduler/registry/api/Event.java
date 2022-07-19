@@ -26,7 +26,7 @@ public class Event {
     private String path;
     // The value corresponding to the path
     private String data;
-    // The event type {ADD, REMOVE ,UPDATE}
+    // The event type {ADD, REMOVE, UPDATE}
     private Type type;
 
     public Event(String key, String path, String data, Type type) {

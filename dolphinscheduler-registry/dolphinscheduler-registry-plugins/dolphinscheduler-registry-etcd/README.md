@@ -4,8 +4,7 @@ This module is the etcd registry plugin module, this plugin will use etcd as the
 
 # How to use
 
-If you want to set the registry center as mysql,you need to set the registry properties in master/worker/api's appplication.yml
-
+If you want to set the registry center as etcd, you need to set the registry properties in master/worker/api's appplication.yml
 ```yaml
 registry:
   type: etcd

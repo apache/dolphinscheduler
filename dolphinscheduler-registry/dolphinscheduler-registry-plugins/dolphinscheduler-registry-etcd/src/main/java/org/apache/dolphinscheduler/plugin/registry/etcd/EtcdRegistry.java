@@ -49,13 +49,13 @@ import io.etcd.jetcd.ClientBuilder;
 import io.etcd.jetcd.KeyValue;
 import io.etcd.jetcd.Lease;
 import io.etcd.jetcd.Lock;
-import io.etcd.jetcd.Util;
 import io.etcd.jetcd.Watch;
 import io.etcd.jetcd.options.DeleteOption;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
+import io.etcd.jetcd.support.Util;
 import io.etcd.jetcd.watch.WatchEvent;
 
 /**

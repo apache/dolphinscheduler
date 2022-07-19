@@ -34,26 +34,25 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.etcd.jetcd.launcher.EtcdCluster;
 import io.etcd.jetcd.test.EtcdClusterExtension;
 
 public class EtcdRegistryTest {
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
     @RegisterExtension
-    static final EtcdCluster server = new EtcdClusterExtension("test-etcd", 1);
-
+    public static final EtcdClusterExtension server = EtcdClusterExtension.builder()
+            .withNodes(1)
+            .withImage("ibmcom/etcd:3.2.24")
+            .build();
     EtcdRegistry registry;
 
     @Before
-    public void before() {
+    public void before() throws InterruptedException {
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
-        server.start();
-
-        properties.setEndpoints(String.valueOf(server.getClientEndpoints()));
+        server.restart();
+        properties.setEndpoints(String.valueOf(server.clientEndpoints().get(0)));
         registry = new EtcdRegistry(properties);
-
-        registry.put("/sub", "", false);
+        registry.put("/sub", "sub", false);
     }
 
     @Test
@@ -131,6 +130,5 @@ public class EtcdRegistryTest {
     @After
     public void after() throws IOException {
         registry.close();
-        server.close();
     }
 }

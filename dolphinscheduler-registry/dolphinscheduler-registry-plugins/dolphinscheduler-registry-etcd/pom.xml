@@ -33,10 +33,6 @@
             <artifactId>dolphinscheduler-registry-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-common</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.etcd</groupId>
             <artifactId>jetcd-core</artifactId>
         </dependency>

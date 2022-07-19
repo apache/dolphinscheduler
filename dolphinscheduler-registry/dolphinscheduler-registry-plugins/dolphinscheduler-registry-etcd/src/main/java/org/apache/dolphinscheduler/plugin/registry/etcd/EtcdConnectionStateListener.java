@@ -26,12 +26,10 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import io.etcd.jetcd.Client;
-import io.grpc.ManagedChannel;
 
 /**
  * Get the connection status by listening to the Client's Channel
@@ -40,8 +38,6 @@ public class EtcdConnectionStateListener implements AutoCloseable {
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
     // A thread pool that periodically obtains connection status
     private final ScheduledExecutorService scheduledExecutorService;
-    // Client's Channel
-    private AtomicReference<ManagedChannel> channel;
     // monitored client
     private Client client;
     // The state of the last monitor
@@ -50,7 +46,6 @@ public class EtcdConnectionStateListener implements AutoCloseable {
     private long delay = 500L;
     public EtcdConnectionStateListener(Client client) {
         this.client = client;
-        channel = new AtomicReference<>();
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
                 1,
                 new ThreadFactoryBuilder().setNameFormat("EtcdConnectionStateListenerThread").setDaemon(true).build());
@@ -71,9 +66,8 @@ public class EtcdConnectionStateListener implements AutoCloseable {
      * @return the current connection state
      * @throws if there is a exception, return is DISCONNECTED
      */
-    private ConnectionState isConnected() {
+    private ConnectionState currentConnectivityState() {
         try {
-            // Use Get() to ensure Future completes
             client.getLeaseClient().grant(1).get().getID();
             return ConnectionState.CONNECTED;
         } catch (Exception e) {
@@ -86,7 +80,7 @@ public class EtcdConnectionStateListener implements AutoCloseable {
      */
     public void start() {
         this.scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            ConnectionState currentConnectionState = isConnected();
+            ConnectionState currentConnectionState = currentConnectivityState();
             if (currentConnectionState == connectionState) {
                 return;
             }

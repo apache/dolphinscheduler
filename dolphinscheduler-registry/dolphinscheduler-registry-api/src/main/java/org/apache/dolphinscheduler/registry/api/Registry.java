@@ -24,25 +24,22 @@ import java.util.Collection;
 
 /**
  * Registry
- *
- * <p>
- * The implementation may throw RegistryException during function call
  */
 public interface Registry extends Closeable {
     /**
      * Watch the change of this path and subpath.
      * The type of change contains [ADD,DELETE,UPDATE]
-     * @return if there is not a Exception, the result is true.
+     * {@code true} if succeeded.
      */
     boolean subscribe(String path, SubscribeListener listener);
 
     /**
-     * remove the SubscribeListener which subscribe this path
+     * Remove the path from the subscribe list.
      */
     void unsubscribe(String path);
 
     /**
-     * addd a connection listener to collection
+     * Add a connection listener to collection.
      */
     void addConnectionStateListener(ConnectionListener listener);
 
@@ -67,7 +64,7 @@ public interface Registry extends Closeable {
     void delete(String key);
 
     /**
-     * This function will get the subdirectory of {@param key}
+     * @return {@code true} if key exists.
      * E.g: registry contains  the following keys:[/test/test1/test2,]
      * if the key: /test
      * Return: test1
