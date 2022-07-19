@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
@@ -26,7 +28,9 @@ import java.util.List;
 /**
  * jupyter parameters
  */
-@Data
+@Getter
+@Setter
+@ToString
 public class JupyterParameters extends AbstractParameters {
 
     /**
