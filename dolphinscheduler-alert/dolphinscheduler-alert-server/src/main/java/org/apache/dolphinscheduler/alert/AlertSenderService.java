@@ -98,12 +98,12 @@ public final class AlertSenderService extends Thread {
                 continue;
             }
             AlertData alertData = new AlertData();
-            if (Objects.nonNull(alert.getContent())) {
-                if (alert.getContent().charAt(0) != '[') {
-                    ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
-                    String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
-                    alert.setContent(content);
-                }
+            if (Objects.nonNull(alert.getContent())
+                    && !alert.getContent().startsWith("[")
+                    && !alert.getContent().endsWith("]")) {
+                ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
+                String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
+                alert.setContent(content);
             }
             alertData.setId(alertId)
                     .setContent(alert.getContent())
