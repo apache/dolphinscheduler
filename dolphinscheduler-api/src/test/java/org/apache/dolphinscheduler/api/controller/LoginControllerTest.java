@@ -62,6 +62,7 @@ public class LoginControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
         Map<String, String> data = (Map<String, String>) result.getData();
         Assert.assertEquals(Constants.SECURITY_CONFIG_TYPE_PASSWORD,data.get(Constants.SECURITY_CONFIG_TYPE));
+        Assert.assertNotEquals(Constants.SECURITY_CONFIG_TYPE_LDAP,data.get(Constants.SECURITY_CONFIG_TYPE));
     }
 
     @Test
