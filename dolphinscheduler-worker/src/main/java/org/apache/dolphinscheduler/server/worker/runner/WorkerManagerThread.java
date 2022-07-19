@@ -143,7 +143,6 @@ public class WorkerManagerThread implements Runnable {
         while (Stopper.isRunning()) {
             try {
                 taskExecuteThread = workerExecuteQueue.take();
-                taskExecuteThread.setStorageOperate(storageOperate);
                 workerExecService.submit(taskExecuteThread);
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "
