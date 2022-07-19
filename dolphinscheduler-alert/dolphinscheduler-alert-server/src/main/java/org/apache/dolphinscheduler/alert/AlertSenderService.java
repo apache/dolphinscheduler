@@ -16,6 +16,7 @@
  */
 
 package org.apache.dolphinscheduler.alert;
+
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
@@ -35,7 +36,12 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
