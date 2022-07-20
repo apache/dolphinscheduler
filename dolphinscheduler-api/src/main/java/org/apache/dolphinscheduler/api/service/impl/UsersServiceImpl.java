@@ -1366,7 +1366,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = userMapper.queryByUserNameAccurately(userName);
         if (Objects.isNull(user)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
+            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
+            return user;
         }
 
         updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
