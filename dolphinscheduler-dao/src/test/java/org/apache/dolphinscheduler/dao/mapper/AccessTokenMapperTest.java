@@ -87,7 +87,6 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Assert.assertEquals(insertCount, deleteCount);
     }
 
-
     /**
      * test select by id
      *
