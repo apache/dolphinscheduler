@@ -36,9 +36,10 @@ import org.slf4j.LoggerFactory;
  * configuration test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
+@PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class})
 public class CommonUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
+
     @Test
     public void getSystemEnvPath() {
         String envPath;
@@ -48,7 +49,7 @@ public class CommonUtilsTest {
 
     @Test
     public void isDevelopMode() {
-        logger.info("develop mode: {}",CommonUtils.isDevelopMode());
+        logger.info("develop mode: {}", CommonUtils.isDevelopMode());
         Assert.assertTrue(true);
     }
 
@@ -89,7 +90,7 @@ public class CommonUtilsTest {
     }
 
     @Test
-    public void getHdfsTenantDir(){
+    public void getHdfsTenantDir() {
         logger.info(HadoopUtils.getHdfsTenantDir("1234"));
         Assert.assertTrue(true);
     }
