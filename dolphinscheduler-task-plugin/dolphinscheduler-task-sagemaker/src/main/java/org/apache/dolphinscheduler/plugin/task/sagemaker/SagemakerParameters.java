@@ -19,20 +19,19 @@ package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
 public class SagemakerParameters extends AbstractParameters {
 
     /**
      * request script
      */
     private String sagemakerRequestJson;
-
-    public String getSagemakerRequestJson() {
-        return sagemakerRequestJson;
-    }
-
-    public void setSagemakerRequestJson(String sagemakerRequestJson) {
-        this.sagemakerRequestJson = sagemakerRequestJson;
-    }
 
     @Override
     public boolean checkParameters() {

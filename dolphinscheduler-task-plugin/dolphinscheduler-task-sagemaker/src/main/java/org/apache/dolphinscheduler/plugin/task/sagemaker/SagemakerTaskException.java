@@ -17,29 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+/**
+ * Custom SagemakerTaskException
+ */
+public class SagemakerTaskException extends RuntimeException {
 
-import java.util.Collections;
-import java.util.List;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(TaskChannelFactory.class)
-public class SagemakerTaskChannelFactory implements TaskChannelFactory {
-    @Override
-    public TaskChannel create() {
-        return new SagemakerTaskChannel();
+    public SagemakerTaskException() {
+        super();
     }
 
-    @Override
-    public String getName() {
-        return "SAGEMAKER";
+    public SagemakerTaskException(String message) {
+        super(message);
     }
 
-    @Override
-    public List<PluginParams> getParams() {
-        return Collections.emptyList();
+    public SagemakerTaskException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

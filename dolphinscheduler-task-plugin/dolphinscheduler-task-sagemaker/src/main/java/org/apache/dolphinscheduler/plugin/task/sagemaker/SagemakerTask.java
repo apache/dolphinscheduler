@@ -74,20 +74,19 @@ public class SagemakerTask extends AbstractTaskExecutor {
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SagemakerParameters.class);
 
         if (!parameters.checkParameters()) {
-            throw new RuntimeException("Sagemaker task params is not valid");
+            throw new SagemakerTaskException("Sagemaker task params is not valid");
         }
 
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws SagemakerTaskException {
         try {
             int exitStatusCode = handleStartPipeline();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
-            logger.error("SageMaker task error", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new SagemakerTaskException("SageMaker task error", e);
         }
     }
 
@@ -97,7 +96,7 @@ public class SagemakerTask extends AbstractTaskExecutor {
         utils.stopPipelineExecution();
     }
 
-    public int handleStartPipeline() throws Exception {
+    public int handleStartPipeline() {
         int exitStatusCode;
         StartPipelineExecutionRequest request = createStartPipelineRequest();
 
@@ -106,7 +105,7 @@ public class SagemakerTask extends AbstractTaskExecutor {
             utils = new PipelineUtils(client);
             setAppIds(utils.getPipelineExecutionArn());
         } catch (Exception e) {
-            return TaskConstants.EXIT_CODE_FAILURE;
+            throw new SagemakerTaskException("can not connect aws ", e);
         }
 
         // Start pipeline
@@ -118,7 +117,7 @@ public class SagemakerTask extends AbstractTaskExecutor {
         return exitStatusCode;
     }
 
-    public StartPipelineExecutionRequest createStartPipelineRequest() throws Exception {
+    public StartPipelineExecutionRequest createStartPipelineRequest() throws SagemakerTaskException {
 
         String requestJson = parameters.getSagemakerRequestJson();
         requestJson = parseRequstJson(requestJson);
@@ -127,8 +126,8 @@ public class SagemakerTask extends AbstractTaskExecutor {
         try {
             startPipelineRequest = objectMapper.readValue(requestJson, StartPipelineExecutionRequest.class);
         } catch (Exception e) {
-            logger.error("can not parse SagemakerRequestJson from json: {}", e.getMessage());
-            throw new Exception("parse SagemakerRequestJson error");
+            logger.error("can not parse SagemakerRequestJson from json: {}", requestJson);
+            throw new SagemakerTaskException("can not parse SagemakerRequestJson ", e);
         }
 
         logger.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
@@ -146,7 +145,7 @@ public class SagemakerTask extends AbstractTaskExecutor {
         return ParameterUtils.convertParameterPlaceholders(requestJson, ParamUtils.convert(paramsMap));
     }
 
-    private AmazonSageMaker createClient() throws Exception {
+    private AmazonSageMaker createClient() {
         final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
         final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
         final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
