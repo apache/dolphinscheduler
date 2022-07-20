@@ -98,8 +98,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result createProject(User loginUser, String name, String desc) {
         Result result = new Result();
 
-        if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
-            result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+        checkDesc(result, desc);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
             return result;
         }
         if (!canOperatorPermissions(loginUser, null,AuthorizationType.PROJECTS, PROJECT_CREATE)) {
@@ -140,6 +140,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
         logger.info("create project complete and id is :{}", project.getId());
         return result;
+    }
+
+    /**
+     * check project description
+     *
+     * @param result
+     * @param desc   desc
+     */
+    public static void checkDesc(Result result, String desc) {
+        if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
+            result.setCode(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
+            result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+        } else {
+            result.setCode(Status.SUCCESS.getCode());
+        }
     }
 
     /**
@@ -324,8 +339,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result update(User loginUser, Long projectCode, String projectName, String desc, String userName) {
         Result result = new Result();
 
-        if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
-            result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+        checkDesc(result, desc);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
             return result;
         }
 
