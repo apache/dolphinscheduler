@@ -1360,6 +1360,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return create result code
      */
     @Override
+    @Transactional
     public User createUserIfNotExists(String userName, String userPassword, String email, String phone, String tenantCode,
                                       String queue,
                                       int state) throws IOException {
