@@ -31,12 +31,10 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-annotation</artifactId>
-            <version>${mybatis-plus.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

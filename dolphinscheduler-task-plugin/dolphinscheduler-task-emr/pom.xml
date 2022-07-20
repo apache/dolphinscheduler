@@ -42,7 +42,6 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-emr</artifactId>
-            <version>${aws.sdk.version}</version>
         </dependency>
 
     </dependencies>
