@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -40,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +49,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONTokener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -97,12 +100,18 @@ public final class AlertSenderService extends Thread {
                 continue;
             }
             AlertData alertData = new AlertData();
-            if (Objects.nonNull(alert.getContent())
-                    && !alert.getContent().startsWith("[")
-                    && !alert.getContent().endsWith("]")) {
-                ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
-                String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
-                alert.setContent(content);
+
+            if (StringUtils.isNotEmpty(alert.getContent())) {
+                try {
+                    Object contentObject = new JSONTokener(alert.getContent()).nextValue();
+                    if (!(contentObject instanceof JSONArray)) {
+                        ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
+                        String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
+                        alert.setContent(content);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             alertData.setId(alertId)
                     .setContent(alert.getContent())
