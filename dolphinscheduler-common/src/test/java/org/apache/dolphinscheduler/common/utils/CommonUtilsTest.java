@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.hadoop.security.UserGroupInformation;
@@ -94,5 +95,24 @@ public class CommonUtilsTest {
         logger.info(HadoopUtils.getHdfsTenantDir("1234"));
         Assert.assertTrue(true);
     }
+
+    @Test
+    public void getHdfsUdfFileName() {
+        logger.info(HadoopUtils.getHdfsUdfFileName("admin", "file_name"));
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void getHdfsResourceFileName() {
+        logger.info(HadoopUtils.getHdfsResourceFileName("admin", "file_name"));
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void getHdfsFileName() {
+        logger.info(HadoopUtils.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
+        Assert.assertTrue(true);
+    }
+
 
 }
