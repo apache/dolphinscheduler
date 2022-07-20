@@ -86,44 +86,43 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private StorageOperate storageOperate;
 
     /**
-     * Valid tenantCode when we want to create or update tenant object
+     * Check the tenant new object valid or not
      *
-     * @param tenantCode Tenant code of tenant object
-     * @return Optional of Status map
+     * @param tenant The tenant object want to create
      */
-    private void tenantCodeValid(String tenantCode) throws ServiceException {
-        Map<String, Object> result = new HashMap<>();
-        if (StringUtils.isEmpty(tenantCode)) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
-        } else if (StringUtils.length(tenantCode) > TENANT_FULL_NAME_MAX_LENGTH) {
+    private void createTenantValid(Tenant tenant) throws ServiceException {
+        if (StringUtils.isEmpty(tenant.getTenantCode())) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenant.getTenantCode());
+        } else if (StringUtils.length(tenant.getTenantCode()) > TENANT_FULL_NAME_MAX_LENGTH) {
             throw new ServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
-        } else if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
+        } else if (!RegexUtils.isValidLinuxUserName(tenant.getTenantCode())) {
             throw new ServiceException(Status.CHECK_OS_TENANT_CODE_ERROR);
-        } else if (checkTenantExists(tenantCode)) {
-            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenantCode);
+        } else if (checkTenantExists(tenant.getTenantCode())) {
+            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenant.getTenantCode());
         }
     }
 
     /**
-     * Insert one single new Tenant record to database
+     * Check tenant update object valid or not
      *
-     * @param tenantCode new Tenant object tenant code
-     * @param desc new Tenant object description
-     * @param queueId The Queue id of new Tenant object
-     * @return Tenant
+     * @param existsTenant The exists queue object
+     * @param updateTenant The queue object want to update
      */
-    private Tenant createObjToDB(String tenantCode, String desc, int queueId) {
-        Tenant tenant = new Tenant();
-        Date now = new Date();
-
-        tenant.setTenantCode(tenantCode);
-        tenant.setQueueId(queueId);
-        tenant.setDescription(desc);
-        tenant.setCreateTime(now);
-        tenant.setUpdateTime(now);
-        // save
-        tenantMapper.insert(tenant);
-        return tenant;
+    private void updateTenantValid(Tenant existsTenant, Tenant updateTenant) throws ServiceException {
+        // Check the exists tenant
+        if (Objects.isNull(existsTenant)) {
+            throw new ServiceException(Status.TENANT_NOT_EXIST);
+        }
+        // Check the update tenant parameters
+        else if (StringUtils.isEmpty(updateTenant.getTenantCode())) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, updateTenant.getTenantCode());
+        } else if (StringUtils.length(updateTenant.getTenantCode()) > TENANT_FULL_NAME_MAX_LENGTH) {
+            throw new ServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
+        } else if (!RegexUtils.isValidLinuxUserName(updateTenant.getTenantCode())) {
+            throw new ServiceException(Status.CHECK_OS_TENANT_CODE_ERROR);
+        } else if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode()) && checkTenantExists(updateTenant.getTenantCode())) {
+            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, updateTenant.getTenantCode());
+        }
     }
 
     /**
@@ -148,15 +147,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        tenantCodeValid(tenantCode);
+        Tenant tenant = new Tenant(tenantCode, desc, queueId);
+        createTenantValid(tenant);
+        tenantMapper.insert(tenant);
 
-        Tenant newTenant = createObjToDB(tenantCode, desc, queueId);
         // if storage startup
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(newTenant.getId()), logger);
-        result.put(Constants.DATA_LIST, newTenant);
+        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()), logger);
+        result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -212,30 +212,18 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        Tenant tenant = tenantMapper.queryById(id);
-
-        if (Objects.isNull(tenant)) {
-            throw new ServiceException(Status.TENANT_NOT_EXIST);
-        }
-
-        tenantCodeValid(tenantCode);
+        Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
+        Tenant existsTenant = tenantMapper.queryById(id);
+        updateTenantValid(existsTenant, updateTenant);
 
         // updateProcessInstance tenant
         /**
          * if the tenant code is modified, the original resource needs to be copied to the new tenant.
          */
-        if (!tenant.getTenantCode().equals(tenantCode) && PropertyUtils.getResUploadStartupState()) {
+        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode()) && PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-
-        Date now = new Date();
-
-        if (queueId != 0) {
-            tenant.setQueueId(queueId);
-        }
-        tenant.setDescription(desc);
-        tenant.setUpdateTime(now);
-        tenantMapper.updateById(tenant);
+        tenantMapper.updateById(updateTenant);
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -378,8 +366,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return tenantMapper.queryByTenantCode(tenantCode);
         }
 
-        tenantCodeValid(tenantCode);
-        Queue newQueue = queueService.createQueueIfNotExists(queue, queueName);
-        return createObjToDB(tenantCode, desc, newQueue.getId());
+        Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
+        Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
+        createTenantValid(tenant);
+        tenantMapper.insert(tenant);
+        return tenant;
     }
 }

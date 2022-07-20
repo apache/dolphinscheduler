@@ -171,10 +171,11 @@ public class PythonGateway {
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        // In the case project exists, but current process definition still not created, we should also return the init version of it
         if (processDefinition == null) {
-            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("version", 0L);
+            return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
@@ -545,6 +546,21 @@ public class PythonGateway {
         result.put("id", resource.getId());
         result.put("name", resource.getFullName());
         return result;
+    }
+
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    public Integer createOrUpdateResource(
+            String userName, String fullName, String description, String resourceContent) {
+        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
     }
 
     @PostConstruct

@@ -4,7 +4,7 @@
 
 点击"项目管理"进入项目管理页面，点击“创建项目”按钮，输入项目名称，项目描述，点击“提交”，创建新的项目。
 
-![project](../../../../img/new_ui/dev/project/project-list.png)
+![project](../../../../img/new_ui/dev/project/project-create.png)
 
 ## 项目首页
 

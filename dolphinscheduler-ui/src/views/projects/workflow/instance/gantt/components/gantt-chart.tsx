@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import _ from 'lodash'
 import { defineComponent, ref, PropType } from 'vue'
 import * as echarts from 'echarts'
 import type { Ref } from 'vue'
@@ -101,7 +102,7 @@ const GanttChart = defineComponent({
         {
           x: start[0],
           y: start[1] - height / 2,
-          width: end[0] - start[0],
+          width: _.max([end[0] - start[0], 1]) || 1,
           height: height
         },
         {
@@ -153,13 +154,15 @@ const GanttChart = defineComponent({
       dataZoom: [
         {
           type: 'slider',
+          xAxisIndex: 0,
           filterMode: 'weakFilter',
-          showDataShadow: false,
-          top:
-            props.taskList.length * 100 > 200
-              ? props.taskList.length * 100
-              : 200,
-          labelFormatter: ''
+          height: 20,
+          bottom: 0,
+          start: 0,
+          end: 100,
+          handleSize: '80%',
+          showDetail: false,
+          top: '85%'
         },
         {
           type: 'inside',
@@ -167,12 +170,12 @@ const GanttChart = defineComponent({
         }
       ],
       grid: {
-        height: props.taskList.length * 50,
+        height: '70%',
         top: 80
       },
       xAxis: {
+        type: 'time',
         min: minTime,
-        scale: true,
         position: 'top',
         axisTick: { show: true },
         splitLine: { show: false },
@@ -186,8 +189,15 @@ const GanttChart = defineComponent({
         axisTick: { show: false },
         splitLine: { show: false },
         axisLine: { show: false },
-        max: props.taskList.length,
-        data: props.taskList
+        data: props.taskList.map((item: string) => {
+          return {
+            value: item,
+            textStyle: {
+              width: 130,
+              overflow: 'truncate'
+            }
+          }
+        })
       },
       series: series
     }
