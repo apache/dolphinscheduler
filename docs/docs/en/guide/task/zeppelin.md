@@ -26,8 +26,20 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 | Timeout alarm | Check Timeout Alarm and Timeout Failure. When the task exceeds the "timeout duration", an alarm email will be sent and the task execution will fail. |
 | Zeppelin Note ID | The unique note id for a zeppelin notebook note. |
 | Zeppelin Paragraph ID | The unique paragraph id for a zeppelin notebook paragraph. If you want to schedule a whole note at a time, leave this field blank. |
+| Zeppelin Production Note Directory | The directory for cloned note in production mode. |
 | Zeppelin Rest Endpoint | The REST endpoint of your zeppelin server |
 | Zeppelin Parameters | Parameters in json format used for zeppelin dynamic form. |
+
+## Production (Clone) Mode
+
+- Fill in the optional `Zeppelin Production Note Directory` parameter to enable `Production Mode`.
+- In `Production Mode`, the target note gets copied to the `Zeppelin Production Note Directory` you choose. 
+`Zeppelin Task Plugin` will execute the cloned note instead of the original one. Once execution done, 
+`Zeppelin Task Plugin` will delete the cloned note automatically. 
+Therefore, it increases the stability as the modification to a running note triggered by `Dolphin Scheduler` 
+will not affect the production task.
+- If you leave the `Zeppelin Production Note Directory` empty, `Zeppelin Task Plugin` will execute the original note.
+- 'Zeppelin Production Note Directory' should both start and end with a `slash`. e.g. `/production_note_directory/`  
 
 ## Task Example
 
