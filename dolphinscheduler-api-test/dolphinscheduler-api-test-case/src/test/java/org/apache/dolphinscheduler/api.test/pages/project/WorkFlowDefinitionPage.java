@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
+import org.apache.dolphinscheduler.api.test.cases.TenantAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.TaskParamsMap;
 import org.apache.dolphinscheduler.api.test.entity.TaskDefinitionRequestData;
@@ -92,13 +93,6 @@ public final class WorkFlowDefinitionPage {
         ArrayList<Object> taskDefinitionRequestDataList = new ArrayList<>();
         taskDefinitionRequestDataList.add(taskDefinitionRequestData);
 
-        logger.info("taskDefinitionRequestData：aaaa: %s");
-        logger.info(String.valueOf(taskDefinitionRequestData));
-        logger.info(String.valueOf(taskDefinitionRequestData.getClass()));
-        logger.info(String.valueOf(taskDefinitionRequestDataList));
-        logger.info(String.valueOf(taskDefinitionRequestDataList.getClass()));
-        logger.info("taskDefinitionRequestData：bbbb: %s");
-
         HashMap<String, Object> conditionParams = new HashMap();
 
         taskRelationRequestData.name("");
@@ -122,7 +116,7 @@ public final class WorkFlowDefinitionPage {
         workFlowCreateRequestData.taskDefinitionJson(JSONUtils.toJsonString(taskDefinitionRequestDataList));
         workFlowCreateRequestData.taskRelationJson(JSONUtils.toJsonString(taskRelationRequestDataList));
         workFlowCreateRequestData.name(workFlowName);
-        workFlowCreateRequestData.tenantCode("admin");
+        workFlowCreateRequestData.tenantCode(TenantAPITest.tenantName);
         workFlowCreateRequestData.executionType("PARALLEL");
         workFlowCreateRequestData.description("");
         workFlowCreateRequestData.globalParams("[]");
@@ -133,7 +127,6 @@ public final class WorkFlowDefinitionPage {
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
 
-        logger.info(String.valueOf(workFlowCreateRequestData));
         HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition", headers, JSONUtils.convertValue(workFlowCreateRequestData, Map.class));
         return res;
     }

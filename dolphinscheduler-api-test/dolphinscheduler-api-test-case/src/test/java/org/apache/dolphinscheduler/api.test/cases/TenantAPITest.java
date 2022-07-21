@@ -46,7 +46,7 @@ public class TenantAPITest {
 
     private static final String user = "admin";
 
-    private static final String tenantName = "admin1";
+    public static final String tenantName = "root";
 
     private static final String password = "dolphinscheduler123";
 

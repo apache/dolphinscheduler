@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowInstancesPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +48,7 @@ public class WorkFlowAPITest {
 
     private static final String workFlowName = "shell123";
 
-    private static final String tenantName = "admin";
+    private static final String tenantName = "wendada";
 
     private static final String user = "admin";
 
@@ -109,6 +110,21 @@ public class WorkFlowAPITest {
 
         logger.info("Run workflow res：%s", res);
         Assertions.assertTrue(res.body().success());
+
+    }
+
+    @Test
+    @Order(5)
+    public void testQueryWorkflowInstanceState() throws InterruptedException {
+        WorkFlowInstancesPage instance = new WorkFlowInstancesPage();
+        String state = null;
+
+        for (int i=0; i<5 & state==null; i++){
+            state = instance.queryWorkflowInstanceState(sessionId, projectName, workFlowName);
+            Thread.sleep(1000);
+        }
+        logger.info("Run workflow state：%s", state);
+        Assertions.assertEquals("SUCCESS",state);
 
     }
 

@@ -70,7 +70,6 @@ public final class TaskInstancePage {
             taskInstanceId = taskInstanceRes.id();
         }
 
-        logger.info("查询task状态：%s", taskState);
         return taskState;
 
     }
