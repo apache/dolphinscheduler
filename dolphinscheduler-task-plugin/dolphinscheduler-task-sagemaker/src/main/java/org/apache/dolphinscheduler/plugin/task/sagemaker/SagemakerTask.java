@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 /**
- *
+ * SagemakerTask task, Used to start Sagemaker pipeline
  */
 public class SagemakerTask extends AbstractTaskExecutor {
 

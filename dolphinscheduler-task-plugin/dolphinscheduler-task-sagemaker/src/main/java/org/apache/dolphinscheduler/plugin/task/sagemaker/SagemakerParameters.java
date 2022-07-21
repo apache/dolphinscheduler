@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
