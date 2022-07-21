@@ -32,17 +32,26 @@ export function useRelation() {
     workflowOptions: [],
     workflow: ref(null),
     seriesData: [],
-    labelShow: ref(true)
+    labelShow: ref(true),
+    links: []
   })
 
-  const formatWorkflow = (obj: Array<WorkFlowListRes>) => {
+  const formatWorkflow = (obj: WorkflowRes) => {
     variables.seriesData = []
+    variables.links = []
 
-    variables.seriesData = obj.map((item) => {
+    variables.seriesData = obj.workFlowList.map((item) => {
       return {
         name: item.workFlowName,
         id: item.workFlowCode,
         ...item
+      }
+    }) as any
+
+    variables.links = obj.workFlowRelationList.map((item) => {
+      return {
+        source: String(item.sourceWorkFlowCode),
+        target: String(item.targetWorkFlowCode)
       }
     }) as any
   }
@@ -71,7 +80,7 @@ export function useRelation() {
         { workFlowCode: workflowCode },
         { projectCode }
       ).then((res: WorkflowRes) => {
-        formatWorkflow(res.workFlowList)
+        formatWorkflow(res)
       }),
       {}
     )
@@ -84,7 +93,7 @@ export function useRelation() {
       queryWorkFlowList({
         projectCode
       }).then((res: WorkflowRes) => {
-        formatWorkflow(res.workFlowList)
+        formatWorkflow(res)
       }),
       {}
     )

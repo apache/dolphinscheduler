@@ -92,8 +92,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param desc environment desc
      * @param workerGroups worker groups
      */
-    @Transactional(rollbackFor = RuntimeException.class)
     @Override
+    @Transactional
     public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ENVIRONMENT, ENVIRONMENT_CREATE)) {
@@ -211,13 +211,19 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     /**
      * query all environment
      *
+     * @param loginUser
      * @return all environment list
      */
     @Override
-    public Map<String, Object> queryAllEnvironmentList() {
+    public Map<String, Object> queryAllEnvironmentList(User loginUser) {
         Map<String,Object> result = new HashMap<>();
-        List<Environment> environmentList = environmentMapper.queryAllEnvironmentList();
-
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT, loginUser.getId(), logger);
+        if (ids.isEmpty()) {
+            result.put(Constants.DATA_LIST, Collections.emptyList());
+            putMsg(result,Status.SUCCESS);
+            return result;
+        }
+        List<Environment> environmentList = environmentMapper.selectBatchIds(ids);
         if (CollectionUtils.isNotEmpty(environmentList)) {
             Map<Long, List<String>> relationMap = relationMapper.selectList(null).stream()
                     .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroup,Collectors.toList())));
@@ -297,7 +303,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param loginUser login user
      * @param code environment code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code) {
         Map<String, Object> result = new HashMap<>();
@@ -336,7 +342,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param desc environment desc
      * @param workerGroups worker groups
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();

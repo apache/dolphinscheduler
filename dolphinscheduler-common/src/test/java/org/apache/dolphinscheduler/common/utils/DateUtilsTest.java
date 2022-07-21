@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -244,5 +246,16 @@ public class DateUtilsTest {
 
         Assert.assertEquals(Timer.ONE_HOUR * 8, utcDate.getTime() - shanghaiDate.getTime());
 
+    }
+
+    @Test
+    public void testDateToString() {
+        ZoneId asiaSh = ZoneId.of("Asia/Shanghai");
+        ZoneId utc = ZoneId.of("UTC");
+        ZonedDateTime asiaShNow = ZonedDateTime.now(asiaSh);
+        ZonedDateTime utcNow = asiaShNow.minusHours(8);
+        String asiaShNowStr = DateUtils.dateToString(utcNow, asiaSh);
+        String utcNowStr = DateUtils.dateToString(asiaShNow, utc);
+        Assert.assertEquals(asiaShNowStr, utcNowStr);
     }
 }

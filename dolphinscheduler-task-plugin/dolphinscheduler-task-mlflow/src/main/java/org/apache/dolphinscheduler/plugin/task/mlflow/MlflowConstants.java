@@ -30,11 +30,13 @@ public class MlflowConstants {
 
     public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
 
+    public static final String PRESET_PATH = "dolphinscheduler-mlflow";
+
     public static final String PRESET_REPOSITORY_VERSION = "main";
 
-    public static final String PRESET_AUTOML_PROJECT = PRESET_REPOSITORY + "#Project-AutoML";
+    public static final String PRESET_AUTOML_PROJECT = PRESET_PATH + "#Project-AutoML";
 
-    public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_REPOSITORY + "#Project-BasicAlgorithm";
+    public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_PATH + "#Project-BasicAlgorithm";
 
     public static final String MLFLOW_TASK_TYPE_PROJECTS = "MLflow Projects";
 
@@ -62,27 +64,25 @@ public class MlflowConstants {
 
     public static final String SET_REPOSITORY = "repo=%s";
 
-    public static final String MLFLOW_RUN_BASIC_ALGORITHM = "mlflow run $repo " +
-            "-P algorithm=%s " +
-            "-P data_path=$data_path " +
-            "-P params=\"%s\" " +
-            "-P search_params=\"%s\" " +
-            "-P model_name=\"%s\" " +
-            "--experiment-name=\"%s\" " +
-            "--version=main ";
+    public static final String MLFLOW_RUN_BASIC_ALGORITHM = "mlflow run $repo "
+        + "-P algorithm=%s "
+        + "-P data_path=$data_path "
+        + "-P params=\"%s\" "
+        + "-P search_params=\"%s\" "
+        + "-P model_name=\"%s\" "
+        + "--experiment-name=\"%s\"";
 
-    public static final String MLFLOW_RUN_AUTOML_PROJECT = "mlflow run $repo " +
-            "-P tool=%s " +
-            "-P data_path=$data_path " +
-            "-P params=\"%s\" " +
-            "-P model_name=\"%s\" " +
-            "--experiment-name=\"%s\" " +
-            "--version=main ";
+    public static final String MLFLOW_RUN_AUTOML_PROJECT = "mlflow run $repo "
+        + "-P tool=%s "
+        + "-P data_path=$data_path "
+        + "-P params=\"%s\" "
+        + "-P model_name=\"%s\" "
+        + "--experiment-name=\"%s\"";
 
-    public static final String MLFLOW_RUN_CUSTOM_PROJECT = "mlflow run $repo " +
-            "%s " +
-            "--experiment-name=\"%s\" " +
-            "--version=\"%s\" ";
+    public static final String MLFLOW_RUN_CUSTOM_PROJECT = "mlflow run $repo "
+        + "%s "
+        + "--experiment-name=\"%s\" "
+        + "--version=\"%s\" ";
 
     public static final String MLFLOW_MODELS_SERVE = "mlflow models serve -m %s --port %s -h 0.0.0.0";
 
@@ -90,20 +90,24 @@ public class MlflowConstants {
 
     public static final String DOCKER_RREMOVE_CONTAINER = "docker rm -f %s";
 
-    public static final String DOCKER_RUN = "docker run --name=%s -p=%s:8080 %s";
+    public static final String DOCKER_RUN = "docker run -d --name=%s -p=%s:8080 "
+        + "--health-cmd \"curl --fail http://127.0.0.1:8080/ping || exit 1\" --health-interval 5s --health-retries 20"
+        + " %s";
 
     public static final String DOCKER_COMPOSE_RUN = "docker-compose up -d";
 
-    public static final String SET_DOCKER_COMPOSE_ENV = "export DS_TASK_MLFLOW_IMAGE_NAME=%s\n" +
-            "export DS_TASK_MLFLOW_CONTAINER_NAME=%s\n" +
-            "export DS_TASK_MLFLOW_DEPLOY_PORT=%s\n" +
-            "export DS_TASK_MLFLOW_CPU_LIMIT=%s\n" +
-            "export DS_TASK_MLFLOW_MEMORY_LIMIT=%s";
+    public static final String SET_DOCKER_COMPOSE_ENV = "export DS_TASK_MLFLOW_IMAGE_NAME=%s\n"
+        + "export DS_TASK_MLFLOW_CONTAINER_NAME=%s\n"
+        + "export DS_TASK_MLFLOW_DEPLOY_PORT=%s\n"
+        + "export DS_TASK_MLFLOW_CPU_LIMIT=%s\n"
+        + "export DS_TASK_MLFLOW_MEMORY_LIMIT=%s";
 
-    public static final String DOCKER_HEALTH_CHECK_COMMAND = "for i in $(seq 1 300); " +
-            "do " +
-            "[ $(docker inspect --format \"{{json .State.Health.Status }}\" %s) = '\"healthy\"' ] " +
-            "&& exit 0  && break;sleep 1; " +
-            "done; docker-compose down; exit 1";
 
+    public static final String DOCKER_HEALTH_CHECK = "docker inspect --format \"{{json .State.Health.Status }}\" %s";
+
+    public static final int DOCKER_HEALTH_CHECK_TIMEOUT = 20;
+
+    public static final int DOCKER_HEALTH_CHECK_INTERVAL = 5000;
+
+    public static final String GIT_CLONE_REPO  = "git clone %s %s";
 }

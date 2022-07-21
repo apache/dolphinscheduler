@@ -571,6 +571,8 @@ CREATE TABLE t_ds_project (
 ) ;
 
 create index user_id_index on t_ds_project (user_id);
+CREATE UNIQUE INDEX unique_name on t_ds_project (name);
+CREATE UNIQUE INDEX unique_code on t_ds_project (code);
 
 --
 -- Table structure for table t_ds_queue
@@ -585,7 +587,8 @@ CREATE TABLE t_ds_queue (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 );
-
+-- add unique key to t_ds_queue
+CREATE UNIQUE INDEX unique_queue_name on t_ds_queue (queue_name);
 
 --
 -- Table structure for table t_ds_relation_datasource_user
@@ -601,7 +604,6 @@ CREATE TABLE t_ds_relation_datasource_user (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-;
 
 --
 -- Table structure for table t_ds_relation_process_instance
@@ -787,6 +789,8 @@ CREATE TABLE t_ds_tenant (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+-- add unique key to t_ds_tenant
+CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
 
 --
 -- Table structure for table t_ds_udfs
@@ -808,6 +812,8 @@ CREATE TABLE t_ds_udfs (
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
 ) ;
+-- add unique key to t_ds_udfs
+CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
 
 --
 -- Table structure for table t_ds_user
@@ -966,7 +972,6 @@ ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_g
 DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
 CREATE SEQUENCE t_ds_worker_server_id_sequence;
 ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
-
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
@@ -1895,20 +1900,21 @@ CREATE TABLE t_ds_k8s (
 DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
    id serial NOT NULL,
+   code               bigint  NOT NULL,
    limits_memory      int DEFAULT NULL ,
    namespace          varchar(100) DEFAULT NULL ,
-   online_job_num     int DEFAULT '0' ,
    user_id            int DEFAULT NULL,
    pod_replicas       int DEFAULT NULL,
    pod_request_cpu    NUMERIC(13,4) NULL,
    pod_request_memory int DEFAULT NULL,
    limits_cpu         NUMERIC(13,4) NULL,
-   k8s                varchar(100) DEFAULT NULL,
+   cluster_code       bigint  NOT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
    PRIMARY KEY (id) ,
-   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,cluster_code)
 );
+
 
 --
 -- Table structure for table t_ds_relation_namespace_user
