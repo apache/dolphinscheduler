@@ -432,6 +432,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-s3 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.12.160  Apache 2.0
     aws-java-sdk-core-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
     aws-java-sdk-kms-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.160  Apache 2.0
+    aws-java-sdk-sagemaker-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sagemaker/1.12.160  Apache 2.0
     commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
     httpasyncclient 4.1.4: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
     httpcore-nio 4.4.14: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.14, Apache 2.0

@@ -40,6 +40,7 @@ import { useMlflow } from './use-mlflow'
 import { useOpenmldb } from './use-openmldb'
 import { useDvc } from './use-dvc'
 import { useDinky } from './use-dinky'
+import { userSagemaker } from './use-sagemaker'
 
 export default {
   SHELL: useShell,
@@ -66,5 +67,6 @@ export default {
   MLFLOW: useMlflow,
   OPENMLDB: useOpenmldb,
   DVC: useDvc,
-  DINKY: useDinky
+  DINKY: useDinky,
+  SAGEMAKER: userSagemaker
 }

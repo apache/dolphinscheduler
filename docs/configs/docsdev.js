@@ -181,6 +181,10 @@ export default {
                                 title: 'Dinky',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
+                            {
+                                title: 'SageMaker',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
                         ],
                     },
                     {
@@ -600,6 +604,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'SageMaker',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/SageMaker.html',
                             },
                         ],
                     },
