@@ -22,12 +22,9 @@ package org.apache.dolphinscheduler.api.test.cases;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -42,17 +39,13 @@ import lombok.extern.slf4j.Slf4j;
 public class TenantAPITest {
     private static final Logger logger = LoggerFactory.getLogger(ProjectAPITest.class);
 
-    private static final String tenant = System.getProperty("user.name");
+    public static final String tenantName = System.getProperty("user.name");
 
     private static final String user = "admin";
-
-    public static final String tenantName = "root";
 
     private static final String password = "dolphinscheduler123";
 
     private static String sessionId = null;
-
-    private static Integer existTenantId = null;
 
     @BeforeAll
     public static void setup() {
