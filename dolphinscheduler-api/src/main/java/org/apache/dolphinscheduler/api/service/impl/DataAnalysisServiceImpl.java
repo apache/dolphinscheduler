@@ -17,14 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
-import org.apache.dolphinscheduler.api.dto.TaskStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -42,11 +46,15 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,14 +65,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
 
 /**
  * data analysis service impl
  */
 @Service
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -127,6 +136,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 startDate,
                 endDate,
                 (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end, projectCodes));
+
         // process state count needs to remove state of forced success
         if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
             ((TaskCountDto) result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
@@ -145,10 +155,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate
             , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         Map<String, Object> result = new HashMap<>();
-
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,PROJECT_OVERVIEW);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -157,16 +166,18 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = null;
         Date end = null;
         if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
+            start = DateUtils.stringToDate(startDate);
+            end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
-
-        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[]{projectCode};
+        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        if (projectIds.getRight() != null) {
+            return projectIds.getRight();
+        }
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
         List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
 
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
@@ -194,18 +205,24 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     @Override
     public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
-
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode,PROJECT_OVERVIEW);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[]{projectCode};
+        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        if (projectIds.getRight() != null) {
+            List<DefinitionGroupByUser> emptyList = new ArrayList<>();
+            DefineUserDto dto = new DefineUserDto(emptyList);
+            result.put(Constants.DATA_LIST, dto);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
         }
@@ -233,18 +250,21 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
          */
         Date start = null;
         Date end = null;
-        Long[] projectCodeArray = getProjectCodesArrays(loginUser);
-
-        // admin can view all
-        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
-
+        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        if (projectIds.getRight() != null) {
+            List<CommandStateCount> noData = Arrays.stream(CommandType.values()).map(commandType -> new CommandStateCount(0, 0, commandType)).collect(Collectors.toList());
+            result.put(Constants.DATA_LIST, noData);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
         // count normal command state
-        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(userId, start, end, projectCodeArray)
+        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
-        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(userId, start, end, projectCodeArray)
+        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
@@ -260,16 +280,23 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Long[] getProjectCodesArrays(User loginUser) {
-        List<Project> projectList = projectMapper.queryRelationProjectListByUserId(
-                loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId());
-        Set<Long> projectCodes = new HashSet<>();
-        projectList.forEach(project -> projectCodes.add(project.getCode()));
-        if (loginUser.getUserType() == UserType.GENERAL_USER) {
-            List<Project> createProjects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
-            createProjects.forEach(project -> projectCodes.add(project.getCode()));
+    private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
+        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        if (projectIds.isEmpty()) {
+            List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>();
+            result.put(Constants.DATA_LIST, new TaskCountDto(taskInstanceStateCounts));
+            putMsg(result, Status.SUCCESS);
+            return Pair.of(null, result);
         }
-        return projectCodes.toArray(new Long[0]);
+        return Pair.of(projectIds, null);
+    }
+
+    private Long[] getProjectCodesArrays(Set<Integer> projectIds) {
+        List<Project> projects = projectMapper.selectBatchIds(projectIds);
+        List<Long> codeList = projects.stream().map(Project::getCode).collect(Collectors.toList());
+        Long[] projectCodeArray = new Long[codeList.size()];
+        codeList.toArray(projectCodeArray);
+        return projectCodeArray;
     }
 
     /**

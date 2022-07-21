@@ -2,7 +2,7 @@
 
 The purpose of the pseudo-cluster deployment is to deploy the DolphinScheduler service on a single machine. In this mode, DolphinScheduler's master, worker, API server, are all on the same machine.
 
-If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
+If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow[pseudo-cluster deployment. If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
 
 ## Preparation
 
@@ -89,7 +89,7 @@ alertServer="localhost"
 apiServers="localhost"
 
 # DolphinScheduler installation path, it will auto-create if not exists
-installPath="~/dolphinscheduler"
+installPath=~/dolphinscheduler
 
 # Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
@@ -114,7 +114,6 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
 export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
@@ -143,60 +142,14 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 
 ## Initialize the Database
 
-DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the lib directory of DolphinScheduler, which is `tools/libs/`. Let's take MySQL as an example for how to initialize the database:
-
-For mysql 5.6 / 5.7
-
-```shell
-mysql -uroot -p
-
-mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-# Replace {user} and {password} with your username and password
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
-
-mysql> flush privileges;
-```
-
-For mysql 8:
-
-```shell
-mysql -uroot -p
-
-mysql> CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-
-# Replace {user} and {password} with your username and password
-mysql> CREATE USER '{user}'@'%' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
-mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
-mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
-mysql> FLUSH PRIVILEGES;
-``` 
-
-Then, modify `./bin/env/dolphinscheduler_env.sh` to use mysql, change {user} and {password} to what you set in the previous step.
-
-```shell
-export DATABASE=${DATABASE:-mysql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
-export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
-```
-
-After the above steps done you would create a new database for DolphinScheduler, then run the Shell script to init database:
-
-```shell
-sh tools/bin/upgrade-schema.sh
-```
+Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 
 ## Start DolphinScheduler
 
 Use **deployment user** you created above, running the following command to complete the deployment, and the server log will be stored in the logs folder.
 
 ```shell
-sh ./bin/install.sh
+bash ./bin/install.sh
 ```
 
 > **_Note:_** For the first time deployment, there maybe occur five times of `sh: bin/dolphinscheduler-daemon.sh: No such file or directory` in the terminal,
@@ -204,32 +157,32 @@ sh ./bin/install.sh
 
 ## Login DolphinScheduler
 
-Access address `http://localhost:12345/dolphinscheduler` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
 
 ## Start or Stop Server
 
 ```shell
 # Stop all DolphinScheduler server
-sh ./bin/stop-all.sh
+bash ./bin/stop-all.sh
 
 # Start all DolphinScheduler server
-sh ./bin/start-all.sh
+bash ./bin/start-all.sh
 
 # Start or stop DolphinScheduler Master
-sh ./bin/dolphinscheduler-daemon.sh stop master-server
-sh ./bin/dolphinscheduler-daemon.sh start master-server
+bash ./bin/dolphinscheduler-daemon.sh stop master-server
+bash ./bin/dolphinscheduler-daemon.sh start master-server
 
 # Start or stop DolphinScheduler Worker
-sh ./bin/dolphinscheduler-daemon.sh start worker-server
-sh ./bin/dolphinscheduler-daemon.sh stop worker-server
+bash ./bin/dolphinscheduler-daemon.sh start worker-server
+bash ./bin/dolphinscheduler-daemon.sh stop worker-server
 
 # Start or stop DolphinScheduler Api
-sh ./bin/dolphinscheduler-daemon.sh start api-server
-sh ./bin/dolphinscheduler-daemon.sh stop api-server
+bash ./bin/dolphinscheduler-daemon.sh start api-server
+bash ./bin/dolphinscheduler-daemon.sh stop api-server
 
 # Start or stop Alert
-sh ./bin/dolphinscheduler-daemon.sh start alert-server
-sh ./bin/dolphinscheduler-daemon.sh stop alert-server
+bash ./bin/dolphinscheduler-daemon.sh start alert-server
+bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
 > **_Note1:_**: Each server have `dolphinscheduler_env.sh` file in path `<server-name>/conf/dolphinscheduler_env.sh` which
@@ -243,5 +196,4 @@ sh ./bin/dolphinscheduler-daemon.sh stop alert-server
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
-[mysql]: https://downloads.MySQL.com/archives/c-j/
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597

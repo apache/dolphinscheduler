@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.time.Duration;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,7 +86,7 @@ public class DependentTaskTest {
 
         MasterConfig config = new MasterConfig();
         config.setTaskCommitRetryTimes(3);
-        config.setTaskCommitInterval(1000);
+        config.setTaskCommitInterval(Duration.ofSeconds(1));
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processService = Mockito.mock(ProcessService.class);

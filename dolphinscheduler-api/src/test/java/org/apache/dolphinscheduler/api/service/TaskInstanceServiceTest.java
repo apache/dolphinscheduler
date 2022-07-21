@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -96,23 +99,45 @@ public class TaskInstanceServiceTest {
 
         //project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
-        Result projectAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 0, "", "",
-                "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)projectAuthFailRes.getCode());
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE)).thenReturn(result);
+        Result projectAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser,
+            projectCode,
+            0,
+            "",
+            "",
+            "test_user",
+            "2019-02-26 19:48:00",
+            "2019-02-26 19:48:22",
+            "",
+            null,
+            "",
+            1,
+            20);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) projectAuthFailRes.getCode());
 
         // data parameter check
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
-        Result dataParameterRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "test_user", "20200101 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int)dataParameterRes.getCode());
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE)).thenReturn(result);
+        Result dataParameterRes = taskInstanceService.queryTaskListPaging(loginUser,
+            projectCode,
+            1,
+            "",
+            "",
+            "test_user",
+            "20200101 00:00:00",
+            "2020-01-02 00:00:00",
+            "",
+            ExecutionStatus.SUCCESS,
+            "192.168.xx.xx",
+            1,
+            20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) dataParameterRes.getCode());
 
         //project
         putMsg(result, Status.SUCCESS, projectCode);
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
         ProcessInstance processInstance = getProcessInstance();
         TaskInstance taskInstance = getTaskInstance();
         List<TaskInstance> taskInstanceList = new ArrayList<>();
@@ -120,7 +145,7 @@ public class TaskInstanceServiceTest {
         taskInstanceList.add(taskInstance);
         pageReturn.setRecords(taskInstanceList);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1), eq(""), eq(""), eq(""),
@@ -247,12 +272,12 @@ public class TaskInstanceServiceTest {
         // user auth failed
         Map<String, Object> mockFailure = new HashMap<>(5);
         putMsg(mockFailure, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(mockFailure);
+        when(projectService.checkProjectAndAuth(user, project, projectCode,FORCED_SUCCESS)).thenReturn(mockFailure);
         Map<String, Object> authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assert.assertNotSame(Status.SUCCESS, authFailRes.get(Constants.STATUS));
 
         // test task not found
-        when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(mockSuccess);
+        when(projectService.checkProjectAndAuth(user, project, projectCode,FORCED_SUCCESS)).thenReturn(mockSuccess);
         when(taskInstanceMapper.selectById(Mockito.anyInt())).thenReturn(null);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
@@ -266,7 +291,7 @@ public class TaskInstanceServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(result);
+        when(projectService.checkProjectAndAuth(user, project, projectCode,FORCED_SUCCESS)).thenReturn(result);
         Map<String, Object> taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
 
@@ -275,7 +300,7 @@ public class TaskInstanceServiceTest {
         when(taskInstanceMapper.updateById(task)).thenReturn(0);
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(result);
+        when(projectService.checkProjectAndAuth(user, project, projectCode,FORCED_SUCCESS)).thenReturn(result);
         Map<String, Object> errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assert.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR, errorRes.get(Constants.STATUS));
 
@@ -284,7 +309,7 @@ public class TaskInstanceServiceTest {
         when(taskInstanceMapper.updateById(task)).thenReturn(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(result);
+        when(projectService.checkProjectAndAuth(user, project, projectCode,FORCED_SUCCESS)).thenReturn(result);
         Map<String, Object> successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }

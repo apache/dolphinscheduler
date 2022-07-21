@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted, ref, Ref } from 'vue'
-import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
+import { defineComponent, PropType, toRefs, onMounted, ref, Ref, getCurrentInstance } from 'vue'
+import { NForm, NFormItem, NInput, NSelect, NInputNumber } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createTaskGroup, updateTaskGroup } from '@/service/modules/task-group'
@@ -87,7 +87,9 @@ const FormModal = defineComponent({
       emit('cancel')
     }
 
-    return { ...toRefs(state), t, onConfirm, onCancel, projectOptions }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
+    return { ...toRefs(state), t, onConfirm, onCancel, projectOptions, trim }
   },
   render() {
     const { t, onConfirm, onCancel, show, status, projectOptions } = this
@@ -111,6 +113,7 @@ const FormModal = defineComponent({
         <NForm rules={this.rules} ref='formRef'>
           <NFormItem label={t('resource.task_group_option.name')} path='name'>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.formData.name, 'value']}
               placeholder={t('resource.task_group_option.please_enter_name')}
             />
@@ -133,8 +136,10 @@ const FormModal = defineComponent({
             label={t('resource.task_group_option.resource_pool_size')}
             path='groupSize'
           >
-            <NInput
+            <NInputNumber
               v-model:value={this.formData.groupSize}
+              style={{ width: '100%' }}
+              min={1}
               placeholder={t(
                 'resource.task_group_option.please_enter_resource_pool_size'
               )}
@@ -145,6 +150,7 @@ const FormModal = defineComponent({
             path='description'
           >
             <NInput
+                  allowInput={this.trim}
               v-model={[this.formData.description, 'value']}
               type='textarea'
               placeholder={t('resource.task_group_option.please_enter_desc')}

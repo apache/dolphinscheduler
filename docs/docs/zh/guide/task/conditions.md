@@ -5,7 +5,7 @@ Conditions 是一个条件节点，根据上游任务运行状态，判断应该
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
-- 拖动工具栏中的<img src="/img/conditions.png" width="20"/>任务节点到画板中。
+- 拖动工具栏中的<img src="../../../../img/conditions.png" width="20"/>任务节点到画板中。
 
 ## 任务参数
 
@@ -41,13 +41,13 @@ Conditions 是一个条件节点，根据上游任务运行状态，判断应该
 - Node_Success：Shell 任务，打印输出 “success”，Node_A 执行成功的分支。
 - Node_False：Shell 任务，打印输出 ”false“，Node_A 执行失败的分支。
 
-![condition_task01](/img/tasks/demo/condition_task01.png)
+![condition_task01](../../../../img/tasks/demo/condition_task01.png)
 
 ### 2、查看执行结果
 
 当完成创建工作流之后，可以上线运行该工作流。在工作流实例页面可以查看到各个任务的执行状态。如下图所示：
 
-![condition_task02](/img/tasks/demo/condition_task02.png)
+![condition_task02](../../../../img/tasks/demo/condition_task02.png)
 
 上图中，任务状态标记为绿色对号的，即为成功执行的任务节点。
 
@@ -57,5 +57,5 @@ Conditions 是一个条件节点，根据上游任务运行状态，判断应该
 - Conditions 任务以及包含该任务的工作流不支持复制操作。
 - Conditions 的前置任务不能连接其分支节点，会造成逻辑混乱，不符合 DAG 调度。如下图所示的情况是**错误**的。
 
-![condition_task03](/img/tasks/demo/condition_task03.png)
-![condition_task04](/img/tasks/demo/condition_task04.png)
+![condition_task03](../../../../img/tasks/demo/condition_task03.png)
+![condition_task04](../../../../img/tasks/demo/condition_task04.png)

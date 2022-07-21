@@ -21,7 +21,7 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-from pydolphinscheduler.constants import ProcessDefinitionReleaseState, TaskType
+from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
@@ -63,6 +63,9 @@ class ProcessDefinition(Base):
         thought Web UI after it :func:`submit` or :func:`run`. It will create a new project belongs to
         ``user`` if it does not exists. And when ``project`` exists but project's create do not belongs
         to ``user``, will grant `project` to ``user`` automatically.
+    :param resource_list: Resource files required by the current process definition.You can create and modify
+        resource files from this field. When the process definition is submitted, these resource files are
+        also submitted along with it.
     """
 
     # key attribute for identify ProcessDefinition object
@@ -88,6 +91,7 @@ class ProcessDefinition(Base):
         "tasks",
         "task_definition_json",
         "task_relation_json",
+        "resource_list",
     }
 
     def __init__(
@@ -105,8 +109,9 @@ class ProcessDefinition(Base):
         warning_type: Optional[str] = configuration.WORKFLOW_WARNING_TYPE,
         warning_group_id: Optional[int] = 0,
         timeout: Optional[int] = 0,
-        release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
+        release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
+        resource_list: Optional[List] = None,
     ):
         super().__init__(name, description)
         self.schedule = schedule
@@ -126,12 +131,13 @@ class ProcessDefinition(Base):
             self.warning_type = warning_type.strip().upper()
         self.warning_group_id = warning_group_id
         self.timeout = timeout
-        self.release_state = release_state
+        self._release_state = release_state
         self.param = param
         self.tasks: dict = {}
         # TODO how to fix circle import
         self._task_relations: set["TaskRelation"] = set()  # noqa: F821
         self._process_definition_code = None
+        self.resource_list = resource_list or []
 
     def __enter__(self) -> "ProcessDefinition":
         ProcessDefinitionContext.set(self)
@@ -196,6 +202,25 @@ class ProcessDefinition(Base):
     def end_time(self, val) -> None:
         """Set attribute end_time."""
         self._end_time = val
+
+    @property
+    def release_state(self) -> int:
+        """Get attribute release_state."""
+        rs_ref = {
+            "online": 1,
+            "offline": 0,
+        }
+        if self._release_state not in rs_ref:
+            raise PyDSParamException(
+                "Parameter release_state only support `online` or `offline` but get %",
+                self._release_state,
+            )
+        return rs_ref[self._release_state]
+
+    @release_state.setter
+    def release_state(self, val: str) -> None:
+        """Set attribute release_state."""
+        self._release_state = val.lower()
 
     @property
     def param_json(self) -> Optional[List[Dict]]:
@@ -381,11 +406,21 @@ class ProcessDefinition(Base):
             self.timeout,
             self.worker_group,
             self._tenant,
+            self.release_state,
             # TODO add serialization function
             json.dumps(self.task_relation_json),
             json.dumps(self.task_definition_json),
             None,
+            None,
         )
+        if len(self.resource_list) > 0:
+            for res in self.resource_list:
+                gateway.entry_point.createOrUpdateResource(
+                    self._user,
+                    res.name,
+                    res.description,
+                    res.content,
+                )
         return self._process_definition_code
 
     def start(self) -> None:

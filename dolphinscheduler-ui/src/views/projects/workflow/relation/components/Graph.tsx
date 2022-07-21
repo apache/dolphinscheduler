@@ -33,6 +33,9 @@ const props = {
     type: Array as PropType<Array<any>>,
     default: () => []
   },
+  links: {
+    default: () => []
+  },
   labelShow: {
     type: Boolean as PropType<boolean>,
     default: true
@@ -117,7 +120,7 @@ const GraphChart = defineComponent({
           draggable: true,
           force: {
             repulsion: 300,
-            edgeLength: 100
+            edgeLength: 200
           },
           symbol: 'roundRect',
           symbolSize: 70,
@@ -135,6 +138,11 @@ const GraphChart = defineComponent({
 
               return newStr.length > 60 ? newStr.slice(0, 60) + '...' : newStr
             }
+          },
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
+          edgeLabel: {
+            fontSize: 20
           },
           data: props.seriesData.map((item) => {
             const category = getCategory(
@@ -175,6 +183,14 @@ const GraphChart = defineComponent({
               itemStyle
             }
           }),
+          links: props.links,
+          lineStyle: {
+            opacity: 0.9,
+            width: 2,
+            curveness: 0
+          },
+          nodeScaleRatio: 0,
+          zoom: 1,
           categories: legendData
         }
       ]

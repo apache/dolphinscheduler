@@ -135,7 +135,7 @@ public class WorkerGroupController extends BaseController {
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = workerGroupService.queryAllGroup();
+        Map<String, Object> result = workerGroupService.queryAllGroup(loginUser);
         return returnDataList(result);
     }
 
@@ -146,7 +146,7 @@ public class WorkerGroupController extends BaseController {
      * @param id group id
      * @return delete result code
      */
-    @ApiOperation(value = "deleteById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")
+    @ApiOperation(value = "deleteWorkerGroupById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
     })
@@ -154,7 +154,7 @@ public class WorkerGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteWorkerGroupById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @PathVariable("id") Integer id
     ) {
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
