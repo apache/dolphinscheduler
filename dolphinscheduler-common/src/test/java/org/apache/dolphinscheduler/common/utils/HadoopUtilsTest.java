@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.hadoop.security.UserGroupInformation;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,59 +31,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * configuration test
+ * hadoop utils test
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class})
-public class CommonUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
+public class HadoopUtilsTest {
+    private static final Logger logger = LoggerFactory.getLogger(HadoopUtilsTest.class);
 
     @Test
-    public void getSystemEnvPath() {
-        String envPath;
-        envPath = CommonUtils.getSystemEnvPath();
-        Assert.assertEquals("/etc/profile", envPath);
-    }
-
-    @Test
-    public void isDevelopMode() {
-        logger.info("develop mode: {}", CommonUtils.isDevelopMode());
+    public void getHdfsTenantDir() {
+        logger.info(HadoopUtils.getHdfsTenantDir("1234"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getHdfsDataBasePath() {
-        logger.info(HadoopUtils.getHdfsDataBasePath());
+    public void getHdfsUdfFileName() {
+        logger.info(HadoopUtils.getHdfsUdfFileName("admin", "file_name"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getDownloadFilename() {
-        logger.info(FileUtils.getDownloadFilename("a.txt"));
+    public void getHdfsResourceFileName() {
+        logger.info(HadoopUtils.getHdfsResourceFileName("admin", "file_name"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getUploadFilename() {
-        logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
-        Assert.assertTrue(true);
-    }
-
-    @Test
-    public void getHdfsDir() {
-        logger.info(HadoopUtils.getHdfsResDir("1234"));
-        Assert.assertTrue(true);
-    }
-
-    @Test
-    public void test() {
-        InetAddress ip;
-        try {
-            ip = InetAddress.getLocalHost();
-            logger.info(ip.getHostAddress());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+    public void getHdfsFileName() {
+        logger.info(HadoopUtils.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
         Assert.assertTrue(true);
     }
 
