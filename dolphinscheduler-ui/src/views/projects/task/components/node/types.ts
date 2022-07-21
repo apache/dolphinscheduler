@@ -300,6 +300,8 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string
   restEndpoint?: string
+  zeppelinProductionNoteDirectory?: string
+  productionNoteDirectory?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
