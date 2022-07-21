@@ -66,10 +66,12 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
+        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
+            new By.ByClassName("dialog-create-data-source")));
+
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
-        new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("dialog-create-data-source")));
+        new WebDriverWait(driver, 10).until(ExpectedConditions.textToBe(new By.ByClassName("dialog-create-data-source"), dataSourceType.toUpperCase()));
 
         createDataSourceForm().selectDataSourceType()
             .stream()
