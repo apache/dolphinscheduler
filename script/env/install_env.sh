@@ -60,5 +60,5 @@ deployUser=${deployUser:-"dolphinscheduler"}
 # The root of zookeeper, for now DolphinScheduler default registry server is zookeeper.
 zkRoot=${zkRoot:-"/dolphinscheduler"}
 
-#whether the installation user has sudo permission
+# whether the installation user has sudo permission
 sudoEnable=${sudoEnable:-"true"}

@@ -34,8 +34,8 @@ if [ ! -d $installPath ];then
       sudo mkdir -p $installPath
       sudo chown -R $deployUser:$deployUser $installPath
     else
-        mkdir -p $installPath
-        chown -R $deployUser:$deployUser $installPath
+      mkdir -p $installPath
+      chown -R $deployUser:$deployUser $installPath
     fi
 elif [[ -z "${installPath// }" || "${installPath// }" == "/" || ( $(command -v realpath) && $(realpath -s "${installPath}") == "/" ) ]]; then
   echo "Parameter installPath can not be empty, use in root path or related path of root path, currently use ${installPath}"
