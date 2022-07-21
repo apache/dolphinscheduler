@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
