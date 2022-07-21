@@ -138,7 +138,6 @@ export function useTable() {
         title: t('project.workflow.operation'),
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](3),
-        className: styles.operation,
         render: (row: any) => {
           return h(NSpace, null, {
             default: () => [

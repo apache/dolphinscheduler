@@ -86,7 +86,6 @@ export function useTable(
       variables.columns.push({
         title: t('project.workflow.operation'),
         key: 'operation',
-        className: styles.operation,
         render: (_row: any) => {
           return h(NSpace, null, {
             default: () => [
