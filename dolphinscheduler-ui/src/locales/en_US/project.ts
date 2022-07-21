@@ -623,6 +623,8 @@ export default {
     zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
     zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
+    zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
+    zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',
