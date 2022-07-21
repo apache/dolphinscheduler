@@ -31,9 +31,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import io.etcd.jetcd.Client;
 
-/**
- * Get the connection status by listening to the Client's Channel
- */
 public class EtcdConnectionStateListener implements AutoCloseable {
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
     // A thread pool that periodically obtains connection status

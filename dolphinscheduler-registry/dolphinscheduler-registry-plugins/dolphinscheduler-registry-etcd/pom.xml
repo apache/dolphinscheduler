@@ -36,13 +36,11 @@
             <groupId>io.etcd</groupId>
             <artifactId>jetcd-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>io.etcd</groupId>
             <artifactId>jetcd-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
