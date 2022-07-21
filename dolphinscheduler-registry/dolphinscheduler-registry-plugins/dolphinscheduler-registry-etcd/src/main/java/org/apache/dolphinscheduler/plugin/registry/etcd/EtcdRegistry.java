@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -163,7 +164,8 @@ public class EtcdRegistry implements Registry {
         try {
             List<KeyValue> keyValues = client.getKVClient().get(byteSequence(key)).get().getKvs();
             return keyValues.iterator().next().getValue().toString(StandardCharsets.UTF_8);
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException("etcd get data error", e);
         }
     }
@@ -187,7 +189,8 @@ public class EtcdRegistry implements Registry {
             } else {
                 client.getKVClient().put(byteSequence(key), byteSequence(value)).get();
             }
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException("Failed to put registry key: " + key, e);
         }
     }
@@ -201,7 +204,8 @@ public class EtcdRegistry implements Registry {
         try {
             DeleteOption deleteOption = DeleteOption.newBuilder().isPrefix(true).build();
             client.getKVClient().delete(byteSequence(key), deleteOption).get();
-        }  catch (Exception e) {
+        }  catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException("Failed to delete registry key: " + key, e);
         }
     }
@@ -220,7 +224,8 @@ public class EtcdRegistry implements Registry {
         try {
             List<KeyValue> keyValues = client.getKVClient().get(byteSequence(prefix),getOption).get().getKvs();
             return keyValues.stream().map(e -> getSubNodeKeyName(prefix, e.getKey().toString(StandardCharsets.UTF_8))).distinct().collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException("etcd get children error", e);
         }
     }
@@ -248,7 +253,8 @@ public class EtcdRegistry implements Registry {
             if (client.getKVClient().get(byteSequence(key),getOption).get().getCount() >= 1) {
                 return true;
             }
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException("etcd check key is existed error", e);
         }
         return false;
@@ -277,7 +283,8 @@ public class EtcdRegistry implements Registry {
             }
             threadLocalLockMap.get().put(key,leaseId);
             return true;
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException("etcd get lock error", e);
         }
     }

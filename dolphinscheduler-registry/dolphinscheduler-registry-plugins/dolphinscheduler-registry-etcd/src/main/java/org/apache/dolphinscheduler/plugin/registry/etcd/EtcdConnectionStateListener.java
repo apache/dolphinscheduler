@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -61,13 +62,16 @@ public class EtcdConnectionStateListener implements AutoCloseable {
     /**
      * Apply for a lease through the client, if there is no exception, the connection is normal
      * @return the current connection state
-     * @throws if there is a exception, return is DISCONNECTED
+     * @throws if there is an exception, return is DISCONNECTED
      */
     private ConnectionState currentConnectivityState() {
         try {
             client.getLeaseClient().grant(1).get().getID();
             return ConnectionState.CONNECTED;
-        } catch (Exception e) {
+        } catch (ExecutionException e) {
+            return ConnectionState.DISCONNECTED;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return ConnectionState.DISCONNECTED;
         }
     }
