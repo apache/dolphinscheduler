@@ -85,6 +85,4 @@ public class EmailAlertChannelFactoryTest {
         AlertResult result = EmailAlertChannel.verifyParams(null);
         Assert.assertEquals(result.getStatus(), String.valueOf(Boolean.FALSE));
     }
-
-
 }
