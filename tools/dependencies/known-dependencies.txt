@@ -255,6 +255,7 @@ aws-java-sdk-s3-1.12.160.jar
 aws-java-sdk-kms-1.12.160.jar
 aws-java-sdk-emr-1.12.160.jar
 aws-java-sdk-core-1.12.160.jar
+aws-java-sdk-sagemaker-1.12.160.jar
 commons-text-1.8.jar
 httpasyncclient-4.1.4.jar
 httpcore-nio-4.4.14.jar
