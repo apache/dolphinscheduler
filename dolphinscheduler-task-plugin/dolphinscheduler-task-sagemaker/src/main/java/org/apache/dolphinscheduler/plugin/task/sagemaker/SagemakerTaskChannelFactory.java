@@ -15,54 +15,31 @@
  * limitations under the License.
  */
 
-.file-edit-content {
-  width: 100%;
-  padding-bottom: 20px;
-  > h2 {
-    line-height: 60px;
-    text-align: center;
-    padding-right: 170px;
-    position: relative;
-  }
-}
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-.form-content {
-  padding: 0 50px 0 50px;
-}
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-.submit {
-  text-align: left;
-  padding-top: 12px;
-  margin-left: 160px;
-}
+import java.util.Collections;
+import java.util.List;
 
-.table-box {
-  table {
-    width: 100%;
-    tr {
-      height: 40px;
-      font-size: 12px;
-      th,
-      td {
-        &:nth-child(1) {
-          width: 50px;
-          text-align: center;
-        }
-      }
-      th {
-        &:nth-child(1) {
-          width: 60px;
-          text-align: center;
-        }
-        > span {
-          font-size: 12px;
-          color: #555;
-        }
-      }
+import com.google.auto.service.AutoService;
+
+@AutoService(TaskChannelFactory.class)
+public class SagemakerTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public TaskChannel create() {
+        return new SagemakerTaskChannel();
     }
-  }
-}
 
-.breadcrumb {
-  padding-left: 10px;
+    @Override
+    public String getName() {
+        return "SAGEMAKER";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return Collections.emptyList();
+    }
 }
