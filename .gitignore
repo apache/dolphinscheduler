@@ -30,7 +30,6 @@ logs/*
 .mvn/
 .www
 t.*
-.history
 .factorypath
 Chart.lock
 yarn.lock
