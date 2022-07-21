@@ -35,7 +35,7 @@ public class SagemakerParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return sagemakerRequestJson != null && !sagemakerRequestJson.isEmpty();
+        return StringUtils.isNotEmpty(sagemakerRequestJson);
     }
 
 }
