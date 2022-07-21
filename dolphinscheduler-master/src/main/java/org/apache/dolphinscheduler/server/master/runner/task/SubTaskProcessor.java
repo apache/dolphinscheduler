@@ -169,7 +169,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (null == processDefinition) {
             logger.error("process definition not found in meta data, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}",
                     subProcessInstance.getProcessDefinitionCode(), subProcessInstance.getProcessDefinitionVersion(), subProcessInstance.getId());
-            throw new RuntimeException(String.format("process definition  code %s, version %s does not exist", subProcessInstance.getProcessDefinitionCode(), subProcessInstance.getProcessDefinitionVersion()));
+            throw new RuntimeException(String.format("process definition  code %s, version %s does not exist",
+                    subProcessInstance.getProcessDefinitionCode(), subProcessInstance.getProcessDefinitionVersion()));
         }
         subProcessInstance.setProcessDefinition(processDefinition);
         DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(subProcessInstance.getProcessDefinition());
