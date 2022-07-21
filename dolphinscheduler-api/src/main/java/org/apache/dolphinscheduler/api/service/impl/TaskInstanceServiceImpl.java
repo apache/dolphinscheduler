@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -170,6 +171,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
+    @Transactional
     @Override
     public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
