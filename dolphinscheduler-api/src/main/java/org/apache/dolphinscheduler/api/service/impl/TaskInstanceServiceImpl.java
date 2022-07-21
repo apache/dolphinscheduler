@@ -197,7 +197,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
             return result;
         }
-
+        // Workflow enforcement succeeded
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(task.getProcessInstanceId());
         if (processInstance != null && (processInstance.getState().typeIsFailure() || processInstance.getState().typeIsCancel())) {
             List<TaskInstance> validTaskList = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -207,6 +207,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(taskRelations);
             List<Long> definiteTaskCodeList = taskDefinitionLogs.stream().filter(definitionLog -> definitionLog.getFlag() == Flag.YES)
                 .map(TaskDefinitionLog::getCode).collect(Collectors.toList());
+            // only all tasks have instances
             if (CollectionUtils.equalLists(instanceTaskCodeList, definiteTaskCodeList)) {
                 List<Integer> failTaskList = validTaskList.stream().filter(instance -> instance.getState().typeIsFailure() || instance.getState().typeIsCancel())
                     .map(TaskInstance::getId).collect(Collectors.toList());
