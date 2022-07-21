@@ -25,10 +25,14 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -194,6 +198,24 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return result;
         }
 
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(task.getProcessInstanceId());
+        if (processInstance != null && (processInstance.getState().typeIsFailure() || processInstance.getState().typeIsCancel())) {
+            List<TaskInstance> validTaskList = processService.findValidTaskListByProcessId(processInstance.getId());
+            List<Long> instanceTaskCodeList = validTaskList.stream().map(TaskInstance::getTaskCode).collect(Collectors.toList());
+            List<ProcessTaskRelation> taskRelations = processService.findRelationByCode(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
+            List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(taskRelations);
+            List<Long> definiteTaskCodeList = taskDefinitionLogs.stream().filter(definitionLog -> definitionLog.getFlag() == Flag.YES)
+                .map(TaskDefinitionLog::getCode).collect(Collectors.toList());
+            if (CollectionUtils.equalLists(instanceTaskCodeList, definiteTaskCodeList)) {
+                List<Integer> failTaskList = validTaskList.stream().filter(instance -> instance.getState().typeIsFailure() || instance.getState().typeIsCancel())
+                    .map(TaskInstance::getId).collect(Collectors.toList());
+                if (failTaskList.size() == 1 && failTaskList.contains(taskInstanceId)) {
+                    processInstance.setState(ExecutionStatus.SUCCESS);
+                    processService.updateProcessInstance(processInstance);
+                }
+            }
+        }
         // change the state of the task instance
         task.setState(ExecutionStatus.FORCED_SUCCESS);
         int changedNum = taskInstanceMapper.updateById(task);

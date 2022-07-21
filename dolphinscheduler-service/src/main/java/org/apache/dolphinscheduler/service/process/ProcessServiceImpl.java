@@ -1337,10 +1337,10 @@ public class ProcessServiceImpl implements ProcessService {
      *
      * @param parentInstance parentInstance
      * @param parentTask     parentTask
+     * @param processMap     processMap
      * @return process instance map
      */
-    private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask) {
-        ProcessInstanceMap processMap = findWorkProcessMapByParent(parentInstance.getId(), parentTask.getId());
+    private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask, ProcessInstanceMap processMap) {
         if (processMap != null) {
             return processMap;
         }
@@ -1404,10 +1404,15 @@ public class ProcessServiceImpl implements ProcessService {
             // recover failover tolerance would not create a new command when the sub command already have been created
             return;
         }
-        instanceMap = setProcessInstanceMap(parentProcessInstance, task);
+        instanceMap = setProcessInstanceMap(parentProcessInstance, task, instanceMap);
         ProcessInstance childInstance = null;
         if (instanceMap.getProcessInstanceId() != 0) {
             childInstance = findProcessInstanceById(instanceMap.getProcessInstanceId());
+        }
+        if (childInstance != null && childInstance.getState() == ExecutionStatus.SUCCESS
+            && CommandType.START_FAILURE_TASK_PROCESS == parentProcessInstance.getCommandType()) {
+            logger.info("sub process instance {} status is success, so skip creating command", childInstance.getId());
+            return;
         }
         Command subProcessCommand = createSubProcessCommand(parentProcessInstance, childInstance, instanceMap, task);
         updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionCode());
