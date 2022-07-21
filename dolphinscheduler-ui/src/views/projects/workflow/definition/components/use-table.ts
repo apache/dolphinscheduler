@@ -25,7 +25,6 @@ import {
 } from '@/service/modules/process-definition'
 import { DeleteOutlined, ExclamationCircleOutlined } from '@vicons/antd'
 import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
-import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 

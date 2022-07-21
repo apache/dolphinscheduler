@@ -38,7 +38,6 @@ import {
 } from '@/common/column-width-config'
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
-import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 
 export function useTable() {
