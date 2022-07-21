@@ -23,11 +23,11 @@ ChunJun task type for executing ChunJun programs. For ChunJun nodes, the worker 
 | Failed retry interval | The time interval (unit minute) for resubmitting the task after a failed task. |
 | Task group name | The task group name. |
 | Priority | The task priority. |
-| Delayed execution time |  The time, in cents, that a task is delayed in execution. |
+| Delayed execution time |  The time, in minutes, that a task is delayed in execution. |
 | Timeout alarm | Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will be sent and the task execution will fail. |
 | Custom template | Custom the content of the ChunJun node's json profile. |
 | json | json configuration file for ChunJun synchronization. |
-| Custom parameters | SQL task type, and stored procedure is a custom parameter order to set values for the method. The custom parameter type and data type are the same as the stored procedure task type. The difference is that the SQL task type custom parameter will replace the \${variable} in the SQL statement. |
+| Custom parameters | It is a user-defined parameter, and will replace the content with `${variable}` in the script.
 | Deploy mode | Execute chunjun task mode, eg local standalone. |
 | Option Parameters | Support such as `-confProp "{\"flink.checkpoint.interval\":60000}"` |
 | Predecessor task | Selecting a predecessor task for the current task will set the selected predecessor task as upstream of the current task. |
