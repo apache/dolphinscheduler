@@ -26,11 +26,8 @@
         <if test="userName != null and userName != ''">
             and u.user_name like concat ('%', #{userName}, '%')
         </if>
-        <if test="ids != null and ids.size() > 0">
-            and t.id  in
-            <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
-                #{id}
-            </foreach>
+        <if test="userId != 0">
+            and t.user_id = #{userId}
         </if>
         order by t.update_time desc
     </select>
