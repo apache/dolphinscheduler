@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryRequest;
-import org.apache.dolphinscheduler.api.dto.project.ProjectCreateResponse;
+import org.apache.dolphinscheduler.api.dto.project.ProjectQueryResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -88,7 +88,7 @@ public class ProjectV2ControllerTest {
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject());
         Mockito.when(projectService.queryByCode(user, projectCode)).thenReturn(result);
-        ProjectCreateResponse response = projectV2Controller.queryProjectByCode(user, projectCode);
+        ProjectQueryResponse response = projectV2Controller.queryProjectByCode(user, projectCode);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
