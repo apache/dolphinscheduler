@@ -15,10 +15,18 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, watch, computed, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  PropType,
+  watch,
+  computed,
+  getCurrentInstance
+} from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
+import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
 import type { IUdf } from '../types'
@@ -100,7 +108,7 @@ export default defineComponent({
             path='name'
           >
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.fileEdit ? this.trim : noSpace}
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
               class='input-directory-name'
@@ -108,7 +116,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}
