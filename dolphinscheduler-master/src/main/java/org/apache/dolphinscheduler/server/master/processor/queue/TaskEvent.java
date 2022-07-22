@@ -109,7 +109,7 @@ public class TaskEvent {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
-        event.setState(ExecutionStatus.of(command.getStatus()));
+        event.setState(command.getStatus());
         event.setStartTime(command.getStartTime());
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());

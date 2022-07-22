@@ -52,7 +52,7 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
                                             System.currentTimeMillis());
         taskExecuteRunningMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());
+        taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());
         taskExecuteRunningMessage.setLogPath(taskExecutionContext.getLogPath());
         taskExecuteRunningMessage.setHost(taskExecutionContext.getHost());
         taskExecuteRunningMessage.setStartTime(taskExecutionContext.getStartTime());

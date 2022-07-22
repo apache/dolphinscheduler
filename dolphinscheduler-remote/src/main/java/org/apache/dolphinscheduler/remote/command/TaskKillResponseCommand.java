@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,7 +41,7 @@ public class TaskKillResponseCommand implements Serializable {
     /**
      * status
      */
-    private int status;
+    private ExecutionStatus status;
 
 
     /**
@@ -69,11 +70,11 @@ public class TaskKillResponseCommand implements Serializable {
         this.host = host;
     }
 
-    public int getStatus() {
+    public ExecutionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(ExecutionStatus status) {
         this.status = status;
     }
 
@@ -111,7 +112,7 @@ public class TaskKillResponseCommand implements Serializable {
         return "TaskKillResponseCommand{"
                 + "taskInstanceId=" + taskInstanceId
                 + ", host='" + host + '\''
-                + ", status=" + status
+                + ", status=" + status.getDescp()
                 + ", processId=" + processId
                 + ", appIds=" + appIds
                 + '}';

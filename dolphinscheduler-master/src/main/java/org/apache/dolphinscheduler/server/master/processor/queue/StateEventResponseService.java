@@ -136,7 +136,7 @@ public class StateEventResponseService {
     private void writeResponse(StateEvent stateEvent, ExecutionStatus status) {
         Channel channel = stateEvent.getChannel();
         if (channel != null) {
-            StateEventResponseCommand command = new StateEventResponseCommand(status.getCode(), stateEvent.getKey());
+            StateEventResponseCommand command = new StateEventResponseCommand(status, stateEvent.getKey());
             channel.writeAndFlush(command.convert2Command());
         }
     }

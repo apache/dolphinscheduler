@@ -61,7 +61,7 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
             LoggerUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
             logger.info("task execute running ack command : {}", runningAckCommand);
 
-            if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+            if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS) {
                 messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),
                                                       CommandType.TASK_EXECUTE_RUNNING);
             }

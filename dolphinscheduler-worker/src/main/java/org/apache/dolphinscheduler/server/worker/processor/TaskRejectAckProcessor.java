@@ -55,7 +55,7 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
         }
         try {
             LoggerUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
-            if (taskRejectAckMessage.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+            if (taskRejectAckMessage.getStatus() == ExecutionStatus.SUCCESS) {
                 messageRetryRunner.removeRetryMessage(taskRejectAckMessage.getTaskInstanceId(),
                                                       CommandType.TASK_REJECT);
                 logger.debug("removeRecallCache: task instance id:{}", taskRejectAckMessage.getTaskInstanceId());

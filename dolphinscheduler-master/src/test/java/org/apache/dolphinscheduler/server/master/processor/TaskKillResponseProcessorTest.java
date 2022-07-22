@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
@@ -50,7 +51,7 @@ public class TaskKillResponseProcessorTest {
                 new ArrayList<String>() {{ add("task_1"); }});
         taskKillResponseCommand.setHost("localhost");
         taskKillResponseCommand.setProcessId(1);
-        taskKillResponseCommand.setStatus(1);
+        taskKillResponseCommand.setStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskKillResponseCommand.setTaskInstanceId(1);
 
     }

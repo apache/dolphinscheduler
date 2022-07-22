@@ -110,7 +110,7 @@ public class TaskResultEventHandler implements TaskEventHandler {
 
     public void sendAckToWorker(TaskEvent taskEvent) {
         // we didn't set the receiver address, since the ack doen's need to retry
-        TaskExecuteAckCommand taskExecuteAckMessage = new TaskExecuteAckCommand(ExecutionStatus.SUCCESS.getCode(),
+        TaskExecuteAckCommand taskExecuteAckMessage = new TaskExecuteAckCommand(ExecutionStatus.SUCCESS,
                                                                                 taskEvent.getTaskInstanceId(),
                                                                                 masterConfig.getMasterAddress(),
                                                                                 taskEvent.getWorkerAddress(),
