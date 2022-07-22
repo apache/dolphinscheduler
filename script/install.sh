@@ -29,7 +29,7 @@ echo "1.create directory"
 # so we should check its value. Here use command `realpath` to get the related path, and it will skip if your shell env
 # without command `realpath`.
 if [ ! -d $installPath ];then
-   echo "sudo enabled = ${sudoEnable}"
+  echo "sudo enabled = ${sudoEnable}"
    if [ ${sudoEnable} = true ]; then
       sudo mkdir -p $installPath
       sudo chown -R $deployUser:$deployUser $installPath

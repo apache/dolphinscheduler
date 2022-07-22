@@ -93,6 +93,8 @@ installPath=~/dolphinscheduler
 
 # Deploy user, use the user you create in section **Configure machine SSH password-free login**
 deployUser="dolphinscheduler"
+# whether the installation user has sudo permission
+sudoEnable=true
 ```
 
 ### Modify `dolphinscheduler_env.sh`
