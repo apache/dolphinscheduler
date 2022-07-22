@@ -23,14 +23,14 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import lombok.Data;
 
 /**
- * project response
+ * project query response
  */
 @Data
-public class ProjectResponse extends Result {
+public class ProjectQueryResponse extends Result {
 
     private Project data;
 
-    public ProjectResponse(Result result) {
+    public ProjectQueryResponse(Result result) {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());

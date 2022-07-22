@@ -29,12 +29,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
-import org.apache.dolphinscheduler.api.dto.project.ProjectDeleteBooleanResponse;
+import org.apache.dolphinscheduler.api.dto.project.ProjectCreateResponse;
+import org.apache.dolphinscheduler.api.dto.project.ProjectDeleteResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryRequest;
-import org.apache.dolphinscheduler.api.dto.project.ProjectResponse;
+import org.apache.dolphinscheduler.api.dto.project.ProjectQueryResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateRequest;
+import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateResponse;
 import org.apache.dolphinscheduler.api.dto.user.UserListResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -86,11 +88,11 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ProjectResponse createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestBody ProjectCreateRequest projectCreateRequest) {
+    public ProjectCreateResponse createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @RequestBody ProjectCreateRequest projectCreateRequest) {
         Result result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
             projectCreateRequest.getDescription());
-        return new ProjectResponse(result);
+        return new ProjectCreateResponse(result);
     }
 
     /**
@@ -106,12 +108,12 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ProjectResponse updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable("code") Long code,
-                                         @RequestBody ProjectUpdateRequest projectUpdateReq) {
+    public ProjectUpdateResponse updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @PathVariable("code") Long code,
+                                               @RequestBody ProjectUpdateRequest projectUpdateReq) {
         Result result = projectService.update(loginUser, code, projectUpdateReq.getProjectName(),
             projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
-        return new ProjectResponse(result);
+        return new ProjectUpdateResponse(result);
     }
 
     /**
@@ -129,10 +131,10 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ProjectResponse queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @PathVariable("code") long code) {
+    public ProjectQueryResponse queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @PathVariable("code") long code) {
         Result result = projectService.queryByCode(loginUser, code);
-        return new ProjectResponse(result);
+        return new ProjectQueryResponse(result);
     }
 
     /**
@@ -179,10 +181,10 @@ public class ProjectV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ProjectDeleteBooleanResponse deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                      @PathVariable("code") Long code) {
+    public ProjectDeleteResponse deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @PathVariable("code") Long code) {
         Result result = projectService.deleteProject(loginUser, code);
-        return new ProjectDeleteBooleanResponse(result);
+        return new ProjectDeleteResponse(result);
     }
 
     /**

@@ -18,21 +18,22 @@
 package org.apache.dolphinscheduler.api.dto.project;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.Project;
 
 import lombok.Data;
 
 /**
- * boolean response
+ * project update response
  */
 @Data
-public class ProjectDeleteBooleanResponse extends Result {
+public class ProjectUpdateResponse extends Result {
 
-    private Boolean data;
+    private Project data;
 
-    public ProjectDeleteBooleanResponse(Result result) {
+    public ProjectUpdateResponse(Result result) {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
-        this.setData((Boolean) result.getData());
+        this.setData((Project) result.getData());
     }
 }
