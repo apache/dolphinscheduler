@@ -15,24 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-public class SwitchTaskUtils {
-    private static ScriptEngineManager manager;
-    private static ScriptEngine engine;
+import java.util.Collections;
+import java.util.List;
 
-    static {
-        manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("js");
+import com.google.auto.service.AutoService;
+
+@AutoService(TaskChannelFactory.class)
+public class SagemakerTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public TaskChannel create() {
+        return new SagemakerTaskChannel();
     }
 
-    public static boolean evaluate(String expression) throws ScriptException {
-        Object result = engine.eval(expression);
-        return (Boolean) result;
+    @Override
+    public String getName() {
+        return "SAGEMAKER";
     }
 
+    @Override
+    public List<PluginParams> getParams() {
+        return Collections.emptyList();
+    }
 }

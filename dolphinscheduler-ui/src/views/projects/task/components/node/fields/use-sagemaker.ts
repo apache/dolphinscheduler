@@ -14,19 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { IJsonItem } from '../types'
+import { useCustomParams } from '.'
 
-.conditions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.conditions-search-input {
-  width: 250px;
-}
-.pagination {
-  margin-top: 20px;
-  justify-content: center;
-}
-.mt-8 {
-  margin-top: 8px;
+export function useSagemaker(model: { [field: string]: any }): IJsonItem[] {
+
+  return [
+    {
+      type: 'editor',
+      field: 'sagemakerRequestJson',
+      name: "SagemakerRequestJson",
+      props: {
+        language: 'json'
+      },
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: 'requestJson' 
+      }
+    },
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+  ]
 }

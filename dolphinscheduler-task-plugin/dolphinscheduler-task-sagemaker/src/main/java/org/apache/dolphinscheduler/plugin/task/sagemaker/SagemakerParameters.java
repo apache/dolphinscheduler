@@ -15,12 +15,29 @@
  * limitations under the License.
  */
 
-.table-card {
-  margin-top: 8px;
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+public class SagemakerParameters extends AbstractParameters {
+
+    /**
+     * request script
+     */
+    private String sagemakerRequestJson;
+
+    @Override
+    public boolean checkParameters() {
+        return StringUtils.isNotEmpty(sagemakerRequestJson);
+    }
+
 }
