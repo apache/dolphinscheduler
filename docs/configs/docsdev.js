@@ -607,7 +607,7 @@ export default {
                             },
                             {
                                 title: 'SageMaker',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/SageMaker.html',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
                         ],
                     },
