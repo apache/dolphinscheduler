@@ -15,54 +15,13 @@
  * limitations under the License.
  */
 
-.file-edit-content {
-  width: 100%;
-  padding-bottom: 20px;
-  > h2 {
-    line-height: 60px;
-    text-align: center;
-    padding-right: 170px;
-    position: relative;
-  }
-}
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-.form-content {
-  padding: 0 50px 0 50px;
-}
+public class SagemakerConstants {
+    public static final int CHECK_PIPELINE_EXECUTION_STATUS_INTERVAL = 5000;
+    public static final int PIPELINE_MAX_RESULTS = 100;
 
-.submit {
-  text-align: left;
-  padding-top: 12px;
-  margin-left: 160px;
-}
-
-.table-box {
-  table {
-    width: 100%;
-    tr {
-      height: 40px;
-      font-size: 12px;
-      th,
-      td {
-        &:nth-child(1) {
-          width: 50px;
-          text-align: center;
-        }
-      }
-      th {
-        &:nth-child(1) {
-          width: 60px;
-          text-align: center;
-        }
-        > span {
-          font-size: 12px;
-          color: #555;
-        }
-      }
+    private SagemakerConstants() {
+        throw new IllegalStateException("Utility class");
     }
-  }
-}
-
-.breadcrumb {
-  padding-left: 10px;
 }
