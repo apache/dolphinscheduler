@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 
@@ -27,22 +28,22 @@ import java.io.Serializable;
 public class StateEventResponseCommand implements Serializable {
 
     private String key;
-    private int status;
+    private ExecutionStatus status;
 
     public StateEventResponseCommand() {
         super();
     }
 
-    public StateEventResponseCommand(int status, String key) {
+    public StateEventResponseCommand(ExecutionStatus status, String key) {
         this.status = status;
         this.key = key;
     }
 
-    public int getStatus() {
+    public ExecutionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(ExecutionStatus status) {
         this.status = status;
     }
 

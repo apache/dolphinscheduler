@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import {
   NForm,
@@ -192,7 +198,7 @@ const TokenModal = defineComponent({
                 <NFormItem label={t('security.token.token')} path='token'>
                   <NSpace>
                     <NInput
-                  allowInput={this.trim}
+                      allowInput={this.trim}
                       class='input-token'
                       style={{ width: '504px' }}
                       disabled
