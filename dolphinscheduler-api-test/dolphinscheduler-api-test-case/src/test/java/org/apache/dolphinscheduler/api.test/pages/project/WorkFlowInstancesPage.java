@@ -45,8 +45,6 @@ import org.slf4j.LoggerFactory;
 public final class WorkFlowInstancesPage {
     private static String workFlowInstanceState = null;
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowInstancesPage.class);
-
-
     public String queryWorkflowInstanceState(String sessionId, String projectName, String workFlowName) {
 
         Map<String, Object> params = new HashMap<>();

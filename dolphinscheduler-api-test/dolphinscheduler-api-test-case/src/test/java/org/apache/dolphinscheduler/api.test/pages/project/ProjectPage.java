@@ -20,8 +20,6 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
-import com.sun.xml.internal.ws.api.model.ExceptionType;
-import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.ProjectListResponseData;
@@ -52,9 +50,8 @@ public final class ProjectPage {
             HttpResponse res = requestClient.post("/projects", headers, params);
             return res;
         } catch (Exception e) {
-            logger.error("create project fail, message:{}", e);
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     public HttpResponse searchProject(String sessionId, String searchVal) {
@@ -84,8 +81,6 @@ public final class ProjectPage {
         RequestClient requestClient = new RequestClient();
 
         HttpResponse res = requestClient.get("/projects", headers, params);
-
-        logger.info("project %s", res);
 
         for (ProjectListResponseTotalList ProjectListRes : JSONUtils.convertValue(res.body().data(), ProjectListResponseData.class).totalList()) {
             logger.info(ProjectListRes.code());

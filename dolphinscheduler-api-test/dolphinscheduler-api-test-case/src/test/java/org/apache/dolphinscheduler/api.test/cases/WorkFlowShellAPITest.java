@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.api.test.cases;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
+import org.apache.dolphinscheduler.api.test.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
@@ -29,6 +30,10 @@ import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowDefinitionPage
 import org.apache.dolphinscheduler.api.test.pages.project.WorkFlowInstancesPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -48,13 +53,84 @@ public class WorkFlowShellAPITest {
 
     private static final String workFlowName = "shell123";
 
-    private static final String tenantName = "wendada";
+    private static final String tenantName = System.getProperty("user.name");
 
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
 
     private static String sessionId = null;
+
+    ArrayList<Object> localParams = new ArrayList<>();
+
+    ArrayList<Object> resourceList = new ArrayList<>();
+
+    private static String rawScript="echo 123";
+
+    private static String delayTime = "0";
+
+    private static String description = "";
+
+    private static String environmentCode = "-1";
+
+    private static String failRetryInterval = "1";
+
+    private static String failRetryTimes="0";
+
+    private static String flag = "YES";
+
+    private static String taskDefinitionRequestDataName = "shell123";
+
+    private static String taskPriority = "MEDIUM";
+
+    private static String taskType = "SHELL";
+
+    private int timeout = 0;
+
+    private static String timeoutFlag = "CLOSE";
+
+    private static String timeoutNotifyStrategy = "";
+
+    private static String workerGroup = "default";
+
+    private static String taskRelationRequestDataName = "";
+
+    private int preTaskCode = 0;
+
+    private int preTaskVersion = 0;
+
+    private static String conditionType = "NONE";
+    private static String executionType = "PARALLEL";
+    HashMap<String, Object> conditionParams = new HashMap<>();
+    private String globalParams="[]";
+
+    private static String startEndTime = "2022-06-25T16:00:00.000Z";
+
+    private static String scheduleTime = "2022-06-26 00:00:00,2022-06-26 00:00:00";
+
+    private static String failureStrategy = "CONTINUE";
+
+    private static String warningType = "NONE";
+
+    private static String warningGroupId = "";
+
+    private static String execType = "START_PROCESS";
+
+    private static String startNodeList = "";
+
+    private static String taskDependType = "TASK_POST";
+
+    private static String dependentMode = "OFF_MODE";
+
+    private static String runMode = "RUN_MODE_SERIAL";
+
+    private static String processInstancePriority = "MEDIUM";
+
+    private static String startParams = "";
+
+    private static String expectedParallelismNumber = "";
+
+    private static int dryRun = 0;
 
     @BeforeAll
     public static void setup() {
@@ -74,7 +150,9 @@ public class WorkFlowShellAPITest {
     public void testCreateWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
         flow.getGenNumId(sessionId, projectName);
-        HttpResponse res = flow.createWorkflow(sessionId, projectName, workFlowName);
+        HttpResponse res = flow.createWorkflow(sessionId, projectName, workFlowName, localParams, resourceList, rawScript, delayTime, description, environmentCode, failRetryInterval,
+            failRetryTimes, flag, taskDefinitionRequestDataName, taskPriority, taskType, timeout, timeoutFlag, timeoutNotifyStrategy, workerGroup, taskRelationRequestDataName, preTaskCode,
+            preTaskVersion, conditionType, conditionParams, executionType, globalParams);
 
         logger.info("Create workflow res：%s", res);
         Assertions.assertTrue(res.body().success());
@@ -106,7 +184,9 @@ public class WorkFlowShellAPITest {
     @Order(4)
     public void testRunWorkflow() {
         WorkFlowDefinitionPage flow = new WorkFlowDefinitionPage();
-        HttpResponse res = flow.runWorkflow(sessionId, projectName, workFlowName);
+        HttpResponse res = flow.runWorkflow(sessionId, projectName, workFlowName, startEndTime, scheduleTime, failureStrategy, warningType,
+            warningGroupId, execType, startNodeList, taskDependType, dependentMode, runMode, processInstancePriority,
+            workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
         logger.info("Run workflow res：%s", res);
         Assertions.assertTrue(res.body().success());
@@ -119,9 +199,9 @@ public class WorkFlowShellAPITest {
         WorkFlowInstancesPage instance = new WorkFlowInstancesPage();
         String state = null;
 
-        for (int i=0; i<5; i++){
+        for (int i=0; i<Constants.SLEEP_FREQUENCY; i++){
             state = instance.queryWorkflowInstanceState(sessionId, projectName, workFlowName);
-            Thread.sleep(1000);
+            Thread.sleep(Constants.SLEEP_INTERVAL);
         }
         logger.info("Run workflow state：%s", state);
         Assertions.assertEquals("SUCCESS",state);

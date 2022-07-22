@@ -20,7 +20,6 @@
 package org.apache.dolphinscheduler.api.test.pages.project;
 
 
-import org.apache.dolphinscheduler.api.test.cases.ProjectAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.TaskInstanceResponseData;
@@ -36,8 +35,43 @@ import java.util.Map;
 
 public final class TaskInstancePage {
     private static final Logger logger = LoggerFactory.getLogger(TaskInstancePage.class);
+
     private static String taskState = null;
+
     private static Integer taskInstanceId = null;
+
+    private static String startEndTime = "2022-06-25T16:00:00.000Z";
+
+    private static String scheduleTime = "2022-06-26 00:00:00,2022-06-26 00:00:00";
+
+    private static String failureStrategy = "CONTINUE";
+
+    private static String warningType = "NONE";
+
+    private static String warningGroupId = "";
+
+    private static String execType = "START_PROCESS";
+
+    private static String startNodeList = "";
+
+    private static String taskDependType = "TASK_POST";
+
+    private static String dependentMode = "OFF_MODE";
+
+    private static String runMode = "RUN_MODE_SERIAL";
+
+    private static String processInstancePriority = "MEDIUM";
+
+    private static String startParams = "";
+
+    private static String expectedParallelismNumber = "";
+
+    private static int dryRun = 0;
+
+    private static String workerGroup = "default";
+
+    private static String environmentCode = "-1";
+
 
     public String queryTaskInstance(String sessionId, String projectName, String workFlowName){
         Map<String, Object> params = new HashMap<>();
@@ -59,19 +93,17 @@ public final class TaskInstancePage {
         String projectCode = project.getProjectCode(sessionId, projectName);
 
         WorkFlowDefinitionPage workflow = new WorkFlowDefinitionPage();
-        workflow.runWorkflow(sessionId, projectName, workFlowName);
+        workflow.runWorkflow(sessionId, projectName, workFlowName, startEndTime, scheduleTime, failureStrategy, warningType,
+            warningGroupId, execType, startNodeList, taskDependType, dependentMode, runMode, processInstancePriority,
+            workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
         HttpResponse res = requestClient.get("/projects/"+projectCode+"/task-instances", headers, params);
-
-
         for (TaskInstanceResponseTotalList taskInstanceRes : JSONUtils.convertValue(res.body().data(), TaskInstanceResponseData.class).totalList()) {
 
             taskState =  taskInstanceRes.state();
             taskInstanceId = taskInstanceRes.id();
         }
-
         return taskState;
-
     }
 
     public HttpResponse queryTaskInstanceLog(String sessionId, String projectName, String workFlowName){
@@ -88,12 +120,7 @@ public final class TaskInstancePage {
         params.put("skipLineNum", 0);
 
         HttpResponse res = requestClient.get("/log/detail", headers, params);
-        String res_log = (String) res.body().data();
-
-        logger.info("查询实例log：%s", res_log);
-
         return res;
-
     }
 
 }

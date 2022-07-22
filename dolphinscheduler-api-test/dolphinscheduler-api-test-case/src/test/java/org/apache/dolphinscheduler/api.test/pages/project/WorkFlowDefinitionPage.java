@@ -43,6 +43,7 @@ import java.util.Map;
 public final class WorkFlowDefinitionPage {
     private static String genNumId = null;
     private static String workFlowCode = null;
+
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowDefinitionPage.class);
 
     public void getGenNumId(String sessionId, String projectName) {
@@ -61,46 +62,47 @@ public final class WorkFlowDefinitionPage {
     }
 
 
-    public HttpResponse createWorkflow(String sessionId, String projectName, String workFlowName) {
+    public HttpResponse createWorkflow(String sessionId, String projectName, String workFlowName, ArrayList<Object> localParams, ArrayList<Object> resourceList,
+                                       String rawScript, String delayTime, String description,
+                                       String environmentCode, String failRetryInterval, String failRetryTimes, String flag, String taskDefinitionRequestDataName, String taskPriority,
+                                       String taskType, Integer timeout, String timeoutFlag, String timeoutNotifyStrategy, String workerGroup, String taskRelationRequestDataName,
+                                       Integer preTaskCode, Integer preTaskVersion, String conditionType, HashMap<String, Object> conditionParams,
+                                       String executionType, String globalParams) {
         Map<String, String> headers = new HashMap<>();
         WorkFlowCreateRequestData workFlowCreateRequestData = new WorkFlowCreateRequestData();
         TaskDefinitionRequestData taskDefinitionRequestData = new TaskDefinitionRequestData();
         TaskRelationRequestData taskRelationRequestData = new TaskRelationRequestData();
 
         TaskParamsMap taskParams = new TaskParamsMap();
-        ArrayList<Object> localParams = new ArrayList<>();
-        ArrayList<Object> resourceList = new ArrayList<>();
         taskParams.localParams(localParams);
         taskParams.resourceList(resourceList);
-        taskParams.rawScript("echo 123");
+        taskParams.rawScript(rawScript);
 
         taskDefinitionRequestData.code(genNumId);
-        taskDefinitionRequestData.delayTime("0");
-        taskDefinitionRequestData.description("");
-        taskDefinitionRequestData.environmentCode("-1");
-        taskDefinitionRequestData.failRetryInterval("1");
-        taskDefinitionRequestData.failRetryTimes("0");
-        taskDefinitionRequestData.flag("YES");
-        taskDefinitionRequestData.name("echo_123");
+        taskDefinitionRequestData.delayTime(delayTime);
+        taskDefinitionRequestData.description(description);
+        taskDefinitionRequestData.environmentCode(environmentCode);
+        taskDefinitionRequestData.failRetryInterval(failRetryInterval);
+        taskDefinitionRequestData.failRetryTimes(failRetryTimes);
+        taskDefinitionRequestData.flag(flag);
+        taskDefinitionRequestData.name(taskDefinitionRequestDataName);
         taskDefinitionRequestData.taskParams(taskParams);
-        taskDefinitionRequestData.taskPriority("MEDIUM");
-        taskDefinitionRequestData.taskType("SHELL");
-        taskDefinitionRequestData.timeout(0);
-        taskDefinitionRequestData.timeoutFlag("CLOSE");
-        taskDefinitionRequestData.timeoutNotifyStrategy("");
-        taskDefinitionRequestData.workerGroup("default");
+        taskDefinitionRequestData.taskPriority(taskPriority);
+        taskDefinitionRequestData.taskType(taskType);
+        taskDefinitionRequestData.timeout(timeout);
+        taskDefinitionRequestData.timeoutFlag(timeoutFlag);
+        taskDefinitionRequestData.timeoutNotifyStrategy(timeoutNotifyStrategy);
+        taskDefinitionRequestData.workerGroup(workerGroup);
 
         ArrayList<Object> taskDefinitionRequestDataList = new ArrayList<>();
         taskDefinitionRequestDataList.add(taskDefinitionRequestData);
 
-        HashMap<String, Object> conditionParams = new HashMap();
-
-        taskRelationRequestData.name("");
-        taskRelationRequestData.preTaskCode(0);
-        taskRelationRequestData.preTaskVersion(0);
-        taskRelationRequestData.preTaskCode(0);
+        taskRelationRequestData.name(taskRelationRequestDataName);
+        taskRelationRequestData.preTaskCode(preTaskCode);
+        taskRelationRequestData.preTaskVersion(preTaskVersion);
+        taskRelationRequestData.preTaskCode(preTaskCode);
         taskRelationRequestData.postTaskCode(genNumId);
-        taskRelationRequestData.conditionType("NONE");
+        taskRelationRequestData.conditionType(conditionType);
         taskRelationRequestData.conditionParams(conditionParams);
         ArrayList<Object> taskRelationRequestDataList = new ArrayList<>();
         taskRelationRequestDataList.add(taskRelationRequestData);
@@ -117,9 +119,9 @@ public final class WorkFlowDefinitionPage {
         workFlowCreateRequestData.taskRelationJson(JSONUtils.toJsonString(taskRelationRequestDataList));
         workFlowCreateRequestData.name(workFlowName);
         workFlowCreateRequestData.tenantCode(TenantAPITest.tenantName);
-        workFlowCreateRequestData.executionType("PARALLEL");
+        workFlowCreateRequestData.executionType(executionType);
         workFlowCreateRequestData.description("");
-        workFlowCreateRequestData.globalParams("[]");
+        workFlowCreateRequestData.globalParams(globalParams);
         workFlowCreateRequestData.timeout(0);
 
         headers.put(Constants.SESSION_ID_KEY, sessionId);
@@ -167,7 +169,9 @@ public final class WorkFlowDefinitionPage {
 
     }
 
-    public HttpResponse runWorkflow(String sessionId, String projectName, String workFlowName){
+    public HttpResponse runWorkflow(String sessionId, String projectName, String workFlowName, String startEndTime, String scheduleTime, String failureStrategy, String warningType,
+                                    String warningGroupId, String execType, String startNodeList, String taskDependType, String dependentMode, String runMode, String processInstancePriority,
+                                    String workerGroup, String environmentCode, String startParams, String expectedParallelismNumber, Integer dryRun){
         WorkFlowDefinitionPage workflow = new WorkFlowDefinitionPage();
         workflow.queryWorkflow(sessionId, projectName, workFlowName);
         workflow.onLineWorkflow(sessionId, projectName, workFlowName);
@@ -176,22 +180,22 @@ public final class WorkFlowDefinitionPage {
         WorkFlowRunRequestData workFlowRunRequestData = new WorkFlowRunRequestData();
 
         workFlowRunRequestData.processDefinitionCode(workFlowCode);
-        workFlowRunRequestData.startEndTime("2022-06-25T16:00:00.000Z");
-        workFlowRunRequestData.scheduleTime("2022-06-26 00:00:00,2022-06-26 00:00:00");
-        workFlowRunRequestData.failureStrategy("CONTINUE");
-        workFlowRunRequestData.warningType("NONE");
-        workFlowRunRequestData.warningGroupId("");
-        workFlowRunRequestData.execType("START_PROCESS");
-        workFlowRunRequestData.startNodeList("");
-        workFlowRunRequestData.taskDependType("TASK_POST");
-        workFlowRunRequestData.dependentMode("OFF_MODE");
-        workFlowRunRequestData.runMode("RUN_MODE_SERIAL");
-        workFlowRunRequestData.processInstancePriority("MEDIUM");
-        workFlowRunRequestData.workerGroup("default");
-        workFlowRunRequestData.environmentCode("");
-        workFlowRunRequestData.startParams("");
-        workFlowRunRequestData.expectedParallelismNumber("");
-        workFlowRunRequestData.dryRun(0);
+        workFlowRunRequestData.startEndTime(startEndTime);
+        workFlowRunRequestData.scheduleTime(scheduleTime);
+        workFlowRunRequestData.failureStrategy(failureStrategy);
+        workFlowRunRequestData.warningType(warningType);
+        workFlowRunRequestData.warningGroupId(warningGroupId);
+        workFlowRunRequestData.execType(execType);
+        workFlowRunRequestData.startNodeList(startNodeList);
+        workFlowRunRequestData.taskDependType(taskDependType);
+        workFlowRunRequestData.dependentMode(dependentMode);
+        workFlowRunRequestData.runMode(runMode);
+        workFlowRunRequestData.processInstancePriority(processInstancePriority);
+        workFlowRunRequestData.workerGroup(workerGroup);
+        workFlowRunRequestData.environmentCode(environmentCode);
+        workFlowRunRequestData.startParams(startParams);
+        workFlowRunRequestData.expectedParallelismNumber(expectedParallelismNumber);
+        workFlowRunRequestData.dryRun(dryRun);
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
