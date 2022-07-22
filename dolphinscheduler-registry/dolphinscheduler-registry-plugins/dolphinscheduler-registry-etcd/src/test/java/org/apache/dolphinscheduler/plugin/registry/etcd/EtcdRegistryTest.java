@@ -26,10 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +41,10 @@ public class EtcdRegistryTest {
             .withNodes(1)
             .withImage("ibmcom/etcd:3.2.24")
             .build();
-    EtcdRegistry registry;
+    public static EtcdRegistry registry;
 
-    @Before
-    public void before() throws InterruptedException {
+    @BeforeClass
+    public static void before() throws Exception {
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
         server.restart();
         properties.setEndpoints(String.valueOf(server.clientEndpoints().get(0)));
@@ -68,7 +65,7 @@ public class EtcdRegistryTest {
     }
 
     @Test
-    public void lockTest() throws InterruptedException {
+    public void lockTest() {
         CountDownLatch preCountDownLatch = new CountDownLatch(1);
         CountDownLatch allCountDownLatch = new CountDownLatch(2);
         List<String> testData = new ArrayList<>();
@@ -89,7 +86,11 @@ public class EtcdRegistryTest {
                 allCountDownLatch.countDown();
             }
         }).start();
-        preCountDownLatch.await();
+        try {
+            preCountDownLatch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         new Thread(() -> {
             try {
                 logger.info(Thread.currentThread().getName() + " :I am trying to acquire the lock");
@@ -103,13 +104,16 @@ public class EtcdRegistryTest {
             }
 
         }).start();
-        allCountDownLatch.await();
+        try {
+            allCountDownLatch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
-
     }
 
     @Test
-    public void subscribeTest() throws InterruptedException {
+    public void subscribeTest() {
         boolean status = registry.subscribe("/sub", new TestListener());
         // The following add and delete operations are used for debugging
         registry.put("/sub/m1", "tt", false);
@@ -127,8 +131,8 @@ public class EtcdRegistryTest {
         }
     }
 
-    @After
-    public void after() throws IOException {
+    @AfterClass
+    public static void after() throws IOException {
         registry.close();
     }
 }
