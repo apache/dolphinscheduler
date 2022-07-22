@@ -19,7 +19,7 @@ SageMaker
 =========
 
 
-A shell task type's example and dive into information of **PyDolphinScheduler**.
+A SageMaker task type's example and dive into information of **PyDolphinScheduler**.
 
 Example
 -------
