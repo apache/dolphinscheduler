@@ -110,7 +110,7 @@ public final class AlertSenderService extends Thread {
                         alert.setContent(content);
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    logger.error("alert content is null");
                 }
             }
             alertData.setId(alertId)
