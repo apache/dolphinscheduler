@@ -227,7 +227,12 @@ export default defineComponent({
               <NTooltip
                 v-slots={{
                   trigger: () => (
-                    <NPopover placement='bottom' trigger='click'>
+                    <NPopover
+                      placement='bottom'
+                      trigger='click'
+                      scrollable
+                      style={{ maxWidth: '50vw', maxHeight: '70vh' }}
+                    >
                       {{
                         trigger: () => (
                           <NButton
