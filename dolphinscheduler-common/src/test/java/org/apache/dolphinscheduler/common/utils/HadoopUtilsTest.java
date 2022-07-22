@@ -65,9 +65,7 @@ public class HadoopUtilsTest {
     @Test
     public void getAppAddress() {
         PowerMockito.mockStatic(HttpUtils.class);
-        PowerMockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info")).thenReturn(
-            "{\"clusterInfo\":{\"id\":1657034250022,\"startedOn\":1657034250022,\"" +
-                "state\":\"STARTED\",\"haState\":\"ACTIVE\",\"haZooKeeperConnectionState\":\"CONNECTED\"}}");
+        PowerMockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info")).thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
         logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
         Assert.assertTrue(true);
     }
