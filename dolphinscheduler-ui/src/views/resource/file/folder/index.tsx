@@ -19,6 +19,7 @@ import { defineComponent, toRefs, PropType, getCurrentInstance } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
+import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
 import { useFolder } from './use-folder'
 
@@ -69,7 +70,7 @@ export default defineComponent({
         <NForm rules={this.rules} ref='folderFormRef'>
           <NFormItem label={t('resource.file.folder_name')} path='name'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={noSpace}
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-directory-name'
@@ -77,7 +78,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}
