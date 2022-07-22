@@ -207,10 +207,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // task result process
             if (this.task.getNeedAlert()) {
-                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus().getCode());
+                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus());
             }
 
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(this.task.getExitStatus().getCode()));
+            taskExecutionContext.setCurrentExecutionStatus(this.task.getExitStatus());
             taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
             taskExecutionContext.setProcessId(this.task.getProcessId());
             taskExecutionContext.setAppIds(this.task.getAppIds());
@@ -233,8 +233,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
     }
 
-    private void sendAlert(TaskAlertInfo taskAlertInfo, int status) {
-        int strategy = status == ExecutionStatus.SUCCESS.getCode() ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
+    private void sendAlert(TaskAlertInfo taskAlertInfo, ExecutionStatus status) {
+        int strategy = status == ExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
         alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent(), strategy);
     }
 

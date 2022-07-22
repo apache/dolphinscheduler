@@ -330,6 +330,7 @@ export function formatParams(data: INodeData): {
     taskParams.noteId = data.zeppelinNoteId
     taskParams.paragraphId = data.zeppelinParagraphId
     taskParams.restEndpoint = data.zeppelinRestEndpoint
+    taskParams.productionNoteDirectory = data.zeppelinProductionNoteDirectory
     taskParams.parameters = data.parameters
   }
 
@@ -381,6 +382,10 @@ export function formatParams(data: INodeData): {
     taskParams.dvcMessage = data.dvcMessage
     taskParams.dvcLoadSaveDataPath = data.dvcLoadSaveDataPath
     taskParams.dvcStoreUrl = data.dvcStoreUrl
+  }
+
+  if (data.taskType === 'SAGEMAKER') {
+    taskParams.sagemakerRequestJson = data.sagemakerRequestJson
   }
 
   if (data.taskType === 'DINKY') {

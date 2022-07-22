@@ -37,13 +37,13 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
      * access token page
      *
      * @param page page
-     * @param tokenIds tokenIds
+     * @param userId userId
      * @param userName userName
      * @return access token Ipage
      */
     IPage<AccessToken> selectAccessTokenPage(Page page,
-                                             @Param("ids") List<Integer> tokenIds,
-                                             @Param("userName") String userName
+                                             @Param("userName") String userName,
+                                             @Param("userId") int userId
     );
 
     /**

@@ -78,7 +78,7 @@ public class TaskResponseServiceTest {
                                                                                             System.currentTimeMillis());
         taskExecuteRunningMessage.setProcessId(1);
         taskExecuteRunningMessage.setTaskInstanceId(22);
-        taskExecuteRunningMessage.setStatus(ExecutionStatus.RUNNING_EXECUTION.getCode());
+        taskExecuteRunningMessage.setStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskExecuteRunningMessage.setExecutePath("path");
         taskExecuteRunningMessage.setLogPath("logPath");
         taskExecuteRunningMessage.setHost("127.*.*.*");
