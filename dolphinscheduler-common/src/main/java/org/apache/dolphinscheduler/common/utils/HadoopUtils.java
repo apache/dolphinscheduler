@@ -458,11 +458,9 @@ public class HadoopUtils implements Closeable, StorageOperate {
                 return ExecutionStatus.FAILURE;
             }
             result = jsonObject.path("app").path("finalStatus").asText();
-            if (StringUtils.equals(result, Constants.UNDEFINED)) {
-                String state = jsonObject.path("app").path("state").asText();
-                if (StringUtils.equals(state, Constants.FINISHED)) {
-                    return ExecutionStatus.FAILURE;
-                }
+            String state = jsonObject.path("app").path("state").asText();
+            if (StringUtils.equals(result, Constants.UNDEFINED) && StringUtils.equals(state, Constants.FINISHED)) {
+                return ExecutionStatus.FAILURE;
             }
 
         } else {
