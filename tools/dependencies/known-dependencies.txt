@@ -266,3 +266,4 @@ websocket-client-9.4.44.v20210927.jar
 websocket-common-9.4.44.v20210927.jar
 zeppelin-client-0.10.1.jar
 zeppelin-common-0.10.1.jar
+json-path-2.7.0.jar
