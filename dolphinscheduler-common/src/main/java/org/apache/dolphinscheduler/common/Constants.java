@@ -481,6 +481,14 @@ public final class Constants {
      */
     public static final String ENDED = "ENDED";
     /**
+     * UNDEFINED
+     */
+    public static final String UNDEFINED = "UNDEFINED";
+    /**
+     * FINISHED
+     */
+    public static final String FINISHED = "FINISHED";
+    /**
      * NEW
      */
     public static final String NEW = "NEW";
