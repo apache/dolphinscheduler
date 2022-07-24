@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.server.master.metrics;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -53,9 +53,7 @@ public final class ProcessInstanceMetrics {
                             .register(Metrics.globalRegistry)
             );
         }
-    }
 
-    static {
         for (final String status : PROCESS_INSTANCE_STATUSES) {
             PROCESS_INSTANCE_COUNTERS.put(
                     status,
@@ -65,6 +63,7 @@ public final class ProcessInstanceMetrics {
                             .register(Metrics.globalRegistry)
             );
         }
+
     }
 
     private static final Timer COMMAND_QUERY_TIMETER =
@@ -75,41 +74,6 @@ public final class ProcessInstanceMetrics {
     private static final Timer PROCESS_INSTANCE_GENERATE_TIMER =
         Timer.builder("ds.workflow.instance.generate.duration")
             .description("Process instance generated duration")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_SUBMIT_COUNTER =
-        Counter.builder("ds.workflow.instance.submit.count")
-            .description("Process instance submit total count")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_TIMEOUT_COUNTER =
-        Counter.builder("ds.workflow.instance.timeout.count")
-            .description("Process instance timeout total count")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_FINISH_COUNTER =
-            Counter.builder("ds.workflow.instance.finish.count")
-                    .description("Process instance finish total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_SUCCESS_COUNTER =
-            Counter.builder("ds.workflow.instance.success.count")
-                    .description("Process instance success total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_FAILURE_COUNTER =
-            Counter.builder("ds.workflow.instance.failure.count")
-                    .description("Process instance failure total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_STOP_COUNTER =
-        Counter.builder("ds.workflow.instance.stop.count")
-            .description("Process instance stop total count")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_FAILOVER_COUNTER =
-        Counter.builder("ds.workflow.instance.failover.count")
-            .description("Process instance failover total count")
             .register(Metrics.globalRegistry);
 
     public static void recordCommandQueryTime(long milliseconds) {

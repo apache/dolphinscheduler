@@ -51,9 +51,7 @@ public final class TaskMetrics {
                             .register(Metrics.globalRegistry)
             );
         }
-    }
 
-    static {
         for (final String status : TASK_INSTANCE_STATUSES) {
             TASK_INSTANCE_COUNTERS.put(
                     status,
@@ -63,47 +61,8 @@ public final class TaskMetrics {
                             .register(Metrics.globalRegistry)
             );
         }
+
     }
-
-    private static final Counter TASK_SUBMIT_COUNTER =
-            Counter.builder("ds.task.submit.count")
-                    .description("Task submit total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_FINISH_COUNTER =
-            Counter.builder("ds.task.finish.count")
-                    .description("Task finish total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_SUCCESS_COUNTER =
-            Counter.builder("ds.task.success.count")
-                    .description("Task success total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_FAILURE_COUNTER =
-            Counter.builder("ds.task.failure.count")
-                    .description("Task failure total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_TIMEOUT_COUNTER =
-            Counter.builder("ds.task.timeout.count")
-                    .description("Task timeout total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_RETRY_COUNTER =
-            Counter.builder("ds.task.retry.count")
-                    .description("Task retry total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_STOP_COUNTER =
-            Counter.builder("ds.task.stop.count")
-                    .description("Task stop total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_FAILOVER_COUNTER =
-            Counter.builder("ds.task.failover.count")
-                    .description("Task failover total count")
-                    .register(Metrics.globalRegistry);
 
     private static final Counter TASK_DISPATCH_COUNTER =
             Counter.builder("ds.task.dispatch.count")
@@ -119,10 +78,6 @@ public final class TaskMetrics {
             Counter.builder("ds.task.dispatch.error.count")
                     .description("Number of errors during task dispatch")
                     .register(Metrics.globalRegistry);
-
-    public static void incTaskSubmit() {
-        TASK_SUBMIT_COUNTER.increment();
-    }
 
     public synchronized static void registerTaskPrepared(Supplier<Number> consumer) {
         Gauge.builder("ds.task.prepared", consumer)
