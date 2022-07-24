@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.project;
 
-
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.TaskInstanceResponseData;
@@ -71,7 +70,6 @@ public final class TaskInstancePage {
     private static String workerGroup = "default";
 
     private static String environmentCode = "-1";
-
 
     public String queryTaskInstance(String sessionId, String projectName, String workFlowName) {
         Map<String, Object> params = new HashMap<>();

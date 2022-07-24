@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class WorkFlowShellAPITest {

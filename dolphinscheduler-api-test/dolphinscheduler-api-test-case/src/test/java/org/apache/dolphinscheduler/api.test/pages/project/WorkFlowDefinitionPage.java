@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.project;
 
-
 import org.apache.dolphinscheduler.api.test.cases.TenantAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
@@ -39,7 +38,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public final class WorkFlowDefinitionPage {
     private static String genNumId = null;
@@ -61,7 +59,6 @@ public final class WorkFlowDefinitionPage {
         genNumId = list.get(0).toString();
 
     }
-
 
     public HttpResponse createWorkflow(String sessionId, String projectName, String workFlowName, ArrayList<Object> localParams, ArrayList<Object> resourceList,
                                        String rawScript, String delayTime, String description,

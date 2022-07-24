@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.project;
 
-
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.ProjectListResponseData;
@@ -83,9 +82,9 @@ public final class ProjectPage {
 
         HttpResponse res = requestClient.get("/projects", headers, params);
 
-        for (ProjectListResponseTotalList ProjectListRes : JSONUtils.convertValue(res.body().data(), ProjectListResponseData.class).totalList()) {
-            logger.info(ProjectListRes.code());
-            projectCode = ProjectListRes.code();
+        for (ProjectListResponseTotalList projectListRes : JSONUtils.convertValue(res.body().data(), ProjectListResponseData.class).totalList()) {
+            logger.info(projectListRes.code());
+            projectCode = projectListRes.code();
         }
         return projectCode;
     }

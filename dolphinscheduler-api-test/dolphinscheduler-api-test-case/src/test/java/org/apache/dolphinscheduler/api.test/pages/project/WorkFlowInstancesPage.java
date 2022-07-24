@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.project;
 
-
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.WorkFlowInstancesResponseData;
@@ -32,7 +31,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public final class WorkFlowInstancesPage {
     private static String workFlowInstanceState = null;
@@ -57,6 +55,5 @@ public final class WorkFlowInstancesPage {
 
         return workFlowInstanceState;
     }
-
 
 }
