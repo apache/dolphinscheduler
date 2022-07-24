@@ -23,12 +23,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableSet;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
-
-import com.google.common.collect.ImmutableSet;
 
 public final class ProcessInstanceMetrics {
 
