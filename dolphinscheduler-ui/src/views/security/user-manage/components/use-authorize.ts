@@ -301,10 +301,10 @@ export function useAuthorize() {
     if (state.saving) return false
     state.saving = true
     if (type === 'authorize_project') {
-      await grantProject({
-        userId,
-        projectIds: state.authorizedProjects.join(',')
-      })
+      // await grantProject({
+      //   userId,
+      //   projectIds: state.authorizedProjects.join(',')
+      // })
     }
     if (type === 'authorize_datasource') {
       await grantDataSource({
