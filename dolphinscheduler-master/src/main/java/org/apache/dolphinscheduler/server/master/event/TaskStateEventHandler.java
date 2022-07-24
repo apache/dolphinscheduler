@@ -100,13 +100,13 @@ public class TaskStateEventHandler implements StateEventHandler {
         }
         switch (taskStateEvent.getExecutionStatus()) {
             case STOP:
-                TaskMetrics.incTaskInstanceByStatus("stop");
+                TaskMetrics.incTaskInstanceByState("stop");
                 break;
             case SUCCESS:
-                TaskMetrics.incTaskInstanceByStatus("success");
+                TaskMetrics.incTaskInstanceByState("success");
                 break;
             case FAILURE:
-                TaskMetrics.incTaskInstanceByStatus("fail");
+                TaskMetrics.incTaskInstanceByState("fail");
                 break;
             default:
                 break;

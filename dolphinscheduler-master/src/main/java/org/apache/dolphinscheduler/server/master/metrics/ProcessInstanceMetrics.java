@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
-import com.google.common.collect.ImmutableSet;
-
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
+
+import com.google.common.collect.ImmutableSet;
 
 public final class ProcessInstanceMetrics {
 
@@ -39,9 +39,7 @@ public final class ProcessInstanceMetrics {
     private static Map<String, Counter> PROCESS_INSTANCE_COUNTERS = new HashMap<>();
 
     private static final Set<String> PROCESS_INSTANCE_STATES = ImmutableSet.of(
-            "submit", "timeout", "finish", "failover");
-
-    private static final Set<String> PROCESS_INSTANCE_STATUSES = ImmutableSet.of("success", "fail", "stop");
+            "submit", "timeout", "finish", "failover", "success", "fail", "stop");
 
     static {
         for (final String state : PROCESS_INSTANCE_STATES) {
@@ -50,16 +48,6 @@ public final class ProcessInstanceMetrics {
                     Counter.builder("ds.workflow.instance.count")
                             .tag("state", state)
                             .description(String.format("Process instance %s total count", state))
-                            .register(Metrics.globalRegistry)
-            );
-        }
-
-        for (final String status : PROCESS_INSTANCE_STATUSES) {
-            PROCESS_INSTANCE_COUNTERS.put(
-                    status,
-                    Counter.builder("ds.workflow.instance.count")
-                            .tag("status", status)
-                            .description(String.format("Process instance %s total count", status))
                             .register(Metrics.globalRegistry)
             );
         }
@@ -100,7 +88,4 @@ public final class ProcessInstanceMetrics {
         PROCESS_INSTANCE_COUNTERS.get(state).increment();
     }
 
-    public static void incProcessInstanceByStatus(final String status) {
-        PROCESS_INSTANCE_COUNTERS.get(status).increment();
-    }
 }

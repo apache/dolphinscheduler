@@ -37,27 +37,15 @@ public final class TaskMetrics {
     private static Map<String, Counter> TASK_INSTANCE_COUNTERS = new HashMap<>();
 
     private static final Set<String> TASK_INSTANCE_STATES = ImmutableSet.of(
-            "submit", "timeout", "finish", "failover", "retry", "dispatch");
-
-    private static final Set<String> TASK_INSTANCE_STATUSES = ImmutableSet.of("success", "fail", "stop");
+            "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "fail", "stop");
 
     static {
         for (final String state : TASK_INSTANCE_STATES) {
             TASK_INSTANCE_COUNTERS.put(
                     state,
                     Counter.builder("ds.task.instance.count")
-                            .tag("state", state)
+                            .tags("state", state)
                             .description(String.format("Process instance %s total count", state))
-                            .register(Metrics.globalRegistry)
-            );
-        }
-
-        for (final String status : TASK_INSTANCE_STATUSES) {
-            TASK_INSTANCE_COUNTERS.put(
-                    status,
-                    Counter.builder("ds.task.instance.count")
-                            .tag("status", status)
-                            .description(String.format("Process instance %s total count", status))
                             .register(Metrics.globalRegistry)
             );
         }
@@ -99,10 +87,6 @@ public final class TaskMetrics {
 
     public static void incTaskInstanceByState(final String state) {
         TASK_INSTANCE_COUNTERS.get(state).increment();
-    }
-
-    public static void incTaskInstanceByStatus(final String status) {
-        TASK_INSTANCE_COUNTERS.get(status).increment();
     }
 
 }

@@ -79,13 +79,13 @@ public class WorkflowStateEventHandler implements StateEventHandler {
         }
         switch (processStateEvent.getExecutionStatus()) {
             case STOP:
-                ProcessInstanceMetrics.incProcessInstanceByStatus("stop");
+                ProcessInstanceMetrics.incProcessInstanceByState("stop");
                 break;
             case SUCCESS:
-                ProcessInstanceMetrics.incProcessInstanceByStatus("success");
+                ProcessInstanceMetrics.incProcessInstanceByState("success");
                 break;
             case FAILURE:
-                ProcessInstanceMetrics.incProcessInstanceByStatus("fail");
+                ProcessInstanceMetrics.incProcessInstanceByState("fail");
                 break;
             default:
                 break;
