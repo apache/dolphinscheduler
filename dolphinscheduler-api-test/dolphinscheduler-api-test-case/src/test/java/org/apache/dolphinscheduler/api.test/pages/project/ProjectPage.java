@@ -26,11 +26,12 @@ import org.apache.dolphinscheduler.api.test.entity.ProjectListResponseData;
 import org.apache.dolphinscheduler.api.test.entity.ProjectListResponseTotalList;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ProjectPage {
     private static final Logger logger = LoggerFactory.getLogger(ProjectPage.class);
@@ -84,7 +85,7 @@ public final class ProjectPage {
 
         for (ProjectListResponseTotalList ProjectListRes : JSONUtils.convertValue(res.body().data(), ProjectListResponseData.class).totalList()) {
             logger.info(ProjectListRes.code());
-            projectCode =  ProjectListRes.code();
+            projectCode = ProjectListRes.code();
         }
         return projectCode;
     }

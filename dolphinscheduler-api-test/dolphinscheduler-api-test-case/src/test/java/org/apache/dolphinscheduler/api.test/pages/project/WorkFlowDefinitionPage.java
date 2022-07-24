@@ -22,22 +22,23 @@ package org.apache.dolphinscheduler.api.test.pages.project;
 
 import org.apache.dolphinscheduler.api.test.cases.TenantAPITest;
 import org.apache.dolphinscheduler.api.test.core.Constants;
-import org.apache.dolphinscheduler.api.test.entity.TaskParamsMap;
-import org.apache.dolphinscheduler.api.test.entity.TaskDefinitionRequestData;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowRunRequestData;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.entity.WorkFlowCreateRequestData;
+import org.apache.dolphinscheduler.api.test.entity.TaskDefinitionRequestData;
+import org.apache.dolphinscheduler.api.test.entity.TaskParamsMap;
 import org.apache.dolphinscheduler.api.test.entity.TaskRelationRequestData;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowCreateRequestData;
 import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseData;
 import org.apache.dolphinscheduler.api.test.entity.WorkFlowResponseTotalList;
+import org.apache.dolphinscheduler.api.test.entity.WorkFlowRunRequestData;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public final class WorkFlowDefinitionPage {
@@ -55,7 +56,7 @@ public final class WorkFlowDefinitionPage {
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
         RequestClient requestClient = new RequestClient();
-        HttpResponse res = requestClient.get("/projects/"+projectCode+"/task-definition/gen-task-codes", headers, params);
+        HttpResponse res = requestClient.get("/projects/" + projectCode + "/task-definition/gen-task-codes", headers, params);
         ArrayList list = (ArrayList) res.body().data();
         genNumId = list.get(0).toString();
 
@@ -129,30 +130,30 @@ public final class WorkFlowDefinitionPage {
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
 
-        HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition", headers, JSONUtils.convertValue(workFlowCreateRequestData, Map.class));
+        HttpResponse res = requestClient.post("/projects/" + projectCode + "/process-definition", headers, JSONUtils.convertValue(workFlowCreateRequestData, Map.class));
         return res;
     }
 
     public HttpResponse queryWorkflow(String sessionId, String projectName, String workFlowName) {
         Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
-        params.put("pageSize",10);
-        params.put("pageNo",1);
-        params.put("searchVal",workFlowName);
+        params.put("pageSize", 10);
+        params.put("pageNo", 1);
+        params.put("searchVal", workFlowName);
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
-        HttpResponse res = requestClient.get("/projects/"+ projectCode + "/process-definition", headers, params);
+        HttpResponse res = requestClient.get("/projects/" + projectCode + "/process-definition", headers, params);
 
         for (WorkFlowResponseTotalList workFlowList : JSONUtils.convertValue(res.body().data(), WorkFlowResponseData.class).totalList()) {
-            workFlowCode =  workFlowList.code();
+            workFlowCode = workFlowList.code();
         }
 
         return res;
     }
 
-    public HttpResponse onLineWorkflow(String sessionId, String projectName, String workFlowName){
+    public HttpResponse onLineWorkflow(String sessionId, String projectName, String workFlowName) {
         WorkFlowDefinitionPage workflow = new WorkFlowDefinitionPage();
         workflow.queryWorkflow(sessionId, projectName, workFlowName);
         Map<String, Object> params = new HashMap<>();
@@ -163,7 +164,7 @@ public final class WorkFlowDefinitionPage {
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
-        HttpResponse res = requestClient.post("/projects/"+projectCode+"/process-definition/"+workFlowCode+"/release", headers, params);
+        HttpResponse res = requestClient.post("/projects/" + projectCode + "/process-definition/" + workFlowCode + "/release", headers, params);
 
         return res;
 
@@ -171,7 +172,7 @@ public final class WorkFlowDefinitionPage {
 
     public HttpResponse runWorkflow(String sessionId, String projectName, String workFlowName, String startEndTime, String scheduleTime, String failureStrategy, String warningType,
                                     String warningGroupId, String execType, String startNodeList, String taskDependType, String dependentMode, String runMode, String processInstancePriority,
-                                    String workerGroup, String environmentCode, String startParams, String expectedParallelismNumber, Integer dryRun){
+                                    String workerGroup, String environmentCode, String startParams, String expectedParallelismNumber, Integer dryRun) {
         WorkFlowDefinitionPage workflow = new WorkFlowDefinitionPage();
         workflow.queryWorkflow(sessionId, projectName, workFlowName);
         workflow.onLineWorkflow(sessionId, projectName, workFlowName);
@@ -200,7 +201,7 @@ public final class WorkFlowDefinitionPage {
         RequestClient requestClient = new RequestClient();
         ProjectPage project = new ProjectPage();
         String projectCode = project.getProjectCode(sessionId, projectName);
-        HttpResponse res = requestClient.post("/projects/"+projectCode+"/executors/start-process-instance", headers, JSONUtils.convertValue(workFlowRunRequestData, Map.class));
+        HttpResponse res = requestClient.post("/projects/" + projectCode + "/executors/start-process-instance", headers, JSONUtils.convertValue(workFlowRunRequestData, Map.class));
 
         return res;
 

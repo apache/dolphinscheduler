@@ -19,9 +19,8 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.Constants;
+import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
@@ -34,12 +33,14 @@ import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
@@ -65,7 +66,7 @@ public class WorkFlowShellAPITest {
 
     ArrayList<Object> resourceList = new ArrayList<>();
 
-    private static String rawScript="echo 123";
+    private static String rawScript = "echo 123";
 
     private static String delayTime = "0";
 
@@ -75,7 +76,7 @@ public class WorkFlowShellAPITest {
 
     private static String failRetryInterval = "1";
 
-    private static String failRetryTimes="0";
+    private static String failRetryTimes = "0";
 
     private static String flag = "YES";
 
@@ -102,7 +103,7 @@ public class WorkFlowShellAPITest {
     private static String conditionType = "NONE";
     private static String executionType = "PARALLEL";
     HashMap<String, Object> conditionParams = new HashMap<>();
-    private String globalParams="[]";
+    private String globalParams = "[]";
 
     private static String startEndTime = "2022-06-25T16:00:00.000Z";
 
@@ -199,12 +200,12 @@ public class WorkFlowShellAPITest {
         WorkFlowInstancesPage instance = new WorkFlowInstancesPage();
         String state = null;
 
-        for (int i=0; i<Constants.SLEEP_FREQUENCY; i++){
+        for (int i = 0; i < Constants.SLEEP_FREQUENCY; i++) {
             state = instance.queryWorkflowInstanceState(sessionId, projectName, workFlowName);
             Thread.sleep(Constants.SLEEP_INTERVAL);
         }
         logger.info("Run workflow state：%s", state);
-        Assertions.assertEquals("SUCCESS",state);
+        Assertions.assertEquals("SUCCESS", state);
 
     }
 

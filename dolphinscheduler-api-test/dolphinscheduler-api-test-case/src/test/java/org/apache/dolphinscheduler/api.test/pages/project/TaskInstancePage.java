@@ -26,12 +26,12 @@ import org.apache.dolphinscheduler.api.test.entity.TaskInstanceResponseData;
 import org.apache.dolphinscheduler.api.test.entity.TaskInstanceResponseTotalList;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TaskInstancePage {
     private static final Logger logger = LoggerFactory.getLogger(TaskInstancePage.class);
@@ -73,7 +73,7 @@ public final class TaskInstancePage {
     private static String environmentCode = "-1";
 
 
-    public String queryTaskInstance(String sessionId, String projectName, String workFlowName){
+    public String queryTaskInstance(String sessionId, String projectName, String workFlowName) {
         Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
         params.put("pageSize", 10);
@@ -97,16 +97,16 @@ public final class TaskInstancePage {
             warningGroupId, execType, startNodeList, taskDependType, dependentMode, runMode, processInstancePriority,
             workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
-        HttpResponse res = requestClient.get("/projects/"+projectCode+"/task-instances", headers, params);
+        HttpResponse res = requestClient.get("/projects/" + projectCode + "/task-instances", headers, params);
         for (TaskInstanceResponseTotalList taskInstanceRes : JSONUtils.convertValue(res.body().data(), TaskInstanceResponseData.class).totalList()) {
 
-            taskState =  taskInstanceRes.state();
+            taskState = taskInstanceRes.state();
             taskInstanceId = taskInstanceRes.id();
         }
         return taskState;
     }
 
-    public HttpResponse queryTaskInstanceLog(String sessionId, String projectName, String workFlowName){
+    public HttpResponse queryTaskInstanceLog(String sessionId, String projectName, String workFlowName) {
         Map<String, Object> params = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
 
