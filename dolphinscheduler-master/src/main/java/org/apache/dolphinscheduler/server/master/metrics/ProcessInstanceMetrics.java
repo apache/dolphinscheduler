@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -29,6 +34,37 @@ public final class ProcessInstanceMetrics {
 
     private ProcessInstanceMetrics() {
         throw new UnsupportedOperationException("Utility class");
+    }
+
+    private static Map<String, Counter> PROCESS_INSTANCE_COUNTERS = new HashMap<>();
+
+    private static final Set<String> PROCESS_INSTANCE_STATES = ImmutableSet.of(
+            "submit", "timeout", "finish", "failover");
+
+    private static final Set<String> PROCESS_INSTANCE_STATUSES = ImmutableSet.of("success", "fail", "stop");
+
+    static {
+        for (final String state : PROCESS_INSTANCE_STATES) {
+            PROCESS_INSTANCE_COUNTERS.put(
+                    state,
+                    Counter.builder("ds.workflow.instance.count")
+                            .tag("state", state)
+                            .description(String.format("Process instance %s total count", state))
+                            .register(Metrics.globalRegistry)
+            );
+        }
+    }
+
+    static {
+        for (final String status : PROCESS_INSTANCE_STATUSES) {
+            PROCESS_INSTANCE_COUNTERS.put(
+                    status,
+                    Counter.builder("ds.workflow.instance.count")
+                            .tag("status", status)
+                            .description(String.format("Process instance %s total count", status))
+                            .register(Metrics.globalRegistry)
+            );
+        }
     }
 
     private static final Timer COMMAND_QUERY_TIMETER =
@@ -96,31 +132,11 @@ public final class ProcessInstanceMetrics {
             .register(Metrics.globalRegistry);
     }
 
-    public static void incProcessInstanceSubmit() {
-        PROCESS_INSTANCE_SUBMIT_COUNTER.increment();
+    public static void incProcessInstanceByState(final String state) {
+        PROCESS_INSTANCE_COUNTERS.get(state).increment();
     }
 
-    public static void incProcessInstanceTimeout() {
-        PROCESS_INSTANCE_TIMEOUT_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceFinish() {
-        PROCESS_INSTANCE_FINISH_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceSuccess() {
-        PROCESS_INSTANCE_SUCCESS_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceFailure() {
-        PROCESS_INSTANCE_FAILURE_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceStop() {
-        PROCESS_INSTANCE_STOP_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceFailover() {
-        PROCESS_INSTANCE_FAILOVER_COUNTER.increment();
+    public static void incProcessInstanceByStatus(final String status) {
+        PROCESS_INSTANCE_COUNTERS.get(status).increment();
     }
 }

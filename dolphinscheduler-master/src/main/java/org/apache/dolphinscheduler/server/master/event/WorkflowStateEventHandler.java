@@ -75,17 +75,17 @@ public class WorkflowStateEventHandler implements StateEventHandler {
 
     private void measureProcessState(StateEvent processStateEvent) {
         if (processStateEvent.getExecutionStatus().typeIsFinished()) {
-            ProcessInstanceMetrics.incProcessInstanceFinish();
+            ProcessInstanceMetrics.incProcessInstanceByState("finish");
         }
         switch (processStateEvent.getExecutionStatus()) {
             case STOP:
-                ProcessInstanceMetrics.incProcessInstanceStop();
+                ProcessInstanceMetrics.incProcessInstanceByStatus("stop");
                 break;
             case SUCCESS:
-                ProcessInstanceMetrics.incProcessInstanceSuccess();
+                ProcessInstanceMetrics.incProcessInstanceByStatus("success");
                 break;
             case FAILURE:
-                ProcessInstanceMetrics.incProcessInstanceFailure();
+                ProcessInstanceMetrics.incProcessInstanceByStatus("fail");
                 break;
             default:
                 break;
