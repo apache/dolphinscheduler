@@ -119,6 +119,9 @@ const DetailModal = defineComponent({
       detailForm,
       rules,
       requiredDataBase,
+      showHost,
+      showPort,
+      showAwsRegion,
       showConnectType,
       showPrincipal,
       loading,
@@ -188,6 +191,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showHost}
                   label={t('datasource.ip')}
                   path='host'
                   show-require-mark
@@ -202,6 +206,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showPort}
                   label={t('datasource.port')}
                   path='port'
                   show-require-mark
@@ -288,6 +293,20 @@ const DetailModal = defineComponent({
                     v-model={[detailForm.password, 'value']}
                     type='password'
                     placeholder={t('datasource.user_password_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showAwsRegion}
+                    label={t('datasource.aws_region')}
+                    path='awsRegion'
+                    show-require-mark
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      v-model={[detailForm.awsRegion, 'value']}
+                      type='text'
+                      maxlength={60}
+                      placeholder={t('datasource.aws_region_tips')}
                   />
                 </NFormItem>
                 <NFormItem
