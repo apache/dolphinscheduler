@@ -10,7 +10,7 @@ This article describes the one-click deployment of highly available DolphinSched
 
 * Docking and accessing the built-in open source app store,Search the keyword `dolphinscheduler` to find App DolphinScheduler.
 
-![](img/rainbond/appstore-dolphinscheduler.png)
+![](../../../../img/rainbond/appstore-dolphinscheduler.png)
 
 * Click install on the right side of DolphinScheduler to go to the installation page,Fill in the corresponding information,Click OK to start the installation,Automatically jump to the application view.
 
@@ -21,15 +21,15 @@ This article describes the one-click deployment of highly available DolphinSched
 | Select app   | select application                   |
 | app version  | select DolphinScheduler version      |
 
-![](img/rainbond/install-dolphinscheduler.png)
+![](../../../../img/rainbond/install-dolphinscheduler.png)
 
 * Wait a few minutes,DolphinScheduler Installation is complete and running.
 
-![](img/rainbond/topology-dolphinscheduler.png)
+![](../../../../img/rainbond/topology-dolphinscheduler.png)
 
 * Access DolphinScheduler-API components,The default user password is `admin` / `dolphinscheduler123`.
 
-![](img/rainbond/homepage-dolphinscheduler.png)
+![](../../../../img/rainbond/homepage-dolphinscheduler.png)
 
 ## API Master Worker Node Telescopic
 
@@ -37,11 +37,11 @@ DolphinScheduler API、Master、Worker Both support scaling multiple instances,M
 
 Take worker as an example,Enter into the component -> Telescopic,Set the number of instances.
 
-![](img/rainbond/dolpscheduler-worker.png)
+![](../../../../img/rainbond/dolpscheduler-worker.png)
 
 Verify Worker Node,Enter DolphinScheduler UI -> Monitoring -> Worker View node information.
 
-![](img/rainbond/monitor-dolphinscheduler.png)
+![](../../../../img/rainbond/monitor-dolphinscheduler.png)
 ## Configuration file
 
 API and Worker Service sharing `/opt/dolphinscheduler/conf/common.properties` ,To modify the configuration, you only need to modify the configuration file of the API service.
@@ -60,5 +60,5 @@ Take Datax as an example:
    * FILE_PATH：/opt/soft
    * LOCK_PATH：/opt/soft
 3. Update component,The initialization plug-in will be downloaded automatically `Datax` and decompress to `/opt/soft`
-![](img/rainbond/plugin.png)
+![](../../../../img/rainbond/plugin.png)
 ---
