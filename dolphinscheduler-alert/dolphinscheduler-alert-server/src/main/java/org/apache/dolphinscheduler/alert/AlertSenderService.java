@@ -132,6 +132,7 @@ public final class AlertSenderService extends Thread {
     public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content, int warnType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = AlertData.builder()
+                .content(content)
                 .title(title)
                 .warnType(warnType)
                 .build();
