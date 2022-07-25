@@ -62,8 +62,8 @@
                     #{i}
                 </foreach>
             </if>
-            <if test=" userId != 1">
-                and a.user_id = #{userId}
+            <if test=" user.userType.code != 0">
+                and a.user_id = #{user.id}
             </if>
             <if test=" ruleType != -1">
                 and a.rule_type = #{ruleType}

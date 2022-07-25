@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -36,7 +37,7 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
      *
      * @param page page
      * @param searchVal searchVal
-     * @param userId userId
+     * @param user user
      * @param statusArray states
      * @param ruleType ruleType
      * @param startTime startTime
@@ -44,7 +45,7 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
      */
     IPage<DqExecuteResult> queryResultListPaging(IPage<DqExecuteResult> page,
                                                  @Param("searchVal") String searchVal,
-                                                 @Param("userId") int userId,
+                                                 @Param("user") User user,
                                                  @Param("states") int[] statusArray,
                                                  @Param("ruleType") int ruleType,
                                                  @Param("startTime") Date startTime,
