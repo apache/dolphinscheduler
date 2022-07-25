@@ -75,8 +75,8 @@ const GanttChart = defineComponent({
     let minTime = Number.MAX_VALUE
     let maxTime = 0
     props.seriesData.forEach(function (task, index) {
-      const start = Math.round(task.startDate[0] / 1000) * 1000
-      const end = Math.round(task.endDate[0] / 1000) * 1000
+      const start = Math.floor(task.startDate[0] / 1000) * 1000
+      const end = Math.floor(task.endDate[0] / 1000) * 1000
       minTime = minTime < start ? minTime : start
       maxTime = maxTime > end ? maxTime : end
       data[task.status].push({
