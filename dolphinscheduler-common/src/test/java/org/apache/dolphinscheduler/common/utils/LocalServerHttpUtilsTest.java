@@ -84,6 +84,9 @@ public class LocalServerHttpUtilsTest extends TestCase {
     }
 
     public void testKerberosHttpsGet() {
+        logger.info(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
+        logger.info(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
+        logger.info(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
         String url = "https://www.apache.org/";
         logger.info(KerberosHttpClient.get(url));
         Assert.assertTrue(true);
