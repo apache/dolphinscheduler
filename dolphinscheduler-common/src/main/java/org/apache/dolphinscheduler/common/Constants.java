@@ -50,8 +50,10 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
+    public static final String FORMAT_S_S_COLON = "%s:%s";
     public static final String FOLDER_SEPARATOR = "/";
 
     public static final String RESOURCE_TYPE_FILE = "resources";
@@ -158,6 +160,11 @@ public final class Constants {
      * COLON :
      */
     public static final String COLON = ":";
+
+    /**
+     * period .
+     */
+    public static final String PERIOD = ".";
 
     /**
      * QUESTION ?
@@ -804,10 +811,10 @@ public final class Constants {
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
-    public static final String K8S = "k8s";
+    public static final String CLUSTER = "cluster";
     public static final String LIMITS_CPU = "limitsCpu";
     public static final String LIMITS_MEMORY = "limitsMemory";
-    public static final String K8S_LOCAL_TEST_CLUSTER = "ds_null_k8s";
+    public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**
      * schedule timezone
@@ -833,4 +840,15 @@ public final class Constants {
     public static final int USER_PASSWORD_MIN_LENGTH = 2;
 
     public static final String FUNCTION_START_WITH = "$";
+
+    public static final Integer DEFAULT_QUEUE_ID = 1;
+
+    /**
+     * Security authentication types (supported types: PASSWORD,LDAP)
+     */
+    public static final String SECURITY_CONFIG_TYPE = "securityConfigType";
+
+    public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
+
+    public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
 }

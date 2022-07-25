@@ -73,8 +73,8 @@ public class DqExecuteResultServiceTest {
 
         String searchVal = "";
         int ruleType = 0;
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
 
         User loginUser = new User();
         loginUser.setId(1);
@@ -85,7 +85,7 @@ public class DqExecuteResultServiceTest {
         page.setTotal(1);
         page.setRecords(getExecuteResultList());
         when(dqExecuteResultMapper.queryResultListPaging(
-                any(IPage.class), eq(""), eq(loginUser.getId()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
+                any(IPage.class), eq(""), eq(loginUser), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
         Result result = dqExecuteResultService.queryResultListPaging(
                 loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);

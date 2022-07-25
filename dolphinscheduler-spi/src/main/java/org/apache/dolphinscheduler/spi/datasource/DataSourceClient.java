@@ -23,10 +23,11 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
-public interface DataSourceClient {
-    /** Methods that need to be overridden by interfaces extending this */
+public interface DataSourceClient extends AutoCloseable {
+
     void checkClient();
 
+    @Override
     void close();
 
     Connection getConnection();

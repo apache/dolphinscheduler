@@ -50,8 +50,8 @@ export default {
           },
           {
             key: 'docs1',
-            text: '1.3.9',
-            link: '/en-us/docs/1.3.9/user_doc/quick-start.html',
+            text: '2.0.6',
+            link: '/en-us/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',
@@ -226,8 +226,8 @@ export default {
           },
           {
             key: 'docs1',
-            text: '1.3.9',
-            link: '/zh-cn/docs/1.3.9/user_doc/quick-start.html',
+            text: '2.0.6',
+            link: '/zh-cn/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',

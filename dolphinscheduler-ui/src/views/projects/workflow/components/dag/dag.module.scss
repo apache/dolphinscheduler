@@ -173,6 +173,12 @@ $bgLight: #ffffff;
     &.icon-dvc {
       background-image: url('/images/task-icons/dvc.png');
     }
+    &.icon-dinky {
+      background-image: url('/images/task-icons/dinky.png');
+    }
+    &.icon-sagemaker {
+      background-image: url('/images/task-icons/sagemaker.png');
+    }
   }
 
   &:hover {
@@ -248,6 +254,12 @@ $bgLight: #ffffff;
       }
       &.icon-dvc {
         background-image: url('/images/task-icons/dvc_hover.png');
+      }
+      &.icon-dinky {
+        background-image: url('/images/task-icons/dinky_hover.png');
+      }
+      &.icon-sagemaker {
+        background-image: url('/images/task-icons/sagemaker_hover.png');
       }
     }
   }
