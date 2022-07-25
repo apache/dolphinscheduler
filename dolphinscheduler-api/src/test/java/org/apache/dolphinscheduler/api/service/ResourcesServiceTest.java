@@ -138,7 +138,7 @@ public class ResourcesServiceTest {
     @Test
     public void testCreateResource() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
@@ -180,7 +180,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.RESOURCE_SUFFIX_FORBID_CHANGE.getMsg(), result.getMsg());
 
         //UDF_RESOURCE_SUFFIX_NOT_JAR
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.UDF_UPLOAD, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.UDF_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         mockMultipartFile = new MockMultipartFile("ResourcesServiceTest.pdf", "ResourcesServiceTest.pdf", "pdf", "test".getBytes());
@@ -190,7 +190,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), result.getMsg());
 
         //FULL_FILE_NAME_TOO_LONG
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         String tooLongFileName = getRandomStringWithLength(Constants.RESOURCE_FULL_NAME_MAX_LENGTH) + ".pdf";
@@ -204,7 +204,7 @@ public class ResourcesServiceTest {
 
     @Test
     public void testCreateDirecotry() {
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
@@ -223,9 +223,9 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(resourcesMapper.selectById(Mockito.anyInt())).thenReturn(null);
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
 
         result = resourcesService.createDirectory(user, "directoryTest", "directory test", ResourceType.FILE, 1, "/");
         logger.info(result.toString());
@@ -242,7 +242,7 @@ public class ResourcesServiceTest {
     @Test
     public void testUpdateResource() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
@@ -255,7 +255,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{0}, 1, serviceLogger)).thenReturn(true);
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
@@ -266,7 +266,7 @@ public class ResourcesServiceTest {
         //USER_NO_OPERATION_PERM
         user.setId(2);
         user.setUserType(UserType.GENERAL_USER);
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 2, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 2, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 2, serviceLogger)).thenReturn(false);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
@@ -278,7 +278,7 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(storageOperate.getFileName(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn("test1");
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF_FILE, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF_FILE, null, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF_FILE, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         try {
             Mockito.when(storageOperate.exists(Mockito.any(), Mockito.any())).thenReturn(false);
@@ -298,7 +298,7 @@ public class ResourcesServiceTest {
             logger.error(e.getMessage(), e);
         }
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest.jar", "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
@@ -310,7 +310,7 @@ public class ResourcesServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
         //USER_NOT_EXIST
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.UDF_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         Mockito.when(userMapper.selectById(Mockito.anyInt())).thenReturn(null);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest1.jar", "ResourcesServiceTest", ResourceType.UDF, null);
@@ -348,7 +348,7 @@ public class ResourcesServiceTest {
         resourcePage.setTotal(1);
         resourcePage.setRecords(getResourceList());
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.RESOURCE_FILE_ID, 1, resourceLogger)).thenReturn(getSetIds());
 
@@ -399,7 +399,7 @@ public class ResourcesServiceTest {
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 0, serviceLogger)).thenReturn(true);
         try {
             // HDFS_NOT_STARTUP
@@ -411,7 +411,7 @@ public class ResourcesServiceTest {
             PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
             Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
 
-            PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
+            PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
             PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{2}, 0, serviceLogger)).thenReturn(true);
             result = resourcesService.delete(loginUser, 2);
             logger.info(result.toString());
@@ -426,7 +426,7 @@ public class ResourcesServiceTest {
             loginUser.setUserType(UserType.ADMIN_USER);
             loginUser.setTenantId(2);
             Mockito.when(userMapper.selectById(Mockito.anyInt())).thenReturn(loginUser);
-            PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
+            PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
             PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 0, serviceLogger)).thenReturn(true);
             result = resourcesService.delete(loginUser, 1);
             logger.info(result.toString());
@@ -451,7 +451,7 @@ public class ResourcesServiceTest {
     @Test
     public void testVerifyResourceName() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
         User user = new User();
         user.setId(1);
@@ -495,7 +495,7 @@ public class ResourcesServiceTest {
     @Test
     public void testReadResource() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
@@ -507,14 +507,14 @@ public class ResourcesServiceTest {
         //RESOURCE_NOT_EXIST
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{2}, 1, serviceLogger)).thenReturn(true);
         result = resourcesService.readResource(getUser(), 2, 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
         //RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
@@ -563,7 +563,7 @@ public class ResourcesServiceTest {
     @Test
     public void testOnlineCreateResource() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
@@ -594,7 +594,7 @@ public class ResourcesServiceTest {
         }
 
         //SUCCESS
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
 
         Mockito.when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
@@ -629,13 +629,13 @@ public class ResourcesServiceTest {
         Mockito.when(resourcesMapper.queryResource(dir1.getFullName(), ResourceType.FILE.ordinal())).thenReturn(Collections.singletonList(dir1));
         Mockito.when(resourcesMapper.queryResource(resourceDir, ResourceType.FILE.ordinal())).thenReturn(null);
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
                 AuthorizationType.RESOURCE_FILE_ID, new Object[]{dir1.getId()}, 1, serviceLogger)).thenReturn(true);
 
         Tenant tenant = getTenant();
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
                 AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
         try {
@@ -645,12 +645,12 @@ public class ResourcesServiceTest {
         }
 
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
                 AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
+                AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_RENAME, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
                 AuthorizationType.RESOURCE_FILE_ID, null, 1, serviceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
@@ -668,7 +668,7 @@ public class ResourcesServiceTest {
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
         // HDFS_NOT_STARTUP
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
 
         Result result = resourcesService.updateResourceContent(getUser(), 1, "content");
@@ -676,7 +676,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{2}, 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
@@ -685,7 +685,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
         //RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
@@ -718,7 +718,7 @@ public class ResourcesServiceTest {
     @Test
     public void testDownloadResource() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, 1, ApiFuncIdentificationConstant.FILE_DOWNLOAD, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null, 1, ApiFuncIdentificationConstant.FILE_DOWNLOAD, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID, new Object[]{1}, 1, serviceLogger)).thenReturn(true);
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);

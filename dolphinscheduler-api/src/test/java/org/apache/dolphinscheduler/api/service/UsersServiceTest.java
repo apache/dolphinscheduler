@@ -234,14 +234,14 @@ public class UsersServiceTest {
         user.setId(1);
 
         //no operate
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,1, USER_MANAGER, serviceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,null, 1, USER_MANAGER, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(false);
         Map<String, Object> result = usersService.queryUserList(user);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         //success
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,1, USER_MANAGER, serviceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,null, 1, USER_MANAGER, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(true);
         user.setUserType(UserType.ADMIN_USER);
         when(userMapper.selectList(null)).thenReturn(getUserList());
