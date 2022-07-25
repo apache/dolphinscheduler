@@ -130,8 +130,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
             String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
 
-            if (StringUtils.isBlank(defaultFS)){
-                defaultFS= PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+            if (StringUtils.isBlank(defaultFS)) {
+                defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
             }
 
             //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
@@ -615,12 +615,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
      */
     public static String getAppAddress(String appAddress, String rmHa) {
 
-        //get active ResourceManager
-        String activeRM = YarnHAAdminUtils.getActiveRMName(rmHa);
-
-        if (StringUtils.isEmpty(activeRM)) {
-            return null;
-        }
 
         String[] split1 = appAddress.split(Constants.DOUBLE_SLASH);
 
@@ -636,6 +630,13 @@ public class HadoopUtils implements Closeable, StorageOperate {
         }
 
         String end = Constants.COLON + split2[1];
+
+        //get active ResourceManager
+        String activeRM = YarnHAAdminUtils.getActiveRMName(start, rmHa);
+
+        if (StringUtils.isEmpty(activeRM)) {
+            return null;
+        }
 
         return start + activeRM + end;
     }
@@ -658,13 +659,16 @@ public class HadoopUtils implements Closeable, StorageOperate {
     private static final class YarnHAAdminUtils {
 
         /**
-         * get active resourcemanager
+         *  get active resourcemanager node
+         * @param protocol http protocol
+         * @param rmIds yarn ha ids
+         * @return yarn active node
          */
-        public static String getActiveRMName(String rmIds) {
+        public static String getActiveRMName(String protocol, String rmIds) {
 
             String[] rmIdArr = rmIds.split(Constants.COMMA);
 
-            String yarnUrl = "http://%s:" + HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE + "/ws/v1/cluster/info";
+            String yarnUrl = protocol + "%s:" + HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE + "/ws/v1/cluster/info";
 
             try {
 
