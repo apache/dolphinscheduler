@@ -354,11 +354,6 @@ public class TaskConstants {
     public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
 
     /**
-     * hadoop.configuration.resources
-     */
-    public static final String HADOOP_CONFIGURATION_RESOURCES = "hadoop.configuration.resources";
-
-    /**
      * hadoop.security.authentication
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";

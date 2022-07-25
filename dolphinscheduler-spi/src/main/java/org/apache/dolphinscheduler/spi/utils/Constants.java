@@ -125,6 +125,11 @@ public class Constants {
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
     /**
+     * hadoop.configuration.resources
+     */
+    public static final String HADOOP_CONFIGURATION_RESOURCES = "hadoop.configuration.resources";
+
+    /**
      * loginUserFromKeytab user
      */
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";

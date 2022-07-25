@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataSourceClient {
-
+    /** Methods that need to be overridden by interfaces extending this */
     void checkClient();
 
     void close();

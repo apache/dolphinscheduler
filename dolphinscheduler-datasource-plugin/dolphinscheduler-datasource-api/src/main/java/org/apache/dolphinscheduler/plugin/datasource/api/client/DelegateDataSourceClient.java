@@ -32,10 +32,26 @@ public class DelegateDataSourceClient {
         this.dataSourceClientManager = dataSourceClientManager;
     }
 
+    /**
+     * @description: Get a list of databases, optionally filtered by Pattern
+     * @param: dbType
+     * @param: connectionParam
+     * @param: databasePattern
+     * @return: java.util.List<java.lang.String>
+     **/
     public List<String> getDatabaseList(DbType dbType, ConnectionParam connectionParam, String databasePattern) {
         return dataSourceClientManager.getDataSource(dbType, connectionParam).getDatabaseList(databasePattern);
     }
 
+    /**
+     * @description: Get a list of tables, optionally filtered by Pattern
+     * @param: dbType
+     * @param: connectionParam
+     * @param: dbName
+     * @param: schemaName
+     * @param: tablePattern
+     * @return: java.util.List<java.lang.String>
+     **/
     public List<String> getTableList(DbType dbType, ConnectionParam connectionParam, String dbName, String schemaName, String tablePattern) {
         return dataSourceClientManager.getDataSource(dbType, connectionParam).getTableList(dbName, schemaName, tablePattern);
     }

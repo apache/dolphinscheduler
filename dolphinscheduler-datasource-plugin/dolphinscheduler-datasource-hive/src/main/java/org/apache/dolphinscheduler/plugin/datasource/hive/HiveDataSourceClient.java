@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.exception.DataSourceException;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.hive.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -125,7 +124,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
                 field.setAccessible(true);
                 field.set(null, Config.getInstance().getDefaultRealm());
             } catch (Exception e) {
-                throw DataSourceException.getInstance("Update Kerberos environment failed.", e);
+                throw new DataSourceException("Update Kerberos environment failed.", e);
             }
         }
     }
@@ -142,7 +141,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
                     this.metaStoreClientPool.getClient().getHiveClient().reconnect();
                     return null;
                 } catch (Exception e2) {
-                    throw DataSourceException.getInstance("Hive metastore connect failed." + " : " + hadoopConf.get("hive.metastore.uris"), e2);
+                    throw new DataSourceException("Hive metastore connect failed." + " : " + hadoopConf.get("hive.metastore.uris"), e2);
                 }
             });
         }
@@ -172,12 +171,12 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             }, 5, 5, TimeUnit.MINUTES);
             return ugi;
         } catch (IOException e) {
-            throw DataSourceException.getInstance("createUserGroupInformation fail. ", e);
+            throw new DataSourceException("createUserGroupInformation fail. ", e);
         }
     }
 
     protected Configuration createHadoopConf(BaseConnectionParam connectionParam) {
-        Configuration hadoopConf = CommonUtils.getHadoopConfFromResources(connectionParam);
+        Configuration hadoopConf = CommonUtil.getHadoopConfFromResources(connectionParam);
 
         hadoopConf.set("hive.metastore.client.connect.retry.delay", "1");
         hadoopConf.set("hive.metastore.connect.retries", "1");
@@ -216,7 +215,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             }
             return this.metaStoreClientPool.getClient().getHiveClient().getDatabases(databasePattern.trim());
         } catch (Exception e) {
-            throw DataSourceException.getInstance("META_EXCEPTION", e);
+            throw new DataSourceException("META_EXCEPTION", e);
         }
     }
 
@@ -232,7 +231,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             }
             return this.metaStoreClientPool.getClient().getHiveClient().getTables(dbName.trim(), "*" + tablePattern.trim() + "*");
         } catch (Exception e) {
-            throw DataSourceException.getInstance("META_EXCEPTION", e);
+            throw new DataSourceException("META_EXCEPTION", e);
         }
     }
 
