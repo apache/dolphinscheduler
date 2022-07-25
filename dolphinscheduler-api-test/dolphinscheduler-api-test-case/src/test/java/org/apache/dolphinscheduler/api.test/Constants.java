@@ -25,7 +25,7 @@ public final class Constants {
     /**
      * sleep parameter
      */
-    public static final Integer SLEEP_FREQUENCY = 5;
+    public static final Integer SLEEP_FREQUENCY = 10;
 
     public static final Integer SLEEP_INTERVAL = 1000;
 
