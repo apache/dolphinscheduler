@@ -173,32 +173,34 @@ export default defineComponent({
                   </NBreadcrumbItem>
                 ))}
               </NBreadcrumb>
+            ),
+            default: () => (
+              <NSpace vertical>
+                <NDataTable
+                  loading={loadingRef}
+                  columns={this.columns}
+                  data={this.tableData}
+                  striped
+                  size={'small'}
+                  class={styles.table}
+                  row-class-name='items'
+                  scrollX={this.tableWidth}
+                />
+                <NSpace justify='center'>
+                  <NPagination
+                    v-model:page={this.page}
+                    v-model:page-size={this.pageSize}
+                    page-count={this.totalPage}
+                    show-size-picker
+                    page-sizes={[10, 30, 50]}
+                    show-quick-jumper
+                    onUpdatePage={this.requestData}
+                    onUpdatePageSize={this.handleChangePageSize}
+                  />
+                </NSpace>
+              </NSpace>
             )
           }}
-          <NSpace vertical>
-            <NDataTable
-              loading={loadingRef}
-              columns={this.columns}
-              data={this.tableData}
-              striped
-              size={'small'}
-              class={styles.table}
-              row-class-name='items'
-              scrollX={this.tableWidth}
-            />
-            <NSpace justify='center'>
-              <NPagination
-                v-model:page={this.page}
-                v-model:page-size={this.pageSize}
-                page-count={this.totalPage}
-                show-size-picker
-                page-sizes={[10, 30, 50]}
-                show-quick-jumper
-                onUpdatePage={this.requestData}
-                onUpdatePageSize={this.handleChangePageSize}
-              />
-            </NSpace>
-          </NSpace>
         </Card>
         <FolderModal
           v-model:row={this.row}
