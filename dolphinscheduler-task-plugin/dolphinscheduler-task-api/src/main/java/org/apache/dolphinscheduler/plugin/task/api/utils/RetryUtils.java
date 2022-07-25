@@ -36,7 +36,8 @@ public class RetryUtils {
     }
 
     /**
-     * Retry to execute the given function with the given retry policy.
+     * Retry to execute the given function with the given retry policy, the retry policy is used to defined retryTimes and retryInterval.
+     * This method will sleep for retryInterval when execute given supplier failure.
      */
     public static <T> T retryFunction(@NonNull Supplier<T> supplier, @NonNull RetryPolicy retryPolicy) {
         int retryCount = 0;
@@ -61,7 +62,13 @@ public class RetryUtils {
 
     @Data
     public static final class RetryPolicy {
+        /**
+         * The max retry times
+         */
         private final int maxRetryTimes;
+        /**
+         * The retry interval, if the give function is failed, will sleep the retry interval milliseconds and retry again.
+         */
         private final long retryInterval;
 
     }

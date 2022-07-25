@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.parser;
+package org.apache.dolphinscheduler.plugin.task.api.loop.template;
 
-import org.apache.dolphinscheduler.plugin.task.api.loop.template.LoopTaskYamlDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskMethodDefinition;
 
 import lombok.NonNull;

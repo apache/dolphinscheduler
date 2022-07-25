@@ -49,6 +49,9 @@ public abstract class BaseHttpTemplateLoopTaskExecutor extends BaseLoopTaskExecu
 
     @Override
     public void cancelLoopTaskInstance(@Nullable LoopTaskInstanceInfo taskInstanceInfo) {
+        if (taskInstanceInfo == null) {
+            return;
+        }
         httpLoopTaskDefinition.getCancelTaskMethod().cancelTaskInstance(taskInstanceInfo);
     }
 }

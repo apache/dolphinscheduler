@@ -26,6 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 public class HttpLoopTaskCancelTaskMethodDefinition extends HttpLoopTaskMethodDefinition
     implements LoopTaskCancelMethodDefinition {
 
@@ -34,13 +36,17 @@ public class HttpLoopTaskCancelTaskMethodDefinition extends HttpLoopTaskMethodDe
     public HttpLoopTaskCancelTaskMethodDefinition(String url,
                                                   String httpMethodType,
                                                   String dataType,
+                                                  Map<String, String> httpHeaders,
                                                   Map<String, Object> requestParams,
                                                   Map<String, Object> requestBody) {
-        super(url, httpMethodType, dataType, requestParams, requestBody);
+        super(url, httpMethodType, dataType, httpHeaders, requestParams, requestBody);
     }
 
     @Override
-    public void cancelTaskInstance(LoopTaskInstanceInfo loopTaskInstanceInfo) {
+    public void cancelTaskInstance(@Nullable LoopTaskInstanceInfo loopTaskInstanceInfo) {
+        if (loopTaskInstanceInfo == null) {
+            return;
+        }
         if (requestParams != null) {
             for (Map.Entry<String, Object> entry : requestParams.entrySet()) {
                 if (StringUtils.equals(entry.getValue().toString(), taskInstanceIdHolder)) {
@@ -58,9 +64,9 @@ public class HttpLoopTaskCancelTaskMethodDefinition extends HttpLoopTaskMethodDe
 
         try {
             if (StringUtils.equalsIgnoreCase("get", httpMethodType)) {
-                OkHttpUtils.get(url, requestParams);
+                OkHttpUtils.get(url, httpHeaders, requestParams);
             } else if (StringUtils.equalsIgnoreCase("post", httpMethodType)) {
-                OkHttpUtils.post(url, requestParams, requestBody);
+                OkHttpUtils.post(url, httpHeaders, requestParams, requestBody);
             } else {
                 throw new IllegalArgumentException(String.format("http method type: %s is not supported",
                                                                  httpMethodType));

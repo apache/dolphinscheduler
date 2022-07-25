@@ -35,7 +35,7 @@ public class HttpTaskDefinitionParserTest {
         Assert.assertNotNull(loopTaskYamlDefinition);
         Assert.assertNotNull(loopTaskYamlDefinition.getService());
         LoopTaskYamlDefinition.LoopTaskServiceYamlDefinition service = loopTaskYamlDefinition.getService();
-        Assert.assertEquals("FlinkX", service.getName());
+        Assert.assertEquals("MockService", service.getName());
         Assert.assertNotNull(service.getApi());
     }
 

@@ -24,21 +24,25 @@ public interface LoopTaskDefinition<SubmitTaskMethodT extends LoopTaskSubmitTask
     /**
      * The task name of this loop task, e.g: K8sPodTask
      */
-    @NonNull String getTaskName();
+    @NonNull
+    String getTaskName();
 
     /**
      * Submit task method definition, each loop task should contain submit task method.
      */
-    @NonNull SubmitTaskMethodT getSubmitTaskMethod();
+    @NonNull
+    SubmitTaskMethodT getSubmitTaskMethod();
 
     /**
      * Query task method definition, each loop task should contain query task method.
      */
-    @NonNull QueryTaskMethodT getQueryTaskStateMethod();
+    @NonNull
+    QueryTaskMethodT getQueryTaskStateMethod();
 
     /**
      * Cancel task method definition, each loop task should contain cancel task method, used to cancel the task instance
      */
-    @NonNull CancelTaskMethodT getCancelTaskMethod();
+    @NonNull
+    CancelTaskMethodT getCancelTaskMethod();
 
 }

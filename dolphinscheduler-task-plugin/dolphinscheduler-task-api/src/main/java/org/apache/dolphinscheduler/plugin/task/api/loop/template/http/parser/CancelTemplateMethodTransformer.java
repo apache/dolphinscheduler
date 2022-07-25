@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.parser;
 
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.LoopTaskYamlDefinition;
+import org.apache.dolphinscheduler.plugin.task.api.loop.template.TemplateMethodTransformer;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.method.HttpLoopTaskCancelTaskMethodDefinition;
 
 import java.util.Map;
@@ -32,8 +33,14 @@ public class CancelTemplateMethodTransformer implements
         String url = loopTaskAPIYamlDefinition.getUrl();
         String method = loopTaskAPIYamlDefinition.getMethod();
         String dataType = loopTaskAPIYamlDefinition.getDataType();
+        Map<String, String> httpHeaders = loopTaskAPIYamlDefinition.getHttpHeaders();
         Map<String, Object> requestParams = loopTaskAPIYamlDefinition.getRequestParams();
         Map<String, Object> requestBody = loopTaskAPIYamlDefinition.getRequestBody();
-        return new HttpLoopTaskCancelTaskMethodDefinition(url, method, dataType, requestParams, requestBody);
+        return new HttpLoopTaskCancelTaskMethodDefinition(url,
+                                                          method,
+                                                          dataType,
+                                                          httpHeaders,
+                                                          requestParams,
+                                                          requestBody);
     }
 }

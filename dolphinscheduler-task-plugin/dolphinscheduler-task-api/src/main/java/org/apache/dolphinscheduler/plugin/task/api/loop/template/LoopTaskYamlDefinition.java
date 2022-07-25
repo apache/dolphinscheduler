@@ -47,12 +47,19 @@ public class LoopTaskYamlDefinition implements Serializable {
         private String url;
         private String method;
         private String dataType;
+        private Map<String, String> httpHeaders;
         private Map<String, Object> requestParams;
         private Map<String, Object> requestBody;
     }
 
     @Data
     public static class LoopTaskSubmitMethodYamlDefinition extends LoopTaskMethodYamlDefinition {
+
+        /**
+         * Used to extract the given params from the task params.
+         */
+        private Map<String, String> taskParamsExtractJPath;
+
         /**
          * Used to extract task instance id from response
          */

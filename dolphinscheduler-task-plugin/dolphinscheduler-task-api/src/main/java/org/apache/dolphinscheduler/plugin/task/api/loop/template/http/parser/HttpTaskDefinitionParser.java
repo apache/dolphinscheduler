@@ -40,7 +40,6 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
 
     @Override
     public @NonNull HttpLoopTaskDefinition parse(@NonNull String yamlConfigFile) {
-        // todo: use different parser to parse yaml config file
         LoopTaskYamlDefinition loopTaskYamlDefinition;
         try {
             loopTaskYamlDefinition = parseYamlConfigFile(yamlConfigFile);

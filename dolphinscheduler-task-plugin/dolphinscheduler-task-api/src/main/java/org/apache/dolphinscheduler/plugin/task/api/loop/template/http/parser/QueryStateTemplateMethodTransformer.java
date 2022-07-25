@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.parser;
 
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.LoopTaskYamlDefinition;
+import org.apache.dolphinscheduler.plugin.task.api.loop.template.TemplateMethodTransformer;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.method.HttpLoopTaskQueryStatusMethodDefinition;
 
 import java.util.Map;
@@ -32,12 +33,14 @@ public class QueryStateTemplateMethodTransformer implements
         String url = loopTaskAPIYamlDefinition.getUrl();
         String method = loopTaskAPIYamlDefinition.getMethod();
         String dataType = loopTaskAPIYamlDefinition.getDataType();
+        Map<String, String> httpHeaders = loopTaskAPIYamlDefinition.getHttpHeaders();
         Map<String, Object> requestParams = loopTaskAPIYamlDefinition.getRequestParams();
         Map<String, Object> requestBody = loopTaskAPIYamlDefinition.getRequestBody();
         String taskInstanceFinishedJPath = loopTaskAPIYamlDefinition.getTaskInstanceFinishedJPath();
         return new HttpLoopTaskQueryStatusMethodDefinition(url,
                                                            method,
                                                            dataType,
+                                                           httpHeaders,
                                                            requestParams,
                                                            requestBody,
                                                            taskInstanceFinishedJPath);

@@ -39,10 +39,11 @@ public class HttpLoopTaskSubmitTaskMethodDefinition extends HttpLoopTaskMethodDe
     public HttpLoopTaskSubmitTaskMethodDefinition(String url,
                                                   String httpMethodType,
                                                   String dataType,
+                                                  Map<String, String> httpHeaders,
                                                   Map<String, Object> requestParams,
                                                   Map<String, Object> requestBody,
                                                   @NonNull String taskInstanceIdJPath) {
-        super(url, httpMethodType, dataType, requestParams, requestBody);
+        super(url, httpMethodType, dataType, httpHeaders, requestParams, requestBody);
         this.taskInstanceIdJPath = taskInstanceIdJPath;
     }
 
@@ -52,9 +53,9 @@ public class HttpLoopTaskSubmitTaskMethodDefinition extends HttpLoopTaskMethodDe
         String responseBody;
         try {
             if (StringUtils.equalsIgnoreCase(httpMethodType, "GET")) {
-                responseBody = OkHttpUtils.get(url, requestParams);
+                responseBody = OkHttpUtils.get(url, httpHeaders, requestParams);
             } else if (StringUtils.equalsIgnoreCase(httpMethodType, "POST")) {
-                responseBody = OkHttpUtils.post(url, requestParams, requestBody);
+                responseBody = OkHttpUtils.post(url, httpHeaders, requestParams, requestBody);
             } else {
                 throw new IllegalArgumentException(String.format("The request method type: %s is not supported.",
                                                                  httpMethodType));

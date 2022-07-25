@@ -25,7 +25,8 @@ import lombok.NonNull;
 
 public interface LoopTaskQueryStatusMethodDefinition extends LoopTaskMethodDefinition {
 
-    @NonNull LoopTaskInstanceStatus queryTaskInstanceStatus(@NonNull LoopTaskInstanceInfo taskInstanceInfo);
+    @NonNull
+    LoopTaskInstanceStatus queryTaskInstanceStatus(@NonNull LoopTaskInstanceInfo taskInstanceInfo);
 
     default Duration getTaskInstanceStatusQueryInterval() {
         return TaskConstants.DEFAULT_LOOP_STATUS_INTERVAL;

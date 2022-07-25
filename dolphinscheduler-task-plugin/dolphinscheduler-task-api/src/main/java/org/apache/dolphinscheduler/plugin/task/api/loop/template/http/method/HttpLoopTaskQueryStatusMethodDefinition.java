@@ -41,10 +41,11 @@ public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodD
     public HttpLoopTaskQueryStatusMethodDefinition(String url,
                                                    String httpMethodType,
                                                    String dataType,
+                                                   Map<String, String> httpHeaders,
                                                    Map<String, Object> requestParams,
                                                    Map<String, Object> requestBody,
                                                    String taskInstanceFinishedJPath) {
-        super(url, httpMethodType, dataType, requestParams, requestBody);
+        super(url, httpMethodType, dataType, httpHeaders, requestParams, requestBody);
         this.taskInstanceFinishedJPath = taskInstanceFinishedJPath;
     }
 
@@ -69,9 +70,9 @@ public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodD
         String responseBody;
         try {
             if (StringUtils.equalsIgnoreCase("get", httpMethodType)) {
-                responseBody = OkHttpUtils.get(url, requestParams);
+                responseBody = OkHttpUtils.get(url, httpHeaders, requestParams);
             } else if (StringUtils.equalsIgnoreCase("post", httpMethodType)) {
-                responseBody = OkHttpUtils.post(url, requestParams, requestBody);
+                responseBody = OkHttpUtils.post(url, httpHeaders, requestParams, requestBody);
             } else {
                 throw new IllegalArgumentException(String.format("http method type: %s is not supported",
                                                                  httpMethodType));

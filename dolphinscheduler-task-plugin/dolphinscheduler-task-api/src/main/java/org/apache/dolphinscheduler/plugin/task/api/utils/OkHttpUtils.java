@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import org.apache.http.HttpStatus;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -36,54 +38,62 @@ public class OkHttpUtils {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
 
-    public static @NonNull String get(@NonNull String url, @Nullable Map<String, Object> requestParams)
-        throws IOException {
-        HttpUrl httpUrl = HttpUrl.parse(url);
-        if (httpUrl == null) {
-            throw new IllegalArgumentException(String.format("url: %s is invalid", url));
-        }
-        HttpUrl.Builder urlBuilder = httpUrl.newBuilder();
-        if (requestParams != null) {
-            for (Map.Entry<String, Object> entry : requestParams.entrySet()) {
-                urlBuilder.addQueryParameter(entry.getKey(), entry.getValue().toString());
-            }
-        }
-        Request request = new Request.Builder().url(urlBuilder.build()).build();
+    public static @NonNull String get(@NonNull String url,
+                                      @Nullable Map<String, String> httpHeaders,
+                                      @Nullable Map<String, Object> requestParams) throws IOException {
+        String finalUrl = addUrlParams(requestParams, url);
+        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
+        addHeader(httpHeaders, requestBuilder);
+        Request request = requestBuilder.build();
         try (Response response = CLIENT.newCall(request).execute()) {
-            if (response.code() != 200 || response.body() == null) {
-                throw new RuntimeException(String.format("Request execute failed, httpCode: %s, httpBody: %s",
-                                                         response.code(),
-                                                         response.body()));
-            }
-            return response.body().string();
+            return getResponseBody(response);
         }
     }
 
     public static @NonNull String post(@NonNull String url,
+                                       @Nullable Map<String, String> httpHeaders,
                                        @Nullable Map<String, Object> requestParamsMap,
                                        @Nullable Map<String, Object> requestBodyMap) throws IOException {
-        HttpUrl httpUrl = HttpUrl.parse(url);
-        if (httpUrl == null) {
-            throw new IllegalArgumentException(String.format("url: %s is invalid", url));
-        }
-        HttpUrl.Builder urlBuilder = httpUrl.newBuilder();
-        if (requestParamsMap != null) {
-            for (Map.Entry<String, Object> entry : requestParamsMap.entrySet()) {
-                urlBuilder.addQueryParameter(entry.getKey(), entry.getValue().toString());
-            }
-        }
-        Request.Builder requestBuilder = new Request.Builder().url(urlBuilder.build());
+        String finalUrl = addUrlParams(requestParamsMap, url);
+        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
         if (requestBodyMap != null) {
             requestBuilder = requestBuilder.post(RequestBody.create(MediaType.parse("application/json"),
                                                                     JSONUtils.toJsonString(requestBodyMap)));
         }
         try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
-            if (response.code() != 200 || response.body() == null) {
-                throw new RuntimeException(String.format("Request execute failed, httpCode: %s, httpBody: %s",
-                                                         response.code(),
-                                                         response.body()));
-            }
-            return response.body().string();
+            return getResponseBody(response);
         }
+    }
+
+    private static String addUrlParams(@Nullable Map<String, Object> requestParams, @NonNull String url) {
+        if (requestParams == null) {
+            return url;
+        }
+
+        HttpUrl httpUrl = HttpUrl.parse(url);
+        if (httpUrl == null) {
+            throw new IllegalArgumentException(String.format("url: %s is invalid", url));
+        }
+        HttpUrl.Builder urlBuilder = httpUrl.newBuilder();
+        for (Map.Entry<String, Object> entry : requestParams.entrySet()) {
+            urlBuilder.addQueryParameter(entry.getKey(), entry.getValue().toString());
+        }
+        return urlBuilder.toString();
+    }
+
+    private static void addHeader(@Nullable Map<String, String> headers, @NonNull Request.Builder requestBuilder) {
+        if (headers == null) {
+            return;
+        }
+        headers.forEach(requestBuilder::addHeader);
+    }
+
+    private static String getResponseBody(@NonNull Response response) throws IOException {
+        if (response.code() != HttpStatus.SC_OK || response.body() == null) {
+            throw new RuntimeException(String.format("Request execute failed, httpCode: %s, httpBody: %s",
+                                                     response.code(),
+                                                     response.body()));
+        }
+        return response.body().string();
     }
 }

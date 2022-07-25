@@ -32,6 +32,7 @@ public abstract class HttpLoopTaskMethodDefinition implements LoopTaskMethodDefi
     protected final String url;
     protected final String httpMethodType;
     protected final String dataType;
+    protected final Map<String, String> httpHeaders;
     protected final Map<String, Object> requestParams;
     protected final Map<String, Object> requestBody;
 

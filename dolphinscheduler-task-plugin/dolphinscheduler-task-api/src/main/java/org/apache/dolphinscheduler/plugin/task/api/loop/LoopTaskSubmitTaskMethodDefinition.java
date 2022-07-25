@@ -21,5 +21,6 @@ import lombok.NonNull;
 
 public interface LoopTaskSubmitTaskMethodDefinition extends LoopTaskMethodDefinition {
 
-    @NonNull LoopTaskInstanceInfo submitLoopTask();
+    @NonNull
+    LoopTaskInstanceInfo submitLoopTask();
 }

@@ -51,6 +51,9 @@ public abstract class BaseLoopTaskExecutor extends AbstractTaskExecutor {
             final long loopInterval = getTaskInstanceStatusQueryInterval().toMillis();
             loopTaskInstanceInfo = submitLoopTask();
             this.appIds = loopTaskInstanceInfo.getTaskInstanceId();
+            // loop the task status until the task is finished or task has been canceled.
+            // we use retry utils here to avoid the task status query failure due to network failure.
+            // the default retry policy is 3 times, and the interval is 1 second.
             while (!cancel
                 && !RetryUtils.retryFunction(() -> queryTaskInstanceStatus(loopTaskInstanceInfo).isFinished())) {
                 Thread.sleep(loopInterval);
