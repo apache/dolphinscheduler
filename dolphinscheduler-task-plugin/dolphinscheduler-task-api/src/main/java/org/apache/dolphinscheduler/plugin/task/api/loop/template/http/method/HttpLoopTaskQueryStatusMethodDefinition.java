@@ -22,13 +22,12 @@ import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceStatus;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskQueryStatusMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskInstanceStatus;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskMethodDefinition;
+import org.apache.dolphinscheduler.plugin.task.api.utils.JsonPathUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OkHttpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
-
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.NonNull;
 
@@ -82,7 +81,6 @@ public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodD
         } catch (Exception ex) {
             throw new RuntimeException("Query loop task instance status failed", ex);
         }
-        // todo: support function to judge the task instance is finished or not
-        return new HttpLoopTaskInstanceStatus(JsonPath.read(responseBody, taskInstanceFinishedJPath));
+        return new HttpLoopTaskInstanceStatus(JsonPathUtils.exist(responseBody, taskInstanceFinishedJPath));
     }
 }

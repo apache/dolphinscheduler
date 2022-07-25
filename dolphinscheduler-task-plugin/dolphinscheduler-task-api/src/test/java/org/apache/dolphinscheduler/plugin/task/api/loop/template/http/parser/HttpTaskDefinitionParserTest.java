@@ -30,10 +30,6 @@ public class HttpTaskDefinitionParserTest {
         .getFile();
 
     @Test
-    public void parse() {
-    }
-
-    @Test
     public void parseYamlConfigFile() throws IOException {
         LoopTaskYamlDefinition loopTaskYamlDefinition = new HttpTaskDefinitionParser().parseYamlConfigFile(yamlFile);
         Assert.assertNotNull(loopTaskYamlDefinition);

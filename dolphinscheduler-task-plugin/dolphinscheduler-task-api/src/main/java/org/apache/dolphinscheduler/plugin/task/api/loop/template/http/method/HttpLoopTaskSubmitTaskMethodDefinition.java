@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskSubmitTaskMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskInstanceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskMethodDefinition;
+import org.apache.dolphinscheduler.plugin.task.api.utils.JsonPathUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OkHttpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
-
-import com.jayway.jsonpath.JsonPath;
+import java.util.Optional;
 
 import lombok.NonNull;
 
@@ -64,7 +64,11 @@ public class HttpLoopTaskSubmitTaskMethodDefinition extends HttpLoopTaskMethodDe
         } catch (Exception ex) {
             throw new RuntimeException("Submit loop task error", ex);
         }
-        String taskInstanceId = JsonPath.read(responseBody, taskInstanceIdJPath).toString();
+        Optional<String> taskInstanceIdOptional = JsonPathUtils.read(responseBody, taskInstanceIdJPath);
+        String taskInstanceId = taskInstanceIdOptional.orElseThrow(() -> new RuntimeException(String.format(
+            "Resolve the taskInstanceId error, responseBody: %s, taskInstanceIdJPath: %s",
+            responseBody,
+            taskInstanceIdJPath)));
         return new HttpLoopTaskInstanceInfo(taskInstanceId);
     }
 }
