@@ -15,23 +15,22 @@
 # limitations under the License.
 #
 service:
-  name: FlinkX
+  name: MockService
   type: Http
   api:
     submit:
-      url: /api/v1/dxp/batch/start/async/runid
+      url: /api/v1/submit
       method: POST
       dataType: Json
       requestParams: { "taskId": "704" }
       taskInstanceIdJPath: "$.taskInstanceId[0]"
     queryState:
-      url: /api/v1/dxp/batch/currentStatus
+      url: /api/v1/state
       method: GET
       dataType: Json
       requestParams: { "runId": "${taskInstanceId}" }
-
     cancel:
-      url: /api/v1/dxp/batch/cancel
+      url: /api/v1/cancel
       method: POST
       dataType: Json
       requestParams: { "runId": "${taskInstanceId}" }
