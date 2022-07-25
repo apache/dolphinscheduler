@@ -17,75 +17,56 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-
-import org.apache.hadoop.security.UserGroupInformation;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * configuration test
+ * hadoop utils test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class})
-public class CommonUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
+@PrepareForTest(value = {HadoopUtils.class})
+@SuppressStaticInitializationFor("org.apache.dolphinscheduler.common.utils.HttpUtils")
+public class HadoopUtilsTest {
+    private static final Logger logger = LoggerFactory.getLogger(HadoopUtilsTest.class);
 
     @Test
-    public void getSystemEnvPath() {
-        String envPath;
-        envPath = CommonUtils.getSystemEnvPath();
-        Assert.assertEquals("/etc/profile", envPath);
-    }
-
-    @Test
-    public void isDevelopMode() {
-        logger.info("develop mode: {}", CommonUtils.isDevelopMode());
+    public void getHdfsTenantDir() {
+        logger.info(HadoopUtils.getHdfsTenantDir("1234"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getHdfsDataBasePath() {
-        logger.info(HadoopUtils.getHdfsDataBasePath());
+    public void getHdfsUdfFileName() {
+        logger.info(HadoopUtils.getHdfsUdfFileName("admin", "file_name"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getDownloadFilename() {
-        logger.info(FileUtils.getDownloadFilename("a.txt"));
+    public void getHdfsResourceFileName() {
+        logger.info(HadoopUtils.getHdfsResourceFileName("admin", "file_name"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getUploadFilename() {
-        logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
+    public void getHdfsFileName() {
+        logger.info(HadoopUtils.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
         Assert.assertTrue(true);
     }
 
     @Test
-    public void getHdfsDir() {
-        logger.info(HadoopUtils.getHdfsResDir("1234"));
-        Assert.assertTrue(true);
-    }
-
-    @Test
-    public void test() {
-        InetAddress ip;
-        try {
-            ip = InetAddress.getLocalHost();
-            logger.info(ip.getHostAddress());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+    public void getAppAddress() {
+        PowerMockito.mockStatic(HttpUtils.class);
+        PowerMockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info")).thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
+        logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
         Assert.assertTrue(true);
     }
 
