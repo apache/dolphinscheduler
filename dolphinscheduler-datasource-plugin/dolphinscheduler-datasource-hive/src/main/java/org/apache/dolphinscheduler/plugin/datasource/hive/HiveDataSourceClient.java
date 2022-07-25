@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
+import static org.apache.dolphinscheduler.spi.utils.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5_CONF_PATH;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
@@ -35,14 +35,19 @@ import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -51,12 +56,17 @@ import sun.security.krb5.Config;
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(HiveDataSourceClient.class);
-
+    private static final String DEFAULT_DATABASE_NAME = "default";
     private ScheduledExecutorService kerberosRenewalService;
 
     private Configuration hadoopConf;
     private UserGroupInformation ugi;
+    private JdbcTemplate oneSessionJdbcTemplate;
     private boolean retryGetConnection = true;
+    /**
+     * Stores metastore clients for direct accesses to HMS.
+     */
+    private MetaStoreClientPool metaStoreClientPool;
 
     public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -72,12 +82,17 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         logger.info("Create Configuration for hive configuration.");
-        this.hadoopConf = createHadoopConf();
+        this.hadoopConf = createHadoopConf(baseConnectionParam);
         logger.info("Create Configuration success.");
 
         logger.info("Create UserGroupInformation.");
         this.ugi = createUserGroupInformation(baseConnectionParam.getUser());
         logger.info("Create ugi success.");
+
+        if (baseConnectionParam.getConnMetaStore()) {
+            this.metaStoreClientPool = new MetaStoreClientPool(5, 2, hadoopConf);
+            logger.info("Create HiveMetaStore success.");
+        }
 
         super.initClient(baseConnectionParam, dbType);
         this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
@@ -104,6 +119,24 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             } catch (Exception e) {
                 throw new RuntimeException("Update Kerberos environment failed.", e);
             }
+        }
+    }
+
+    private void checkHiveMetaStoreClient() {
+        if (!super.baseConnectionParam.getConnMetaStore()) {
+            throw new RuntimeException("Hive metastore not connect");
+        }
+        try {
+            this.metaStoreClientPool.getClient().getHiveClient().getAllDatabases();
+        } catch (Exception e) {
+            this.ugi.doAs((PrivilegedAction<Void>) () -> {
+                try {
+                    this.metaStoreClientPool.getClient().getHiveClient().reconnect();
+                    return null;
+                } catch (Exception e2) {
+                    throw new RuntimeException("Hive metastore connect failed." + " : " + hadoopConf.get("hive.metastore.uris"), e2);
+                }
+            });
         }
     }
 
@@ -135,8 +168,11 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         }
     }
 
-    protected Configuration createHadoopConf() {
-        Configuration hadoopConf = new Configuration();
+    protected Configuration createHadoopConf(BaseConnectionParam connectionParam) {
+        Configuration hadoopConf = CommonUtil.getHadoopConfFromResources(connectionParam);
+
+        hadoopConf.set("hive.metastore.client.connect.retry.delay", "1");
+        hadoopConf.set("hive.metastore.connect.retries", "1");
         hadoopConf.setBoolean("ipc.client.fallback-to-simple-auth-allowed", true);
         return hadoopConf;
     }
@@ -161,6 +197,56 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             logger.error("get oneSessionDataSource Connection fail SQLException: {}", e.getMessage(), e);
             return null;
         }
+    }
+
+    @Override
+    public List<String> getDatabaseList(String databasePattern) {
+        try {
+            checkHiveMetaStoreClient();
+            if (StringUtils.isBlank(databasePattern)) {
+                return this.metaStoreClientPool.getClient().getHiveClient().getAllDatabases();
+            }
+            return this.metaStoreClientPool.getClient().getHiveClient().getDatabases(databasePattern.trim());
+        } catch (Exception e) {
+            throw new RuntimeException("META_EXCEPTION", e);
+        }
+    }
+
+    @Override
+    public List<String> getTableList(String dbName, String schemaName, String tablePattern) {
+        if (StringUtils.isBlank(dbName)) {
+            dbName = DEFAULT_DATABASE_NAME;
+        }
+        try {
+            checkHiveMetaStoreClient();
+            if (StringUtils.isBlank(tablePattern)) {
+                return this.metaStoreClientPool.getClient().getHiveClient().getAllTables(dbName.trim());
+            }
+            return this.metaStoreClientPool.getClient().getHiveClient().getTables(dbName.trim(), "*" + tablePattern.trim() + "*");
+        } catch (Exception e) {
+            throw new RuntimeException("META_EXCEPTION", e);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getTableStruct(String dbName, String schemaName, String tableName) {
+        List<Map<String, Object>> struct = super.executeSql(dbName, schemaName, Boolean.FALSE, String.format("desc %s", tableName)).getMiddle();
+        List<Map<String, Object>> filterStruct = new LinkedList<>();
+        for (Map<String, Object> stringObjectMap : struct) {
+            if (StringUtils.isBlank(stringObjectMap.get("col_name").toString())) {
+                break;
+            }
+            filterStruct.add(stringObjectMap);
+        }
+        return filterStruct;
+    }
+
+    @Override
+    protected JdbcTemplate getJdbcTemplate(Boolean oneSession) {
+        if (oneSession) {
+            return this.oneSessionJdbcTemplate;
+        }
+        return this.jdbcTemplate;
     }
 
     @Override

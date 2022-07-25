@@ -38,8 +38,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
-public class DataSourceClientProvider {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
+public class DataSourceClientManager {
+    private static final Logger logger = LoggerFactory.getLogger(DataSourceClientManager.class);
 
     private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
@@ -53,19 +53,19 @@ public class DataSourceClientProvider {
         .build();
     private DataSourcePluginManager dataSourcePluginManager;
 
-    private DataSourceClientProvider() {
+    private DataSourceClientManager() {
         initDataSourcePlugin();
     }
 
-    private static class DataSourceClientProviderHolder {
-        private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
+    private static class DataSourceClientManagerHolder {
+        private static final DataSourceClientManager INSTANCE = new DataSourceClientManager();
     }
 
-    public static DataSourceClientProvider getInstance() {
-        return DataSourceClientProviderHolder.INSTANCE;
+    public static DataSourceClientManager getInstance() {
+        return DataSourceClientManagerHolder.INSTANCE;
     }
 
-    public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
+    public Connection getDataSource(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("Get connection from datasource {}", datasourceUniqueId);
