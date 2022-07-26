@@ -1862,6 +1862,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
                 if (scheduleObj != null) {
                     scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
+                    scheduleObj.setProcessDefinitionName(processDefinition.getName());
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     scheduleObj.setCreateTime(date);
                     scheduleObj.setUpdateTime(date);
