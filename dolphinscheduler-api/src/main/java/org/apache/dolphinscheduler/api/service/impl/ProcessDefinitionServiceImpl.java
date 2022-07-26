@@ -1232,7 +1232,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         for (TaskDefinition taskDefinition : taskDefinitionList) {
             TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-            taskDefinitionLog.setName(taskDefinitionLog.getName() + "_import_" + DateUtils.getCurrentTimeStamp());
+            taskDefinitionLog.setName(taskDefinitionLog.getName());
             taskDefinitionLog.setProjectCode(projectCode);
             taskDefinitionLog.setUserId(loginUser.getId());
             taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
