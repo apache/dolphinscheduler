@@ -440,7 +440,7 @@ public class PythonGateway {
         return usersService.queryUser(id);
     }
 
-    public void updateUser(String userName, int id, String userPassword, String email, String phone, String tenantCode, String queue, int state, String timeZone) throws Exception {
+    public void updateUser(String userName, String userPassword, String email, String phone, String tenantCode, String queue, int state) throws Exception {
         usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
     }
 
