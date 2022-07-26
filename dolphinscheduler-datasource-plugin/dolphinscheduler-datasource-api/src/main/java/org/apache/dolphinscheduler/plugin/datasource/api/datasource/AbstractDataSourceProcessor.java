@@ -41,7 +41,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         checkHost(baseDataSourceParamDTO.getHost());
-        checkDatasourcePatter(baseDataSourceParamDTO.getDatabase());
+        checkDatabasePatter(baseDataSourceParamDTO.getDatabase());
         checkOther(baseDataSourceParamDTO.getOther());
     }
 
@@ -61,9 +61,9 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      *
      * @param database database name
      */
-    protected void checkDatasourcePatter(String database) {
+    protected void checkDatabasePatter(String database) {
         if (!DATABASE_PATTER.matcher(database).matches()) {
-            throw new IllegalArgumentException("datasource name illegal");
+            throw new IllegalArgumentException("database name illegal");
         }
     }
 
