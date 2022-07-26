@@ -1716,6 +1716,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param targetProjectCode targetProjectCode
      */
     @Override
+    @Transactional
     public Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                           long projectCode,
                                                           String codes,
@@ -1788,7 +1789,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-    @Transactional(rollbackFor = RuntimeException.class)
     protected void doBatchOperateProcessDefinition(User loginUser,
                                                  long targetProjectCode,
                                                  List<String> failedProcessList,
