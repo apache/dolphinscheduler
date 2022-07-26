@@ -497,6 +497,8 @@ export default {
     allow_insert: 'AllowInsert',
     concurrency: 'Concurrency',
     concurrency_tips: 'Please enter Concurrency',
+    concurrency_column: 'Concurrency Column',
+    concurrency_column_tips: 'Please enter Concurrency Column',
     sea_tunnel_master: 'Master',
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: 'Queue',

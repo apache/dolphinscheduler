@@ -30,6 +30,8 @@ public final class SqoopConstants {
     public static final String LINES_TERMINATED_BY = "--lines-terminated-by";
     public static final String FIELD_NULL_PLACEHOLDER = "--null-non-string 'NULL' --null-string 'NULL'";
 
+    public static final String SPLIT_BY = "--split-by";
+
     //sqoop db
     public static final String DB_CONNECT = "--connect";
     public static final String DB_USERNAME = "--username";

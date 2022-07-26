@@ -24,6 +24,8 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
   const customSpan = computed(() => (model.isCustomTask ? 24 : 0))
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
 
+  const unCustomHalfSpan = computed(() => (model.isCustomTask ? 0 : 12))
+
   return [
     {
       type: 'switch',
@@ -75,10 +77,19 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
       type: 'input-number',
       field: 'concurrency',
       name: t('project.node.concurrency'),
-      span: unCustomSpan,
+      span: unCustomHalfSpan,
       props: {
         placeholder: t('project.node.concurrency_tips'),
         min: 1
+      }
+    },
+    {
+      type: 'input',
+      field: 'splitBy',
+      name: t('project.node.concurrency_column'),
+      span: unCustomHalfSpan,
+      props: {
+        placeholder: t('project.node.concurrency_column_tips')
       }
     },
     {

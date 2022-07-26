@@ -265,6 +265,7 @@ interface ITaskParams {
   hadoopCustomParams?: ILocalParam[]
   sqoopAdvancedParams?: ILocalParam[]
   concurrency?: number
+  splitBy?: string
   modelType?: ModelType
   sourceType?: SourceType
   targetType?: SourceType

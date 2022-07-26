@@ -491,6 +491,8 @@ export default {
     allow_insert: '无更新便插入',
     concurrency: '并发度',
     concurrency_tips: '请输入并发度',
+    concurrency_column: '并发键',
+    concurrency_column_tips: '请输入并发键',
     sea_tunnel_master: 'Master',
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: '队列',
