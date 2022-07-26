@@ -139,7 +139,7 @@ public class EphemeralNodeManager implements AutoCloseable {
                     final String nodeAddress = entry.getKey();
                     activeMasterServers.remove(nodeAddress);
                     updateActiveMaster(activeMasterServers);
-                    addDeadServer(Constants.MASTER_TYPE, nodeAddress);
+                    addDeadServer(getDeadServerSuffix(Constants.MASTER_TYPE, nodeAddress));
                     if (nodeAddress.split(Constants.COLON)[0].equals(NetUtils.getHost())) {
                         connectionState = ConnectionState.DISCONNECTED;
                         triggerListener(ConnectionState.DISCONNECTED);
@@ -156,7 +156,7 @@ public class EphemeralNodeManager implements AutoCloseable {
                     activeWorkerServers.remove(nodeAddress);
                     updateActiveWorker(nodeAddress, activeWorkerServers);
                     removeWorkerGroup(nodeAddress);
-                    addDeadServer(Constants.WORKER_TYPE, nodeAddress);
+                    addDeadServer(getDeadServerSuffix(Constants.WORKER_TYPE, nodeAddress));
                     removeNodeData(nodeAddress);
                     log.warn("Worker server {} connect to raft cluster timeout, last heartbeat {}, timeout config {} ms",
                             nodeAddress, convertTimeToString(entry.getValue()), expireTime);
@@ -249,11 +249,7 @@ public class EphemeralNodeManager implements AutoCloseable {
             removeDeadServer(Constants.WORKER_TYPE, nodeAddress);
             addNodeData(key, value);
         } else if (key.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS)) {
-            final List<String> deadServers = getDeadServers();
-            if (!deadServers.contains(nodeAddress)) {
-                deadServers.add(nodeAddress);
-                kvStore.bPut(Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, writeUtf8(JSONUtils.toJsonString(deadServers)));
-            }
+            addDeadServer(nodeAddress);
         }
 
     }
@@ -288,8 +284,7 @@ public class EphemeralNodeManager implements AutoCloseable {
         kvStore.bPut(key.substring(0, key.lastIndexOf(Constants.SINGLE_SLASH)), writeUtf8(JSONUtils.toJsonString(activeNodes.keySet())));
     }
 
-    private void addDeadServer(String nodeType, String nodeAddress) {
-        final String deadServerAddress = getDeadServerSuffix(nodeType, nodeAddress);
+    private void addDeadServer(String deadServerAddress) {
         List<String> deadServers = getDeadServers();
         if (!deadServers.contains(deadServerAddress)) {
             deadServers.add(deadServerAddress);
