@@ -15,18 +15,13 @@
  * limitations under the License.
  */
 
-.conditions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.conditions-search-input {
-  width: 250px;
-}
-.pagination {
-  margin-top: 20px;
-  justify-content: center;
-}
-.mt-8 {
-  margin-top: 8px;
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
+
+public class SagemakerConstants {
+    public static final int CHECK_PIPELINE_EXECUTION_STATUS_INTERVAL = 5000;
+    public static final int PIPELINE_MAX_RESULTS = 100;
+
+    private SagemakerConstants() {
+        throw new IllegalStateException("Utility class");
+    }
 }

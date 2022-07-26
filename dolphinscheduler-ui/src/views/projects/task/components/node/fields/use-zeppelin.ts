@@ -66,6 +66,14 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
+      field: 'zeppelinProductionNoteDirectory',
+      name: t('project.node.zeppelin_production_note_directory'),
+      props: {
+        placeholder: t('project.node.zeppelin_production_note_directory_tips')
+      }
+    },
+    {
+      type: 'input',
       field: 'parameters',
       name: t('project.node.zeppelin_parameters'),
       props: {

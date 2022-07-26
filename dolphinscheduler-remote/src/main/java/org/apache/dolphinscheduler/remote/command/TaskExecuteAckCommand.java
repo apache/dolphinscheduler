@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,9 +36,9 @@ import lombok.ToString;
 public class TaskExecuteAckCommand extends BaseCommand {
 
     private int taskInstanceId;
-    private int status;
+    private ExecutionStatus status;
 
-    public TaskExecuteAckCommand(int status,
+    public TaskExecuteAckCommand(ExecutionStatus status,
                                  int taskInstanceId,
                                  String sourceServerAddress,
                                  String messageReceiverAddress,
