@@ -165,6 +165,7 @@ public class AlertDao {
         Date crashAlarmSuppressionStartTime = Date.from(LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
 
         alertGroupIds.stream()
+                .sequential()
                 .forEach(ag -> {
                     alert.setAlertGroupId(ag);
                     // we use this method to avoid insert duplicate alert(issue #5525)

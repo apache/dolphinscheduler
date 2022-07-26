@@ -314,3 +314,5 @@ CREATE TABLE `t_ds_cluster` (
   UNIQUE KEY `cluster_name_unique` (`name`),
   UNIQUE KEY `cluster_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `t_ds_alertgroup` ADD COLUMN `recv_fault_tol_warn` boolean DEFAULT FALSE COMMENT 'receive fault tolerance warnings';

@@ -282,6 +282,8 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_cluster"
     CONSTRAINT cluster_code_unique UNIQUE (code)
 )';
 
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alertgroup ADD COLUMN IF NOT EXISTS recv_fault_tol_warn boolean DEFAULT FALSE ';
+
 return 'Success!';
 exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;

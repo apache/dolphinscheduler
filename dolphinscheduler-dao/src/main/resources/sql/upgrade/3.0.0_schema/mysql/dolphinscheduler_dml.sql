@@ -650,3 +650,5 @@ VALUES(149, 10, 19, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.00
 INSERT INTO t_ds_relation_rule_input_entry
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
 VALUES(150, 8, 29, NULL, 7, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+
+UPDATE `t_ds_alertgroup` SET `recv_fault_tol_warn` = TRUE WHERE `id` = 1;
