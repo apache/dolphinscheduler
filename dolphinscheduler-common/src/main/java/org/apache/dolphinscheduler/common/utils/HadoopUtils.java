@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
@@ -446,42 +447,39 @@ public class HadoopUtils implements Closeable, StorageOperate {
         if (StringUtils.isEmpty(applicationId)) {
             return null;
         }
-
-        String result;
-        String applicationUrl = getApplicationUrl(applicationId);
-        logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
-
-        String responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
-        if (responseContent != null) {
-            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-            if (!jsonObject.has("app")) {
-                return ExecutionStatus.FAILURE;
-            }
-            result = jsonObject.path("app").path("finalStatus").asText();
-            String state = jsonObject.path("app").path("state").asText();
-            if (StringUtils.equals(result, Constants.UNDEFINED) && StringUtils.equals(state, Constants.FINISHED)) {
-                return ExecutionStatus.FAILURE;
-            }
-
-        } else {
+        String result = getResult(applicationId, "app", false);
+        if (result == null) {
             //may be in job history
-            String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
-            responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
-
-            if (null != responseContent) {
-                ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-                if (!jsonObject.has("job")) {
-                    return ExecutionStatus.FAILURE;
-                }
-                result = jsonObject.path("job").path("state").asText();
-            } else {
-                return ExecutionStatus.FAILURE;
-            }
+            result = getResult(applicationId, "job", true);
         }
-
         return getExecutionStatus(result);
     }
+
+
+    private String getResult(String applicationId, String filedName, boolean isHistory) throws BaseException {
+        String url = isHistory ? getJobHistoryUrl(applicationId) : getApplicationUrl(applicationId);
+        logger.debug("generate yarn application url or job history application url, url={}", url);
+        String responseContent = Boolean.TRUE.equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) ? KerberosHttpClient.get(url) : HttpUtils.get(url);
+        if (responseContent != null) {
+            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            if (!jsonObject.has(filedName)) {
+                return Constants.FAILED;
+            }
+            JsonNode node = jsonObject.path(filedName);
+            if (isHistory) {
+                return node.path("state").asText();
+            } else {
+                String result = node.path("finalStatus").asText();
+                String state = node.path("state").asText();
+                if (StringUtils.equals(result, Constants.UNDEFINED) && StringUtils.equals(state, Constants.FINISHED)) {
+                    return Constants.FAILED;
+                }
+                return result;
+            }
+        }
+        return isHistory ? Constants.FAILED : null;
+    }
+
 
     private ExecutionStatus getExecutionStatus(String result) {
         switch (result) {
