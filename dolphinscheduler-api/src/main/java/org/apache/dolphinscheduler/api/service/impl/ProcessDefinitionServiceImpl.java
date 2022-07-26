@@ -115,7 +115,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1888,20 +1887,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private String getNewName(String originalName, String suffix) {
         StringBuilder newName = new StringBuilder();
         if (originalName.contains(suffix)) {
-            final String originalTimeStamp = originalName.substring(originalName.lastIndexOf(suffix) + suffix.length());
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.YYYYMMDDHHMMSSSSS);
-                dateFormat.parse(originalTimeStamp);
-                //replace timestamp in originalName
-                newName.append(originalName, 0, originalName.lastIndexOf(suffix))
-                        .append(suffix)
-                        .append(DateUtils.getCurrentTimeStamp());
-                return newName.toString();
-            } catch (Exception e) {
-                logger.error("error while parse last timestamp in {}", originalName);
-            }
+            //replace timestamp of originalName
+            return newName.append(originalName, 0, originalName.lastIndexOf(suffix))
+                    .append(suffix)
+                    .append(DateUtils.getCurrentTimeStamp())
+                    .toString();
         }
-        return newName.append(originalName).append(suffix).append(DateUtils.getCurrentTimeStamp()).toString();
+        return newName.append(originalName)
+                .append(suffix)
+                .append(DateUtils.getCurrentTimeStamp())
+                .toString();
     }
 
     /**
