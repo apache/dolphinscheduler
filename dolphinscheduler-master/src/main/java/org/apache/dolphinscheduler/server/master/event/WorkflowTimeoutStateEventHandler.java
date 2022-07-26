@@ -27,7 +27,7 @@ import com.google.auto.service.AutoService;
 public class WorkflowTimeoutStateEventHandler implements StateEventHandler {
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent) {
-        ProcessInstanceMetrics.incProcessInstanceTimeout();
+        ProcessInstanceMetrics.incProcessInstanceByState("timeout");
         workflowExecuteRunnable.processTimeout();
         return true;
     }

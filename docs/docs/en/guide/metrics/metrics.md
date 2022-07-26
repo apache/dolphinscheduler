@@ -60,14 +60,15 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 ### Task Related Metrics
 
-- ds.task.timeout.count: (counter) the number of timeout tasks
-- ds.task.finish.count: (counter) the number of finished tasks, both succeeded and failed included
-- ds.task.success.count: (counter) the number of successful tasks
-- ds.task.failure.count: (counter) the number of failed tasks
-- ds.task.stop.count: (counter) the number of stopped tasks
-- ds.task.retry.count: (counter) the number of retried tasks 
-- ds.task.submit.count: (counter) the number of submitted tasks
-- ds.task.failover.count: (counter) the number of task fail-overs
+- ds.task.instance.count: (counter) the number of task instances, sliced by the tag `state`:
+  - timeout: the number of timeout tasks
+  - finish: the number of finished tasks, both succeeded and failed included
+  - success: the number of successful tasks
+  - fail: the number of failed tasks
+  - stop: the number of stopped tasks
+  - retry: the number of retried tasks 
+  - submit: the number of submitted tasks
+  - failover: the number of task fail-overs
 - ds.task.dispatch.count: (counter) the number of tasks dispatched to worker
 - ds.task.dispatch.failure.count: (counter) the number of tasks failed to dispatch, retry failure included
 - ds.task.dispatch.error.count: (counter) the number of task dispatch errors
@@ -83,12 +84,13 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.workflow.create.command.count: (counter) the number of commands created and inserted by workflows
 - ds.workflow.instance.submit.count: (counter) the number of submitted workflow instances
 - ds.workflow.instance.running: (gauge) the number of running workflow instances
-- ds.workflow.instance.timeout.count: (counter) the number of timeout workflow instances
-- ds.workflow.instance.finish.count: (counter) indicates the number of finished workflow instances, both successes and failures included
-- ds.workflow.instance.success.count: (counter) the number of successful workflow instances
-- ds.workflow.instance.failure.count: (counter) the number of failed workflow instances 
-- ds.workflow.instance.stop.count: (counter) the number of stopped workflow instances 
-- ds.workflow.instance.failover.count: (counter) the number of workflow instance fail-overs
+- ds.workflow.instance.count: (counter) the number of workflow instances, sliced by the tag `state`:
+  - timeout: the number of timeout workflow instances
+  - finish: the number of finished workflow instances, both successes and failures included
+  - success: the number of successful workflow instances
+  - fail: the number of failed workflow instances 
+  - stop: the number of stopped workflow instances 
+  - failover: the number of workflow instance fail-overs
 
 ### Master Server Metrics
 
