@@ -38,7 +38,6 @@ import {
 } from '@/common/column-width-config'
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
-import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 
 export function useTable() {
@@ -138,7 +137,6 @@ export function useTable() {
         title: t('project.workflow.operation'),
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](3),
-        className: styles.operation,
         render: (row: any) => {
           return h(NSpace, null, {
             default: () => [

@@ -15,12 +15,31 @@
  * limitations under the License.
  */
 
-.table-card {
-  margin-top: 8px;
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+
+import java.util.Collections;
+import java.util.List;
+
+import com.google.auto.service.AutoService;
+
+@AutoService(TaskChannelFactory.class)
+public class SagemakerTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public TaskChannel create() {
+        return new SagemakerTaskChannel();
+    }
+
+    @Override
+    public String getName() {
+        return "SAGEMAKER";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return Collections.emptyList();
+    }
 }

@@ -181,6 +181,10 @@ export default {
                                 title: 'Dinky',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
+                            {
+                                title: 'SageMaker',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
                         ],
                     },
                     {
@@ -601,6 +605,10 @@ export default {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
+                            {
+                                title: 'SageMaker',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
                         ],
                     },
                     {
@@ -814,7 +822,7 @@ export default {
                     },
                     {
                         title: '数据源设置',
-                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/datasource-setting.html',
                     },
                     {
                         title: '其他',
