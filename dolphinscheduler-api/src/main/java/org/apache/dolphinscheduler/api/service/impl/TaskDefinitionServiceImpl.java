@@ -45,7 +45,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.service.permission.PermissionCheck;
+import org.apache.dolphinscheduler.api.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -71,6 +71,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * task definition service impl
@@ -113,14 +115,14 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param projectCode project code
      * @param taskDefinitionJson task definition json
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> createTaskDefinition(User loginUser,
                                                     long projectCode,
                                                     String taskDefinitionJson) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -165,7 +167,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param upstreamCodes upstream task codes, sep comma
      * @return create result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> createTaskBindsWorkFlow(User loginUser,
                                                        long projectCode,
@@ -174,7 +176,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                        String upstreamCodes) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_CREATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -270,18 +272,19 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      *
      * @param loginUser login user
      * @param projectCode project code
+     * @param processCode process code
      * @param taskName task name
      */
     @Override
-    public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, String taskName) {
+    public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, long processCode, String taskName) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), taskName);
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), processCode, taskName);
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskName);
         } else {
@@ -299,12 +302,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param projectCode project code
      * @param taskCode task code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_DELETE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -378,7 +381,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param taskCode task code
      * @param taskDefinitionJsonObj task definition json object
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateTaskDefinition(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj) {
         Map<String, Object> result = new HashMap<>();
@@ -400,7 +403,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj, Map<String, Object> result) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode));
+        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_UPDATE));
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return null;
         }
@@ -542,12 +545,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param taskCode task code
      * @param version the version user want to switch
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> switchVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project,projectCode,WORKFLOW_SWITCH_TO_THIS_VERSION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -589,7 +592,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_VERSION_VIEW);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -611,7 +614,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_DELETE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -638,7 +641,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -664,7 +667,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -736,12 +739,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param releaseState releaseState
      * @return update result code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
         Status resultStatus = (Status) result.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             return result;

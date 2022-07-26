@@ -11,7 +11,7 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点：
 ## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
-- 拖动工具栏的 <img src="/img/tasks/icons/flink.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的 <img src="../../../../img/tasks/icons/flink.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
 
@@ -28,7 +28,7 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点：
 - 程序类型：支持 Java、Scala、 Python 和 SQL 四种语言。
 - 主函数的 Class：Flink 程序的入口 Main Class 的**全路径**。
 - 主程序包：执行 Flink 程序的 jar 包（通过资源中心上传）。
-- 部署方式：支持 cluster 和 local 两种模式的部署。
+- 部署方式：支持 cluster、 local 和 application （Flink 1.11和之后的版本支持，参见 [Run an application in Application Mode](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/yarn_setup.html#run-an-application-in-application-mode)） 三种模式的部署。
 - 初始化脚本：用于初始化会话上下文的脚本文件。
 - 脚本：用户开发的应该执行的 SQL 脚本文件。
 - Flink 版本：根据所需环境选择对应的版本即可。
@@ -54,7 +54,7 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点：
 
 若生产环境中要是使用到 flink 任务类型，则需要先配置好所需的环境。配置文件如下：`bin/env/dolphinscheduler_env.sh`。
 
-![flink-configure](/img/tasks/demo/flink_task01.png)
+![flink-configure](../../../../img/tasks/demo/flink_task01.png)
 
 ####  上传主程序包
 
@@ -62,19 +62,19 @@ Flink 任务类型，用于执行 Flink 程序。对于 Flink 节点：
 
 当配置完成资源中心之后，直接使用拖拽的方式，即可上传所需目标文件。
 
-![resource_upload](/img/tasks/demo/upload_jar.png)
+![resource_upload](../../../../img/tasks/demo/upload_jar.png)
 
 #### 配置 Flink 节点
 
 根据上述参数说明，配置所需的内容即可。
 
-![demo-flink-simple](/img/tasks/demo/flink_task02.png)
+![demo-flink-simple](../../../../img/tasks/demo/flink_task02.png)
 
 ### 执行 FlinkSQL 程序
 
 根据上述参数说明，配置所需的内容即可。
 
-![demo-flink-sql-simple](/img/tasks/demo/flink_sql_test.png)
+![demo-flink-sql-simple](../../../../img/tasks/demo/flink_sql_test.png)
 
 ## 注意事项：
 

@@ -70,7 +70,6 @@ export function useTable() {
     variables.columns = [
       {
         type: 'selection',
-        disabled: (row) => row.releaseState === 'ONLINE',
         className: 'btn-selected',
         ...COLUMN_WIDTH_CONFIG['selection']
       },
@@ -187,7 +186,6 @@ export function useTable() {
         title: t('project.workflow.operation'),
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](8.5),
-        className: styles.operation,
         render: (row) =>
           h(TableAction, {
             row,

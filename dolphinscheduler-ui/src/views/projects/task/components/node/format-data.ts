@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { find, omit, cloneDeep } from 'lodash'
+import { omit, cloneDeep } from 'lodash'
 import type {
   INodeData,
   ITaskData,
@@ -88,6 +88,7 @@ export function formatParams(data: INodeData): {
       taskParams.hadoopCustomParams = data.hadoopCustomParams
       taskParams.sqoopAdvancedParams = data.sqoopAdvancedParams
       taskParams.concurrency = data.concurrency
+      taskParams.splitBy = data.splitBy
       taskParams.modelType = data.modelType
       taskParams.sourceType = data.sourceType
       taskParams.targetType = data.targetType
@@ -199,12 +200,23 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SEATUNNEL') {
-    if (data.deployMode === 'local') {
-      data.master = 'local'
-      data.masterUrl = ''
-      data.deployMode = 'client'
+    taskParams.engine = data.engine
+    taskParams.useCustom = data.useCustom
+    taskParams.rawScript = data.rawScript
+    switch (data.engine) {
+      case 'FLINK':
+        taskParams.runMode = data.runMode
+        taskParams.others = data.others
+        break
+      case 'SPARK':
+        taskParams.deployMode = data.deployMode
+        taskParams.master = data.master
+        taskParams.masterUrl = data.masterUrl
+        taskParams.queue = data.queue
+        break
+      default:
+        break
     }
-    buildRawScript(data)
   }
 
   if (data.taskType === 'SWITCH') {
@@ -279,6 +291,13 @@ export function formatParams(data: INodeData): {
       operator: data.operator,
       src_connector_type: data.src_connector_type,
       src_datasource_id: data.src_datasource_id,
+      field_length: data.field_length,
+      begin_time: data.begin_time,
+      deadline: data.deadline,
+      datetime_format: data.datetime_format,
+      enum_list: data.enum_list,
+      regexp_pattern: data.regexp_pattern,
+      target_filter: data.target_filter,
       src_filter: data.src_filter,
       src_field: data.src_field,
       src_table: data.src_table,
@@ -287,7 +306,8 @@ export function formatParams(data: INodeData): {
       target_connector_type: data.target_connector_type,
       target_datasource_id: data.target_datasource_id,
       target_table: data.target_table,
-      threshold: data.threshold
+      threshold: data.threshold,
+      mapping_columns: JSON.stringify(data.mapping_columns)
     }
     taskParams.sparkParameters = {
       deployMode: data.deployMode,
@@ -302,12 +322,24 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'EMR') {
     taskParams.type = data.type
+    taskParams.programType = data.programType
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
+    taskParams.stepsDefineJson = data.stepsDefineJson
   }
 
   if (data.taskType === 'ZEPPELIN') {
     taskParams.noteId = data.zeppelinNoteId
     taskParams.paragraphId = data.zeppelinParagraphId
+    taskParams.restEndpoint = data.zeppelinRestEndpoint
+    taskParams.productionNoteDirectory = data.zeppelinProductionNoteDirectory
+    taskParams.parameters = data.parameters
+  }
+
+  if (data.taskType === 'K8S') {
+    taskParams.namespace = data.namespace
+    taskParams.minCpuCores = data.minCpuCores
+    taskParams.minMemorySpace = data.minMemorySpace
+    taskParams.image = data.image
   }
 
   if (data.taskType === 'JUPYTER') {
@@ -320,6 +352,54 @@ export function formatParams(data: INodeData): {
     taskParams.executionTimeout = data.executionTimeout
     taskParams.startTimeout = data.startTimeout
     taskParams.others = data.others
+  }
+
+  if (data.taskType === 'MLFLOW') {
+    taskParams.algorithm = data.algorithm
+    taskParams.params = data.params
+    taskParams.searchParams = data.searchParams
+    taskParams.dataPath = data.dataPath
+    taskParams.experimentName = data.experimentName
+    taskParams.modelName = data.modelName
+    taskParams.mlflowTrackingUri = data.mlflowTrackingUri
+    taskParams.mlflowJobType = data.mlflowJobType
+    taskParams.automlTool = data.automlTool
+    taskParams.registerModel = data.registerModel
+    taskParams.mlflowTaskType = data.mlflowTaskType
+    taskParams.deployType = data.deployType
+    taskParams.deployPort = data.deployPort
+    taskParams.deployModelKey = data.deployModelKey
+    taskParams.mlflowProjectRepository = data.mlflowProjectRepository
+    taskParams.mlflowProjectVersion = data.mlflowProjectVersion
+    taskParams.cpuLimit = data.cpuLimit
+    taskParams.memoryLimit = data.memoryLimit
+  }
+
+  if (data.taskType === 'DVC') {
+    taskParams.dvcTaskType = data.dvcTaskType
+    taskParams.dvcRepository = data.dvcRepository
+    taskParams.dvcVersion = data.dvcVersion
+    taskParams.dvcDataLocation = data.dvcDataLocation
+    taskParams.dvcMessage = data.dvcMessage
+    taskParams.dvcLoadSaveDataPath = data.dvcLoadSaveDataPath
+    taskParams.dvcStoreUrl = data.dvcStoreUrl
+  }
+
+  if (data.taskType === 'SAGEMAKER') {
+    taskParams.sagemakerRequestJson = data.sagemakerRequestJson
+  }
+
+  if (data.taskType === 'DINKY') {
+    taskParams.address = data.address
+    taskParams.taskId = data.taskId
+    taskParams.online = data.online
+  }
+
+  if (data.taskType === 'OPENMLDB') {
+    taskParams.zk = data.zk
+    taskParams.zkPath = data.zkPath
+    taskParams.executeMode = data.executeMode
+    taskParams.sql = data.sql
   }
 
   if (data.taskType === 'PIGEON') {
@@ -367,7 +447,9 @@ export function formatParams(data: INodeData): {
       timeout: data.timeoutFlag ? data.timeout : 0,
       timeoutFlag: data.timeoutFlag ? 'OPEN' : 'CLOSE',
       timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
-      workerGroup: data.workerGroup
+      workerGroup: data.workerGroup,
+      cpuQuota: data.cpuQuota || -1,
+      memoryMax: data.memoryMax || -1
     }
   } as {
     processDefinitionCode: string
@@ -511,6 +593,13 @@ export function formatModel(data: ITaskData) {
     params.src_datasource_id =
       data.taskParams.ruleInputParameter.src_datasource_id
     params.src_table = data.taskParams.ruleInputParameter.src_table
+    params.field_length = data.taskParams.ruleInputParameter.field_length
+    params.begin_time = data.taskParams.ruleInputParameter.begin_time
+    params.deadline = data.taskParams.ruleInputParameter.deadline
+    params.datetime_format = data.taskParams.ruleInputParameter.datetime_format
+    params.target_filter = data.taskParams.ruleInputParameter.target_filter
+    params.regexp_pattern = data.taskParams.ruleInputParameter.regexp_pattern
+    params.enum_list = data.taskParams.ruleInputParameter.enum_list
     params.src_filter = data.taskParams.ruleInputParameter.src_filter
     params.src_field = data.taskParams.ruleInputParameter.src_field
     params.statistics_execute_sql =
@@ -522,6 +611,10 @@ export function formatModel(data: ITaskData) {
       data.taskParams.ruleInputParameter.target_datasource_id
     params.target_table = data.taskParams.ruleInputParameter.target_table
     params.threshold = data.taskParams.ruleInputParameter.threshold
+    if (data.taskParams.ruleInputParameter.mapping_columns)
+      params.mapping_columns = JSON.parse(
+        data.taskParams.ruleInputParameter.mapping_columns
+      )
   }
   if (data.taskParams?.sparkParameters) {
     params.deployMode = data.taskParams.sparkParameters.deployMode
@@ -549,50 +642,4 @@ export function formatModel(data: ITaskData) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
   return params
-}
-
-const buildRawScript = (model: INodeData) => {
-  const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
-  if (!model.resourceList) return
-
-  let master = model.master
-  let masterUrl = model?.masterUrl ? model?.masterUrl : ''
-  let deployMode = model.deployMode
-  const queue = model.queue
-
-  if (model.deployMode === 'local') {
-    master = 'local'
-    masterUrl = ''
-    deployMode = 'client'
-  }
-
-  if (master === 'yarn' || master === 'local') {
-    masterUrl = ''
-  }
-
-  let localParams = ''
-  model?.localParams?.forEach((param: any) => {
-    localParams = localParams + ' --variable ' + param.prop + '=' + param.value
-  })
-
-  let rawScript = ''
-  model.resourceList?.forEach((id: number) => {
-    const item = find(model.resourceFiles, { id: id })
-
-    rawScript =
-      rawScript +
-      baseScript +
-      ' --master ' +
-      master +
-      masterUrl +
-      ' --deploy-mode ' +
-      deployMode +
-      ' --queue ' +
-      queue
-    if (item && item.fullName) {
-      rawScript = rawScript + ' --config ' + item.fullName
-    }
-    rawScript = rawScript + localParams + ' \n'
-  })
-  model.rawScript = rawScript ? rawScript : ''
 }

@@ -120,9 +120,7 @@ public class UdfManageE2ETest {
 
         new WebDriverWait(page.driver(), 10)
             .until(ExpectedConditions.urlContains("/resource-manage"));
-
         page.createDirectory(testDirectoryName, "test_desc");
-
         await().untilAsserted(() -> assertThat(page.udfList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
@@ -151,7 +149,6 @@ public class UdfManageE2ETest {
     @Order(30)
     void testDeleteDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
-
         page.delete(testDirectoryName);
 
         await().untilAsserted(() -> {
@@ -172,9 +169,7 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
 
         downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
-
         page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
-
         await().untilAsserted(() -> {
             assertThat(page.udfList())
                 .as("File list should contain newly-created file")
@@ -205,7 +200,6 @@ public class UdfManageE2ETest {
     @Order(60)
     void testRenameUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
-
         page.rename(testUploadUdfFileName, testUploadUdfRenameFileName);
 
         await().untilAsserted(() -> {
@@ -220,7 +214,6 @@ public class UdfManageE2ETest {
     @Order(70)
     void testDeleteUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
-
         page.delete(testUploadUdfRenameFileName);
 
         await().untilAsserted(() -> {

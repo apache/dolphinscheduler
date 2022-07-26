@@ -45,15 +45,39 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.zeppelin_paragraph_id'),
       props: {
         placeholder: t('project.node.zeppelin_paragraph_id_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'zeppelinRestEndpoint',
+      name: t('project.node.zeppelin_rest_endpoint'),
+      props: {
+        placeholder: t('project.node.zeppelin_rest_endpoint_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
           if (!value) {
-            return new Error(t('project.node.zeppelin_paragraph_id_tips'))
+            return new Error(t('project.node.zeppelin_rest_endpoint_tips'))
           }
         }
+      }
+    },
+    {
+      type: 'input',
+      field: 'zeppelinProductionNoteDirectory',
+      name: t('project.node.zeppelin_production_note_directory'),
+      props: {
+        placeholder: t('project.node.zeppelin_production_note_directory_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'parameters',
+      name: t('project.node.zeppelin_parameters'),
+      props: {
+        placeholder: t('project.node.zeppelin_parameters_tips')
       }
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: false })

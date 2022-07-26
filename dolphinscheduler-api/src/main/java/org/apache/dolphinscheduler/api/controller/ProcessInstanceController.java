@@ -39,11 +39,14 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,11 +96,12 @@ public class ProcessInstanceController extends BaseController {
      * @param host host
      * @param startTime start time
      * @param endTime end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
     @ApiOperation(value = "queryProcessInstanceListPaging", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefiniteCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
+        @ApiImplicitParam(name = "processDefineCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
         @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
         @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
@@ -120,6 +124,7 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "host", required = false) String host,
                                            @RequestParam(value = "startDate", required = false) String startTime,
                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
 
@@ -129,7 +134,7 @@ public class ProcessInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
-                searchVal, executorName, stateType, host, pageNo, pageSize);
+                searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
         return result;
     }
 
@@ -380,7 +385,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "batchDeleteProcessInstanceByIds", notes = "BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
         @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
     })
     @PostMapping(value = "/batch-delete")
@@ -394,7 +399,7 @@ public class ProcessInstanceController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (!StringUtils.isEmpty(processInstanceIds)) {
-            String[] processInstanceIdArray = processInstanceIds.split(",");
+            String[] processInstanceIdArray = processInstanceIds.split(Constants.COMMA);
 
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);

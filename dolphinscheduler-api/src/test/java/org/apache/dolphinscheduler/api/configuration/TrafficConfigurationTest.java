@@ -32,7 +32,7 @@ public class TrafficConfigurationTest extends AbstractControllerTest {
 
     @Test
     public void isTrafficGlobalControlSwitch() {
-        Assert.assertFalse(trafficConfiguration.isTrafficGlobalControlSwitch());
+        Assert.assertFalse(trafficConfiguration.isGlobalSwitch());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class TrafficConfigurationTest extends AbstractControllerTest {
 
     @Test
     public void isTrafficTenantControlSwitch() {
-        Assert.assertFalse(trafficConfiguration.isTrafficTenantControlSwitch());
+        Assert.assertFalse(trafficConfiguration.isTenantSwitch());
     }
 
     @Test

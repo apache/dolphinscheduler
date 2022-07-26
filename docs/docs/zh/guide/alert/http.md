@@ -24,11 +24,11 @@
 GET `Http`告警指将告警结果作为参数通过`Http` GET方法进行请求。
 下图是GET告警配置的示例:
 
-![enterprise-wechat-app-msg-config](/img/alert/http-get-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/http-get-example.png)
 
 ### POST Http告警
 
 POST `Http`告警指将告警结果作为`BODY`参数通过`Http`POST方法进行请求。
 下图是POST告警配置的示例:
 
-![enterprise-wechat-app-msg-config](/img/alert/http-post-example.png)
+![enterprise-wechat-app-msg-config](../../../../img/alert/http-post-example.png)

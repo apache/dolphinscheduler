@@ -17,8 +17,24 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.collections.CollectionUtils;
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -35,6 +51,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -42,6 +59,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -52,16 +70,18 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncPa
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.DataQualityParameters;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.plugin.task.k8s.K8sTaskParameters;
+import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,21 +93,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.zaxxer.hikari.HikariDataSource;
+
+import lombok.NonNull;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -105,28 +116,28 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected int maxRetryTimes;
 
-    protected int commitInterval;
+    protected long commitInterval;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    protected ProcessService processService;
 
-    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+    protected MasterConfig masterConfig;
 
-    protected TaskPluginManager taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
+    protected TaskPluginManager taskPluginManager;
+
+    protected CuringParamsService curingParamsService;
 
     protected String threadLoggerInfoName;
 
     @Override
-    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
-        if (processService == null) {
-            processService = SpringApplicationContext.getBean(ProcessService.class);
-        }
-        if (masterConfig == null) {
-            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        }
+    public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
+        processService = SpringApplicationContext.getBean(ProcessService.class);
+        masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
+        curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
-        this.commitInterval = masterConfig.getTaskCommitInterval();
+        this.commitInterval = masterConfig.getTaskCommitInterval().toMillis();
     }
 
     protected javax.sql.DataSource defaultDataSource =
@@ -151,6 +162,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * submit task
      */
     protected abstract boolean submitTask();
+
+    /*
+     * resubmit task
+     */
+    protected abstract boolean resubmitTask();
 
     /**
      * run task
@@ -181,12 +197,18 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return run();
             case DISPATCH:
                 return dispatch();
+            case RESUBMIT:
+                return resubmit();
             default:
                 logger.error("unknown task action: {}", taskAction);
         }
         // reset thread name
         Thread.currentThread().setName(threadName);
         return false;
+    }
+
+    protected boolean resubmit() {
+        return resubmitTask();
     }
 
     protected boolean submit() {
@@ -227,7 +249,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public String getType() {
-        return null;
+        throw new UnsupportedOperationException("This abstract class doesn's has type");
     }
 
     @Override
@@ -278,7 +300,15 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
             setDataQualityTaskRelation(dataQualityTaskExecutionContext,taskInstance,tenant.getTenantCode());
         }
+        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
+        if (TASK_TYPE_K8S.equalsIgnoreCase(taskInstance.getTaskType())) {
+            setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
+        }
 
+        Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(processInstance);
+
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        Map<String, Property> propertyMap = curingParamsService.paramParsingPreparation(taskInstance, baseParam, processInstance);
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
@@ -286,6 +316,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
                 .buildResourceParametersInfo(resources)
                 .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
+                .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)
+                .buildBusinessParamsMap(businessParamsMap)
+                .buildParamInfo(propertyMap)
                 .create();
     }
 
@@ -578,5 +611,20 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         }
 
         return resourcesMap;
+    }
+
+    /**
+     * set k8s task relation
+     * @param k8sTaskExecutionContext k8sTaskExecutionContext
+     * @param taskInstance taskInstance
+     */
+    private void setK8sTaskRelation(K8sTaskExecutionContext k8sTaskExecutionContext, TaskInstance taskInstance) {
+        K8sTaskParameters k8sTaskParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
+        Map<String,String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
+        String clusterName = namespace.get(CLUSTER);
+        String configYaml = processService.findConfigYamlByName(clusterName);
+        if (configYaml != null) {
+            k8sTaskExecutionContext.setConfigYaml(configYaml);
+        }
     }
 }

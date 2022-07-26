@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -24,15 +24,14 @@ import {
   NPagination,
   NSpace
 } from 'naive-ui'
-import Card from '@/components/card'
-import DetailModal from './detail'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
-import styles from './index.module.scss'
-import type { TableColumns } from './types'
 import { DefaultTableWidth } from '@/common/column-width-config'
+import Card from '@/components/card'
+import DetailModal from './detail'
+import type { TableColumns } from './types'
 
 const list = defineComponent({
   name: 'list',
@@ -61,6 +60,8 @@ const list = defineComponent({
       showDetailModal.value = true
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       changePage(1)
       columns.value = getColumns()
@@ -79,7 +80,8 @@ const list = defineComponent({
       changePage,
       changePageSize,
       onCreate,
-      onUpdatedList: updateList
+      onUpdatedList: updateList,
+      trim
     }
   },
   render() {
@@ -100,59 +102,58 @@ const list = defineComponent({
     } = this
 
     return (
-      <>
-        <Card title=''>
-          {{
-            default: () => (
-              <div class={styles['conditions']}>
-                <NButton
-                  onClick={onCreate}
-                  type='primary'
-                  class='btn-create-data-source'
-                >
-                  {t('datasource.create_datasource')}
-                </NButton>
-                <NSpace
-                  class={styles['conditions-search']}
-                  justify='end'
-                  wrap={false}
-                >
-                  <div class={styles['conditions-search-input']}>
-                    <NInput
-                      v-model={[this.searchVal, 'value']}
-                      placeholder={`${t('datasource.search_input_tips')}`}
-                    />
-                  </div>
-                  <NButton type='primary' onClick={onUpdatedList}>
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  </NButton>
-                </NSpace>
-              </div>
-            )
-          }}
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButton
+              onClick={onCreate}
+              type='primary'
+              size='small'
+              class='btn-create-data-source'
+            >
+              {t('datasource.create_datasource')}
+            </NButton>
+            <NSpace
+              justify='end'
+              wrap={false}
+            >
+              <NInput
+                allowInput={this.trim}
+                v-model={[this.searchVal, 'value']}
+                size='small'
+                placeholder={`${t('datasource.search_input_tips')}`}
+              />
+              <NButton type='primary' size='small' onClick={onUpdatedList}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
+            </NSpace>
+          </NSpace>
         </Card>
-        <Card title='' class={styles['mt-8']}>
-          <NDataTable
-            row-class-name='data-source-items'
-            columns={columns.columns}
-            data={list}
-            loading={loading}
-            striped
-            scrollX={columns.tableWidth}
-          />
-          <NPagination
-            page={page}
-            page-size={pageSize}
-            item-count={itemCount}
-            show-quick-jumper
-            show-size-picker
-            page-sizes={[10, 30, 50]}
-            class={styles['pagination']}
-            on-update:page={changePage}
-            on-update:page-size={changePageSize}
-          />
+        <Card title={t('menu.datasource')}>
+          <NSpace vertical>
+            <NDataTable
+              row-class-name='data-source-items'
+              columns={columns.columns}
+              data={list}
+              loading={loading}
+              striped
+              scrollX={columns.tableWidth}
+            />
+            <NSpace justify='center'>
+              <NPagination
+                page={page}
+                page-size={pageSize}
+                item-count={itemCount}
+                show-quick-jumper
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                on-update:page={changePage}
+                on-update:page-size={changePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <DetailModal
           show={showDetailModal}
@@ -160,7 +161,7 @@ const list = defineComponent({
           onCancel={() => void (this.showDetailModal = false)}
           onUpdate={onUpdatedList}
         />
-      </>
+      </NSpace>
     )
   }
 })

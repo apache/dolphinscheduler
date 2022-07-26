@@ -17,12 +17,15 @@
 package org.apache.dolphinscheduler.common.os;
 
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /**
@@ -40,6 +43,13 @@ public class OSUtilsTest {
     }
 
     @Test
+    public void diskAvailable() {
+        double diskAvailable = OSUtils.diskAvailable();
+        logger.info("diskAvailable : {}", diskAvailable);
+        Assert.assertTrue(diskAvailable >= 0.0);
+    }
+
+    @Test
     public void loadAverage() {
         double loadAverage = OSUtils.loadAverage();
         logger.info("loadAverage : {}", loadAverage);
@@ -52,4 +62,41 @@ public class OSUtilsTest {
         logger.info("cpuUsage : {}", cpuUsage);
         Assert.assertTrue(cpuUsage >= 0.0);
     }
+
+    @Test
+    public void availablePhysicalMemorySize(){
+        double physicalMemorySize = OSUtils.availablePhysicalMemorySize();
+        logger.info("physicalMemorySize : {}", physicalMemorySize);
+        Assert.assertTrue(physicalMemorySize >= 0.0);
+
+    }
+
+    @Test
+    public void existTenantCodeInLinux(){
+        if (SystemUtils.IS_OS_LINUX){
+            boolean test = OSUtils.existTenantCodeInLinux("root");
+            Assert.assertTrue(test);
+            boolean test1 = OSUtils.existTenantCodeInLinux("xxxtt");
+            Assert.assertFalse(test1);
+        }else{
+            Assert.assertFalse("system must be linux",false);
+        }
+
+    }
+
+    @Test
+    public void existOSTenandCode(){
+        if (SystemUtils.IS_OS_LINUX){
+            List<String> userList = OSUtils.getUserList();
+            Assert.assertTrue(userList.contains("root"));
+            Assert.assertFalse(userList.contains("xxxtt"));
+        }else{
+            Assert.assertFalse("system must be linux",false);
+
+        }
+
+    }
+
+
+
 }

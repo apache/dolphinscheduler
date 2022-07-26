@@ -38,7 +38,6 @@ import {
 } from '@/common/column-width-config'
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
-import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 
 export function useTable() {
@@ -106,6 +105,13 @@ export function useTable() {
       {
         title: t('project.workflow.failure_strategy'),
         key: 'failureStrategy',
+        render: (row: any) => {
+          if (row.failureStrategy === 'CONTINUE') {
+            return t('project.workflow.continue')
+          } else if (row.failureStrategy === 'END') {
+            return t('project.workflow.end')
+          }
+        },
         width: 140
       },
       {
@@ -131,7 +137,6 @@ export function useTable() {
         title: t('project.workflow.operation'),
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](3),
-        className: styles.operation,
         render: (row: any) => {
           return h(NSpace, null, {
             default: () => [
