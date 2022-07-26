@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
+import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
@@ -29,45 +33,24 @@ public final class TaskMetrics {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    private static final Counter TASK_SUBMIT_COUNTER =
-            Counter.builder("ds.task.submit.count")
-                    .description("Task submit total count")
-                    .register(Metrics.globalRegistry);
 
-    private static final Counter TASK_FINISH_COUNTER =
-            Counter.builder("ds.task.finish.count")
-                    .description("Task finish total count")
-                    .register(Metrics.globalRegistry);
+    private static Map<String, Counter> TASK_INSTANCE_COUNTERS = new HashMap<>();
 
-    private static final Counter TASK_SUCCESS_COUNTER =
-            Counter.builder("ds.task.success.count")
-                    .description("Task success total count")
-                    .register(Metrics.globalRegistry);
+    private static final Set<String> TASK_INSTANCE_STATES = ImmutableSet.of(
+            "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "fail", "stop");
 
-    private static final Counter TASK_FAILURE_COUNTER =
-            Counter.builder("ds.task.failure.count")
-                    .description("Task failure total count")
-                    .register(Metrics.globalRegistry);
+    static {
+        for (final String state : TASK_INSTANCE_STATES) {
+            TASK_INSTANCE_COUNTERS.put(
+                    state,
+                    Counter.builder("ds.task.instance.count")
+                            .tags("state", state)
+                            .description(String.format("Process instance %s total count", state))
+                            .register(Metrics.globalRegistry)
+            );
+        }
 
-    private static final Counter TASK_TIMEOUT_COUNTER =
-            Counter.builder("ds.task.timeout.count")
-                    .description("Task timeout total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_RETRY_COUNTER =
-            Counter.builder("ds.task.retry.count")
-                    .description("Task retry total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_STOP_COUNTER =
-            Counter.builder("ds.task.stop.count")
-                    .description("Task stop total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter TASK_FAILOVER_COUNTER =
-            Counter.builder("ds.task.failover.count")
-                    .description("Task failover total count")
-                    .register(Metrics.globalRegistry);
+    }
 
     private static final Counter TASK_DISPATCH_COUNTER =
             Counter.builder("ds.task.dispatch.count")
@@ -76,50 +59,18 @@ public final class TaskMetrics {
 
     private static final Counter TASK_DISPATCHER_FAILED =
             Counter.builder("ds.task.dispatch.failure.count")
-                    .description("Task dispatch failed count")
+                    .description("Task dispatch failures count, retried ones included")
                     .register(Metrics.globalRegistry);
 
     private static final Counter TASK_DISPATCH_ERROR =
             Counter.builder("ds.task.dispatch.error.count")
-                    .description("Task dispatch error")
+                    .description("Number of errors during task dispatch")
                     .register(Metrics.globalRegistry);
-
-    public static void incTaskSubmit() {
-        TASK_SUBMIT_COUNTER.increment();
-    }
 
     public synchronized static void registerTaskPrepared(Supplier<Number> consumer) {
         Gauge.builder("ds.task.prepared", consumer)
                 .description("Task prepared count")
                 .register(Metrics.globalRegistry);
-    }
-
-    public static void incTaskFinish() {
-        TASK_FINISH_COUNTER.increment();
-    }
-
-    public static void incTaskSuccess() {
-        TASK_SUCCESS_COUNTER.increment();
-    }
-
-    public static void incTaskFailure() {
-        TASK_FAILURE_COUNTER.increment();
-    }
-
-    public static void incTaskTimeout() {
-        TASK_TIMEOUT_COUNTER.increment();
-    }
-
-    public static void incTaskRetry() {
-        TASK_RETRY_COUNTER.increment();
-    }
-
-    public static void incTaskStop() {
-        TASK_STOP_COUNTER.increment();
-    }
-
-    public static void incTaskFailover() {
-        TASK_FAILOVER_COUNTER.increment();
     }
 
     public static void incTaskDispatchFailed(int failedCount) {
@@ -132,6 +83,10 @@ public final class TaskMetrics {
 
     public static void incTaskDispatch() {
         TASK_DISPATCH_COUNTER.increment();
+    }
+
+    public static void incTaskInstanceByState(final String state) {
+        TASK_INSTANCE_COUNTERS.get(state).increment();
     }
 
 }

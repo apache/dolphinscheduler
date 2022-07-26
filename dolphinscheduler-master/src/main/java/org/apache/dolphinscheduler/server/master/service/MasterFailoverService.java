@@ -169,7 +169,7 @@ public class MasterFailoverService {
                     }
                 }
 
-                ProcessInstanceMetrics.incProcessInstanceFailover();
+                ProcessInstanceMetrics.incProcessInstanceByState("failover");
                 //updateProcessInstance host is null to mark this processInstance has been failover
                 // and insert a failover command
                 processInstance.setHost(Constants.NULL);
@@ -211,7 +211,7 @@ public class MasterFailoverService {
      * @param taskInstance
      */
     private void failoverTaskInstance(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
-        TaskMetrics.incTaskFailover();
+        TaskMetrics.incTaskInstanceByState("failover");
         boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
 
         taskInstance.setProcessInstance(processInstance);
