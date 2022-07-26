@@ -50,6 +50,8 @@ dolphinscheduler-ui-next/node
 dolphinscheduler-common/sql
 dolphinscheduler-common/test
 dolphinscheduler-worker/logs
+dolphinscheduler-master/logs
+dolphinscheduler-api/logs
 
 # ------------------
 # pydolphinscheduler

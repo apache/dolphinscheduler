@@ -215,6 +215,7 @@ Apache 2.0 licenses
 The following components are provided under the Apache License. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
+    accessors-smart 2.4.7: https://github.com/netplex/json-smart-v2, Apache 2.0
     apacheds-i18n 2.0.0-M15: https://mvnrepository.com/artifact/org.apache.directory.server/apacheds-i18n/2.0.0-M15, Apache 2.0
     apacheds-kerberos-codec 2.0.0-M15: https://mvnrepository.com/artifact/org.apache.directory.server/apacheds-kerberos-codec/2.0.0-M15, Apache 2.0
     tomcat-embed-el 9.0.54: https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-el/9.0.54, Apache 2.0
@@ -321,6 +322,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
+    json-path 2.7.0: https://github.com/json-path/JsonPath, Apache 2.0
+    json-smart 2.4.7: https://github.com/netplex/json-smart-v2, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
     jsr305 3.0.0: https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305, Apache 2.0
     j2objc-annotations 1.1 https://mvnrepository.com/artifact/com.google.j2objc/j2objc-annotations/1.1, Apache 2.0
@@ -449,7 +452,7 @@ BSD licenses
 The following components are provided under a BSD license. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
-    asm 3.1: https://github.com/jdf/javalin/tree/master/lib/asm-3.1, BSD
+    asm 9.1: https://gitlab.ow2.org/asm/asm, BSD 3-Clause
     click 8.0: https://github.com/pallets/click, BSD 3-Clause
     curvesapi 1.06: https://mvnrepository.com/artifact/com.github.virtuald/curvesapi/1.06, BSD 3-clause
     javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD

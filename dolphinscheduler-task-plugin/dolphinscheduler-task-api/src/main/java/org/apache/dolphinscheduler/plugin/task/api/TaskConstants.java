@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -397,5 +398,8 @@ public class TaskConstants {
     public static final String AWS_ACCESS_KEY_ID= "aws.access.key.id";
     public static final String AWS_SECRET_ACCESS_KEY= "aws.secret.access.key";
     public static final String AWS_REGION = "aws.region";
+
+    // Loop task constants
+    public static final Duration DEFAULT_LOOP_STATUS_INTERVAL = Duration.ofSeconds(5L);
 
 }
