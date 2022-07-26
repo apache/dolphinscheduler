@@ -95,8 +95,10 @@ public class EnvironmentServiceTest {
     @Test
     public void testCreateEnvironment() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null, loginUser.getId(),ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                loginUser.getId(),ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
@@ -136,8 +138,10 @@ public class EnvironmentServiceTest {
     @Test
     public void testUpdateEnvironmentByCode() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null, loginUser.getId(),ENVIRONMENT_UPDATE , baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                loginUser.getId(),ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
@@ -171,7 +175,8 @@ public class EnvironmentServiceTest {
     public void testQueryAllEnvironmentList() {
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT, 1, environmentServiceLogger)).thenReturn(ids);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
+                1, environmentServiceLogger)).thenReturn(ids);
         Mockito.when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
 
         Map<String, Object> result  = environmentService.queryAllEnvironmentList(getAdminUser());
@@ -224,8 +229,10 @@ public class EnvironmentServiceTest {
     @Test
     public void testDeleteEnvironmentByCode() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null, loginUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                loginUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser,1L);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
