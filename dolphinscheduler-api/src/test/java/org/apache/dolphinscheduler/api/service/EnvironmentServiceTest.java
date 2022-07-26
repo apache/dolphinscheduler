@@ -168,7 +168,6 @@ public class EnvironmentServiceTest {
         result = environmentService.updateEnvironmentByCode(loginUser,1L,"testName","test","test",workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
     }
 
     @Test
