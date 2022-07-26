@@ -47,6 +47,9 @@ export function useForm() {
           if (state.fileForm.fileName === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
+          if (state.fileForm.fileName.endsWith(`.${state.fileForm.suffix}`)) {
+            return new Error(t('resource.file.duplicate_suffix_tips'))
+          }
         }
       },
       suffix: {

@@ -41,6 +41,7 @@ export default {
     enter_description_tips: '请输入描述',
     enter_content_tips: '请输入资源内容',
     enter_suffix_tips: '请输入文件后缀',
+    duplicate_suffix_tips: '文件后缀重复',
     file_format: '文件格式',
     file_content: '文件内容',
     delete_confirm: '确定删除吗?',
