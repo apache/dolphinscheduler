@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -113,8 +114,24 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 List<String> lines = readPartFileContent(rollViewLogPath,
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
+                final int MaxResponseLogSize = 65535;
+                int totalLogByteSize = 0;
                 for (String line : lines) {
-                    builder.append(line).append("\r\n");
+                    //If a single line of log is exceed max response size, cut off the line
+                    final int lineByteSize = line.getBytes(StandardCharsets.UTF_8).length;
+                    if (lineByteSize >= MaxResponseLogSize) {
+                        builder.append(line, 0, MaxResponseLogSize)
+                                .append(" [this line's size ").append(lineByteSize).append(" bytes is exceed ")
+                                .append(MaxResponseLogSize).append(" bytes, so only ")
+                                .append(MaxResponseLogSize).append(" characters are reserved for performance reasons.]")
+                                .append("\r\n");
+                    } else {
+                        builder.append(line).append("\r\n");
+                    }
+                    totalLogByteSize += lineByteSize;
+                    if (totalLogByteSize >= MaxResponseLogSize) {
+                        break;
+                    }
                 }
                 RollViewLogResponseCommand rollViewLogRequestResponse = new RollViewLogResponseCommand(builder.toString());
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
