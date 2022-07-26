@@ -34,7 +34,7 @@ public abstract class AbstractTask {
     /**
      * taskExecutionContext
      **/
-    TaskExecutionContext taskRequest;
+    protected TaskExecutionContext taskRequest;
 
     /**
      * SHELL process pid

@@ -87,6 +87,8 @@
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
         <aws-sdk.version>1.12.160</aws-sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
+        <okhttp.version>3.14.9</okhttp.version>
+        <json-path.version>2.7.0</json-path.version>
 
     </properties>
 
@@ -601,6 +603,18 @@
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${json-path.version}</version>
             </dependency>
 
         </dependencies>
