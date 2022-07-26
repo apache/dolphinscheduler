@@ -19,18 +19,12 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * alert result
  */
-@AllArgsConstructor
-@Getter
-@NoArgsConstructor
-@Setter
+@Data
 public class AlertResult {
 
     /**

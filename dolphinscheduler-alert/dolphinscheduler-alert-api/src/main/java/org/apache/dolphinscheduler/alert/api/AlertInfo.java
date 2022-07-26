@@ -21,20 +21,14 @@ package org.apache.dolphinscheduler.alert.api;
 
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * The alarm information includes the parameters of the alert channel and the alarm data
  */
-@AllArgsConstructor
 @Builder
-@Getter
-@NoArgsConstructor
-@Setter
+@Data
 public class AlertInfo {
 
     private Map<String, String> alertParams;
