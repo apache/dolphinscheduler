@@ -8,10 +8,11 @@ If you want to set the registry center as raft,
 
 you need to set the registry properties in master/worker/api's appplication.yml,
 
-please remember change the server-port in appplication.yml.
+worker and api address add `/learner` suffix in `server-address-list`, indicates that they are not participate in the leader election.
 
-In PRO environment, worker and api add `/learner` suffix in `server-address-list`
+`please remember change the server-port in appplication.yml`.
 
+NOTE: In production environment, in order to achieve high availability, the master must be an odd number e.g 3 or 5.
 
 ```yaml
 registry:
