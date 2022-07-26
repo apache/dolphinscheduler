@@ -1,16 +1,16 @@
 # Apache Zeppelin
 
-## Overview
+## 综述
 
-`Zeppelin`任务类型，用于创建并执行`Zeppelin`类型任务。worker 执行该任务的时候，会通过`Zeppelin Cient API`触发`Zeppelin Notebook段落`。
+`Zeppelin`任务类型，用于创建并执行`Zeppelin`类型任务。worker 执行该任务的时候，会通过`Zeppelin Cient API`触发`Zeppelin Notebook Paragraph`。
 点击[这里](https://zeppelin.apache.org/) 获取更多关于`Apache Zeppelin Notebook`的信息。
 
-## Create Task
+## 创建任务
 
 - 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入DAG编辑页面。
 - 工具栏中拖动 <img src="/img/tasks/icons/zeppelin.png" width="15"/> 到画板中，即可完成创建。
 
-## Task Parameter
+## 任务参数
 
 - 任务名称：设置任务的名称。一个工作流定义中的节点名称是唯一的。
 - 运行标志：标识这个节点是否能正常调度,如果不需要执行，可以打开禁止执行开关。
@@ -24,9 +24,9 @@
 - Zeppelin Note ID：Zeppelin Note对应的唯一ID。
 - Zepplin Paragraph：Zeppelin Paragraph对应的唯一ID。
 
-## Task Example
+## 任务样例
 
-### Zeppelin Paragraph Task Example
+### Zeppelin Paragraph 任务样例
 
 这个示例展示了如何创建Zeppelin Paragraph任务节点：
 
