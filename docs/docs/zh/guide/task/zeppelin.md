@@ -2,7 +2,7 @@
 
 ## 综述
 
-`Zeppelin`任务类型，用于创建并执行`Zeppelin`类型任务。worker 执行该任务的时候，会通过`Zeppelin Cient API`触发`Zeppelin Notebook段落`。
+`Zeppelin`任务类型，用于创建并执行`Zeppelin`类型任务。worker 执行该任务的时候，会通过`Zeppelin Cient API`触发`Zeppelin Notebook Paragraph`。
 点击[这里](https://zeppelin.apache.org/) 获取更多关于`Apache Zeppelin Notebook`的信息。
 
 ## 创建任务
