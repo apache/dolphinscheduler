@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.datasource;
+package org.apache.dolphinscheduler.dao.entity;
 
-import java.sql.Connection;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface DataSourceClient extends AutoCloseable {
-
-    void checkClient();
-
-    @Override
-    void close();
-
-    Connection getConnection();
+/**
+ * log of the logger service response
+ */
+@Data
+@AllArgsConstructor
+public class ResponseTaskLog {
+    private int lineNum;
+    private String message;
 }
