@@ -59,8 +59,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                 "The workflow start event is invalid, cannot find the workflow instance from cache");
         }
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
-
-        ProcessInstanceMetrics.incProcessInstanceSubmit();
+        ProcessInstanceMetrics.incProcessInstanceByState("submit");
         CompletableFuture<WorkflowSubmitStatue> workflowSubmitFuture =
             CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool);
         workflowSubmitFuture.thenAccept(workflowSubmitStatue -> {
