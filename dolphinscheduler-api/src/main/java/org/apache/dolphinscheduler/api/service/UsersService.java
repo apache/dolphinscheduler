@@ -191,6 +191,17 @@ public interface UsersService {
     Map<String, Object> revokeProject(User loginUser, int userId, long projectCode);
 
     /**
+     * grant resource with permission level
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param readPermResourceIds resource id array with read permission
+     * @param allPermResourceIds resource id array with all permission
+     * @return grant result code
+     */
+    Map<String, Object> grantResourceWithPermLevel(User loginUser, int userId, String readPermResourceIds, String allPermResourceIds);
+
+    /**
      * grant resource
      *
      * @param loginUser login user
