@@ -23,7 +23,15 @@ package org.apache.dolphinscheduler.plugin.task.api.loop;
 public interface LoopTaskInstanceStatus {
     /**
      * Judge if the task instance is finished.
+     *
      * @return true if the task instance is finished, false otherwise.
      */
     boolean isFinished();
+
+    /**
+     * Judge if the task instance is success.
+     *
+     * @return true if the task instance is success, false otherwise.
+     */
+    boolean isSuccess();
 }
