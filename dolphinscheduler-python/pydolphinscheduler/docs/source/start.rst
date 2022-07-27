@@ -86,6 +86,13 @@ which we hold in GitHub
 After you installed *PyDolphinScheduler*, please remember `start Python Gateway Service`_
 which waiting for *PyDolphinScheduler*'s workflow definition require.
 
+Above command will clone whole dolphinscheduler source code to local, maybe you want to install latest pydolphinscheduler
+package directly and do not case about other code(including Python gateway service code), you can execute command
+
+.. code-block:: bash
+
+   pip install -e git+https://github.com/apache/dolphinscheduler.git#egg=apache-dolphinscheduler\&subdirectory=dolphinscheduler-python/pydolphinscheduler
+
 Start Python Gateway Service
 ----------------------------
 
