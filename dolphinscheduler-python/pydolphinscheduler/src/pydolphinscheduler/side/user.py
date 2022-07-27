@@ -49,6 +49,7 @@ class User(BaseSide):
         status: Optional[int] = configuration.USER_STATE,
     ):
         super().__init__(name)
+        self.user_id = None
         self.password = password
         self.email = email
         self.phone = phone
@@ -66,7 +67,7 @@ class User(BaseSide):
         # Should make sure queue already exists.
         self.create_tenant_if_not_exists()
         gateway = launch_gateway()
-        gateway.entry_point.createUser(
+        user = gateway.entry_point.createUser(
             self.name,
             self.password,
             self.email,
@@ -75,5 +76,54 @@ class User(BaseSide):
             self.queue,
             self.status,
         )
+        self.user_id = user.userId
         # TODO recover result checker
         # gateway_result_checker(result, None)
+
+    def get_user(self, user_id) -> None:
+        """Get User."""
+        gateway = launch_gateway()
+        user = gateway.entry_point.getUser(user_id)
+        self.user_id = user.userId
+        self.name = user.name
+        self.password = user.password
+        self.email = user.email
+        self.phone = user.phone
+        self.tenant = user.tenant
+        self.queue = user.queue
+        self.status = user.status
+        return user
+
+    def update(self, password=None, email=None, phone=None, tenant=None, queue=None, status=None) -> None:
+        """Update User."""
+        gateway = launch_gateway()
+        gateway.entry_point.updateUser(
+            self.name,
+            password,
+            email,
+            phone,
+            tenant,
+            queue,
+            status,
+        )
+        self.password = password
+        self.email = email
+        self.phone = phone
+        self.tenant = tenant
+        self.queue = queue
+        self.status = status
+        return
+
+    def delete(self) -> None:
+        """Delete User."""
+        gateway = launch_gateway()
+        gateway.entry_point.deleteUser(self.user_id)
+        self.user_id = None
+        self.name = None
+        self.password = None
+        self.email = None
+        self.phone = None
+        self.tenant = None
+        self.queue = None
+        self.status = None
+        return

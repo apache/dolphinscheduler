@@ -31,8 +31,10 @@ class Project(BaseSide):
         self,
         name: str = configuration.WORKFLOW_PROJECT,
         description: Optional[str] = None,
+        code: Optional[str] = None,
     ):
         super().__init__(name, description)
+        self.code = code
 
     def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
         """Create Project if not exists."""
@@ -40,3 +42,24 @@ class Project(BaseSide):
         gateway.entry_point.createOrGrantProject(user, self.name, self.description)
         # TODO recover result checker
         # gateway_result_checker(result, None)
+
+    def get_project_by_name(self, user=configuration.USER_NAME, name=None) -> None:
+        """Get Project by name."""
+        gateway = launch_gateway()
+        project = gateway.entry_point.getProjectByName(user, name)
+        self.name = project.name
+        self.description = project.description
+        self.code = project.code
+        return self
+
+    def update(self, user=configuration.USER_NAME, project_code=None, project_name=None, description=None) -> None:
+        """Update Project."""
+        gateway = launch_gateway()
+        gateway.entry_point.updateProject(user, project_code, project_name, description)
+        self.name = project_name
+        self.description = description
+
+    def delete(self, user=configuration.USER_NAME) -> None:
+        """Delete Project."""
+        gateway = launch_gateway()
+        gateway.entry_point.deleteProject(user, self.code)
