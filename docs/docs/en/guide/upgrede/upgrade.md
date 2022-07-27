@@ -2,6 +2,10 @@
 
 ## Prepare
 
+### Check Incompatible Change
+
+You should check [incompatible change](./incompatible.md) before you upgrade, because some incompatible change may break your current function.
+
 ### Backup Previous Version's Files and Database
 
 To prevent data loss by some miss-operation, it is recommended to back up data before upgrading. The backup way according to your environment.
@@ -15,7 +19,7 @@ directory where current service running. And all below command is running in thi
 
 ### Stop All Services of DolphinScheduler
 
-Stop all services of dolphinscheduler according to your deployment method. If you deploy your dolphinscheduler according to [cluster deployment](./installation/cluster.md), you can stop all services by command `sh ./script/stop-all.sh`.
+Stop all services of dolphinscheduler according to your deployment method. If you deploy your dolphinscheduler according to [cluster deployment](../installation/cluster.md), you can stop all services by command `sh ./script/stop-all.sh`.
 
 ### Upgrade Database
 
@@ -38,8 +42,8 @@ Execute database upgrade script: `sh ./tools/bin/upgrade-schema.sh`
 
 #### Change Configuration `bin/env/install_config.conf`
 
-- If you deploy with Pseudo-Cluster deployment, change it according to [Pseudo-Cluster](./installation/pseudo-cluster.md) section "Modify Configuration".
-- If you deploy with Cluster deployment, change it according to [Cluster](./installation/cluster.md) section "Modify Configuration".
+- If you deploy with Pseudo-Cluster deployment, change it according to [Pseudo-Cluster](../installation/pseudo-cluster.md) section "Modify Configuration".
+- If you deploy with Cluster deployment, change it according to [Cluster](../installation/cluster.md) section "Modify Configuration".
 
 And them run command `sh ./bin/start-all.sh` to start all services. 
 
