@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,10 +34,31 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,14 +71,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 /**
  * users service test
@@ -465,7 +484,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        when(k8sNamespaceUserMapper.deleteNamespaceRelation(0,1)).thenReturn(1);
+        when(k8sNamespaceUserMapper.deleteNamespaceRelation(0, 1)).thenReturn(1);
         result = usersService.grantNamespaces(loginUser, 1, namespaceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -706,6 +725,30 @@ public class UsersServiceTest {
         }
     }
 
+    @Test
+    public void testCreateUserIfNotExists() throws IOException {
+        User user;
+        String userName = "userTest0001";
+        String userPassword = "userTest";
+        String email = "abc@x.com";
+        String phone = "123456789";
+        String tenantCode = "tenantCode";
+        int stat = 1;
+
+        // User exists
+        Mockito.when(userMapper.existUser(userName)).thenReturn(true);
+        Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
+        Assert.assertEquals(getUser(), user);
+
+        // User not exists
+        Mockito.when(userMapper.existUser(userName)).thenReturn(false);
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
+        Assert.assertNotNull(user);
+    }
+
     /**
      * get disabled user
      */
@@ -720,6 +763,7 @@ public class UsersServiceTest {
 
     /**
      * Get project
+     *
      * @return
      */
     private Project getProject() {
