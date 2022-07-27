@@ -19,6 +19,7 @@ import { defineComponent, toRefs, PropType, watch, computed } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
+import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
 import type { IUdf } from '../types'
@@ -97,6 +98,7 @@ export default defineComponent({
             path='name'
           >
             <NInput
+              allowInput={this.fileEdit ? undefined : noSpace}
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
               class='input-directory-name'
