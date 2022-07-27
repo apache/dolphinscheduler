@@ -76,11 +76,11 @@ const TaskInstance = defineComponent({
           taskInstanceId: Number(row.id),
           limit: variables.limit,
           skipLineNum: variables.skipLineNum
-        }).then((res: string) => {
-          variables.logRef += res
-          if (res) {
+        }).then((res: any) => {
+          if (res?.message) {
+            variables.logRef += res.message
             variables.limit += 1000
-            variables.skipLineNum += 1000
+            variables.skipLineNum += res.lineNum
             getLogs(row)
           } else {
             variables.logLoadingRef = false
