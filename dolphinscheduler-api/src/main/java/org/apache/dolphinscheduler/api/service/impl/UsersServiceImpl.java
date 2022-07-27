@@ -77,10 +77,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
-import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
 
 /**
  * users service impl
@@ -1343,5 +1343,35 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, res);
         return result;
+    }
+
+    /**
+     * Make sure user with given name exists, and create the user if not exists
+     * <p>
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param userName     user name
+     * @param userPassword user password
+     * @param email        user email
+     * @param phone        user phone
+     * @param tenantCode   tenant code
+     * @param queue        queue
+     * @param state        state
+     * @return create result code
+     */
+    @Override
+    @Transactional
+    public User createUserIfNotExists(String userName, String userPassword, String email, String phone, String tenantCode,
+                                      String queue,
+                                      int state) throws IOException {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        if (Objects.isNull(user)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
+            return user;
+        }
+
+        updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
+        return user;
     }
 }
