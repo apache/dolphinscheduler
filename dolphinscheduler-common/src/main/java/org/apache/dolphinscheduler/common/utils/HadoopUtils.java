@@ -455,7 +455,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
         return getExecutionStatus(result);
     }
 
-
     private String getResult(String applicationId, String filedName, boolean isHistory) throws BaseException {
         String url = isHistory ? getJobHistoryUrl(applicationId) : getApplicationUrl(applicationId);
         logger.debug("generate yarn application url or job history application url, url={}", url);
