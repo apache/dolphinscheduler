@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,10 +78,10 @@ public class LoggerController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<String> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
-                                   @RequestParam(value = "skipLineNum") int skipNum,
-                                   @RequestParam(value = "limit") int limit) {
+    public Result<ResponseTaskLog> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                            @RequestParam(value = "skipLineNum") int skipNum,
+                                            @RequestParam(value = "limit") int limit) {
         return loggerService.queryLog(taskInstanceId, skipNum, limit);
     }
 

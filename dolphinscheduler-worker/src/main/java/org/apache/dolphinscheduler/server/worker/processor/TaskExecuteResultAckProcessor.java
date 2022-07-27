@@ -62,17 +62,17 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
 
         try {
             LoggerUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId());
-            if (taskExecuteAckMessage.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
+            if (taskExecuteAckMessage.getStatus() == ExecutionStatus.SUCCESS) {
                 messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
                                                       CommandType.TASK_EXECUTE_RESULT);
                 logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
-            } else if (taskExecuteAckMessage.getStatus() == ExecutionStatus.FAILURE.getCode()) {
+            } else if (taskExecuteAckMessage.getStatus() == ExecutionStatus.FAILURE) {
                 // master handle worker response error, will still retry
                 logger.error("Receive task execute result ack message, the message status is not success, message: {}",
-                             taskExecuteAckMessage);
+                        taskExecuteAckMessage);
             } else {
                 throw new IllegalArgumentException("Invalid task execute response ack status: "
-                                                       + taskExecuteAckMessage.getStatus());
+                        + taskExecuteAckMessage.getStatus());
             }
         } finally {
             LoggerUtils.removeTaskInstanceIdMDC();
