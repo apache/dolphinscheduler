@@ -43,13 +43,9 @@ export function useChunjun({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
-    cpuQuota: -1,
-    memoryMax: -1,
     delayTime: 0,
     timeout: 30,
     customConfig: false,
-    dsType: 'MYSQL',
-    dtType: 'MYSQL',
     preStatements: [],
     postStatements: [],
     timeoutNotifyStrategy: ['WARN']
