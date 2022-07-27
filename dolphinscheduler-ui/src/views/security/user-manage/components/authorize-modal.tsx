@@ -202,8 +202,16 @@ export const AuthorizeModal = defineComponent({
                 {t('security.user.udf_resource')}
               </NRadioButton>
             </NRadioGroup>
+            <NRadioGroup v-model:value={this.authorizationType}>
+              <NRadioButton key='read' value='read'>
+                {t('security.user.grant_read')}
+              </NRadioButton>
+              <NRadioButton key='all' value='all'>
+                {t('security.user.grant_all')}
+              </NRadioButton>
+            </NRadioGroup>
             <NTreeSelect
-              v-show={this.resourceType === 'file'}
+              v-show={this.resourceType === 'file' && this.authorizationType === "all"}
               filterable
               multiple
               cascade
@@ -215,7 +223,7 @@ export const AuthorizeModal = defineComponent({
               v-model:value={this.authorizedFileResources}
             />
             <NTreeSelect
-              v-show={this.resourceType === 'udf'}
+              v-show={this.resourceType === 'udf'  && this.authorizationType === "all"}
               filterable
               multiple
               cascade
@@ -225,6 +233,30 @@ export const AuthorizeModal = defineComponent({
               label-field='fullName'
               options={this.udfResources}
               v-model:value={this.authorizedUdfResources}
+            />
+            <NTreeSelect
+              v-show={this.resourceType === 'file' && this.authorizationType === "read"}
+              filterable
+              multiple
+              cascade
+              checkable
+              checkStrategy='child'
+              key-field='id'
+              label-field='fullName'
+              options={this.fileResources}
+              v-model:value={this.authorizedFileResourcesWithReadPerm}
+            />
+            <NTreeSelect
+              v-show={this.resourceType === 'udf'  && this.authorizationType === "read"}
+              filterable
+              multiple
+              cascade
+              checkable
+              checkStrategy='child'
+              key-field='id'
+              label-field='fullName'
+              options={this.udfResources}
+              v-model:value={this.authorizedUdfResourcesWithReadPerm}
             />
           </NSpace>
         )}

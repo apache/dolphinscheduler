@@ -25,6 +25,7 @@ import {
   UserIdReq,
   GrantDataSourceReq,
   GrantResourceReq,
+  GrantResourceReqWithPermLevel,
   GrantProject,
   ProjectCodeReq,
   GrantUDFReq,
@@ -92,6 +93,14 @@ export function grantDataSource(data: GrantDataSourceReq) {
 export function grantResource(data: GrantResourceReq) {
   return axios({
     url: '/users/grant-file',
+    method: 'post',
+    data
+  })
+}
+
+export function  grantResourceWithPermLevel(data: GrantResourceReqWithPermLevel) {
+  return axios({
+    url: '/users/grant-file-with-perm-level',
     method: 'post',
     data
   })
