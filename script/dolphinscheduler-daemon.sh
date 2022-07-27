@@ -66,14 +66,19 @@ cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/api-server/logs/$command-$HOSTNAME.out
+  CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/master-server/logs/$command-$HOSTNAME.out
+  CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/worker-server/logs/$command-$HOSTNAME.out
+  CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/alert-server/logs/$command-$HOSTNAME.out
+  CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "standalone-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
+  CLASS=org.apache.dolphinscheduler.server.StandaloneServer
 else
   echo "Error: No command named '$command' was found."
   exit 1
