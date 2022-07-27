@@ -50,6 +50,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -162,21 +163,26 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
+    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource, boolean overwrite) throws IOException {
+        File dstFile = new File(dstFilePath);
+        if (dstFile.isDirectory()) {
+            Files.delete(dstFile.toPath());
+        } else {
+            Files.createDirectories(dstFile.getParentFile().toPath());
+        }
         S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
         try (S3ObjectInputStream s3is = o.getObjectContent();
-             FileOutputStream fos = new FileOutputStream(new File(dstFile))) {
+             FileOutputStream fos = new FileOutputStream(dstFilePath)) {
             byte[] readBuf = new byte[1024];
-            int readLen = 0;
+            int readLen;
             while ((readLen = s3is.read(readBuf)) > 0) {
                 fos.write(readBuf, 0, readLen);
             }
         } catch (AmazonServiceException e) {
-            logger.error("the resource can`t be downloaded,the bucket is {},and the src is {}", tenantCode, srcFilePath);
             throw new IOException(e.getMessage());
         } catch (FileNotFoundException e) {
-            logger.error("the file isn`t exists");
-            throw new IOException("the file isn`t exists");
+            logger.error("the destination file {} not found", dstFilePath);
+            throw e;
         }
     }
 
