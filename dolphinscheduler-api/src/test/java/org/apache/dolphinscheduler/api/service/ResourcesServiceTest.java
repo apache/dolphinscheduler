@@ -137,7 +137,6 @@ public class ResourcesServiceTest {
 
     @Test
     public void testCreateResource() {
-
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID,
                 null, 1, ApiFuncIdentificationConstant.FILE_UPLOAD, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID,
