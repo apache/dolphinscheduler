@@ -242,12 +242,12 @@ public class PythonGateway {
             processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
-            Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
+            processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
                     locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         } else {
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
+            Result result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
                     locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
-            processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
+            processDefinition = (ProcessDefinition) result.getData();
             processDefinitionCode = processDefinition.getCode();
         }
 
@@ -267,8 +267,8 @@ public class PythonGateway {
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
-        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
+        Result verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
+        Status verifyStatus = Status.findStatusBy(verifyProcessDefinitionExists.getCode()).get();
 
         ProcessDefinition processDefinition = null;
         if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {

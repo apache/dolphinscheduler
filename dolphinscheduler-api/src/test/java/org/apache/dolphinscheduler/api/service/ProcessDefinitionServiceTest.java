@@ -26,6 +26,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -157,22 +161,25 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
-        //project not found
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), eq(projectCode), eq(WORKFLOW_DEFINITION));
+        // project not found
+        Result map = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map.getCode());
 
-        //project check auth success
+        // project check auth success
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
         List<ProcessDefinition> resourceList = new ArrayList<>();
         resourceList.add(getProcessDefinition());
         Mockito.when(processDefineMapper.queryAllDefinitionList(project.getCode())).thenReturn(resourceList);
-        Map<String, Object> checkSuccessRes = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
-        Assert.assertEquals(Status.SUCCESS, checkSuccessRes.get(Constants.STATUS));
+        Result checkSuccessRes = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)checkSuccessRes.getCode());
     }
 
     @Test
@@ -218,38 +225,38 @@ public class ProcessDefinitionServiceTest {
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
-        Project project = getProject(projectCode);
-
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
         Tenant tenant = new Tenant();
         tenant.setId(1);
         tenant.setTenantCode("root");
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), any(), anyLong(), eq(WORKFLOW_DEFINITION));
 
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.queryProcessDefinitionByCode(loginUser, 1L, 1L);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        // project check auth fail
+        Result map = processDefinitionService.queryProcessDefinitionByCode(loginUser, 1L, 1L);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map.getCode());
 
-        //project check auth success, instance not exist
+        // project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
         DagData dagData = new DagData(getProcessDefinition(), null, null);
         Mockito.when(processService.genDagData(Mockito.any())).thenReturn(dagData);
 
-        Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 1L);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
+        Result instanceNotExistRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 1L);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), (int)instanceNotExistRes.getCode());
 
-        //instance exit
+        // instance exit
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(tenant);
-        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
     }
 
     @Test
@@ -263,28 +270,31 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), any(), eq(projectCode), eq(WORKFLOW_DEFINITION));
 
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, "test_def");
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
-        //project check auth success, instance not exist
+        // project check auth fail
+        Result map = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, "test_def");
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map.getCode());
+
+        // project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
         Mockito.when(processDefineMapper.queryByDefineName(project.getCode(), "test_def")).thenReturn(null);
 
-        Map<String, Object> instanceNotExitRes = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, "test_def");
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotExitRes.get(Constants.STATUS));
+        Result instanceNotExistRes = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, "test_def");
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), (int)instanceNotExistRes.getCode());
 
-        //instance exit
+        // instance exit
         Mockito.when(processDefineMapper.queryByDefineName(project.getCode(), "test")).thenReturn(getProcessDefinition());
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
-        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, "test");
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, "test");
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
     }
 
     @Test
@@ -295,26 +305,27 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_BATCH_COPY)).thenReturn(result);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), any(), anyLong(), eq(WORKFLOW_BATCH_COPY));
 
         // copy project definition ids empty test
-        Map<String, Object> map = processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, StringUtils.EMPTY, 2L);
-        Assert.assertEquals(Status.PROCESS_DEFINITION_CODES_IS_EMPTY, map.get(Constants.STATUS));
+        Result map = processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, StringUtils.EMPTY, 2L);
+        Assert.assertEquals(Status.PROCESS_DEFINITION_CODES_IS_EMPTY.getCode(), (int)map.getCode());
 
         // project check auth fail
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_BATCH_COPY)).thenReturn(result);
-        Map<String, Object> map1 = processDefinitionService.batchCopyProcessDefinition(
-                loginUser, projectCode, String.valueOf(project.getId()), 2L);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map1.get(Constants.STATUS));
+        Result map1 = processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, String.valueOf(project.getId()), 2L);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map1.getCode());
 
         // project check auth success, target project name not equal project name, check auth target project fail
         projectCode = 2L;
         Project project1 = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project1);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_BATCH_COPY)).thenReturn(result);
 
         putMsg(result, Status.SUCCESS, projectCode);
         ProcessDefinition definition = getProcessDefinition();
@@ -323,9 +334,8 @@ public class ProcessDefinitionServiceTest {
         Set<Long> definitionCodes = Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
         Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Mockito.when(processService.saveProcessDefine(loginUser, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
-        Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
-                loginUser, projectCode, "46", 1L);
-        Assert.assertEquals(Status.SUCCESS, map3.get(Constants.STATUS));
+        Result map3 = processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, "46", 1L);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)map3.getCode());
     }
 
     @Test
@@ -342,11 +352,14 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS, projectCode);
 
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project1, projectCode, TASK_DEFINITION_MOVE)).thenReturn(result);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project2, projectCode2, TASK_DEFINITION_MOVE)).thenReturn(result);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), any(), anyLong(), eq(TASK_DEFINITION_MOVE));
 
         ProcessDefinition definition = getProcessDefinition();
         definition.setVersion(1);
@@ -358,9 +371,8 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 46L)).thenReturn(getProcessTaskRelation(projectCode));
         putMsg(result, Status.SUCCESS);
 
-        Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(
-                loginUser, projectCode, "46", projectCode2);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = processDefinitionService.batchMoveProcessDefinition(loginUser, projectCode, "46", projectCode2);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
     }
 
     @Test
@@ -373,30 +385,33 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        //project check auth fail
-        Map<String, Object> result = new HashMap<>();
+        // project check auth fail
+        Result result = new Result();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_DELETE)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 6L);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), any(), anyLong(), eq(WORKFLOW_DEFINITION_DELETE));
 
-        //project check auth success, instance not exist
+        Result map = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 6L);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map.getCode());
+
+        // project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_DELETE)).thenReturn(result);
         Mockito.when(processDefineMapper.queryByCode(1L)).thenReturn(null);
-        Map<String, Object> instanceNotExitRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 1L);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotExitRes.get(Constants.STATUS));
+        Result instanceNotExistRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 1L);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), (int)instanceNotExistRes.getCode());
 
         ProcessDefinition processDefinition = getProcessDefinition();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_DELETE)).thenReturn(result);
-        //user no auth
+        // user no auth
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
-        Map<String, Object> userNoAuthRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, userNoAuthRes.get(Constants.STATUS));
+        Result userNoAuthRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), (int)userNoAuthRes.getCode());
 
-        //process definition online
+        // process definition online
         loginUser.setUserType(UserType.ADMIN_USER);
         putMsg(result, Status.SUCCESS, projectCode);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
@@ -405,7 +420,7 @@ public class ProcessDefinitionServiceTest {
         String formatter = MessageFormat.format(Status.PROCESS_DEFINE_STATE_ONLINE.getMsg(), processDefinition.getName());
         Assertions.assertEquals(formatter, exception.getMessage());
 
-        //scheduler list elements > 1
+        // scheduler list elements > 1
         processDefinition.setReleaseState(ReleaseState.OFFLINE);
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectCode);
@@ -414,19 +429,19 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processDefineMapper.deleteById(processDefinition.getId())).thenReturn(1);
         Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode())).thenReturn(1);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode())).thenReturn(Collections.emptySet());
-        Map<String, Object> schedulerGreaterThanOneRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.SUCCESS, schedulerGreaterThanOneRes.get(Constants.STATUS));
+        Result schedulerGreaterThanOneRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)schedulerGreaterThanOneRes.getCode());
 
-        //scheduler online
+        // scheduler online
         Schedule schedule = getSchedule();
         schedule.setReleaseState(ReleaseState.ONLINE);
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(schedule);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode())).thenReturn(Collections.emptySet());
-        Map<String, Object> schedulerOnlineRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.SCHEDULE_CRON_STATE_ONLINE, schedulerOnlineRes.get(Constants.STATUS));
+        Result schedulerOnlineRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.SCHEDULE_CRON_STATE_ONLINE.getCode(), (int)schedulerOnlineRes.getCode());
 
-        //process used by other task, sub process
+        // process used by other task, sub process
         loginUser.setUserType(UserType.ADMIN_USER);
         putMsg(result, Status.SUCCESS, projectCode);
         TaskMainInfo taskMainInfo = getTaskMainInfo().get(0);
@@ -435,7 +450,7 @@ public class ProcessDefinitionServiceTest {
         formatter = MessageFormat.format(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL.getMsg(), String.format("%s:%s", taskMainInfo.getProcessDefinitionName(), taskMainInfo.getTaskName()));
         Assertions.assertEquals(formatter, exception.getMessage());
 
-        //delete success
+        // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
         Mockito.when(processDefineMapper.deleteById(46)).thenReturn(1);
         Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
@@ -443,8 +458,8 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode())).thenReturn(Collections.emptySet());
         putMsg(result, Status.SUCCESS, projectCode);
-        Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
+        Result deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)deleteSuccess.getCode());
     }
 
     @Test
@@ -458,13 +473,17 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        //project check auth fail
-        Map<String, Object> result = new HashMap<>();
+        // project check auth fail
+        Result result = new Result();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,null)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.releaseProcessDefinition(loginUser, projectCode,
-                6, ReleaseState.OFFLINE);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), eq(projectCode), null);
+
+        Result map = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, 6, ReleaseState.OFFLINE);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map.getCode());
 
         // project check auth success, processs definition online
         putMsg(result, Status.SUCCESS, projectCode);
@@ -476,20 +495,19 @@ public class ProcessDefinitionServiceTest {
         processTaskRelation.setPostTaskCode(123L);
         processTaskRelationList.add(processTaskRelation);
         Mockito.when(processService.findRelationByCode(46L, 1)).thenReturn(processTaskRelationList);
-        Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
+        Result onlineRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)onlineRes.getCode());
 
         // project check auth success, processs definition online
-        Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
+        Result onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)onlineWithResourceRes.getCode());
 
         // release error code
-        Map<String, Object> failRes = processDefinitionService.releaseProcessDefinition(
+        Result failRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.getEnum(2));
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
-
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int)failRes.getCode());
     }
 
     @Test
@@ -502,37 +520,41 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        //project check auth fail
-        Map<String, Object> result = new HashMap<>();
+        // project check auth fail
+        Result result = new Result();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.verifyProcessDefinitionName(loginUser,
-                projectCode, "test_pdf");
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), eq(projectCode), eq(WORKFLOW_CREATE));
 
-        //project check auth success, process not exist
+        Result map = processDefinitionService.verifyProcessDefinitionName(loginUser,
+                projectCode, "test_pdf");
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int)map.getCode());
+
+        // project check auth success, process not exist
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(null);
-        Map<String, Object> processNotExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
-                projectCode, "test_pdf");
-        Assert.assertEquals(Status.SUCCESS, processNotExistRes.get(Constants.STATUS));
+        Result processNotExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, "test_pdf");
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)processNotExistRes.getCode());
 
-        //process exist
+        // process exist
         Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(getProcessDefinition());
-        Map<String, Object> processExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
+        Result processExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
                 projectCode, "test_pdf");
-        Assert.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(), (int)processExistRes.getCode());
     }
 
     @Test
     public void testCheckProcessNodeList() {
-        Map<String, Object> dataNotValidRes = processDefinitionService.checkProcessNodeList(null, null);
-        Assert.assertEquals(Status.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
+        Result dataNotValidRes = processDefinitionService.checkProcessNodeList(null, null);
+        Assert.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), (int)dataNotValidRes.getCode());
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
 
-        Map<String, Object> taskEmptyRes = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
-        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, taskEmptyRes.get(Constants.STATUS));
+        Result taskEmptyRes = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
+        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY.getCode(), (int)taskEmptyRes.getCode());
     }
 
     @Test
@@ -545,22 +567,27 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        //project check auth fail
-        Map<String, Object> result = new HashMap<>();
+        // project check auth fail
+        Result result = new Result();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,null)).thenReturn(result);
-        //process definition not exist
-        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(null);
-        Map<String, Object> processDefinitionNullRes = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), anyLong(), eq(null));
 
-        //success
+        // process definition not exist
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(null);
+        Result processDefinitionNullRes = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), (int)processDefinitionNullRes.getCode());
+
+        // success
         ProcessDefinition processDefinition = getProcessDefinition();
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(processService.genDagData(Mockito.any())).thenReturn(new DagData(processDefinition, null, null));
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
-        Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.SUCCESS, dataNotValidRes.get(Constants.STATUS));
+        Result dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, 46L);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)dataNotValidRes.getCode());
     }
 
     @Test
@@ -573,16 +600,21 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        //project check auth fail
-        Map<String, Object> result = new HashMap<>();
+        // project check auth fail
+        Result result = new Result();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,null)).thenReturn(result);
-        //process definition not exist
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), anyLong(), eq(null));
+
+        // process definition not exist
         String defineCodes = "46";
         Set<Long> defineCodeSet = Lists.newArrayList(defineCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
         Mockito.when(processDefineMapper.queryByCodes(defineCodeSet)).thenReturn(null);
-        Map<String, Object> processNotExistRes = processDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, defineCodes);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processNotExistRes.get(Constants.STATUS));
+        Result processNotExistRes = processDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, defineCodes);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), (int)processNotExistRes.getCode());
 
         putMsg(result, Status.SUCCESS, projectCode);
         ProcessDefinition processDefinition = getProcessDefinition();
@@ -596,8 +628,8 @@ public class ProcessDefinitionServiceTest {
         projects.add(project1);
         Mockito.when(projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())).thenReturn(projects);
 
-        Map<String, Object> successRes = processDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, defineCodes);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = processDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, defineCodes);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
     }
 
     @Test
@@ -605,18 +637,24 @@ public class ProcessDefinitionServiceTest {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = new HashMap<>();
         long projectCode = 2L;
         Project project = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+
+        Result result = new Result();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), anyLong(), eq(WORKFLOW_DEFINITION));
+
         ProcessDefinition processDefinition = getProcessDefinition();
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
         Mockito.when(processDefineMapper.queryAllDefinitionList(projectCode)).thenReturn(processDefinitionList);
-        Map<String, Object> successRes = processDefinitionService.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = processDefinitionService.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
     }
 
     @Test
@@ -627,27 +665,32 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         long projectCode =  1;
         Project project1 = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectMapper.queryByCode(1)).thenReturn(project1);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project1, projectCode, WORKFLOW_TREE_VIEW)).thenReturn(result);
-        //process definition not exist
-        ProcessDefinition processDefinition = getProcessDefinition();
-        Map<String, Object> processDefinitionNullRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(),46, 10);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
-        //task instance not existproject
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS, projectCode);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project1), anyLong(), eq(WORKFLOW_TREE_VIEW));
+
+        // process definition not exist
+        ProcessDefinition processDefinition = getProcessDefinition();
+        Result processDefinitionNullRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(),46, 10);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), (int)processDefinitionNullRes.getCode());
+
+        // task instance not existproject
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectMapper.queryByCode(1)).thenReturn(project1);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
-        Map<String, Object> taskNullRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(),46, 10);
-        Assert.assertEquals(Status.SUCCESS, taskNullRes.get(Constants.STATUS));
+        Result taskNullRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(),46, 10);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)taskNullRes.getCode());
 
-        //task instance exist
-        Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(),46, 10);
-        Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
+        // task instance exist
+        Result taskNotNuLLRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(),46, 10);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)taskNotNuLLRes.getCode());
     }
 
     @Test
@@ -659,14 +702,18 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
 
         Project project1 = getProject(1);
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(projectMapper.queryByCode(1)).thenReturn(project1);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            res.setCode(result.getCode());
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project1), anyLong(), eq(WORKFLOW_TREE_VIEW));
 
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
-        Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(), 46, 10);
-        Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
+        Result taskNotNuLLRes = processDefinitionService.viewTree(loginUser,processDefinition.getProjectCode(), 46, 10);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)taskNotNuLLRes.getCode());
     }
 
     @Test
@@ -675,17 +722,18 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-
         long projectCode = 1L;
         Project project = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE)).thenReturn(result);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            putMsg(res, Status.SUCCESS);
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project), eq(projectCode), eq(WORKFLOW_UPDATE));
 
-        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
+        Result updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
                 "", "", "", 0, "root", null,"",null, ProcessExecutionTypeEnum.PARALLEL);
-        Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), (int)updateResult.getCode());
     }
 
     @Test
@@ -748,17 +796,20 @@ public class ProcessDefinitionServiceTest {
 
         long projectCode =  1001;
         Project project1 = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
+
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project1, projectCode, WORKFLOW_IMPORT)).thenReturn(result);
+        doAnswer(invocation -> {
+            Result res = invocation.getArgument(0);
+            putMsg(res, Status.SUCCESS);
+            return null;
+        }).when(projectService).checkProjectAndAuth(any(), eq(loginUser), eq(project1), eq(projectCode), eq(WORKFLOW_IMPORT));
         Mockito.when(processService.saveTaskDefine(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(2);
         Mockito.when(processService.saveProcessDefine(Mockito.same(loginUser), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(1);
         Mockito.when(processService.saveTaskRelation(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.anyLong(),
             Mockito.eq(1), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(0);
-        result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
+        Result result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
 
-        Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int)result.getCode());
     }
 
     /**
@@ -835,6 +886,15 @@ public class ProcessDefinitionServiceTest {
         }
     }
 
+    private void putMsg(Result result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
+        }
+    }
+
     /**
      * get mock task main info
      *
@@ -849,4 +909,5 @@ public class ProcessDefinitionServiceTest {
         taskMainInfos.add(taskMainInfo);
         return taskMainInfos;
     }
+
 }

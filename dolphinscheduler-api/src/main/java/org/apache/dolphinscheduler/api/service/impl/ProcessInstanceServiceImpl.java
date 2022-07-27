@@ -519,8 +519,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
         //check workflow json is valid
-        result = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        Result result1 = processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
+        if (Status.SUCCESS.getCode() != result1.getCode()) {
             return result;
         }
         int tenantId = -1;
