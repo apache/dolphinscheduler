@@ -81,7 +81,6 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("query list-paging queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
