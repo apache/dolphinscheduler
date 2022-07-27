@@ -1232,7 +1232,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         for (TaskDefinition taskDefinition : taskDefinitionList) {
             TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-            taskDefinitionLog.setName(taskDefinitionLog.getName() + "_import_" + DateUtils.getCurrentTimeStamp());
+            taskDefinitionLog.setName(taskDefinitionLog.getName());
             taskDefinitionLog.setProjectCode(projectCode);
             taskDefinitionLog.setUserId(loginUser.getId());
             taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
@@ -1716,6 +1716,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param targetProjectCode targetProjectCode
      */
     @Override
+    @Transactional
     public Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                           long projectCode,
                                                           String codes,
@@ -1824,7 +1825,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                     taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setVersion(0);
-                    taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                    taskDefinitionLog.setName(taskDefinitionLog.getName());
                 }
                 for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
                     if (processTaskRelationLog.getPreTaskCode() > 0) {
@@ -1834,6 +1835,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
                     }
                 }
+                final long oldProcessDefinitionCode = processDefinition.getCode();
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
@@ -1855,6 +1857,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         jsonNodes.set(i, node);
                     }
                     processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
+                }
+                //copy timing configuration
+                Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
+                if (scheduleObj != null) {
+                    scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
+                    scheduleObj.setReleaseState(ReleaseState.OFFLINE);
+                    scheduleObj.setCreateTime(date);
+                    scheduleObj.setUpdateTime(date);
+                    int insertResult = scheduleMapper.insert(scheduleObj);
+                    if (insertResult != 1) {
+                        putMsg(result, Status.CREATE_SCHEDULE_ERROR);
+                        throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
+                    }
                 }
                 try {
                     result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson));
