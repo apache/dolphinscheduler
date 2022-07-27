@@ -1,48 +1,47 @@
 # Overview
 
-This node is used to perform java-type tasks and supports the use of single files and jar packages as program entries.
+This node is for executing java-type tasks and supports using files and jar packages as program entries.
 
 # Create Tasks
 
-- Click on project management-> Project name-> workflow definition, click on the“Create workflow” button, go to the DAG edit page:
+- Click on `Project Management` -> `Project Name` -> `Workflow Definition`, click on the“Create workflow” button, go to the DAG edit page:
 
 - Drag the toolbar's Java task node to the palette.
 
 # Task Parameters
 | **Parameter** | **Description** |
 | ------- | ---------- |
-|Node Name|the name of the set task. The node name in a workflow definition is unique.
-|Run Flag|indicates whether the node is scheduled properly and, if it is not needed, turns on the kill switch.
-|Description|describes the functionality of the node.
-|Task Priority|when the number of worker threads is insufficient, the worker is executed according to the priority from high to low. When the priority is the same, the worker is executed according to the first in, first out principle.
-|Worker Group|The machine whose task is assigned to the Worker group executes, and selecting Default will randomly select a Worker machine to execute.
-|Environment Name|configure the environment in which the task runs.
-|Number Of Failed Retries|number of resubmitted tasks that failed, supported drop-down and hand-fill.
-|Failed Retry Interval|the interval between tasks that fail and are resubmitted, supported by drop-down and hand-fill.
+|Node Name|The name of the set task. The node name in a workflow definition is unique.
+|Run Flag|Indicates whether the node is scheduled properly and turns on the kill switch, if not needed.
+|Description|Describes the functionality of the node.
+|Task Priority|When the number of worker threads is insufficient, the worker executes tasks according to the priority. When the priority is the same, the worker executes tasks by order.
+|Worker Group|The group of machines who execute the tasks. If selecting `Default`, DolphinScheduler will randomly choose a worker machine to execute the task.
+|Environment Name|Configure the environment in which the task runs.
+|Number Of Failed Retries|Number of resubmitted tasks that failed. You can choose the number in the drop-down menu or fill it manually.
+|Failed Retry Interval|the interval between the failure and resubmission of a task. You can choose the number in the drop-down menu or fill it manually.
 |Delayed Execution Time|the amount of time a task is delayed, in units.
 |Timeout Alarm|Check timeout warning, timeout failure, when the task exceeds the“Timeout length”, send a warning message and the task execution fails.
-|Module Path|turn on the use of Java 9 + 's modularity feature, put all resources into-module-path, and require that the JDK version in your worker support modularity.
-|Main Parameter|as a normal Java program main method entry parameter.
-|Java VM Parameters|configure startup virtual machine parameters.
-|Script|you need to write Java code if you use the Java run type. The public class must exist in the code without writing a package statement.
-|Resources|these can be external JAR packages or other resource files that are added to the Classpath or module path and can be easily retrieved in your JAVA script.
-|Custom parameter|a user-defined parameter that is part of HTTP and replaces the contents of the script with the ${ variable } .
-|Pre Tasks|selecting a pre-task for the current task sets the selected pre-task upstream of the current task.
+|Module Path| pick Java 9 + 's modularity feature, put all resources into-module-path, and require that the JDK version in your worker supports modularity.
+|Main Parameter|Java program main method entry parameter.
+|Java VM Parameters|JVM startup parameters.
+|Script|You need to write Java code if you use the Java run type. The public class must exist in the code without writing a package statement.
+|Resources|External JAR packages or other resource files that are added to the classpath or module path and can be easily retrieved in your JAVA script.
+|Custom parameter|A user-defined parameter that is part of HTTP and replaces `${ variable }` in the script .
+|Pre Tasks|Selects a pre-task for the current task and sets the pre-task as the upstream of the current task.
 
 ## Example
 
-Java task types have two modes of execution, which are demonstrated here as an example of a Java mode.
+Java type tasks have two modes of execution, here is a demonstration of executing tasks in Java mode.
 
 The main configuration parameters are as follows:
 - Run Type
 - Module Path
 - Main Parameters
 - Java VM Parameters
-
 - Script 
 
 ![java_task](../../../../img/tasks/demo/java_task02.png)
 
 ## Note
 
-When you run a type with JAVA, the public class must exist in the code, and you can not write a package statement.
+When you run the task in JAVA execution mode, the public class must exist in the code, and you could omit writing a package statement.
