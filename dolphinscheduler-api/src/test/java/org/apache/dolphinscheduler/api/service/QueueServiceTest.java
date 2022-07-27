@@ -139,7 +139,7 @@ public class QueueServiceTest {
 
         // correct
         Result result = queueService.createQueue(getLoginUser(), QUEUE_NAME, QUEUE_NAME);
-        Assert.assertEquals(Status.SUCCESS, result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test

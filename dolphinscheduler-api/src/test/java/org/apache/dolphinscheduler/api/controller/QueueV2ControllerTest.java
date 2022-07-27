@@ -53,9 +53,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/v2/queues/list")
-            .header(SESSION_ID, sessionId))
+            .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -73,9 +74,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/v2/queues")
             .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(JSONUtils.toJsonString(queueQueryRequest)))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -91,9 +93,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueCreateRequest.setQueueName(QUEUE_NAME_CREATE_NAME);
         MvcResult mvcResult = mockMvc.perform(post("/v2/queues")
             .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(JSONUtils.toJsonString(queueCreateRequest)))
             .andExpect(status().isCreated())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -109,9 +112,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueUpdateRequest.setQueueName(QUEUE_NAME_MODIFY_NAME);
         MvcResult mvcResult = mockMvc.perform(put("/v2/queues/{id}", 1)
             .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(JSONUtils.toJsonString(queueUpdateRequest)))
             .andExpect(status().isCreated())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
@@ -128,9 +132,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
         MvcResult mvcResult = mockMvc.perform(post("/v2/queues/verify")
             .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(JSONUtils.toJsonString(queueVerifyRequest)))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -142,9 +147,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueVerifyRequest.setQueueName(QUEUE_NAME_CREATE_NAME);
         mvcResult = mockMvc.perform(post("/v2/queues/verify")
             .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(JSONUtils.toJsonString(queueVerifyRequest)))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -155,9 +161,10 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
         mvcResult = mockMvc.perform(post("/v2/queues/verify")
             .header(SESSION_ID, sessionId)
+            .accept(MediaType.ALL)
+            .contentType(MediaType.APPLICATION_JSON)
             .content(JSONUtils.toJsonString(queueVerifyRequest)))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
