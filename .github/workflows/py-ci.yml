@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
@@ -78,12 +78,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-18.04, macOS-latest, windows-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10, 3.11-dev]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependences
@@ -104,7 +104,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
@@ -123,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
@@ -163,7 +163,7 @@ jobs:
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
