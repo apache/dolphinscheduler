@@ -1678,6 +1678,38 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     /**
+     * authorized file with read permission
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return authorized result
+     */
+    @Override
+    public Map<String, Object> authorizedFileWithReadPerm(User loginUser, Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+        if (resourcePermissionCheckService.functionDisabled()){
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+
+        List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_READABLE_PERM);
+        for (int i = 0; i < authedResources.size(); i++) {
+            if(authedResources.get(i).isDirectory()){
+                authedResources.remove(i);
+            }
+        }
+
+        Visitor visitor = new ResourceTreeVisitor(authedResources);
+        String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        logger.info(visit);
+        String jsonTreeStr = JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        logger.info(jsonTreeStr);
+        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * authorized file
      *
      * @param loginUser login user

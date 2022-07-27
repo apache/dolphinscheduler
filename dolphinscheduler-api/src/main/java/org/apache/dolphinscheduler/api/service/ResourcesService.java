@@ -257,6 +257,15 @@ public interface ResourcesService {
     Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId);
 
     /**
+     * authorized file with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result
+     */
+    Map<String, Object> authorizedFileWithReadPerm(User loginUser, Integer userId);
+
+    /**
      * authorized file
      *
      * @param loginUser login user
