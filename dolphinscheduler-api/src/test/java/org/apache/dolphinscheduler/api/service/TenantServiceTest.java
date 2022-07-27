@@ -17,19 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_UPDATE;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -46,10 +40,8 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -93,9 +85,6 @@ public class TenantServiceTest {
     @Mock
     private UserMapper userMapper;
 
-    @Mock
-    private ResourcePermissionCheckService resourcePermissionCheckService;
-
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
     private static final String queue = "queue";
@@ -106,8 +95,6 @@ public class TenantServiceTest {
 
         User loginUser = getLoginUser();
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result;
 
         //check exist
@@ -155,10 +142,7 @@ public class TenantServiceTest {
         IPage<Tenant> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
-        Set<Integer> ids = new HashSet<>();
-        ids.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
-        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq(tenantDesc)))
+        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq(tenantDesc)))
                 .thenReturn(page);
         Result result = tenantService.queryTenantList(getLoginUser(), tenantDesc, 1, 10);
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
@@ -169,8 +153,6 @@ public class TenantServiceTest {
     @Test
     public void testUpdateTenant() throws Exception {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
 
         // update not exists tenant
         Throwable exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc));
@@ -187,8 +169,6 @@ public class TenantServiceTest {
 
     @Test
     public void testDeleteTenantById() throws Exception {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES))
                 .thenReturn(getInstanceList());
