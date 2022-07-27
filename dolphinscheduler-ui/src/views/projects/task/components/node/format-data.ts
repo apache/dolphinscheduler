@@ -88,6 +88,7 @@ export function formatParams(data: INodeData): {
       taskParams.hadoopCustomParams = data.hadoopCustomParams
       taskParams.sqoopAdvancedParams = data.sqoopAdvancedParams
       taskParams.concurrency = data.concurrency
+      taskParams.splitBy = data.splitBy
       taskParams.modelType = data.modelType
       taskParams.sourceType = data.sourceType
       taskParams.targetType = data.targetType
