@@ -40,6 +40,7 @@ export type TaskType =
   | 'OPENMLDB'
   | 'DVC'
   | 'DINKY'
+  | 'SAGEMAKER'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -127,6 +128,10 @@ export const TASK_TYPES_MAP = {
   },
   DINKY: {
     alias: 'DINKY',
+    helperLinkDisable: true
+  },
+  SAGEMAKER: {
+    alias: 'SageMaker',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }

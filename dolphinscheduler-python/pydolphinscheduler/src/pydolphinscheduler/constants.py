@@ -57,6 +57,7 @@ class TaskType(str):
     FLINK = "FLINK"
     SPARK = "SPARK"
     MR = "MR"
+    SAGEMAKER = "SAGEMAKER"
 
 
 class DefaultTaskCodeNum(str):

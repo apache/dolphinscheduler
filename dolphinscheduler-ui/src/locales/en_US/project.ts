@@ -497,6 +497,8 @@ export default {
     allow_insert: 'AllowInsert',
     concurrency: 'Concurrency',
     concurrency_tips: 'Please enter Concurrency',
+    concurrency_column: 'Concurrency Column',
+    concurrency_column_tips: 'Please enter Concurrency Column',
     sea_tunnel_master: 'Master',
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: 'Queue',
@@ -621,6 +623,8 @@ export default {
     zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
     zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
+    zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
+    zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',

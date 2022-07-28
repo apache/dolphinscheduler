@@ -24,7 +24,7 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'input',
-      field: 'zeppelinNoteId',
+      field: 'noteId',
       name: t('project.node.zeppelin_note_id'),
       props: {
         placeholder: t('project.node.zeppelin_note_id_tips')
@@ -41,7 +41,7 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
-      field: 'zeppelinParagraphId',
+      field: 'paragraphId',
       name: t('project.node.zeppelin_paragraph_id'),
       props: {
         placeholder: t('project.node.zeppelin_paragraph_id_tips')
@@ -49,7 +49,7 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
-      field: 'zeppelinRestEndpoint',
+      field: 'restEndpoint',
       name: t('project.node.zeppelin_rest_endpoint'),
       props: {
         placeholder: t('project.node.zeppelin_rest_endpoint_tips')
@@ -62,6 +62,14 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
             return new Error(t('project.node.zeppelin_rest_endpoint_tips'))
           }
         }
+      }
+    },
+    {
+      type: 'input',
+      field: 'productionNoteDirectory',
+      name: t('project.node.zeppelin_production_note_directory'),
+      props: {
+        placeholder: t('project.node.zeppelin_production_note_directory_tips')
       }
     },
     {

@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-.table-card {
-  margin-top: 8px;
+package org.apache.dolphinscheduler.plugin.task.api.loop;
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+import lombok.NonNull;
+
+public interface LoopTaskMethodDefinition {
+    @NonNull
+    LoopTaskMethodType getLoopTaskMethodType();
+    
 }

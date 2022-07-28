@@ -69,7 +69,7 @@ public class TaskRejectByWorkerEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        TaskRejectAckCommand taskRejectAckMessage = new TaskRejectAckCommand(ExecutionStatus.SUCCESS.getCode(),
+        TaskRejectAckCommand taskRejectAckMessage = new TaskRejectAckCommand(ExecutionStatus.SUCCESS,
                                                                              taskEvent.getTaskInstanceId(),
                                                                              masterConfig.getMasterAddress(),
                                                                              taskEvent.getWorkerAddress(),

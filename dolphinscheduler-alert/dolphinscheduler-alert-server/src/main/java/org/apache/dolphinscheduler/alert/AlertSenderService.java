@@ -99,7 +99,6 @@ public final class AlertSenderService extends Thread {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alertId);
                 continue;
             }
-            AlertData alertData = new AlertData();
 
             if (StringUtils.isNotEmpty(alert.getContent())) {
                 try {
@@ -113,12 +112,13 @@ public final class AlertSenderService extends Thread {
                     logger.error("alert content is null");
                 }
             }
-            alertData.setId(alertId)
-                    .setContent(alert.getContent())
-                    .setLog(alert.getLog())
-                    .setTitle(alert.getTitle())
-                    .setTitle(alert.getTitle())
-                    .setWarnType(alert.getWarningType().getCode());
+            AlertData alertData = AlertData.builder()
+                    .id(alertId)
+                    .content(alert.getContent())
+                    .log(alert.getLog())
+                    .title(alert.getTitle())
+                    .warnType(alert.getWarningType().getCode())
+                    .build();
 
             int sendSuccessCount = 0;
             for (AlertPluginInstance instance : alertInstanceList) {
@@ -151,10 +151,11 @@ public final class AlertSenderService extends Thread {
      */
     public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content, int warnType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
-        AlertData alertData = new AlertData();
-        alertData.setContent(content)
-                .setTitle(title)
-                .setWarnType(warnType);
+        AlertData alertData = AlertData.builder()
+                .content(content)
+                .title(title)
+                .warnType(warnType)
+                .build();
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -242,9 +243,10 @@ public final class AlertSenderService extends Thread {
             return null;
         }
 
-        AlertInfo alertInfo = new AlertInfo();
-        alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(paramsMap);
+        AlertInfo alertInfo = AlertInfo.builder()
+                .alertData(alertData)
+                .alertParams(paramsMap)
+                .build();
         int waitTimeout = alertConfig.getWaitTimeout();
         AlertResult alertResult;
         try {

@@ -88,6 +88,7 @@ export function formatParams(data: INodeData): {
       taskParams.hadoopCustomParams = data.hadoopCustomParams
       taskParams.sqoopAdvancedParams = data.sqoopAdvancedParams
       taskParams.concurrency = data.concurrency
+      taskParams.splitBy = data.splitBy
       taskParams.modelType = data.modelType
       taskParams.sourceType = data.sourceType
       taskParams.targetType = data.targetType
@@ -327,9 +328,10 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'ZEPPELIN') {
-    taskParams.noteId = data.zeppelinNoteId
-    taskParams.paragraphId = data.zeppelinParagraphId
-    taskParams.restEndpoint = data.zeppelinRestEndpoint
+    taskParams.noteId = data.noteId
+    taskParams.paragraphId = data.paragraphId
+    taskParams.restEndpoint = data.restEndpoint
+    taskParams.productionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
   }
 
@@ -381,6 +383,10 @@ export function formatParams(data: INodeData): {
     taskParams.dvcMessage = data.dvcMessage
     taskParams.dvcLoadSaveDataPath = data.dvcLoadSaveDataPath
     taskParams.dvcStoreUrl = data.dvcStoreUrl
+  }
+
+  if (data.taskType === 'SAGEMAKER') {
+    taskParams.sagemakerRequestJson = data.sagemakerRequestJson
   }
 
   if (data.taskType === 'DINKY') {

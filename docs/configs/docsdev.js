@@ -181,6 +181,10 @@ export default {
                                 title: 'Dinky',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
+                            {
+                                title: 'SageMaker',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
                         ],
                     },
                     {
@@ -334,7 +338,16 @@ export default {
                     },
                     {
                         title: 'Upgrade',
-                        link: '/en-us/docs/dev/user_doc/guide/upgrade.html',
+                        children: [
+                            {
+                                title: 'Incompatible',
+                                link: '/en-us/docs/dev/user_doc/guide/upgrade/incompatible.html',
+                            },
+                            {
+                                title: 'Upgrade',
+                                link: '/en-us/docs/dev/user_doc/guide/upgrade/upgrade.html',
+                            },
+                        ],
                     },
                     {
                         title: 'Expansion and Reduction',
@@ -601,6 +614,10 @@ export default {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
+                            {
+                                title: 'SageMaker',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
                         ],
                     },
                     {
@@ -730,7 +747,16 @@ export default {
                     },
                     {
                         title: '升级',
-                        link: '/zh-cn/docs/dev/user_doc/guide/upgrade.html',
+                        children: [
+                            {
+                                title: '不向前兼容的更新',
+                                link: '/zh-cn/docs/dev/user_doc/guide/upgrade/incompatible.html',
+                            },
+                            {
+                                title: '升级步骤',
+                                link: '/zh-cn/docs/dev/user_doc/guide/upgrade/upgrade.html',
+                            },
+                        ],
                     },
                     {
                         title: '扩/缩容',
@@ -814,7 +840,7 @@ export default {
                     },
                     {
                         title: '数据源设置',
-                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/datasource-setting.html',
                     },
                     {
                         title: '其他',

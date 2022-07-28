@@ -2,6 +2,10 @@
 
 ## 准备工作
 
+### 检查不向前兼容的更改
+
+在升级之前，您应该检查 [incompatible change](./incompatible.md)，因为一些不兼容的更改可能会破坏您当前的功能。
+
 ### 备份上一版本文件和数据库
 
 为了防止操作错误导致数据丢失，建议升级之前备份数据，备份方法请结合你数据库的情况来定
@@ -14,7 +18,7 @@
 
 ### 停止 dolphinscheduler 所有服务
 
-根据你部署方式停止 dolphinscheduler 的所有服务，如果你是通过 [集群部署](./installation/cluster.md) 来部署你的 dolphinscheduler 的话，可以通过 `sh ./script/stop-all.sh` 停止全部服务。
+根据你部署方式停止 dolphinscheduler 的所有服务，如果你是通过 [集群部署](../installation/cluster.md) 来部署你的 dolphinscheduler 的话，可以通过 `sh ./script/stop-all.sh` 停止全部服务。
 
 ### 数据库升级
 
@@ -37,8 +41,8 @@ jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinschedul
 
 #### 修改 `bin/env/install_config.conf` 配置内容
 
-- 伪集群部署请参照[伪集群部署(Pseudo-Cluster)](./installation/pseudo-cluster.md)中的 `修改相关配置`
-- 集群部署请参照[集群部署(Cluster)](./installation/cluster.md)中的 `修改相关配置`
+- 伪集群部署请参照[伪集群部署(Pseudo-Cluster)](../installation/pseudo-cluster.md)中的 `修改相关配置`
+- 集群部署请参照[集群部署(Cluster)](../installation/cluster.md)中的 `修改相关配置`
 
 然后运行命令 `sh ./bin/start-all.sh` 重启全部服务。
 
