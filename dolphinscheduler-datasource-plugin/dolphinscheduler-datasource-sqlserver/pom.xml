@@ -49,7 +49,6 @@
                     <groupId>com.microsoft.azure</groupId>
                 </exclusion>
             </exclusions>
-            <version>${mssql.jdbc.version}</version>
         </dependency>
 
 
