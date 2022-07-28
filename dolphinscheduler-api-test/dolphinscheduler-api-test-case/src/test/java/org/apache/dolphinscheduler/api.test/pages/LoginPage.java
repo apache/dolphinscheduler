@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages;
 
-
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 

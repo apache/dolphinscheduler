@@ -39,6 +39,8 @@ import { useJupyter } from './use-jupyter'
 import { useMlflow } from './use-mlflow'
 import { useOpenmldb } from './use-openmldb'
 import { useDvc } from './use-dvc'
+import { useDinky } from './use-dinky'
+import { userSagemaker } from './use-sagemaker'
 
 export default {
   SHELL: useShell,
@@ -64,5 +66,7 @@ export default {
   JUPYTER: useJupyter,
   MLFLOW: useMlflow,
   OPENMLDB: useOpenmldb,
-  DVC: useDvc
+  DVC: useDvc,
+  DINKY: useDinky,
+  SAGEMAKER: userSagemaker
 }

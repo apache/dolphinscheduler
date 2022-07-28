@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -42,9 +42,6 @@ import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
-/**
- * task manager
- */
 @Component
 public class StateEventResponseService {
 
@@ -96,8 +93,9 @@ public class StateEventResponseService {
     /**
      * put task to attemptQueue
      */
-    public void addResponse(StateEvent stateEvent) {
+    public void addStateChangeEvent(StateEvent stateEvent) {
         try {
+            // check the event is validated
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
             logger.error("Put state event : {} error", stateEvent, e);
@@ -138,7 +136,7 @@ public class StateEventResponseService {
     private void writeResponse(StateEvent stateEvent, ExecutionStatus status) {
         Channel channel = stateEvent.getChannel();
         if (channel != null) {
-            StateEventResponseCommand command = new StateEventResponseCommand(status.getCode(), stateEvent.getKey());
+            StateEventResponseCommand command = new StateEventResponseCommand(status, stateEvent.getKey());
             channel.writeAndFlush(command.convert2Command());
         }
     }
@@ -153,6 +151,7 @@ public class StateEventResponseService {
             }
 
             WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            // We will refresh the task instance status first, if the refresh failed the event will not be removed
             switch (stateEvent.getType()) {
                 case TASK_STATE_CHANGE:
                     workflowExecuteThread.refreshTaskInstance(stateEvent.getTaskInstanceId());

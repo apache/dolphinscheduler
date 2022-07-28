@@ -47,7 +47,7 @@ runs:
       run: |
         if [[ -n "${{ inputs.token }}" ]]; then
           reviewdog -f=checkstyle \
-            -reporter="github-pr-check" \
+            -reporter="github-pr-review" \
             -filter-mode="added" \
             -fail-on-error="true" < target/checkstyle-result.xml
         fi

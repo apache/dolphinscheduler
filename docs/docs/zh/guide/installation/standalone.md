@@ -22,7 +22,7 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 # 解压并运行 Standalone Server
 tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
 cd apache-dolphinscheduler-*-bin
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```
 
 ### 登录 DolphinScheduler
@@ -35,9 +35,9 @@ sh ./bin/dolphinscheduler-daemon.sh start standalone-server
 
 ```shell
 # 启动 Standalone Server 服务
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 # 停止 Standalone Server 服务
-sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
+bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ```
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -45,17 +45,4 @@ sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ## 配置数据库
 
 Standalone server 使用 H2 数据库作为其元数据存储数据，这是为了上手简单，用户在启动服务器之前不需要启动数据库。但是如果用户想将元数据库存储在
-MySQL 或 PostgreSQL 等其他数据库中，他们必须更改一些配置。我们这里以 MySQL 为例来说明如何配置外部数据库：
-
-* 首先，参照 [伪集群部署](pseudo-cluster.md) `初始化数据库` 创建并初始化数据库 
-* 在你的命令行设定下列环境变量，将 `{user}` 和 `{password}` 改为你数据库的用户名和密码
-
-```shell
-export DATABASE=${DATABASE:-mysql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
-```
-
-* 将mysql-connector-java驱动加到`./standalone-server/libs/standalone-server/`目录下, 下载方法见 [伪集群部署](pseudo-cluster.md) `初始化数据库` 一栏
-* 启动standalone-server，此时你已经连接上mysql，重启或者停止standalone-server并不会清空您数据库里的数据
+MySQL 或 PostgreSQL 等其他数据库中，他们必须更改一些配置。请参考 [数据源配置](../howto/datasource-setting.md) `Standalone 切换元数据库` 创建并初始化数据库

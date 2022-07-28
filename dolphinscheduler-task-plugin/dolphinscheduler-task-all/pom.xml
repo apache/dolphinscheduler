@@ -177,6 +177,18 @@
             <artifactId>dolphinscheduler-task-dvc</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-dinky</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-sagemaker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

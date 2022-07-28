@@ -18,6 +18,8 @@ package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 
+import java.text.MessageFormat;
+
 
 /**
  * service exception
@@ -34,6 +36,11 @@ public class ServiceException extends RuntimeException {
 
     public ServiceException(Status status) {
         super(status.getMsg());
+        this.code = status.getCode();
+    }
+
+    public ServiceException(Status status, Object... formatter) {
+        super(MessageFormat.format(status.getMsg(), formatter));
         this.code = status.getCode();
     }
 

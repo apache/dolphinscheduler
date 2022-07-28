@@ -174,7 +174,7 @@ snappy-0.2.jar
 snappy-java-1.0.4.1.jar
 SparseBitSet-1.2.jar
 spring-aop-5.3.12.jar
-spring-beans-5.3.12.jar
+spring-beans-5.3.19.jar
 spring-boot-2.5.6.jar
 spring-boot-actuator-2.5.6.jar
 spring-boot-actuator-autoconfigure-2.5.6.jar
@@ -190,15 +190,15 @@ spring-boot-starter-logging-2.5.6.jar
 spring-boot-starter-quartz-2.5.6.jar
 spring-boot-starter-web-2.5.6.jar
 spring-boot-starter-cache-2.5.6.jar
-spring-context-5.3.12.jar
+spring-context-5.3.19.jar
 spring-context-support-5.3.12.jar
-spring-core-5.3.12.jar
+spring-core-5.3.19.jar
 spring-expression-5.3.12.jar
 spring-jcl-5.3.12.jar
-spring-jdbc-5.3.12.jar
+spring-jdbc-5.3.19.jar
 spring-plugin-core-1.2.0.RELEASE.jar
 spring-plugin-metadata-1.2.0.RELEASE.jar
-spring-tx-5.3.12.jar
+spring-tx-5.3.19.jar
 spring-web-5.3.12.jar
 spring-webmvc-5.3.12.jar
 springfox-core-2.9.2.jar
@@ -255,6 +255,7 @@ aws-java-sdk-s3-1.12.160.jar
 aws-java-sdk-kms-1.12.160.jar
 aws-java-sdk-emr-1.12.160.jar
 aws-java-sdk-core-1.12.160.jar
+aws-java-sdk-sagemaker-1.12.160.jar
 commons-text-1.8.jar
 httpasyncclient-4.1.4.jar
 httpcore-nio-4.4.14.jar
@@ -265,3 +266,7 @@ websocket-client-9.4.44.v20210927.jar
 websocket-common-9.4.44.v20210927.jar
 zeppelin-client-0.10.1.jar
 zeppelin-common-0.10.1.jar
+json-path-2.7.0.jar
+accessors-smart-2.4.7.jar
+asm-9.1.jar
+json-smart-2.4.7.jar

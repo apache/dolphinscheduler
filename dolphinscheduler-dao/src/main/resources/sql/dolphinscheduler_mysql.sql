@@ -642,7 +642,9 @@ CREATE TABLE `t_ds_project` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `user_id_index` (`user_id`) USING BTREE
+  KEY `user_id_index` (`user_id`) USING BTREE,
+  UNIQUE KEY `unique_name`(`name`),
+  UNIQUE KEY `unique_code`(`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -659,7 +661,8 @@ CREATE TABLE `t_ds_queue` (
   `queue` varchar(64) DEFAULT NULL COMMENT 'yarn queue name',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_queue_name`(`queue_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -882,7 +885,8 @@ CREATE TABLE `t_ds_tenant` (
   `queue_id` int(11) DEFAULT NULL COMMENT 'queue id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_tenant_code`(`tenant_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -906,7 +910,8 @@ CREATE TABLE `t_ds_udfs` (
   `resource_name` varchar(255) NOT NULL COMMENT 'resource name',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_func_name`(`func_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -1896,19 +1901,19 @@ CREATE TABLE `t_ds_k8s` (
 DROP TABLE IF EXISTS `t_ds_k8s_namespace`;
 CREATE TABLE `t_ds_k8s_namespace` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` bigint(20) NOT NULL DEFAULT '0',
   `limits_memory` int(11) DEFAULT NULL,
   `namespace` varchar(100) DEFAULT NULL,
-  `online_job_num` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `pod_replicas` int(11) DEFAULT NULL,
   `pod_request_cpu` decimal(14,3) DEFAULT NULL,
   `pod_request_memory` int(11) DEFAULT NULL,
   `limits_cpu` decimal(14,3) DEFAULT NULL,
-  `k8s` varchar(100) DEFAULT NULL,
+  `cluster_code` bigint(20) NOT NULL DEFAULT '0',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `k8s_namespace_unique` (`namespace`,`k8s`)
+  UNIQUE KEY `k8s_namespace_unique` (`namespace`,`cluster_code`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
 
 -- ----------------------------

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import {
   NSpace,
   NInput,
@@ -76,11 +76,11 @@ const TaskInstance = defineComponent({
           taskInstanceId: Number(row.id),
           limit: variables.limit,
           skipLineNum: variables.skipLineNum
-        }).then((res: string) => {
-          variables.logRef += res
-          if (res) {
+        }).then((res: any) => {
+          if (res?.message) {
+            variables.logRef += res.message
             variables.limit += 1000
-            variables.skipLineNum += 1000
+            variables.skipLineNum += res.lineNum
             getLogs(row)
           } else {
             variables.logLoadingRef = false
@@ -98,6 +98,8 @@ const TaskInstance = defineComponent({
       variables.skipLineNum = 0
       getLogs(row)
     }
+
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
       createColumns(variables)
@@ -130,7 +132,8 @@ const TaskInstance = defineComponent({
       onUpdatePageSize,
       onSearch,
       onConfirmModal,
-      refreshLogs
+      refreshLogs,
+      trim
     }
   },
   render() {
@@ -149,24 +152,28 @@ const TaskInstance = defineComponent({
         <NCard>
           <NSpace justify='end' wrap={false}>
             <NInput
+                  allowInput={this.trim}
               v-model={[this.searchVal, 'value']}
               size='small'
               placeholder={t('project.task.task_name')}
               clearable
             />
             <NInput
+                  allowInput={this.trim}
               v-model={[this.processInstanceName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
             />
             <NInput
+                  allowInput={this.trim}
               v-model={[this.executorName, 'value']}
               size='small'
               placeholder={t('project.task.executor')}
               clearable
             />
             <NInput
+                  allowInput={this.trim}
               v-model={[this.host, 'value']}
               size='small'
               placeholder={t('project.task.host')}

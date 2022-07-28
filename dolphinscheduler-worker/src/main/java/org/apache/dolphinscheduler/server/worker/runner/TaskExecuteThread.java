@@ -33,10 +33,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
@@ -46,21 +47,23 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+
+import lombok.NonNull;
 
 /**
  * task scheduler thread
@@ -75,9 +78,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
     /**
      * task instance
      */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private StorageOperate storageOperate;
+    private final String masterAddress;
+
+    private final StorageOperate storageOperate;
 
     /**
      * abstract task
@@ -87,12 +92,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
     /**
      * task callback service
      */
-    private TaskCallbackService taskCallbackService;
+    private final WorkerMessageSender workerMessageSender;
 
     /**
      * alert client server
      */
-    private AlertClientService alertClientService;
+    private final AlertClientService alertClientService;
 
     private TaskPluginManager taskPluginManager;
 
@@ -100,25 +105,29 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param taskCallbackService  taskCallbackService
+     * @param workerMessageSender  used for worker send message to master
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
-                             TaskCallbackService taskCallbackService,
-                             AlertClientService alertClientService,
+    public TaskExecuteThread(@NonNull TaskExecutionContext taskExecutionContext,
+                             @NonNull String masterAddress,
+                             @NonNull WorkerMessageSender workerMessageSender,
+                             @NonNull AlertClientService alertClientService,
                              StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
-        this.taskCallbackService = taskCallbackService;
+        this.masterAddress = masterAddress;
+        this.workerMessageSender = workerMessageSender;
         this.alertClientService = alertClientService;
         this.storageOperate = storageOperate;
     }
 
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
-                             TaskCallbackService taskCallbackService,
-                             AlertClientService alertClientService,
-                             TaskPluginManager taskPluginManager,
+    public TaskExecuteThread(@NonNull TaskExecutionContext taskExecutionContext,
+                             @NonNull String masterAddress,
+                             @NonNull WorkerMessageSender workerMessageSender,
+                             @NonNull AlertClientService alertClientService,
+                             @NonNull TaskPluginManager taskPluginManager,
                              StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
-        this.taskCallbackService = taskCallbackService;
+        this.masterAddress = masterAddress;
+        this.workerMessageSender = workerMessageSender;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
@@ -126,18 +135,26 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     @Override
     public void run() {
-        if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUCCESS);
-            taskExecutionContext.setStartTime(new Date());
-            taskExecutionContext.setEndTime(new Date());
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
-            logger.info("[WorkflowInstance-{}][TaskInstance-{}] Task dry run success",
-                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-            return;
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                                                        taskExecutionContext.getTaskInstanceId());
+            if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.SUCCESS);
+                taskExecutionContext.setStartTime(new Date());
+                taskExecutionContext.setEndTime(new Date());
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                         masterAddress,
+                                                         CommandType.TASK_EXECUTE_RESULT);
+                logger.info("Task dry run success");
+                return;
+            }
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                                                        taskExecutionContext.getTaskInstanceId());
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
@@ -146,10 +163,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // callback task execute running
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            taskCallbackService.sendTaskExecuteRunningCommand(taskExecutionContext);
+            workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                     masterAddress,
+                                                     CommandType.TASK_EXECUTE_RUNNING);
 
             // copy hdfs/minio file to local
-            List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(), taskExecutionContext.getResources());
+            List<Pair<String, String>> fileDownloads = downloadCheck(taskExecutionContext.getExecutePath(),
+                                                                     taskExecutionContext.getResources());
             if (!fileDownloads.isEmpty()) {
                 downloadResource(taskExecutionContext.getExecutePath(), logger, fileDownloads);
             }
@@ -157,8 +177,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
 
             taskExecutionContext.setTaskAppId(String.format("%s_%s",
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId()));
+                                                            taskExecutionContext.getProcessInstanceId(),
+                                                            taskExecutionContext.getTaskInstanceId()));
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
@@ -187,10 +207,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // task result process
             if (this.task.getNeedAlert()) {
-                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus().getCode());
+                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus());
             }
 
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(this.task.getExitStatus().getCode()));
+            taskExecutionContext.setCurrentExecutionStatus(this.task.getExitStatus());
             taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
             taskExecutionContext.setProcessId(this.task.getProcessId());
             taskExecutionContext.setAppIds(this.task.getAppIds());
@@ -205,14 +225,16 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setAppIds(this.task.getAppIds());
         } finally {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
+            workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                                                     masterAddress,
+                                                     CommandType.TASK_EXECUTE_RESULT);
             clearTaskExecPath();
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
-    private void sendAlert(TaskAlertInfo taskAlertInfo, int status) {
-        int strategy = status == ExecutionStatus.SUCCESS.getCode() ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
+    private void sendAlert(TaskAlertInfo taskAlertInfo, ExecutionStatus status) {
+        int strategy = status == ExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
         alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent(), strategy);
     }
 
@@ -278,8 +300,14 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 String tenantCode = fileDownload.getRight();
                 String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
                 logger.info("get resource file from hdfs :{}", resHdfsPath);
+                long resourceDownloadStartTime = System.currentTimeMillis();
                 storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
+                WorkerServerMetrics.recordWorkerResourceDownloadSize(
+                        Files.size(Paths.get(execLocalPath, fullName)));
+                WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
             } catch (Exception e) {
+                WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
                 logger.error(e.getMessage(), e);
                 throw new ServiceException(e.getMessage());
             }

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public interface ExecutorService {
      * @param processDefinitionCode process definition code
      * @param cronTime cron time
      * @param commandType command type
-     * @param failureStrategy failuer strategy
+     * @param failureStrategy failure strategy
      * @param startNodeList start nodelist
      * @param taskDependType node dependency type
      * @param warningType warning type
@@ -111,4 +112,11 @@ public interface ExecutorService {
      * @return
      */
     Map<String, Object> forceStartTaskInstance(User loginUser, int queueId);
+
+    /**
+     * query executing workflow data in Master memory
+     * @param processInstanceId
+     * @return
+     */
+    WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
 }

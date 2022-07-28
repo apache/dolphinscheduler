@@ -54,6 +54,8 @@ jobs:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
@@ -112,6 +114,7 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
+            -Dcheckstyle.skip=false \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v2
         if: always()

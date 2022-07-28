@@ -61,14 +61,15 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 ### 任务相关指标
 
-- ds.task.timeout.count: (counter) 超时的任务数量
-- ds.task.finish.count: (counter) 完成的任务数量，成功和失败的任务都算在内
-- ds.task.success.count: (counter) 成功完成的任务数量
-- ds.task.failure.count: (counter) 失败的任务数量
-- ds.task.stop.count: (counter) 暂停的任务数量
-- ds.task.retry.count: (counter) 重试的任务数量 
-- ds.task.submit.count: (counter) 已提交的任务数量
-- ds.task.failover.count: (counter) 容错的任务数量
+- ds.task.instance.count: (counter) 任务实例数量，由tag `state`按状态切分：
+  - timeout：超时的任务数量
+  - finish：完成的任务数量，成功和失败的任务都算在内
+  - success：成功完成的任务数量
+  - fail：失败的任务数量
+  - stop：暂停的任务数量
+  - retry：重试的任务数量 
+  - submit：已提交的任务数量
+  - failover：容错的任务数量
 - ds.task.dispatch.count: (counter) 分发到worker上的任务数量
 - ds.task.dispatch.failure.count: (counter) 分发失败的任务数量，重试也包含在内
 - ds.task.dispatch.error.count: (counter) 分发任务的错误数量
@@ -82,14 +83,15 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 ### 工作流相关指标
 
 - ds.workflow.create.command.count: (counter) 工作量创建并插入的命令数量
-- ds.workflow.instance.submit.count: (counter) 已提交的工作量实例数量
 - ds.workflow.instance.running: (gauge) 正在运行的工作流实例数量
-- ds.workflow.instance.timeout.count: (counter) 运行超时的工作流实例数量
-- ds.workflow.instance.finish.count: (counter) 已完成的工作流实例数量，包含成功和失败
-- ds.workflow.instance.success.count: (counter) 运行成功的工作流实例数量
-- ds.workflow.instance.failure.count: (counter) 运行失败的工作流实例数量 
-- ds.workflow.instance.stop.count: (counter) 停止的工作流实例数量 
-- ds.workflow.instance.failover.count: (counter) 容错的工作流实例数量
+- ds.workflow.instance.count: (counter) 工作流实例数量，由tag `state`按状态切分：
+  - submit：已提交的工作量实例数量
+  - timeout：运行超时的工作流实例数量
+  - finish：已完成的工作流实例数量，包含成功和失败
+  - success：运行成功的工作流实例数量
+  - fail：运行失败的工作流实例数量 
+  - stop：停止的工作流实例数量 
+  - failover：容错的工作流实例数量
 
 ### Master Server指标
 
@@ -104,6 +106,9 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 - ds.worker.overload.count: (counter) worker过载次数
 - ds.worker.full.submit.queue.count: (counter) worker提交队列全满次数
+- ds.worker.resource.download.count: (counter) worker下载资源文件的次数，可由`status`标签切分
+- ds.worker.resource.download.duration: (histogram) worker下载资源文件时花费的时间分布
+- ds.worker.resource.download.size: (histogram) worker下载资源文件大小的分布（bytes）
 
 ### Api Server指标
 
