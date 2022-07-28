@@ -294,7 +294,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * check if the current process has subprocesses and all subprocesses are valid
+     * check whether the current process has subprocesses and valid all subprocesses
      *
      * @param processDefinition
      * @return check result
@@ -562,7 +562,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * insert command, used in the implementation of the page, re run, recovery (pause / failure) execution
+     * insert command, used in the implementation of the page, rerun, recovery (pause / failure) execution
      *
      * @param loginUser             login user
      * @param instanceId            instance id
@@ -607,7 +607,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * check if sub processes are offline before starting process definition
+     * check whether sub processes are offline before starting process definition
      *
      * @param processDefinitionCode process definition code
      * @return check result code
@@ -724,7 +724,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber,
                     complementDependentMode);
             } catch (CronParseException cronParseException) {
-                // this just make compile happy, since we already validate the cron before
+                // this just make compile happen, since we already validate the cron before
                 logger.error("Parse cron error", cronParseException);
                 return 0;
             }
@@ -940,7 +940,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * @param schedule
-     * @return check error return 0 otherwish 1
+     * @return check error return 0 otherwise 1
      */
     private boolean isValidateScheduleTime(String schedule) {
         Map<String, String> scheduleResult = JSONUtils.toMap(schedule);
