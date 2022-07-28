@@ -294,7 +294,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * check whether the current process has subprocesses and valid all subprocesses
+     * check whether the current process has subprocesses and validate all subprocesses
      *
      * @param processDefinition
      * @return check result
