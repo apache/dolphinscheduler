@@ -15,16 +15,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""DolphinScheduler Worker Group object."""
+"""Init Models package, keeping object related to DolphinScheduler covert from Java Gateway Service."""
 
-from typing import Optional
+from pydolphinscheduler.models.base import Base
+from pydolphinscheduler.models.base_side import BaseSide
+from pydolphinscheduler.models.project import Project
+from pydolphinscheduler.models.queue import Queue
+from pydolphinscheduler.models.tenant import Tenant
+from pydolphinscheduler.models.user import User
+from pydolphinscheduler.models.worker_group import WorkerGroup
 
-from pydolphinscheduler.core.base_side import BaseSide
-
-
-class WorkerGroup(BaseSide):
-    """DolphinScheduler Worker Group object."""
-
-    def __init__(self, name: str, address: str, description: Optional[str] = None):
-        super().__init__(name, description)
-        self.address = address
+__all__ = [
+    "Base",
+    "BaseSide",
+    "Project",
+    "Tenant",
+    "User",
+    "Queue",
+    "WorkerGroup",
+]

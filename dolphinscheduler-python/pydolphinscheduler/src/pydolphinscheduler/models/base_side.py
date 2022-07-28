@@ -15,18 +15,26 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init Models package, keeping object related to DolphinScheduler covert from Java Gateway Service."""
+"""Module for models object."""
 
-from pydolphinscheduler.side.project import Project
-from pydolphinscheduler.side.queue import Queue
-from pydolphinscheduler.side.tenant import Tenant
-from pydolphinscheduler.side.user import User
-from pydolphinscheduler.side.worker_group import WorkerGroup
+from typing import Optional
 
-__all__ = [
-    "Project",
-    "Tenant",
-    "User",
-    "Queue",
-    "WorkerGroup",
-]
+from pydolphinscheduler import configuration
+from pydolphinscheduler.models import Base
+
+
+class BaseSide(Base):
+    """Base class for models object, it declare base behavior for them."""
+
+    def __init__(self, name: str, description: Optional[str] = None):
+        super().__init__(name, description)
+
+    @classmethod
+    def create_if_not_exists(
+        cls,
+        # TODO comment for avoiding cycle import
+        # user: Optional[User] = ProcessDefinitionDefault.USER
+        user=configuration.WORKFLOW_USER,
+    ):
+        """Create Base if not exists."""
+        raise NotImplementedError

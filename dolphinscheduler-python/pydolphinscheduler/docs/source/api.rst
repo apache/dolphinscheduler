@@ -27,7 +27,7 @@ Core
 Models
 ------
 
-.. automodule:: pydolphinscheduler.side
+.. automodule:: pydolphinscheduler.models
   :inherited-members:
 
 Tasks

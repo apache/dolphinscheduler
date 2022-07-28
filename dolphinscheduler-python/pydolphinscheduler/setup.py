@@ -151,7 +151,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     package_data={
-        "pydolphinscheduler": ["core/default_config.yaml"],
+        "pydolphinscheduler": ["default_config.yaml"],
     },
     platforms=["any"],
     classifiers=[
