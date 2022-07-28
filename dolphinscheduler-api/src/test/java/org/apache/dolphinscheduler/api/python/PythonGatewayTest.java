@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UsersService;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -40,6 +38,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -120,13 +119,11 @@ public class PythonGatewayTest {
     @Test
     public void testQueryResourcesFileInfo() {
         User user = getTestUser();
-        Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
-
-        Result<Object> mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
         Resource resource = getTestResource();
-        mockResult.setData(resource);
-        Mockito.when(resourcesService.queryResource(user, resource.getFullName(), null, ResourceType.FILE)).thenReturn(mockResult);
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put("id", resource.getId());
+        mockResult.put("name", resource.getFullName());
+        Mockito.when(resourcesService.queryResourcesFileInfo(user.getUserName(), resource.getFullName())).thenReturn(mockResult);
 
         Map<String, Object> result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
         Assert.assertEquals((int) result.get("id"), resource.getId());
