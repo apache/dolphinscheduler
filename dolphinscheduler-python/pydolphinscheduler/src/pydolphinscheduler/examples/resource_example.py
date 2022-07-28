@@ -24,7 +24,7 @@ When the process definition is submitted, this resource file is also submitted a
 
 from pydolphinscheduler.core import ProcessDefinition
 from pydolphinscheduler.core.resource import Resource
-from pydolphinscheduler.tasks import Sql
+from pydolphinscheduler.tasks import Shell
 
 resource = Resource(
     name="/dir/test.py", content="""print("hello world")""", description="Test file."
@@ -32,5 +32,5 @@ resource = Resource(
 with ProcessDefinition(
     name="resource_example", tenant="tenant_exists", resource_list=[resource]
 ) as pd:
-    test_task = Sql(name="task_name", datasource_name="test_datasource", sql="select 1")
+    test_task = Shell(name="test_task", command="echo 1")
     pd.submit()
