@@ -800,10 +800,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     createCount = listDate.size();
                     if (!CollectionUtils.isEmpty(listDate)) {
                         if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                            createCount = Math.min(listDate.size(), expectedParallelismNumber);
-                            if (listDateSize < createCount) {
-                                createCount = listDateSize;
-                            }
+                            createCount = Math.min(createCount, expectedParallelismNumber);
                         }
                         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
 
@@ -843,14 +840,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 }
                 if (StringUtils.isNotEmpty(dateList)) {
                     List<String> listDate = Arrays.asList(dateList.split(COMMA));
-                    int listDateSize = listDate.size();
                     createCount = listDate.size();
                     if (!CollectionUtils.isEmpty(listDate)) {
                         if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                            createCount = Math.min(listDate.size(), expectedParallelismNumber);
-                            if (listDateSize < createCount) {
-                                createCount = listDateSize;
-                            }
+                            createCount = Math.min(createCount, expectedParallelismNumber);
                         }
                         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
                         for (List<String> stringDate : Lists.partition(listDate, createCount)) {
