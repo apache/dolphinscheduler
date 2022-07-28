@@ -18,7 +18,7 @@
 """
 A example for create or update resource.
 
-This example creates or modifies a resource whose full name is `/dir/test.py`.
+This example creates or modifies a resource whose full name is `/test.py`.
 When the process definition is submitted, this resource file is also submitted along with it.
 """
 
