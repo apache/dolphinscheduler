@@ -119,7 +119,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "exemplar": true,
@@ -196,7 +196,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "exemplar": true,
@@ -272,7 +272,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "exemplar": true,
@@ -335,7 +335,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -476,7 +476,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "exemplar": true,
@@ -552,7 +552,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "expr": "hikaricp_connections_min{application=\"$application\", instance=~\"$instance\", pool=~\"$hikaricp_pool_name\"}",
@@ -625,7 +625,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "expr": "hikaricp_connections_timeout_total{application=\"$application\", instance=~\"$instance\", pool=~\"$hikaricp_pool_name\"}",
@@ -675,7 +675,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",

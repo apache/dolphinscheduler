@@ -502,7 +502,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "exemplar": true,
@@ -569,7 +569,7 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "exemplar": true,
@@ -624,7 +624,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -731,7 +731,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -835,7 +835,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -933,7 +933,7 @@
       "legend": {
         "show": true
       },
-      "pluginVersion": "8.2.3",
+      "pluginVersion": "9.0.5",
       "reverseYBuckets": false,
       "targets": [
         {

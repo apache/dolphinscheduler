@@ -172,7 +172,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": false
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "datasource": {
@@ -488,7 +488,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "datasource": {
@@ -544,7 +544,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "targets": [
         {
           "datasource": {
@@ -599,7 +599,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -699,7 +699,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1121,7 +1121,7 @@
       "legend": {
         "show": false
       },
-      "pluginVersion": "8.5.3",
+      "pluginVersion": "9.0.5",
       "reverseYBuckets": false,
       "targets": [
         {
