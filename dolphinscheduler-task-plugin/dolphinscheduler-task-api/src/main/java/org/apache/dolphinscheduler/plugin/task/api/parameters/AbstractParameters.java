@@ -93,7 +93,7 @@ public abstract class AbstractParameters implements IParameters {
         if (localParams != null) {
 
             for (Property property : localParams) {
-                if (property.getDirect().equals(Direct.IN)) {
+                if (property.getDirect() == null || property.getDirect().equals(Direct.IN)) {
                     localParametersMaps.put(property.getProp(), property);
                 }
             }
