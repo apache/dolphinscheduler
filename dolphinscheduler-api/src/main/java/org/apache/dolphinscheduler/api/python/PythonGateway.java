@@ -537,7 +537,7 @@ public class PythonGateway {
     public Map<String, Object> queryResourcesFileInfo(String userName, String fullName) {
         Map<String, Object> result = new HashMap<>();
         User user = usersService.queryUser(userName);
-        Result<Object> resourceResponse = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
+        Result<Object> resourceResponse = resourceService.queryResource(fullName, null, ResourceType.FILE);
         if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
             String msg = String.format("Can not find valid resource by name %s", fullName);
             logger.error(msg);

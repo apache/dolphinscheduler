@@ -341,7 +341,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if (!PropertyUtils.getResUploadStartupState()){
+        if (!PropertyUtils.getResUploadStartupState()) {
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -1068,7 +1068,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content) {
         if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
             Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
-            Result<Object> result = this.updateResourceContent(loginUser, resource.getId(), content);
+            Result<Object> result = this.updateResourceContent(resource.getId(), content);
             if (result.getCode() == Status.SUCCESS.getCode()) {
                 resource.setDescription(desc);
                 Map<String, Object> resultMap = new HashMap<>();
@@ -1141,11 +1141,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 throw new IllegalArgumentException(msg);
             }
         }
-    }
-
-    private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
-        AuthorizationType authorizationType = resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
-        permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), logger);
     }
 
     private Result<Object> checkResourceUploadStartupState() {

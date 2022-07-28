@@ -126,7 +126,7 @@ public class PythonGatewayTest {
         mockResult.setCode(Status.SUCCESS.getCode());
         Resource resource = getTestResource();
         mockResult.setData(resource);
-        Mockito.when(resourcesService.queryResource(user, resource.getFullName(), null, ResourceType.FILE)).thenReturn(mockResult);
+        Mockito.when(resourcesService.queryResource(resource.getFullName(), null, ResourceType.FILE)).thenReturn(mockResult);
 
         Map<String, Object> result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
         Assert.assertEquals((int) result.get("id"), resource.getId());

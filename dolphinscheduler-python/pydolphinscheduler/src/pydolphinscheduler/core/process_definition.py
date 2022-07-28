@@ -411,7 +411,6 @@ class ProcessDefinition(Base):
             json.dumps(self.task_relation_json),
             json.dumps(self.task_definition_json),
             None,
-            None,
         )
         if len(self.resource_list) > 0:
             for res in self.resource_list:
