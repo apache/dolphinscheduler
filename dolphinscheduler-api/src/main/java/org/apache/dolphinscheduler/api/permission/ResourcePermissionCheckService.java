@@ -51,7 +51,7 @@ public interface ResourcePermissionCheckService<T>{
      * @param logger
      * @return
      */
-    boolean operationPermissionCheck(Object authorizationType, Integer userId, String permissionKey, Logger logger);
+    boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId, String permissionKey, Logger logger);
 
     /**
      * functionDisabled

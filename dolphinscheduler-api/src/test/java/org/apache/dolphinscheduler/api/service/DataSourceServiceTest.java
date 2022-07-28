@@ -206,7 +206,7 @@ public class DataSourceServiceTest {
         String searchVal = "";
         int pageNo = 1;
         int pageSize = 10;
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), DATASOURCE_LIST, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), DATASOURCE_LIST, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), baseServiceLogger)).thenReturn(ids);
 
@@ -227,7 +227,7 @@ public class DataSourceServiceTest {
         User loginUser = getAdminUser();
         int dataSourceId = 1;
         Result result = new Result();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, new Object[]{dataSourceId}, -1, baseServiceLogger)).thenReturn(true);
         //resource not exist
         dataSourceService.putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -247,7 +247,7 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(1);
         dataSource.setId(22);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), DATASOURCE_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), DATASOURCE_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,new Object[]{dataSource.getId()} , 0, baseServiceLogger)).thenReturn(true);
         PowerMockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
         Assert.assertEquals(result.getCode(), dataSourceService.delete(loginUser, dataSourceId).getCode());
@@ -260,7 +260,7 @@ public class DataSourceServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         int userId = 3;
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
         // test admin user
         Mockito.when(dataSourceMapper.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
@@ -308,7 +308,7 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         Set<Integer> dataSourceIds = new HashSet<>();
         dataSourceIds.add(1);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), dataSourceServiceLogger)).thenReturn(dataSourceIds);
 
