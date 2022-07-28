@@ -268,12 +268,11 @@ public class PythonGateway {
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
         Result verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
-        Status verifyStatus = Status.findStatusBy(verifyProcessDefinitionExists.getCode()).get();
 
         ProcessDefinition processDefinition = null;
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
+        if (Status.PROCESS_DEFINITION_NAME_EXIST.getCode() == verifyProcessDefinitionExists.getCode()) {
             processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
-        } else if (verifyStatus != Status.SUCCESS) {
+        } else if (Status.SUCCESS.getCode() != verifyProcessDefinitionExists.getCode()) {
             String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
             logger.error(msg);
             throw new RuntimeException(msg);
