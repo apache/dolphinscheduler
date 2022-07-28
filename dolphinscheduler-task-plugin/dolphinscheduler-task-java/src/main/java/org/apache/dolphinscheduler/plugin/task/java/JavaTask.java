@@ -162,6 +162,10 @@ public class JavaTask extends AbstractTaskExecutor {
             logger.error("java task interrupted ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             Thread.currentThread().interrupt();
+        } catch (RunTypeNotFoundException e) {
+            logger.error(e.getMessage());
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            throw e;
         } catch (Exception e) {
             logger.error("java task failed ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);

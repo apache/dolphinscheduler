@@ -25,9 +25,13 @@ import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYP
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
+import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
+import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,6 +111,63 @@ public class JavaTaskTest {
 
     /**
      * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: void
+     * @throws IOException
+     **/
+    @Test(expected = JavaSourceFileExistException.class)
+    public void  coverJavaSourceFileExistException() throws IOException {
+        JavaTask javaTask = runJavaType();
+        String sourceCode = javaTask.buildJavaSourceContent();
+        String publicClassName = javaTask.getPublicClassName(sourceCode);
+        Assert.assertEquals("JavaTaskTest", publicClassName);
+        String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
+        try {
+            Path path = Paths.get(fileName);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            javaTask.createJavaSourceFileIfNotExists(sourceCode,fileName);
+        } finally {
+            Path path = Paths.get(fileName);
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
+        }
+    }
+
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: void
+     **/
+    @Test(expected = PublicClassNotFoundException.class)
+    public void  coverPublicClassNotFoundException() {
+        JavaTask javaTask = runJavaType();
+        javaTask.getPublicClassName("");
+    }
+
+    /**
+     * @description:
+     * @date: 7/22/22 2:38 AM
+     * @param: []
+     * @return: void
+     * @throws Exception
+     **/
+    @Test(expected = RunTypeNotFoundException.class)
+    public void  coverRunTypeNotFoundException() throws Exception {
+        JavaTask javaTask = runJavaType();
+        Field javaParameters = JavaTask.class.getDeclaredField("javaParameters");
+        javaParameters.setAccessible(true);
+        ((JavaParameters)(javaParameters.get(javaTask))).setRunType("");
+        javaTask.handle();
+        javaTask.getPublicClassName("");
+    }
+
+    /**
+     * @description:
      * @date: 7/22/22 2:39 AM
      * @param: [java.lang.String]
      * @return: org.apache.dolphinscheduler.plugin.task.java.JavaParameters
@@ -124,7 +185,16 @@ public class JavaTaskTest {
         ArrayList<ResourceInfo> resourceInfoArrayList = new ArrayList<>();
         resourceInfoArrayList.add(resourceJar);
         javaParameters.setResourceList(resourceInfoArrayList);
-        javaParameters.setRawScript("import java.io.IOException;\n" + "public class JavaTaskTest {\n" + "    public static void main(String[] args) throws IOException {\n" + "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" + "        for (String arg : args) {\n" + "            builder.append(arg).append(\" \");\n" + "        }\n" + "        System.out.println(builder);\n" + "    }\n" + "}\n");
+        javaParameters.setRawScript(
+                        "import java.io.IOException;\n" +
+                        "public class JavaTaskTest {\n" +
+                        "    public static void main(String[] args) throws IOException {\n" +
+                        "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" +
+                        "        for (String arg : args) {\n" +
+                        "            builder.append(arg).append(\" \");\n" +
+                        "        }\n" + "        System.out.println(builder);\n" +
+                        "    }\n" +
+                        "}\n");
         ArrayList<Property> localParams = new ArrayList<>();
         Property property = new Property();
         property.setProp("name");
@@ -171,5 +241,4 @@ public class JavaTaskTest {
         javaTask.init();
         return javaTask;
     }
-
 }
