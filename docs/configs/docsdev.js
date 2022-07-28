@@ -265,6 +265,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/alert/alert_plugin_user_guide.html',
                             },
                             {
+                                title: 'Email',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/email.html',
+                            },
+                            {
                                 title: 'Telegram',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/telegram.html',
                             },
@@ -287,6 +291,10 @@ export default {
                             {
                                 title: 'Http',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
+                            },
+                            {
+                                title: 'Feishu',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/feishu.html',
                             },
                         ],
                     },
@@ -674,6 +682,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/alert_plugin_user_guide.html',
                             },
                             {
+                                title: 'Email',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/email.html',
+                            },
+                            {
                                 title: 'Telegram',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/telegram.html',
                             },
@@ -696,6 +708,10 @@ export default {
                             {
                                 title: 'Http告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/http.html',
+                            },
+                            {
+                                title: '飞书告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/feishu.html',
                             },
                         ],
                     },
