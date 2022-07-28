@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.CollectionUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.QueueServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,6 +32,9 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,9 +54,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_MANAGE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * queue service test
@@ -95,7 +96,6 @@ public class QueueServiceTest {
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, getLoginUser().getId(), queueServiceImplLogger)).thenReturn(ids);
         Mockito.when(queueMapper.selectBatchIds(Mockito.anySet())).thenReturn(getQueueList());
         Map<String, Object> result = queueService.queryList(getLoginUser());
-        logger.info(result.toString());
         List<Queue> queueList = (List<Queue>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(queueList));
 
@@ -119,7 +119,7 @@ public class QueueServiceTest {
 
     @Test
     public void testCreateQueue() {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, getLoginUser().getId(),YARN_QUEUE_CREATE , baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, null, getLoginUser().getId(), YARN_QUEUE_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, null, 0, baseServiceLogger)).thenReturn(true);
         // queue is null
         Map<String, Object> result = queueService.createQueue(getLoginUser(), null, queueName);
@@ -133,7 +133,6 @@ public class QueueServiceTest {
         result = queueService.createQueue(getLoginUser(), queueName, queueName);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
     }
 
     @Test
@@ -142,7 +141,7 @@ public class QueueServiceTest {
         Mockito.when(queueMapper.selectById(1)).thenReturn(getQueue());
         Mockito.when(queueMapper.existQueue("test", null)).thenReturn(true);
         Mockito.when(queueMapper.existQueue(null, "test")).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, getLoginUser().getId(), YARN_QUEUE_UPDATE , baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, new Object[]{0}, getLoginUser().getId(), YARN_QUEUE_UPDATE , baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{0}, 0, baseServiceLogger)).thenReturn(true);
         // not exist
         Map<String, Object> result = queueService.updateQueue(getLoginUser(), 0, "queue", queueName);
@@ -171,10 +170,6 @@ public class QueueServiceTest {
 
     @Test
     public void testVerifyQueue() {
-
-        Mockito.when(queueMapper.existQueue(queueName, null)).thenReturn(true);
-        Mockito.when(queueMapper.existQueue(null, queueName)).thenReturn(true);
-
         //queue null
         Result result = queueService.verifyQueue(null, queueName);
         logger.info(result.toString());
@@ -211,12 +206,6 @@ public class QueueServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(99999999);
         return loginUser;
-    }
-
-    private List<User> getUserList() {
-        List<User> list = new ArrayList<>();
-        list.add(getLoginUser());
-        return list;
     }
 
     /**

@@ -101,7 +101,7 @@ public class K8sNameSpaceServiceTest {
 
     @Test
     public void createK8sNamespace() {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, null, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         // namespace is null
         Map<String, Object> result = k8sNamespaceService.createK8sNamespace(getLoginUser(), null, k8s, 10.0, 100);
@@ -124,7 +124,7 @@ public class K8sNameSpaceServiceTest {
     @Test
     public void updateK8sNamespace() {
         Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, null, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = k8sNamespaceService.updateK8sNamespace(getLoginUser(), 1, null, null, null);
         logger.info(result.toString());
@@ -169,7 +169,7 @@ public class K8sNameSpaceServiceTest {
     public void deleteNamespaceById() {
         Mockito.when(k8sNamespaceMapper.deleteById(Mockito.any())).thenReturn(1);
         Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, null, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1);
         logger.info(result.toString());
@@ -179,7 +179,7 @@ public class K8sNameSpaceServiceTest {
     @Test
     public void testQueryAuthorizedNamespace() {
         Mockito.when(k8sNamespaceMapper.queryAuthedNamespaceListByUserId(2)).thenReturn(getNamespaceList());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, null, getLoginUser().getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         User loginUser = getLoginUser();
 
@@ -203,7 +203,7 @@ public class K8sNameSpaceServiceTest {
     public void testQueryUnAuthorizedNamespace() {
         Mockito.when(k8sNamespaceMapper.queryAuthedNamespaceListByUserId(2)).thenReturn(new ArrayList<>());
         Mockito.when(k8sNamespaceMapper.selectList(Mockito.any())).thenReturn(getNamespaceList());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, 0, null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.K8S_NAMESPACE, null, 0, baseServiceLogger)).thenReturn(true);
         // test admin user
         User loginUser = new User();

@@ -41,8 +41,6 @@ $BODY$;
 
 select dolphin_update_metadata();
 
-<<<<<<< HEAD
-=======
 d//
 
 -- add unique key to t_ds_relation_project_user
@@ -63,7 +61,6 @@ CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
 CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
 
 delimiter d//
->>>>>>> b8a90d801... [Improvement] Resource authority module database table unique index increased. (#10807)
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
     RETURNS character varying

@@ -37,8 +37,6 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_resources_R_full_name;
 DROP PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name;
 
-<<<<<<< HEAD
-=======
 -- uc_dolphin_T_t_ds_alert_R_sign
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_alert_R_sign;
 delimiter d//
@@ -76,7 +74,6 @@ ALTER TABLE t_ds_udfs ADD UNIQUE KEY unique_func_name(func_name);
 -- add unique key to t_ds_tenant
 ALTER TABLE t_ds_tenant ADD UNIQUE KEY unique_tenant_code(tenant_code);
 
->>>>>>> b8a90d801... [Improvement] Resource authority module database table unique index increased. (#10807)
 ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;

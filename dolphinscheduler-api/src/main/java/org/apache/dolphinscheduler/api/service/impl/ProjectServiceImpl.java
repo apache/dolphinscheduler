@@ -501,18 +501,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * check whether have read permission new
-     * @param user
-     * @param id
-     * @return true if the user have permission to see the project, otherwise return false
-     */
-    private boolean checkReadPermissions(User user, Integer id){
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger);
-        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{id}, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        return operationPermissionCheck && resourcePermissionCheck;
-    }
-
-    /**
      * query permission id
      *
      * @param user user

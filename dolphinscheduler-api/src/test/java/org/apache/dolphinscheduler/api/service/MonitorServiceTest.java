@@ -127,7 +127,7 @@ public class MonitorServiceTest {
     }
 
     private void mockPermissionCheck(String permissionKey, boolean result){
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, 1, permissionKey, serviceLogger)).thenReturn(result);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, null, 1, permissionKey, serviceLogger)).thenReturn(result);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0, serviceLogger)).thenReturn(true);
     }
 
