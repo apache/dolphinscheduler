@@ -15,16 +15,16 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Module for side object."""
+"""Module for models object."""
 
 from typing import Optional
 
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base import Base
+from pydolphinscheduler import configuration
+from pydolphinscheduler.models import Base
 
 
 class BaseSide(Base):
-    """Base class for side object, it declare base behavior for them."""
+    """Base class for models object, it declare base behavior for them."""
 
     def __init__(self, name: str, description: Optional[str] = None):
         super().__init__(name, description)
