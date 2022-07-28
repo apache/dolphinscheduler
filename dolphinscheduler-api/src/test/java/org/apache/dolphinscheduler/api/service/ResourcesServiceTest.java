@@ -663,7 +663,6 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
-
     @Test
     public void testQueryResourcesFileInfo() {
         User user = getUser();
