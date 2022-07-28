@@ -24,11 +24,11 @@ from unittest.mock import patch
 import pytest
 from freezegun import freeze_time
 
-from pydolphinscheduler.core import configuration
+from pydolphinscheduler import configuration
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException
-from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.models import Project, Tenant, User
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 from pydolphinscheduler.utils.date import conv_to_schedule
 from tests.testing.task import Task
