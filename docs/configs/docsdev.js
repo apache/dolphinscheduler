@@ -185,6 +185,10 @@ export default {
                                 title: 'SageMaker',
                                 link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
+                            {
+                                title: 'ChunJun',
+                                link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
                         ],
                     },
                     {
@@ -625,6 +629,10 @@ export default {
                             {
                                 title: 'SageMaker',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
+                            {
+                                title: 'ChunJun',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
                             },
                         ],
                     },
