@@ -310,7 +310,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(),
             insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {
-            putMsg(result, Status.SUCCESS, processDefinition);
+            putMsg(result, Status.SUCCESS);
+            result.setData(processDefinition);
         } else {
             putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
@@ -407,7 +408,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList = resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
-        putMsg(result, Status.SUCCESS, dagDataList);
+        putMsg(result, Status.SUCCESS);
+        result.setData(dagDataList);
         return result;
     }
 
@@ -437,7 +439,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processDefinitionNode.put("projectCode", processDefinition.getProjectCode());
             arrayNode.add(processDefinitionNode);
         }
-        putMsg(result, Status.SUCCESS, arrayNode);
+        putMsg(result, Status.SUCCESS);
+        result.setData(arrayNode);
         return result;
     }
 
@@ -511,7 +514,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setTenantCode(tenant.getTenantCode());
             }
             DagData dagData = processService.genDagData(processDefinition);
-            putMsg(result, Status.SUCCESS, dagData);
+            putMsg(result, Status.SUCCESS);
+            result.setData(dagData);
         }
         return result;
     }
@@ -539,7 +543,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, name);
         } else {
             DagData dagData = processService.genDagData(processDefinition);
-            putMsg(result, Status.SUCCESS, dagData);
+            putMsg(result, Status.SUCCESS);
+            result.setData(dagData);
         }
         return result;
     }
@@ -702,14 +707,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
             if (insertResult == Constants.EXIT_CODE_SUCCESS) {
-                putMsg(result, Status.SUCCESS, processDefinition);
+                putMsg(result, Status.SUCCESS);
+                result.setData(processDefinition);
             } else {
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
             saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
         } else {
-            putMsg(result, Status.SUCCESS, processDefinition);
+            putMsg(result, Status.SUCCESS);
+            result.setData(processDefinition);
         }
         return result;
     }
@@ -1438,7 +1445,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         DagData dagData = processService.genDagData(processDefinition);
-        putMsg(result, Status.SUCCESS, dagData.getTaskDefinitionList());
+        putMsg(result, Status.SUCCESS);
+        result.setData(dagData.getTaskDefinitionList());
 
         return result;
     }
@@ -1485,7 +1493,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskNodeMap.put(processDefinition.getCode(), dagData.getTaskDefinitionList());
         }
 
-        putMsg(result, Status.SUCCESS, taskNodeMap);
+        putMsg(result, Status.SUCCESS);
+        result.setData(taskNodeMap);
 
         return result;
 
@@ -1509,7 +1518,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList = processDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
-        putMsg(result, Status.SUCCESS, dagDataList);
+        putMsg(result, Status.SUCCESS);
+        result.setData(dagDataList);
         return result;
     }
 
@@ -1523,7 +1533,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     public Result queryProcessDefinitionListByProjectCode(long projectCode) {
         Result result = new Result();
         List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
-        putMsg(result, Status.SUCCESS, processDefinitions);
+        putMsg(result, Status.SUCCESS);
+        result.setData(processDefinitions);
         return result;
     }
 
@@ -1559,7 +1570,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskDefinitionList.add(dependentSimplifyDefinition);
         }
 
-        putMsg(result, Status.SUCCESS, taskDefinitionList);
+        putMsg(result, Status.SUCCESS);
+        result.setData(taskDefinitionList);
         return result;
     }
 
@@ -1682,7 +1694,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 waitingRunningNodeMap.clear();
             }
         }
-        putMsg(result, Status.SUCCESS, parentTreeViewDto);
+        putMsg(result, Status.SUCCESS);
+        result.setData(parentTreeViewDto);
         return result;
     }
 
@@ -2104,7 +2117,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
         }
-        putMsg(result, Status.SUCCESS, processDefinition);
+        putMsg(result, Status.SUCCESS);
+        result.setData(processDefinition);
         return result;
     }
 

@@ -90,7 +90,8 @@ public class ProcessDefinitionControllerTest {
         int timeout = 0;
         String tenantCode = "root";
         Result result = new Result();
-        putMsg(result, Status.SUCCESS, 1);
+        putMsg(result, Status.SUCCESS);
+        result.setData(1);
 
         Mockito.when(processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
             locations, timeout, tenantCode, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
@@ -190,7 +191,8 @@ public class ProcessDefinitionControllerTest {
         processDefinition.setName(name);
 
         Result result = new Result();
-        putMsg(result, Status.SUCCESS, processDefinition);
+        putMsg(result, Status.SUCCESS);
+        result.setData(processDefinition);
 
         Mockito.when(processDefinitionService.queryProcessDefinitionByCode(user, projectCode, code)).thenReturn(result);
         Result response = processDefinitionController.queryProcessDefinitionByCode(user, projectCode, code);
@@ -234,7 +236,8 @@ public class ProcessDefinitionControllerTest {
         List<ProcessDefinition> resourceList = getDefinitionList();
 
         Result result = new Result();
-        putMsg(result, Status.SUCCESS, resourceList);
+        putMsg(result, Status.SUCCESS);
+        result.setData(resourceList);
 
         Mockito.when(processDefinitionService.queryProcessDefinitionList(user, projectCode)).thenReturn(result);
         Result response = processDefinitionController.queryProcessDefinitionList(user, projectCode);
