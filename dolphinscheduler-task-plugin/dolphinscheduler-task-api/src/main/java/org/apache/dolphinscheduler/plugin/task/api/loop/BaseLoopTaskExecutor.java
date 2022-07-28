@@ -54,9 +54,20 @@ public abstract class BaseLoopTaskExecutor extends AbstractTaskExecutor {
             // loop the task status until the task is finished or task has been canceled.
             // we use retry utils here to avoid the task status query failure due to network failure.
             // the default retry policy is 3 times, and the interval is 1 second.
-            while (!cancel
-                && !RetryUtils.retryFunction(() -> queryTaskInstanceStatus(loopTaskInstanceInfo).isFinished())) {
+            LoopTaskInstanceStatus loopTaskInstanceStatus = null;
+            while (!cancel) {
+                loopTaskInstanceStatus = RetryUtils.retryFunction(() -> queryTaskInstanceStatus(loopTaskInstanceInfo));
+                if (loopTaskInstanceStatus.isFinished()) {
+                    break;
+                }
                 Thread.sleep(loopInterval);
+            }
+            if (loopTaskInstanceStatus != null && loopTaskInstanceStatus.isSuccess()) {
+                setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
+                logger.info("The task instance: {} execute successfully.", appIds);
+            } else {
+                setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+                logger.info("The task instance: {} is execute failure.", appIds);
             }
         } catch (InterruptedException e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);

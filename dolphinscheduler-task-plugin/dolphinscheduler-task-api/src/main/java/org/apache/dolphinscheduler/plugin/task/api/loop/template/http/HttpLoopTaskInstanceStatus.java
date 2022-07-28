@@ -28,4 +28,8 @@ public class HttpLoopTaskInstanceStatus implements LoopTaskInstanceStatus {
 
     private final boolean finished;
 
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }
