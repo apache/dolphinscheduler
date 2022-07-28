@@ -20,10 +20,10 @@
 from typing import Dict, Optional, Tuple
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException, PyDSParamException
 from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.models.base import Base
 
 DEPENDENT_ALL_TASK_IN_WORKFLOW = "0"
 
@@ -31,8 +31,8 @@ DEPENDENT_ALL_TASK_IN_WORKFLOW = "0"
 class DependentDate(str):
     """Constant of Dependent date value.
 
-    These values set according to Java server side, if you want to add and change it,
-    please change Java server side first.
+    These values set according to Java server models, if you want to add and change it,
+    please change Java server models first.
     """
 
     # TODO Maybe we should add parent level to DependentDate for easy to use, such as

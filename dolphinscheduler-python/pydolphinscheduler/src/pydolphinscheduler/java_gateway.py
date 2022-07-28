@@ -22,8 +22,8 @@ from typing import Any, Optional
 from py4j.java_collections import JavaMap
 from py4j.java_gateway import GatewayParameters, JavaGateway
 
+from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import JavaGatewayDefault
-from pydolphinscheduler.core import configuration
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException
 
 
