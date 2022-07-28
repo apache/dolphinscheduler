@@ -27,7 +27,7 @@ from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.tasks import Shell
 
 resource = Resource(
-    name="/dir/test.py", content="""print("hello world")""", description="Test file."
+    name="/test.py", content="""print("hello world")""", description="Test file."
 )
 with ProcessDefinition(
     name="resource_example", tenant="tenant_exists", resource_list=[resource]
