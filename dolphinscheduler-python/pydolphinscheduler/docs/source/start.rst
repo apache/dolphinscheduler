@@ -92,7 +92,7 @@ package directly and do not case about other code(including Python gateway servi
 .. code-block:: bash
 
    # Must escape the '&' character by adding '\' 
-   pip install -e git+https://github.com/apache/dolphinscheduler.git#egg=apache-dolphinscheduler\&subdirectory=dolphinscheduler-python/pydolphinscheduler
+   pip install -e "git+https://github.com/apache/dolphinscheduler.git#egg=apache-dolphinscheduler&subdirectory=dolphinscheduler-python/pydolphinscheduler"
 
 Start Python Gateway Service
 ----------------------------
