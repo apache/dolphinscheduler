@@ -22,7 +22,7 @@ java_gateway:
   address: 127.0.0.1
 
   # The port of Python gateway server start. Define which port you could connect to Python gateway server from
-  # Python API side.
+  # Python API models.
   port: 25333
 
   # Whether automatically convert Python objects to Java Objects. Default value is ``True``. There is some

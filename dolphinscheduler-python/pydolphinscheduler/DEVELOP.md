@@ -34,7 +34,7 @@ Now, we should install all dependence to make sure we could run test or check co
 
 ```shell
 cd dolphinscheduler/dolphinscheduler-python/pydolphinscheduler
-python -m pip install .[dev]
+python -m pip install -e '.[dev]'
 ```
 
 Next, we have to open pydolphinscheduler project in you editor. We recommend you use [pycharm][pycharm]

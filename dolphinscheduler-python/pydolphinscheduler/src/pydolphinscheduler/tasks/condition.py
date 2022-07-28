@@ -20,9 +20,9 @@
 from typing import Dict, List
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.models.base import Base
 
 
 class Status(Base):

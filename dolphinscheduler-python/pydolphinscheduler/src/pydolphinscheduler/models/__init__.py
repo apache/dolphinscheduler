@@ -17,13 +17,17 @@
 
 """Init Side package, Side package keep object related to DolphinScheduler but not in the Core part."""
 
-from pydolphinscheduler.side.project import Project
-from pydolphinscheduler.side.queue import Queue
-from pydolphinscheduler.side.tenant import Tenant
-from pydolphinscheduler.side.user import User
-from pydolphinscheduler.side.worker_group import WorkerGroup
+from pydolphinscheduler.models.base import Base
+from pydolphinscheduler.models.base_side import BaseSide
+from pydolphinscheduler.models.project import Project
+from pydolphinscheduler.models.queue import Queue
+from pydolphinscheduler.models.tenant import Tenant
+from pydolphinscheduler.models.user import User
+from pydolphinscheduler.models.worker_group import WorkerGroup
 
 __all__ = [
+    "Base",
+    "BaseSide",
     "Project",
     "Tenant",
     "User",

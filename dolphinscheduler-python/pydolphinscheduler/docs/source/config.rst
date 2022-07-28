@@ -200,7 +200,7 @@ All Configurations in File
 
 Here are all our configurations for pydolphinscheduler.
 
-.. literalinclude:: ../../src/pydolphinscheduler/core/default_config.yaml
+.. literalinclude:: ../../src/pydolphinscheduler/default_config.yaml
    :language: yaml
    :lines: 18-
 

@@ -21,7 +21,7 @@ import click
 from click import echo
 
 from pydolphinscheduler import __version__
-from pydolphinscheduler.core.configuration import (
+from pydolphinscheduler.configuration import (
     get_single_config,
     init_config_file,
     set_single_config,
