@@ -940,7 +940,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * @param schedule
-     * @return check error return 0 otherwise 1
+     * @return check error return 0, otherwise 1
      */
     private boolean isValidateScheduleTime(String schedule) {
         Map<String, String> scheduleResult = JSONUtils.toMap(schedule);
