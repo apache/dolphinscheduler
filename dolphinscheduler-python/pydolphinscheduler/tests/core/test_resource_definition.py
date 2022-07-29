@@ -30,12 +30,9 @@ def test_resource():
         "name": name,
         "content": content,
         "description": description,
-        "userName": user_name
+        "userName": user_name,
     }
     resourceDefinition = Resource(
-        name=name,
-        content=content,
-        description=description,
-        user_name=user_name
+        name=name, content=content, description=description, user_name=user_name
     )
     assert resourceDefinition.get_define() == expect
