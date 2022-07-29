@@ -41,6 +41,10 @@ from pydolphinscheduler.tasks.shell import Shell
 # [end package_import]
 
 # [start workflow_declare]
+# @Resource(
+#     type="github",
+#     id="https://github.com/apache/dolphinscheduler/tree/dev/script"
+# )
 with ProcessDefinition(
     name="tutorial",
     schedule="0 0 0 * * ? *",
