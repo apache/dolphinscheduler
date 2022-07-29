@@ -15,26 +15,28 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Module for side object."""
+"""DolphinScheduler User object."""
 
 from typing import Optional
 
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base import Base
+from pydolphinscheduler import configuration
+from pydolphinscheduler.java_gateway import gateway_result_checker, launch_gateway
+from pydolphinscheduler.models import BaseSide
 
 
-class BaseSide(Base):
-    """Base class for side object, it declare base behavior for them."""
+class Queue(BaseSide):
+    """DolphinScheduler Queue object."""
 
-    def __init__(self, name: str, description: Optional[str] = None):
+    def __init__(
+        self,
+        name: str = configuration.WORKFLOW_QUEUE,
+        description: Optional[str] = "",
+    ):
         super().__init__(name, description)
 
-    @classmethod
-    def create_if_not_exists(
-        cls,
-        # TODO comment for avoiding cycle import
-        # user: Optional[User] = ProcessDefinitionDefault.USER
-        user=configuration.WORKFLOW_USER,
-    ):
-        """Create Base if not exists."""
-        raise NotImplementedError
+    def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
+        """Create Queue if not exists."""
+        gateway = launch_gateway()
+        # Here we set Queue.name and Queue.queueName same as self.name
+        result = gateway.entry_point.createProject(user, self.name, self.name)
+        gateway_result_checker(result, None)

@@ -19,9 +19,9 @@
 
 from typing import Optional
 
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base_side import BaseSide
+from pydolphinscheduler import configuration
 from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.models import BaseSide
 
 
 class Project(BaseSide):

@@ -19,7 +19,7 @@
 
 from typing import Optional
 
-from pydolphinscheduler.core.base import Base
+from pydolphinscheduler.models import Base
 
 
 class Resource(Base):
