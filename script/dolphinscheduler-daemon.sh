@@ -117,8 +117,8 @@ case $startStop in
           state="RUNNING"
           state="[ \033[1;32m $state \033[0m ]"
         fi
-      echo -e "$command  $state"
       fi
+      echo -e "$command  $state"
       ;;
       
   (*)
