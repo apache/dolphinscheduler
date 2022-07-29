@@ -20,6 +20,7 @@
 from logging import getLogger
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
+from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import (
     Delimiter,
     ResourceKey,
@@ -27,13 +28,13 @@ from pydolphinscheduler.constants import (
     TaskPriority,
     TaskTimeoutFlag,
 )
-from pydolphinscheduler.core import configuration, resource
-from pydolphinscheduler.core.base import Base
+from pydolphinscheduler.core import resource
 from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.models import Base
 
 logger = getLogger(__name__)
 

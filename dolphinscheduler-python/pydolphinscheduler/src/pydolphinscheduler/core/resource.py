@@ -19,8 +19,8 @@
 
 from typing import Optional
 
-from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.models import Base
 
 
 def query_resource_id(user_name, full_name):
