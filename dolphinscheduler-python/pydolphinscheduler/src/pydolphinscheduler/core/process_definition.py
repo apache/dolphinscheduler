@@ -21,13 +21,14 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-from pydolphinscheduler.constants import ProcessDefinitionReleaseState, TaskType
+from pydolphinscheduler.constants import ProcessDefinitionReleaseState, TaskType, ResourcePluginType
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
 from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
+from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
 
 
 class ProcessDefinitionContext:
@@ -107,6 +108,7 @@ class ProcessDefinition(Base):
         timeout: Optional[int] = 0,
         release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
         param: Optional[Dict] = None,
+        resource_plugin: Optional[ResourcePlugin] = None,
     ):
         super().__init__(name, description)
         self.schedule = schedule
@@ -129,6 +131,7 @@ class ProcessDefinition(Base):
         self.release_state = release_state
         self.param = param
         self.tasks: dict = {}
+        self.resource_plugin = resource_plugin
         # TODO how to fix circle import
         self._task_relations: set["TaskRelation"] = set()  # noqa: F821
         self._process_definition_code = None

@@ -107,3 +107,11 @@ class Time(str):
 
     FMT_STD_TIME = "%H:%M:%S"
     FMT_NO_COLON_TIME = "%H%M%S"
+
+class ResourcePluginType(str):
+    """Constants for resources plugin type, it will also show you which kind we support up to now."""
+    LOCAL = "local"
+    GITHUB = "github"
+    GITLAB = "gitlab"
+    S3 = "S3"
+    OSS = "OSS"

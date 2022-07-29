@@ -25,7 +25,9 @@ from pydolphinscheduler.constants import (
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
+    ResourcePluginType,
 )
+from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.process_definition import (
@@ -97,6 +99,9 @@ class Task(Base):
 
     _task_custom_attr: set = set()
 
+    ext = None
+    ext_attr: str = None
+
     DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
 
     def __init__(
@@ -119,6 +124,7 @@ class Task(Base):
         dependence: Optional[Dict] = None,
         wait_start_timeout: Optional[Dict] = None,
         condition_result: Optional[Dict] = None,
+        resource_plugin: Optional[ResourcePlugin] = None,
     ):
 
         super().__init__(name, description)
@@ -159,6 +165,8 @@ class Task(Base):
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
         self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
+        self.resource_plugin = resource_plugin
+        self.get_content()
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:
@@ -195,6 +203,24 @@ class Task(Base):
         }
         custom_attr |= self._task_custom_attr
         return self.get_define_custom(custom_attr=custom_attr)
+
+    def get_content(self):
+        """Get the file content according to the resource plugin"""
+        _ext_attr = getattr(self, str(self.ext_attr))
+        if _ext_attr is not None:
+            if self.resource_plugin is None:
+                if self.process_definition.resources_plugin is not None:
+                    res = self.process_definition.resource_plugin.resource
+                else:
+                    return
+            else:
+                res = self.resource_plugin.resource
+                print(res)
+
+            content = res.read_file(self.ext_attr)
+            setattr(self, _ext_attr[1:], content)
+        else:
+            raise ValueError('ext_attr is None')
 
     def __hash__(self):
         return hash(self.code)
