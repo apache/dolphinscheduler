@@ -48,7 +48,7 @@ class User(BaseSide):
         status: Optional[int] = configuration.USER_STATE,
     ):
         super().__init__(name)
-        self.user_id = None
+        self.user_id: Optional[int] = None
         self.password = password
         self.email = email
         self.phone = phone
@@ -75,23 +75,24 @@ class User(BaseSide):
             self.queue,
             self.status,
         )
-        self.user_id = user.userId
+        print(user.user_id)
+        self.user_id = user.getId()
         # TODO recover result checker
         # gateway_result_checker(result, None)
 
     def get_user(self, user_id) -> None:
         """Get User."""
         gateway = launch_gateway()
-        user = gateway.entry_point.getUser(user_id)
-        self.user_id = user.userId
+        user = gateway.entry_point.queryUser(user_id)
+        self.user_id = user.getId()
         self.name = user.name
-        self.password = user.password
+        self.password = user.userPassword
         self.email = user.email
         self.phone = user.phone
         self.tenant = user.tenant
         self.queue = user.queue
         self.status = user.status
-        return user
+        return
 
     def update(self, password=None, email=None, phone=None, tenant=None, queue=None, status=None) -> None:
         """Update User."""
@@ -116,7 +117,7 @@ class User(BaseSide):
     def delete(self) -> None:
         """Delete User."""
         gateway = launch_gateway()
-        gateway.entry_point.deleteUser(self.user_id)
+        gateway.entry_point.deleteUser(self.name, self.user_id)
         self.user_id = None
         self.name = None
         self.password = None

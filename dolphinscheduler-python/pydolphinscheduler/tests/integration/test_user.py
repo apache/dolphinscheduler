@@ -17,7 +17,7 @@
 
 """Test pydolphinscheduler user."""
 
-from pydolphinscheduler.side import User
+from pydolphinscheduler.models import User
 
 
 def get_user(name="test-name",
@@ -45,7 +45,7 @@ def test_get_user():
     """Test get user from java gateway."""
     user = get_user()
     user_ = User(user.name)
-    User(user.name).get_user(user.user_id)
+    user_.get_user(user.user_id)
     assert user_.password == user.password
     assert user_.email == user.email
     assert user_.phone == user.phone
@@ -73,6 +73,4 @@ def test_delete_user():
     """Test delete user from java gateway."""
     user = get_user()
     user.delete()
-    user_ = User(user.name)
-    User(user.name).get_user(user.user_id)
-    assert user_.user_id is None
+    assert user.user_id is None
