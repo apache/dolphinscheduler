@@ -4,6 +4,7 @@
 
 ## dev
 
-## 3.0.0
+## 3.1.0
 
 * Copy and import workflow without 'copy' suffix [#10607](https://github.com/apache/dolphinscheduler/pull/10607)
+* Auto turn on resource center, and set LOCAL mode [#10265](https://github.com/apache/dolphinscheduler/pull/10265)
