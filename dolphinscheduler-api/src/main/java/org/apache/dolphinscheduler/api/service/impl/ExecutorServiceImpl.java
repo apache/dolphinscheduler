@@ -724,8 +724,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber,
                     complementDependentMode);
             } catch (CronParseException cronParseException) {
-                // this just make compile happen, since we already validate the cron before
-                logger.error("Parse cron error", cronParseException);
+                // We catch the exception here just to make compiler happen, since we have already validated the schedule cron expression before
                 return 0;
             }
         } else {
