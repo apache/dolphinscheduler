@@ -91,7 +91,7 @@ jobs:
         name: Upload Binary Package
         with:
           name: binary-package-${{ matrix.java }}
-          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
+          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz
           retention-days: 1
   cluster-test:
     name: ${{ matrix.case.name }}
