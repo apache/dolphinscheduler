@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.service.ResourcesService;
-import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -38,7 +37,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -61,9 +59,6 @@ public class PythonGatewayTest {
 
     @Mock
     private ResourcesService resourcesService;
-
-    @Mock
-    private UsersService usersService;
 
     @Test
     public void testGetCodeAndVersion() throws CodeGenerateUtils.CodeGenerateException {
