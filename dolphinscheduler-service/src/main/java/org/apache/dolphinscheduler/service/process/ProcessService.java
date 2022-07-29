@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -193,6 +194,10 @@ public interface ProcessService {
 
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
+    TaskInstance findLastTaskInstanceInterval(long taskCode, DateInterval dateInterval);
+
+    List<TaskInstance> findLastTaskInstanceListInterval(Set<Long> taskCodes, DateInterval dateInterval);
+
     ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval);
 
     ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval);
@@ -244,6 +249,8 @@ public interface ProcessService {
     List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations);
 
     TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion);
+
+    TaskDefinition findTaskDefinitionByCode(long taskCode);
 
     List<ProcessTaskRelation> findRelationByCode(long processDefinitionCode, int processDefinitionVersion);
 

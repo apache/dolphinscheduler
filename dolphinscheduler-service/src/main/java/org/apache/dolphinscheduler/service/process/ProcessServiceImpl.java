@@ -2197,6 +2197,28 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
+     * find last task instance in the date interval
+     *
+     * @param taskCode     taskCode
+     * @param dateInterval dateInterval
+     * @return task instance
+     */
+    public TaskInstance findLastTaskInstanceInterval(long taskCode, DateInterval dateInterval) {
+        return taskInstanceMapper.queryLastTaskInstance(taskCode, dateInterval.getStartTime(), dateInterval.getEndTime());
+    }
+
+    /**
+     * find last task instance list in the date interval
+     *
+     * @param taskCodes    taskCode list
+     * @param dateInterval dateInterval
+     * @return task instance
+     */
+    public List<TaskInstance> findLastTaskInstanceListInterval(Set<Long> taskCodes, DateInterval dateInterval) {
+        return taskInstanceMapper.queryLastTaskInstanceList(taskCodes, dateInterval.getStartTime(), dateInterval.getEndTime());
+    }
+
+    /**
      * find last scheduler process instance in the date interval
      *
      * @param definitionCode definitionCode
@@ -2730,6 +2752,13 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
         return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
+    }
+
+    /**
+     * find task definition by code
+     */
+    public TaskDefinition findTaskDefinitionByCode(long taskCode) {
+        return taskDefinitionMapper.queryByCode(taskCode);
     }
 
     /**
