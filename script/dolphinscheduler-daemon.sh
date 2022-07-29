@@ -66,19 +66,14 @@ cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/api-server/logs/$command-$HOSTNAME.out
-  CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/master-server/logs/$command-$HOSTNAME.out
-  CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/worker-server/logs/$command-$HOSTNAME.out
-  CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/alert-server/logs/$command-$HOSTNAME.out
-  CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "standalone-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
-  CLASS=org.apache.dolphinscheduler.StandaloneServer
 else
   echo "Error: No command named '$command' was found."
   exit 1
@@ -113,19 +108,19 @@ case $startStop in
       ;;
 
   (status)
-    # more details about the status can be added later
-    serverCount=`ps -ef | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
-    state="STOP"
-    #  font color - red
-    state="[ \033[1;31m $state \033[0m ]"
-    if [[ $serverCount -gt 0 ]];then
-      state="RUNNING"
-      # font color - green
-      state="[ \033[1;32m $state \033[0m ]"
-    fi
-    echo -e "$command  $state"
-    ;;
-
+      state="STOP"
+      state="[ \033[1;31m $state \033[0m ]"
+      if [ -f $pid ]; then
+        TARGET_PID=`cat $pid`
+        serverCount=`ps -p $TARGET_PID | wc -l`
+        if [[ $serverCount -gt 1 ]];then
+          state="RUNNING"
+          state="[ \033[1;32m $state \033[0m ]"
+        fi
+      echo -e "$command  $state"
+      fi
+      ;;
+      
   (*)
     echo $usage
     exit 1
