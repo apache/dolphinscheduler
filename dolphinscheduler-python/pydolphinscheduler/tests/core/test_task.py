@@ -63,7 +63,7 @@ TEST_TASK_RELATION_SIZE = 0
     ],
 )
 @patch(
-    "pydolphinscheduler.core.resource.query_resource_id",
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
     return_value=1,
 )
 def test_property_task_params(mock_resource, attr, expect):
@@ -265,7 +265,7 @@ def test_add_duplicate(caplog):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.core.resource.query_resource_id",
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
     return_value=1,
 )
 def test_python_resource_list(mock_code_version, mock_resource, resources, expect):

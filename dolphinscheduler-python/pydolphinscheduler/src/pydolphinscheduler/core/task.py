@@ -33,6 +33,7 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
     ProcessDefinitionContext,
 )
+from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.java_gateway import launch_gateway
 from pydolphinscheduler.models import Base
 
@@ -178,7 +179,9 @@ class Task(Base):
         resources = set()
         for res in self._resource_list:
             if type(res) == str:
-                resources.add(resource.query_resource_id(self.user_name, res))
+                resources.add(
+                    Resource(name=res, user_name=self.user_name).get_id_from_database()
+                )
             elif type(res) == dict and res.get(ResourceKey.ID) is not None:
                 logger.warning(
                     """`resource_list` should be defined using List[str] with resource paths,

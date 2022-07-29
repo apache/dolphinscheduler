@@ -414,12 +414,8 @@ class ProcessDefinition(Base):
         )
         if len(self.resource_list) > 0:
             for res in self.resource_list:
-                gateway.entry_point.createOrUpdateResource(
-                    self._user,
-                    res.name,
-                    res.description,
-                    res.content,
-                )
+                res.user_name = self._user
+                res.create_or_update_resource()
         return self._process_definition_code
 
     def start(self) -> None:

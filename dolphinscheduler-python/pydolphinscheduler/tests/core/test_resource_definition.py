@@ -25,14 +25,17 @@ def test_resource():
     name = "/dev/test.py"
     content = """print("hello world")"""
     description = "hello world"
+    user_name = "test_user"
     expect = {
         "name": name,
         "content": content,
         "description": description,
+        "userName": user_name
     }
     resourceDefinition = Resource(
         name=name,
         content=content,
         description=description,
+        user_name=user_name
     )
     assert resourceDefinition.get_define() == expect
