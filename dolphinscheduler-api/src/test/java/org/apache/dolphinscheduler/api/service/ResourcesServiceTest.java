@@ -727,7 +727,7 @@ public class ResourcesServiceTest {
         Mockito.when(resourcesMapper.queryResource(file.getFullName(), ResourceType.FILE.ordinal()))
                 .thenReturn(Collections.singletonList(file));
         PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+                AuthorizationType.RESOURCE_FILE_ID, null, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
                 AuthorizationType.RESOURCE_FILE_ID, new Object[]{file.getId()}, user.getId(), serviceLogger)).thenReturn(true);
         Resource result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
