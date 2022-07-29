@@ -120,13 +120,9 @@ public class PythonGatewayTest {
     public void testQueryResourcesFileInfo() {
         User user = getTestUser();
         Resource resource = getTestResource();
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put("id", resource.getId());
-        mockResult.put("name", resource.getFullName());
-        Mockito.when(resourcesService.queryResourcesFileInfo(user.getUserName(), resource.getFullName())).thenReturn(mockResult);
-
-        Map<String, Object> result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
-        Assert.assertEquals((int) result.get("id"), resource.getId());
+        Mockito.when(resourcesService.queryResourcesFileInfo(user.getUserName(), resource.getFullName())).thenReturn(resource);
+        Resource result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
+        Assert.assertEquals(result.getId(), resource.getId());
     }
 
     private Resource getTestResource() {

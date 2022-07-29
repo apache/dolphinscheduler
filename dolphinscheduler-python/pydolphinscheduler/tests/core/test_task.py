@@ -63,8 +63,8 @@ TEST_TASK_RELATION_SIZE = 0
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.query_resource",
-    return_value=({"id": 1, "name": "foo"}),
+    "pydolphinscheduler.core.resource.query_resource_id",
+    return_value=1,
 )
 def test_property_task_params(mock_resource, attr, expect):
     """Test class task property."""
@@ -265,8 +265,8 @@ def test_add_duplicate(caplog):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.query_resource",
-    return_value=({"id": 1, "name": "/dev/test.py"}),
+    "pydolphinscheduler.core.resource.query_resource_id",
+    return_value=1,
 )
 def test_python_resource_list(mock_code_version, mock_resource, resources, expect):
     """Test python task resource list."""

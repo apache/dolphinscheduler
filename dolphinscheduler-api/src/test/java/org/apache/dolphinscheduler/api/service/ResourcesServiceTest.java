@@ -677,8 +677,8 @@ public class ResourcesServiceTest {
                 AuthorizationType.RESOURCE_FILE_ID, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
                 AuthorizationType.RESOURCE_FILE_ID, new Object[]{file.getId()}, user.getId(), serviceLogger)).thenReturn(true);
-        Map<String, Object> result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
-        Assert.assertEquals(file.getFullName(), result.get("name"));
+        Resource result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
+        Assert.assertEquals(file.getFullName(), result.getFullName());
     }
 
     @Test

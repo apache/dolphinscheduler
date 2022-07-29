@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -570,7 +571,7 @@ public class PythonGateway {
      * @param userName user who query resource
      * @param fullName full name of the resource
      */
-    public Map<String, Object> queryResourcesFileInfo(String userName, String fullName) {
+    public Resource queryResourcesFileInfo(String userName, String fullName) {
         return resourceService.queryResourcesFileInfo(userName, fullName);
     }
 

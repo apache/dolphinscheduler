@@ -20,6 +20,18 @@
 from typing import Optional
 
 from pydolphinscheduler.core.base import Base
+from pydolphinscheduler.java_gateway import launch_gateway
+
+
+def query_resource_id(user_name, full_name):
+    """Get resource id from java gateway."""
+    return query_resource(user_name, full_name).getId()
+
+
+def query_resource(user_name, full_name):
+    """Get resource info from java gateway, contains resource id, name."""
+    gateway = launch_gateway()
+    return gateway.entry_point.queryResourcesFileInfo(user_name, full_name)
 
 
 class Resource(Base):
