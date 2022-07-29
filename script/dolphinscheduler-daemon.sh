@@ -78,7 +78,7 @@ elif [ "$command" = "alert-server" ]; then
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "standalone-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
-  CLASS=org.apache.dolphinscheduler.server.StandaloneServer
+  CLASS=org.apache.dolphinscheduler.StandaloneServer
 else
   echo "Error: No command named '$command' was found."
   exit 1
