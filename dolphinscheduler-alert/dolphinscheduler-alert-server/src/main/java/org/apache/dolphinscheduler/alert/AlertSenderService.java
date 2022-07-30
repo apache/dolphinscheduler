@@ -100,18 +100,6 @@ public final class AlertSenderService extends Thread {
                 continue;
             }
 
-            if (StringUtils.isNotEmpty(alert.getContent())) {
-                try {
-                    Object contentObject = new JSONTokener(alert.getContent()).nextValue();
-                    if (!(contentObject instanceof JSONArray)) {
-                        ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
-                        String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
-                        alert.setContent(content);
-                    }
-                } catch (JSONException e) {
-                    logger.error("alert content is null");
-                }
-            }
             AlertData alertData = AlertData.builder()
                     .id(alertId)
                     .content(alert.getContent())

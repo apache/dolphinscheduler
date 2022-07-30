@@ -17,15 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.util.Collections;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONTokener;
 
 public final class EmailAlertChannel implements AlertChannel {
     private static final Logger logger = LoggerFactory.getLogger(EmailAlertChannel.class);
@@ -38,6 +45,20 @@ public final class EmailAlertChannel implements AlertChannel {
         if (null == paramsMap) {
             return new AlertResult("false", "mail params is null");
         }
+        // Converts an object type to an array type to prevent subsequent conversions from reporting errors
+        if (StringUtils.isNotEmpty(alert.getContent())) {
+            try {
+                Object contentObject = new JSONTokener(alert.getContent()).nextValue();
+                if (!(contentObject instanceof JSONArray)) {
+                    ObjectNode jsonNodes = JSONUtils.parseObject(alert.getContent());
+                    String content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
+                    alert.setContent(content);
+                }
+            } catch (JSONException e) {
+                logger.error("alert content is null");
+            }
+        }
+
         MailSender mailSender = new MailSender(paramsMap);
         AlertResult alertResult = mailSender.sendMails(alert.getTitle(), alert.getContent());
 
