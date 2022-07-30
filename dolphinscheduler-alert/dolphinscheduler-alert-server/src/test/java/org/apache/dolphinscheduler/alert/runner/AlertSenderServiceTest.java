@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.alert.runner;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,11 +31,9 @@ import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.plugin.alert.email.EmailAlertChannel;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -147,10 +144,7 @@ public class AlertSenderServiceTest {
     public void testRun() {
         int alertGroupId = 1;
         String title = "alert mail test title";
-        String content = "{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
-                + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
-                + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
-                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}";
+        String content = "";
         List<Alert> alertList = new ArrayList<>();
         Alert alert = new Alert();
         alert.setAlertGroupId(alertGroupId);
@@ -182,16 +176,6 @@ public class AlertSenderServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
         Assert.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
-        when(alertDao.listInstanceByAlertGroupId(anyInt())).thenReturn(Collections.singletonList(new AlertPluginInstance()));
-        when(alertPluginManager.getAlertChannel(anyInt())).thenReturn(Optional.of(new EmailAlertChannel()));
-        alertSenderService.send(alertList);
-        content = "[{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
-                + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
-                + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
-                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}]";
-        alertList.get(0).setContent(content);
-        alertSenderService.send(alertList);
-        alertList.get(0).setContent("");
         alertSenderService.send(alertList);
     }
 }
