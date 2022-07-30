@@ -298,10 +298,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 // query the tenant code of the resource according to the name of the resource
                 String fullName = fileDownload.getLeft();
                 String tenantCode = fileDownload.getRight();
-                String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
-                logger.info("get resource file from hdfs :{}", resHdfsPath);
+                String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
+                logger.info("get resource file from path:{}", resPath);
                 long resourceDownloadStartTime = System.currentTimeMillis();
-                storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false, true);
                 WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                 WorkerServerMetrics.recordWorkerResourceDownloadSize(
                         Files.size(Paths.get(execLocalPath, fullName)));
