@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -40,7 +39,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -83,8 +82,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Autowired
     private DataSourceUserMapper datasourceUserMapper;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     private static final String TABLE = "TABLE";
     private static final String VIEW = "VIEW";
@@ -263,7 +260,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             dataSourceList = dataSourceMapper.selectPagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
         }
-
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);

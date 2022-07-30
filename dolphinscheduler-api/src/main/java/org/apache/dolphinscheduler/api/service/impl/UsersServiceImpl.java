@@ -59,7 +59,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,8 +129,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * create user, only system admin have permission
