@@ -213,7 +213,8 @@ public class TaskExecutionContext implements Serializable {
     private ExecutionStatus currentExecutionStatus;
 
     /**
-     *  Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
+     * Task Logger name should be like:
+     * TaskAppId=TASK-{firstSubmitTime}-{processDefineCode}_{processDefineVersion}-{processInstanceId}-{taskInstanceId}
      */
     private String taskLogName;
 
