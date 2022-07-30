@@ -1844,7 +1844,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setId(0);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(getNewName(processDefinition.getName(), COPY_SUFFIX));
-                processDefinition.setName(getNewName(processDefinition.getName(), "_copy_"));
                 final Date date = new Date();
                 processDefinition.setCreateTime(date);
                 processDefinition.setUpdateTime(date);
@@ -1886,7 +1885,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     private String getNewName(String originalName, String suffix) {
         StringBuilder newName = new StringBuilder();
-        if (originalName.contains(suffix)) {
+        String regex = String.format(".*%s\\d{17}$", suffix);
+        if (originalName.matches(regex)) {
             //replace timestamp of originalName
             return newName.append(originalName, 0, originalName.lastIndexOf(suffix))
                     .append(suffix)
