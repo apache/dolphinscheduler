@@ -1673,7 +1673,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             taskInstance.getName(),
             taskInstance.getId(),
             taskInstance.getTaskCode());
-        TaskMetrics.incTaskSubmit();
+        TaskMetrics.incTaskInstanceByState("submit");
         readyToSubmitTaskQueue.put(taskInstance);
     }
 

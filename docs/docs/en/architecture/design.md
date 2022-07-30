@@ -49,7 +49,7 @@
      WorkerServer also adopts a distributed and decentralized design concept. WorkerServer is mainly responsible for task execution and providing log services.
 
      When the WorkerServer service starts, register a temporary node with ZooKeeper and maintain a heartbeat.
-     Server provides monitoring services based on netty.
+     WorkerServer provides monitoring services based on netty.
   
      #### The Service Mainly Includes:
 

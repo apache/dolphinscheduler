@@ -141,7 +141,7 @@ public class AccessTokenServiceTest {
         User userLogin = new User();
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1, ACCESS_TOKEN_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1, ACCESS_TOKEN_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         // not exist
         Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin, 0);
@@ -166,7 +166,7 @@ public class AccessTokenServiceTest {
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1, ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1, ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         // Given Token
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
