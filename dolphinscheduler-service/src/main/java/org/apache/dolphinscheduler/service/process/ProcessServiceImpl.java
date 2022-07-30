@@ -1308,10 +1308,10 @@ public class ProcessServiceImpl implements ProcessService {
      *
      * @param parentInstance parentInstance
      * @param parentTask     parentTask
+     * @param processMap     processMap
      * @return process instance map
      */
-    private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask) {
-        ProcessInstanceMap processMap = findWorkProcessMapByParent(parentInstance.getId(), parentTask.getId());
+    private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask, ProcessInstanceMap processMap) {
         if (processMap != null) {
             return processMap;
         }
@@ -1375,10 +1375,15 @@ public class ProcessServiceImpl implements ProcessService {
             // recover failover tolerance would not create a new command when the sub command already have been created
             return;
         }
-        instanceMap = setProcessInstanceMap(parentProcessInstance, task);
+        instanceMap = setProcessInstanceMap(parentProcessInstance, task, instanceMap);
         ProcessInstance childInstance = null;
         if (instanceMap.getProcessInstanceId() != 0) {
             childInstance = findProcessInstanceById(instanceMap.getProcessInstanceId());
+        }
+        if (childInstance != null && childInstance.getState() == ExecutionStatus.SUCCESS
+            && CommandType.START_FAILURE_TASK_PROCESS == parentProcessInstance.getCommandType()) {
+            logger.info("sub process instance {} status is success, so skip creating command", childInstance.getId());
+            return;
         }
         Command subProcessCommand = createSubProcessCommand(parentProcessInstance, childInstance, instanceMap, task);
         updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionCode());
@@ -3048,6 +3053,33 @@ public class ProcessServiceImpl implements ProcessService {
         int delete = this.commandMapper.deleteById(commandId);
         if (delete != 1) {
             throw new ServiceException("delete command fail, id:" + commandId);
+        }
+    }
+
+    @Override
+    public void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId) {
+        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
+        if (task == null) {
+            return;
+        }
+        ProcessInstance processInstance = findProcessInstanceDetailById(task.getProcessInstanceId());
+        if (processInstance != null && (processInstance.getState().typeIsFailure() || processInstance.getState().typeIsCancel())) {
+            List<TaskInstance> validTaskList = findValidTaskListByProcessId(processInstance.getId());
+            List<Long> instanceTaskCodeList = validTaskList.stream().map(TaskInstance::getTaskCode).collect(Collectors.toList());
+            List<ProcessTaskRelation> taskRelations = findRelationByCode(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
+            List<TaskDefinitionLog> taskDefinitionLogs = genTaskDefineList(taskRelations);
+            List<Long> definiteTaskCodeList = taskDefinitionLogs.stream().filter(definitionLog -> definitionLog.getFlag() == Flag.YES)
+                .map(TaskDefinitionLog::getCode).collect(Collectors.toList());
+            // only all tasks have instances
+            if (org.apache.dolphinscheduler.common.utils.CollectionUtils.equalLists(instanceTaskCodeList, definiteTaskCodeList)) {
+                List<Integer> failTaskList = validTaskList.stream().filter(instance -> instance.getState().typeIsFailure() || instance.getState().typeIsCancel())
+                    .map(TaskInstance::getId).collect(Collectors.toList());
+                if (failTaskList.size() == 1 && failTaskList.contains(taskInstanceId)) {
+                    processInstance.setState(ExecutionStatus.SUCCESS);
+                    updateProcessInstance(processInstance);
+                }
+            }
         }
     }
 }

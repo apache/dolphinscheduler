@@ -295,4 +295,6 @@ public interface ProcessService {
                               org.apache.dolphinscheduler.remote.command.CommandType taskType);
 
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
+
+    void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 }
