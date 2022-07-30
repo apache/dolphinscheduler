@@ -52,7 +52,7 @@ public class EmailAlertChannelTest {
         String mapjson = "{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
                 + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
                 + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
-                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}";;
+                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}";
 
         AlertData alertData = AlertData.builder()
                 .id(10)
@@ -66,6 +66,8 @@ public class EmailAlertChannelTest {
 
         alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = emailAlertChannel.process(alertInfo);
+        Assert.assertNotNull(alertResult);
+        Assert.assertEquals("false", alertResult.getStatus());
         mapjson = "[{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
                 + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
                 + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
