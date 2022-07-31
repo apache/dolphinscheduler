@@ -20,11 +20,14 @@ package org.apache.dolphinscheduler.plugin.registry.raft;
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,21 +37,23 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import com.alipay.sofa.jraft.Node;
+import com.alipay.sofa.jraft.NodeManager;
+import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.option.NodeOptions;
 import com.alipay.sofa.jraft.rhea.client.DefaultRheaKVStore;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import com.alipay.sofa.jraft.rhea.options.PlacementDriverOptions;
 import com.alipay.sofa.jraft.rhea.options.RheaKVStoreOptions;
+import com.alipay.sofa.jraft.rhea.options.RpcOptions;
 import com.alipay.sofa.jraft.rhea.options.StoreEngineOptions;
 import com.alipay.sofa.jraft.rhea.options.configured.PlacementDriverOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigured;
-import com.alipay.sofa.jraft.rhea.options.configured.RocksDBOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.StoreEngineOptionsConfigured;
+import com.alipay.sofa.jraft.rhea.storage.KVEntry;
 import com.alipay.sofa.jraft.rhea.storage.StorageType;
 import com.alipay.sofa.jraft.rhea.util.concurrent.DistributedLock;
 import com.alipay.sofa.jraft.util.Endpoint;
@@ -62,11 +67,17 @@ public class RaftRegistry implements Registry {
 
     private final Map<String, DistributedLock<byte[]>> distributedLockMap = new ConcurrentHashMap<>();
 
-    private RheaKVStore kvStore;
+    private final RheaKVStore kvStore;
 
-    private RaftRegistryProperties properties;
+    private final RaftRegistryProperties properties;
 
-    private EphemeralNodeManager ephemeralNodeManager;
+    private SubscribeListenerManager subscribeListenerManager;
+
+    private static final String REGISTRY_DOLPHINSCHEDULER_WORKER_GROUPS = "/nodes/worker-groups";
+
+    private static final String RANDOM_STRING = RandomStringUtils.randomAlphanumeric(200);
+
+    private static final String API_TYPE = "api";
 
     public RaftRegistry(RaftRegistryProperties properties) {
         this.properties = properties;
@@ -76,45 +87,49 @@ public class RaftRegistry implements Registry {
                 .config();
         NodeOptions nodeOptions = new NodeOptions();
         nodeOptions.setElectionTimeoutMs((int) properties.getElectionTimeout().toMillis());
-        nodeOptions.setSnapshotIntervalSecs((int) properties.getSnapshotInterval().getSeconds());
+        final Endpoint serverAddress = new Endpoint(properties.getServerAddress(), properties.getServerPort());
         final StoreEngineOptions storeOpts = StoreEngineOptionsConfigured.newConfigured()
-                .withStorageType(StorageType.RocksDB)
-                .withRocksDBOptions(RocksDBOptionsConfigured.newConfigured().withDbPath(properties.getDbStorageDir()).config())
+                .withStorageType(StorageType.Memory)
                 .withRaftDataPath(properties.getLogStorageDir())
-                .withServerAddress(new Endpoint(properties.getServerAddress(), properties.getServerPort()))
+                .withServerAddress(serverAddress)
                 .withCommonNodeOptions(nodeOptions)
+                .withKvRpcCoreThreads(properties.getRpcCoreThreads())
                 .config();
+        RpcOptions rpcOptions = new RpcOptions();
+        rpcOptions.setCallbackExecutorCorePoolSize(properties.getRpcCoreThreads());
+        rpcOptions.setRpcTimeoutMillis((int) properties.getRpcTimeoutMillis().toMillis());
         final RheaKVStoreOptions opts = RheaKVStoreOptionsConfigured.newConfigured()
                 .withClusterName(properties.getClusterName())
                 .withUseParallelCompress(true)
                 .withInitialServerList(properties.getServerAddressList())
                 .withStoreEngineOptions(storeOpts)
                 .withPlacementDriverOptions(pdOpts)
+                .withRpcOptions(rpcOptions)
                 .config();
         this.kvStore = new DefaultRheaKVStore();
         this.kvStore.init(opts);
         log.info("kvStore started...");
-        this.ephemeralNodeManager = new EphemeralNodeManager(properties, kvStore);
-    }
-
-    @PostConstruct
-    public void start() {
-        ephemeralNodeManager.start();
+        if (!properties.getModule().equalsIgnoreCase(API_TYPE)) {
+            this.subscribeListenerManager = new SubscribeListenerManager(properties, kvStore);
+            subscribeListenerManager.start();
+        }
     }
 
     @Override
     public boolean subscribe(String path, SubscribeListener listener) {
-        return ephemeralNodeManager.addSubscribeListener(path, listener);
+        return subscribeListenerManager.addSubscribeListener(path, listener);
     }
 
     @Override
     public void unsubscribe(String path) {
-        ephemeralNodeManager.removeSubscribeListener(path);
+        subscribeListenerManager.removeSubscribeListener(path);
     }
 
     @Override
     public void addConnectionStateListener(ConnectionListener listener) {
-        ephemeralNodeManager.addConnectionListener(listener);
+        final String groupId = properties.getClusterName() + "--1";
+        final Node node = NodeManager.getInstance().get(groupId, new PeerId((properties.getServerAddress()), properties.getServerPort()));
+        node.addReplicatorStateListener(new RaftConnectionStateListener(listener));
     }
 
     @Override
@@ -124,11 +139,28 @@ public class RaftRegistry implements Registry {
 
     @Override
     public void put(String key, String value, boolean deleteOnDisconnect) {
-        if (StringUtils.isBlank(value)) {
-            return;
+        kvStore.bPut(key, writeUtf8(value));
+        if (key.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH)) {
+            addWorkerGroup(key);
         }
-        readUtf8(kvStore.bGetAndPut(key, writeUtf8(value)));
-        ephemeralNodeManager.putHandler(key, value);
+    }
+
+    private void addWorkerGroup(String key) {
+        List<String> workerGroupList = getWorkerGroups();
+        String workerGroup = key.substring(key.indexOf(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS)
+                + Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS.length() + 1, key.lastIndexOf(Constants.SINGLE_SLASH));
+        if (!workerGroupList.contains(workerGroup)) {
+            workerGroupList.add(workerGroup);
+            kvStore.bPut(REGISTRY_DOLPHINSCHEDULER_WORKER_GROUPS, writeUtf8(JSONUtils.toJsonString(workerGroupList)));
+        }
+    }
+
+    private List<String> getWorkerGroups() {
+        final String storedWorkerGroup = readUtf8(kvStore.bGet(REGISTRY_DOLPHINSCHEDULER_WORKER_GROUPS));
+        if (StringUtils.isEmpty(storedWorkerGroup)) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(JSONUtils.toList(storedWorkerGroup, String.class));
     }
 
     @Override
@@ -139,17 +171,32 @@ public class RaftRegistry implements Registry {
             distributedLock.unlock();
         }
         distributedLockMap.remove(key);
-        ephemeralNodeManager.deleteHandler(key);
-
     }
 
     @Override
     public Collection<String> children(String key) {
-        final String result = readUtf8(kvStore.bGet(key));
-        if (StringUtils.isEmpty(result)) {
-            return new ArrayList<>();
+        List<String> children = new ArrayList<>();
+        if (key.equals(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS)) {
+            //get all worker groups
+            children = getWorkerGroups();
+
+        } else {
+            final List<KVEntry> result = kvStore.bScan(key, key + Constants.SINGLE_SLASH + RANDOM_STRING);
+            if (result.isEmpty()) {
+                return new ArrayList<>();
+            }
+            for (final KVEntry kv : result) {
+                if (StringUtils.isEmpty(readUtf8(kv.getValue()))) {
+                    continue;
+                }
+                final String entryKey = readUtf8(kv.getKey());
+                if (StringUtils.isEmpty(entryKey)) {
+                    continue;
+                }
+                String child = entryKey.substring(entryKey.lastIndexOf(Constants.SINGLE_SLASH) + 1);
+                children.add(child);
+            }
         }
-        final List<String> children = JSONUtils.toList(result, String.class);
         children.sort(Comparator.reverseOrder());
         return children;
     }
@@ -180,7 +227,7 @@ public class RaftRegistry implements Registry {
 
     @Override
     public void close() {
-        ephemeralNodeManager.close();
+        subscribeListenerManager.close();
         kvStore.shutdown();
         log.info("Closed raft registry...");
     }

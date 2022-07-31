@@ -35,13 +35,10 @@ public class RaftRegistryProperties {
     private String serverAddress;
     private int serverPort;
     private String logStorageDir;
-    private String dbStorageDir;
     private Duration distributedLockTimeout = Duration.ofSeconds(3);
     private Duration electionTimeout = Duration.ofMillis(1000);
-    private Duration snapshotInterval = Duration.ofSeconds(3600);
     private Duration listenerCheckInterval = Duration.ofSeconds(2);
-    /**
-     * expireTime = listenerCheckInterval * connectionExpireFactor
-     */
-    private int connectionExpireFactor = 2;
+    private String module = "master";
+    private int rpcCoreThreads = 8;
+    private Duration rpcTimeoutMillis = Duration.ofMillis(5000);
 }

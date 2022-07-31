@@ -20,13 +20,14 @@ registry:
   cluster-name: dolphinscheduler
   server-address-list: 127.0.0.1:8181,127.0.0.1:8182/learner,127.0.0.1:8183/learner
   log-storage-dir: raft-data/
-  db-storage-dir: raft-db/
   election-timeout: 1000ms
-  snapshot-interval: 1800s
   listener-check-interval: 2s
-  connection-expire-factor: 2
+  distributed-lock-timeout: 3s
   server-address: 127.0.0.1
-  server-port: 8181
+  server-port: 8183
+  module: api
+  rpc-core-threads: 8
+  rpc-timeout-millis: 5000ms
 ```
 
 Then you can start your DolphinScheduler cluster, your cluster will use raft cluster as registry center to
