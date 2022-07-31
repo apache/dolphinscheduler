@@ -265,6 +265,7 @@ interface ITaskParams {
   hadoopCustomParams?: ILocalParam[]
   sqoopAdvancedParams?: ILocalParam[]
   concurrency?: number
+  splitBy?: string
   modelType?: ModelType
   sourceType?: SourceType
   targetType?: SourceType
@@ -359,6 +360,7 @@ interface ITaskParams {
   address?: string
   taskId?: string
   online?: boolean
+  sagemakerRequestJson?: string
 }
 
 interface INodeData

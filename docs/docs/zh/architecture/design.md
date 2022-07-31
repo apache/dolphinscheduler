@@ -46,7 +46,7 @@
 
      WorkerServer也采用分布式无中心设计理念，WorkerServer主要负责任务的执行和提供日志服务。
      WorkerServer服务启动时向Zookeeper注册临时节点，并维持心跳。
-     Server基于netty提供监听服务。
+     WorkerServer基于netty提供监听服务。
      ##### 该服务包含：
 
      - **WorkerManagerThread**主要负责任务队列的提交，不断从任务队列中领取任务，提交到线程池处理；
