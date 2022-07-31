@@ -40,9 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 
 import io.etcd.jetcd.ByteSequence;
 import io.etcd.jetcd.Client;
@@ -87,14 +87,14 @@ public class EtcdRegistry implements Registry {
                 .retryDelay(registryProperties.getRetryDelay().toMillis())
                 .retryMaxDelay(registryProperties.getRetryMaxDelay().toMillis())
                 .retryMaxDuration(registryProperties.getRetryMaxDuration());
-        if (!Strings.isNullOrEmpty(registryProperties.getUser()) && (!Strings.isNullOrEmpty(registryProperties.getPassword()))) {
+        if (StringUtils.hasLength(registryProperties.getUser()) && StringUtils.hasLength(registryProperties.getPassword())) {
             clientBuilder.user(byteSequence(registryProperties.getUser()));
             clientBuilder.password(byteSequence(registryProperties.getPassword()));
         }
-        if (!Strings.isNullOrEmpty(registryProperties.getLoadBalancerPolicy())) {
+        if (StringUtils.hasLength(registryProperties.getLoadBalancerPolicy())) {
             clientBuilder.loadBalancerPolicy(registryProperties.getLoadBalancerPolicy());
         }
-        if (!Strings.isNullOrEmpty(registryProperties.getAuthority())) {
+        if (StringUtils.hasLength(registryProperties.getAuthority())) {
             clientBuilder.authority(registryProperties.getAuthority());
         }
         client = clientBuilder.build();
@@ -155,7 +155,6 @@ public class EtcdRegistry implements Registry {
 
     /**
      *
-     * @param key
      * @return Returns the value corresponding to the key
      * @throws throws an exception if the key does not exist
      */
@@ -164,16 +163,16 @@ public class EtcdRegistry implements Registry {
         try {
             List<KeyValue> keyValues = client.getKVClient().get(byteSequence(key)).get().getKvs();
             return keyValues.iterator().next().getValue().toString(StandardCharsets.UTF_8);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("etcd get data error", e);
+        } catch (ExecutionException e) {
             throw new RegistryException("etcd get data error", e);
         }
     }
 
     /**
      *
-     * @param key
-     * @param value
      * @param deleteOnDisconnect Does the put data disappear when the client disconnects
      */
     @Override
@@ -189,31 +188,32 @@ public class EtcdRegistry implements Registry {
             } else {
                 client.getKVClient().put(byteSequence(key), byteSequence(value)).get();
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("Failed to put registry key: " + key, e);
+        } catch (ExecutionException e) {
             throw new RegistryException("Failed to put registry key: " + key, e);
         }
     }
 
     /**
-     * delete all keys that contain the prefix
-     * @param key the prrefix
+     * delete all keys that contain the prefix {@Code key}
      */
     @Override
     public void delete(String key) {
         try {
             DeleteOption deleteOption = DeleteOption.newBuilder().isPrefix(true).build();
             client.getKVClient().delete(byteSequence(key), deleteOption).get();
-        }  catch (InterruptedException | ExecutionException e) {
+        }  catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("Failed to delete registry key: " + key, e);
+        }  catch (ExecutionException e) {
             throw new RegistryException("Failed to delete registry key: " + key, e);
         }
     }
 
     /**
      * Get all child objects, split by "/"
-     * @param key
-     * @return
      */
     @Override
     public Collection<String> children(String key) {
@@ -224,28 +224,22 @@ public class EtcdRegistry implements Registry {
         try {
             List<KeyValue> keyValues = client.getKVClient().get(byteSequence(prefix),getOption).get().getKvs();
             return keyValues.stream().map(e -> getSubNodeKeyName(prefix, e.getKey().toString(StandardCharsets.UTF_8))).distinct().collect(Collectors.toList());
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("etcd get children error", e);
+        } catch (ExecutionException e) {
             throw new RegistryException("etcd get children error", e);
         }
     }
 
     /**
      * If "/" exists in the child object, get the string prefixed with "/"
-     * @param prefix
-     * @param fullPath
-     * @return
      */
     private String getSubNodeKeyName(final String prefix, final String fullPath) {
         String pathWithoutPrefix = fullPath.substring(prefix.length());
         return pathWithoutPrefix.contains(FOLDER_SEPARATOR) ? pathWithoutPrefix.substring(0, pathWithoutPrefix.indexOf(FOLDER_SEPARATOR)) : pathWithoutPrefix;
     }
 
-    /**
-     *
-     * @param key
-     * @return
-     */
     @Override
     public boolean exists(String key) {
         GetOption getOption = GetOption.newBuilder().withCountOnly(true).build();
@@ -253,8 +247,10 @@ public class EtcdRegistry implements Registry {
             if (client.getKVClient().get(byteSequence(key),getOption).get().getCount() >= 1) {
                 return true;
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("etcd check key is existed error", e);
+        } catch (ExecutionException e) {
             throw new RegistryException("etcd check key is existed error", e);
         }
         return false;
@@ -262,8 +258,6 @@ public class EtcdRegistry implements Registry {
 
     /**
      * get the lock with a lease
-     * @param key
-     * @return
      */
     @Override
     public boolean acquireLock(String key) {
@@ -283,16 +277,16 @@ public class EtcdRegistry implements Registry {
             }
             threadLocalLockMap.get().put(key,leaseId);
             return true;
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("etcd get lock error", e);
+        } catch (ExecutionException e) {
             throw new RegistryException("etcd get lock error", e);
         }
     }
 
     /**
      * release the lock by revoking the leaseId
-     * @param key
-     * @return
      */
     @Override
     public boolean releaseLock(String key) {

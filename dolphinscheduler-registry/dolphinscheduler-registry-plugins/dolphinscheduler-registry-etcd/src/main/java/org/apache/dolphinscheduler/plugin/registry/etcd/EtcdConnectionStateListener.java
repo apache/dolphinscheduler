@@ -37,11 +37,10 @@ public class EtcdConnectionStateListener implements AutoCloseable {
     // A thread pool that periodically obtains connection status
     private final ScheduledExecutorService scheduledExecutorService;
     // monitored client
-    private Client client;
+    private final Client client;
     // The state of the last monitor
     private ConnectionState connectionState;
-    private long initialDelay = 500L;
-    private long delay = 500L;
+
     public EtcdConnectionStateListener(Client client) {
         this.client = client;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
@@ -80,6 +79,8 @@ public class EtcdConnectionStateListener implements AutoCloseable {
      * Periodically execute thread to get connection status
      */
     public void start() {
+        long initialDelay = 500L;
+        long delay = 500L;
         this.scheduledExecutorService.scheduleWithFixedDelay(() -> {
             ConnectionState currentConnectionState = currentConnectivityState();
             if (currentConnectionState == connectionState) {
