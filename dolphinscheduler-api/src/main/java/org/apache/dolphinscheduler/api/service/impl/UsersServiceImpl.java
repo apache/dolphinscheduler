@@ -453,62 +453,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         Date now = new Date();
         user.setUpdateTime(now);
-
-        //if user switches the tenant, the user's resources need to be copied to the new tenant
-        //        if (user.getTenantId() != tenantId) {
-        //            Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
-        //            //query tenant
-        //            Tenant newTenant = tenantMapper.queryById(tenantId);
-        //            // if hdfs startup
-        //            if (null != newTenant && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
-        //                String newTenantCode = newTenant.getTenantCode();
-        //                String oldResourcePath = storageOperate.getResDir(oldTenant.getTenantCode());
-        //                String oldUdfsPath = storageOperate.getUdfDir(oldTenant.getTenantCode());
-        //
-        //                try {// if old tenant dir exists
-        //                    if (storageOperate.exists(oldTenant.getTenantCode(), oldResourcePath)) {
-        //                        String newResourcePath = storageOperate.getResDir(newTenantCode);
-        //                        String newUdfsPath = storageOperate.getUdfDir(newTenantCode);
-        //
-        //                        //file resources list
-        //                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-        //                                null, userId, ResourceType.FILE.ordinal());
-        //                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-        //                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-        //                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-        //                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldResourcePath, newResourcePath);
-        //                        }
-        //
-        //                        //udf resources
-        //                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-        //                                null, userId, ResourceType.UDF.ordinal());
-        //                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-        //                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-        //                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-        //                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldUdfsPath, newUdfsPath);
-        //                        }
-        //
-        //                    } else {
-        //                        // if old tenant dir not exists , create
-        //                        storageOperate.createTenantDirIfNotExists(oldTenant.getTenantCode());
-        //
-        //                        if (!storageOperate.exists(newTenant.getTenantCode(), storageOperate.getDir(null,newTenant.getTenantCode()))) {
-        //                            storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
-        //                        }
-        //                    }
-        //                } catch (Exception e) {
-        //                    logger.error("create tenant {} failed ,the reason is {}", oldTenant, e.getMessage());
-        //                }
-        //
-        //
-        //            try {
-        //                storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
-        //            } catch (Exception e) {
-        //                logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
-        //            }
-        //            }
-        //            user.setTenantId(tenantId);
-        //        }
         user.setTenantId(tenantId);
         // updateProcessInstance user
         userMapper.updateById(user);
