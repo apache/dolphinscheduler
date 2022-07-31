@@ -9,7 +9,7 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 
 ## 前置准备工作
 
-* JDK：下载[JDK][jdk] (1.8+)，并将 `JAVA_HOME` 配置到以及 `PATH` 变量中。如果你的环境中已存在，可以跳过这步。
+* JDK：下载[JDK][jdk] (1.8+)，并将 JAVA_HOME 配置到以及 PATH 变量中。如果你的环境中已存在，可以跳过这步。
 * 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download/download.html)下载 DolphinScheduler 二进制包
 
 ## 启动 DolphinScheduler Standalone Server
