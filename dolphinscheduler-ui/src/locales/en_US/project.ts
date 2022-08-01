@@ -312,7 +312,7 @@ export default {
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',
-    is_module_path: 'Module Path',
+    is_module_path: 'Use Module Path',
     return_back: 'Return',
     current_node_settings: 'Current node settings',
     instructions: 'Instructions',
