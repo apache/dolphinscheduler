@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -288,6 +289,11 @@ public class TaskInstance implements Serializable {
      * max memory
      */
     private Integer memoryMax;
+
+    /**
+     * task execute type
+     */
+    private TaskExecuteType taskExecuteType;
 
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
@@ -725,6 +731,7 @@ public class TaskInstance implements Serializable {
                 + ", dryRun=" + dryRun
                 + ", taskGroupId=" + taskGroupId
                 + ", taskGroupPriority=" + taskGroupPriority
+                + ", taskExecuteType=" + taskExecuteType
                 + '}';
     }
 
@@ -778,5 +785,13 @@ public class TaskInstance implements Serializable {
 
     public void setMemoryMax(Integer memoryMax) {
         this.memoryMax = memoryMax;
+    }
+    
+    public TaskExecuteType getTaskExecuteType() {
+        return taskExecuteType;
+    }
+
+    public void setTaskExecuteType(TaskExecuteType taskExecuteType) {
+        this.taskExecuteType = taskExecuteType;
     }
 }
