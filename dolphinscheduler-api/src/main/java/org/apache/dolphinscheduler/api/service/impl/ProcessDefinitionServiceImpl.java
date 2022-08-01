@@ -1883,7 +1883,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param suffix "_copy_" or "_import_"
      * @return
      */
-    private String getNewName(String originalName, String suffix) {
+    public String getNewName(String originalName, String suffix) {
         StringBuilder newName = new StringBuilder();
         String regex = String.format(".*%s\\d{17}$", suffix);
         if (originalName.matches(regex)) {

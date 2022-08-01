@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -759,6 +760,19 @@ public class ProcessDefinitionServiceTest {
         result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
 
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
+    }
+
+    @Test
+    public void TestGetNewProcessName() {
+        String processName1 = "test_copy_" + DateUtils.getCurrentTimeStamp();
+        final String newName1 = processDefinitionService.getNewName(processName1, Constants.COPY_SUFFIX);
+        Assert.assertEquals(2, newName1.split(Constants.COPY_SUFFIX).length);
+        String processName2 = "wf_copy_all_ods_data_to_d";
+        final String newName2 = processDefinitionService.getNewName(processName2, Constants.COPY_SUFFIX);
+        Assert.assertEquals(3, newName2.split(Constants.COPY_SUFFIX).length);
+        String processName3 = "test_import_" + DateUtils.getCurrentTimeStamp();
+        final String newName3 = processDefinitionService.getNewName(processName3, Constants.IMPORT_SUFFIX);
+        Assert.assertEquals(2, newName3.split(Constants.IMPORT_SUFFIX).length);
     }
 
     /**
