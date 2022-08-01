@@ -15,18 +15,47 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { useProfile } from '../use-profile'
+import { useSetting } from '../use-setting'
 import styles from '../info.module.scss'
+import { ref } from 'vue'
+import Timezone from '../../../layouts/content/components/timezone';
+
+const props =  {
+  type: String as PropType<string>,
+}
 
 const Info = defineComponent({
   name: 'Info',
+  props: {type: String},
+  setup(props) {
+    const type = props.type;
+    return {
+      type
+    }
+  },
   render() {
     const { infoOptions } = useProfile()
+    const { settingOptions } = useSetting()
+
+    let options;
+
+    if (!props.type || this.type === 'profile') {
+      options = infoOptions;
+    }
+
+    if (this.type === 'setting') {
+      options = settingOptions
+    }
 
     return (
       <dl class={styles.container}>
-        {infoOptions.value.map((item) => {
+        {(options || ref([])).value.map((item) => {
+          // Todo: custome JSX element based on item key; eg., for Timer option, return TimeZone
+          if (item.key === 'Time Zone') {
+            return <Timezone timezoneOptions={[{label: 'Africa/Abidjan', value: 'Africa/Abidjan'}]} />
+          }
           return (
             <dd class={styles.item}>
               <span class={styles.label}>{item.key}: </span>

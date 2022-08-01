@@ -64,7 +64,7 @@ const profile = defineComponent({
       <div>
         <Card title={t('profile.profile')}>
           {{
-            default: () => <Info />,
+            default: () => <Info type="profile"/>,
             'header-extra': () => (
               <NButton
                 type='info'
@@ -74,6 +74,11 @@ const profile = defineComponent({
                 {t('profile.edit')}
               </NButton>
             )
+          }}
+        </Card>
+        <Card title="UI Settings">
+          {{
+            default: () => <Info type="setting"/>,
           }}
         </Card>
         <Modal
