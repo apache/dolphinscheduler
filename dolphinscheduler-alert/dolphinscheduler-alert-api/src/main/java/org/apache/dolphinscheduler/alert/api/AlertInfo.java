@@ -39,4 +39,6 @@ public class AlertInfo {
 
     private AlertData alertData;
 
+    private int alertPluginInstanceId;
+
 }
