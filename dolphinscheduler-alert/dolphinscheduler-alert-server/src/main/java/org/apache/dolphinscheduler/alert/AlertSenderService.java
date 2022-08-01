@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -43,9 +44,13 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Lists;
 
 @Service
 public final class AlertSenderService extends Thread {
@@ -89,26 +94,31 @@ public final class AlertSenderService extends Thread {
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
                 logger.error("send alert msg fail,no bind plugin instance.");
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alertId);
+                List<AlertResult> alertResults = Lists.newArrayList(new AlertResult("false",
+                                                                                    "no bind plugin instance"));
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, JSONUtils.toJsonString(alertResults), alertId);
                 continue;
             }
             AlertData alertData = AlertData.builder()
-                    .id(alertId)
-                    .content(alert.getContent())
-                    .log(alert.getLog())
-                    .title(alert.getTitle())
-                    .warnType(alert.getWarningType().getCode())
-                    .build();
+                .id(alertId)
+                .content(alert.getContent())
+                .log(alert.getLog())
+                .title(alert.getTitle())
+                .warnType(alert.getWarningType().getCode())
+                .alertType(alert.getAlertType().getCode())
+                .build();
 
             int sendSuccessCount = 0;
+            List<AlertResult> alertResults = new ArrayList<>();
             for (AlertPluginInstance instance : alertInstanceList) {
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
                     AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alertId,instance.getId());
+                    alertDao.addAlertSendStatus(sendStatus, JSONUtils.toJsonString(alertResult), alertId, instance.getId());
                     if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
                         sendSuccessCount++;
                     }
+                    alertResults.add(alertResult);
                 }
             }
             AlertStatus alertStatus = AlertStatus.EXECUTION_SUCCESS;
@@ -117,7 +127,7 @@ public final class AlertSenderService extends Thread {
             } else if (sendSuccessCount < alertInstanceList.size()) {
                 alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
             }
-            alertDao.updateAlert(alertStatus, "", alertId);
+            alertDao.updateAlert(alertStatus, JSONUtils.toJsonString(alertResults), alertId);
         }
     }
 
@@ -170,17 +180,18 @@ public final class AlertSenderService extends Thread {
      * @param alertData alertData
      * @return AlertResult
      */
-    private AlertResult alertResultHandler(AlertPluginInstance instance, AlertData alertData) {
-        Optional<AlertChannel> alertChannel = alertPluginManager.getAlertChannel(instance.getPluginDefineId());
-        AlertResult alertResultExtend = new AlertResult();
+    private @Nullable AlertResult alertResultHandler(AlertPluginInstance instance, AlertData alertData) {
         String pluginInstanceName = instance.getInstanceName();
-        if (!alertChannel.isPresent()) {
-            String message = String.format("Alert Plugin %s send error : return value is null", pluginInstanceName);
-            alertResultExtend.setStatus(String.valueOf(false));
-            alertResultExtend.setMessage(message);
-            logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, instance.getPluginDefineId());
-            return alertResultExtend;
+        int pluginDefineId = instance.getPluginDefineId();
+        Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(instance.getPluginDefineId());
+        if (!alertChannelOptional.isPresent()) {
+            String message = String.format("Alert Plugin %s send error: the channel doesn't exist, pluginDefineId: %s",
+                                           pluginInstanceName,
+                                           pluginDefineId);
+            logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginDefineId);
+            return new AlertResult("false", message);
         }
+        AlertChannel alertChannel = alertChannelOptional.get();
 
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         String instanceWarnType = WarningType.ALL.getDescp();
@@ -193,10 +204,8 @@ public final class AlertSenderService extends Thread {
 
         if (warningType == null) {
             String message = String.format("Alert Plugin %s send error : plugin warnType is null", pluginInstanceName);
-            alertResultExtend.setStatus(String.valueOf(false));
-            alertResultExtend.setMessage(message);
             logger.error("Alert Plugin {} send error : plugin warnType is null", pluginInstanceName);
-            return alertResultExtend;
+            return new AlertResult("false", message);
         }
 
         boolean sendWarning = false;
@@ -231,10 +240,18 @@ public final class AlertSenderService extends Thread {
         AlertResult alertResult;
         try {
             if (waitTimeout <= 0) {
-                alertResult = alertChannel.get().process(alertInfo);
+                if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
+                    alertResult = alertChannel.closeAlert(alertInfo);
+                } else {
+                    alertResult = alertChannel.process(alertInfo);
+                }
             } else {
-                CompletableFuture<AlertResult> future =
-                        CompletableFuture.supplyAsync(() -> alertChannel.get().process(alertInfo));
+                CompletableFuture<AlertResult> future;
+                if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
+                    future = CompletableFuture.supplyAsync(() -> alertChannel.closeAlert(alertInfo));
+                } else {
+                    future = CompletableFuture.supplyAsync(() -> alertChannel.process(alertInfo));
+                }
                 alertResult = future.get(waitTimeout, TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
@@ -246,18 +263,19 @@ public final class AlertSenderService extends Thread {
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
         }
 
+        AlertResult alertResultExtend = new AlertResult();
         if (alertResult == null) {
             String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);
-            alertResultExtend.setStatus(String.valueOf(false));
+            alertResultExtend.setStatus("false");
             alertResultExtend.setMessage(message);
             logger.info("Alert Plugin {} send error : return alertResult value is null", pluginInstanceName);
         } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
-            alertResultExtend.setStatus(String.valueOf(false));
+            alertResultExtend.setStatus("false");
             alertResultExtend.setMessage(alertResult.getMessage());
             logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
         } else {
             String message = String.format("Alert Plugin %s send success", pluginInstanceName);
-            alertResultExtend.setStatus(String.valueOf(true));
+            alertResultExtend.setStatus("true");
             alertResultExtend.setMessage(message);
             logger.info("Alert Plugin {} send success", pluginInstanceName);
         }

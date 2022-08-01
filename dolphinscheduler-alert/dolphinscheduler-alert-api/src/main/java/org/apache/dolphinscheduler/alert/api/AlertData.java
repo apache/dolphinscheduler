@@ -61,4 +61,9 @@ public class AlertData {
      */
     private int warnType;
 
+    /**
+     * AlertType#code
+     */
+    private int alertType;
+
 }
