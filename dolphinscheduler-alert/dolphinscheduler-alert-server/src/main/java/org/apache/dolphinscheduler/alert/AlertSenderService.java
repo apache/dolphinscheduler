@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -56,10 +58,12 @@ public final class AlertSenderService extends Thread {
 
     private final AlertDao alertDao;
     private final AlertPluginManager alertPluginManager;
+    private final AlertConfig alertConfig;
 
-    public AlertSenderService(AlertDao alertDao, AlertPluginManager alertPluginManager) {
+    public AlertSenderService(AlertDao alertDao, AlertPluginManager alertPluginManager, AlertConfig alertConfig) {
         this.alertDao = alertDao;
         this.alertPluginManager = alertPluginManager;
+        this.alertConfig = alertConfig;
     }
 
     @Override
@@ -234,13 +238,24 @@ public final class AlertSenderService extends Thread {
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
         alertInfo.setAlertParams(paramsMap);
+        int waitTimeout = alertConfig.getWaitTimeout();
         AlertResult alertResult;
         try {
             if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
                 alertResult = alertChannel.closeAlert(alertInfo);
             } else {
-                alertResult = alertChannel.process(alertInfo);
+                if (waitTimeout <= 0) {
+                    alertResult = alertChannel.process(alertInfo);
+                } else {
+                    CompletableFuture<AlertResult> future =
+                            CompletableFuture.supplyAsync(() -> alertChannel.process(alertInfo));
+                    alertResult = future.get(waitTimeout, TimeUnit.MILLISECONDS);
+                }
             }
+        } catch (InterruptedException e) {
+            alertResult = new AlertResult("false", e.getMessage());
+            logger.error("send alert error alert data id :{},", alertData.getId(), e);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
