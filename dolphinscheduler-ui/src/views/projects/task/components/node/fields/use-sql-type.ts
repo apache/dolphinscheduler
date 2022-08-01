@@ -24,7 +24,7 @@ import type { IJsonItem } from '../types'
 export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const querySpan = computed(() => (model.sqlType === '0' ? 6 : 0))
-  const nonQuerySpan = computed(() => (model.sqlType === '1' ? 6 : 0))
+  const nonQuerySpan = computed(() => (model.sqlType === '1' ? 18 : 0))
   const emailSpan = computed(() =>
     model.sqlType === '0' && model.sendEmail ? 24 : 0
   )

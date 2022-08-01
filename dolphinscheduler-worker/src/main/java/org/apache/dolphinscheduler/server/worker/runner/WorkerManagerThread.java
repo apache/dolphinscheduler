@@ -21,11 +21,9 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +59,7 @@ public class WorkerManagerThread implements Runnable {
      * task callback service
      */
     @Autowired
-    private TaskCallbackService taskCallbackService;
+    private WorkerMessageSender workerMessageSender;
 
     private volatile int workerExecThreads;
 
@@ -109,20 +107,8 @@ public class WorkerManagerThread implements Runnable {
         waitSubmitQueue.stream()
                           .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
                           .forEach(waitSubmitQueue::remove);
-        sendTaskKillResponse(taskInstanceId);
     }
 
-    /**
-     * kill task before execute , like delay task
-     */
-    private void sendTaskKillResponse(Integer taskInstanceId) {
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        if (taskExecutionContext == null) {
-            return;
-        }
-        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.KILL);
-        taskCallbackService.sendTaskExecuteResponseCommand(taskExecutionContext);
-    }
 
     /**
      * submit task
@@ -132,6 +118,7 @@ public class WorkerManagerThread implements Runnable {
      */
     public boolean offer(TaskExecuteThread taskExecuteThread) {
         if (waitSubmitQueue.size() > workerExecThreads) {
+            WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
             // if waitSubmitQueue is full, it will wait 1s, then try add
             ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             if (waitSubmitQueue.size() > workerExecThreads) {
@@ -142,9 +129,11 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public void start() {
+        logger.info("Worker manager thread starting");
         Thread thread = new Thread(this, this.getClass().getName());
         thread.setDaemon(true);
         thread.start();
+        logger.info("Worker manager thread started");
     }
 
     @Override
@@ -155,11 +144,11 @@ public class WorkerManagerThread implements Runnable {
             try {
                 if (this.getThreadPoolQueueSize() <= workerExecThreads) {
                     taskExecuteThread = waitSubmitQueue.take();
-                    taskExecuteThread.setStorageOperate(storageOperate);
                     workerExecService.submit(taskExecuteThread);
                 } else {
+                    WorkerServerMetrics.incWorkerOverloadCount();
                     logger.info("Exec queue is full, waiting submit queue {}, waiting exec queue size {}",
-                        this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
+                            this.getWaitSubmitQueueSize(), this.getThreadPoolQueueSize());
                     ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             } catch (Exception e) {

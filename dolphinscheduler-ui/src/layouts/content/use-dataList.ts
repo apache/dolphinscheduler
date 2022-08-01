@@ -46,7 +46,8 @@ import {
   ContainerOutlined,
   ApartmentOutlined,
   BarsOutlined,
-  CloudServerOutlined
+  CloudServerOutlined,
+  ClusterOutlined
 } from '@vicons/antd'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
@@ -291,6 +292,11 @@ export function useDataList() {
                   icon: renderIcon(EnvironmentOutlined)
                 },
                 {
+                  label: t('menu.cluster_manage'),
+                  key: '/security/cluster-manage',
+                  icon: renderIcon(ClusterOutlined)
+                },
+                {
                   label: t('menu.k8s_namespace_manage'),
                   key: '/security/k8s-namespace-manage',
                   icon: renderIcon(CloudServerOutlined)
@@ -334,7 +340,8 @@ export function useDataList() {
       {
         label: t('user_dropdown.password'),
         key: 'password',
-        icon: renderIcon(KeyOutlined)
+        icon: renderIcon(KeyOutlined),
+        disabled: (userStore.getUserInfo as UserInfoRes).securityConfigType !== 'PASSWORD'
       },
       {
         label: t('user_dropdown.logout'),

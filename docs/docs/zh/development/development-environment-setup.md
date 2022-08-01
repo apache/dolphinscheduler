@@ -99,7 +99,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 ### 启动后端
 
-在 Intellij IDEA 找到并启动类 `org.apache.dolphinscheduler.server.StandaloneServer` 即可完成后端启动
+在 Intellij IDEA 找到并启动类 `org.apache.dolphinscheduler.StandaloneServer` 即可完成后端启动
 
 ### 启动前端
 

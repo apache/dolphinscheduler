@@ -43,7 +43,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ITaskProcessor.class)
 public class CommonTaskProcessor extends BaseTaskProcessor {
 
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue<TaskPriority> taskUpdateQueue;
 
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
@@ -67,7 +67,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 return true;
             }
         }
-        dispatchTask();
         return true;
     }
 
@@ -110,7 +109,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 this.initQueue();
             }
             if (taskInstance.getState().typeIsFinished()) {
-                logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                logger.info("submit task , but task [{}] state [{}] is already  finished. ", taskInstance.getName(), taskInstance.getState());
                 return true;
             }
             // task cannot be submitted because its execution state is RUNNING or DELAY.
@@ -119,7 +118,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
-            logger.debug("task ready to submit: {}", taskInstance.getName());
+            logger.info("task ready to dispatch to worker: taskInstanceId: {}", taskInstance.getId());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
@@ -134,7 +133,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
-            logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
+            logger.info("Master submit task to priority queue success, taskInstanceId : {}", taskInstance.getId());
             return true;
         } catch (Exception e) {
             logger.error("submit task error", e);
@@ -167,7 +166,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
 
-            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
+            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
 
             Host host = Host.of(taskInstance.getHost());
             executionContext.setHost(host);

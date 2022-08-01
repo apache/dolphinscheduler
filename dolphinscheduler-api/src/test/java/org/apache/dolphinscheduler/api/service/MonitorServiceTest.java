@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -94,7 +94,7 @@ public class MonitorServiceTest {
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, false);
         Map<String,Object> noPermission = monitorService.queryDatabaseState(user);
-        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION,noPermission.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class MonitorServiceTest {
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, false);
         Map<String,Object> noPermission = monitorService.queryMaster(user);
-        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION,noPermission.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
     @Test
@@ -118,7 +118,7 @@ public class MonitorServiceTest {
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, false);
         Map<String,Object> noPermission = monitorService.queryWorker(user);
-        Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION,noPermission.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class MonitorServiceTest {
     }
 
     private void mockPermissionCheck(String permissionKey, boolean result){
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, 1, permissionKey, serviceLogger)).thenReturn(result);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, null, 1, permissionKey, serviceLogger)).thenReturn(result);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0, serviceLogger)).thenReturn(true);
     }
 

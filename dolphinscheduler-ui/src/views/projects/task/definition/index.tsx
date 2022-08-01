@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   NButton,
@@ -90,6 +90,8 @@ const TaskDefinition = defineComponent({
         onRefresh()
       }
     }
+
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -110,7 +112,8 @@ const TaskDefinition = defineComponent({
       onCreate,
       onTaskSubmit,
       onTaskCancel,
-      projectCode
+      projectCode,
+      trim
     }
   },
   render() {
@@ -135,12 +138,14 @@ const TaskDefinition = defineComponent({
             </div>
             <NSpace justify='end'>
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 clearable
                 v-model={[this.searchTaskName, 'value']}
                 placeholder={t('project.task.task_name')}
               />
               <NInput
+                  allowInput={this.trim}
                 size='small'
                 clearable
                 v-model={[this.searchWorkflowName, 'value']}

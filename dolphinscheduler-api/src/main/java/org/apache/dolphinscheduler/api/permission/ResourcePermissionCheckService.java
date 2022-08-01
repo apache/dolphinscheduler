@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.service.permission;
+package org.apache.dolphinscheduler.api.permission;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public interface ResourcePermissionCheckService<T>{
      * @param logger
      * @return
      */
-    boolean resourcePermissionCheck(AuthorizationType authorizationType, Object[] needChecks, Integer userId, Logger logger);
+    boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId, Logger logger);
 
     /**
      * userOwnedResourceIdsAcquisition
@@ -41,7 +41,7 @@ public interface ResourcePermissionCheckService<T>{
      * @param <T>
      * @return
      */
-    Set<T> userOwnedResourceIdsAcquisition(AuthorizationType authorizationType, Integer userId, Logger logger);
+    Set<T> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger);
 
     /**
      * operationpermissionCheck
@@ -51,7 +51,7 @@ public interface ResourcePermissionCheckService<T>{
      * @param logger
      * @return
      */
-    boolean operationPermissionCheck(AuthorizationType authorizationType, Integer userId, String permissionKey, Logger logger);
+    boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId, String permissionKey, Logger logger);
 
     /**
      * functionDisabled
@@ -65,5 +65,5 @@ public interface ResourcePermissionCheckService<T>{
      * @param ids
      * @param logger
      */
-    void postHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger);
+    void postHandle(Object authorizationType, Integer userId, List<Integer> ids, Logger logger);
 }

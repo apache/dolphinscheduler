@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.service.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,19 +73,19 @@ public class DqExecuteResultServiceTest {
 
         String searchVal = "";
         int ruleType = 0;
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
 
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, null, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0, baseServiceLogger)).thenReturn(true);
         Page<DqExecuteResult> page = new Page<>(1, 10);
         page.setTotal(1);
         page.setRecords(getExecuteResultList());
         when(dqExecuteResultMapper.queryResultListPaging(
-                any(IPage.class), eq(""), eq(loginUser.getId()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
+                any(IPage.class), eq(""), eq(loginUser), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
         Result result = dqExecuteResultService.queryResultListPaging(
                 loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);

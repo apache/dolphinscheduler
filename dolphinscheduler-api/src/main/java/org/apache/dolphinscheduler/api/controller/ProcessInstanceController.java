@@ -43,7 +43,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +96,7 @@ public class ProcessInstanceController extends BaseController {
      * @param host host
      * @param startTime start time
      * @param endTime end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
     @ApiOperation(value = "queryProcessInstanceListPaging", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
@@ -120,6 +124,7 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "host", required = false) String host,
                                            @RequestParam(value = "startDate", required = false) String startTime,
                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
 
@@ -129,7 +134,7 @@ public class ProcessInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
-                searchVal, executorName, stateType, host, pageNo, pageSize);
+                searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
         return result;
     }
 

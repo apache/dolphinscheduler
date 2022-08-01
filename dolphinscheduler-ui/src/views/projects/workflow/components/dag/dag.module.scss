@@ -170,6 +170,18 @@ $bgLight: #ffffff;
     &.icon-openmldb {
       background-image: url('/images/task-icons/openmldb.png');
     }
+    &.icon-dvc {
+      background-image: url('/images/task-icons/dvc.png');
+    }
+    &.icon-dinky {
+      background-image: url('/images/task-icons/dinky.png');
+    }
+    &.icon-sagemaker {
+      background-image: url('/images/task-icons/sagemaker.png');
+    }
+    &.icon-chunjun {
+      background-image: url('/images/task-icons/chunjun.png');
+    }
   }
 
   &:hover {
@@ -242,6 +254,18 @@ $bgLight: #ffffff;
       }
       &.icon-openmldb {
         background-image: url('/images/task-icons/openmldb_hover.png');
+      }
+      &.icon-dvc {
+        background-image: url('/images/task-icons/dvc_hover.png');
+      }
+      &.icon-dinky {
+        background-image: url('/images/task-icons/dinky_hover.png');
+      }
+      &.icon-sagemaker {
+        background-image: url('/images/task-icons/sagemaker_hover.png');
+      }
+      &.icon-chunjun {
+        background-image: url('/images/task-icons/chunjun_hover.png');
       }
     }
   }

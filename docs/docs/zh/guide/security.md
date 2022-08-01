@@ -149,11 +149,23 @@ worker.groups=default,test
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
+## 集群管理
+
+> 创建/更新 集群
+
+- 每个工作流可以绑定零到若干个集群用来支持多集群，目前先用于k8s。
+
+> 使用集群
+
+- 创建和授权后，k8s命名空间和工作流会增加关联集群的功能。每一个集群会有独立的工作流和任务实例独立运行。
+
+![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
+
 ## 命名空间管理
 
 > 创建/更新 k8s集群
 
-- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`，后续会通过页面配置.
+- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`给批次使用后续移除，namespace的创建现在通过下拉选择集群.
 
 > 创建/更新 namespace
 

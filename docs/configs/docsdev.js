@@ -28,13 +28,17 @@ export default {
                         link: '/en-us/docs/dev/user_doc/about/introduction.html',
                     },
                     {
+                        title: 'Features',
+                        link: '/en-us/docs/dev/user_doc/about/features.html',
+                    },
+                    {
                         title: 'Hardware Environment',
                         link: '/en-us/docs/dev/user_doc/about/hardware.html',
                     },
                     {
                         title: 'Glossary',
                         link: '/en-us/docs/dev/user_doc/about/glossary.html',
-                    },
+                    }
                 ],
             },
             {
@@ -54,7 +58,7 @@ export default {
                 title: 'Introduction to Functions',
                 children: [
                     {
-                        title: 'Workflow Overview',
+                        title: 'Application Homepage',
                         link: '/en-us/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -142,6 +146,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/switch.html',
                             },
                             {
+                                title: 'SeaTunnel',
+                                link: '/en-us/docs/dev/user_doc/guide/task/seatunnel.html',
+                            },
+                            {
                                 title: 'Amazon EMR',
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
                             },
@@ -164,6 +172,22 @@ export default {
                             {
                                 title: 'Openmldb',
                                 link: '/en-us/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dvc.html',
+                            },
+                            {
+                                title: 'Dinky',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'SageMaker',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
+                            {
+                                title: 'ChunJun',
+                                link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
                             },
                         ],
                     },
@@ -196,10 +220,6 @@ export default {
                         title: 'Data Source',
                         children: [
                             {
-                                title: 'Introduction',
-                                link: '/en-us/docs/dev/user_doc/guide/datasource/introduction.html',
-                            },
-                            {
                                 title: 'MySQL',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/mysql.html',
                             },
@@ -215,6 +235,30 @@ export default {
                                 title: 'Spark',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/spark.html',
                             },
+                            {
+                                title: 'Presto',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/presto.html',
+                            },
+                            {
+                                title: 'SQL SERVER',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/sqlserver.html',
+                            },
+                            {
+                                title: 'Amazon Redshift',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/redshift.html',
+                            },
+                            {
+                                title: 'ClickHouse',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/clickhouse.html',
+                            },
+                            {
+                                title: 'IBM DB2',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/db2.html',
+                            },
+                            {
+                                title: 'Oracle',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
+                            },
                         ],
                     },
                     {
@@ -223,6 +267,10 @@ export default {
                             {
                                 title: 'Alert Component User Guide ',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/alert_plugin_user_guide.html',
+                            },
+                            {
+                                title: 'Email',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/email.html',
                             },
                             {
                                 title: 'Telegram',
@@ -248,11 +296,19 @@ export default {
                                 title: 'Http',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
                             },
+                            {
+                                title: 'Feishu',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
                         ],
                     },
                     {
                         title: 'Resource',
                         children: [
+                            {
+                                title: 'Introduction',
+                                link: '/en-us/docs/dev/user_doc/guide/resource/intro.html'
+                            },
                             {
                                 title: 'Configuration',
                                 link: '/en-us/docs/dev/user_doc/guide/resource/configuration.html'
@@ -280,11 +336,11 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: 'How-To',
+                        title: 'Metrics',
                         children: [
                             {
-                                title: 'General Setting',
-                                link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                                title: 'Metrics',
+                                link: '/en-us/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
@@ -294,7 +350,16 @@ export default {
                     },
                     {
                         title: 'Upgrade',
-                        link: '/en-us/docs/dev/user_doc/guide/upgrade.html',
+                        children: [
+                            {
+                                title: 'Incompatible',
+                                link: '/en-us/docs/dev/user_doc/guide/upgrade/incompatible.html',
+                            },
+                            {
+                                title: 'Upgrade',
+                                link: '/en-us/docs/dev/user_doc/guide/upgrade/upgrade.html',
+                            },
+                        ],
                     },
                     {
                         title: 'Expansion and Reduction',
@@ -363,15 +428,27 @@ export default {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
                     },
+                    {
+                        title: 'Health Check',
+                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
                 ],
             },
             {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
-                        link: '/en-us/docs/release/faq.html',
+                        title: 'General Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
+                    {
+                        title: 'Datasource Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
+                        title: 'Others',
+                        link: '/en-us/docs/release/faq.html',
+                    }
                 ],
             },
             {
@@ -394,6 +471,10 @@ export default {
                     {
                         title: '简介',
                         link: '/zh-cn/docs/dev/user_doc/about/introduction.html',
+                    },
+                    {
+                        title: '特性',
+                        link: '/zh-cn/docs/dev/user_doc/about/features.html',
                     },
                     {
                         title: '建议配置',
@@ -422,7 +503,7 @@ export default {
                 title: '功能介绍',
                 children: [
                     {
-                        title: '指标总览',
+                        title: '应用首页',
                         link: '/zh-cn/docs/dev/user_doc/guide/homepage.html',
                     },
                     {
@@ -510,6 +591,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/switch.html',
                             },
                             {
+                                title: 'SeaTunnel',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/seatunnel.html',
+                            },
+                            {
                                 title: 'Amazon EMR',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
                             },
@@ -532,6 +617,22 @@ export default {
                             {
                                 title: 'Openmldb',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/openmldb.html',
+                            },
+                            {
+                                title: 'DVC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dvc.html',
+                            },
+                            {
+                                title: 'Dinky',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'SageMaker',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
+                            },
+                            {
+                                title: 'ChunJun',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
                             },
                         ],
                     },
@@ -564,10 +665,6 @@ export default {
                         title: '数据源中心',
                         children: [
                             {
-                                title: '简介',
-                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/introduction.html',
-                            },
-                            {
                                 title: 'MySQL',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/mysql.html',
                             },
@@ -593,6 +690,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/alert_plugin_user_guide.html',
                             },
                             {
+                                title: 'Email',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/email.html',
+                            },
+                            {
                                 title: 'Telegram',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/telegram.html',
                             },
@@ -616,11 +717,19 @@ export default {
                                 title: 'Http告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/http.html',
                             },
+                            {
+                                title: '飞书告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
                         ],
                     },
                     {
                         title: '资源中心',
                         children: [
+                            {
+                                title: '简介',
+                                link: '/zh-cn/docs/dev/user_doc/guide/resource/intro.html'
+                            },
                             {
                                 title: '配置详情',
                                 link: '/zh-cn/docs/dev/user_doc/guide/resource/configuration.html'
@@ -648,11 +757,11 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/security.html',
                     },
                     {
-                        title: '常用指引',
+                        title: '指标相关',
                         children: [
                             {
-                                title: '通用设置',
-                                link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                                title: '指标',
+                                link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
@@ -662,7 +771,16 @@ export default {
                     },
                     {
                         title: '升级',
-                        link: '/zh-cn/docs/dev/user_doc/guide/upgrade.html',
+                        children: [
+                            {
+                                title: '不向前兼容的更新',
+                                link: '/zh-cn/docs/dev/user_doc/guide/upgrade/incompatible.html',
+                            },
+                            {
+                                title: '升级步骤',
+                                link: '/zh-cn/docs/dev/user_doc/guide/upgrade/upgrade.html',
+                            },
+                        ],
                     },
                     {
                         title: '扩/缩容',
@@ -731,13 +849,25 @@ export default {
                         title: 'PyDolphinScheduler',
                         link: '/python/index.html',
                     },
+                    {
+                        title: '健康检查',
+                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                    },
                 ],
             },
             {
                 title: 'FAQ',
                 children: [
                     {
-                        title: 'FAQ',
+                        title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '数据源设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
+                        title: '其他',
                         link: '/zh-cn/docs/release/faq.html',
                     },
                 ],

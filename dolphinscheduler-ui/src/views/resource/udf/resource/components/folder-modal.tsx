@@ -15,10 +15,18 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, watch } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  PropType,
+  watch,
+  computed,
+  getCurrentInstance
+} from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
+import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
 import type { IUdf } from '../types'
@@ -55,6 +63,8 @@ export default defineComponent({
       handleRenameResource(props.row.id)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.row,
       () => {
@@ -62,12 +72,15 @@ export default defineComponent({
         state.folderForm.description = props.row.description
       }
     )
+    const fileEdit = computed(() => props.row.id && !props.row.directory)
 
     return {
+      fileEdit,
       hideModal,
       handleCreate,
       handleRename,
-      ...toRefs(state)
+      ...toRefs(state),
+      trim
     }
   },
   render() {
@@ -76,7 +89,9 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('resource.udf.create_folder')}
+        title={
+          this.row.id ? t('resource.udf.edit') : t('resource.udf.create_folder')
+        }
         onCancel={this.hideModal}
         onConfirm={this.row.id ? this.handleRename : this.handleCreate}
         confirmClassName='btn-submit'
@@ -84,8 +99,16 @@ export default defineComponent({
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='folderFormRef'>
-          <NFormItem label={t('resource.udf.folder_name')} path='name'>
+          <NFormItem
+            label={
+              this.fileEdit
+                ? t('resource.udf.file_name')
+                : t('resource.udf.folder_name')
+            }
+            path='name'
+          >
             <NInput
+              allowInput={this.fileEdit ? this.trim : noSpace}
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
               class='input-directory-name'
@@ -93,6 +116,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
             <NInput
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}

@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
@@ -53,7 +54,7 @@ import com.google.common.collect.Sets;
  * worker registry
  */
 @Service
-public class WorkerRegistryClient {
+public class WorkerRegistryClient implements AutoCloseable {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerRegistryClient.class);
 
@@ -97,18 +98,18 @@ public class WorkerRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
-        int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
+        long workerHeartbeatInterval = workerConfig.getHeartbeatInterval().getSeconds();
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                workerConfig.getMaxCpuLoadAvg(),
-                workerConfig.getReservedMemory(),
-                workerConfig.getHostWeight(),
-                workerZkPaths,
-                Constants.WORKER_TYPE,
-                registryClient,
-                workerConfig.getExecThreads(),
-                workerManagerThread.getThreadPoolQueueSize()
-        );
+                                                        workerConfig.getMaxCpuLoadAvg(),
+                                                        workerConfig.getReservedMemory(),
+                                                        workerConfig.getHostWeight(),
+                                                        workerZkPaths,
+                                                        Constants.WORKER_TYPE,
+                                                        registryClient,
+                                                        workerConfig.getExecThreads(),
+                                                        workerManagerThread.getThreadPoolQueueSize(),
+                                                        workerConfig.getHeartbeatErrorThreshold());
 
         for (String workerZKPath : workerZkPaths) {
             // remove before persist
@@ -146,8 +147,10 @@ public class WorkerRegistryClient {
             logger.error("remove worker zk path exception", ex);
         }
 
-        this.heartBeatExecutor.shutdownNow();
-        logger.info("heartbeat executor shutdown");
+        if (heartBeatExecutor != null) {
+            heartBeatExecutor.shutdownNow();
+            logger.info("Heartbeat executor shutdown");
+        }
 
         registryClient.close();
         logger.info("registry client closed");
@@ -174,8 +177,9 @@ public class WorkerRegistryClient {
         return workerPaths;
     }
 
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) {
-        registryClient.handleDeadServer(nodeSet, nodeType, opType);
+    public void handleDeadServer() {
+        Set<String> workerZkPaths = getWorkerZkPaths();
+        registryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
     }
 
     /**
@@ -187,6 +191,11 @@ public class WorkerRegistryClient {
 
     public void setRegistryStoppable(IStoppable stoppable) {
         registryClient.setStoppable(stoppable);
+    }
+
+    @Override
+    public void close() throws IOException {
+        unRegistry();
     }
 
 }

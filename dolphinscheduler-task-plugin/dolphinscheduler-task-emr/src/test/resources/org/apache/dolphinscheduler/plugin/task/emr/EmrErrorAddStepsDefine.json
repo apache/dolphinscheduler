@@ -1,0 +1,29 @@
+{
+  "JobFlowId": "j-3V628TKAERHP8",
+  "Steps": [
+    {
+      "Name": "calculate_pi",
+      "ActionOnFailure": "CONTINUE",
+      "HadoopJarStep": {
+        "Jar": "command-runner.jar",
+        "Args": [
+          "/usr/lib/spark/bin/run-example",
+          "SparkPi",
+          "15"
+        ]
+      }
+    },
+    {
+      "Name": "calculate_pi",
+      "ActionOnFailure": "CONTINUE",
+      "HadoopJarStep": {
+        "Jar": "command-runner.jar",
+        "Args": [
+          "/usr/lib/spark/bin/run-example",
+          "SparkPi",
+          "15"
+        ]
+      }
+    }
+  ]
+}

@@ -42,14 +42,40 @@ export function useSeaTunnel({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
+    cpuQuota: -1,
+    memoryMax: -1,
     delayTime: 0,
     timeout: 30,
+    engine: 'FLINK',
+    runMode: 'RUN',
+    useCustom: true,
     deployMode: 'client',
     queue: 'default',
-    master: 'yarn',
+    master: 'YARN',
     masterUrl: '',
     resourceFiles: [],
-    timeoutNotifyStrategy: ['WARN']
+    timeoutNotifyStrategy: ['WARN'],
+    rawScript:
+      'env {\n' +
+      '    execution.parallelism = 1\n' +
+      '}\n' +
+      '\n' +
+      'source {\n' +
+      '    FakeSourceStream {\n' +
+      '        result_table_name = "fake"\n' +
+      '        field_name = "name,age"\n' +
+      '    }\n' +
+      '}\n' +
+      '\n' +
+      'transform {\n' +
+      '    sql {\n' +
+      '        sql = "select name,age from fake"\n' +
+      '    }\n' +
+      '}\n' +
+      '\n' +
+      'sink {\n' +
+      '    ConsoleSink {}\n' +
+      '}'
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -77,6 +103,7 @@ export function useSeaTunnel({
       Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useSeaTunnel(model),

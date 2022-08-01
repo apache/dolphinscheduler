@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
-import com.zaxxer.hikari.HikariDataSource;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.hive.utils.CommonUtil;
@@ -26,11 +29,9 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.security.krb5.Config;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -40,7 +41,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import sun.security.krb5.Config;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
@@ -49,7 +55,6 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     private ScheduledExecutorService kerberosRenewalService;
 
     private Configuration hadoopConf;
-    protected HikariDataSource oneSessionDataSource;
     private UserGroupInformation ugi;
     private boolean retryGetConnection = true;
 
@@ -60,7 +65,8 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void preInit() {
         logger.info("PreInit in {}", getClass().getName());
-        this.kerberosRenewalService = Executors.newSingleThreadScheduledExecutor();
+        this.kerberosRenewalService = Executors.newSingleThreadScheduledExecutor(
+                new ThreadFactoryBuilder().setNameFormat("Hive-Kerberos-Renewal-Thread-").setDaemon(true).build());
     }
 
     @Override
@@ -74,7 +80,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("Create ugi success.");
 
         super.initClient(baseConnectionParam, dbType);
-        this.oneSessionDataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
+        this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
         logger.info("Init {} success.", getClass().getName());
     }
 
@@ -142,7 +148,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     public Connection getConnection() {
         try {
-            return oneSessionDataSource.getConnection();
+            return dataSource.getConnection();
         } catch (SQLException e) {
             boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
             if (retryGetConnection && kerberosStartupState) {
@@ -164,8 +170,5 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("close {}.", this.getClass().getSimpleName());
         kerberosRenewalService.shutdown();
         this.ugi = null;
-
-        this.oneSessionDataSource.close();
-        this.oneSessionDataSource = null;
     }
 }

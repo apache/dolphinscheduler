@@ -34,7 +34,7 @@ Now, we should install all dependence to make sure we could run test or check co
 
 ```shell
 cd dolphinscheduler/dolphinscheduler-python/pydolphinscheduler
-pip install .[dev]
+python -m pip install -e '.[dev]'
 ```
 
 Next, we have to open pydolphinscheduler project in you editor. We recommend you use [pycharm][pycharm]
@@ -154,7 +154,7 @@ GitHub. You may locally ensure docs could be built suceessfully in case the fail
 To build docs locally, install sphinx and related python modules first via:
 
 ```shell
-pip install '.[doc]'
+python -m pip install '.[doc]'
 ``` 
 
 Then 

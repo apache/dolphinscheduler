@@ -19,10 +19,11 @@ package org.apache.dolphinscheduler.spi.datasource;
 
 import java.sql.Connection;
 
-public interface DataSourceClient {
+public interface DataSourceClient extends AutoCloseable {
 
     void checkClient();
 
+    @Override
     void close();
 
     Connection getConnection();

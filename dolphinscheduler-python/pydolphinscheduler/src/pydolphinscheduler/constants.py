@@ -57,6 +57,7 @@ class TaskType(str):
     FLINK = "FLINK"
     SPARK = "SPARK"
     MR = "MR"
+    SAGEMAKER = "SAGEMAKER"
 
 
 class DefaultTaskCodeNum(str):
@@ -100,3 +101,9 @@ class Time(str):
 
     FMT_STD_TIME = "%H:%M:%S"
     FMT_NO_COLON_TIME = "%H%M%S"
+
+
+class ResourceKey(str):
+    """Constants for key of resource."""
+
+    ID = "id"

@@ -55,5 +55,21 @@
         <module>dolphinscheduler-task-jupyter</module>
         <module>dolphinscheduler-task-mlflow</module>
         <module>dolphinscheduler-task-openmldb</module>
+        <module>dolphinscheduler-task-dvc</module>
+        <module>dolphinscheduler-task-dinky</module>
+        <module>dolphinscheduler-task-sagemaker</module>
+        <module>dolphinscheduler-task-chunjun</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

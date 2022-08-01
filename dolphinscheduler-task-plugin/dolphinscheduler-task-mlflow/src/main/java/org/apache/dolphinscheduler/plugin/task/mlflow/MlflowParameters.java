@@ -76,6 +76,10 @@ public class MlflowParameters extends AbstractParameters {
 
     private String deployPort;
 
+    private String cpuLimit;
+
+    private String memoryLimit;
+
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
     }
@@ -196,6 +200,22 @@ public class MlflowParameters extends AbstractParameters {
         return deployPort;
     }
 
+    public void setCpuLimit(String cpuLimit) {
+        this.cpuLimit = cpuLimit;
+    }
+
+    public String getCpuLimit() {
+        return cpuLimit;
+    }
+
+    public void setMemoryLimit(String memoryLimit) {
+        this.memoryLimit = memoryLimit;
+    }
+
+    public String getMemoryLimit() {
+        return memoryLimit;
+    }
+
     @Override
     public boolean checkParameters() {
         Boolean checkResult = true;
@@ -242,19 +262,6 @@ public class MlflowParameters extends AbstractParameters {
         paramsMap.put("repo_version", MlflowConstants.PRESET_REPOSITORY_VERSION);
     }
 
-    public String getScriptPath() {
-        String projectScript;
-        if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
-            projectScript = MlflowConstants.RUN_PROJECT_BASIC_ALGORITHM_SCRIPT;
-        } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
-            projectScript = MlflowConstants.RUN_PROJECT_AUTOML_SCRIPT;
-        } else {
-            throw new IllegalArgumentException();
-        }
-        String scriptPath = MlflowTask.class.getClassLoader().getResource(projectScript).getPath();
-        return scriptPath;
-    }
-
     public String getModelKeyName(String tag) throws IllegalArgumentException {
         String imageName;
         if (deployModelKey.startsWith("runs:")) {
@@ -266,6 +273,21 @@ public class MlflowParameters extends AbstractParameters {
         }
         imageName = imageName.replace("/", tag);
         return imageName;
+    }
+
+    public String getDockerComposeEnvCommand() {
+        String imageName = "mlflow/" + getModelKeyName(":");
+        String env = String.format(MlflowConstants.SET_DOCKER_COMPOSE_ENV, imageName, getContainerName(), deployPort, cpuLimit, memoryLimit);
+        return env;
+    }
+
+    public String getContainerName(){
+        String containerName = "ds-mlflow-" + getModelKeyName("-");
+        return containerName;
+    }
+
+    public boolean getIsDeployDocker(){
+        return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER) || deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
     }
 
 };

@@ -120,7 +120,7 @@ public class ApiFuncIdentificationConstant {
     public static final String DATASOURCE_PARAM_VIEW = "datasource:param-view";
 
     public static final String FILE_VIEW = "resources:file:view";
-    public static final String FOLDER_ONLINE_CREATE = "resources:folder:online-create";
+    public static final String FOLDER_ONLINE_CREATE = "resources:file:create";
     public static final String FILE_ONLINE_CREATE = "resources:file:online-create";
     public static final String FILE_UPLOAD = "resources:file:upload";
     public static final String FILE_UPDATE = "resources:file:update-content";
@@ -129,7 +129,7 @@ public class ApiFuncIdentificationConstant {
     public static final String FILE_DELETE = "resources:file:delete";
 
     public static final String UDF_FILE_VIEW = "resources:udf:view";
-    public static final String UDF_FOLDER_ONLINE_CREATE = "resources:udf-folder:online-create";
+    public static final String UDF_FOLDER_ONLINE_CREATE = "resources:udf:create";
     public static final String UDF_UPLOAD = "resources:udf:upload";
     public static final String UDF_UPDATE = "resources:udf:edit";
     public static final String UDF_DOWNLOAD = "resources:udf:download";
@@ -155,8 +155,6 @@ public class ApiFuncIdentificationConstant {
     public static final String MONITOR_DATABASES_VIEW = "monitor:databases:view";
 
     public static final String MONITOR_STATISTICS_VIEW = "monitor:statistics:view";
-    public static final String MONITOR_EVENT_LIST_VIEW = "monitor:event:view";
-    public static final String MONITOR_ALERT_LIST_VIEW = "monitor:alert:view";
 
     public final static Map<ExecuteType,String> map = new HashMap<ExecuteType,String>();
 

@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -24,6 +27,9 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
+@Setter
+@ToString
 public class ZeppelinParameters extends AbstractParameters {
 
     /**
@@ -32,49 +38,18 @@ public class ZeppelinParameters extends AbstractParameters {
      */
     private String noteId;
     private String paragraphId;
+    private String restEndpoint;
+    private String productionNoteDirectory;
     private String parameters;
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.paragraphId);
+        return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.restEndpoint);
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return Collections.emptyList();
-    }
-
-    public String getNoteId() {
-        return noteId;
-    }
-
-    public void setNoteId(String noteId) {
-        this.noteId = noteId;
-    }
-
-    public String getParagraphId() {
-        return paragraphId;
-    }
-
-    public void setParagraphId(String paragraphId) {
-        this.paragraphId = paragraphId;
-    }
-
-    public String getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
-    }
-
-    @Override
-    public String toString() {
-        return "ZeppelinParameters{" +
-                "noteId='" + noteId + '\'' +
-                ", paragraphId='" + paragraphId + '\'' +
-                ", parameters='" + parameters + '\'' +
-                '}';
     }
 
 }
