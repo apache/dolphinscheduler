@@ -113,12 +113,8 @@ public final class AlertSenderService extends Thread {
             for (AlertPluginInstance instance : alertInstanceList) {
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
-                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ?
-                        AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.addAlertSendStatus(sendStatus,
-                                                JSONUtils.toJsonString(alertResult),
-                                                alertId,
-                                                instance.getId());
+                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
+                    alertDao.addAlertSendStatus(sendStatus, JSONUtils.toJsonString(alertResult), alertId, instance.getId());
                     if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
                         sendSuccessCount++;
                     }
@@ -145,10 +141,11 @@ public final class AlertSenderService extends Thread {
      */
     public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content, int warnType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
-        AlertData alertData = new AlertData();
-        alertData.setContent(content);
-        alertData.setTitle(title);
-        alertData.setWarnType(warnType);
+        AlertData alertData = AlertData.builder()
+                .content(content)
+                .title(title)
+                .warnType(warnType)
+                .build();
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -235,48 +232,40 @@ public final class AlertSenderService extends Thread {
             return null;
         }
 
-        AlertInfo alertInfo = new AlertInfo();
-        alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(paramsMap);
+        AlertInfo alertInfo = AlertInfo.builder()
+            .alertData(alertData)
+            .alertParams(paramsMap)
+            .alertPluginInstanceId(instance.getId())
+            .build();
         int waitTimeout = alertConfig.getWaitTimeout();
-        AlertResult alertResult;
         try {
-            if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
-                alertResult = alertChannel.closeAlert(alertInfo);
-            } else {
-                if (waitTimeout <= 0) {
-                    alertResult = alertChannel.process(alertInfo);
+            AlertResult alertResult;
+            if (waitTimeout <= 0) {
+                if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
+                    alertResult = alertChannel.closeAlert(alertInfo);
                 } else {
-                    CompletableFuture<AlertResult> future =
-                            CompletableFuture.supplyAsync(() -> alertChannel.process(alertInfo));
-                    alertResult = future.get(waitTimeout, TimeUnit.MILLISECONDS);
+                    alertResult = alertChannel.process(alertInfo);
                 }
+            } else {
+                CompletableFuture<AlertResult> future;
+                if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
+                    future = CompletableFuture.supplyAsync(() -> alertChannel.closeAlert(alertInfo));
+                } else {
+                    future = CompletableFuture.supplyAsync(() -> alertChannel.process(alertInfo));
+                }
+                alertResult = future.get(waitTimeout, TimeUnit.MILLISECONDS);
             }
+            if (alertResult == null) {
+                throw new RuntimeException("Alert result cannot be null");
+            }
+            return alertResult;
         } catch (InterruptedException e) {
-            alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
             Thread.currentThread().interrupt();
+            return new AlertResult("false", e.getMessage());
         } catch (Exception e) {
-            alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
+            return new AlertResult("false", e.getMessage());
         }
-
-        AlertResult alertResultExtend = new AlertResult();
-        if (alertResult == null) {
-            String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);
-            alertResultExtend.setStatus("false");
-            alertResultExtend.setMessage(message);
-            logger.info("Alert Plugin {} send error : return alertResult value is null", pluginInstanceName);
-        } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
-            alertResultExtend.setStatus("false");
-            alertResultExtend.setMessage(alertResult.getMessage());
-            logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
-        } else {
-            String message = String.format("Alert Plugin %s send success", pluginInstanceName);
-            alertResultExtend.setStatus("true");
-            alertResultExtend.setMessage(message);
-            logger.info("Alert Plugin {} send success", pluginInstanceName);
-        }
-        return alertResultExtend;
     }
 }
