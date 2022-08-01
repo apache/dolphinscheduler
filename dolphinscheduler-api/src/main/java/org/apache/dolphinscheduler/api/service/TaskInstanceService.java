@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
@@ -40,6 +41,7 @@ public interface TaskInstanceService {
      * @param host host
      * @param startDate start time
      * @param endDate end time
+     * @param taskExecuteType task execute type
      * @param pageNo page number
      * @param pageSize page size
      * @return task list page
@@ -55,6 +57,7 @@ public interface TaskInstanceService {
                                String searchVal,
                                ExecutionStatus stateType,
                                String host,
+                               TaskExecuteType taskExecuteType,
                                Integer pageNo,
                                Integer pageSize);
 

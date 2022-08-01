@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -74,6 +75,7 @@ public class TaskInstanceController extends BaseController {
      * @param endTime end time
      * @param pageNo page number
      * @param pageSize page size
+     * @param taskExecuteType task execute type
      * @return task list page
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
@@ -87,6 +89,7 @@ public class TaskInstanceController extends BaseController {
         @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
         @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
         @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+        @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataType = "TaskExecuteType", example = "STREAM"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
@@ -105,6 +108,7 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "host", required = false) String host,
                                       @RequestParam(value = "startDate", required = false) String startTime,
                                       @RequestParam(value = "endDate", required = false) String endTime,
+                                      @RequestParam(value = "taskExecuteType", required = false) TaskExecuteType taskExecuteType,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
         Result result = checkPageParams(pageNo, pageSize);
@@ -113,7 +117,7 @@ public class TaskInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
-                taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+                taskName, executorName, startTime, endTime, searchVal, stateType, host, taskExecuteType, pageNo, pageSize);
         return result;
     }
 

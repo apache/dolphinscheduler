@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -80,7 +81,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         processInstance.setEndTime(new Date());
         processInstance.setProcessDefinitionCode(1L);
         processInstanceMapper.insert(processInstance);
-        return processInstanceMapper.queryByProcessDefineCode(1L,1).get(0);
+        return processInstanceMapper.queryByProcessDefineCode(1L, 1).get(0);
     }
 
     /**
@@ -159,8 +160,8 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         task.setProcessInstanceId(processInstance.getId());
         taskInstanceMapper.updateById(task);
         List<Integer> taskInstances = taskInstanceMapper.queryTaskByProcessIdAndState(
-                task.getProcessInstanceId(),
-                ExecutionStatus.RUNNING_EXECUTION.ordinal()
+            task.getProcessInstanceId(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -183,14 +184,14 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstanceMapper.updateById(task2);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.findValidTaskListByProcessId(
-                task.getProcessInstanceId(),
-                Flag.YES
+            task.getProcessInstanceId(),
+            Flag.YES
         );
 
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
-                Flag.NO);
+            Flag.NO);
 
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
@@ -212,7 +213,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstanceMapper.updateById(task);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.queryByHostAndStatus(
-                task.getHost(), new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()}
+            task.getHost(), new int[] {ExecutionStatus.RUNNING_EXECUTION.ordinal()}
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -232,9 +233,9 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstanceMapper.updateById(task);
 
         int setResult = taskInstanceMapper.setFailoverByHostAndStateArray(
-                task.getHost(),
-                new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()},
-                ExecutionStatus.NEED_FAULT_TOLERANCE
+            task.getHost(),
+            new int[] {ExecutionStatus.RUNNING_EXECUTION.ordinal()},
+            ExecutionStatus.NEED_FAULT_TOLERANCE
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(setResult, 0);
@@ -254,8 +255,8 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstanceMapper.updateById(task);
 
         TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(
-                task.getProcessInstanceId(),
-                task.getName()
+            task.getProcessInstanceId(),
+            task.getName()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstance, null);
@@ -301,12 +302,12 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstanceMapper.updateById(task);
 
         int countTask = taskInstanceMapper.countTask(
-                new Long[0],
-                new int[0]
+            new Long[0],
+            new int[0]
         );
         int countTask2 = taskInstanceMapper.countTask(
-                new Long[]{definition.getProjectCode()},
-                new int[]{task.getId()}
+            new Long[] {definition.getProjectCode()},
+            new int[] {task.getId()}
         );
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
@@ -335,8 +336,8 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstanceMapper.updateById(task);
 
         List<ExecuteStatusCount> count = taskInstanceMapper.countTaskInstanceStateByProjectCodes(
-                null, null,
-                new Long[]{definition.getProjectCode()}
+            null, null,
+            new Long[] {definition.getProjectCode()}
         );
 
         processDefinitionMapper.deleteById(definition.getId());
@@ -363,16 +364,17 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page,
-                definition.getProjectCode(),
-                task.getProcessInstanceId(),
-                "",
-                "",
-                "",
-                0,
-                new int[0],
-                "",
-                null, null
+            page,
+            definition.getProjectCode(),
+            task.getProcessInstanceId(),
+            "",
+            "",
+            "",
+            0,
+            new int[0],
+            "",
+            TaskExecuteType.BATCH,
+            null, null
         );
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
