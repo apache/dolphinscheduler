@@ -73,6 +73,7 @@ public final class AlertSenderService extends Thread {
         while (Stopper.isRunning()) {
             try {
                 List<Alert> alerts = alertDao.listPendingAlerts();
+                AlertServerMetrics.registerPendingAlertGauge(alerts::size);
                 this.send(alerts);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             } catch (Exception e) {
@@ -108,6 +109,9 @@ public final class AlertSenderService extends Thread {
                     alertDao.addAlertSendStatus(sendStatus,alertResult.getMessage(),alertId,instance.getId());
                     if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
                         sendSuccessCount++;
+                        AlertServerMetrics.incAlertSuccessCount();
+                    } else {
+                        AlertServerMetrics.incAlertFailCount();
                     }
                 }
             }
