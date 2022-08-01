@@ -404,48 +404,31 @@ public abstract class AbstractCommandExecutor {
      * @return app id list
      */
     private List<String> getAppIds(String logPath) {
-        List<String> logs = convertFile2List(logPath);
-
         List<String> appIds = new ArrayList<>();
+
+        File file = new File(logPath);
+        if (!file.exists()) {
+            return appIds;
+        }
+
         /*
          * analysis log?get submited yarn application id
          */
-        for (String log : logs) {
-            String appId = findAppId(log);
-            if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
-                logger.info("find app id: {}", appId);
-                appIds.add(appId);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(logPath), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String appId = findAppId(line);
+                if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
+                    logger.info("find app id: {}", appId);
+                    appIds.add(appId);
+                }
             }
+        } catch (Exception e) {
+            logger.error(String.format("read file: %s failed : ", logPath), e);
         }
         return appIds;
     }
 
-    /**
-     * convert file to list
-     *
-     * @param filename file name
-     * @return line list
-     */
-    private List<String> convertFile2List(String filename) {
-        List<String> lineList = new ArrayList<>(100);
-        File file = new File(filename);
-
-        if (!file.exists()) {
-            return lineList;
-        }
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                lineList.add(line);
-            }
-        } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ", filename), e);
-        }
-
-        return lineList;
-    }
-    
     /**
      * find var pool
      * @param line
