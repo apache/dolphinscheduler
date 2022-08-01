@@ -233,12 +233,13 @@ public final class AlertSenderService extends Thread {
         }
 
         AlertInfo alertInfo = AlertInfo.builder()
-                .alertData(alertData)
-                .alertParams(paramsMap)
-                .build();
+            .alertData(alertData)
+            .alertParams(paramsMap)
+            .alertPluginInstanceId(instance.getId())
+            .build();
         int waitTimeout = alertConfig.getWaitTimeout();
-        AlertResult alertResult;
         try {
+            AlertResult alertResult;
             if (waitTimeout <= 0) {
                 if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
                     alertResult = alertChannel.closeAlert(alertInfo);
@@ -254,31 +255,17 @@ public final class AlertSenderService extends Thread {
                 }
                 alertResult = future.get(waitTimeout, TimeUnit.MILLISECONDS);
             }
+            if (alertResult == null) {
+                throw new RuntimeException("Alert result cannot be null");
+            }
+            return alertResult;
         } catch (InterruptedException e) {
-            alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
             Thread.currentThread().interrupt();
+            return new AlertResult("false", e.getMessage());
         } catch (Exception e) {
-            alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
+            return new AlertResult("false", e.getMessage());
         }
-
-        AlertResult alertResultExtend = new AlertResult();
-        if (alertResult == null) {
-            String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);
-            alertResultExtend.setStatus("false");
-            alertResultExtend.setMessage(message);
-            logger.info("Alert Plugin {} send error : return alertResult value is null", pluginInstanceName);
-        } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
-            alertResultExtend.setStatus("false");
-            alertResultExtend.setMessage(alertResult.getMessage());
-            logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
-        } else {
-            String message = String.format("Alert Plugin %s send success", pluginInstanceName);
-            alertResultExtend.setStatus("true");
-            alertResultExtend.setMessage(message);
-            logger.info("Alert Plugin {} send success", pluginInstanceName);
-        }
-        return alertResultExtend;
     }
 }
