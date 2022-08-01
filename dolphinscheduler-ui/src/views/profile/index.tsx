@@ -70,7 +70,7 @@ const profile = defineComponent({
       <div>
         <Card title={t('profile.profile')}>
           {{
-            default: () => <Info />,
+            default: () => <Info type='profile' />,
             'header-extra': () => (
               <NButton
                 type='info'

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,6 +17,9 @@
 #
 
 lockfileVersion: 5.3
+=======
+lockfileVersion: 5.4
+>>>>>>> 5194c1ceb (Set up UI setting component in profile page)
 
 specifiers:
   '@antv/layout': 0.1.31
