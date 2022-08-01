@@ -20,24 +20,27 @@
 package org.apache.dolphinscheduler.alert.api;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * alert result
  */
+@Builder
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
 public class AlertResult {
 
     /**
+     * todo: use enum
      * false or true
      */
     private String status;
 
     /**
-     * alert result message
+     * alert result message, each plugin can have its own message
      */
     private String message;
 

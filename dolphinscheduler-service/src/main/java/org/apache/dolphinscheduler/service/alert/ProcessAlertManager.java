@@ -33,6 +33,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -271,10 +273,33 @@ public class ProcessAlertManager {
     }
 
     /**
+     * Send a close alert event, if the processInstance has sent alert before, then will insert a closed event.
+     *
+     * @param processInstance success process instance
+     */
+    public void closeAlert(ProcessInstance processInstance) {
+        List<Alert> alerts = alertDao.listAlerts(processInstance.getId());
+        if (CollectionUtils.isEmpty(alerts)) {
+            // no need to close alert
+            return;
+        }
+
+        Alert alert = new Alert();
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setUpdateTime(new Date());
+        alert.setCreateTime(new Date());
+        alert.setProjectCode(processInstance.getProcessDefinition().getProjectCode());
+        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(processInstance.getId());
+        alert.setAlertType(AlertType.CLOSE_ALERT);
+        alertDao.addAlert(alert);
+    }
+
+    /**
      * send process timeout alert
      *
      * @param processInstance process instance
-     * @param projectUser projectUser
+     * @param projectUser     projectUser
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
         alertDao.sendProcessTimeoutAlert(processInstance, projectUser);
