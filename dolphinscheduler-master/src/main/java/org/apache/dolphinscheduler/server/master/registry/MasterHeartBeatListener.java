@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.registry;
+package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
@@ -27,51 +27,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Heart beat task
+ * Master heart beat listener
  */
-public class HeartBeatTask implements Runnable {
+public class MasterHeartBeatListener implements Runnable {
 
-    private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
+    private final Logger logger = LoggerFactory.getLogger(MasterHeartBeatListener.class);
 
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
-    private int workerWaitingTaskCount;
     private final String serverType;
     private final HeartBeat heartBeat;
-
     private final int heartBeatErrorThreshold;
-
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         Set<String> heartBeatPaths,
-                         String serverType,
-                         RegistryClient registryClient,
-                         int heartBeatErrorThreshold) {
+    public MasterHeartBeatListener(long startupTime,
+                                   double maxCpuloadAvg,
+                                   double reservedMemory,
+                                   Set<String> heartBeatPaths,
+                                   String serverType,
+                                   RegistryClient registryClient,
+                                   int heartBeatErrorThreshold) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
         this.serverType = serverType;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
-        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
-    }
-
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         int hostWeight,
-                         Set<String> heartBeatPaths,
-                         String serverType,
-                         RegistryClient registryClient,
-                         int workerThreadCount,
-                         int workerWaitingTaskCount,
-                         int heartBeatErrorThreshold) {
-        this.heartBeatPaths = heartBeatPaths;
-        this.registryClient = registryClient;
-        this.workerWaitingTaskCount = workerWaitingTaskCount;
-        this.serverType = serverType;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
         this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
@@ -89,10 +68,6 @@ public class HeartBeatTask implements Runnable {
                     return;
                 }
             }
-
-            // update waiting task count
-            heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
-
             for (String heartBeatPath : heartBeatPaths) {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
