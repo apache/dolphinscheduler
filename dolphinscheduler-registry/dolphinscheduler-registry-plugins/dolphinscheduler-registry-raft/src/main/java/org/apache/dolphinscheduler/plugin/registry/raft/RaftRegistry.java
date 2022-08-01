@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.lang3.RandomStringUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
