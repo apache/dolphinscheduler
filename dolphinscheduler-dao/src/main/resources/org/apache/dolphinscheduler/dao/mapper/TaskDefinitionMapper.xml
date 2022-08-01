@@ -111,6 +111,9 @@
         <if test="taskType != ''">
             and td.task_type = #{taskType}
         </if>
+        <if test="taskExecuteType != ''">
+            and td.task_execute_type = #{taskExecuteType.code}
+        </if>
         <if test="searchWorkflowName != null and searchWorkflowName != ''">
             and pd.name like concat('%', #{searchWorkflowName}, '%')
         </if>

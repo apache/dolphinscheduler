@@ -786,7 +786,7 @@ public class TaskInstance implements Serializable {
     public void setMemoryMax(Integer memoryMax) {
         this.memoryMax = memoryMax;
     }
-    
+
     public TaskExecuteType getTaskExecuteType() {
         return taskExecuteType;
     }
