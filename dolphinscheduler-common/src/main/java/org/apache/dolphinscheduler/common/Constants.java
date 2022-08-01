@@ -845,4 +845,9 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    /**
+     * use for endKey of RheaKVStore scan
+     */
+    public static final String RANDOM_STRING = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz";
 }

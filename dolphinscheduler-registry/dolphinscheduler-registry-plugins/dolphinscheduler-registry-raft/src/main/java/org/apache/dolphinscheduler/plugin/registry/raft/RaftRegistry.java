@@ -73,9 +73,7 @@ public class RaftRegistry implements Registry {
 
     private SubscribeListenerManager subscribeListenerManager;
 
-    private static final String REGISTRY_DOLPHINSCHEDULER_WORKER_GROUPS = "/nodes/worker-groups";
-
-    private static final String RANDOM_STRING = RandomStringUtils.randomAlphanumeric(200);
+    private static final String REGISTRY_DOLPHINSCHEDULER_WORKER_GROUPS = "worker-groups";
 
     private static final String API_TYPE = "api";
 
@@ -181,16 +179,13 @@ public class RaftRegistry implements Registry {
             children = getWorkerGroups();
 
         } else {
-            final List<KVEntry> result = kvStore.bScan(key, key + Constants.SINGLE_SLASH + RANDOM_STRING);
+            final List<KVEntry> result = kvStore.bScan(key, key + Constants.SINGLE_SLASH + Constants.RANDOM_STRING);
             if (result.isEmpty()) {
                 return new ArrayList<>();
             }
             for (final KVEntry kv : result) {
-                if (StringUtils.isEmpty(readUtf8(kv.getValue()))) {
-                    continue;
-                }
                 final String entryKey = readUtf8(kv.getKey());
-                if (StringUtils.isEmpty(entryKey)) {
+                if (StringUtils.isEmpty(readUtf8(kv.getValue())) || StringUtils.isEmpty(entryKey)) {
                     continue;
                 }
                 String child = entryKey.substring(entryKey.lastIndexOf(Constants.SINGLE_SLASH) + 1);

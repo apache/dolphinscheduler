@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import com.alipay.sofa.jraft.rhea.storage.KVEntry;
@@ -46,8 +45,6 @@ public class SubscribeListenerManager implements AutoCloseable {
     private final RaftRegistryProperties properties;
 
     private final RheaKVStore kvStore;
-
-    private static final String REGEX = "\\d{1,3}(\\.\\d{1,3}){3,5}:\\d+";
 
     public SubscribeListenerManager(RaftRegistryProperties properties, RheaKVStore kvStore) {
         this.properties = properties;
@@ -85,11 +82,8 @@ public class SubscribeListenerManager implements AutoCloseable {
 
         @Override
         public void run() {
-            if (dataSubScribeMap.isEmpty()) {
-                return;
-            }
             final Map<String, String> currentNodeDataMap = getNodeDataMap();
-            if (currentNodeDataMap.isEmpty()) {
+            if (dataSubScribeMap.isEmpty() || currentNodeDataMap.isEmpty()) {
                 return;
             }
             // find the different
@@ -116,6 +110,10 @@ public class SubscribeListenerManager implements AutoCloseable {
             nodeDataMap.clear();
             nodeDataMap.putAll(currentNodeDataMap);
             // trigger listener
+            triggerListener(addedData, deletedData, updatedData);
+        }
+
+        private void triggerListener(Map<String, String> addedData, Map<String, String> deletedData, Map<String, String> updatedData) {
             for (Map.Entry<String, List<SubscribeListener>> entry : dataSubScribeMap.entrySet()) {
                 String subscribeKey = entry.getKey();
                 List<SubscribeListener> subscribeListeners = entry.getValue();
@@ -136,18 +134,17 @@ public class SubscribeListenerManager implements AutoCloseable {
          * @return
          */
         private Map<String, String> getNodeDataMap() {
-            Pattern pattern = Pattern.compile(REGEX);
-            HashMap<String, String> nodeDataMap = new HashMap<>();
-            final List<KVEntry> entryList = kvStore.bScan(Constants.REGISTRY_DOLPHINSCHEDULER_NODE + Constants.SINGLE_SLASH, null);
+            HashMap<String, String> dataMap = new HashMap<>();
+            final List<KVEntry> entryList = kvStore.bScan(Constants.REGISTRY_DOLPHINSCHEDULER_NODE, Constants.REGISTRY_DOLPHINSCHEDULER_NODE + Constants.SINGLE_SLASH + Constants.RANDOM_STRING);
             for (KVEntry kvEntry : entryList) {
                 final String value = readUtf8(kvEntry.getValue());
                 final String entryKey = readUtf8(kvEntry.getKey());
-                if (StringUtils.isEmpty(value) || pattern.matcher(value).find() || !entryKey.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_NODE)) {
+                if (StringUtils.isEmpty(value) || !entryKey.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_NODE)) {
                     continue;
                 }
-                nodeDataMap.put(entryKey, value);
+                dataMap.put(entryKey, value);
             }
-            return nodeDataMap;
+            return dataMap;
         }
 
         private void triggerListener(Map<String, String> nodeDataMap, String subscribeKey, List<SubscribeListener> subscribeListeners, Event.Type type) {

@@ -24,6 +24,9 @@ import com.alipay.sofa.jraft.Status;
 import com.alipay.sofa.jraft.core.Replicator;
 import com.alipay.sofa.jraft.entity.PeerId;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RaftConnectionStateListener implements Replicator.ReplicatorStateListener {
     private final ConnectionListener connectionListener;
     private ConnectionState connectionState;
@@ -34,17 +37,17 @@ public class RaftConnectionStateListener implements Replicator.ReplicatorStateLi
 
     @Override
     public void onCreated(PeerId peerId) {
-
+        log.info("{}:{} created...", peerId.getIp(), peerId.getPort());
     }
 
     @Override
     public void onError(PeerId peerId, Status status) {
-
+        log.error("{}:{} an error occurred, {}", peerId.getIp(), peerId.getPort(), status.getErrorMsg());
     }
 
     @Override
     public void onDestroyed(PeerId peerId) {
-
+        log.info("{}:{} destroyed...", peerId.getIp(), peerId.getPort());
     }
 
     @Override
