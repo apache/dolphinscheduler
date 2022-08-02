@@ -60,7 +60,7 @@ import io.etcd.jetcd.support.Observers;
 import io.etcd.jetcd.watch.WatchEvent;
 
 /**
- * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd CLuster to
+ * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd cluster to
  * store the DolphinScheduler master/worker's metadata and do the server registry/unRegistry.
  */
 @Component
