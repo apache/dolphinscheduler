@@ -62,11 +62,11 @@ class Resource(Base):
 
     def create_or_update_resource(self):
         """Create or update resource via java gateway."""
-        gateway = launch_gateway()
         if not self.content or not self.user_name:
             raise PyDSParamException(
                 "`user_name` and `content` are required when create or update resource from python gate."
             )
+        gateway = launch_gateway()
         gateway.entry_point.createOrUpdateResource(
             self.user_name,
             self.name,

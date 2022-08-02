@@ -16,8 +16,10 @@
 # under the License.
 
 """Test resource definition."""
+import pytest
 
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.exceptions import PyDSParamException
 
 
 def test_resource():
@@ -36,3 +38,31 @@ def test_resource():
         name=name, content=content, description=description, user_name=user_name
     )
     assert resourceDefinition.get_define() == expect
+
+
+def test_empty_user_name():
+    """Tests for the exception get info from database when the user name is null."""
+    name = "/dev/test.py"
+    content = """print("hello world")"""
+    description = "hello world"
+    resourceDefinition = Resource(name=name, content=content, description=description)
+    with pytest.raises(
+        PyDSParamException,
+        match="`user_name` is required when querying resources from python gate.",
+    ):
+        resourceDefinition.get_info_from_database()
+
+
+def test_empty_content():
+    """Tests for the exception create or update resource when the user name or content is empty."""
+    name = "/dev/test.py"
+    user_name = "test_user"
+    description = "hello world"
+    resourceDefinition = Resource(
+        name=name, description=description, user_name=user_name
+    )
+    with pytest.raises(
+        PyDSParamException,
+        match="`user_name` and `content` are required when create or update resource from python gate.",
+    ):
+        resourceDefinition.create_or_update_resource()
