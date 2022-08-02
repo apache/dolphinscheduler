@@ -4,7 +4,7 @@ This node is for executing java-type tasks and supports using files and jar pack
 
 # Create Tasks
 
-- Click on `Project Management` -> `Project Name` -> `Workflow Definition`, click on the“Create workflow” button, go to the DAG edit page:
+- Click on `Project Management` -> `Project Name` -> `Workflow Definition`, click on the “Create workflow” button, go to the DAG edit page:
 
 - Drag the toolbar's Java task node to the palette.
 

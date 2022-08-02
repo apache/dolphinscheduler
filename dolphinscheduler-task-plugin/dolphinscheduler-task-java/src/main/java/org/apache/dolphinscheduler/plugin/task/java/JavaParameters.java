@@ -41,7 +41,7 @@ public class JavaParameters extends AbstractParameters {
     private ResourceInfo mainJar;
 
     /**
-     * run type is JAVA or JAR
+     * Marks the current task running mode
      */
     private String runType;
 
@@ -51,7 +51,7 @@ public class JavaParameters extends AbstractParameters {
     private String mainArgs;
 
     /**
-     * jvm args
+     * java virtual machine args
      **/
     private String jvmArgs;
 
@@ -66,7 +66,7 @@ public class JavaParameters extends AbstractParameters {
     private List<ResourceInfo> resourceList;
 
     /**
-     * @description:
+     * @description: Check that the parameters are valid
      * @date: 7/22/22 2:35 AM
      * @param: []
      * @return: boolean
@@ -77,7 +77,7 @@ public class JavaParameters extends AbstractParameters {
     }
 
     /**
-     * @description:
+     * @description: Gets a list of known resource files
      * @date: 7/22/22 2:34 AM
      * @param: []
      * @return: java.util.List<org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo>

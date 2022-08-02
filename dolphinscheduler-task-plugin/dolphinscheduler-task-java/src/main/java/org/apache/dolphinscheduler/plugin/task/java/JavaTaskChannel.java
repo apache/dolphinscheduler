@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 public class JavaTaskChannel implements TaskChannel {
 
     /**
-     * @description:
+     * @description: Cancel the mission
      * @date: 7/22/22 2:37 AM
      * @param: [boolean]
      * @return: void
@@ -38,7 +38,7 @@ public class JavaTaskChannel implements TaskChannel {
     }
 
     /**
-     * @description:
+     * @description: Create a task
      * @date: 7/22/22 2:37 AM
      * @param: [org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext]
      * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
@@ -49,7 +49,7 @@ public class JavaTaskChannel implements TaskChannel {
     }
 
     /**
-     * @description:
+     * @description: Parses Java task parameters
      * @date: 7/22/22 2:37 AM
      * @param: [org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode]
      * @return: org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
@@ -60,7 +60,7 @@ public class JavaTaskChannel implements TaskChannel {
     }
 
     /**
-     * @description:
+     * @description: Gets a list of the resources that the task depends on
      * @date: 7/22/22 2:37 AM
      * @param: [java.lang.String]
      * @return: org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper
