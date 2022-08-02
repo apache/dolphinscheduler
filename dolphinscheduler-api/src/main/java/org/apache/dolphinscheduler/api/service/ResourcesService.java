@@ -221,7 +221,7 @@ public interface ResourcesService {
     Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
 
     /**
-     * Get resource by given resource type and full name. It return map contain resource id, name.
+     * Get resource by given resource type and full name.
      * Useful in Python API create task which need processDefinition information.
      *
      * @param userName user who query resource
