@@ -17,19 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import lombok.experimental.UtilityClass;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 
-public final class MasterServerMetrics {
-
-    private MasterServerMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+@UtilityClass
+public class MasterServerMetrics {
 
     /**
      * Used to measure the master server is overload.
      */
-    private static final Counter MASTER_OVERLOAD_COUNTER =
+    private final Counter MASTER_OVERLOAD_COUNTER =
             Counter.builder("ds.master.overload.count")
                     .description("Master server overload count")
                     .register(Metrics.globalRegistry);
@@ -37,16 +36,16 @@ public final class MasterServerMetrics {
     /**
      * Used to measure the number of process command consumed by master.
      */
-    private static final Counter MASTER_CONSUME_COMMAND_COUNTER =
+    private final Counter MASTER_CONSUME_COMMAND_COUNTER =
             Counter.builder("ds.master.consume.command.count")
                     .description("Master server consume command count")
                     .register(Metrics.globalRegistry);
 
-    public static void incMasterOverload() {
+    public void incMasterOverload() {
         MASTER_OVERLOAD_COUNTER.increment();
     }
 
-    public static void incMasterConsumeCommand(int commandCount) {
+    public void incMasterConsumeCommand(int commandCount) {
         MASTER_CONSUME_COMMAND_COUNTER.increment(commandCount);
     }
 

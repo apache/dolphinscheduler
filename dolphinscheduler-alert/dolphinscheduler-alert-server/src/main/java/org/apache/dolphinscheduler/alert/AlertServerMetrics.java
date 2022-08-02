@@ -19,39 +19,38 @@ package org.apache.dolphinscheduler.alert;
 
 import java.util.function.Supplier;
 
+import lombok.experimental.UtilityClass;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 
-public final class AlertServerMetrics {
+@UtilityClass
+public class AlertServerMetrics {
 
-    private AlertServerMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
-    private static final Counter ALERT_SUCCESS_COUNTER =
+    private final Counter ALERT_SUCCESS_COUNTER =
             Counter.builder("ds.alert.send.count")
                     .tag("status", "success")
                     .description("Alert success count")
                     .register(Metrics.globalRegistry);
 
-    private static final Counter ALERT_FAIL_COUNTER =
+    private final Counter ALERT_FAIL_COUNTER =
             Counter.builder("ds.alert.send.count")
                     .tag("status", "fail")
                     .description("Alert failure count")
                     .register(Metrics.globalRegistry);
 
-    public static void registerPendingAlertGauge(final Supplier<Number> supplier) {
+    public void registerPendingAlertGauge(final Supplier<Number> supplier) {
         Gauge.builder("ds.alert.pending", supplier)
                 .description("Number of pending alert")
                 .register(Metrics.globalRegistry);
     }
 
-    public static void incAlertSuccessCount() {
+    public void incAlertSuccessCount() {
         ALERT_SUCCESS_COUNTER.increment();
     }
 
-    public static void incAlertFailCount() {
+    public void incAlertFailCount() {
         ALERT_FAIL_COUNTER.increment();
     }
 

@@ -17,23 +17,23 @@
 
 package org.apache.dolphinscheduler.server.worker.metrics;
 
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import lombok.experimental.UtilityClass;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 
-public final class TaskMetrics {
+@UtilityClass
+public class TaskMetrics {
 
-    private TaskMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
-    private static Map<String, Counter> TASK_TYPE_EXECUTE_COUNTER = new HashMap<>();
-    private static final Counter UNKNOWN_TASK_EXECUTE_COUNTER =
+    private final Map<String, Counter> TASK_TYPE_EXECUTE_COUNTER = new HashMap<>();
+    private final Counter UNKNOWN_TASK_EXECUTE_COUNTER =
             Counter.builder("ds.task.execution.count.by.type")
                     .tag("task_type", "unknown")
                     .description("task execution counter by type")
@@ -51,7 +51,7 @@ public final class TaskMetrics {
         }
     }
 
-    public static void incrTaskTypeExecuteCount(String taskType) {
+    public void incrTaskTypeExecuteCount(String taskType) {
         TASK_TYPE_EXECUTE_COUNTER.getOrDefault(taskType, UNKNOWN_TASK_EXECUTE_COUNTER).increment();
     }
 
