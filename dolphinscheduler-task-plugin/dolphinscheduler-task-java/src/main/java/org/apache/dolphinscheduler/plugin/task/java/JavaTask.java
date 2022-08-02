@@ -153,7 +153,7 @@ public class JavaTask extends AbstractTaskExecutor {
             }
             Preconditions.checkNotNull(command, "command not be null.");
             TaskResponse taskResponse = shellCommandExecutor.run(command);
-            logger.info("java task run result : " + taskResponse);
+            logger.info("java task run result : {}", taskResponse);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
