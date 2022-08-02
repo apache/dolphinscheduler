@@ -90,8 +90,8 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                                 .append(SPACE).append(sourceMysqlParameter.getSrcTable());
                         }
 
-                        if(sourceMysqlParameter.getSrcColumnType() == SqoopColumnType.SOME_COLUMNS.getCode() 
-                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())){
+                        if (sourceMysqlParameter.getSrcColumnType() == SqoopColumnType.SOME_COLUMNS.getCode()
+                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
                             mysqlSourceSb.append(SPACE).append(COLUMNS)
                                 .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
                         }
