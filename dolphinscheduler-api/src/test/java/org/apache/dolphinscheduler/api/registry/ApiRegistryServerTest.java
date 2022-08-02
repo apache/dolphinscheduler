@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.registry;
 
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
