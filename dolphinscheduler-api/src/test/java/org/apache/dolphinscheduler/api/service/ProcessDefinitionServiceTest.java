@@ -763,7 +763,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void TestGetNewProcessName() {
+    public void testGetNewProcessName() {
         String processName1 = "test_copy_" + DateUtils.getCurrentTimeStamp();
         final String newName1 = processDefinitionService.getNewName(processName1, Constants.COPY_SUFFIX);
         Assert.assertEquals(2, newName1.split(Constants.COPY_SUFFIX).length);
