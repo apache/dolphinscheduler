@@ -69,6 +69,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
@@ -1007,5 +1009,53 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
         WorkflowExecutingDataResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponseCommand.class);
         return responseCommand.getWorkflowExecuteDto();
+    }
+
+    @Override
+    public Map<String, Object> execTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion, CommandType commandType, FailureStrategy failureStrategy, WarningType warningType,
+                                                int warningGroupId, String workerGroup, Long environmentCode, Integer timeout, Map<String, String> startParams, int dryRun) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result =
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        // timeout is invalid
+        if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
+            putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
+            return result;
+        }
+
+        // check master exists
+        if (!checkMasterExists(result)) {
+            return result;
+        }
+
+        // todo dispatch improvement
+        List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
+        Host host = new Host(masterServerList.get(0).getHost(), masterServerList.get(0).getPort());
+
+        TaskExecuteStartCommand taskExecuteStartCommand = new TaskExecuteStartCommand();
+        taskExecuteStartCommand.setProjectCode(projectCode);
+        taskExecuteStartCommand.setTaskDefinitionCode(taskDefinitionCode);
+        taskExecuteStartCommand.setTaskDefinitionVersion(taskDefinitionVersion);
+        taskExecuteStartCommand.setTimeout(timeout);
+        taskExecuteStartCommand.setFailureStrategy(failureStrategy);
+        taskExecuteStartCommand.setWorkerGroup(workerGroup);
+        taskExecuteStartCommand.setWarningGroupId(warningGroupId);
+        taskExecuteStartCommand.setWarningType(warningType);
+        taskExecuteStartCommand.setEnvironmentCode(environmentCode);
+        taskExecuteStartCommand.setStartParams(startParams);
+        taskExecuteStartCommand.setCommandType(commandType);
+        taskExecuteStartCommand.setDryRun(dryRun);
+
+        org.apache.dolphinscheduler.remote.command.Command response = stateEventCallbackService.sendSync(host, taskExecuteStartCommand.convert2Command());
+        if (response != null) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.START_TASK_INSTANCE_ERROR);
+        }
+        return result;
     }
 }

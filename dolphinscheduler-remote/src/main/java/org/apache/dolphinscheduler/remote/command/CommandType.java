@@ -64,6 +64,11 @@ public enum CommandType {
     MASTER_RESPONSE,
 
     /**
+     * task execute start, from api to master
+     */
+    TASK_EXECUTE_START,
+
+    /**
      * dispatch task request
      */
     TASK_DISPATCH_REQUEST,

@@ -898,7 +898,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             // package task instance before submit
             processService.packageTaskInstance(taskInstance, processInstance);
 
-            ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance);
             taskProcessor.init(taskInstance, processInstance);
 
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {

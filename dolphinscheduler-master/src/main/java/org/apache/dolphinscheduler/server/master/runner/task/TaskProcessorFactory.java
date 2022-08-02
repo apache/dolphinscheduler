@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_STREAM;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.experimental.UtilityClass;
+
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 /**
  * the factory to create task processor
@@ -54,7 +58,11 @@ public final class TaskProcessorFactory {
         }
     }
 
-    public static ITaskProcessor getTaskProcessor(String type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static ITaskProcessor getTaskProcessor(TaskInstance taskInstance) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        String type = taskInstance.getTaskType();
+        if (taskInstance.getTaskExecuteType() == TaskExecuteType.STREAM) {
+            type = TASK_TYPE_STREAM;
+        }
         if (StringUtils.isEmpty(type)) {
             type = DEFAULT_PROCESSOR;
         }

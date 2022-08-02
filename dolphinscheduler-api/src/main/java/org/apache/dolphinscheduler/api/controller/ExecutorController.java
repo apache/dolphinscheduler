@@ -380,4 +380,62 @@ public class ExecutorController extends BaseController {
         WorkflowExecuteDto workflowExecuteDto = execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
         return Result.success(workflowExecuteDto);
     }
+
+    /**
+     * execute task instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code taskDefinitionCode
+     * @param version taskDefinitionVersion
+     * @param failureStrategy failure strategy
+     * @param execType execute type
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param workerGroup worker group
+     * @param timeout timeout
+     * @return start task result code
+     */
+    @ApiOperation(value = "startTaskInstance", notes = "RUN_TASK_INSTANCE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "version", value = "VERSION", dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
+        @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
+        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
+        @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+    })
+    @PostMapping(value = "/task-instance/{code}/start")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result startTaskInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                       @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
+                                       @RequestParam(value = "version", required = true) int version,
+                                       @RequestParam(value = "failureStrategy", required = false) FailureStrategy failureStrategy,
+                                       @RequestParam(value = "execType", required = false) CommandType execType,
+                                       @RequestParam(value = "warningType") WarningType warningType,
+                                       @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
+                                       @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                       @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                       @RequestParam(value = "timeout", required = false) Integer timeout,
+                                       @RequestParam(value = "startParams", required = false) String startParams,
+                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
+
+        if (timeout == null) {
+            timeout = Constants.MAX_TASK_TIMEOUT;
+        }
+        Map<String, String> startParamMap = null;
+        if (startParams != null) {
+            startParamMap = JSONUtils.toMap(startParams);
+        }
+
+        Map<String, Object> result = execService.execTaskInstance(loginUser, projectCode, code, version,
+            execType, failureStrategy, warningType, warningGroupId, workerGroup, environmentCode, timeout, startParamMap, dryRun);
+        return returnDataList(result);
+    }
 }
