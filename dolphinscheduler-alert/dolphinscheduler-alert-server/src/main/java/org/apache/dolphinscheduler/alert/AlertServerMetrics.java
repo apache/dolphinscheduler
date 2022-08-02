@@ -31,13 +31,13 @@ public final class AlertServerMetrics {
 
     private static final Counter ALERT_SUCCESS_COUNTER =
             Counter.builder("ds.alert.send.count")
-                    .tag("state", "success")
+                    .tag("status", "success")
                     .description("Alert success count")
                     .register(Metrics.globalRegistry);
 
     private static final Counter ALERT_FAIL_COUNTER =
             Counter.builder("ds.alert.send.count")
-                    .tag("state", "fail")
+                    .tag("status", "fail")
                     .description("Alert failure count")
                     .register(Metrics.globalRegistry);
 
