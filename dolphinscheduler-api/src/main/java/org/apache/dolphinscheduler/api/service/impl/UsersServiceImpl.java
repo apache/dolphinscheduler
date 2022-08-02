@@ -205,6 +205,41 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = new User();
         Date now = new Date();
 
+        if (StringUtils.isNotEmpty(userName)) {
+
+            if (!CheckUtils.checkUserName(userName)) {
+                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("userName %s doesn't valid", userName));
+            }
+
+            User tempUser = userMapper.queryByUserNameAccurately(userName);
+            if (tempUser != null) {
+                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("userName %s exist", userName));
+            }
+            user.setUserName(userName);
+        }
+
+        if (StringUtils.isNotEmpty(userPassword)) {
+            if (!CheckUtils.checkPasswordLength(userPassword)) {
+                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("userPassword %s length error", userPassword));
+            }
+            user.setUserPassword(EncryptionUtils.getMd5(userPassword));
+        }
+
+        if (StringUtils.isNotEmpty(email)) {
+            if (!CheckUtils.checkEmail(email)) {
+                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("email %s doesn't valid", email));
+            }
+            user.setEmail(email);
+        }
+
+        if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
+            throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("phone %s doesn't valid", phone));
+        }
+
+        if (state == 0 && user.getState() != state) {
+            throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("state %s doesn't allow to disable own account", state));
+        }
+
         user.setUserName(userName);
         user.setUserPassword(EncryptionUtils.getMd5(userPassword));
         user.setEmail(email);
@@ -1019,7 +1054,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        // only admin can operate
+        //only admin can operate
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, USER_MANAGER)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
