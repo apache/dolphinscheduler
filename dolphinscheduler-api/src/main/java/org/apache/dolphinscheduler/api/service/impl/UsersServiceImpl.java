@@ -239,10 +239,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (state == 0 && user.getState() != state) {
             throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("state %s doesn't allow to disable own account", state));
         }
-
-        user.setUserName(userName);
-        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
-        user.setEmail(email);
+        
         user.setTenantId(tenantId);
         user.setPhone(phone);
         user.setState(state);
@@ -1210,8 +1207,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
                     if (!component.isDirctory()) {
                         // copy it to dst
-                        storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()),
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true);
+                        storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()), String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false,
+                            true);
                         continue;
                     }
 
