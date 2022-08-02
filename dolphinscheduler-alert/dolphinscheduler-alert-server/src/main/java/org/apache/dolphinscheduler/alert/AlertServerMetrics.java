@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.alert;
 
 import java.util.function.Supplier;
 
-import lombok.experimental.UtilityClass;
-
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
+
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class AlertServerMetrics {
