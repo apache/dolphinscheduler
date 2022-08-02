@@ -42,6 +42,7 @@ public final class Constants {
     /**
      * registry properties
      */
+    public static final String REGISTRY_DOLPHINSCHEDULER_APIS = "/nodes/api";
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
     public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
     public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
@@ -570,6 +571,7 @@ public final class Constants {
     /**
      * master/worker server use for zk
      */
+    public static final String API_TYPE = "api";
     public static final String MASTER_TYPE = "master";
     public static final String WORKER_TYPE = "worker";
     public static final String DELETE_OP = "delete";

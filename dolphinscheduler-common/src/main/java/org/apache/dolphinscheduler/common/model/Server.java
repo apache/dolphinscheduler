@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * server
  */
-public class Server {
+public class Server implements Comparable<Server> {
 
     /**
      * id
@@ -126,5 +126,10 @@ public class Server {
                 ", createTime=" + createTime +
                 ", lastHeartbeatTime=" + lastHeartbeatTime +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Server other) {
+        return this.lastHeartbeatTime.compareTo(other.getLastHeartbeatTime());
     }
 }

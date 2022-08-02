@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.service.registry;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
+import static org.apache.dolphinscheduler.common.Constants.API_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
 import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_APIS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
@@ -42,7 +44,6 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -149,7 +150,7 @@ public class RegistryClient {
     public void handleDeadServer(Collection<String> nodes, NodeType nodeType, String opType) {
         nodes.forEach(node -> {
             final String host = getHostByEventDataPath(node);
-            final String type = nodeType == NodeType.MASTER ? MASTER_TYPE : WORKER_TYPE;
+            final String type = nodeType == NodeType.MASTER ? MASTER_TYPE : (nodeType == NodeType.WORKER ? WORKER_TYPE : API_TYPE);
 
             if (opType.equals(DELETE_OP)) {
                 removeDeadServerByHost(host, type);
@@ -269,6 +270,7 @@ public class RegistryClient {
     }
 
     private void initNodes() {
+        registry.put(REGISTRY_DOLPHINSCHEDULER_APIS, EMPTY, false);
         registry.put(REGISTRY_DOLPHINSCHEDULER_MASTERS, EMPTY, false);
         registry.put(REGISTRY_DOLPHINSCHEDULER_WORKERS, EMPTY, false);
         registry.put(REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, EMPTY, false);
@@ -276,6 +278,8 @@ public class RegistryClient {
 
     private String rootNodePath(NodeType type) {
         switch (type) {
+            case API:
+                return Constants.REGISTRY_DOLPHINSCHEDULER_APIS;
             case MASTER:
                 return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
             case WORKER:

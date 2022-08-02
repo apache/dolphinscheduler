@@ -18,5 +18,5 @@
 package org.apache.dolphinscheduler.common.enums;
 
 public enum NodeType {
-    MASTER, WORKER, DEAD_SERVER
+    API, MASTER, WORKER, DEAD_SERVER
 }
