@@ -106,6 +106,7 @@ spec:
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
       volumes:
+        {{- if .Values.worker.persistentVolumeClaim.enabled }}
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
           persistentVolumeClaim:
@@ -120,6 +121,12 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- else }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          emptyDir: {}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          emptyDir: {}
+        {{- end }}
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
