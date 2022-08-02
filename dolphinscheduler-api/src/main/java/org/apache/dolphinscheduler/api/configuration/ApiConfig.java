@@ -36,7 +36,7 @@ import lombok.Data;
 public class ApiConfig implements Validator {
 
     private boolean registryEnabled = false;
-    private int listenPort = 9010;
+    private int listenPort = 7890;
     private int execThreads = 10;
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     private int heartbeatErrorThreshold = 5;
