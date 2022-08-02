@@ -20,6 +20,17 @@ package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 public class PrestoConnectionParam extends BaseConnectionParam {
+
+    protected String schema;
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+
     @Override
     public String toString() {
         return "PrestoConnectionParam{"
@@ -27,6 +38,7 @@ public class PrestoConnectionParam extends BaseConnectionParam {
                 + ", password='" + password + '\''
                 + ", address='" + address + '\''
                 + ", database='" + database + '\''
+                + ", schema='" + schema + '\''
                 + ", jdbcUrl='" + jdbcUrl + '\''
                 + ", driverLocation='" + driverLocation + '\''
                 + ", driverClassName='" + driverClassName + '\''

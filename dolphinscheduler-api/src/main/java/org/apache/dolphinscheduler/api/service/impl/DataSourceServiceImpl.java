@@ -568,11 +568,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
 
             DatabaseMetaData metaData = connection.getMetaData();
+            String schema = null;
+            try {
+                schema = metaData.getConnection().getSchema();
+            } catch (SQLException e) {
+                logger.error("cant not get the schema : {}", e.getMessage(), e);
+            }
 
             if (dataSource.getType() == DbType.ORACLE) {
                 database = null;
             }
-            rs = metaData.getColumns(database, null, tableName, "%");
+            rs = metaData.getColumns(database,
+                getDbSchemaPattern(dataSource.getType(),schema,connectionParam),
+                tableName, "%");
             if (rs == null) {
                 return result;
             }

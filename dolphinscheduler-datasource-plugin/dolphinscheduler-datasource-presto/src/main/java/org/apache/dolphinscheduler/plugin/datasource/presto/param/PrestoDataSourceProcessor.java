@@ -37,11 +37,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final Pattern PRESTO_DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+/[a-zA-Z0-9\\_\\-\\.]+$");
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -59,7 +62,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
                 prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
         prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
+        prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase() + "/" + connectionParams.getSchema());
         prestoDatasourceParamDTO.setUserName(connectionParams.getUser());
         prestoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
@@ -78,7 +81,8 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         prestoConnectionParam.setOther(transformOther(prestoParam.getOther()));
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);
-        prestoConnectionParam.setDatabase(prestoParam.getDatabase());
+        prestoConnectionParam.setDatabase(prestoParam.getDatabase().split("/")[0]);
+        prestoConnectionParam.setSchema(prestoParam.getDatabase().split("/")[1]);
         prestoConnectionParam.setDriverClassName(getDatasourceDriver());
         prestoConnectionParam.setValidationQuery(getValidationQuery());
         prestoConnectionParam.setProps(prestoParam.getOther());
@@ -147,5 +151,12 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
             otherMap.put(config.split("=")[0], config.split("=")[1]);
         }
         return otherMap;
+    }
+
+    @Override
+    protected void checkDatasourcePatter(String database) {
+        if (!PRESTO_DATABASE_PATTER.matcher(database).matches()) {
+            throw new IllegalArgumentException("datasource name illegal");
+        }
     }
 }
