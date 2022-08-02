@@ -415,6 +415,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param taskInstance
      */
     public void releaseTaskGroup(TaskInstance taskInstance) {
+        logger.info("Release task group");
         if (taskInstance.getTaskGroupId() > 0) {
             TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
             if (nextTaskInstance != null) {
@@ -929,6 +930,23 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
+
+            // if we use task group, then need to acquire the task group resource
+            // if there is no resource the current task instance will not be dispatched
+            // it will be weakup when other tasks release the resource.
+            int taskGroupId = taskInstance.getTaskGroupId();
+            if (taskGroupId > 0) {
+                boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
+                                                                           taskInstance.getName(),
+                                                                           taskGroupId,
+                                                                           taskInstance.getProcessInstanceId(),
+                                                                           taskInstance.getTaskGroupPriority());
+                if (!acquireTaskGroup) {
+                    logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
+                    return Optional.of(taskInstance);
+                }
+            }
+
             boolean dispatchSuccess = taskProcessor.action(TaskAction.DISPATCH);
             if (!dispatchSuccess) {
                 logger.error("process id:{} name:{} dispatch standby task id:{} name:{} failed!",
