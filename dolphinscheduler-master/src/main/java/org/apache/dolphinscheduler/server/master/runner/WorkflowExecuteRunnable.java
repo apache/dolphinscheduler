@@ -851,7 +851,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
                 Date start = null;
                 Date end = null;
-                if(cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE) && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)){
+                if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE) && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)) {
                     start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
                     end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
                 }
@@ -1820,12 +1820,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         // todo: Can we use a better way to set the recover taskInstanceId list? rather then use the cmdParam
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
-            if (ArrayUtils.isNotEmpty(idList)) {
-                List<Integer> taskInstanceIds = Arrays.stream(idList)
-                    .map(Integer::valueOf)
-                    .collect(Collectors.toList());
-                return processService.findTaskInstanceByIdList(taskInstanceIds);
+            List<Integer> startTaskInstanceIds = Arrays.stream(paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING)
+                                                                   .split(COMMA))
+                .filter(StringUtils::isNotEmpty)
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(startTaskInstanceIds)) {
+                return processService.findTaskInstanceByIdList(startTaskInstanceIds);
             }
         }
         return Collections.emptyList();
