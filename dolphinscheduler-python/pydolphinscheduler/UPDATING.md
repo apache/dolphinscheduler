@@ -35,3 +35,4 @@ It started after version 2.0.5 released
 * Remove parameter `queue` from class `ProcessDefinition` to avoid confuse user when it change but not work
 * Change `yaml_parser.py` method `to_string` to magic method `__str__` make it more pythonic.
 * Use package ``ruamel.yaml`` replace ``pyyaml`` for write yaml file with comment.
+
