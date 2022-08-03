@@ -389,62 +389,44 @@
                 <version>${spotless.version}</version>
                 <configuration>
                     <!-- optional: limit format enforcement to just the files changed by this feature branch -->
-                    <!--                    <ratchetFrom>upstream/dev</ratchetFrom>-->
-                    <formats>
-                        <!-- you can define as many formats as you want, each is independent -->
-                        <format>
-                            <!-- define the files to apply to -->
-                            <includes>
-                                <include>*.md</include>
-                                <include>.gitignore</include>
-                            </includes>
-                            <!-- define the steps to apply to those files -->
-                            <trimTrailingWhitespace/>
-                            <endWithNewline/>
-                            <indent>
-                                <tabs>true</tabs>
-                                <spacesPerTab>4</spacesPerTab>
-                            </indent>
-                        </format>
-                    </formats>
-                    <!-- define a language-specific format -->
+                    <ratchetFrom>upstream/dev</ratchetFrom>
                     <java>
-                        <!-- no need to specify files, inferred automatically, but you can if you want -->
-
-                        <importOrder /> <!-- standard import order -->
-
-                        <removeUnusedImports /> <!-- self-explanatory -->
-
-                        <!-- apply a specific flavor of google-java-format and reflow long strings -->
-                        <googleJavaFormat>
-                            <version>1.8</version>
-                            <style>AOSP</style>
-                            <reflowLongStrings>true</reflowLongStrings>
-                        </googleJavaFormat>
-
-                        <!-- make sure every file has the following copyright header.
-                          optionally, Spotless can set copyright years by digging
-                          through git history (see "license" section below) -->
+                        <eclipse>
+                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
+                        </eclipse>
                         <licenseHeader>
-                            <content>/*
-                                * Licensed to the Apache Software Foundation (ASF) under one or more
-                                * contributor license agreements.  See the NOTICE file distributed with
-                                * this work for additional information regarding copyright ownership.
-                                * The ASF licenses this file to You under the Apache License, Version 2.0
-                                * (the "License"); you may not use this file except in compliance with
-                                * the License.  You may obtain a copy of the License at
-                                *
-                                *    http://www.apache.org/licenses/LICENSE-2.0
-                                *
-                                * Unless required by applicable law or agreed to in writing, software
-                                * distributed under the License is distributed on an "AS IS" BASIS,
-                                * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                                * See the License for the specific language governing permissions and
-                                * limitations under the License.
-                                */</content>  <!-- or <file>${project.basedir}/license-header</file> -->
+                            <file>style/license-header</file>
                         </licenseHeader>
                     </java>
+                    <pom>
+                        <sortPom>
+                            <encoding>UTF-8</encoding>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <keepBlankLines>true</keepBlankLines>
+                            <indentBlankLines>true</indentBlankLines>
+                            <indentSchemaLocation>true</indentSchemaLocation>
+                            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+                            <sortModules>false</sortModules>
+                            <sortExecutions>false</sortExecutions>
+                            <predefinedSortOrder>custom_1</predefinedSortOrder>
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <sortProperties>false</sortProperties>
+                        </sortPom>
+                        <replace>
+                            <name>Leading blank line</name>
+                            <search>project</search>
+                            <replacement>project</replacement>
+                        </replace>
+                    </pom>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
