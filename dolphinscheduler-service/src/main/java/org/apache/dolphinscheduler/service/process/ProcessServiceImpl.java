@@ -2966,11 +2966,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public boolean acquireTaskGroupAgain(TaskGroupQueue taskGroupQueue) {
-        return robTaskGroupResource(taskGroupQueue);
-    }
-
-    @Override
     public void releaseAllTaskGroup(int processInstanceId) {
         List<TaskInstance> taskInstances = this.taskInstanceMapper.loadAllInfosNoRelease(processInstanceId, TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
         for (TaskInstance info : taskInstances) {

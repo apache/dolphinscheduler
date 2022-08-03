@@ -338,7 +338,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return true;
         }
         if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
-            boolean acquireTaskGroup = processService.acquireTaskGroupAgain(taskGroupQueue);
+            boolean acquireTaskGroup = processService.robTaskGroupResource(taskGroupQueue);
             if (acquireTaskGroup) {
                 TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
