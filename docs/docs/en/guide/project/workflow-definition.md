@@ -122,6 +122,7 @@ The following are the operation functions of the workflow definition list:
          1. Select the date through the page:
         
          ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
+         
          2. Manual input:
          
          ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
