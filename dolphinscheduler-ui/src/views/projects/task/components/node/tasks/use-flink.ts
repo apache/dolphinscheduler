@@ -31,7 +31,7 @@ export function useFlink({
   data?: ITaskData
 }) {
   const model = reactive<INodeData>({
-    taskType: 'FLINK',
+    taskType: data?.taskType,
     name: '',
     flag: 'YES',
     description: '',

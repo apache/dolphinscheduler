@@ -18,6 +18,10 @@
 import type { Node, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import utils from '@/utils'
+import {
+  TASK_TYPES_MAP,
+  TaskType
+} from '@/views/projects/task/constants/task-type'
 import { WorkflowDefinition, Coordinate } from './types'
 
 export function useCustomCellBuilder() {
@@ -64,7 +68,7 @@ export function useCustomCellBuilder() {
    */
   function buildNode(
     id: string,
-    type: string,
+    type: TaskType,
     taskName: string,
     flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
@@ -78,14 +82,18 @@ export function useCustomCellBuilder() {
       data: {
         taskType: type,
         taskName: taskName || id,
-        flag: flag
+        flag: flag,
+        taskExecuteType: TASK_TYPES_MAP[type].taskExecuteType
       },
       attrs: {
         image: {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
           'xlink:href': `${
             import.meta.env.BASE_URL
-          }images/task-icons/${type.toLocaleLowerCase()}.png`
+          }images/task-icons/${(type !== 'FLINK_STREAM'
+            ? type
+            : 'FLINK'
+          ).toLocaleLowerCase()}.png`
         },
         title: {
           text: truncation

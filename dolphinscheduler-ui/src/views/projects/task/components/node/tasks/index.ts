@@ -70,5 +70,6 @@ export default {
   DVC: useDvc,
   DINKY: useDinky,
   SAGEMAKER: userSagemaker,
-  CHUNJUN: useChunjun
+  CHUNJUN: useChunjun,
+  FLINK_STREAM: useFlink
 }
