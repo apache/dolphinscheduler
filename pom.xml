@@ -389,7 +389,7 @@
                 <version>${spotless.version}</version>
                 <configuration>
                     <!-- optional: limit format enforcement to just the files changed by this feature branch -->
-                    <ratchetFrom>upstream/dev</ratchetFrom>
+                    <ratchetFrom>HEAD</ratchetFrom>
                     <java>
                         <eclipse>
                             <file>style/spotless_dolphinscheduler_formatter.xml</file>
