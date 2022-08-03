@@ -237,8 +237,7 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(process.exitValue());
 
         } else {
-            logger.error("process has failure , the task timeout configuration value is:{}, ready to kill ...",
-                    result.getExitStatusCode(), taskRequest.getTaskTimeout());
+            logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...", taskRequest.getTaskTimeout());
             ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
