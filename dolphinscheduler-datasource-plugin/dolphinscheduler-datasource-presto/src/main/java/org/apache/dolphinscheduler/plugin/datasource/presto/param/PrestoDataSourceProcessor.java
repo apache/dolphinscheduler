@@ -62,7 +62,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
                 prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
         prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase() + "/" + connectionParams.getSchema());
+        prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase() + Constants.SLASH + connectionParams.getSchema());
         prestoDatasourceParamDTO.setUserName(connectionParams.getUser());
         prestoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
@@ -73,7 +73,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PrestoDataSourceParamDTO prestoParam = (PrestoDataSourceParamDTO) datasourceParam;
         String address = String.format("%s%s:%s", Constants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
-        String jdbcUrl = address + "/" + prestoParam.getDatabase();
+        String jdbcUrl = address + Constants.SLASH + prestoParam.getDatabase();
 
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setUser(prestoParam.getUserName());
@@ -81,8 +81,8 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         prestoConnectionParam.setOther(transformOther(prestoParam.getOther()));
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);
-        prestoConnectionParam.setDatabase(prestoParam.getDatabase().split("/")[0]);
-        prestoConnectionParam.setSchema(prestoParam.getDatabase().split("/")[1]);
+        prestoConnectionParam.setDatabase(prestoParam.getDatabase().split(Constants.SLASH)[0]);
+        prestoConnectionParam.setSchema(prestoParam.getDatabase().split(Constants.SLASH)[1]);
         prestoConnectionParam.setDriverClassName(getDatasourceDriver());
         prestoConnectionParam.setValidationQuery(getValidationQuery());
         prestoConnectionParam.setProps(prestoParam.getOther());
