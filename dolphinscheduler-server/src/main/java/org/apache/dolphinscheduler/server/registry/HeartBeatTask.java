@@ -44,6 +44,18 @@ public class HeartBeatTask implements Runnable {
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
     public HeartBeatTask(long startupTime,
+                         Set<String> heartBeatPaths,
+                         String serverType,
+                         RegistryClient registryClient,
+                         int heartBeatErrorThreshold) {
+        this.heartBeatPaths = heartBeatPaths;
+        this.registryClient = registryClient;
+        this.serverType = serverType;
+        this.heartBeat = new HeartBeat(startupTime);
+        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
+    }
+
+    public HeartBeatTask(long startupTime,
                          double maxCpuloadAvg,
                          double reservedMemory,
                          Set<String> heartBeatPaths,

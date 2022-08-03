@@ -17,35 +17,31 @@
 
 package org.apache.dolphinscheduler.api.registry;
 
-import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(prefix = "register",name = "enabled",havingValue = "true")
 public class ApiRegistryServer implements IStoppable {
 
     private final Logger logger = LoggerFactory.getLogger(ApiRegistryServer.class);
 
-    @Autowired
-    private ApiConfig apiConfig;
-
-    @Autowired
+    @Resource
     private ApiRegistryClient apiRegistryClient;
 
     @PostConstruct
     public void start() {
-        if (!apiConfig.isRegistryEnabled()) {
-            return;
-        }
+        this.apiRegistryClient.init();
         this.apiRegistryClient.registry();
         this.apiRegistryClient.setRegistryStoppable(this);
     }

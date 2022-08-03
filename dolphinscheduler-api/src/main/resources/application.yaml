@@ -111,14 +111,10 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
-api:
-  registry-enabled: false
-  listen-port: 7890
-  exec-threads: 10
+register:
+  enabled: false
   heartbeat-interval: 10s
   heartbeat-error-threshold: 5
-  max-cpu-load-avg: -1
-  reserved-memory: 0.3
 
 audit:
   enabled: false

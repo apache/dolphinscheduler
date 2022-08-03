@@ -37,12 +37,7 @@ public class ApiConfigTest {
 
     @Test
     public void apiConfigParamTest() {
-        Assert.assertFalse(apiConfig.isRegistryEnabled());
-        Assert.assertEquals(7890, apiConfig.getListenPort());
         Assert.assertEquals(Duration.ofSeconds(10), apiConfig.getHeartbeatInterval());
         Assert.assertEquals(5, apiConfig.getHeartbeatErrorThreshold());
-        Assert.assertEquals(-1, apiConfig.getMaxCpuLoadAvg());
-        Assert.assertEquals(10, apiConfig.getExecThreads());
-        Assert.assertTrue(0.3 == apiConfig.getReservedMemory());
     }
 }

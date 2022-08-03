@@ -37,16 +37,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
 
 @Service
+@ConditionalOnProperty(prefix = "register",name = "enabled",havingValue = "true")
 public class ApiRegistryClient implements AutoCloseable {
 
     private final Logger logger = LoggerFactory.getLogger(ApiRegistryClient.class);
@@ -63,9 +63,8 @@ public class ApiRegistryClient implements AutoCloseable {
 
     private String apiAddress;
 
-    @PostConstruct
     public void init() {
-        this.apiAddress = NetUtils.getAddr(apiConfig.getListenPort());
+        this.apiAddress = apiConfig.getApiAddress();
         this.startupTime = System.currentTimeMillis();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -76,8 +75,6 @@ public class ApiRegistryClient implements AutoCloseable {
         Duration apiHeartbeatInterval = apiConfig.getHeartbeatInterval();
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                                                        apiConfig.getMaxCpuLoadAvg(),
-                                                        apiConfig.getReservedMemory(),
                                                         Sets.newHashSet(localNodePath),
                                                         Constants.API_TYPE,
                                                         registryClient,
@@ -103,26 +100,24 @@ public class ApiRegistryClient implements AutoCloseable {
     }
 
     private String getCurrentNodePath() {
-        String address = getLocalAddress();
-        return REGISTRY_DOLPHINSCHEDULER_APIS + "/" + address;
+        return REGISTRY_DOLPHINSCHEDULER_APIS + "/" + apiAddress;
+    }
+
+    public String getApiAddress() {
+        return this.apiAddress;
     }
 
     public void deregister() {
         try {
-            String address = getLocalAddress();
             String localNodePath = getCurrentNodePath();
             registryClient.remove(localNodePath);
-            logger.info("Api node : {} unRegistry to register center.", address);
+            logger.info("Api node : {} unRegistry to register center.", apiAddress);
             heartBeatExecutor.shutdown();
             logger.info("ApiServer heartbeat executor shutdown");
             registryClient.close();
         } catch (Exception e) {
             logger.error("ApiServer remove registry path exception ", e);
         }
-    }
-
-    public String getLocalAddress() {
-        return NetUtils.getAddr(apiConfig.getListenPort());
     }
 
     @Override

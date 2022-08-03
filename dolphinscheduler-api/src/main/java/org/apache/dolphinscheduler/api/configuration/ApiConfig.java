@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 
 import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
@@ -32,16 +33,14 @@ import lombok.Data;
 @Data
 @Validated
 @Configuration
-@ConfigurationProperties(prefix = "api")
+@ConfigurationProperties(prefix = "register")
 public class ApiConfig implements Validator {
 
-    private boolean registryEnabled = false;
-    private int listenPort = 7890;
-    private int execThreads = 10;
+    @Value("${server.port}")
+    private int port;
+
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     private int heartbeatErrorThreshold = 5;
-    private int maxCpuLoadAvg = -1;
-    private double reservedMemory = 0.3;
     private String apiAddress;
 
     @Override
@@ -55,12 +54,9 @@ public class ApiConfig implements Validator {
         if (apiConfig.getHeartbeatInterval().toMillis() <= 0) {
             errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
         }
-        if (apiConfig.getMaxCpuLoadAvg() <= 0) {
-            apiConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
-        }
         if (apiConfig.getHeartbeatErrorThreshold() <= 0) {
             errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
         }
-        apiConfig.setApiAddress(NetUtils.getAddr(apiConfig.getListenPort()));
+        apiConfig.setApiAddress(NetUtils.getAddr(port));
     }
 }

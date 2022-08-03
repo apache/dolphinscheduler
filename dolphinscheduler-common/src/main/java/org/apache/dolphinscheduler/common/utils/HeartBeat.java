@@ -37,9 +37,20 @@ public class HeartBeat {
     private int serverStatus;
     private int processId;
 
-    private int workerHostWeight; // worker host weight
-    private int workerWaitingTaskCount; // worker waiting task count
-    private int workerExecThreadCount; // worker thread pool thread count
+    /**
+     * worker host weight
+     */
+    private int workerHostWeight;
+
+    /**
+     * worker waiting task count
+     */
+    private int workerWaitingTaskCount;
+
+    /**
+     * worker thread pool thread count
+     */
+    private int workerExecThreadCount;
 
     private double diskAvailable;
 
@@ -158,6 +169,12 @@ public class HeartBeat {
     public HeartBeat() {
         this.reportTime = System.currentTimeMillis();
         this.serverStatus = Constants.NORMAL_NODE_STATUS;
+    }
+
+    public HeartBeat(long startupTime) {
+        this.reportTime = System.currentTimeMillis();
+        this.serverStatus = Constants.NORMAL_NODE_STATUS;
+        this.startupTime = startupTime;
     }
 
     public HeartBeat(long startupTime, double maxCpuloadAvg, double reservedMemory) {
