@@ -99,12 +99,15 @@
         1. 通过页面选择日期：
         
         ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
+        
         2. 手动输入：
         
         ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
      
      * 补数与定时配置的关系：
+       
         1. 未配置定时：当没有定时配置时默认会根据所选时间范围进行每天一次的补数，比如该工作流调度日期为7月 7号到7月10号，未配置定时，流程实例为：
+        
         ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
 
         2. 已配置定时：如果有定时配置则会根据所选的时间范围结合定时配置进行补数，比如该工作流调度日期为7月 7号到7月10号，配置了定时（每凌晨5点运行），流程实例为：
