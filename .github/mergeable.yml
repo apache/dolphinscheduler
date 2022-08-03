@@ -36,3 +36,5 @@ mergeable:
         status: 'success'
       - do: labels
         delete: 'sql not sync'
+
+
