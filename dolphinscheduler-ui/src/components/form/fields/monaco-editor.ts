@@ -26,7 +26,7 @@ export function renderEditor(
 ) {
   const { props, field } = isFunction(item) ? item() : item
   return h(Editor, {
-    ...props,
+    options: props,
     value: fields[field],
     onUpdateValue: (value: string) => void (fields[field] = value)
   })

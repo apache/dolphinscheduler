@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 import type { MaybeArray } from 'naive-ui/es/_utils'
+import type monaco from 'monaco-editor'
 
 type OnUpdateValue = <T extends string>(value: T) => void
 type OnUpdateValueImpl = (value: string) => void
 
-export { MaybeArray, OnUpdateValue, OnUpdateValueImpl }
+export { MaybeArray, OnUpdateValue, OnUpdateValueImpl, monaco }
