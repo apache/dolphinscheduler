@@ -15,37 +15,42 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.metrics;
+package org.apache.dolphinscheduler.alert;
+
+import java.util.function.Supplier;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class MasterServerMetrics {
+public class AlertServerMetrics {
 
-    /**
-     * Used to measure the master server is overload.
-     */
-    private final Counter masterOverloadCounter =
-            Counter.builder("ds.master.overload.count")
-                    .description("Master server overload count")
+    private final Counter alertSuccessCounter =
+            Counter.builder("ds.alert.send.count")
+                    .tag("status", "success")
+                    .description("Alert success count")
                     .register(Metrics.globalRegistry);
 
-    /**
-     * Used to measure the number of process command consumed by master.
-     */
-    private final Counter masterConsumeCommandCounter =
-            Counter.builder("ds.master.consume.command.count")
-                    .description("Master server consume command count")
+    private final Counter alertFailCounter =
+            Counter.builder("ds.alert.send.count")
+                    .tag("status", "fail")
+                    .description("Alert failure count")
                     .register(Metrics.globalRegistry);
 
-    public void incMasterOverload() {
-        masterOverloadCounter.increment();
+    public void registerPendingAlertGauge(final Supplier<Number> supplier) {
+        Gauge.builder("ds.alert.pending", supplier)
+                .description("Number of pending alert")
+                .register(Metrics.globalRegistry);
     }
 
-    public void incMasterConsumeCommand(int commandCount) {
-        masterConsumeCommandCounter.increment(commandCount);
+    public void incAlertSuccessCount() {
+        alertSuccessCounter.increment();
+    }
+
+    public void incAlertFailCount() {
+        alertFailCounter.increment();
     }
 
 }

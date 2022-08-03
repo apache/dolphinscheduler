@@ -23,25 +23,23 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
+public class TaskMetrics {
 
-public final class TaskMetrics {
-    private TaskMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    private final Map<String, Counter> taskInstanceCounters = new HashMap<>();
 
-
-    private static Map<String, Counter> TASK_INSTANCE_COUNTERS = new HashMap<>();
-
-    private static final Set<String> TASK_INSTANCE_STATES = ImmutableSet.of(
+    private final Set<String> taskInstanceStates = ImmutableSet.of(
             "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "fail", "stop");
 
     static {
-        for (final String state : TASK_INSTANCE_STATES) {
-            TASK_INSTANCE_COUNTERS.put(
+        for (final String state : taskInstanceStates) {
+            taskInstanceCounters.put(
                     state,
                     Counter.builder("ds.task.instance.count")
                             .tags("state", state)
@@ -52,41 +50,41 @@ public final class TaskMetrics {
 
     }
 
-    private static final Counter TASK_DISPATCH_COUNTER =
+    private final Counter taskDispatchCounter =
             Counter.builder("ds.task.dispatch.count")
                     .description("Task dispatch count")
                     .register(Metrics.globalRegistry);
 
-    private static final Counter TASK_DISPATCHER_FAILED =
+    private final Counter taskDispatchFailCounter =
             Counter.builder("ds.task.dispatch.failure.count")
                     .description("Task dispatch failures count, retried ones included")
                     .register(Metrics.globalRegistry);
 
-    private static final Counter TASK_DISPATCH_ERROR =
+    private final Counter taskDispatchErrorCounter =
             Counter.builder("ds.task.dispatch.error.count")
                     .description("Number of errors during task dispatch")
                     .register(Metrics.globalRegistry);
 
-    public synchronized static void registerTaskPrepared(Supplier<Number> consumer) {
+    public synchronized void registerTaskPrepared(Supplier<Number> consumer) {
         Gauge.builder("ds.task.prepared", consumer)
                 .description("Task prepared count")
                 .register(Metrics.globalRegistry);
     }
 
-    public static void incTaskDispatchFailed(int failedCount) {
-        TASK_DISPATCHER_FAILED.increment(failedCount);
+    public void incTaskDispatchFailed(int failedCount) {
+        taskDispatchFailCounter.increment(failedCount);
     }
 
-    public static void incTaskDispatchError() {
-        TASK_DISPATCH_ERROR.increment();
+    public void incTaskDispatchError() {
+        taskDispatchErrorCounter.increment();
     }
 
-    public static void incTaskDispatch() {
-        TASK_DISPATCH_COUNTER.increment();
+    public void incTaskDispatch() {
+        taskDispatchCounter.increment();
     }
 
-    public static void incTaskInstanceByState(final String state) {
-        TASK_INSTANCE_COUNTERS.get(state).increment();
+    public void incTaskInstanceByState(final String state) {
+        taskInstanceCounters.get(state).increment();
     }
 
 }
