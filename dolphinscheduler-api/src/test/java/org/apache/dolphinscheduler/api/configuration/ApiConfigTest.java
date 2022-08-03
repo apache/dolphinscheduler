@@ -38,7 +38,6 @@ public class ApiConfigTest {
     @Test
     public void apiConfigParamTest() {
         Assert.assertFalse(apiConfig.isRegistryEnabled());
-        System.out.println(apiConfig.getApiAddress());
         Assert.assertEquals(7890, apiConfig.getListenPort());
         Assert.assertEquals(Duration.ofSeconds(10), apiConfig.getHeartbeatInterval());
         Assert.assertEquals(5, apiConfig.getHeartbeatErrorThreshold());
