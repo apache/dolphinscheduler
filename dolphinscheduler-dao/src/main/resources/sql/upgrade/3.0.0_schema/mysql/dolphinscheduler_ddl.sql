@@ -477,6 +477,24 @@ delimiter ;
 CALL add_t_ds_alert_col_project_code;
 DROP PROCEDURE add_t_ds_alert_col_project_code;
 
+-- t_ds_task_instance
+drop PROCEDURE if EXISTS alter_t_ds_task_instance_col_log_path;
+delimiter d//
+CREATE PROCEDURE alter_t_ds_task_instance_col_log_path()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_instance'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='log_path')
+    THEN
+ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `log_path` longtext DEFAULT NULL COMMENT 'task log path';
+END IF;
+END;
+d//
+delimiter ;
+CALL alter_t_ds_task_instance_col_log_path;
+DROP PROCEDURE alter_t_ds_task_instance_col_log_path;
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --

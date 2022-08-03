@@ -18,6 +18,9 @@
 --- Drop table: Some table forget delete in the past, should be delete in version 1.2.0
 DROP TABLE IF EXISTS t_ds_worker_server;
 
+--- alter table
+ALTER TABLE t_ds_task_instance ALTER COLUMN log_path TYPE text;
+
 --- Add CONSTRAINT key
 ALTER TABLE t_ds_task_instance DROP CONSTRAINT IF EXISTS foreign_key_instance_id;
 ALTER TABLE t_ds_task_instance ADD CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE;
