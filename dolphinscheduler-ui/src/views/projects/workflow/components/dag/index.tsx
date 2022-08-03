@@ -241,11 +241,11 @@ export default defineComponent({
           taskInstanceId: nodeVariables.logTaskId,
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
-        }).then((res: string) => {
-          nodeVariables.logRef += res
-          if (res) {
+        }).then((res: any) => {
+          if (res.message) {
+            nodeVariables.logRef += res.message
             nodeVariables.limit += 1000
-            nodeVariables.skipLineNum += 1000
+            nodeVariables.skipLineNum += res.lineNum
             getLogs()
           } else {
             nodeVariables.logLoadingRef = false
