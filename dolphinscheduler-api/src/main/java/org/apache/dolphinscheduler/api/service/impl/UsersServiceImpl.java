@@ -205,43 +205,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = new User();
         Date now = new Date();
 
-        if (StringUtils.isNotEmpty(userName)) {
+        checkUserParams(userName, userPassword, email, phone, state);
 
-            if (!CheckUtils.checkUserName(userName)) {
-                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("userName %s doesn't valid", userName));
-            }
-
-            User tempUser = userMapper.queryByUserNameAccurately(userName);
-            if (tempUser != null) {
-                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("userName %s exist", userName));
-            }
-            user.setUserName(userName);
-        }
-
-        if (StringUtils.isNotEmpty(userPassword)) {
-            if (!CheckUtils.checkPasswordLength(userPassword)) {
-                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("userPassword %s length error", userPassword));
-            }
-            user.setUserPassword(EncryptionUtils.getMd5(userPassword));
-        }
-
-        if (StringUtils.isNotEmpty(email)) {
-            if (!CheckUtils.checkEmail(email)) {
-                throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("email %s doesn't valid", email));
-            }
-            user.setEmail(email);
-        }
-
-        if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
-            throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("phone %s doesn't valid", phone));
-        }
-
-        if (state == 0 && user.getState() != state) {
-            throw new org.apache.dolphinscheduler.service.exceptions.ServiceException(String.format("state %s doesn't allow to disable own account", state));
-        }
-        
-        user.setTenantId(tenantId);
+        user.setUserName(userName);
+        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
+        user.setEmail(email);
         user.setPhone(phone);
+        user.setTenantId(tenantId);
         user.setState(state);
         // create general users, administrator users are currently built-in
         user.setUserType(UserType.GENERAL_USER);
@@ -404,7 +374,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param state        state
      * @param timeZone     timeZone
      * @return update result code
-     * @throws Exception exception
      */
     @Override
     public Map<String, Object> updateUser(User loginUser, int userId,
@@ -415,80 +384,33 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           String phone,
                                           String queue,
                                           int state,
-                                          String timeZone) throws IOException {
+                                          String timeZone) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
+            throw new ServiceException("Function Disabled");
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
-            return result;
+            throw new ServiceException("User No Operation Perm");
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
-            logger.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-        if (StringUtils.isNotEmpty(userName)) {
-
-            if (!CheckUtils.checkUserName(userName)) {
-                logger.warn("Parameter userName check failed.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
-                return result;
-            }
-
-            User tempUser = userMapper.queryByUserNameAccurately(userName);
-            if (tempUser != null && tempUser.getId() != userId) {
-                logger.warn("User name already exists, userName:{}.", tempUser.getUserName());
-                putMsg(result, Status.USER_NAME_EXIST);
-                return result;
-            }
-            user.setUserName(userName);
+            throw new ServiceException("User Doesn't Exist");
         }
 
-        if (StringUtils.isNotEmpty(userPassword)) {
-            if (!CheckUtils.checkPasswordLength(userPassword)) {
-                logger.warn("Parameter userPassword check failed.");
-                putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
-                return result;
-            }
-            user.setUserPassword(EncryptionUtils.getMd5(userPassword));
-        }
-
-        if (StringUtils.isNotEmpty(email)) {
-            if (!CheckUtils.checkEmail(email)) {
-                logger.warn("Parameter email check failed.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
-                return result;
-            }
-            user.setEmail(email);
-        }
-
-        if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
-            logger.warn("Parameter phone check failed.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
-            return result;
-        }
-
-        if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
-            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(), user.getUserName());
-            putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
-            return result;
-        }
+        checkUserParams(userName, userPassword, email, phone, state);
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                logger.warn("Parameter time zone is illegal.");
-                putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
-                return result;
+                throw new ServiceException(String.format("timeZone %s doesn't valid", timeZone));
             }
             user.setTimeZone(timeZone);
         }
 
+        user.setUserName(userName);
+        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
+        user.setEmail(email);
         user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);
@@ -1180,6 +1102,44 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         return msg;
+    }
+
+    /**
+     * @return if check failed throw error, otherwise return null
+     */
+    private void checkUserParams(String userName, String userPassword, String email, String phone, Integer state) {
+
+        if (StringUtils.isNotEmpty(userName)) {
+
+            if (!CheckUtils.checkUserName(userName)) {
+                throw new ServiceException(String.format("userName %s doesn't valid", userName));
+            }
+
+            User tempUser = userMapper.queryByUserNameAccurately(userName);
+            if (tempUser != null) {
+                throw new ServiceException(String.format("userName %s exist", userName));
+            }
+        }
+
+        if (StringUtils.isNotEmpty(userPassword)) {
+            if (!CheckUtils.checkPasswordLength(userPassword)) {
+                throw new ServiceException(String.format("userPassword %s length error", userPassword));
+            }
+        }
+
+        if (StringUtils.isNotEmpty(email)) {
+            if (!CheckUtils.checkEmail(email)) {
+                throw new ServiceException(String.format("email %s doesn't valid", email));
+            }
+        }
+
+        if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
+            throw new ServiceException(String.format("phone %s doesn't valid", phone));
+        }
+
+        if (state == 0) {
+            throw new ServiceException(String.format("state %s doesn't allow to disable own account", state));
+        }
     }
 
     /**

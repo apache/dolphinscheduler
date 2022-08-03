@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
@@ -54,6 +55,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +64,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.Null;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,17 +302,17 @@ public class UsersServiceTest {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
         try {
-            // user not exist
-            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
-                    "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
-            Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-            logger.info(result.toString());
+            //user not exist
+            Throwable exception =
+                Assertions.assertThrows(ServiceException.class, () -> usersService.updateUser(getLoginUser(), 0, userName, userPassword, "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai"));
+            Assertions.assertEquals("User Doesn't Exist", exception.getMessage());
 
             // success
             when(userMapper.selectById(1)).thenReturn(getUser());
             when(userMapper.updateById(getUser())).thenReturn(1);
-            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
-                    "13457864543", "queue", 1, "Asia/Shanghai");
+            Map<String, Object> result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
+                "13457864543", "queue", 1, "Asia/Shanghai");
+            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
@@ -743,6 +747,7 @@ public class UsersServiceTest {
         String email = "abc@x.com";
         String phone = "17366666666";
         String tenantCode = "tenantCode";
+        Integer userId = 1;
         int stat = 1;
 
         // User exists
