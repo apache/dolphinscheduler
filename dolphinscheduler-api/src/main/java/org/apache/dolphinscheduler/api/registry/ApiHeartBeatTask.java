@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.registry;
 
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
