@@ -294,7 +294,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * check if the current process has subprocesses and all subprocesses are valid
+     * check whether the current process has subprocesses and validate all subprocesses
      *
      * @param processDefinition
      * @return check result
@@ -562,7 +562,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * insert command, used in the implementation of the page, re run, recovery (pause / failure) execution
+     * insert command, used in the implementation of the page, rerun, recovery (pause / failure) execution
      *
      * @param loginUser             login user
      * @param instanceId            instance id
@@ -607,7 +607,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * check if sub processes are offline before starting process definition
+     * check whether sub processes are offline before starting process definition
      *
      * @param processDefinitionCode process definition code
      * @return check result code
@@ -724,8 +724,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber,
                     complementDependentMode);
             } catch (CronParseException cronParseException) {
-                // this just make compile happy, since we already validate the cron before
-                logger.error("Parse cron error", cronParseException);
+                // We catch the exception here just to make compiler happy, since we have already validated the schedule cron expression before
                 return 0;
             }
         } else {
@@ -800,10 +799,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     createCount = listDate.size();
                     if (!CollectionUtils.isEmpty(listDate)) {
                         if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                            createCount = Math.min(listDate.size(), expectedParallelismNumber);
-                            if (listDateSize < createCount) {
-                                createCount = listDateSize;
-                            }
+                            createCount = Math.min(createCount, expectedParallelismNumber);
                         }
                         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
 
@@ -843,14 +839,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 }
                 if (StringUtils.isNotEmpty(dateList)) {
                     List<String> listDate = Arrays.asList(dateList.split(COMMA));
-                    int listDateSize = listDate.size();
                     createCount = listDate.size();
                     if (!CollectionUtils.isEmpty(listDate)) {
                         if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                            createCount = Math.min(listDate.size(), expectedParallelismNumber);
-                            if (listDateSize < createCount) {
-                                createCount = listDateSize;
-                            }
+                            createCount = Math.min(createCount, expectedParallelismNumber);
                         }
                         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
                         for (List<String> stringDate : Lists.partition(listDate, createCount)) {
@@ -947,7 +939,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * @param schedule
-     * @return check error return 0 otherwish 1
+     * @return check error return 0, otherwise 1
      */
     private boolean isValidateScheduleTime(String schedule) {
         Map<String, String> scheduleResult = JSONUtils.toMap(schedule);

@@ -22,8 +22,6 @@ import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import initChart from '@/components/chart'
 import { tasksState } from '@/common/common'
-import { format } from 'date-fns'
-import { parseTime } from '@/common/common'
 import type { ISeriesData, ITaskState } from '../type'
 
 const props = {
@@ -74,17 +72,16 @@ const GanttChart = defineComponent({
     }))
 
     // format series data
-    let minTime = Number(new Date())
+    let minTime = Number.MAX_VALUE
+    let maxTime = 0
     props.seriesData.forEach(function (task, index) {
-      minTime = minTime < task.startDate[0] ? minTime : task.startDate[0]
+      const start = Math.floor(task.startDate[0] / 1000) * 1000
+      const end = Math.floor(task.endDate[0] / 1000) * 1000
+      minTime = minTime < start ? minTime : start
+      maxTime = maxTime > end ? maxTime : end
       data[task.status].push({
         name: task.name,
-        value: [
-          index,
-          task.startDate[0],
-          task.endDate[0],
-          task.endDate[0] - task.startDate[0]
-        ],
+        value: [index, start, end, end - start],
         itemStyle: {
           color: state[task.status as ITaskState].color
         }
@@ -97,7 +94,6 @@ const GanttChart = defineComponent({
       const start = api.coord([api.value(1), taskIndex])
       const end = api.coord([api.value(2), taskIndex])
       const height = api.size([0, 1])[1] * 0.6
-
       const rectShape = echarts.graphic.clipRectByRect(
         {
           x: start[0],
@@ -176,13 +172,15 @@ const GanttChart = defineComponent({
       xAxis: {
         type: 'time',
         min: minTime,
+        max: maxTime - minTime > 5000 ? maxTime + 1000 : minTime + 5000,
         position: 'top',
         axisTick: { show: true },
         splitLine: { show: false },
         axisLabel: {
-          formatter: function (val: number) {
-            return format(parseTime(val), 'HH:mm:ss')
-          }
+          formatter: '{HH}:{mm}:{ss}',
+          showMinLabel: true,
+          showMaxLabel: true,
+          hideOverlap: true
         }
       },
       yAxis: {

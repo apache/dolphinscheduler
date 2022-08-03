@@ -83,7 +83,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -692,15 +691,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public void endProcess() {
         this.stateEvents.clear();
-        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()) {
+        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
+            .typeIsSerialPriority()) {
             checkSerialProcess(processDefinition);
         }
         if (processInstance.getState().typeIsWaitingThread()) {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         if (processAlertManager.isNeedToSendWarning(processInstance)) {
-            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
             processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+        }
+        if (processInstance.getState().typeIsSuccess()) {
+            processAlertManager.closeAlert(processInstance);
         }
         if (checkTaskQueue()) {
             //release task group
@@ -1673,7 +1676,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             taskInstance.getName(),
             taskInstance.getId(),
             taskInstance.getTaskCode());
-        TaskMetrics.incTaskSubmit();
+        TaskMetrics.incTaskInstanceByState("submit");
         readyToSubmitTaskQueue.put(taskInstance);
     }
 
@@ -1814,10 +1817,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         // todo: Can we use a better way to set the recover taskInstanceId list? rather then use the cmdParam
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
-            if (ArrayUtils.isNotEmpty(idList)) {
-                List<Integer> taskInstanceIds = Arrays.stream(idList).map(Integer::valueOf).collect(Collectors.toList());
-                return processService.findTaskInstanceByIdList(taskInstanceIds);
+            List<Integer> startTaskInstanceIds = Arrays.stream(paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING)
+                                                                   .split(COMMA))
+                .filter(StringUtils::isNotEmpty)
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(startTaskInstanceIds)) {
+                return processService.findTaskInstanceByIdList(startTaskInstanceIds);
             }
         }
         return Collections.emptyList();

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.python;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -391,8 +392,38 @@ public class PythonGateway {
         }
     }
 
+    public Project queryProjectByName(String userName, String projectName) {
+        User user = usersService.queryUser(userName);
+        return (Project) projectService.queryByName(user, projectName);
+    }
+
+    public void updateProject(String userName, Long projectCode, String projectName, String desc) {
+        User user = usersService.queryUser(userName);
+        projectService.update(user, projectCode, projectName, desc, userName);
+    }
+
+    public void deleteProject(String userName, Long projectCode) {
+        User user = usersService.queryUser(userName);
+        projectService.deleteProject(user, projectCode);
+    }
+
     public Tenant createTenant(String tenantCode, String desc, String queueName) {
         return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
+    }
+
+    public Result queryTenantList(String userName, String searchVal, Integer pageNo, Integer pageSize) {
+        User user = usersService.queryUser(userName);
+        return tenantService.queryTenantList(user, searchVal, pageNo, pageSize);
+    }
+
+    public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
+        User user = usersService.queryUser(userName);
+        tenantService.updateTenant(user, id, tenantCode, queueId, desc);
+    }
+
+    public void deleteTenantById(String userName, Integer tenantId) throws Exception {
+        User user = usersService.queryUser(userName);
+        tenantService.deleteTenantById(user, tenantId);
     }
 
     public void createUser(String userName,
@@ -401,13 +432,21 @@ public class PythonGateway {
                            String phone,
                            String tenantCode,
                            String queue,
-                           int state) {
+                           int state) throws IOException {
+        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
+    }
+
+    public User queryUser(int id) {
+        return usersService.queryUser(id);
+    }
+
+    public void updateUser(String userName, String userPassword, String email, String phone, String tenantCode, String queue, int state) throws Exception {
+        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
+    }
+
+    public void deleteUser(String userName, int id) throws Exception {
         User user = usersService.queryUser(userName);
-        if (Objects.isNull(user)) {
-            Map<String, Object> tenantResult = tenantService.queryByTenantCode(tenantCode);
-            Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
-            usersService.createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
-        }
+        usersService.deleteUserById(user, id);
     }
 
     /**

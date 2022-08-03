@@ -8,7 +8,7 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 Pseudo-cluster deployment of DolphinScheduler requires external software support:
 
-* JDK：Download [JDK][jdk] (1.8+), and configure `JAVA_HOME` to and `PATH` variable. You can skip this step, if it already exists in your environment.
+* JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
 * Binary package: Download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/download.html)
 * Database: [PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) or [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+), you can choose one of the two, such as MySQL requires JDBC Driver 8.0.16
 * Registry Center: [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)，[download link][zookeeper]
@@ -185,10 +185,10 @@ bash ./bin/dolphinscheduler-daemon.sh start alert-server
 bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
-> **_Note1:_**: Each server have `dolphinscheduler_env.sh` file in path `<server-name>/conf/dolphinscheduler_env.sh` which
-> for micro-services need. It means that you could start all servers by command `<server-name>/bin/start.sh` with different
-> environment variable from `bin/env/dolphinscheduler_env.sh`. But it will use file `bin/env/dolphinscheduler_env.sh` overwrite
-> `<server-name>/conf/dolphinscheduler_env.sh` if you start server with command `/bin/dolphinscheduler-daemon.sh start <server-name>`.
+> **_Note1:_**: Each server have `dolphinscheduler_env.sh` file in path `<service>/conf/dolphinscheduler_env.sh` which
+> for micro-services need. It means that you could start all servers by command `<service>/bin/start.sh` with different
+> environment variable from `<service>/conf/dolphinscheduler_env.sh`. But it will use file `bin/env/dolphinscheduler_env.sh` overwrite
+> `<service>/conf/dolphinscheduler_env.sh` if you start server with command `/bin/dolphinscheduler-daemon.sh start <service>`.
 
 > **_Note2:_**: Please refer to the section of "System Architecture Design" for service usage. Python gateway service is
 > started along with the api-server, and if you do not want to start Python gateway service please disabled it by changing

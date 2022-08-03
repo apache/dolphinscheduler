@@ -207,10 +207,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             // task result process
             if (this.task.getNeedAlert()) {
-                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus().getCode());
+                sendAlert(this.task.getTaskAlertInfo(), this.task.getExitStatus());
             }
 
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(this.task.getExitStatus().getCode()));
+            taskExecutionContext.setCurrentExecutionStatus(this.task.getExitStatus());
             taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
             taskExecutionContext.setProcessId(this.task.getProcessId());
             taskExecutionContext.setAppIds(this.task.getAppIds());
@@ -233,8 +233,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
     }
 
-    private void sendAlert(TaskAlertInfo taskAlertInfo, int status) {
-        int strategy = status == ExecutionStatus.SUCCESS.getCode() ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
+    private void sendAlert(TaskAlertInfo taskAlertInfo, ExecutionStatus status) {
+        int strategy = status == ExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
         alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent(), strategy);
     }
 
@@ -298,10 +298,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 // query the tenant code of the resource according to the name of the resource
                 String fullName = fileDownload.getLeft();
                 String tenantCode = fileDownload.getRight();
-                String resHdfsPath = storageOperate.getResourceFileName(tenantCode, fullName);
-                logger.info("get resource file from hdfs :{}", resHdfsPath);
+                String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
+                logger.info("get resource file from path:{}", resPath);
                 long resourceDownloadStartTime = System.currentTimeMillis();
-                storageOperate.download(tenantCode, resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false, true);
                 WorkerServerMetrics.recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                 WorkerServerMetrics.recordWorkerResourceDownloadSize(
                         Files.size(Paths.get(execLocalPath, fullName)));

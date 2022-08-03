@@ -8,7 +8,7 @@
 
 伪分布式部署 DolphinScheduler 需要有外部软件的支持
 
-* JDK：下载[JDK][jdk] (1.8+)，并将 JAVA_HOME 配置到以及 PATH 变量中。如果你的环境中已存在，可以跳过这步。
+* JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 * 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download/download.html)下载 DolphinScheduler 二进制包
 * 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.16
 * 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)，[下载地址][zookeeper]
@@ -181,10 +181,10 @@ bash ./bin/dolphinscheduler-daemon.sh start alert-server
 bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
-> **_注意1:_**: 每个服务在路径 `<server-name>/conf/dolphinscheduler_env.sh` 中都有 `dolphinscheduler_env.sh` 文件，这是可以为微
-> 服务需求提供便利。意味着您可以基于不同的环境变量来启动各个服务，只需要在对应服务中配置 `bin/env/dolphinscheduler_env.sh` 然后通过 `<server-name>/bin/start.sh`
-> 命令启动即可。但是如果您使用命令 `/bin/dolphinscheduler-daemon.sh start <server-name>` 启动服务器，它将会用文件 `bin/env/dolphinscheduler_env.sh`
-> 覆盖 `<server-name>/conf/dolphinscheduler_env.sh` 然后启动服务，目的是为了减少用户修改配置的成本.
+> **_注意1:_**: 每个服务在路径 `<service>/conf/dolphinscheduler_env.sh` 中都有 `dolphinscheduler_env.sh` 文件，这是可以为微
+> 服务需求提供便利。意味着您可以基于不同的环境变量来启动各个服务，只需要在对应服务中配置 `<service>/conf/dolphinscheduler_env.sh` 然后通过 `<service>/bin/start.sh`
+> 命令启动即可。但是如果您使用命令 `/bin/dolphinscheduler-daemon.sh start <service>` 启动服务器，它将会用文件 `bin/env/dolphinscheduler_env.sh`
+> 覆盖 `<service>/conf/dolphinscheduler_env.sh` 然后启动服务，目的是为了减少用户修改配置的成本.
 
 > **_注意2:_**：服务用途请具体参见《系统架构设计》小节。Python gateway service 默认与 api-server 一起启动，如果您不想启动 Python gateway service
 > 请通过更改 api-server 配置文件 `api-server/conf/application.yaml` 中的 `python-gateway.enabled : false` 来禁用它。

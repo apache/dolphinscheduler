@@ -88,6 +88,7 @@ export function formatParams(data: INodeData): {
       taskParams.hadoopCustomParams = data.hadoopCustomParams
       taskParams.sqoopAdvancedParams = data.sqoopAdvancedParams
       taskParams.concurrency = data.concurrency
+      taskParams.splitBy = data.splitBy
       taskParams.modelType = data.modelType
       taskParams.sourceType = data.sourceType
       taskParams.targetType = data.targetType
@@ -327,9 +328,10 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'ZEPPELIN') {
-    taskParams.noteId = data.zeppelinNoteId
-    taskParams.paragraphId = data.zeppelinParagraphId
-    taskParams.restEndpoint = data.zeppelinRestEndpoint
+    taskParams.noteId = data.noteId
+    taskParams.paragraphId = data.paragraphId
+    taskParams.restEndpoint = data.restEndpoint
+    taskParams.productionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
   }
 
@@ -383,6 +385,10 @@ export function formatParams(data: INodeData): {
     taskParams.dvcStoreUrl = data.dvcStoreUrl
   }
 
+  if (data.taskType === 'SAGEMAKER') {
+    taskParams.sagemakerRequestJson = data.sagemakerRequestJson
+  }
+
   if (data.taskType === 'DINKY') {
     taskParams.address = data.address
     taskParams.taskId = data.taskId
@@ -396,9 +402,17 @@ export function formatParams(data: INodeData): {
     taskParams.sql = data.sql
   }
 
+  if (data.taskType === 'CHUNJUN') {
+    taskParams.customConfig = data.customConfig ? 1 : 0
+    taskParams.json = data.json
+    taskParams.deployMode = data.deployMode
+    taskParams.others = data.others
+  }
+
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
