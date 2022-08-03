@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -354,15 +355,17 @@ public class SqlTask extends AbstractTaskExecutor {
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
         try {
-            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
+            Map<Integer, Property> params = sqlBinds.getParamsMap();
+            PreparedStatement stmt = connection.prepareStatement(ParameterUtils.replaceListParameter(params, sqlBinds.getSql()));
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
             if (params != null) {
+                int index = 1;
                 for (Map.Entry<Integer, Property> entry : params.entrySet()) {
                     Property prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+                    ParameterUtils.setInParameter(index, stmt, prop.getType(), prop.getValue());
+                    index++;
                 }
             }
             logger.info("prepare statement replace sql : {} ", stmt);
@@ -370,7 +373,6 @@ public class SqlTask extends AbstractTaskExecutor {
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
         }
-
     }
 
     /**

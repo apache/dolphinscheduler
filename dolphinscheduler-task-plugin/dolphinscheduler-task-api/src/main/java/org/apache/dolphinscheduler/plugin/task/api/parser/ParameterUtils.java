@@ -24,12 +24,15 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -146,6 +149,37 @@ public class ParameterUtils {
         } else if (dataType.equals(DataType.BOOLEAN)) {
             stmt.setBoolean(index, Boolean.parseBoolean(value));
         }
+    }
+
+    public static String replaceListParameter(Map<Integer, Property> params, String sql) {
+        if (params == null || params.isEmpty()) {
+            return sql;
+        }
+        List<Integer> removeList = new ArrayList<>();
+        String[] split = sql.split("\\?");
+        if (split.length == 0) {
+            return sql;
+        }
+        StringBuilder ret = new StringBuilder(split[0]);
+        for (int i = 1; i < split.length; i++) {
+            Property property = params.get(i);
+            if (DataType.LIST.equals(property.getType())) {
+                List<Object> valueList = JSONUtils.toList(property.getValue(), Object.class);
+                valueList.forEach(v -> {
+                    if (v instanceof String) {
+                        ret.append("'").append(v).append("'");
+                    } else {
+                        ret.append(v);
+                    }
+                    ret.append(",");
+                });
+                ret.deleteCharAt(ret.length() - 1);
+            } else {
+                ret.append("?");
+            }
+            ret.append(split[i]);
+        }
+        return ret.toString();
     }
 
     /**
