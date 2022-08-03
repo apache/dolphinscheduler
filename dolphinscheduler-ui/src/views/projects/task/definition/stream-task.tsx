@@ -1,0 +1,175 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { useI18n } from 'vue-i18n'
+import { SearchOutlined } from '@vicons/antd'
+import { defineComponent, getCurrentInstance, watch, onMounted } from 'vue'
+import {
+  NInput,
+  NSelect,
+  NButton,
+  NIcon,
+  NSpace,
+  NDataTable,
+  NPagination
+} from 'naive-ui'
+import { useRoute } from 'vue-router'
+import Card from '@/components/card'
+import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
+import { useTable } from './use-stream-table'
+import { useTask } from './use-task'
+import type { INodeData } from './types'
+
+const StreamTaskDefinition = defineComponent({
+  name: 'stream-task-definition',
+  setup() {
+    const { t } = useI18n()
+    const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+    const { task, onToggleShow, onTaskSave, onEditTask, onInitTask } =
+      useTask(projectCode)
+    const { variables, getTableData, createColumns } = useTable(onEditTask)
+
+    const requestData = () => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchTaskName: variables.searchTaskName,
+        searchWorkflowName: variables.searchWorkflowName,
+        taskType: variables.taskType
+      })
+    }
+
+    const onSearch = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const onRefresh = () => {
+      requestData()
+    }
+
+    const onUpdatePageSize = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const onTaskCancel = () => {
+      onToggleShow(false)
+      onInitTask()
+    }
+
+    const onTaskSubmit = async (params: { data: INodeData }) => {
+      const result = await onTaskSave(params.data)
+      if (result) {
+        onTaskCancel()
+        onRefresh()
+      }
+    }
+
+    onMounted(() => {
+      createColumns(variables)
+      requestData()
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
+    return () => (
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NSpace />
+            <NSpace>
+              <NInput
+                allowInput={trim}
+                size='small'
+                clearable
+                v-model={[variables.searchTaskName, 'value']}
+                placeholder={t('project.task.task_name')}
+              />
+              <NInput
+                allowInput={trim}
+                size='small'
+                clearable
+                v-model={[variables.searchWorkflowName, 'value']}
+                placeholder={t('project.task.workflow_name')}
+              />
+              <NSelect
+                v-model={[variables.taskType, 'value']}
+                size='small'
+                options={Object.keys(TASK_TYPES_MAP).map((item) => {
+                  return { value: item, label: item }
+                })}
+                placeholder={t('project.task.task_type')}
+                style={{ width: '180px' }}
+                clearable
+              />
+              <NButton size='small' type='primary' onClick={onSearch}>
+                {{
+                  icon: () => (
+                    <NIcon>
+                      <SearchOutlined />
+                    </NIcon>
+                  )
+                }}
+              </NButton>
+            </NSpace>
+          </NSpace>
+        </Card>
+        <Card>
+          <NSpace vertical>
+            <NDataTable
+              loading={variables.loading}
+              columns={variables.columns}
+              data={variables.tableData}
+              scrollX={variables.tableWidth}
+            />
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={variables.page}
+                v-model:page-size={variables.pageSize}
+                page-count={variables.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </Card>
+        <TaskModal
+          show={task.taskShow}
+          data={task.taskData}
+          onSubmit={onTaskSubmit}
+          onCancel={onTaskCancel}
+          projectCode={projectCode}
+          from={1}
+          readonly={task.taskReadonly}
+          saving={task.taskSaving}
+        />
+      </NSpace>
+    )
+  }
+})
+
+export default StreamTaskDefinition

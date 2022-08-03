@@ -94,8 +94,8 @@ export function deleteTaskDefinition(
 
 export function releaseTaskDefinition(
   data: ReleaseStateReq,
-  code: CodeReq,
-  projectCode: ProjectCodeReq
+  code: number,
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/release`,
@@ -155,5 +155,12 @@ export function updateWithUpstream(
     url: `/projects/${projectCode}/task-definition/${code}/with-upstream`,
     method: 'put',
     data
+  })
+}
+
+export function startTaskDefinition(projectCode: number, code: number) {
+  return axios({
+    url: `projects/${projectCode}/executors/task-instance/${code}/start`,
+    method: 'post'
   })
 }

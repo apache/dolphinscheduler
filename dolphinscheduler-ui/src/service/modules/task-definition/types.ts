@@ -31,6 +31,7 @@ interface ProjectCodeReq {
 interface TaskDefinitionListReq extends ListReq {
   taskType?: string
   userId?: number
+  taskExecuteType?: 'BATCH' | 'STREAM'
 }
 
 interface TaskDefinitionJsonReq {
