@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinNT;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
@@ -139,8 +142,10 @@ public abstract class AbstractCommandExecutor {
                 command.add(taskRequest.getTenantCode());
             }
         }
-        command.add(commandInterpreter());
-        command.addAll(Collections.emptyList());
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            command.add(commandInterpreter());
+            command.addAll(Collections.emptyList());
+        }
         command.add(commandFile);
 
         // setting commands
@@ -297,6 +302,9 @@ public abstract class AbstractCommandExecutor {
                 // sudo -u user command to run command
                 String cmd = String.format("kill %d", processId);
                 cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
+                if(SystemUtils.IS_OS_WINDOWS) {
+                    cmd = String.format("taskkill -f /pid %d", processId);
+                }
                 logger.info("soft kill task:{}, process id:{}, cmd:{}", taskRequest.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -318,6 +326,9 @@ public abstract class AbstractCommandExecutor {
             try {
                 String cmd = String.format("kill -9 %d", processId);
                 cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
+                if(SystemUtils.IS_OS_WINDOWS) {
+                    cmd = String.format("taskkill -f /pid %d", processId);
+                }
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskRequest.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -482,10 +493,20 @@ public abstract class AbstractCommandExecutor {
         int processId = 0;
 
         try {
-            Field f = process.getClass().getDeclaredField(TaskConstants.PID);
-            f.setAccessible(true);
-
-            processId = f.getInt(process);
+            if (SystemUtils.IS_OS_WINDOWS){
+                Field f = process.getClass().getDeclaredField("handle");
+                f.setAccessible(true);
+                long handl = f.getLong(process);
+                Kernel32 kernel = Kernel32.INSTANCE;
+                WinNT.HANDLE handle = new WinNT.HANDLE();
+                handle.setPointer(Pointer.createConstant(handl));
+                processId = kernel.GetProcessId(handle);
+            }
+            else {
+                Field f = process.getClass().getDeclaredField(TaskConstants.PID);
+                f.setAccessible(true);
+                processId = f.getInt(process);
+            }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
         }

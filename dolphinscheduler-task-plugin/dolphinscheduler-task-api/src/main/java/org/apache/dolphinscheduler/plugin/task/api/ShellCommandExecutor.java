@@ -45,7 +45,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     /**
      * For Windows, using cmd.exe
      */
-    private static final String CMD = "cmd.exe";
+    private static final String CMD = "cmd.exe /C ";
 
     /**
      * constructor

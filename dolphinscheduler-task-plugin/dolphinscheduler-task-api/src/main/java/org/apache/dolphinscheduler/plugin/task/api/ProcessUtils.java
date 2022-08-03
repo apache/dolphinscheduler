@@ -59,8 +59,12 @@ public final class ProcessUtils {
                 return false;
             }
 
-            String cmd = String.format("kill -9 %s", getPidsStr(processId));
+            String pstr = getPidsStr(processId);
+            String cmd = String.format("kill -9 %s", pstr);
             cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);
+            if(SystemUtils.IS_OS_WINDOWS) {
+                cmd = String.format("taskkill -f /pid %s", pstr);
+            }
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
@@ -79,24 +83,31 @@ public final class ProcessUtils {
      * @return pids pid String
      * @throws Exception exception
      */
-    public static String getPidsStr(int processId) throws Exception {
+    public static String getPidsStr(int processId)  {
         StringBuilder sb = new StringBuilder();
         Matcher mat = null;
         // pstree pid get sub pids
-        if (SystemUtils.IS_OS_MAC) {
-            String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-            if (null != pids) {
-                mat = MACPATTERN.matcher(pids);
+        try{
+            if (SystemUtils.IS_OS_MAC) {
+                String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
+                if (null != pids) {
+                    mat = MACPATTERN.matcher(pids);
+                }
+            } else {
+                String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+                mat = WINDOWSATTERN.matcher(pids);
             }
-        } else {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            mat = WINDOWSATTERN.matcher(pids);
-        }
 
-        if (null != mat) {
-            while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
+            if (null != mat) {
+                while (mat.find()) {
+                    sb.append(mat.group(1)).append(" ");
+                }
             }
+        }
+        catch (Exception e)
+        {
+            sb.append(processId);
+            logger.warn("your system not support ptree command!", e);
         }
 
         return sb.toString().trim();

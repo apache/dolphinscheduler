@@ -152,28 +152,35 @@ public class ProcessUtils {
      * @return pids pid String
      * @throws Exception exception
      */
-    public static String getPidsStr(int processId) throws Exception {
+    public static String getPidsStr(int processId)  {
         List<String> pidList = new ArrayList<>();
         Matcher mat = null;
         // pstree pid get sub pids
-        if (SystemUtils.IS_OS_MAC) {
-            String pids = OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId));
-            if (null != pids) {
-                mat = MACPATTERN.matcher(pids);
+        try{
+            if (SystemUtils.IS_OS_MAC) {
+                String pids = OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId));
+                if (null != pids) {
+                    mat = MACPATTERN.matcher(pids);
+                }
+            } else {
+                String pids = OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId));
+                mat = WINDOWSATTERN.matcher(pids);
             }
-        } else {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId));
-            mat = WINDOWSATTERN.matcher(pids);
-        }
 
-        if (null != mat) {
-            while (mat.find()) {
-                pidList.add(mat.group(1));
+            if (null != mat) {
+                while (mat.find()) {
+                    pidList.add(mat.group(1));
+                }
+            }
+
+            if (CommonUtils.isSudoEnable() && !pidList.isEmpty()) {
+                pidList = pidList.subList(1, pidList.size());
             }
         }
-
-        if (CommonUtils.isSudoEnable() && !pidList.isEmpty()) {
-            pidList = pidList.subList(1, pidList.size());
+        catch (Exception e)
+        {
+            pidList.add("" + processId);
+            logger.warn("your system not support ptree command!", e);
         }
         return String.join(" ", pidList).trim();
     }

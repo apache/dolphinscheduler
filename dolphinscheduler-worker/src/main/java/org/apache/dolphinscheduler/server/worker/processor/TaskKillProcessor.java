@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -191,6 +192,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             if (!Strings.isNullOrEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);
                 cmd = OSUtils.getSudoCmd(tenantCode, cmd);
+                if(SystemUtils.IS_OS_WINDOWS) {
+                    cmd = String.format("taskkill -f /pid %s", pidsStr);
+                }
                 logger.info("process id:{}, cmd:{}", processId, cmd);
                 OSUtils.exeCmd(cmd);
             }
