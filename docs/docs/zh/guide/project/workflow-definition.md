@@ -110,7 +110,7 @@
         
         ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
 
-        2. 已配置定时：如果有定时配置则会根据所选的时间范围结合定时配置进行补数，比如该工作流调度日期为7月 7号到7月10号，配置了定时（每凌晨5点运行），流程实例为：
+        2. 已配置定时：如果有定时配置则会根据所选的时间范围结合定时配置进行补数，比如该工作流调度日期为7月 7号到7月10号，配置了定时（每日凌晨5点运行），流程实例为：
         
         ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
         
