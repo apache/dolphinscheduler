@@ -49,7 +49,7 @@ public class PrestoDataSourceProcessorTest {
         PrestoDataSourceParamDTO prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
         prestoDatasourceParamDTO.setHost("localhost");
         prestoDatasourceParamDTO.setPort(1234);
-        prestoDatasourceParamDTO.setDatabase("default");
+        prestoDatasourceParamDTO.setDatabase("hive/default");
         prestoDatasourceParamDTO.setUserName("root");
         prestoDatasourceParamDTO.setPassword("123456");
         prestoDatasourceParamDTO.setOther(props);
@@ -58,13 +58,15 @@ public class PrestoDataSourceProcessorTest {
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
                 .createConnectionParams(prestoDatasourceParamDTO);
         Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
+        Assert.assertEquals("jdbc:presto://localhost:1234/hive/default", connectionParams.getJdbcUrl());
+        Assert.assertEquals("hive", connectionParams.getDatabase());
+        Assert.assertEquals("default", connectionParams.getSchema());
     }
 
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
+                + ",\"database\":\"hive\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/hive/default\",\"schema\":\"default\"}";
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
@@ -79,9 +81,9 @@ public class PrestoDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
-        prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
+        prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/hive/default");
         prestoConnectionParam.setOther("other");
-        Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
+        Assert.assertEquals("jdbc:postgresql://localhost:1234/hive/default?other",
                 prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }
