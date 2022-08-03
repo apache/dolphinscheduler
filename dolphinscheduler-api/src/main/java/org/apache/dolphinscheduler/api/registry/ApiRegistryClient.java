@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.io.IOException;
@@ -74,7 +73,7 @@ public class ApiRegistryClient implements AutoCloseable {
         String localNodePath = getCurrentNodePath();
         Duration apiHeartbeatInterval = apiConfig.getHeartbeatInterval();
 
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
+        ApiHeartBeatTask apiHeartBeatTask = new ApiHeartBeatTask(startupTime,
                                                         Sets.newHashSet(localNodePath),
                                                         Constants.API_TYPE,
                                                         registryClient,
@@ -82,7 +81,7 @@ public class ApiRegistryClient implements AutoCloseable {
 
         // remove before persist
         registryClient.remove(localNodePath);
-        registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
+        registryClient.persistEphemeral(localNodePath, apiHeartBeatTask.getHeartBeatInfo());
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.API)) {
             logger.warn("The current api server node:{} cannot find in registry", NetUtils.getHost());
@@ -95,7 +94,7 @@ public class ApiRegistryClient implements AutoCloseable {
         // delete dead server
         registryClient.handleDeadServer(Collections.singleton(localNodePath), NodeType.API, Constants.DELETE_OP);
 
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, apiHeartbeatInterval.getSeconds(), TimeUnit.SECONDS);
+        this.heartBeatExecutor.scheduleAtFixedRate(apiHeartBeatTask, 0L, apiHeartbeatInterval.getSeconds(), TimeUnit.SECONDS);
         logger.info("Api node : {} registered to registry center successfully with heartBeatInterval : {}s", apiAddress, apiHeartbeatInterval);
     }
 
