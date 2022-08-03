@@ -29,20 +29,19 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
-
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ProcessInstanceMetrics {
 
-    private final Map<String, Counter> PROCESS_INSTANCE_COUNTERS = new HashMap<>();
+    private final Map<String, Counter> processInstanceCounters = new HashMap<>();
 
-    private final Set<String> PROCESS_INSTANCE_STATES = ImmutableSet.of(
+    private final Set<String> processInstanceStates = ImmutableSet.of(
             "submit", "timeout", "finish", "failover", "success", "fail", "stop");
 
     static {
-        for (final String state : PROCESS_INSTANCE_STATES) {
-            PROCESS_INSTANCE_COUNTERS.put(
+        for (final String state : processInstanceStates) {
+            processInstanceCounters.put(
                     state,
                     Counter.builder("ds.workflow.instance.count")
                             .tag("state", state)
@@ -53,22 +52,22 @@ public class ProcessInstanceMetrics {
 
     }
 
-    private final Timer COMMAND_QUERY_TIMETER =
+    private final Timer commandQueryTimer =
         Timer.builder("ds.workflow.command.query.duration")
             .description("Command query duration")
             .register(Metrics.globalRegistry);
 
-    private final Timer PROCESS_INSTANCE_GENERATE_TIMER =
+    private final Timer processInstanceGenerateTimer =
         Timer.builder("ds.workflow.instance.generate.duration")
             .description("Process instance generated duration")
             .register(Metrics.globalRegistry);
 
     public void recordCommandQueryTime(long milliseconds) {
-        COMMAND_QUERY_TIMETER.record(milliseconds, TimeUnit.MILLISECONDS);
+        commandQueryTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
     public void recordProcessInstanceGenerateTime(long milliseconds) {
-        PROCESS_INSTANCE_GENERATE_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
+        processInstanceGenerateTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
     public synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
@@ -84,7 +83,7 @@ public class ProcessInstanceMetrics {
     }
 
     public void incProcessInstanceByState(final String state) {
-        PROCESS_INSTANCE_COUNTERS.get(state).increment();
+        processInstanceCounters.get(state).increment();
     }
 
 }

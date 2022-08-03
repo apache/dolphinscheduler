@@ -22,19 +22,18 @@ import java.util.function.Supplier;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
-
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class AlertServerMetrics {
 
-    private final Counter ALERT_SUCCESS_COUNTER =
+    private final Counter alertSuccessCounter =
             Counter.builder("ds.alert.send.count")
                     .tag("status", "success")
                     .description("Alert success count")
                     .register(Metrics.globalRegistry);
 
-    private final Counter ALERT_FAIL_COUNTER =
+    private final Counter alertFailCounter =
             Counter.builder("ds.alert.send.count")
                     .tag("status", "fail")
                     .description("Alert failure count")
@@ -47,11 +46,11 @@ public class AlertServerMetrics {
     }
 
     public void incAlertSuccessCount() {
-        ALERT_SUCCESS_COUNTER.increment();
+        alertSuccessCounter.increment();
     }
 
     public void incAlertFailCount() {
-        ALERT_FAIL_COUNTER.increment();
+        alertFailCounter.increment();
     }
 
 }

@@ -26,14 +26,13 @@ import java.util.ServiceLoader;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
-
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TaskMetrics {
 
-    private final Map<String, Counter> TASK_TYPE_EXECUTE_COUNTER = new HashMap<>();
-    private final Counter UNKNOWN_TASK_EXECUTE_COUNTER =
+    private final Map<String, Counter> taskTypeExecutionCounter = new HashMap<>();
+    private final Counter taskUnknownTypeExecutionCounter =
             Counter.builder("ds.task.execution.count.by.type")
                     .tag("task_type", "unknown")
                     .description("task execution counter by type")
@@ -41,7 +40,7 @@ public class TaskMetrics {
 
     static {
         for (TaskChannelFactory taskChannelFactory : ServiceLoader.load(TaskChannelFactory.class)) {
-            TASK_TYPE_EXECUTE_COUNTER.put(
+            taskTypeExecutionCounter.put(
                     taskChannelFactory.getName(),
                     Counter.builder("ds.task.execution.count.by.type")
                             .tag("task_type", taskChannelFactory.getName())
@@ -52,7 +51,7 @@ public class TaskMetrics {
     }
 
     public void incrTaskTypeExecuteCount(String taskType) {
-        TASK_TYPE_EXECUTE_COUNTER.getOrDefault(taskType, UNKNOWN_TASK_EXECUTE_COUNTER).increment();
+        taskTypeExecutionCounter.getOrDefault(taskType, taskUnknownTypeExecutionCounter).increment();
     }
 
 }
