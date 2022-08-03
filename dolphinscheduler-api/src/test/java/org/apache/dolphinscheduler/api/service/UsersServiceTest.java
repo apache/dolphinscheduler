@@ -161,11 +161,19 @@ public class UsersServiceTest {
         String phone = "13456432345";
         int state = 1;
         try {
-            // userName error
-            Map<String, Object> result =
-                    usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            String finalUserName = "userTest0001";
+            String finalUserPassword = userPassword;
+            String finalEmail = email;
+            String finalPhone = phone;
+
+            //userName error
+            Map<String, Object> result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //userName null
+            Throwable exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(null, finalUserPassword, finalEmail, tenantId, finalPhone, queueName, state));
+            Assertions.assertEquals("userName can't be null", exception.getMessage());
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
@@ -174,6 +182,10 @@ public class UsersServiceTest {
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
+            //userPassword null
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, null, finalEmail, tenantId, finalPhone, queueName, state));
+            Assertions.assertEquals("userPassword can't be null", exception.getMessage());
+
             userPassword = "userTest0001";
             email = "1q.com";
             // email error
@@ -181,12 +193,20 @@ public class UsersServiceTest {
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
+            //email null
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, finalUserPassword, null, tenantId, finalPhone, queueName, state));
+            Assertions.assertEquals("email can't be null", exception.getMessage());
+
             email = "122222@qq.com";
             phone = "2233";
             // phone error
             result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //phone null
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, finalUserPassword, finalEmail, tenantId, null, queueName, state));
+            Assertions.assertEquals("phone can't be null", exception.getMessage());
 
             phone = "13456432345";
             // tenantId not exists

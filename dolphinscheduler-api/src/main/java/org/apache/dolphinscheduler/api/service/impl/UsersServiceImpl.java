@@ -1119,22 +1119,30 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             if (tempUser != null) {
                 throw new ServiceException(String.format("userName %s exist", userName));
             }
+        } else {
+            throw new ServiceException("userName can't be null");
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
             if (!CheckUtils.checkPasswordLength(userPassword)) {
                 throw new ServiceException(String.format("userPassword %s length error", userPassword));
             }
+        } else {
+            throw new ServiceException("userPassword can't be null");
         }
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
                 throw new ServiceException(String.format("email %s doesn't valid", email));
             }
+        } else {
+            throw new ServiceException("email can't be null");
         }
 
         if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
             throw new ServiceException(String.format("phone %s doesn't valid", phone));
+        } else if (StringUtils.isEmpty(phone)) {
+            throw new ServiceException("phone can't be null");
         }
 
         if (state == 0) {
