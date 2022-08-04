@@ -215,6 +215,10 @@ public final class Constants {
      * date format of yyyyMMddHHmmssSSS
      */
     public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+
+    public static final String IMPORT_SUFFIX = "_import_";
+
+    public static final String COPY_SUFFIX = "_copy_";
     /**
      * http connect time out
      */
