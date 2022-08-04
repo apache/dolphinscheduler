@@ -18,10 +18,7 @@
 package org.apache.dolphinscheduler.api.security.impl.pwd;
 
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
-import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class PasswordAuthenticator extends AbstractAuthenticator {
 
