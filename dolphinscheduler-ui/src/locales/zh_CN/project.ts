@@ -205,6 +205,7 @@ export default {
     offline: '已下线',
     task_name: '任务名称',
     task_type: '任务类型',
+    task_instance: '任务实例',
     create_task: '创建任务',
     workflow_instance: '工作流实例',
     workflow_name: '工作流名称',
@@ -236,7 +237,8 @@ export default {
     forced_success: '强制成功',
     view_log: '查看日志',
     download_log: '下载日志',
-    refresh: '刷新'
+    refresh: '刷新',
+    app_id: 'Application ID'
   },
   dag: {
     create: '创建工作流',

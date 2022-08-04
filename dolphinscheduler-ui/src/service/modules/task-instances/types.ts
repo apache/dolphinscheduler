@@ -35,6 +35,7 @@ interface TaskListReq {
   startDate?: string
   stateType?: string
   taskName?: string
+  taskExecuteType?: 'BATCH' | 'STREAM'
 }
 
 interface Dependency {
@@ -114,6 +115,12 @@ interface TaskInstancesRes {
   start: number
 }
 
+type executeType = 'STOP' | 'PAUSE' | 'RECOVER_SUSPENDED_PROCESS'
+
+interface TaskInstanceExecuteReq {
+  executeType: executeType
+}
+
 export {
   ProjectCodeReq,
   IdReq,
@@ -121,5 +128,7 @@ export {
   Dependency,
   SwitchDependency,
   TotalList,
-  TaskInstancesRes
+  TaskInstancesRes,
+  executeType,
+  TaskInstanceExecuteReq
 }

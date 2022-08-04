@@ -17,7 +17,12 @@
 
 import { axios } from '@/service/service'
 import utils from '@/utils'
-import { ProjectCodeReq, IdReq, TaskListReq } from './types'
+import {
+  ProjectCodeReq,
+  IdReq,
+  TaskListReq,
+  TaskInstanceExecuteReq
+} from './types'
 
 export function queryTaskListPaging(
   params: TaskListReq,
@@ -39,4 +44,16 @@ export function forceSuccess(taskId: IdReq, projectCode: ProjectCodeReq): any {
 
 export function downloadLog(id: number): void {
   utils.downloadFile('log/download-log', { taskInstanceId: id })
+}
+
+export function streamTaskExecute(
+  projectCode: number,
+  taskId: number,
+  data: TaskInstanceExecuteReq
+): any {
+  return axios({
+    url: `projects/${projectCode}/executors/task-instance/${taskId}/execute`,
+    method: 'post',
+    data
+  })
 }
