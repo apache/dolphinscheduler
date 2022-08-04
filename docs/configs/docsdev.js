@@ -439,7 +439,7 @@ export default {
                 children: [
                     {
                         title: 'Development Environment Setup',
-                        link: '/en-us/docs/dev/user_doc/guide/contribute/development-environment-setup.html',
+                        link: '/en-us/docs/dev/user_doc/contribute/development-environment-setup.html',
                     },
                     {
                         title: 'Design Document',
@@ -450,27 +450,27 @@ export default {
                             // children: [
                             {
                                 title: 'Architecture Design',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/architecture-design.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/architecture-design.html',
                             },
                             {
                                 title: 'Alert SPI',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/backend/spi/alert.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/alert.html',
                             },
                             {
                                 title: 'Registry SPI',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/backend/spi/registry.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/registry.html',
                             },
                             {
                                 title: 'Task SPI',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/backend/spi/task.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/task.html',
                             },
                             {
                                 title: 'Datasource SPI',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/backend/spi/datasource.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/datasource.html',
                             },
                             {
                                 title: 'Mechanism Design',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/backend/mechanism/overview.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/mechanism/overview.html',
                             },
                         ],
                     },
@@ -479,25 +479,25 @@ export default {
                         children: [
                             {
                                 title: 'Frontend Development',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/frontend-development.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/frontend-development.html',
                             },
                             {
                                 title: 'API Standard',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/api-standard.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/api-standard.html',
                             },
                             {
                                 title: 'E2E Automation Test',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/e2e-test.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/e2e-test.html',
                             },
                             {
                                 title: 'API Automation Test',
-                                link: '/en-us/docs/dev/user_doc/guide/contribute/api-test.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/api-test.html',
                             },
                         ],
                     },
                     {
                         title: 'Questions & Communications',
-                        link: '/en-us/docs/dev/user_doc/guide/contribute/have-questions.html',
+                        link: '/en-us/docs/dev/user_doc/contribute/have-questions.html',
                     },
                 ],
             },
@@ -927,7 +927,7 @@ export default {
                 children: [
                     {
                         title: '环境搭建',
-                        link: '/zh-cn/docs/dev/user_doc/guide/contribute/development-environment-setup.html',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/development-environment-setup.html',
                     },
                     {
                         title: '设计文档',
@@ -938,27 +938,27 @@ export default {
                             // children: [
                             {
                                 title: '架构设计',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/architecture-design.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/architecture-design.html',
                             },
                             {
                                 title: 'Alert SPI',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/backend/spi/alert.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/alert.html',
                             },
                             {
                                 title: 'Registry SPI',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/backend/spi/registry.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/registry.html',
                             },
                             {
                                 title: 'Task SPI',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/backend/spi/task.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/task.html',
                             },
                             {
                                 title: 'Datasource SPI',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/backend/spi/datasource.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/datasource.html',
                             },
                             {
                                 title: '组件设计',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/backend/mechanism/overview.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/mechanism/overview.html',
                             },
                         ],
                     },
@@ -967,25 +967,25 @@ export default {
                         children: [
                             {
                                 title: '前端开发',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/frontend-development.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/frontend-development.html',
                             },
                             {
                                 title: 'API规范',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/api-standard.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/api-standard.html',
                             },
                             {
                                 title: 'E2E 自动化测试',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/e2e-test.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/e2e-test.html',
                             },
                             {
                                 title: 'API 自动化测试',
-                                link: '/zh-cn/docs/dev/user_doc/guide/contribute/api-test.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/api-test.html',
                             },
                         ],
                     },
                     {
                         title: '问题与交流',
-                        link: '/zh-cn/docs/dev/user_doc/guide/contribute/have-questions.html',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/have-questions.html',
                     },
                 ],
             },
