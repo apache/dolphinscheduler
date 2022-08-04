@@ -276,7 +276,9 @@ def test_add_duplicate(caplog):
     "pydolphinscheduler.core.task.Task.user_name",
     return_value="test_user",
 )
-def test_python_resource_list(mock_code_version, mock_resource, mock_user_name, resources, expect):
+def test_python_resource_list(
+    mock_code_version, mock_resource, mock_user_name, resources, expect
+):
     """Test python task resource list."""
     task = Task(
         name="python_resource_list.",
