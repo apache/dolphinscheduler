@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -143,13 +144,14 @@ public class DependentExecute {
     private DependResult dependResultByProcessInstance(ProcessInstance processInstance, DateInterval dateInterval) {
         if (processInstance.getState().typeIsSuccess()) {
             List<ProcessTaskRelation> taskRelations = processService.findRelationByCode(processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion());
+                processInstance.getProcessDefinitionVersion());
             if (!taskRelations.isEmpty()) {
                 List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(taskRelations);
                 Map<Long, String> definiteTask = taskDefinitionLogs.stream().filter(log -> !log.getTaskType().equals(TaskConstants.TASK_TYPE_SUB_PROCESS)
                         || !log.getTaskType().equals(TaskConstants.TASK_TYPE_DEPENDENT)
                         || !log.getTaskType().equals(TaskConstants.TASK_TYPE_CONDITIONS))
-                        .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinitionLog::getName));
+                    .filter(log -> log.getFlag().equals(Flag.YES))
+                    .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinitionLog::getName));
                 if (!definiteTask.isEmpty()) {
                     List<TaskInstance> taskInstanceList = processService.findLastTaskInstanceListInterval(definiteTask.keySet(), dateInterval);
                     if (taskInstanceList.isEmpty()) {
@@ -159,14 +161,14 @@ public class DependentExecute {
                     Map<Long, TaskInstance> taskInstanceMap = new HashMap<>();
                     for (TaskInstance instance : taskInstanceList) {
                         taskInstanceMap.compute(instance.getTaskCode(), (k, v) -> {
-                           if (v == null) {
-                               v = instance;
-                           } else {
-                               if (v.getId() < instance.getId()) {
-                                   v = instance;
-                               }
-                           }
-                           return v;
+                            if (v == null) {
+                                v = instance;
+                            } else {
+                                if (v.getId() < instance.getId()) {
+                                    v = instance;
+                                }
+                            }
+                            return v;
                         });
                         definiteTask.remove(instance.getTaskCode());
                     }
@@ -198,25 +200,27 @@ public class DependentExecute {
      */
     private DependResult getDependTaskResult(ProcessInstance processInstance, long taskCode, DateInterval dateInterval) {
         TaskInstance taskInstance = processService.findLastTaskInstanceInterval(taskCode, dateInterval);
-        DependResult result;
         if (taskInstance == null) {
-            if (!processInstance.getState().typeIsFinished()) {
-                logger.info("Wait for the dependent workflow to complete, taskCode:{}, processInstanceId:{}, processInstance state:{}",
-                        taskCode, processInstance.getId(), processInstance.getState());
-                return DependResult.WAITING;
-            }
             TaskDefinition taskDefinition = processService.findTaskDefinitionByCode(taskCode);
             if (taskDefinition == null) {
                 logger.error("Cannot find the task definition, something error, taskCode: {}", taskCode);
-            } else {
-                logger.warn("Cannot find the task in the process instance when the ProcessInstance is finish, taskCode: {}, taskName: {}", taskCode, taskDefinition.getName());
+                return DependResult.FAILED;
             }
-            result = DependResult.FAILED;
+            if (taskDefinition.getFlag() == Flag.NO) {
+                logger.warn("Cannot find the task instance, but the task is forbidden, so dependent success, taskCode: {}, taskName: {}", taskCode, taskDefinition.getName());
+                return DependResult.SUCCESS;
+            }
+            if (!processInstance.getState().typeIsFinished()) {
+                logger.info("Wait for the dependent workflow to complete, taskCode:{}, processInstanceId:{}, processInstance state:{}",
+                    taskCode, processInstance.getId(), processInstance.getState());
+                return DependResult.WAITING;
+            }
+            logger.warn("Cannot find the task in the process instance when the ProcessInstance is finish, taskCode: {}, taskName: {}", taskCode, taskDefinition.getName());
+            return DependResult.FAILED;
         } else {
             logger.info("The running task, taskId:{}, taskCode:{}, taskName:{}", taskInstance.getId(), taskInstance.getTaskCode(), taskInstance.getName());
-            result = getDependResultByState(taskInstance.getState());
+            return getDependResultByState(taskInstance.getState());
         }
-        return result;
     }
 
     /**
