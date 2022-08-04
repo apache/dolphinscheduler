@@ -85,7 +85,7 @@
     
     ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
   
-        * 并发度：是指在并行补数的模式下，最多并行执行的实例数。例如同时执行7月6号到7月10号的工作流定义，并发度为2，那么流程实例为：
+        * 并行度：是指在并行补数的模式下，最多并行执行的实例数。例如同时执行7月6号到7月10号的工作流定义，并行度为2，那么流程实例为：
     ![workflow-concurrency-from](../../../../img/new_ui/dev/project/workflow-concurrency-from.png)
     
     ![workflow-concurrency](../../../../img/new_ui/dev/project/workflow-concurrency.png)
