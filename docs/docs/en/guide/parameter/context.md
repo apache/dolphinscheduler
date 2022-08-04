@@ -28,7 +28,7 @@ The user needs to pass the parameter when creating the shell script, the output 
 
 Create a Node_A task, add output and value parameters to the custom parameters, and write the following script:
 
-![context-parameter01](/img/new_ui/dev/parameter/context_parameter01.png)
+![context-parameter01](../../../../img/new_ui/dev/parameter/context_parameter01.png)
 
 Parameter Description:
 
@@ -39,13 +39,13 @@ When the SHELL node is defined, the log detects the format of `${setValue(output
 
 Create the Node_B task, which is mainly used to test and output the parameters passed by the upstream task Node_A.
 
-![context-parameter02](/img/new_ui/dev/parameter/context_parameter02.png)
+![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
 #### Create SQL tasks and use parameters
 
 When the SHELL task is completed, we can use the output passed upstream as the query object for the SQL. The id of the query is renamed to ID and is output as a parameter.
 
-![context-parameter03](/img/new_ui/dev/parameter/context_parameter03.png)
+![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
 > Note: If the result of the SQL node has only one row, one or multiple fields, the name of the `prop` needs to be the same as the field name. The data type can choose structure except `LIST`. The parameter assigns the value according to the same column name in the SQL query result.
 >
@@ -55,7 +55,7 @@ When the SHELL task is completed, we can use the output passed upstream as the q
 
 Click on the Save workflow icon and set the global parameters output and value.
 
-![context-parameter03](/img/new_ui/dev/parameter/context_parameter04.png)
+![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter04.png)
 
 #### View results
 
@@ -63,15 +63,15 @@ After the workflow is created, run the workflow online and view its running resu
 
 The result of Node_A is as follows:
 
-![context-log01](/img/new_ui/dev/parameter/context_log01.png)
+![context-log01](../../../../img/new_ui/dev/parameter/context_log01.png)
 
 The result of Node_B is as follows:
 
-![context-log02](/img/new_ui/dev/parameter/context_log02.png)
+![context-log02](../../../../img/new_ui/dev/parameter/context_log02.png)
 
 The result of Node_mysql is as follows:
 
-![context-log03](/img/new_ui/dev/parameter/context_log03.png)
+![context-log03](../../../../img/new_ui/dev/parameter/context_log03.png)
 
 Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
 

@@ -7,7 +7,7 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 ## 创建任务
 
 - 点击项目管理 -> 项目名称 -> 工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
-- 拖动工具栏的<img src="/img/tasks/icons/datax.png" width="15"/> 任务节点到画板中。
+- 拖动工具栏的<img src="../../../../img/tasks/icons/datax.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
 
@@ -42,7 +42,7 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
 若生产环境中要是使用到 DataX 任务类型，则需要先配置好所需的环境。配置文件如下：`/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
 
-![datax_task01](/img/tasks/demo/datax_task01.png)
+![datax_task01](../../../../img/tasks/demo/datax_task01.png)
 
 当环境配置完成之后，需要重启 DolphinScheduler。
 
@@ -52,11 +52,11 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
 在编写好所需的 json 之后，可按照下图步骤进行配置节点内容。
 
-![datax_task02](/img/tasks/demo/datax_task02.png)
+![datax_task02](../../../../img/tasks/demo/datax_task02.png)
 
 ### 查看运行结果
 
-![datax_task03](/img/tasks/demo/datax_task03.png)
+![datax_task03](../../../../img/tasks/demo/datax_task03.png)
 
 ## 注意事项：
 

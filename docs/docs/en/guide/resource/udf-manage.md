@@ -17,7 +17,7 @@ Currently only temporary UDF functions for HIVE are supported.
 - Package name Class name: Enter the full path of the UDF function.
 - UDF resource: Set the resource file corresponding to the created UDF function.
 
-![create-udf](/img/new_ui/dev/resource/create-udf.png)
+![create-udf](../../../../img/new_ui/dev/resource/create-udf.png)
 
 ## Example
 
@@ -25,13 +25,13 @@ Currently only temporary UDF functions for HIVE are supported.
 
 Users can customize the desired UDF function according to actual production requirements. Here's a function that appends "HelloWorld" to the end of any string. As shown below:
 
-![code-udf](/img/new_ui/dev/resource/demo/udf-demo01.png)
+![code-udf](../../../../img/new_ui/dev/resource/demo/udf-demo01.png)
 
 ### Configure the UDF function
 
 Before configuring UDF functions, you need to upload the required function jar package through resource management. Then enter the function management and configure the relevant information. As shown below:
 
-![conf-udf](/img/new_ui/dev/resource/demo/udf-demo02.png)
+![conf-udf](../../../../img/new_ui/dev/resource/demo/udf-demo02.png)
 
 ### Use UDF functions
 
@@ -42,4 +42,4 @@ Enter the workflow to define an SQL node, the data source type is HIVE, and the 
 - SQL statement: `select HwUdf("abc");` This function is used in the same way as the built-in functions, and can be accessed directly using the function name.
 - UDF function: Select the one configured for the resource center.
 
-![use-udf](/img/new_ui/dev/resource/demo/udf-demo03.png)
+![use-udf](../../../../img/new_ui/dev/resource/demo/udf-demo03.png)

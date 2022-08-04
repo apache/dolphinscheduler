@@ -4,7 +4,7 @@ If you need to use `DingTalk` for alerting, create an alert instance in the aler
 
 The following shows the `DingTalk` configuration example:
 
-![alert-dingtalk](/img/new_ui/dev/alert/alert_dingtalk.png)
+![alert-dingtalk](../../../../img/new_ui/dev/alert/alert_dingtalk.png)
 
 ## Parameter Configuration
 

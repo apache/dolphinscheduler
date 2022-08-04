@@ -22,7 +22,7 @@ This example shows how to use local parameters to print the current date.
 
 Create a Shell task and write a script with the content `echo ${dt}`. Click **custom parameter** in the configuration bar, and the configuration is as follows:
 
-![local-parameter01](/img/new_ui/dev/parameter/local_parameter01.png)
+![local-parameter01](../../../../img/new_ui/dev/parameter/local_parameter01.png)
 
 Parameters:
 
@@ -33,7 +33,7 @@ Parameters:
 
 Save the workflow and run it. View log of Shell task.
 
-![local-parameter02](/img/new_ui/dev/parameter/local_parameter02.png)
+![local-parameter02](../../../../img/new_ui/dev/parameter/local_parameter02.png)
 
 > Note: The local parameter can be used in the workflow of the current task node. If it is set to OUT, it can be passed to the downstream workflow. Please refer to: [Parameter Context](context.md).
 
@@ -41,7 +41,7 @@ Save the workflow and run it. View log of Shell task.
 
 If you want to simple export parameters and then use them in downstream tasks, you could use `setValue` in your task. And you can manage your parameters into one single task. You can use syntax `echo '${setValue(set_val=123)}'`(**do not forget the single quote**) in Shell task and add new `OUT` custom parameter to export it.
 
-![local-parameter-set-val](/img/new_ui/dev/parameter/local_param_set_val.png)
+![local-parameter-set-val](../../../../img/new_ui/dev/parameter/local_param_set_val.png)
 
 You can get this value in downstream task using syntax `echo '${set_val}'`.
 
@@ -53,7 +53,7 @@ change its value. You can use syntax `echo "#{setValue(set_val_param=${val})}"`(
 using any variable with `setValue`**) in Shell task and add new `IN` custom parameter for input variable `val` and `OUT` custom
 parameter for exporting parameter `set_val_param`.
 
-![local-parameter-set-val-param](/img/new_ui/dev/parameter/local_param_set_val_custom.png)
+![local-parameter-set-val-param](../../../../img/new_ui/dev/parameter/local_param_set_val_custom.png)
 
 You could get this value in downstream task using syntax `echo '${set_val_param}'`.
 
@@ -72,6 +72,6 @@ in Shell task(**do not forget the double quote, if you are using any variable wi
 for exporting parameter `set_val_var`
 .
 
-![local-parameter-set-val-bash](/img/new_ui/dev/parameter/local_param_set_val_bash.png)
+![local-parameter-set-val-bash](../../../../img/new_ui/dev/parameter/local_param_set_val_bash.png)
 
 You could get this value in downstream task using syntax `echo '${set_val_var}'`.
