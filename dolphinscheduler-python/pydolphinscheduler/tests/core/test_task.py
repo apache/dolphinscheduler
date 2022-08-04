@@ -18,9 +18,10 @@
 """Test Task class function."""
 import logging
 import re
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 import pytest
+from pydolphinscheduler.constants import TaskType
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
@@ -35,30 +36,30 @@ TEST_TASK_RELATION_SIZE = 0
     "attr, expect",
     [
         (
-            dict(),
-            {
-                "localParams": [],
-                "resourceList": [],
-                "dependence": {},
-                "waitStartTimeout": {},
-                "conditionResult": {"successNode": [""], "failedNode": [""]},
-            },
+                dict(),
+                {
+                    "localParams": [],
+                    "resourceList": [],
+                    "dependence": {},
+                    "waitStartTimeout": {},
+                    "conditionResult": {"successNode": [""], "failedNode": [""]},
+                },
         ),
         (
-            {
-                "local_params": ["foo", "bar"],
-                "resource_list": ["foo", "bar"],
-                "dependence": {"foo", "bar"},
-                "wait_start_timeout": {"foo", "bar"},
-                "condition_result": {"foo": ["bar"]},
-            },
-            {
-                "localParams": ["foo", "bar"],
-                "resourceList": ["foo", "bar"],
-                "dependence": {"foo", "bar"},
-                "waitStartTimeout": {"foo", "bar"},
-                "conditionResult": {"foo": ["bar"]},
-            },
+                {
+                    "local_params": ["foo", "bar"],
+                    "resource_list": ["foo", "bar"],
+                    "dependence": {"foo", "bar"},
+                    "wait_start_timeout": {"foo", "bar"},
+                    "condition_result": {"foo": ["bar"]},
+                },
+                {
+                    "localParams": ["foo", "bar"],
+                    "resourceList": ["foo", "bar"],
+                    "dependence": {"foo", "bar"},
+                    "waitStartTimeout": {"foo", "bar"},
+                    "conditionResult": {"foo": ["bar"]},
+                },
         ),
     ],
 )
@@ -160,8 +161,8 @@ def test_task_get_define():
         "timeout": 0,
     }
     with patch(
-        "pydolphinscheduler.core.task.Task.gen_code_and_version",
-        return_value=(code, version),
+            "pydolphinscheduler.core.task.Task.gen_code_and_version",
+            return_value=(code, version),
     ):
         task = Task(name=name, task_type=task_type)
         assert task.get_define() == expect
@@ -182,12 +183,12 @@ def test_two_tasks_shift(shift: str):
     else:
         assert False, f"Unexpect bit operator type {shift}."
     assert (
-        1 == len(upstream._downstream_task_codes)
-        and downstream.code in upstream._downstream_task_codes
+            1 == len(upstream._downstream_task_codes)
+            and downstream.code in upstream._downstream_task_codes
     ), "Task downstream task attributes error, downstream codes size or specific code failed."
     assert (
-        1 == len(downstream._upstream_task_codes)
-        and upstream.code in downstream._upstream_task_codes
+            1 == len(downstream._upstream_task_codes)
+            and upstream.code in downstream._upstream_task_codes
     ), "Task upstream task attributes error, upstream codes size or upstream code failed."
 
 
@@ -241,3 +242,42 @@ def test_add_duplicate(caplog):
                 re.findall("already in process definition", caplog.text),
             ]
         )
+
+@pytest.mark.parametrize(
+    "val, expected",
+    [
+        ("a.sh", "echo test command content"),
+        ("a.zsh", "echo test command content"),
+        # ("echo test command content", "echo test command content"),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.ext",
+    new_callable=PropertyMock,
+    return_value={".sh"},
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.ext_attr",
+    new_callable=PropertyMock,
+    return_value="_raw_script",
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.get_res",
+)
+def test_task_ext_attr(mock_res, mock_ext_attr, mock_ext, mock_code_version, val, expected):
+    """Test task shell task ext_attr."""
+    with patch(
+        "pydolphinscheduler.core.task.Task._raw_script",
+        new_callable=PropertyMock,
+        create=True,
+        return_value=val,
+    ):
+        mock_res.return_value.read_file = expected
+        task = Task("test task ext_attr", TaskType.SHELL)
+        # assert expected == getattr(task, "raw_script")
+
+

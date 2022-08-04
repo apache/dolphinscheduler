@@ -25,7 +25,6 @@ from pydolphinscheduler.constants import (
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
-    ResourcePluginType,
 )
 from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
 from pydolphinscheduler.core import configuration
@@ -99,7 +98,7 @@ class Task(Base):
 
     _task_custom_attr: set = set()
 
-    ext = None
+    ext: set = None
     ext_attr: str = None
 
     DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
@@ -204,23 +203,48 @@ class Task(Base):
         custom_attr |= self._task_custom_attr
         return self.get_define_custom(custom_attr=custom_attr)
 
+    def get_res(self):
+        """ """
+        if self.resource_plugin is None:
+            if self.process_definition.resource_plugin is not None:
+                res = self.process_definition.resource_plugin.resource
+            else:
+                raise ValueError("")
+        else:
+            res = self.resource_plugin.resource
+        return res
+
+
     def get_content(self):
         """Get the file content according to the resource plugin"""
-        _ext_attr = getattr(self, str(self.ext_attr))
-        if _ext_attr is not None:
-            if self.resource_plugin is None:
-                if self.process_definition.resources_plugin is not None:
-                    res = self.process_definition.resource_plugin.resource
-                else:
-                    return
-            else:
-                res = self.resource_plugin.resource
-                print(res)
-
-            content = res.read_file(self.ext_attr)
-            setattr(self, _ext_attr[1:], content)
-        else:
+        if self.ext_attr is None:
             raise ValueError('ext_attr is None')
+        if self.ext is None:
+            raise ValueError('ext is None')
+
+        _ext_attr = getattr(self, self.ext_attr)
+
+        if _ext_attr is not None:
+            if _ext_attr.endswith(tuple(self.ext)):
+
+                # res = self.get_res()
+
+                if self.resource_plugin is None:
+                    if self.process_definition.resource_plugin is not None:
+                        res = self.process_definition.resource_plugin.resource
+                    else:
+                        return
+                else:
+                    res = self.resource_plugin.resource
+
+                content = res.read_file(_ext_attr)
+                setattr(self, self.ext_attr[1:], content)
+            else:
+                index = _ext_attr.rfind('.')
+                if index != -1:
+                    raise ValueError('This task does not support files with suffix {}, only supports {}'.format(_ext_attr[index:], ",".join(str(suf) for suf in self.ext)))
+                setattr(self, self.ext_attr[1:], _ext_attr)
+        # print(getattr(self, self.ext_attr[1:]))
 
     def __hash__(self):
         return hash(self.code)
@@ -246,7 +270,7 @@ class Task(Base):
         return self
 
     def _set_deps(
-        self, tasks: Union["Task", Sequence["Task"]], upstream: bool = True
+            self, tasks: Union["Task", Sequence["Task"]], upstream: bool = True
     ) -> None:
         """
         Set parameter tasks dependent to current task.

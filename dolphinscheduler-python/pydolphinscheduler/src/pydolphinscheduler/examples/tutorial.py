@@ -57,7 +57,7 @@ with ProcessDefinition(
     # [start task_declare]
     task_parent = Shell(
         name="task_parent",
-        command="parent.sh",
+        command="parent.zsh",
         resource_plugin=ResourcePlugin(
             type=ResourcePluginType.LOCAL,
             prefix='/opt/',
@@ -83,11 +83,7 @@ with ProcessDefinition(
     )
     task_union = Shell(
         name="task_union",
-        command="union.sh",
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix='/opt/',
-        )
+        command="echo union1 ab",
     )
     # [end task_declare]
 

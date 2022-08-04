@@ -1,7 +1,6 @@
 import importlib
 import os
-
-from pydolphinscheduler.resources_plugin.local import Local
+import importlib.util
 
 
 class ResourcePlugin:
@@ -11,6 +10,7 @@ class ResourcePlugin:
         self._prefix = prefix
 
     def get_modules(self, package="."):
+        """Get the names of all modules under a package"""
         modules = []
         files = os.listdir(package)
         for file in files:
@@ -23,20 +23,15 @@ class ResourcePlugin:
         """Import module"""
         spec = importlib.util.spec_from_file_location(script_name, script_path)
         module = importlib.util.module_from_spec(spec)
-        setattr(module, self._type, self._type)
-        setattr(module, self._prefix, self._prefix)
         spec.loader.exec_module(module)
-        return module
+        plugin = getattr(module, self._type.capitalize())
+        return plugin(self._prefix)
 
     @property
     def resource(self):
-        #         all_resource = importlib.import_module("")
-        #         if self.type not in [str(i)  for i in all_resource]:
-        #             raise ValueError()
         pwd = os.path.abspath(__file__)
         parent_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
         modules = self.get_modules(parent_path)
-        print(modules)
         if self._type not in [module for module in modules]:
             raise ValueError('{} type is not supported'.format(self._type))
 
