@@ -152,6 +152,8 @@ Create a task node in the workflow definition, select the worker group and the e
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
+> NOTE: Please make sure you have associated the `Environments` with your `worker groups` if you can not select the `Environment Name` in workflow definition page or when triggering workflows.
+
 ## Cluster Management
 
 > Add or update cluster
