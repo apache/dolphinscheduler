@@ -51,6 +51,8 @@ public class ParameterUtils {
 
     private static final String DATE_START_PATTERN = "^[0-9]";
 
+    private static final char PARAM_REPLACE_CHAR = '?';
+
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
     }
@@ -155,7 +157,6 @@ public class ParameterUtils {
         if (params == null || params.isEmpty()) {
             return sql;
         }
-        List<Integer> removeList = new ArrayList<>();
         String[] split = sql.split("\\?");
         if (split.length == 0) {
             return sql;
@@ -174,10 +175,14 @@ public class ParameterUtils {
                     ret.append(",");
                 });
                 ret.deleteCharAt(ret.length() - 1);
+                params.remove(i);
             } else {
-                ret.append("?");
+                ret.append(PARAM_REPLACE_CHAR);
             }
             ret.append(split[i]);
+        }
+        if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
+            ret.append(PARAM_REPLACE_CHAR);
         }
         return ret.toString();
     }

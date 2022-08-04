@@ -7,6 +7,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -24,6 +25,13 @@ public class ParameterUtilsTest {
         params.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
         params.put(3, new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("d1", "d2", "d3"))));
         String sql = ParameterUtils.replaceListParameter(params, "select * from test where col1 in (?) and date=? and col2 in (?)");
-        System.out.println(sql);
+        Assert.assertEquals("select * from test where col1 in ('c1','c2','c3') and date=? and col2 in ('d1','d2','d3')", sql);
+
+        Map<Integer, Property> params2 = new HashMap<>();
+        params2.put(1, new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1", "c2", "c3"))));
+        params2.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
+        String sql2 = ParameterUtils.replaceListParameter(params2, "select * from test where col1 in (?) and date=?");
+        Assert.assertEquals("select * from test where col1 in ('c1','c2','c3') and date=?", sql2);
+
     }
 }
