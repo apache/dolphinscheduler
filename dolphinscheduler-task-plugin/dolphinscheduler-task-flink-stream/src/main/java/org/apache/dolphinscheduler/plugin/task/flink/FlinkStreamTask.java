@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -24,7 +25,13 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
@@ -90,7 +97,16 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void cancelApplication(boolean status) throws Exception {
+        List<String> appIds = getApplicationIds();
+        if (CollectionUtils.isEmpty(appIds)) {
+            logger.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
+            return;
+        }
+        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
+
+        logger.info("cancel application args:{}", args);
+
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);
         processBuilder.start();
@@ -99,7 +115,16 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void savePoint() throws Exception {
+        List<String> appIds = getApplicationIds();
+        if (CollectionUtils.isEmpty(appIds)) {
+            logger.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
+            return;
+        }
+
+        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
+        logger.info("savepoint args:{}", args);
+
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);
         processBuilder.start();

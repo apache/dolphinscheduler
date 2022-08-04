@@ -79,7 +79,7 @@ public class FlinkArgsUtils {
     }
 
     /**
-     * build flink savepoint command line
+     * build flink savepoint command line, the savepoint folder should be set in flink conf
      * @return
      */
     public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {

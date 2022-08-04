@@ -20,11 +20,28 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * executive task
  */
 public abstract class AbstractTask {
+
+    /**
+     * rules for extracting application ID
+     */
+    protected static final Pattern YARN_APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     /**
      * varPool string
@@ -100,6 +117,48 @@ public abstract class AbstractTask {
      */
     public void cancelApplication(boolean status) throws Exception {
         this.cancel = status;
+    }
+
+    /**
+     * get application ids
+     * @return
+     * @throws IOException
+     */
+    public List<String> getApplicationIds() throws IOException {
+        List<String> appIds = new ArrayList<>();
+
+        File file = new File(taskRequest.getLogPath());
+        if (!file.exists()) {
+            return appIds;
+        }
+
+        /*
+         * analysis log? get submitted yarn application id
+         */
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String appId = findAppId(line);
+                if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
+                    appIds.add(appId);
+                }
+            }
+        }
+        return appIds;
+    }
+
+    /**
+     * find app id
+     *
+     * @param line line
+     * @return appid
+     */
+    protected String findAppId(String line) {
+        Matcher matcher = YARN_APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 
     public void setVarPool(String varPool) {

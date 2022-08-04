@@ -39,6 +39,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -81,6 +84,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private StateEventCallbackService stateEventCallbackService;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -212,7 +218,29 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Override
     public Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId) {
-        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
-        return null;
+        Result result = new Result();
+
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            putMsg(result,status);
+            return result;
+        }
+
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        if (taskInstance == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return result;
+        }
+
+        TaskSavePointRequestCommand command = new TaskSavePointRequestCommand(taskInstanceId);
+
+        Host host = new Host(taskInstance.getHost());
+        stateEventCallbackService.sendResult(host, command.convert2Command());
+        putMsg(result, Status.SUCCESS);
+
+        return result;
     }
 }
