@@ -1161,6 +1161,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         // delay execution time
         taskInstance.setDelayTime(taskNode.getDelayTime());
+        taskInstance.setTaskExecuteType(taskNode.getTaskExecuteType());
         return taskInstance;
     }
 

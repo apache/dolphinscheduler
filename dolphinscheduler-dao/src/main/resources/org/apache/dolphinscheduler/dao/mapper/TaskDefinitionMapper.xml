@@ -112,7 +112,7 @@
         <if test="taskType != ''">
             and td.task_type = #{taskType}
         </if>
-        <if test="taskExecuteType != ''">
+        <if test="taskExecuteType != null">
             and td.task_execute_type = #{taskExecuteType.code}
         </if>
         <if test="searchWorkflowName != null and searchWorkflowName != ''">

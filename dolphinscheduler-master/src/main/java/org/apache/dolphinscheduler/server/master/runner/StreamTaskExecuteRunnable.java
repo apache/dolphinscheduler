@@ -272,6 +272,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 taskInstance.setEnvironmentConfig(environment.getConfig());
             }
         }
+
+        taskInstance.setTaskExecuteType(taskDefinition.getTaskExecuteType());
         return taskInstance;
     }
 

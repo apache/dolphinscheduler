@@ -60,9 +60,9 @@ public final class TaskProcessorFactory {
 
     public static ITaskProcessor getTaskProcessor(TaskInstance taskInstance) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         String type = taskInstance.getTaskType();
-        if (taskInstance.getTaskExecuteType() == TaskExecuteType.STREAM) {
-            type = TASK_TYPE_STREAM;
-        }
+//        if (taskInstance.getTaskExecuteType() == TaskExecuteType.STREAM) {
+//            type = TASK_TYPE_STREAM;
+//        }
         if (StringUtils.isEmpty(type)) {
             type = DEFAULT_PROCESSOR;
         }

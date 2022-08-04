@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -188,6 +189,11 @@ public class TaskNode {
      */
     private Integer memoryMax;
 
+    /**
+     * task execute type
+     */
+    private TaskExecuteType taskExecuteType;
+
     public String getId() {
         return id;
     }
@@ -297,7 +303,8 @@ public class TaskNode {
                 && Objects.equals(workerGroup, taskNode.workerGroup)
                 && Objects.equals(environmentCode, taskNode.environmentCode)
                 && Objects.equals(conditionResult, taskNode.conditionResult)
-                && CollectionUtils.equalLists(depList, taskNode.depList);
+                && CollectionUtils.equalLists(depList, taskNode.depList)
+                && Objects.equals(taskExecuteType, taskNode.taskExecuteType);
     }
 
     @Override
@@ -464,7 +471,8 @@ public class TaskNode {
                 + ", workerGroup='" + workerGroup + '\''
                 + ", environmentCode=" + environmentCode
                 + ", timeout='" + timeout + '\''
-                + ", delayTime=" + delayTime
+                + ", delayTime=" + delayTime + '\''
+                + ", taskExecuteType=" + taskExecuteType
                 + '}';
     }
 
@@ -522,5 +530,13 @@ public class TaskNode {
 
     public void setMemoryMax(Integer memoryMax) {
         this.memoryMax = memoryMax;
+    }
+
+    public TaskExecuteType getTaskExecuteType() {
+        return taskExecuteType;
+    }
+
+    public void setTaskExecuteType(TaskExecuteType taskExecuteType) {
+        this.taskExecuteType = taskExecuteType;
     }
 }
