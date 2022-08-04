@@ -44,6 +44,7 @@ interface CodeReq {
 
 interface TaskDefinitionJsonObjReq {
   taskDefinitionJsonObj: string
+  taskExecuteType?: string
 }
 
 interface ReleaseStateReq {

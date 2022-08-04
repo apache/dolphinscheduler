@@ -70,10 +70,10 @@ export function queryTaskDefinitionByCode(
   })
 }
 
-export function update(
-  data: TaskDefinitionJsonObjReq,
-  code: CodeReq,
-  projectCode: ProjectCodeReq
+export function updateTask(
+  projectCode: number,
+  code: number,
+  data: TaskDefinitionJsonObjReq
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,

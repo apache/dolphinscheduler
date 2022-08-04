@@ -43,32 +43,22 @@ const StreamTaskDefinition = defineComponent({
     const projectCode = Number(route.params.projectCode)
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-    const { task, onToggleShow, onTaskSave, onEditTask, onInitTask } =
+    const { task, onToggleShow, onEditTask, onInitTask, onUpdateTask } =
       useTask(projectCode)
     const { variables, getTableData, createColumns } = useTable(onEditTask)
 
-    const requestData = () => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
-        taskType: variables.taskType
-      })
-    }
-
     const onSearch = () => {
       variables.page = 1
-      requestData()
+      getTableData()
     }
 
     const onRefresh = () => {
-      requestData()
+      getTableData()
     }
 
     const onUpdatePageSize = () => {
       variables.page = 1
-      requestData()
+      getTableData()
     }
 
     const onTaskCancel = () => {
@@ -77,7 +67,7 @@ const StreamTaskDefinition = defineComponent({
     }
 
     const onTaskSubmit = async (params: { data: INodeData }) => {
-      const result = await onTaskSave(params.data)
+      const result = await onUpdateTask(params.data)
       if (result) {
         onTaskCancel()
         onRefresh()
@@ -86,7 +76,7 @@ const StreamTaskDefinition = defineComponent({
 
     onMounted(() => {
       createColumns(variables)
-      requestData()
+      getTableData()
     })
 
     watch(useI18n().locale, () => {
@@ -151,7 +141,7 @@ const StreamTaskDefinition = defineComponent({
                 show-size-picker
                 page-sizes={[10, 30, 50]}
                 show-quick-jumper
-                onUpdatePage={requestData}
+                onUpdatePage={getTableData}
                 onUpdatePageSize={onUpdatePageSize}
               />
             </NSpace>

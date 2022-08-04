@@ -171,10 +171,18 @@ export function useTable(onEdit: Function) {
     loading: false
   })
 
-  const getTableData = (params: any) => {
+  const getTableData = () => {
     if (variables.loading) return
     variables.loading = true
-    queryTaskDefinitionListPaging({ ...params }, { projectCode })
+    const params = {
+      pageSize: variables.pageSize,
+      pageNo: variables.page,
+      searchTaskName: variables.searchTaskName,
+      searchWorkflowName: variables.searchWorkflowName,
+      taskType: variables.taskType
+    } as any
+
+    queryTaskDefinitionListPaging(params, { projectCode })
       .then((res: TaskDefinitionRes) => {
         variables.tableData = [...res.totalList] as any
         variables.totalPage = res.totalPage
@@ -187,13 +195,7 @@ export function useTable(onEdit: Function) {
   const onStart = (row: any) => {
     startTaskDefinition(projectCode, row.code).then(() => {
       window.$message.success(t('project.workflow.success'))
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
-        taskType: variables.taskType
-      })
+      getTableData()
     })
   }
 
