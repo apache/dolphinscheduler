@@ -16,18 +16,12 @@
  */
 
 import { reactive, h } from 'vue'
-import { NButton, NIcon, NSpace, NTag, NTooltip, NEllipsis } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { useI18n } from 'vue-i18n'
-import {
-  EditOutlined,
-  DownloadOutlined,
-  UploadOutlined,
-  PlayCircleOutlined
-} from '@vicons/antd'
+import { EditOutlined, PlayCircleOutlined } from '@vicons/antd'
 import {
   queryTaskDefinitionListPaging,
-  releaseTaskDefinition,
   startTaskDefinition
 } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
@@ -93,22 +87,6 @@ export function useTable(onEdit: Function) {
         ...COLUMN_WIDTH_CONFIG['type']
       },
       {
-        title: t('project.task.workflow_state'),
-        key: 'processReleaseState',
-        render: (row: any) => {
-          if (row.processReleaseState === 'OFFLINE') {
-            return h(NTag, { type: 'error', size: 'small' }, () =>
-              t('project.task.offline')
-            )
-          } else if (row.processReleaseState === 'ONLINE') {
-            return h(NTag, { type: 'info', size: 'small' }, () =>
-              t('project.task.online')
-            )
-          }
-        },
-        width: 130
-      },
-      {
         title: t('project.task.create_time'),
         key: 'taskCreateTime',
         ...COLUMN_WIDTH_CONFIG['time']
@@ -121,38 +99,10 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](2),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
-              h(
-                NTooltip,
-                {},
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        onClick: () => onRelease(row)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, {
-                            default: () =>
-                              h(
-                                row.processReleaseState === 'ONLINE'
-                                  ? DownloadOutlined
-                                  : UploadOutlined
-                              )
-                          })
-                      }
-                    ),
-                  default: () => t('project.task.move')
-                }
-              ),
               h(
                 NTooltip,
                 {},
@@ -187,10 +137,6 @@ export function useTable(onEdit: Function) {
                         circle: true,
                         type: 'info',
                         size: 'small',
-                        disabled:
-                          ['CONDITIONS', 'SWITCH'].includes(row.taskType) ||
-                          (!!row.processDefinitionCode &&
-                            row.processReleaseState === 'ONLINE'),
                         onClick: () => onEdit(row, false)
                       },
                       {
@@ -236,24 +182,6 @@ export function useTable(onEdit: Function) {
       .finally(() => {
         variables.loading = false
       })
-  }
-
-  const onRelease = (row: any) => {
-    const data = {
-      releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
-        | 'OFFLINE'
-        | 'ONLINE'
-    }
-    releaseTaskDefinition(data, projectCode, row.code).then(() => {
-      window.$message.success(t('project.workflow.success'))
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
-        taskType: variables.taskType
-      })
-    })
   }
 
   const onStart = (row: any) => {
