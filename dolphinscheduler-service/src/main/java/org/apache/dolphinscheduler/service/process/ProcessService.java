@@ -271,9 +271,7 @@ public interface ProcessService {
                              String taskName, int groupId,
                              int processId, int priority);
 
-    boolean robTaskGroupResouce(TaskGroupQueue taskGroupQueue);
-
-    boolean acquireTaskGroupAgain(TaskGroupQueue taskGroupQueue);
+    boolean robTaskGroupResource(TaskGroupQueue taskGroupQueue);
 
     void releaseAllTaskGroup(int processInstanceId);
 
