@@ -72,6 +72,9 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      */
     TaskGroup queryByName(@Param("userId") int userId, @Param("name") String name);
 
+    /**
+     * Select the groupSize > useSize Count
+     */
     int selectAvailableCountById(@Param("groupId") int groupId);
 
     int selectCountByIdStatus(@Param("id") int id,@Param("status") int status);

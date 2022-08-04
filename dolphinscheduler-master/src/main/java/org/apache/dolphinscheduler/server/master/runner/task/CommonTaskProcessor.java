@@ -51,23 +51,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     protected boolean submitTask() {
         this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
-        if (this.taskInstance == null) {
-            return false;
-        }
-
-        int taskGroupId = taskInstance.getTaskGroupId();
-        if (taskGroupId > 0) {
-            boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
-                    taskInstance.getName(),
-                    taskGroupId,
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskGroupPriority());
-            if (!acquireTaskGroup) {
-                logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
-                return true;
-            }
-        }
-        return true;
+        return this.taskInstance != null;
     }
 
     @Override
