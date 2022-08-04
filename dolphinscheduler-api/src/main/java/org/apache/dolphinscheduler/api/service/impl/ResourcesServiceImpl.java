@@ -1448,6 +1448,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return result;
     }
 
+    @Override
+    public Resource queryResourcesFileInfo(String userName, String fullName) {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE);
+        if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
+            String msg = String.format("Can not find valid resource by name %s", fullName);
+            throw new IllegalArgumentException(msg);
+        }
+        return (Resource) resourceResponse.getData();
+    }
+
     /**
      * unauthorized file
      *

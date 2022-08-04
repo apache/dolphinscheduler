@@ -63,10 +63,14 @@ TEST_TASK_RELATION_SIZE = 0
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.query_resource",
-    return_value=({"id": 1, "name": "foo"}),
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
+    return_value=1,
 )
-def test_property_task_params(mock_resource, attr, expect):
+@patch(
+    "pydolphinscheduler.core.task.Task.user_name",
+    return_value="test_user",
+)
+def test_property_task_params(mock_resource, mock_user_name, attr, expect):
     """Test class task property."""
     task = testTask(
         "test-property-task-params",
@@ -265,10 +269,16 @@ def test_add_duplicate(caplog):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.query_resource",
-    return_value=({"id": 1, "name": "/dev/test.py"}),
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
+    return_value=1,
 )
-def test_python_resource_list(mock_code_version, mock_resource, resources, expect):
+@patch(
+    "pydolphinscheduler.core.task.Task.user_name",
+    return_value="test_user",
+)
+def test_python_resource_list(
+    mock_code_version, mock_resource, mock_user_name, resources, expect
+):
     """Test python task resource list."""
     task = Task(
         name="python_resource_list.",
