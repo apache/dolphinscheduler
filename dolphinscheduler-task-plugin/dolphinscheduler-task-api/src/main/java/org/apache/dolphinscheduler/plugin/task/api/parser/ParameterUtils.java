@@ -164,8 +164,12 @@ public class ParameterUtils {
         StringBuilder ret = new StringBuilder(split[0]);
         for (int i = 1; i < split.length; i++) {
             Property property = params.get(i);
+            String value = property.getValue();
             if (DataType.LIST.equals(property.getType())) {
-                List<Object> valueList = JSONUtils.toList(property.getValue(), Object.class);
+                List<Object> valueList = JSONUtils.toList(value, Object.class);
+                if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
+                    valueList.add(value);
+                }
                 valueList.forEach(v -> {
                     if (v instanceof String) {
                         ret.append("'").append(v).append("'");

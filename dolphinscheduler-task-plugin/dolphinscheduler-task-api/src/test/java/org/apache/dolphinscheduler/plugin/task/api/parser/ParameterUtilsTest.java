@@ -28,10 +28,10 @@ public class ParameterUtilsTest {
         Assert.assertEquals("select * from test where col1 in ('c1','c2','c3') and date=? and col2 in ('d1','d2','d3')", sql);
 
         Map<Integer, Property> params2 = new HashMap<>();
-        params2.put(1, new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1", "c2", "c3"))));
+        params2.put(1, new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1"))));
         params2.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
         String sql2 = ParameterUtils.replaceListParameter(params2, "select * from test where col1 in (?) and date=?");
-        Assert.assertEquals("select * from test where col1 in ('c1','c2','c3') and date=?", sql2);
+        Assert.assertEquals("select * from test where col1 in ('c1') and date=?", sql2);
 
     }
 }
