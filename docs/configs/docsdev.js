@@ -435,6 +435,73 @@ export default {
                 ],
             },
             {
+                title: 'Contribution',
+                children: [
+                    {
+                        title: 'Development Environment Setup',
+                        link: '/en-us/docs/dev/user_doc/guide/development/development-environment-setup.html',
+                    },
+                    {
+                        title: 'Design Document',
+                        children: [
+                            // TODO not support multiply level for now
+                            // {
+                            // title: 'SPI',
+                            // children: [
+                            {
+                                title: 'Architecture Design',
+                                link: '/en-us/docs/dev/user_doc/guide/development/architecture-design.html',
+                            },
+                            {
+                                title: 'Alert SPI',
+                                link: '/en-us/docs/dev/user_doc/guide/development/backend/spi/alert.html',
+                            },
+                            {
+                                title: 'Registry SPI',
+                                link: '/en-us/docs/dev/user_doc/guide/development/backend/spi/registry.html',
+                            },
+                            {
+                                title: 'Task SPI',
+                                link: '/en-us/docs/dev/user_doc/guide/development/backend/spi/task.html',
+                            },
+                            {
+                                title: 'Datasource SPI',
+                                link: '/en-us/docs/dev/user_doc/guide/development/backend/spi/datasource.html',
+                            },
+                            {
+                                title: 'Mechanism Design',
+                                link: '/en-us/docs/dev/user_doc/guide/development/backend/mechanism/overview.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Guidelines',
+                        children: [
+                            {
+                                title: 'Frontend Development',
+                                link: '/en-us/docs/dev/user_doc/guide/development/frontend-development.html',
+                            },
+                            {
+                                title: 'API Standard',
+                                link: '/en-us/docs/dev/user_doc/guide/development/api-standard.html',
+                            },
+                            {
+                                title: 'E2E Automation Test',
+                                link: '/en-us/docs/dev/user_doc/guide/development/e2e-test.html',
+                            },
+                            {
+                                title: 'API Automation Test',
+                                link: '/en-us/docs/dev/user_doc/guide/development/api-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Questions & Communications',
+                        link: '/en-us/docs/dev/user_doc/guide/development/have-questions.html',
+                    },
+                ],
+            },
+            {
                 title: 'FAQ',
                 children: [
                     {
@@ -852,6 +919,73 @@ export default {
                     {
                         title: '健康检查',
                         link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
+                title: '贡献指南',
+                children: [
+                    {
+                        title: '环境搭建',
+                        link: '/zh-cn/docs/dev/user_doc/guide/development/development-environment-setup.html',
+                    },
+                    {
+                        title: '设计文档',
+                        children: [
+                            // TODO not support multiply level for now
+                            // {
+                            // title: 'SPI',
+                            // children: [
+                            {
+                                title: '架构设计',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/architecture-design.html',
+                            },
+                            {
+                                title: 'Alert SPI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/backend/spi/alert.html',
+                            },
+                            {
+                                title: 'Registry SPI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/backend/spi/registry.html',
+                            },
+                            {
+                                title: 'Task SPI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/backend/spi/task.html',
+                            },
+                            {
+                                title: 'Datasource SPI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/backend/spi/datasource.html',
+                            },
+                            {
+                                title: '组件设计',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/backend/mechanism/overview.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '规范',
+                        children: [
+                            {
+                                title: '前端开发',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/frontend-development.html',
+                            },
+                            {
+                                title: 'API规范',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/api-standard.html',
+                            },
+                            {
+                                title: 'E2E 自动化测试',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/e2e-test.html',
+                            },
+                            {
+                                title: 'API 自动化测试',
+                                link: '/zh-cn/docs/dev/user_doc/guide/development/api-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '问题与交流',
+                        link: '/zh-cn/docs/dev/user_doc/guide/development/have-questions.html',
                     },
                 ],
             },
