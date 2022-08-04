@@ -33,6 +33,7 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.java_gateway import launch_gateway
 from pydolphinscheduler.models import Base
 
@@ -196,7 +197,7 @@ class Task(Base):
         if self.process_definition:
             return self.process_definition.user.name
         else:
-            return None
+            raise PyDSParamException("`user_name` cannot be empty.")
 
     @property
     def condition_result(self) -> Dict:

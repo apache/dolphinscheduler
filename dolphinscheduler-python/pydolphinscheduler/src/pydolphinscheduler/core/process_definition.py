@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Optional, Set
 
 from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
+from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
 from pydolphinscheduler.models import Base, Project, Tenant, User
@@ -110,7 +111,7 @@ class ProcessDefinition(Base):
         timeout: Optional[int] = 0,
         release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
-        resource_list: Optional[List] = None,
+        resource_list: Optional[List[Resource]] = None,
     ):
         super().__init__(name, description)
         self.schedule = schedule
