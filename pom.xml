@@ -394,9 +394,6 @@
                         <eclipse>
                             <file>style/spotless_dolphinscheduler_formatter.xml</file>
                         </eclipse>
-                        <licenseHeader>
-                            <file>style/license-header</file>
-                        </licenseHeader>
                     </java>
                     <pom>
                         <sortPom>
