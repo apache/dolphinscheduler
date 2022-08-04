@@ -247,8 +247,7 @@ def test_add_duplicate(caplog):
     "val, expected",
     [
         ("a.sh", "echo test command content"),
-        ("a.zsh", "echo test command content"),
-        # ("echo test command content", "echo test command content"),
+        ("echo test command content", "echo test command content"),
     ],
 )
 @patch(
@@ -265,19 +264,13 @@ def test_add_duplicate(caplog):
     new_callable=PropertyMock,
     return_value="_raw_script",
 )
-@patch(
-    "pydolphinscheduler.core.task.Task.get_res",
-)
-def test_task_ext_attr(mock_res, mock_ext_attr, mock_ext, mock_code_version, val, expected):
+@patch("pydolphinscheduler.core.task.Task._raw_script", create=True, new_callable=PropertyMock,)
+@patch("pydolphinscheduler.core.task.Task.get_plugin")
+def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version, val, expected):
     """Test task shell task ext_attr."""
-    with patch(
-        "pydolphinscheduler.core.task.Task._raw_script",
-        new_callable=PropertyMock,
-        create=True,
-        return_value=val,
-    ):
-        mock_res.return_value.read_file = expected
-        task = Task("test task ext_attr", TaskType.SHELL)
-        # assert expected == getattr(task, "raw_script")
+    m_plugin.return_value.read_file.return_value = expected
+    m_raw_script.retrun_value = val
+    task = Task("test_task_ext_attr", "test_task_ext_attr")
+    assert expected == getattr(task, "raw_script")
 
 

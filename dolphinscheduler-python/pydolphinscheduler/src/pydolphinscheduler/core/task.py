@@ -214,6 +214,15 @@ class Task(Base):
             res = self.resource_plugin.resource
         return res
 
+    def get_plugin(self):
+        if self.resource_plugin is None:
+            if self.process_definition.resource_plugin is not None:
+                return self.process_definition.resource_plugin.resource
+            else:
+                raise ValueError
+        else:
+            return self.resource_plugin.resource
+
 
     def get_content(self):
         """Get the file content according to the resource plugin"""
@@ -226,24 +235,14 @@ class Task(Base):
 
         if _ext_attr is not None:
             if _ext_attr.endswith(tuple(self.ext)):
-
-                # res = self.get_res()
-
-                if self.resource_plugin is None:
-                    if self.process_definition.resource_plugin is not None:
-                        res = self.process_definition.resource_plugin.resource
-                    else:
-                        return
-                else:
-                    res = self.resource_plugin.resource
-
+                res = self.get_plugin()
                 content = res.read_file(_ext_attr)
-                setattr(self, self.ext_attr[1:], content)
+                setattr(self, self.ext_attr.lstrip("_"), content)
             else:
                 index = _ext_attr.rfind('.')
                 if index != -1:
                     raise ValueError('This task does not support files with suffix {}, only supports {}'.format(_ext_attr[index:], ",".join(str(suf) for suf in self.ext)))
-                setattr(self, self.ext_attr[1:], _ext_attr)
+                setattr(self, self.ext_attr.lstrip("_"), _ext_attr)
         # print(getattr(self, self.ext_attr[1:]))
 
     def __hash__(self):
