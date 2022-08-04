@@ -27,6 +27,26 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
+
+### 代码风格
+
+`DolphinScheduler`使用`Spotless`检查并修复代码风格和格式问题
+`Spotless`的`executions`配置如下：
+
+```xml
+<executions>
+  <execution>
+      <goals>
+          <goal>apply</goal>
+      </goals>
+      <phase>compile</phase>
+  </execution>
+</executions>
+```
+
+当您使用`mvn clean install -Prelease -Dmaven.test.skip=true`命令编译项目时，
+`Spotless`会自动为您修复增量代码中的代码风格和格式问题。
+
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像

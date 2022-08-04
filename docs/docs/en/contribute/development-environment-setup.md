@@ -19,13 +19,32 @@ cd dolphinscheduler
 git clone git@github.com:apache/dolphinscheduler.git
 ```
 
-### compile source code
+### Compile Source Code
 
 Supporting system:
 * MacOS
 * Liunx
 
 Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+
+### Code Style
+
+`DolphinScheduler` uses `Spotless` for code style and formatting checks
+and the `executions` configuration for `Spotless` is as follows:
+
+```xml
+<executions>
+  <execution>
+      <goals>
+          <goal>apply</goal>
+      </goals>
+      <phase>compile</phase>
+  </execution>
+</executions>
+```
+
+When you compile the project with `mvn clean install -Prelease -Dmaven.test.skip=true`, 
+`Spotless` will automatically fix the code style and formatting errors for you. 
 
 ## Docker image build
 
