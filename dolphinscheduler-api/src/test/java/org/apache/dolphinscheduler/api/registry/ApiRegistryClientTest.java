@@ -64,7 +64,6 @@ public class ApiRegistryClientTest {
         given(apiConfig.getHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
 
         apiRegistryClient.registry();
-
         Mockito.verify(registryClient, Mockito.times(1)).handleDeadServer(Mockito.anyCollection(), Mockito.any(NodeType.class), Mockito.anyString());
     }
 }
