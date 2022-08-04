@@ -152,7 +152,7 @@ Create a task node in the workflow definition, select the worker group and the e
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
-> NOTE: Please check you already select worker and the environment you want to use already connect to the worker you select when you can not use the environment in task definition or workflow run dialog
+> NOTE: Please make sure you have associated the `Environments` with your `worker groups` if you can not select the `Environment Name` in workflow definition page or when triggering workflows.
 
 ## Cluster Management
 
