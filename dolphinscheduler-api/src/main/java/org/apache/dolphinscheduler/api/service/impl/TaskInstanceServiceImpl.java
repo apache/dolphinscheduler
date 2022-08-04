@@ -209,4 +209,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
         return result;
     }
+
+    @Override
+    public Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId) {
+        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
+        return null;
+    }
 }

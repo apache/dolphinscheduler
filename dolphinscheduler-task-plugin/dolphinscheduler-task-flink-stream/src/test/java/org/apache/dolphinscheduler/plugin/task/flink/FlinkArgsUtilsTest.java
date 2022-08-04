@@ -30,8 +30,8 @@ public class FlinkArgsUtilsTest {
         return String.join(" ", stringList);
     }
 
-    private FlinkParameters buildTestFlinkParametersWithDeployMode(FlinkDeployMode flinkDeployMode) {
-        FlinkParameters flinkParameters = new FlinkParameters();
+    private FlinkStreamParameters buildTestFlinkParametersWithDeployMode(FlinkDeployMode flinkDeployMode) {
+        FlinkStreamParameters flinkParameters = new FlinkStreamParameters();
         flinkParameters.setProgramType(ProgramType.SCALA);
         flinkParameters.setDeployMode(flinkDeployMode);
         flinkParameters.setParallelism(4);
@@ -57,7 +57,7 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testRunJarInApplicationMode() throws Exception {
-        FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION);
+        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
@@ -67,7 +67,7 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testRunJarInClusterMode() throws Exception {
-        FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
+        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setFlinkVersion("1.11");
         List<String> commandLine1 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
@@ -92,7 +92,7 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testRunJarInLocalMode() throws Exception {
-        FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL);
+        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
@@ -102,7 +102,7 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testRunSql() throws Exception {
-        FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
+        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setProgramType(ProgramType.SQL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 

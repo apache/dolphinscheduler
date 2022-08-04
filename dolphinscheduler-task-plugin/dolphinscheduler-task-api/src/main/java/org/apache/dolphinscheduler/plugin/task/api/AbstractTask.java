@@ -53,7 +53,7 @@ public abstract class AbstractTask {
 
 
     /**
-     * cancel
+     * cancel flag
      */
     protected volatile boolean cancel = false;
 

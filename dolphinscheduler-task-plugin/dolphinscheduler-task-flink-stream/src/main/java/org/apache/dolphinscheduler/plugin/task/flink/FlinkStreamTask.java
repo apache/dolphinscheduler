@@ -17,35 +17,28 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class FlinkTask extends AbstractYarnTask {
+public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     /**
      * flink parameters
      */
-    private FlinkParameters flinkParameters;
+    private FlinkStreamParameters flinkParameters;
 
     /**
      * taskExecutionContext
      */
     private TaskExecutionContext taskExecutionContext;
 
-    public FlinkTask(TaskExecutionContext taskExecutionContext) {
+    public FlinkStreamTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
     }
@@ -54,7 +47,7 @@ public class FlinkTask extends AbstractYarnTask {
     public void init() {
         logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
-        flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
+        flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
@@ -93,5 +86,22 @@ public class FlinkTask extends AbstractYarnTask {
     @Override
     public AbstractParameters getParameters() {
         return flinkParameters;
+    }
+
+    @Override
+    public void cancelApplication(boolean status) throws Exception {
+        List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(args);
+        processBuilder.start();
+        super.cancelApplication(status);
+    }
+
+    @Override
+    public void savePoint() throws Exception {
+        List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(args);
+        processBuilder.start();
     }
 }

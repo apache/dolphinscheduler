@@ -72,4 +72,13 @@ public interface TaskInstanceService {
     Map<String, Object> forceTaskSuccess(User loginUser,
                                          long projectCode,
                                          Integer taskInstanceId);
+
+    /**
+     * task savepoint
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId);
 }

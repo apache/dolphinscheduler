@@ -101,6 +101,16 @@ public enum CommandType {
 
     TASK_REJECT_ACK,
 
+    /**
+     * task savepoint, for stream task
+     */
+    TASK_SAVEPOINT_REQUEST,
+
+    /**
+     * task savepoint ack, for stream task
+     */
+    TASK_SAVEPOINT_RESPONSE,
+
     HEART_BEAT,
 
     PING,

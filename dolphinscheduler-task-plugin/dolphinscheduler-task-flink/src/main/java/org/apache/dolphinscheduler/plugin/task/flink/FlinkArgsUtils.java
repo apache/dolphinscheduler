@@ -51,26 +51,51 @@ public class FlinkArgsUtils {
     public static final FlinkDeployMode DEFAULT_DEPLOY_MODE = FlinkDeployMode.CLUSTER;
 
     /**
-     * build flink command line
+     * build flink run command line
      *
      * @param param flink parameters
      * @return argument list
      */
-    public static List<String> buildCommandLine(TaskExecutionContext taskExecutionContext, FlinkParameters param) {
+    public static List<String> buildRunCommandLine(TaskExecutionContext taskExecutionContext, FlinkParameters param) {
         switch (param.getProgramType()) {
             case SQL:
-                return buildCommandLineForSql(taskExecutionContext, param);
+                return buildRunCommandLineForSql(taskExecutionContext, param);
             default:
-                return buildCommandLineForOthers(taskExecutionContext, param);
+                return buildRunCommandLineForOthers(taskExecutionContext, param);
         }
     }
 
     /**
-     * build flink command line for SQL
+     * build flink cancel command line
+     * @param taskExecutionContext
+     * @return
+     */
+    public static List<String> buildCancelCommandLine(TaskExecutionContext taskExecutionContext) {
+        List<String> args = new ArrayList<>();
+        args.add(FlinkConstants.FLINK_COMMAND);
+        args.add(FlinkConstants.FLINK_CANCEL);
+        args.add(taskExecutionContext.getAppIds());
+        return args;
+    }
+
+    /**
+     * build flink savepoint command line
+     * @return
+     */
+    public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
+        List<String> args = new ArrayList<>();
+        args.add(FlinkConstants.FLINK_COMMAND);
+        args.add(FlinkConstants.FLINK_SAVEPOINT);
+        args.add(taskExecutionContext.getAppIds());
+        return args;
+    }
+
+    /**
+     * build flink run command line for SQL
      *
      * @return argument list
      */
-    private static List<String> buildCommandLineForSql(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
+    private static List<String> buildRunCommandLineForSql(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
         args.add(FlinkConstants.FLINK_SQL_COMMAND);
@@ -150,7 +175,7 @@ public class FlinkArgsUtils {
         return initOptions;
     }
 
-    private static List<String> buildCommandLineForOthers(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
+    private static List<String> buildRunCommandLineForOthers(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
         args.add(FlinkConstants.FLINK_COMMAND);

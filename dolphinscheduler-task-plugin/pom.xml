@@ -33,6 +33,7 @@
         <module>dolphinscheduler-task-shell</module>
         <module>dolphinscheduler-task-datax</module>
         <module>dolphinscheduler-task-flink</module>
+        <module>dolphinscheduler-task-flink-stream</module>
         <module>dolphinscheduler-task-http</module>
         <module>dolphinscheduler-task-mr</module>
         <module>dolphinscheduler-task-python</module>
@@ -59,6 +60,7 @@
         <module>dolphinscheduler-task-dinky</module>
         <module>dolphinscheduler-task-sagemaker</module>
         <module>dolphinscheduler-task-chunjun</module>
+        <module>dolphinscheduler-task-flink-stream</module>
     </modules>
 
     <dependencyManagement>
