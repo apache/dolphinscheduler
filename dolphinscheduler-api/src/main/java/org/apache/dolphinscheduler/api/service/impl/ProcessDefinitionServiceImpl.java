@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
+import org.apache.dolphinscheduler.api.dto.workflow.SimpleWorkflow;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -430,17 +431,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
-        ArrayNode arrayNode = JSONUtils.createArrayNode();
+        List<SimpleWorkflow> list = new ArrayList(processDefinitions.size());
         for (ProcessDefinition processDefinition : processDefinitions) {
-            ObjectNode processDefinitionNode = JSONUtils.createObjectNode();
-            processDefinitionNode.put("id", processDefinition.getId());
-            processDefinitionNode.put("code", processDefinition.getCode());
-            processDefinitionNode.put("name", processDefinition.getName());
-            processDefinitionNode.put("projectCode", processDefinition.getProjectCode());
-            arrayNode.add(processDefinitionNode);
+            SimpleWorkflow workflow = new SimpleWorkflow();
+            workflow.setId(processDefinition.getId());
+            workflow.setCode(processDefinition.getCode());
+            workflow.setName(processDefinition.getName());
+            workflow.setProjectCode(processDefinition.getProjectCode());
+            list.add(workflow);
         }
         putMsg(result, Status.SUCCESS);
-        result.setData(arrayNode);
+        result.setData(list);
         return result;
     }
 
