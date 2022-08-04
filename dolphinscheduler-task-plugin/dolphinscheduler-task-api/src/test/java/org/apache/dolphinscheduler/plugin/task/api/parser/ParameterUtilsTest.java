@@ -29,10 +29,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-/**
- * @author lirongqian
- * @date 2022/8/3
- **/
 public class ParameterUtilsTest {
 
     @Test
