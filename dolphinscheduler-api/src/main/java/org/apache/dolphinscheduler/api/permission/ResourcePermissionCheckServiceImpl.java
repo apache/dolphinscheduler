@@ -433,7 +433,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return alertGroupMapper.listAuthorizedAlertGroupList(userId, null).stream().map(AlertGroup::getId).collect(toSet());
+            List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();
+            return alertGroupList.stream().map(AlertGroup::getId).collect(toSet());
         }
     }
 
