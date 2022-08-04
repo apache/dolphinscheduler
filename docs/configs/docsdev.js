@@ -442,7 +442,7 @@ export default {
                         children: [
                             {
                                 title: 'Security Report',
-                                link: '/en-us/community/security.html',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/security.html',
                             },
                             {
                                 title: 'How to Become a Committer',
@@ -1021,7 +1021,7 @@ export default {
                         children: [
                             {
                                 title: '报告安全问题',
-                                link: '/zh-cn/community/security.html',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/security.html',
                             },
                             {
                                 title: '如何成为 Committer',
