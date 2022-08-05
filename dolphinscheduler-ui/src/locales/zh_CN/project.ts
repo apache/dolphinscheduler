@@ -243,7 +243,8 @@ export default {
     stop: '停止',
     batch_task: '批量任务',
     stream_task: '实时任务',
-    jump_tip: '跳转，暂未开放!'
+    jump_tip: '跳转，暂未开放!',
+    savepoint: 'Savepoint'
   },
   dag: {
     create: '创建工作流',

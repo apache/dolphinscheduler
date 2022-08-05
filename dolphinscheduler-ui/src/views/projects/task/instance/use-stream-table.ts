@@ -19,10 +19,16 @@ import { useI18n } from 'vue-i18n'
 import { h, reactive } from 'vue'
 import {
   queryTaskListPaging,
-  streamTaskExecute
+  savePoint,
+  streamTaskStop
 } from '@/service/modules/task-instances'
 import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
-import { AlignLeftOutlined, RetweetOutlined, StopOutlined } from '@vicons/antd'
+import {
+  AlignLeftOutlined,
+  RetweetOutlined,
+  SaveOutlined,
+  StopOutlined
+} from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute } from 'vue-router'
 import { parseTime, renderTableTime, tasksState } from '@/common/common'
@@ -32,7 +38,6 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { TaskInstancesRes, IRecord, ITaskState } from './types'
-import { executeType } from '@/service/modules/task-instances/types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -129,7 +134,7 @@ export function useTable() {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -145,7 +150,31 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
-                        onClick: () => onExecute(row.taskCode, 'STOP')
+                        onClick: () => onSavePoint(row.taskCode)
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(SaveOutlined)
+                          })
+                      }
+                    ),
+                  default: () => t('project.task.savepoint')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        tag: 'div',
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        onClick: () => onExecute(row.taskCode)
                       },
                       {
                         icon: () =>
@@ -249,11 +278,12 @@ export function useTable() {
       .finally(() => (variables.loadingRef = false))
   }
 
-  const onExecute = (taskId: number, execType: executeType) => {
-    const data = {
-      executeType: execType
-    }
-    streamTaskExecute(projectCode, taskId, data).then(getTableData())
+  const onExecute = (taskId: number) => {
+    streamTaskStop(projectCode, taskId).then(getTableData())
+  }
+
+  const onSavePoint = (taskId: number) => {
+    savePoint(projectCode, taskId).then(getTableData())
   }
 
   return {

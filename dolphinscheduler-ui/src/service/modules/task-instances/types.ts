@@ -116,12 +116,6 @@ interface TaskInstancesRes {
   start: number
 }
 
-type executeType = 'STOP' | 'PAUSE' | 'RECOVER_SUSPENDED_PROCESS'
-
-interface TaskInstanceExecuteReq {
-  executeType: executeType
-}
-
 export {
   ProjectCodeReq,
   IdReq,
@@ -129,7 +123,5 @@ export {
   Dependency,
   SwitchDependency,
   TotalList,
-  TaskInstancesRes,
-  executeType,
-  TaskInstanceExecuteReq
+  TaskInstancesRes
 }
