@@ -71,13 +71,13 @@ Code style is the thing you have to consider when you submit pull request for Do
 3. Configure and activate Checkstyle and Intellij IDEA code-style: After completing the above steps, you could configure and activate it in your environment. You could find Checkstyle plugins in the path `Preferences -> Tool -> Checkstyle`. After that you could activate Checkstyles as screenshot show
 
 <p align="center">
-    <img src="/img/checkstyle-idea.png" alt="checkstyle idea configuration" />
+    <img src="../../../../img/contribute/join/pull-request/checkstyle-idea.png" alt="checkstyle idea configuration" />
 </p>
 
 For now your Checkstyle plugins are setup, it would show codes and files which out of style. We highly recommend you configure Intellij IDEA code-style for auto-formatting your code in Intellij IDEA, you could find this setting in `Preferences -> Editor -> Code Style -> Java` and then activate it as screenshot show
 
 <p align="center">
-    <img src="/img/code-style-idea.png" alt="code style idea configuration" />
+    <img src="../../../../img/contribute/join/pull-request/code-style-idea.png" alt="code style idea configuration" />
 </p>
 
 1. Format your codebase in Intellij IDEA before submit your pull request: After you done above steps, you could using Intellij IDEA shortcut `Command + L`(for Mac) or `Ctrl+L`(for Windows) to format your code. The best time to format your code is before you commit your change to your local git repository.

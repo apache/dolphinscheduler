@@ -10,7 +10,7 @@ The E2E test pages are currently divided into four pages: Project Management, Re
 
 Contributors can find the task by going to GitHub, searching for [apace/dolphinscheduler](https://github.com/apache/dolphinscheduler), and then searching for `e2e test cases` in the [issue list](https://github.com/apache/dolphinscheduler/issues?q=is%3Aissue+is%3Aopen+e2e+test+cases). As shown below.
 
-![e2e-issue](/img/community/join/e2e/e2e-issue.png)
+![e2e-issue](../../../../img/contribute/join/e2e/e2e-issue.png)
 
 In each issue, we list the content to be tested and the expected results, which can be seen in the Description. Once you are on the current page, you can select the issue you are interested in, for example, to participate in the Security Center test, just leave a comment under the corresponding issue about the case you want to test.
 
@@ -25,7 +25,7 @@ In each issue, we list the content to be tested and the expected results, which 
 - actual results: The actual results.
 - remarks: The precautions needed during the test process.
 
-![e2e-security](/img/community/join/e2e/e2e-security.png)
+![e2e-security](../../../../img/contribute/join/e2e/e2e-security.png)
 
 ### How to write test code?
 

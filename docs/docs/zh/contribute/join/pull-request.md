@@ -71,13 +71,13 @@ waste time。
 3. 配置并激活 Checkstyles 以及 Intellij IDEA 代码风格：当完成上面几步后，你就可以配置并激活他们了。你可以在路径`Preferences -> Tool -> Checkstyle`中找到 Checkstyle，请参照下图完成其配置
 
 <p align="center">
-    <img src="/img/checkstyle-idea.png" alt="checkstyle idea configuration" />
+    <img src="../../../../img/contribute/join/pull-request/checkstyle-idea.png" alt="checkstyle idea configuration" />
 </p>
 
 截止目前，Checkstyle 插件已经配置完成了，当有代码或者文件不符合风格时就会显示在 Checkstyle 中。但强烈建议同时配置 Intellij IDEA 的代码风格，完成配置后可以使用 Intellij IDEA 自动格式化功能。你可以在路径`Preferences -> Editor -> Code Style -> Java`找到配置，请参照下图完成其配置
 
 <p align="center">
-    <img src="/img/code-style-idea.png" alt="code style idea configuration" />
+    <img src="../../../../img/contribute/join/pull-request/code-style-idea.png" alt="code style idea configuration" />
 </p>
 
 1. 在提交 pull request 前格式化你的代码：完成上面全部后，你可以使用快捷键`Command + L`(Mac用户) or `Ctrl+L`(Windows用户)在 Intellij IDEA 完成自动格式化。格式化代码的最佳时间是将你的修改提交到本地 git 版本库之前

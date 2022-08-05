@@ -10,7 +10,7 @@ E2E 测试的主要目的是通过模拟真实的用户场景，验证被测系�
 
 贡献者可以通过 GitHub 然后搜索 [apace/dolphinscheduler](https://github.com/apache/dolphinscheduler)，然后在 [issue](https://github.com/apache/dolphinscheduler/issues?q=is%3Aissue+is%3Aopen+e2e+test+cases) 列表中搜索 `e2e test cases` 即可找到对应的任务。如下图：
 
-![e2e-issue](/img/community/join/e2e/e2e-issue.png)
+![e2e-issue](../../../../img/contribute/join/e2e/e2e-issue.png)
 
 在每个对应的 issue 中，我们都列出需要测试的内容和期望的结果，可以在 Description 中看见。进入当前页面之后，可以根据自身所感兴趣的选择对应的 issue，例如参与 Security Center 的测试，在对应的 issue 下留言自己所想测试的案例即可。
 
@@ -25,7 +25,7 @@ E2E 测试的主要目的是通过模拟真实的用户场景，验证被测系�
 - actual results：实际测试的结果。
 - remarks：测试过程中需要的注意点。
 
-![e2e-security](/img/community/join/e2e/e2e-security.png)
+![e2e-security](../../../../img/contribute/join/e2e/e2e-security.png)
 
 ### 如何编写测试代码？
 
