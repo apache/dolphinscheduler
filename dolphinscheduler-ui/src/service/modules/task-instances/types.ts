@@ -31,6 +31,7 @@ interface TaskListReq {
   host?: string
   processInstanceId?: number
   processInstanceName?: string
+  processDefinitionName?: string
   searchVal?: string
   startDate?: string
   stateType?: string

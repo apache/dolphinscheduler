@@ -52,7 +52,7 @@ export function useTable() {
     stateType: null,
     datePickerRange: null,
     executorName: null,
-    processInstanceName: null,
+    processDefinitionName: null,
     totalPage: 1,
     showModalRef: false,
     row: {},
@@ -72,8 +72,8 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['index']
       },
       {
-        title: t('project.task.task_instance'),
-        key: 'taskInstance',
+        title: t('project.task.task_name'),
+        key: 'name',
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
@@ -213,7 +213,7 @@ export function useTable() {
         ? format(parseTime(variables.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: variables.executorName,
-      processInstanceName: variables.processInstanceName,
+      processDefinitionName: variables.processDefinitionName,
       taskExecuteType: 'STREAM' as 'BATCH' | 'STREAM'
     } as any
 

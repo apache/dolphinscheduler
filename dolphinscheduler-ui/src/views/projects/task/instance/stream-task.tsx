@@ -152,9 +152,9 @@ const BatchTaskInstance = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.processInstanceName, 'value']}
+              v-model={[this.processDefinitionName, 'value']}
               size='small'
-              placeholder={t('project.task.workflow_instance')}
+              placeholder={t('project.task.workflow_name')}
               clearable
             />
             <NInput
