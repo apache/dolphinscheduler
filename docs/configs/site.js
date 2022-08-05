@@ -72,7 +72,7 @@ export default {
       {
         key: 'community',
         text: 'COMMUNITY',
-        link: '/en-us/community/team.html',
+        link: '/en-us/community/community.html',
       },
       {
         key: 'ASF',
@@ -202,7 +202,7 @@ export default {
       {
         key: 'community',
         text: '社区',
-        link: '/zh-cn/community/team.html',
+        link: '/zh-cn/community/community.html',
       },
       {
         key: 'ASF',
