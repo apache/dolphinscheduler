@@ -154,7 +154,7 @@ export function useTable() {
                           })
                       }
                     ),
-                  default: () => t('project.task.forced_success')
+                  default: () => t('project.task.stop')
                 }
               ),
               h(

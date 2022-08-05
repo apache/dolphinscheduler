@@ -123,7 +123,7 @@ export function useTable(onEdit: Function) {
                           })
                       }
                     ),
-                  default: () => t('project.task.version')
+                  default: () => t('project.task.execute')
                 }
               ),
               h(

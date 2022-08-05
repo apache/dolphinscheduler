@@ -236,7 +236,12 @@ export default {
     forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
-    refresh: 'Refresh'
+    refresh: 'Refresh',
+    app_id: 'Application ID',
+    execute: 'Execute',
+    stop: 'Stop',
+    batch_task: 'Batch Task',
+    stream_task: 'Stream Task'
   },
   dag: {
     create: 'Create Workflow',

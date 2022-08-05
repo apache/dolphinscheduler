@@ -238,7 +238,11 @@ export default {
     view_log: '查看日志',
     download_log: '下载日志',
     refresh: '刷新',
-    app_id: 'Application ID'
+    app_id: 'Application ID',
+    execute: '执行',
+    stop: '停止',
+    batch_task: '批量任务',
+    stream_task: '实时任务'
   },
   dag: {
     create: '创建工作流',

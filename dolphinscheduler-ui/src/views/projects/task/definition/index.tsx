@@ -16,6 +16,7 @@
  */
 
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { NTabPane, NTabs } from 'naive-ui'
 import BatchTaskDefinition from './batch-task'
 import StreamTaskDefinition from './stream-task'
@@ -23,12 +24,13 @@ import StreamTaskDefinition from './stream-task'
 const TaskDefinition = defineComponent({
   name: 'task-definition',
   setup() {
+    const { t } = useI18n()
     return () => (
       <NTabs type='line' animated>
-        <NTabPane name='Batch' tab='Batch Task'>
+        <NTabPane name='Batch' tab={t('project.task.batch_task')}>
           <BatchTaskDefinition />
         </NTabPane>
-        <NTabPane name='Stream' tab='Stream Task'>
+        <NTabPane name='Stream' tab={t('project.task.stream_task')}>
           <StreamTaskDefinition />
         </NTabPane>
       </NTabs>
