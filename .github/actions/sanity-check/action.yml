@@ -39,7 +39,7 @@ runs:
         reviewdog_version: v0.10.2
 
     - shell: bash
-      run: ./mvnw -B -q checkstyle:checkstyle-aggregate
+      run: ./mvnw spotless:check
 
     - shell: bash
       env:
