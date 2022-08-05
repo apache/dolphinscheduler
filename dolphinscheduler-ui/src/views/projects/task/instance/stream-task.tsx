@@ -40,7 +40,7 @@ import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
-import { stateType, streamStateType } from '@/common/common'
+import { streamStateType } from '@/common/common'
 import styles from './index.module.scss'
 
 const BatchTaskInstance = defineComponent({

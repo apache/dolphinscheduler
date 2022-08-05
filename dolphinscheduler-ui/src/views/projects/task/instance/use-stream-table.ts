@@ -22,7 +22,7 @@ import {
   streamTaskExecute
 } from '@/service/modules/task-instances'
 import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
-import { AlignLeftOutlined, StopOutlined } from '@vicons/antd'
+import { AlignLeftOutlined, RetweetOutlined, StopOutlined } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute } from 'vue-router'
 import { parseTime, renderTableTime, tasksState } from '@/common/common'
@@ -179,6 +179,30 @@ export function useTable() {
                       }
                     ),
                   default: () => t('project.task.view_log')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'warning',
+                        size: 'small',
+                        disabled: true,
+                        tag: 'div'
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(RetweetOutlined)
+                          })
+                      }
+                    ),
+                  default: () => t('project.task.jump_tip')
                 }
               )
             ]
