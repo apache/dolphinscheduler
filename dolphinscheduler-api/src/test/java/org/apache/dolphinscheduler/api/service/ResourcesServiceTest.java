@@ -717,6 +717,24 @@ public class ResourcesServiceTest {
     }
 
     @Test
+    public void testQueryResourcesFileInfo() {
+        User user = getUser();
+        String userName = "test-user";
+        Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(user);
+        Resource file = new Resource();
+        file.setFullName("/dir/file1.py");
+        file.setId(1);
+        Mockito.when(resourcesMapper.queryResource(file.getFullName(), ResourceType.FILE.ordinal()))
+                .thenReturn(Collections.singletonList(file));
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, null, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(
+                AuthorizationType.RESOURCE_FILE_ID, new Object[]{file.getId()}, user.getId(), serviceLogger)).thenReturn(true);
+        Resource result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
+        Assert.assertEquals(file.getFullName(), result.getFullName());
+    }
+
+    @Test
     public void testUpdateResourceContent() {
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
