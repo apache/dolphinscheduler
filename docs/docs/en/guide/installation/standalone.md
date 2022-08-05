@@ -27,7 +27,7 @@ bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 
 ### Login DolphinScheduler
 
-Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+Access address `http://localhost:12345/dolphinscheduler/ui/` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
 
 ### Start or Stop Server
 
