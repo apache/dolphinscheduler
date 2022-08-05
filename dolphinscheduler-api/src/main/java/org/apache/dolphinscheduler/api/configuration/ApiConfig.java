@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.apache.dolphinscheduler.common.utils.NetUtils;
-
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
@@ -35,9 +32,6 @@ import lombok.Data;
 @Configuration
 @ConfigurationProperties(prefix = "register")
 public class ApiConfig implements Validator {
-
-    @Value("${server.port}")
-    private int port;
 
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     private int heartbeatErrorThreshold = 5;
@@ -57,6 +51,5 @@ public class ApiConfig implements Validator {
         if (apiConfig.getHeartbeatErrorThreshold() <= 0) {
             errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
         }
-        apiConfig.setApiAddress(NetUtils.getAddr(port));
     }
 }

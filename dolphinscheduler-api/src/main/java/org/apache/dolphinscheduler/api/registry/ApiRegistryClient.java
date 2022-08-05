@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,9 @@ import com.google.common.collect.Sets;
 public class ApiRegistryClient implements AutoCloseable {
 
     private final Logger logger = LoggerFactory.getLogger(ApiRegistryClient.class);
+
+    @Value("${server.port}")
+    private int port;
 
     @Autowired
     private ApiConfig apiConfig;
@@ -63,7 +67,7 @@ public class ApiRegistryClient implements AutoCloseable {
     private String apiAddress;
 
     public void init() {
-        this.apiAddress = apiConfig.getApiAddress();
+        this.apiAddress = NetUtils.getAddr(port);
         this.startupTime = System.currentTimeMillis();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
