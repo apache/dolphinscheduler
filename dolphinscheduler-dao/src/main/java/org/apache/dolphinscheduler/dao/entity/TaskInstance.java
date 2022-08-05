@@ -89,6 +89,12 @@ public class TaskInstance implements Serializable {
     private String processInstanceName;
 
     /**
+     * process definition name
+     */
+    @TableField(exist = false)
+    private String processDefinitionName;
+
+    /**
      * process instance name
      */
     @TableField(exist = false)
@@ -532,6 +538,14 @@ public class TaskInstance implements Serializable {
 
     public void setProcessInstanceName(String processInstanceName) {
         this.processInstanceName = processInstanceName;
+    }
+
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
     }
 
     public String getDuration() {

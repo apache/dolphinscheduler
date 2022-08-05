@@ -102,6 +102,7 @@ public class TaskInstanceController extends BaseController {
                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
                                       @RequestParam(value = "processInstanceName", required = false) String processInstanceName,
+                                      @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
                                       @RequestParam(value = "executorName", required = false) String executorName,
@@ -117,7 +118,7 @@ public class TaskInstanceController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
+        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName, processDefinitionName,
                 taskName, executorName, startTime, endTime, searchVal, stateType, host, taskExecuteType, pageNo, pageSize);
         return result;
     }
@@ -145,7 +146,6 @@ public class TaskInstanceController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * task savepoint, for stream task
      *
@@ -166,5 +166,27 @@ public class TaskInstanceController extends BaseController {
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable(value = "id") Integer id) {
         return taskInstanceService.taskSavePoint(loginUser, projectCode, id);
+    }
+
+    /**
+     * task stop, for stream task
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param id task instance id
+     * @return the result code and msg
+     */
+    @ApiOperation(value = "stop", notes = "TASK_STOP")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+    })
+    @PostMapping(value = "/{id}/stop")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(TASK_SAVEPOINT_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<Object> stopTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                        @PathVariable(value = "id") Integer id) {
+        return taskInstanceService.stopTask(loginUser, projectCode, id);
     }
 }

@@ -221,6 +221,7 @@ public enum Status {
     DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, cause used by other tasks: {1}", "删除任务 {0} 失败，被其他任务引用：{1}"),
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
     TASK_SAVEPOINT_ERROR(10196, "task savepoint error", "任务实例savepoint错误"),
+    TASK_STOP_ERROR(10197, "task stop error", "任务实例停止错误"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),

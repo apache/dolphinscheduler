@@ -43,14 +43,14 @@ export function downloadLog(id: number): void {
 
 export function streamTaskStop(projectCode: number, taskId: number): any {
   return axios({
-    url: `projects/${projectCode}/task-instance/${taskId}/stop`,
+    url: `projects/${projectCode}/task-instances/${taskId}/stop`,
     method: 'post'
   })
 }
 
 export function savePoint(projectCode: number, taskId: number): any {
   return axios({
-    url: `projects/${projectCode}/task-instance/${taskId}/savepoint`,
+    url: `projects/${projectCode}/task-instances/${taskId}/savepoint`,
     method: 'post'
   })
 }

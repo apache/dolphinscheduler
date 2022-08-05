@@ -195,6 +195,47 @@
         </if>
         order by instance.start_time desc
     </select>
+    <select id="queryStreamTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="instance"/>
+        </include>
+        ,
+        process.name as process_definition_name
+        from t_ds_task_instance instance
+        left join t_ds_task_definition_log define on define.code=instance.task_code and define.version=instance.task_definition_version
+        left join t_ds_process_task_relation relation on relation.post_task_code = define.code and relation.post_task_version = define.version
+        left join t_ds_process_definition process on process.code=relation.process_definition_code and process.version = relation.process_definition_version
+        where define.project_code = #{projectCode}
+        <if test="startTime != null">
+            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+        </if>
+        <if test="searchVal != null and searchVal != ''">
+            and instance.name like concat('%', #{searchVal}, '%')
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and instance.name=#{taskName}
+        </if>
+        <if test="states != null and states.length != 0">
+            and instance.state in
+            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="host != null and host != ''">
+            and instance.host like concat('%', #{host}, '%')
+        </if>
+        <if test="taskExecuteType != null">
+            and instance.task_execute_type = #{taskExecuteType.code}
+        </if>
+        <if test="executorId != 0">
+            and instance.executor_id = #{executorId}
+        </if>
+        <if test="processDefinitionName != null and processDefinitionName != ''">
+            and process.name like concat('%', #{processDefinitionName}, '%')
+        </if>
+        order by instance.start_time desc
+    </select>
     <select id="loadAllInfosNoRelease" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSqlV2">

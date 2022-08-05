@@ -152,7 +152,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
-                        onClick: () => onSavePoint(row.taskCode)
+                        onClick: () => onSavePoint(row.id)
                       },
                       {
                         icon: () =>
@@ -176,7 +176,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
-                        onClick: () => onExecute(row.taskCode)
+                        onClick: () => onExecute(row.id)
                       },
                       {
                         icon: () =>

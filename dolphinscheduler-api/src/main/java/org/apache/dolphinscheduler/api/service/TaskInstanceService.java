@@ -50,6 +50,7 @@ public interface TaskInstanceService {
                                long projectCode,
                                Integer processInstanceId,
                                String processInstanceName,
+                               String processDefinitionName,
                                String taskName,
                                String executorName,
                                String startDate,
@@ -81,4 +82,13 @@ public interface TaskInstanceService {
      * @return
      */
     Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId);
+
+    /**
+     * stop task
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    Result stopTask(User loginUser, long projectCode, Integer taskInstanceId);
 }
