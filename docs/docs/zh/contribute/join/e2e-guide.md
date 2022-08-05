@@ -33,4 +33,4 @@ E2E 测试的主要目的是通过模拟真实的用户场景，验证被测系�
 
 ### 如何提交 Pull Request ？
 
-参与开源社区的形式多种多样，其中不限于 issue、pull request 和翻译等等。在参与 E2E 测试的过程，首先要求贡献者了解简单的提交 pull request 的流程，可参考：[Pull Request](../development/pull-request.md)。
+参与开源社区的形式多种多样，其中不限于 issue、pull request 和翻译等等。在参与 E2E 测试的过程，首先要求贡献者了解简单的提交 pull request 的流程，可参考：[Pull Request](./pull-request.md)。

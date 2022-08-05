@@ -1,6 +1,6 @@
 # Community Review
 
-Beside submit Issues and pull requests to the GitHub repository mentioned in [team](../team.md), another important way to
+Beside submit Issues and pull requests to the GitHub repository mentioned in [team](https://dolphinscheduler.apache.org/us-en/community/community.html), another important way to
 contribute to DolphinScheduler is reviewing GitHub Issues or Pull Requests. You can not only know the latest new and
 direction of the community, but also understand the good design in others during you reviewing. At the same time, you can
 increase your exposure in the community and accumulate your honor.
@@ -12,7 +12,7 @@ in [GitHub Discussion][discussion-result-review-wanted].
 > Note: It is only users mentioned in the [GitHub Discussion][discussion-result-review-wanted] can review Issues or Pull
 > Requests, Community advocates **Anyone is encouraged to review Issues and Pull Requests**. Users in 
 > [GitHub Discussion][discussion-result-review-wanted] show their willing to review when we collect in the mail thread.
-> The advantage of this list is when the community has discussion, in addition to the mention Members in [team](../team.md),
+> The advantage of this list is when the community has discussion, in addition to the mention Members in [team](https://dolphinscheduler.apache.org/us-en/community/community.html),
 > you can also find some help in [GitHub Discussion][discussion-result-review-wanted] people. If you want to join the
 > [GitHub Discussion][discussion-result-review-wanted], please comment in that discussion and leave a module you are interested
 > in, and the maintainer will add you to the list.
@@ -68,7 +68,7 @@ Before reading following content, please make sure you have labeled the Issue.
   added when [creating an Issue][issue-choose]. It makes positioning un reply issue more convenient, and you should remove
   this label after you reviewed it. If you do not remove it, will cause others to waste time looking on the same issue.
 * Mark [Waiting for review][label-waiting-for-review] when not sure whether issue is resolved or not: There are two situations
-  when you review issue. One is the problem has been located or resolved, maybe have to [Create PR](../development/submit-code.md)
+  when you review issue. One is the problem has been located or resolved, maybe have to [Create PR](./submit-code.md)
   when necessary. Secondly, you are not sure about this issue, you can labeled [Waiting for review][label-waiting-for-review]
   and mention others to make a second confirmation.
 

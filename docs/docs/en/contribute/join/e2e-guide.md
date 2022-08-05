@@ -33,4 +33,4 @@ After taking up the corresponding task, the next step is to get to the crux of w
 
 ### How to submit a Pull Request?
 
-Participation in the open source community can take many forms, including issue, pull request and translation. To participate in the E2E testing process, contributors are first required to understand the simple process of submitting a pull request, see: [Pull Request](../development/pull-request.md).
+Participation in the open source community can take many forms, including issue, pull request and translation. To participate in the E2E testing process, contributors are first required to understand the simple process of submitting a pull request, see: [Pull Request](./pull-request.md).

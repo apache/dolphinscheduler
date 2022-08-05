@@ -1,6 +1,6 @@
 # 参与社区 review
 
-贡献 DolphinScheduler 的方式，除了向 [团队](../team.md) 中提到的 GitHub 仓库提交 Issues 和 pull requests 外，另一非常重要的方式是
+贡献 DolphinScheduler 的方式，除了向 [团队](https://dolphinscheduler.apache.org/us-en/community/community.html) 中提到的 GitHub 仓库提交 Issues 和 pull requests 外，另一非常重要的方式是
 review 社区的 Issues 或者 Pull Requests。通过别人 Issues 和 Pull Requests，你不仅能知道社区的最新进展和发展方向，还能了解别人代码的设
 计思想，同时可以增加自己在社区的曝光、积累自己在社区的荣誉值。
 
@@ -9,7 +9,7 @@ review 社区的 Issues 或者 Pull Requests。通过别人 Issues 和 Pull Requ
 
 > 注意: 这里并不是说只有 [GitHub Discussion][discussion-result-review-wanted] 中提及的用户才可以协助 review Issue 或者 Pull Requests，
 > 请记住社区的主张是 **任何人都被鼓励去 review 社区的  Issues 和 Pull Requests**。只是那部分用户在邮件列表意见征集的时候，表达了愿意付
-> 出更多的时间，参与社区的 review。另一个好处是，当社区有不确定的问题的时，除了可以找 [团队](../team.md) 中对应的 Members 外，还可以找
+> 出更多的时间，参与社区的 review。另一个好处是，当社区有不确定的问题的时，除了可以找 [团队](https://dolphinscheduler.apache.org/us-en/community/community.html) 中对应的 Members 外，还可以找
 > [GitHub Discussion][discussion-result-review-wanted] 中提及的人解答对应的问题。如果你要想要加入到 [GitHub Discussion][discussion-result-review-wanted]
 > 中，请在该 discussion 中评论并留下你感兴趣的模块，维护者会将你加入到对应的名单中。
 
@@ -62,7 +62,7 @@ Review Issues 是指在 GitHub 中参与 [Issues][all-issues] 的讨论，并在
   [Waiting for reply][label-waiting-for-reply]，方便定位还没有被回复的 Issue，所以当你 review 了 Issue 之后，就需要将标签
   [Waiting for reply][label-waiting-for-reply] 及时的从 Issue 中删除。
 * 打上 [Waiting for review][label-waiting-for-review] 标当你不确定这个 Issue 是否被解决：当你查阅了 Issue 后，会有两个情况出现。一是
-  问题已经被定位或解决，如果创建 Pull Requests 的话，则参考 [创建PR](../development/submit-code.md)。二是你也不确定这个问题是否真的是
+  问题已经被定位或解决，如果创建 Pull Requests 的话，则参考 [创建PR](./submit-code.md)。二是你也不确定这个问题是否真的是
   被解决，这时你可以为 Issue 打上 [Waiting for review][label-waiting-for-review] 标签，并在 Issue 中 `@` 对应的人进行二次确认
 
 当 Issue 需要被创建 Pull Requests 解决，也可以视情况打上部分标签
