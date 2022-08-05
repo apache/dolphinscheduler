@@ -18,36 +18,47 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.dolphinscheduler</groupId>
-    <artifactId>dolphinscheduler</artifactId>
-    <version>dev-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>${project.artifactId}</name>
-    <url>https://dolphinscheduler.apache.org</url>
-    <description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated
-        to solving the complex dependencies in data processing, making the scheduling system out of the box for data
-        processing.
-    </description>
-    <scm>
-        <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
-        <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
-        <url>https://github.com/apache/dolphinscheduler</url>
-        <tag>HEAD</tag>
-    </scm>
-    <mailingLists>
-        <mailingList>
-            <name>DolphinScheduler Developer List</name>
-            <post>dev@dolphinscheduler.apache.org</post>
-            <subscribe>dev-subscribe@dolphinscheduler.apache.org</subscribe>
-            <unsubscribe>dev-unsubscribe@dolphinscheduler.apache.org</unsubscribe>
-        </mailingList>
-    </mailingLists>
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>25</version>
     </parent>
-
+    <groupId>org.apache.dolphinscheduler</groupId>
+    <artifactId>dolphinscheduler</artifactId>
+    <version>dev-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated
+        to solving the complex dependencies in data processing, making the scheduling system out of the box for data
+        processing.</description>
+    
+    <modules>
+        <module>dolphinscheduler-bom</module>
+        <module>dolphinscheduler-alert</module>
+        <module>dolphinscheduler-spi</module>
+        <module>dolphinscheduler-registry</module>
+        <module>dolphinscheduler-task-plugin</module>
+        <module>dolphinscheduler-server</module>
+        <module>dolphinscheduler-common</module>
+        <module>dolphinscheduler-api</module>
+        <module>dolphinscheduler-dao</module>
+        <module>dolphinscheduler-dist</module>
+        <module>dolphinscheduler-remote</module>
+        <module>dolphinscheduler-service</module>
+        <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-data-quality</module>
+        <module>dolphinscheduler-standalone-server</module>
+        <module>dolphinscheduler-datasource-plugin</module>
+        <module>dolphinscheduler-python</module>
+        <module>dolphinscheduler-meter</module>
+        <module>dolphinscheduler-master</module>
+        <module>dolphinscheduler-worker</module>
+        <module>dolphinscheduler-log-server</module>
+        <module>dolphinscheduler-tools</module>
+        <module>dolphinscheduler-ui</module>
+        <module>dolphinscheduler-scheduler-plugin</module>
+    </modules>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -55,7 +66,6 @@
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
         <spotbugs.version>3.1.12</spotbugs.version>
-        <checkstyle.version>3.1.2</checkstyle.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -81,415 +91,11 @@
         <docker.tag>${project.version}</docker.tag>
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
-
+        
         <python.sign.skip>true</python.sign.skip>
         <skipDepCheck>true</skipDepCheck>
     </properties>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>rpm-maven-plugin</artifactId>
-                    <version>${rpm-maven-plugion.version}</version>
-                    <inherited>false</inherited>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                        <testSource>${java.version}</testSource>
-                        <testTarget>${java.version}</testTarget>
-                    </configuration>
-                    <version>${maven-compiler-plugin.version}</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>${maven-release-plugin.version}</version>
-                    <configuration>
-                        <tagNameFormat>@{project.version}</tagNameFormat>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${maven-assembly-plugin.version}</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven-javadoc-plugin.version}</version>
-                    <configuration>
-                        <source>8</source>
-                        <failOnError>false</failOnError>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${maven-dependency-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>${maven-shade-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>${exec-maven-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>docker-build</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>exec</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${docker.build.skip}</skip>
-                                <executable>docker</executable>
-                                <workingDirectory>${project.basedir}</workingDirectory>
-                                <arguments>
-                                    <argument>build</argument>
-                                    <argument>--no-cache</argument>
-                                    <argument>-t</argument>
-                                    <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
-                                    <argument>-t</argument>
-                                    <argument>${docker.hub}/${docker.repo}:latest</argument>
-                                    <argument>${project.basedir}</argument>
-                                    <argument>--file=src/main/docker/Dockerfile</argument>
-                                </arguments>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>docker-push</id>
-                            <phase>deploy</phase>
-                            <goals>
-                                <goal>exec</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${docker.push.skip}</skip>
-                                <environmentVariables>
-                                    <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
-                                </environmentVariables>
-                                <executable>docker</executable>
-                                <workingDirectory>${project.basedir}</workingDirectory>
-                                <arguments>
-                                    <argument>buildx</argument>
-                                    <argument>build</argument>
-                                    <argument>--platform</argument>
-                                    <argument>linux/amd64,linux/arm64</argument>
-                                    <argument>--no-cache</argument>
-                                    <argument>--push</argument>
-                                    <argument>-t</argument>
-                                    <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
-                                    <argument>-t</argument>
-                                    <argument>${docker.hub}/${docker.repo}:latest</argument>
-                                    <argument>${project.basedir}</argument>
-                                    <argument>--file=src/main/docker/Dockerfile</argument>
-                                </arguments>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>dependency-check-maven</artifactId>
-                    <version>${owasp-dependency-check-maven.version}</version>
-                    <configuration>
-                        <skip>${skipDepCheck}</skip>
-                        <skipProvidedScope>true</skipProvidedScope>
-                        <skipRuntimeScope>true</skipRuntimeScope>
-                        <skipSystemScope>true</skipSystemScope>
-                        <failBuildOnCVSS>7</failBuildOnCVSS>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>aggregate</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <charset>${project.build.sourceEncoding}</charset>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <docencoding>${project.build.sourceEncoding}</docencoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <tagNameFormat>@{project.version}</tagNameFormat>
-                    <tagBase>${project.version}</tagBase>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-jgit</artifactId>
-                        <version>1.9.5</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <skip>false</skip><!--not skip compile test classes-->
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit4</artifactId>
-                        <version>${maven-surefire-plugin.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <systemPropertyVariables>
-                        <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-
-            <!-- jenkins plugin jacoco report-->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <configuration>
-                    <skip>${jacoco.skip}</skip>
-                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-instrument</id>
-                        <goals>
-                            <goal>instrument</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-restore-instrumented-classes</id>
-                        <goals>
-                            <goal>restore-instrumented-classes</goal>
-                        </goals>
-                        <configuration>
-                            <excludes>com/github/dreamhead/moco/*</excludes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs.version}</version>
-                <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <threshold>medium</threshold>
-                    <effort>default</effort>
-                    <excludeFilterFile>dev-config/spotbugs-exclude.xml</excludeFilterFile>
-                    <failOnError>true</failOnError>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>4.0.0-beta4</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>8.45</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <consoleOutput>true</consoleOutput>
-                    <encoding>UTF-8</encoding>
-                    <configLocation>style/checkstyle.xml</configLocation>
-                    <failOnViolation>true</failOnViolation>
-                    <violationSeverity>warning</violationSeverity>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <sourceDirectories>
-                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                    </sourceDirectories>
-                    <excludes>**\/generated-sources\/</excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-                <version>${spotless.version}</version>
-                <configuration>
-                    <!-- optional: limit format enforcement to just the files changed by this feature branch -->
-                    <ratchetFrom>HEAD</ratchetFrom>
-                    <java>
-                        <eclipse>
-                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
-                        </eclipse>
-                    </java>
-                    <pom>
-                        <sortPom>
-                            <encoding>UTF-8</encoding>
-                            <nrOfIndentSpace>4</nrOfIndentSpace>
-                            <keepBlankLines>true</keepBlankLines>
-                            <indentBlankLines>true</indentBlankLines>
-                            <indentSchemaLocation>true</indentSchemaLocation>
-                            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
-                            <sortModules>false</sortModules>
-                            <sortExecutions>false</sortExecutions>
-                            <predefinedSortOrder>custom_1</predefinedSortOrder>
-                            <expandEmptyElements>false</expandEmptyElements>
-                            <sortProperties>false</sortProperties>
-                        </sortPom>
-                        <replace>
-                            <name>Leading blank line</name>
-                            <search>project</search>
-                            <replacement>project</replacement>
-                        </replace>
-                    </pom>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>apply</goal>
-                        </goals>
-                        <phase>compile</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${cobertura-maven-plugin.version}</version>
-                <configuration>
-                    <check>
-                    </check>
-                    <aggregate>true</aggregate>
-                    <outputDirectory>./target/cobertura</outputDirectory>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <quiet>true</quiet>
-                    <format>xml</format>
-                    <instrumentation>
-                        <ignoreTrivial>true</ignoreTrivial>
-                    </instrumentation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven-source-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>analyze-dependencies</id>
-                        <goals>
-                            <goal>analyze-only</goal>
-                        </goals>
-                        <configuration>
-                            <ignoredDependencies>
-                                <!-- Because of SpringBoot auto-configurations, the configuration is happening outside of your application code, so Maven believes these dependencies to be unused -->
-                                <!-- Static code analysis tools like (maven-dependency-plugin) can not detect runtime dependencies, so you should instruct them about runtime dependencies -->
-                                <!-- https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin -->
-                                <ignoredDependency>org.springframework*:*</ignoredDependency>
-                                <ignoredDependency>org.apache.dolphinscheduler:dolphinscheduler-meter</ignoredDependency>
-                            </ignoredDependencies>
-                            <ignoreNonCompile>true</ignoreNonCompile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>docker</id>
-            <properties>
-                <docker.build.skip>false</docker.build.skip>
-                <docker.push.skip>false</docker.push.skip>
-            </properties>
-        </profile>
-    </profiles>
-
+    
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -567,13 +173,13 @@
                 <artifactId>dolphinscheduler-spi</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-data-quality</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-python</artifactId>
@@ -654,7 +260,7 @@
                 <artifactId>dolphinscheduler-registry-mysql</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-scheduler-api</artifactId>
@@ -665,7 +271,7 @@
                 <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-datasource-all</artifactId>
@@ -676,7 +282,7 @@
                 <artifactId>dolphinscheduler-datasource-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-api</artifactId>
@@ -692,7 +298,7 @@
                 <artifactId>dolphinscheduler-task-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-ui</artifactId>
@@ -704,9 +310,9 @@
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
-
+        
     </dependencyManagement>
-
+    
     <dependencies>
         <!--
           NOTE: only development / test phase dependencies (scope = test / provided)
@@ -764,31 +370,391 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <modules>
-        <module>dolphinscheduler-bom</module>
-        <module>dolphinscheduler-alert</module>
-        <module>dolphinscheduler-spi</module>
-        <module>dolphinscheduler-registry</module>
-        <module>dolphinscheduler-task-plugin</module>
-        <module>dolphinscheduler-server</module>
-        <module>dolphinscheduler-common</module>
-        <module>dolphinscheduler-api</module>
-        <module>dolphinscheduler-dao</module>
-        <module>dolphinscheduler-dist</module>
-        <module>dolphinscheduler-remote</module>
-        <module>dolphinscheduler-service</module>
-        <module>dolphinscheduler-microbench</module>
-        <module>dolphinscheduler-data-quality</module>
-        <module>dolphinscheduler-standalone-server</module>
-        <module>dolphinscheduler-datasource-plugin</module>
-        <module>dolphinscheduler-python</module>
-        <module>dolphinscheduler-meter</module>
-        <module>dolphinscheduler-master</module>
-        <module>dolphinscheduler-worker</module>
-        <module>dolphinscheduler-log-server</module>
-        <module>dolphinscheduler-tools</module>
-        <module>dolphinscheduler-ui</module>
-        <module>dolphinscheduler-scheduler-plugin</module>
-    </modules>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>rpm-maven-plugin</artifactId>
+                    <version>${rpm-maven-plugion.version}</version>
+                    <inherited>false</inherited>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <testSource>${java.version}</testSource>
+                        <testTarget>${java.version}</testTarget>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                    <configuration>
+                        <tagNameFormat>@{project.version}</tagNameFormat>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${maven-assembly-plugin.version}</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc-plugin.version}</version>
+                    <configuration>
+                        <source>8</source>
+                        <failOnError>false</failOnError>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${exec-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>docker-build</id>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <phase>package</phase>
+                            <configuration>
+                                <skip>${docker.build.skip}</skip>
+                                <executable>docker</executable>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <arguments>
+                                    <argument>build</argument>
+                                    <argument>--no-cache</argument>
+                                    <argument>-t</argument>
+                                    <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
+                                    <argument>-t</argument>
+                                    <argument>${docker.hub}/${docker.repo}:latest</argument>
+                                    <argument>${project.basedir}</argument>
+                                    <argument>--file=src/main/docker/Dockerfile</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>docker-push</id>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <phase>deploy</phase>
+                            <configuration>
+                                <skip>${docker.push.skip}</skip>
+                                <environmentVariables>
+                                    <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
+                                </environmentVariables>
+                                <executable>docker</executable>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <arguments>
+                                    <argument>buildx</argument>
+                                    <argument>build</argument>
+                                    <argument>--platform</argument>
+                                    <argument>linux/amd64,linux/arm64</argument>
+                                    <argument>--no-cache</argument>
+                                    <argument>--push</argument>
+                                    <argument>-t</argument>
+                                    <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
+                                    <argument>-t</argument>
+                                    <argument>${docker.hub}/${docker.repo}:latest</argument>
+                                    <argument>${project.basedir}</argument>
+                                    <argument>--file=src/main/docker/Dockerfile</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${owasp-dependency-check-maven.version}</version>
+                    <configuration>
+                        <skip>${skipDepCheck}</skip>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipRuntimeScope>true</skipRuntimeScope>
+                        <skipSystemScope>true</skipSystemScope>
+                        <failBuildOnCVSS>7</failBuildOnCVSS>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <charset>${project.build.sourceEncoding}</charset>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <docencoding>${project.build.sourceEncoding}</docencoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
+                    <tagBase>${project.version}</tagBase>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-jgit</artifactId>
+                        <version>1.9.5</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <skip>false</skip>
+                    <!--not skip compile test classes-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
+                    </systemPropertyVariables>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit4</artifactId>
+                        <version>${maven-surefire-plugin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            
+            <!-- jenkins plugin jacoco report-->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <skip>${jacoco.skip}</skip>
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-instrument</id>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-restore-instrumented-classes</id>
+                        <goals>
+                            <goal>restore-instrumented-classes</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>com/github/dreamhead/moco/*</excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs.version}</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <threshold>medium</threshold>
+                    <effort>default</effort>
+                    <excludeFilterFile>dev-config/spotbugs-exclude.xml</excludeFilterFile>
+                    <failOnError>true</failOnError>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>4.0.0-beta4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <!-- optional: limit format enforcement to just the files changed by this feature branch -->
+                    <ratchetFrom>HEAD</ratchetFrom>
+                    <java>
+                        <eclipse>
+                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
+                        </eclipse>
+                    </java>
+                    <pom>
+                        <sortPom>
+                            <encoding>UTF-8</encoding>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <keepBlankLines>true</keepBlankLines>
+                            <indentBlankLines>true</indentBlankLines>
+                            <indentSchemaLocation>true</indentSchemaLocation>
+                            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+                            <sortModules>false</sortModules>
+                            <sortExecutions>false</sortExecutions>
+                            <predefinedSortOrder>custom_1</predefinedSortOrder>
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <sortProperties>false</sortProperties>
+                        </sortPom>
+                        <replace>
+                            <name>Leading blank line</name>
+                            <search>project</search>
+                            <replacement>project</replacement>
+                        </replace>
+                    </pom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura-maven-plugin.version}</version>
+                <configuration>
+                    <check />
+                    <aggregate>true</aggregate>
+                    <outputDirectory>./target/cobertura</outputDirectory>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <quiet>true</quiet>
+                    <format>xml</format>
+                    <instrumentation>
+                        <ignoreTrivial>true</ignoreTrivial>
+                    </instrumentation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>analyze-dependencies</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <ignoredDependencies>
+                                <!-- Because of SpringBoot auto-configurations, the configuration is happening outside of your application code, so Maven believes these dependencies to be unused -->
+                                <!-- Static code analysis tools like (maven-dependency-plugin) can not detect runtime dependencies, so you should instruct them about runtime dependencies -->
+                                <!-- https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin -->
+                                <ignoredDependency>org.springframework*:*</ignoredDependency>
+                                <ignoredDependency>org.apache.dolphinscheduler:dolphinscheduler-meter</ignoredDependency>
+                            </ignoredDependencies>
+                            <ignoreNonCompile>true</ignoreNonCompile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <url>https://dolphinscheduler.apache.org</url>
+    <mailingLists>
+        <mailingList>
+            <name>DolphinScheduler Developer List</name>
+            <subscribe>dev-subscribe@dolphinscheduler.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@dolphinscheduler.apache.org</unsubscribe>
+            <post>dev@dolphinscheduler.apache.org</post>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
+        <url>https://github.com/apache/dolphinscheduler</url>
+        <tag>HEAD</tag>
+    </scm>
+    
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <docker.build.skip>false</docker.build.skip>
+                <docker.push.skip>false</docker.push.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
