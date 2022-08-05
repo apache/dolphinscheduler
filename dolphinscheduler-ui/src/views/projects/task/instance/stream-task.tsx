@@ -40,7 +40,7 @@ import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
-import { stateType } from '@/common/common'
+import { stateType, streamStateType } from '@/common/common'
 import styles from './index.module.scss'
 
 const BatchTaskInstance = defineComponent({
@@ -174,7 +174,7 @@ const BatchTaskInstance = defineComponent({
             <NSelect
               v-model={[this.stateType, 'value']}
               size='small'
-              options={stateType(t).slice(1)}
+              options={streamStateType(t).slice(1)}
               placeholder={t('project.task.state')}
               style={{ width: '180px' }}
               clearable
