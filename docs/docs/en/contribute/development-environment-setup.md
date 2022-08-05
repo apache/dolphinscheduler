@@ -34,7 +34,7 @@ You could run the following command and `Spotless` will automatically fix
 the code style and formatting errors for you:
 
 ```shell
-mvn spotless:apply
+./mvnw spotless:apply
 ```
 
 You could copy the `pre-commit hook` file `/style/pre-commit` to your `.git/hooks/`

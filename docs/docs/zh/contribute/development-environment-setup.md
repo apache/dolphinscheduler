@@ -34,7 +34,7 @@ DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
 您可以执行如下的命令，`Spotless`将会为您自动检查并修复代码风格和格式问题。
 
 ```shell
-mvn spotless:apply
+./mvnw spotless:apply
 ```
 
 您可将`/style/pre-commit`目录下的`pre-commit hook`文件拷贝到您的`.git/hooks/`
