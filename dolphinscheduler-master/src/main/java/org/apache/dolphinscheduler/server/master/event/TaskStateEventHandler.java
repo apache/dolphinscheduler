@@ -63,6 +63,7 @@ public class TaskStateEventHandler implements StateEventHandler {
             }
             workflowExecuteRunnable.taskFinished(task);
             if (task.getTaskGroupId() > 0) {
+                logger.info("The task instance need to release task Group: {}", task.getTaskGroupId());
                 workflowExecuteRunnable.releaseTaskGroup(task);
             }
             return true;
