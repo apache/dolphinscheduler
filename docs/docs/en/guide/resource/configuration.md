@@ -15,7 +15,7 @@ Configure the file in the following paths: `api-server/conf/common.properties` a
 
 ## Configuring the common.properties
 
-After version 3.0.0-alpha, if you want to upload resources using HDFS or S3 from the Resource Center, you will need to configure the following paths The following paths need to be configured: `api-server/conf/common.properties` and `worker-server/conf/common.properties`. This can be found as follows.
+After version 3.0.0, if you want to upload resources using HDFS or S3 from the Resource Center, you will need to configure the following paths The following paths need to be configured: `api-server/conf/common.properties` and `worker-server/conf/common.properties`. This can be found as follows.
 
 ```properties
 #

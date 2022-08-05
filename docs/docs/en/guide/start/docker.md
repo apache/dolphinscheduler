@@ -19,7 +19,7 @@ Start DolphinScheduler with standalone-server Docker images is the easiest way t
 you can learn DolphinScheduler's concepts and usage, with minimal cost.
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.0.0-beta-2
+$ DOLPHINSCHEDULER_VERSION=3.0.0
 $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
@@ -49,7 +49,7 @@ After complete the configuration, we can get the `docker-compose.yaml` file from
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.0.0-beta-2
+$ DOLPHINSCHEDULER_VERSION=3.0.0
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Going to docker-compose's location
 # For Mac or Linux users 
@@ -73,7 +73,7 @@ container when it up. You could start DolphinScheduler server separately if you 
 
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.0.0-beta-2
+$ DOLPHINSCHEDULER_VERSION=3.0.0
 # Initialize the database, make sure database <DATABASE> already exists
 $ docker run -d --name dolphinscheduler-tools \
     -e DATABASE="postgresql" \
