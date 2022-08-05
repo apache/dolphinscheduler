@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# A hook script to automatically fix code style and formatting errors with spotless
+#
+mvn spotless:apply

@@ -30,22 +30,15 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### 代码风格
 
-`DolphinScheduler`使用`Spotless`检查并修复代码风格和格式问题
-`Spotless`的`executions`配置如下：
+DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
+您可以执行如下的命令，`Spotless`将会为您自动检查并修复代码风格和格式问题。
 
-```xml
-<executions>
-  <execution>
-      <goals>
-          <goal>apply</goal>
-      </goals>
-      <phase>compile</phase>
-  </execution>
-</executions>
+```shell
+mvn spotless:apply
 ```
 
-当您使用`mvn clean install -Prelease -Dmaven.test.skip=true`命令编译项目时，
-`Spotless`会自动为您修复增量代码中的代码风格和格式问题。
+您可将`/style/pre-commit`目录下的`pre-commit hook`文件拷贝到您的`.git/hooks/`
+目录下，这样您每次使用`git commit`命令时，`Spotless`将会自动为您修复代码风格和格式问题。
 
 ## Docker镜像构建
 

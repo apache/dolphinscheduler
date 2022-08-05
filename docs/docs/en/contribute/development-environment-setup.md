@@ -29,22 +29,17 @@ Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
 ### Code Style
 
-`DolphinScheduler` uses `Spotless` for code style and formatting checks
-and the `executions` configuration for `Spotless` is as follows:
+DolphinScheduler uses `Spotless` for code style and formatting checks.
+You could run the following command and `Spotless` will automatically fix 
+the code style and formmatting errors for you:
 
-```xml
-<executions>
-  <execution>
-      <goals>
-          <goal>apply</goal>
-      </goals>
-      <phase>compile</phase>
-  </execution>
-</executions>
+```shell
+mvn spotless:apply
 ```
 
-When you compile the project with `mvn clean install -Prelease -Dmaven.test.skip=true`, 
-`Spotless` will automatically fix the code style and formatting errors for you. 
+You could copy the `pre-commit hook` file `/style/pre-commit` to your `.git/hooks/`
+directory so that everytime you commit your code with `git commit`, `Spotless` will automatically
+fix things for you.
 
 ## Docker image build
 
