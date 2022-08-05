@@ -73,7 +73,7 @@ export function useTaskPriority(): IJsonItem {
             default: () => h(option.icon)
           }
         ),
-        option.label as string
+        h('span', { style: { 'z-index': 1 } }, option.label as string)
       ]
     })
   return {
