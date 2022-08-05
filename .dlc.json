@@ -4,13 +4,10 @@
       "pattern": "^http://localhost"
     },
     {
-      "pattern": "^https://hive.apache.org"
-    },
-    {
-      "pattern": "^http://192"
-    },
-    {
       "pattern": "^https://img.shields.io/badge"
+    },
+    {
+      "pattern": "/community/community.html$"
     }
   ],
   "replacementPatterns": [
