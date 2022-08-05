@@ -20,7 +20,6 @@ import { SearchOutlined } from '@vicons/antd'
 import { defineComponent, getCurrentInstance, watch, onMounted } from 'vue'
 import {
   NInput,
-  NSelect,
   NButton,
   NIcon,
   NSpace,
@@ -29,7 +28,6 @@ import {
 } from 'naive-ui'
 import { useRoute } from 'vue-router'
 import Card from '@/components/card'
-import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import { useTable } from './use-stream-table'
 import { useTask } from './use-task'
@@ -102,16 +100,6 @@ const StreamTaskDefinition = defineComponent({
                 clearable
                 v-model={[variables.searchWorkflowName, 'value']}
                 placeholder={t('project.task.workflow_name')}
-              />
-              <NSelect
-                v-model={[variables.taskType, 'value']}
-                size='small'
-                options={Object.keys(TASK_TYPES_MAP).map((item) => {
-                  return { value: item, label: item }
-                })}
-                placeholder={t('project.task.task_type')}
-                style={{ width: '180px' }}
-                clearable
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 {{

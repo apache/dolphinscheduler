@@ -166,7 +166,6 @@ export function useTable(onEdit: Function) {
     searchTaskName: null,
     searchWorkflowName: null,
     totalPage: 1,
-    taskType: null,
     row: {},
     loading: false
   })
@@ -179,7 +178,7 @@ export function useTable(onEdit: Function) {
       pageNo: variables.page,
       searchTaskName: variables.searchTaskName,
       searchWorkflowName: variables.searchWorkflowName,
-      taskType: variables.taskType
+      taskExecuteType: 'STREAM' as 'BATCH' | 'STREAM'
     } as any
 
     queryTaskDefinitionListPaging(params, { projectCode })
@@ -193,7 +192,7 @@ export function useTable(onEdit: Function) {
   }
 
   const onStart = (row: any) => {
-    startTaskDefinition(projectCode, row.code).then(() => {
+    startTaskDefinition(projectCode, row.taskCode).then(() => {
       window.$message.success(t('project.workflow.success'))
       getTableData()
     })
