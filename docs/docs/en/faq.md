@@ -575,7 +575,7 @@ Modify the configuration in `common.properties`:
 # dolphin.scheduler.network.priority.strategy=default
 ```
 
-In addition, if you would like to obtain the ip address from the specified network card, modify the configuration `dolphin.scheduler.network.interface.preferred` in `common.properties`. For example, you could mofidy the configuration in `common.properties` as follows to obtain the ip address from the network card `eth1`:
+In addition, if you would like to obtain the ip address from the specified network card, modify the configuration `dolphin.scheduler.network.interface.preferred` in `common.properties`. For example, you could modify the configuration in `common.properties` as follows to obtain the ip address from the network card `eth1`:
 
 ```shell
 dolphin.scheduler.network.interface.preferred=eth1
