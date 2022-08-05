@@ -18,6 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import { h, reactive } from 'vue'
 import {
+  downloadLog,
   queryTaskListPaging,
   savePoint,
   streamTaskStop
@@ -25,6 +26,7 @@ import {
 import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
 import {
   AlignLeftOutlined,
+  DownloadOutlined,
   RetweetOutlined,
   SaveOutlined,
   StopOutlined
@@ -134,7 +136,7 @@ export function useTable() {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](4),
+        ...COLUMN_WIDTH_CONFIG['operation'](5),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -208,6 +210,27 @@ export function useTable() {
                       }
                     ),
                   default: () => t('project.task.view_log')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        onClick: () => downloadLog(row.id)
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(DownloadOutlined) })
+                      }
+                    ),
+                  default: () => t('project.task.download_log')
                 }
               ),
               h(
