@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -66,7 +65,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * project service impl
  **/
 @Service
-public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService{
+public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
@@ -82,8 +81,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * create project
