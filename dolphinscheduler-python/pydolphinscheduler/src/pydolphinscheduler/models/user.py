@@ -20,7 +20,7 @@
 from typing import Optional
 
 from pydolphinscheduler import configuration
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.java_gateway import create_user
 from pydolphinscheduler.models import BaseSide, Tenant
 
 
@@ -64,8 +64,7 @@ class User(BaseSide):
         """Create User if not exists."""
         # Should make sure queue already exists.
         self.create_tenant_if_not_exists()
-        gateway = launch_gateway()
-        gateway.entry_point.createUser(
+        create_user(
             self.name,
             self.password,
             self.email,

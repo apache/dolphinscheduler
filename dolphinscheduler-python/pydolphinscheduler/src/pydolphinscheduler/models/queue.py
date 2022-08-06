@@ -20,7 +20,6 @@
 from typing import Optional
 
 from pydolphinscheduler import configuration
-from pydolphinscheduler.java_gateway import gateway_result_checker, launch_gateway
 from pydolphinscheduler.models import BaseSide
 
 
@@ -35,8 +34,5 @@ class Queue(BaseSide):
         super().__init__(name, description)
 
     def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
-        """Create Queue if not exists."""
-        gateway = launch_gateway()
-        # Here we set Queue.name and Queue.queueName same as self.name
-        result = gateway.entry_point.createProject(user, self.name, self.name)
-        gateway_result_checker(result, None)
+        """This operation is not used."""
+        super()

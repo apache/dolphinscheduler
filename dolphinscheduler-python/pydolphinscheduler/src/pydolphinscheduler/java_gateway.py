@@ -63,3 +63,128 @@ def gateway_result_checker(
     ):
         raise PyDSJavaGatewayException("Get result state not success.")
     return result
+
+
+java_gateway = launch_gateway()
+
+
+def get_datasource_info(name):
+    """Get datasource info through java gateway."""
+    return java_gateway.entry_point.getDatasourceInfo(name)
+
+
+def get_resources_file_info(program_type, main_package):
+    """Get resources file info through java gateway."""
+    return java_gateway.entry_point.getResourcesFileInfo(program_type, main_package)
+
+
+def create_or_update_resource(user_name, name, description, content):
+    """Create or update resource through java gateway."""
+    return java_gateway.entry_point.createOrUpdateResource(
+        user_name, name, description, content
+    )
+
+
+def query_resources_file_info(user_name, name):
+    """Get resources file info through java gateway."""
+    return java_gateway.entry_point.queryResourcesFileInfo(user_name, name)
+
+
+def get_code_and_version(project_name, process_definition_name, task_name):
+    """Get code and version through java gateway."""
+    return java_gateway.entry_point.getCodeAndVersion(
+        project_name, process_definition_name, task_name
+    )
+
+
+def create_or_grant_project(user, name, description):
+    """Create or grant project through java gateway."""
+    return java_gateway.entry_point.createOrGrantProject(user, name, description)
+
+
+def create_tenant(tenant_name, description, queue_name):
+    """Create tenant through java gateway."""
+    return java_gateway.entry_point.createTenant(tenant_name, description, queue_name)
+
+
+def create_user(name, password, email, phone, tenant, queue, status):
+    """Create user through java gateway."""
+    return java_gateway.entry_point.createUser(
+        name, password, email, phone, tenant, queue, status
+    )
+
+
+def get_dependent_info(code_parameter):
+    """Get dependent info through java gateway."""
+    return java_gateway.entry_point.getDependentInfo(code_parameter)
+
+
+def get_process_definition_info(user_name, project_name, process_definition_name):
+    """Get process definition info through java gateway."""
+    return java_gateway.entry_point.getProcessDefinitionInfo(
+        user_name, project_name, process_definition_name
+    )
+
+
+def create_or_update_process_definition(
+    user_name,
+    project_name,
+    name,
+    description,
+    global_params,
+    schedule,
+    warning_type,
+    warning_group_id,
+    locations,
+    timeout,
+    worker_group,
+    tenant_code,
+    release_state,
+    task_relation_json,
+    task_definition_json,
+    other_params_json,
+    execution_type,
+):
+    """Create or update process definition through java gateway."""
+    return java_gateway.entry_point.createOrUpdateProcessDefinition(
+        user_name,
+        project_name,
+        name,
+        description,
+        global_params,
+        schedule,
+        warning_type,
+        warning_group_id,
+        locations,
+        timeout,
+        worker_group,
+        tenant_code,
+        release_state,
+        task_relation_json,
+        task_definition_json,
+        other_params_json,
+        execution_type,
+    )
+
+
+def exec_process_instance(
+    user_name,
+    project_name,
+    process_definition_name,
+    cron_time,
+    worker_group,
+    warning_type,
+    warning_group_id,
+    timeout,
+):
+    """Exec process instance through java gateway."""
+    return java_gateway.entry_point.execProcessInstance(
+        user_name,
+        project_name,
+        process_definition_name,
+        cron_time,
+        worker_group,
+        warning_type,
+        warning_group_id,
+        timeout,
+    )
