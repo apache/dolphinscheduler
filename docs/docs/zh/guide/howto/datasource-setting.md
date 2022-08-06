@@ -61,7 +61,7 @@ postgres=# CREATE DATABASE dolphinscheduler;
 # 修改 {user} 和 {password} 为你希望的用户名和密码
 postgres=# CREATE USER {user} PASSWORD {password};
 postgres=# ALTER DATABASE dolphinscheduler OWNER TO {user};
-# 推出 PostgreSQL
+# 退出 PostgreSQL
 postgres=#\q
 # 在终端执行如下命令，向配置文件新增登陆权限，并重载 PostgreSQL 配置，替换 {ip} 为对应的 DS 集群服务器 IP 地址段
 echo "host    dolphinscheduler   {user}    {ip}     md5" >> $PGDATA/pg_hba.conf

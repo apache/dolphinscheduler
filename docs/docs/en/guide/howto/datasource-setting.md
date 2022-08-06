@@ -20,7 +20,8 @@ export SPRING_DATASOURCE_PASSWORD={password}
 ## Pseudo-Cluster/Cluster Initialize the Database
 
 DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
-which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`. Let's take MySQL as an example for how to initialize the database:
+which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`, just ignore this steps if you use PostgreSQL. Let's walk through how to initialize the database in MySQL
+ and PostgreSQL :
 
 For mysql 5.6 / 5.7
 
@@ -51,12 +52,40 @@ mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
 mysql> FLUSH PRIVILEGES;
 ``` 
 
-Then, modify `./bin/env/dolphinscheduler_env.sh` to use mysql, change {user} and {password} to what you set in the previous step.
-
+For PostgreSQL: 
 ```shell
+# Use psql-tools to login PostgreSQL
+psql
+# Create a database
+postgres=# CREATE DATABASE dolphinscheduler;
+# Replace {user} and {password} with your username and password
+postgres=# CREATE USER {user} PASSWORD {password};
+postgres=# ALTER DATABASE dolphinscheduler OWNER TO {user};
+# Logout PostgreSQL
+postgres=#\q
+# Exec cmd below in terminal, add config to pg_hba.conf and reload PostgreSQL config, replace {ip} to DS cluster ip addresses
+echo "host    dolphinscheduler   {user}    {ip}     md5" >> $PGDATA/pg_hba.conf
+pg_ctl reload
+```
+
+Then, modify `./bin/env/dolphinscheduler_env.sh`, change {user} and {password} to what you set in the previous step.
+
+For MySQL:
+```shell
+# for mysql
 export DATABASE=${DATABASE:-mysql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
+```
+
+For PostgreSQL:
+```shell
+# for postgresql
+export DATABASE=${DATABASE:-postgresql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```
