@@ -27,6 +27,19 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
+
+### 代码风格
+
+DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
+您可以执行如下的命令，`Spotless`将会为您自动检查并修复代码风格和格式问题。
+
+```shell
+./mvnw spotless:apply
+```
+
+您可将`/style/pre-commit`目录下的`pre-commit hook`文件拷贝到您的`.git/hooks/`
+目录下，这样您每次使用`git commit`命令时，`Spotless`将会自动为您修复代码风格和格式问题。
+
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
