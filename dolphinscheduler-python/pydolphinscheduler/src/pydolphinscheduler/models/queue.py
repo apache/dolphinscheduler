@@ -32,7 +32,3 @@ class Queue(BaseSide):
         description: Optional[str] = "",
     ):
         super().__init__(name, description)
-
-    def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
-        """This operation is not used."""
-        super()
