@@ -85,39 +85,37 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         logger.info("tenantCode user:{}, task dir:{}", taskRequest.getTenantCode(),
                 taskRequest.getTaskAppId());
 
-        // create if non existence
-        if (!Files.exists(Paths.get(commandFile))) {
-            logger.info("create command file:{}", commandFile);
-
-            StringBuilder sb = new StringBuilder();
-            if (SystemUtils.IS_OS_WINDOWS) {
-                sb.append("@echo off\n");
-                sb.append("cd /d %~dp0\n");
-                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
-                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-                } else {
-                    if (taskRequest.getEnvFile() != null) {
-                        sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
-                    }
-                }
-            } else {
-                sb.append("#!/bin/sh\n");
-                sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-                sb.append("cd $BASEDIR\n");
-                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
-                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-                } else {
-                    if (taskRequest.getEnvFile() != null) {
-                        sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
-                    }
-                }
-            }
-            sb.append(execCommand);
-            logger.info("command : {}", sb);
-
-            // write data to file
-            FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+        if (Files.exists(Paths.get(commandFile))) {
+            return;
         }
+
+        logger.info("create command file:{}", commandFile);
+        StringBuilder sb = new StringBuilder();
+
+        String envFileLoader;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            sb.append("@echo off\n");
+            sb.append("cd /d %~dp0\n");
+            envFileLoader = "call";
+        } else {
+            sb.append("#!/bin/sh\n");
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+            sb.append("cd $BASEDIR\n");
+            envFileLoader = "source";
+        }
+
+        if (taskRequest.getEnvFile() != null) {
+            sb.append(envFileLoader).append(" ").append(taskRequest.getEnvFile()).append("\n");
+        }
+        if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
+            sb.append(taskRequest.getEnvironmentConfig()).append("\n");
+        }
+
+        sb.append(execCommand);
+        logger.info("command : {}", sb);
+
+        // write data to file
+        FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
     }
 
     @Override
