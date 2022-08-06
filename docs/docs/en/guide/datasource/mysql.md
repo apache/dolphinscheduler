@@ -2,18 +2,18 @@
 
 ![mysql](../../../../img/new_ui/dev/datasource/mysql.png)
 
-## Datasource Parameters
+## DataSource Parameters
 
-| **Datasource** | **Description** |
-| --- | --- |
-| Datasource | Select MYSQL. |
-| Datasource name | Enter the name of the DataSource. |
-| Description | Enter a description of the DataSource. |
-| IP/Host Name | Enter the MYSQL service IP. |
-| Port | Enter the MYSQL service port. |
-| Username | Set the username for MYSQL connection. |
-| Password | Set the password for MYSQL connection. |
-| Database name | Enter the database name of the MYSQL connection. |
+| **DataSource**             | **Description** |
+|----------------------------| --- |
+| DataSource                 | Select MYSQL. |
+| DataSource name            | Enter the name of the DataSource. |
+| Description                | Enter a description of the DataSource. |
+| IP/Host Name               | Enter the MYSQL service IP. |
+| Port                       | Enter the MYSQL service port. |
+| Username                   | Set the username for MYSQL connection. |
+| Password                   | Set the password for MYSQL connection. |
+| Database name              | Enter the database name of the MYSQL connection. |
 | Jdbc connection parameters | Parameter settings for MYSQL connection, in JSON format. |
 
 ## Native Supported

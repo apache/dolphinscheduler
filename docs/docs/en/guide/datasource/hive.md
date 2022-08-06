@@ -4,18 +4,18 @@
 
 ![hive](../../../../img/new_ui/dev/datasource/hive.png)
 
-## Datasource Parameters
+## DataSource Parameters
 
-| **Datasource** | **Description** |
-| --- | --- |
-| Datasource | Select HIVE. |
-| Datasource name | Enter the name of the DataSource. |
-| Description | Enter a description of the DataSource. |
-| IP/Host Name | Enter the HIVE service IP. |
-| Port | Enter the HIVE service port. |
-| Username | Set the username for HIVE connection. |
-| Password | Set the password for HIVE connection. |
-| Database name | Enter the database name of the HIVE connection. |
+| **DataSource**             | **Description** |
+|----------------------------| --- |
+| DataSource                 | Select HIVE. |
+| DataSource name            | Enter the name of the DataSource. |
+| Description                | Enter a description of the DataSource. |
+| IP/Host Name               | Enter the HIVE service IP. |
+| Port                       | Enter the HIVE service port. |
+| Username                   | Set the username for HIVE connection. |
+| Password                   | Set the password for HIVE connection. |
+| Database name              | Enter the database name of the HIVE connection. |
 | Jdbc connection parameters | Parameter settings for HIVE connection, in JSON format. |
 
 > NOTICE: If you wish to execute multiple HIVE SQL in the same session, you could set `support.hive.oneSession = true` in `common.properties`. 
