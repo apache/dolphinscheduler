@@ -1,4 +1,4 @@
-# Datasource Setting
+# DataSource Setting
 
 ## Standalone Switching Metadata Database Configuration
 
@@ -111,7 +111,7 @@ DataSource supports MySQL, PostgreSQL, Hive/Impala, Spark, ClickHouse, Oracle, S
 
 Some of datasource are native supported to DolphinScheduler while others need users download JDBC driver package manually,
 because those JDBC driver incompatible to Apache LICENSE V2 LICENSE. For this reason we have to release DolphinScheduler's
-distribute package without those packages, even if this will make more complicated for users. Datasource such as MySQL,
+distribute package without those packages, even if this will make more complicated for users. DataSource such as MySQL,
 Oracle, SQL Server as the examples, but we have the solution to solve this
 
 ### Example

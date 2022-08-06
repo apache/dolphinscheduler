@@ -1,4 +1,4 @@
-## DolphinScheduler Datasource SPI main design
+## DolphinScheduler DataSource SPI main design
 
 #### How do I use data sources?
 
@@ -6,7 +6,7 @@ The data source center supports POSTGRESQL, HIVE/IMPALA, SPARK, CLICKHOUSE, SQLS
 
 If you are using MySQL or ORACLE data source, you need to place the corresponding driver package in the lib directory
 
-#### How to do Datasource plugin development?
+#### How to do DataSource plugin development?
 
 org.apache.dolphinscheduler.spi.datasource.DataSourceChannel
 org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory

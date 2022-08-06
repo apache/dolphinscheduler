@@ -1,4 +1,4 @@
-## DolphinScheduler Datasource SPI 主要设计
+## DolphinScheduler DataSource SPI 主要设计
 
 #### 如何使用数据源？
 

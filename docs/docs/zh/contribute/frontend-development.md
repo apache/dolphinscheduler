@@ -538,7 +538,7 @@ dag 相关接口 `src/js/conf/home/store/dag/actions.js`
 */
   _verification () {
     // datasource 子组件验证
-    if (!this.$refs.refDs._verifDatasource()) {
+    if (!this.$refs.refDs._verifDataSource()) {
       return false
     }
 

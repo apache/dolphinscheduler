@@ -232,7 +232,7 @@ externalDatabase:
 
 8. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
 
-### How to Support MySQL or Oracle Datasource in `Datasource manage`?
+### How to Support MySQL or Oracle DataSource in `DataSource manage`?
 
 > Because of the commercial license, we cannot directly use the driver of MySQL or Oracle.
 >
@@ -250,10 +250,10 @@ FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version
 # For example
 # FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
 
-# If you want to support MySQL Datasource
+# If you want to support MySQL DataSource
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
 
-# If you want to support Oracle Datasource
+# If you want to support Oracle DataSource
 COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/libs
 ```
 
@@ -269,7 +269,7 @@ docker build -t apache/dolphinscheduler-<service>:new-driver .
 
 6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
 
-7. Add a MySQL or Oracle datasource in `Datasource manage`.
+7. Add a MySQL or Oracle datasource in `DataSource manage`.
 
 ### How to Support Python 2 pip and Custom requirements.txt?
 

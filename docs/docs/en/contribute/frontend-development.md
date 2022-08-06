@@ -538,7 +538,7 @@ User Center Related Interfaces `src/js/conf/home/store/user/actions.js`
 */
   _verification () {
     // datasource subcomponent verification
-    if (!this.$refs.refDs._verifDatasource()) {
+    if (!this.$refs.refDs._verifDataSource()) {
       return false
     }
 
