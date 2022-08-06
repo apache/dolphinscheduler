@@ -114,9 +114,11 @@ def create_user(name, password, email, phone, tenant, queue, status):
     )
 
 
-def get_dependent_info(code_parameter):
+def get_dependent_info(project_name, process_definition_name, task_name):
     """Get dependent info through java gateway."""
-    return java_gateway.entry_point.getDependentInfo(code_parameter)
+    return java_gateway.entry_point.getDependentInfo(
+        project_name, process_definition_name, task_name
+    )
 
 
 def get_process_definition_info(user_name, project_name, process_definition_name):
