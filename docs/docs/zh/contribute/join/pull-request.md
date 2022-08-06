@@ -64,23 +64,8 @@ waste time。
 
 ### Pull Request Code Style
 
-当你向 DolphinScheduler 提交 pull request 的时候 code-style 是你不得不考虑的问题。我们在 CI 中使用 Checkstyle [参考](https://checkstyle.sourceforge.io/)来保持代码风格的统一，它是一种帮助开发者编写遵循编码规范的 Java 代码开发工具。如果你的 pull request 没有通过 Checkstyle 的检测，那它将不会被合并到主库中。你可以在提交 pull request 前使用 Checkstyle 来检测或者格式化你的代码。如下的步骤将引领你配置并激活 Checkstyle
-
-1. 准备 Checkstyle 配置文件：你可以点击[这里](https://github.com/apache/dolphinscheduler/blob/dev/style/checkstyle.xml)手动下载，但是我们更加推荐在 DolphinScheduler 代码库中找到它。当你将代码库克隆下来后，你可以在路径 `style/checkstyle.xml` 下找到配置文件
-2. 下载 Intellij IDEA Checkstyle 插件：通过关键字**CheckStyle-IDEA**或者通过[这个页面](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea)安装均可。如果你不清楚如何安装Intellij IDEA插件，可以参考[这个连接](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_repo)
-3. 配置并激活 Checkstyles 以及 Intellij IDEA 代码风格：当完成上面几步后，你就可以配置并激活他们了。你可以在路径`Preferences -> Tool -> Checkstyle`中找到 Checkstyle，请参照下图完成其配置
-
-<p align="center">
-    <img src="../../../../img/contribute/join/pull-request/checkstyle-idea.png" alt="checkstyle idea configuration" />
-</p>
-
-截止目前，Checkstyle 插件已经配置完成了，当有代码或者文件不符合风格时就会显示在 Checkstyle 中。但强烈建议同时配置 Intellij IDEA 的代码风格，完成配置后可以使用 Intellij IDEA 自动格式化功能。你可以在路径`Preferences -> Editor -> Code Style -> Java`找到配置，请参照下图完成其配置
-
-<p align="center">
-    <img src="../../../../img/contribute/join/pull-request/code-style-idea.png" alt="code style idea configuration" />
-</p>
-
-1. 在提交 pull request 前格式化你的代码：完成上面全部后，你可以使用快捷键`Command + L`(Mac用户) or `Ctrl+L`(Windows用户)在 Intellij IDEA 完成自动格式化。格式化代码的最佳时间是将你的修改提交到本地 git 版本库之前
+DolphinScheduler使用`Spotless`为您自动修复代码风格和格式问题，
+详情见[代码风格](../development-environment-setup.md#代码风格)。
 
 ### 相关问题
 
