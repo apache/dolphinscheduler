@@ -31,7 +31,7 @@ export const useLogTimerStore = defineStore({
   },
   actions: {
     setLogTimer(timer: logTimer): void {
-      this.locales = timer
+      this.logTimer = timer
     }
   }
 })
