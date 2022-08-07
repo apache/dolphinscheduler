@@ -49,10 +49,9 @@ public class EmailAlertChannelTest {
         map1.put("port", "3306");
         map1.put("no index of number", "80");
         map1.put("database client connections", "190");
-        String mapjson = "{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
-                + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
-                + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
-                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}";
+        List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
+        maps.add(0, map1);
+        String mapjson = JSONUtils.toJsonString(maps);
 
         AlertData alertData = AlertData.builder()
                 .id(10)
@@ -66,15 +65,6 @@ public class EmailAlertChannelTest {
 
         alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = emailAlertChannel.process(alertInfo);
-        Assert.assertNotNull(alertResult);
-        Assert.assertEquals("false", alertResult.getStatus());
-        mapjson = "[{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
-                + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
-                + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
-                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}]";
-        alertData.setContent(mapjson);
-        alertInfo.setAlertData(alertData);
-        alertResult = emailAlertChannel.process(alertInfo);
         Assert.assertNotNull(alertResult);
         Assert.assertEquals("false", alertResult.getStatus());
     }

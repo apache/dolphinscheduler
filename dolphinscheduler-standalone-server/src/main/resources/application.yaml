@@ -36,12 +36,12 @@ spring:
       spec: maximumSize=100,expireAfterWrite=300s,recordStats
   sql:
     init:
-      schema-locations: classpath:sql/dolphinscheduler_h2.sql
+      schema-locations: classpath:sql/dolphinscheduler_mysql.sql
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
-    username: sa
-    password: ""
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://zaihui-dev.mysql.rds.aliyuncs.com/dolphin-local?useUnicode=true&characterEncoding=UTF-8&sslMode=disabled
+    username: zaihui
+    password: Wocao404
   quartz:
     job-store-type: jdbc
     jdbc:
