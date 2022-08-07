@@ -83,7 +83,6 @@ each machine. You could find this file in the path `bin/env/install_env.sh` and 
 # ---------------------------------------------------------
 # Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
 ips="localhost"
-sshPort=${sshPort:-"22"}
 masters="localhost"
 workers="localhost:default"
 alertServer="localhost"

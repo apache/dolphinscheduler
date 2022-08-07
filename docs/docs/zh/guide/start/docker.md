@@ -32,7 +32,7 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 服务重启的时候保留元数据（如需要挂载到本地路径需要做指定）。他更健壮，能保证用户体验更加完整的 DolphinScheduler 服务。这种方式需要先安装
 [docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux，Windows。
 
-安装完成 docker-compose 后我们需要修改部分配置以便能更好体验 DolphinScheduler 服务，我们需要配置不少于 4GB 的空闲内存：
+安装完成 docker-compose 后我们需要修改部分配置以便能更好体验 DolphinScheduler 服务，我们需要配置不少于 4GB 的内存：
 
 - Mac：点击 `Docker Desktop -> Preferences -> Resources -> Memory` 调整内存大小
 - Windows Docker Desktop：

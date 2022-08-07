@@ -38,7 +38,7 @@ DolphinScheduler in a long term. You have to install [docker-compose](https://do
 start servers.
 
 After installed docker-compose, it is recommended to modify some configurations for better experience. We highly recommended
-modify docker-compose's free memory up to 4 GB.
+modify docker-compose's memory up to 4 GB.
 
 - Mac：Click `Docker Desktop -> Preferences -> Resources -> Memory` modified it
 - Windows Docker Desktop：
