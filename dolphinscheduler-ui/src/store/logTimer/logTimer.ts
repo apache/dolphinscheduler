@@ -15,29 +15,23 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import { defineStore } from 'pinia'
+import { LogTimerStore, logTimer } from './types'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
-
-export default {
-  path: '/ui-setting',
-  name: 'ui-setting',
-  meta: { title: '设置' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '',
-      name: 'ui-setting',
-      component: components['ui-setting'],
-      meta: {
-        title: '设置',
-        activeMenu: 'ui-setting',
-        showSide: false,
-        auth: []
-      }
+export const useLogTimerStore = defineStore({
+  id: 'logTimer',
+  state: (): LogTimerStore => ({
+    logTimer: 0,
+  }),
+  persist: true,
+  getters: {
+    getLogTimer(): logTimer {
+      return this.logTimer
     }
-  ]
-}
+  },
+  actions: {
+    setLogTimer(timer: logTimer): void {
+      this.locales = timer
+    }
+  }
+})
