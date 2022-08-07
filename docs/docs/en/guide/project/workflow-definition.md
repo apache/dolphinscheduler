@@ -103,7 +103,7 @@ The following are the operation functions of the workflow definition list:
         
         ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
     
-    * Parallel Replenishment: within the specified time range, replenishment is performed simultaneously for multiple days, and multiple process instances are generated at the same time. Enter date manually: manually enter a date in the comma separated date format of 'yyyy MM DD hh:mm:ss'.Click Run workflow and select the parallel complement mode: for example, execute the tasks from July 9 to July 10 at the same time, and generate two process instances on the process instance page at the same time.
+    * Parallel Replenishment: within the specified time range, replenishment is performed simultaneously for multiple days, and multiple process instances are generated at the same time. Enter date manually: manually enter a date in the comma separated date format of 'yyyy MM DD hh:mm:ss'.Click Run workflow and select the parallel complement mode: for example, execute the workflow definition from July 9 to July 10 at the same time, and generate two process instances on the process instance page at the same time.
        
         ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
     
