@@ -36,10 +36,14 @@ import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/common/common'
 import styles from './index.module.scss'
+import { useLogTimerStore } from '@/store/logTimer/logTimer'
 
 const TaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
+    const logTimerStore = useLogTimerStore()
+    const logTimer = logTimerStore.getLogTimer;
+
     const { t, variables, getTableData, createColumns } = useTable()
 
     const requestTableData = () => {
@@ -92,11 +96,11 @@ const TaskInstance = defineComponent({
       return state
     }
 
-    const refreshLogs = (row: any) => {
+    const refreshLogs = (row: any, logTimer: number) => {
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0
-      getLogs(row)
+      const delayGetLogsId = setInterval(getLogs.bind(row), logTimer);
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -133,7 +137,8 @@ const TaskInstance = defineComponent({
       onSearch,
       onConfirmModal,
       refreshLogs,
-      trim
+      trim,
+      logTimer
     }
   },
   render() {

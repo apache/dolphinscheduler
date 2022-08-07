@@ -32,6 +32,8 @@ const setting = defineComponent({
     name: 'ui-setting',
     setup() {
         const logTimerStore = useLogTimerStore()
+        const defaultLogTimer = logTimerStore.getLogTimer;
+
         const logTimerMap = {
             0: "Off",
             10: '10 Seconds',
@@ -67,18 +69,16 @@ const setting = defineComponent({
                 value: 1800,
             },
             ]
-        return {logTimerStore, logTimerMap, logTimerOptions}
+        return {defaultLogTimer, logTimerMap, logTimerOptions}
     },
     render() {
-        const defaultLogTimer = this.logTimerStore.getLogTimer;
-
         return ( 
             <>
             <div>UI Setting</div>
             <NForm>
                 <NFormItem label="Log Auto Refresh Time">
                 <NSelect
-                    default-value={this.logTimerMap[defaultLogTimer]}
+                    default-value={this.logTimerMap[this.defaultLogTimer]}
                     options={this.logTimerOptions} 
                     onUpdateValue={handleUpdateValue}
                     />
