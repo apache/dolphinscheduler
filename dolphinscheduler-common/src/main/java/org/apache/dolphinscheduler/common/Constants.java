@@ -855,4 +855,6 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    public static final String DISTRIBUTE_LOCK_PATH = "/distributeLock";
 }
