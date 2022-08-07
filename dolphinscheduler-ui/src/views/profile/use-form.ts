@@ -33,11 +33,6 @@ export function useForm() {
       username: userInfo.userName,
       email: userInfo.email,
       phone: userInfo.phone,
-      autorefresh: '10 s',
-      timezone: 'UTC',
-      theme: 'light',
-      language: 'English',
-      DeveloperMode: 'Developer',
     },
     saving: false,
     rules: {
@@ -69,11 +64,6 @@ export function useForm() {
       username: userInfo.userName,
       email: userInfo.email,
       phone: userInfo.phone,
-      autorefresh: '10 s',
-      timezone: 'UTC',
-      theme: 'light',
-      language: 'English',
-      DeveloperMode: 'Developer',
     }
   })
 

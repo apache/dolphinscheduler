@@ -15,36 +15,29 @@
  * limitations under the License.
  */
 
-import { ref } from 'vue'
-import type { InfoProps } from './types'
-import type { Ref } from 'vue'
+import type { Component } from 'vue'
+import utils from '@/utils'
 
-export function useSetting() {
-  const settingOptions: Ref<Array<InfoProps>> = ref([])
+// All TSX files under the views folder automatically generate mapping relationship
+const modules = import.meta.glob('/src/views/**/**.tsx')
+const components: { [key: string]: Component } = utils.mapping(modules)
 
-  settingOptions.value.push({
-    key: "Auto Refresh Time",
-    value: "10s",
-  })
-  settingOptions.value.push({
-    key: "Time Zone",
-    value: "UTC",
-  })
-  settingOptions.value.push({
-    key: "Theme",
-    value: "Light",
-  })
-  settingOptions.value.push({
-    key: "Language",
-    value: "English",
-  })
-  settingOptions.value.push({
-    key: "Developer Mode",
-    value: "Enabled",
-  })
-
-
-  return {
-    settingOptions
-  }
+export default {
+  path: '/ui-setting',
+  name: 'uisetting',
+  meta: { title: '设置' },
+  component: () => import('@/layouts/content'),
+  children: [
+    {
+      path: '',
+      name: 'ui-setting',
+      component: components['ui-setting'],
+      meta: {
+        title: '设置',
+        activeMenu: 'ui-setting',
+        showSide: false,
+        auth: []
+      }
+    }
+  ]
 }

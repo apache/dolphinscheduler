@@ -24,6 +24,7 @@ import datasourcePage from './modules/datasource'
 import monitorPage from './modules/monitor'
 import securityPage from './modules/security'
 import dataQualityPage from './modules/data-quality'
+import uiSettingPage from './modules/ui-setting'
 
 // All TSX files under the views folder automatically generate mapping relationship
 const modules = import.meta.glob('/src/views/**/**.tsx')
@@ -74,7 +75,8 @@ const basePage: RouteRecordRaw[] = [
   datasourcePage,
   monitorPage,
   securityPage,
-  dataQualityPage
+  dataQualityPage,
+  uiSettingPage
 ]
 
 /**
