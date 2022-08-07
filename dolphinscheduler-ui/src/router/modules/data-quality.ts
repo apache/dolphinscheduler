@@ -22,6 +22,8 @@ import utils from '@/utils'
 const modules = import.meta.glob('/src/views/**/**.tsx')
 const components: { [key: string]: Component } = utils.mapping(modules)
 
+console.log(components);
+
 export default {
   path: '/data-quality',
   name: 'data-quality',

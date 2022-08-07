@@ -15,28 +15,18 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useProfile } from '../use-profile'
-import styles from '../info.module.scss'
+import { defineComponent } from "vue";
 
-const Info = defineComponent({
-  name: 'Info',
-  render() {
-    const { infoOptions } = useProfile()
+const setting = defineComponent({
+    name: 'setting',
+    setup() {
 
-    return (
-      <dl class={styles.container}>
-        {infoOptions.value.map((item) => {
-          return (
-            <dd class={styles.item}>
-              <span class={styles.label}>{item.key}: </span>
-              <span>{item.value}</span>
-            </dd>
-          )
-        })}
-      </dl>
-    )
-  }
+    },
+    render() {
+        return (
+            <div>UI Setting</div>
+        )
+    }
 })
 
-export default Info
+export default setting

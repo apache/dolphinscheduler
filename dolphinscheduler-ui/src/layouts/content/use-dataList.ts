@@ -88,6 +88,7 @@ export function useDataList() {
   })
 
   const changeMenuOption = (state: any) => {
+    console.log('state', state);
     const projectCode = route.params.projectCode || ''
     state.menuOptions = [
       {
@@ -314,7 +315,15 @@ export function useDataList() {
                   icon: renderIcon(SafetyOutlined)
                 }
               ]
-      }
+      },
+      // add UI setting to the banner
+      {
+        label: () =>
+          h(NEllipsis, null, { default: () => t('menu.ui_setting') }),
+        key: 'ui-setting',
+        icon: renderIcon(SettingOutlined),
+        children: []
+      },
     ]
   }
 
