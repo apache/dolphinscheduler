@@ -15,29 +15,10 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+type logTimer = number
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
-
-export default {
-  path: '/ui-setting',
-  name: 'ui-setting',
-  meta: { title: '设置' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '',
-      name: 'ui-setting',
-      component: components['ui-setting'],
-      meta: {
-        title: '设置',
-        activeMenu: 'ui-setting',
-        showSide: false,
-        auth: []
-      }
-    }
-  ]
+interface LogTimerStore {
+  logTimer: logTimer
 }
+
+export { LogTimerStore, logTimer }

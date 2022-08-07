@@ -15,16 +15,63 @@
  * limitations under the License.
  */
 
+import { NButton, NForm, NFormItem, NSelect } from "naive-ui";
 import { defineComponent } from "vue";
+import { useLogTimerStore } from '@/store/logTimer/logTimer'
 
 const setting = defineComponent({
-    name: 'setting',
+    name: 'ui-setting',
     setup() {
+        const logTimerStore = useLogTimerStore()
+        const logTimerMap = {
+            0: "Off",
+        } as any
 
+        const logTimerOptions = [
+            {
+                label: "Off",
+                value: 0,
+            },
+            {
+                label: "10 Seconds",
+                value: '10',
+            },
+            {
+                label: "30 Seconds",
+                value: '30',
+            },
+            {
+                label: "1 Minute",
+                value: '60',
+            },
+            {
+                label: "5 Minute",
+                value: '300',
+            },
+            {
+                label: "30 Minute",
+                value: '1800',
+            },
+            ]
+        return {logTimerStore, logTimerMap, logTimerOptions}
     },
     render() {
-        return (
+        const defaultLogTimer = this.logTimerStore.getLogTimer;
+
+        return ( 
+            <>
             <div>UI Setting</div>
+            <NForm>
+                <NFormItem label="Log Auto Refresh Time">
+                <NSelect
+                    default-value={this.logTimerMap[defaultLogTimer]}
+                    options={this.logTimerOptions} />
+                </NFormItem>
+            </NForm>
+            <NButton type='primary'>
+                Save
+            </NButton>
+            </>
         )
     }
 })
