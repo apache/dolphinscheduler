@@ -46,7 +46,8 @@ export function useCustomCellBuilder() {
   function buildEdge(
     sourceId: string,
     targetId: string,
-    label = ''
+    label = '',
+    isStream = false
   ): Edge.Metadata {
     return {
       shape: X6_EDGE_NAME,
@@ -56,7 +57,12 @@ export function useCustomCellBuilder() {
       target: {
         cell: targetId
       },
-      labels: label ? [label] : undefined
+      labels: label ? [label] : undefined,
+      attrs: {
+        line: {
+          strokeDasharray: isStream ? '5 5' : 'none'
+        }
+      }
     }
   }
 
@@ -118,6 +124,7 @@ export function useCustomCellBuilder() {
       parseLocationStr(definition.processDefinition.locations) || []
     const tasks = definition.taskDefinitionList
     const connects = definition.processTaskRelationList
+    const taskTypeMap = {} as { [key in string]: TaskType }
 
     tasks.forEach((task) => {
       const location = locations.find((l) => l.taskCode === task.code) || {}
@@ -132,12 +139,23 @@ export function useCustomCellBuilder() {
         }
       )
       nodes.push(node)
+      taskTypeMap[String(task.code)] = task.taskType
     })
 
     connects
       .filter((r) => !!r.preTaskCode)
       .forEach((c) => {
-        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode + '', c.name)
+        const isStream =
+          TASK_TYPES_MAP[taskTypeMap[c.preTaskCode]].taskExecuteType ===
+            'STREAM' ||
+          TASK_TYPES_MAP[taskTypeMap[c.postTaskCode]].taskExecuteType ===
+            'STREAM'
+        const edge = buildEdge(
+          c.preTaskCode + '',
+          c.postTaskCode + '',
+          c.name,
+          isStream
+        )
         edges.push(edge)
       })
     return {
