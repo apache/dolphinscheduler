@@ -551,7 +551,7 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
-    @antv/layout 0.2.5: https://github.com/antvis/layout MIT
+    @antv/layout 0.1.31: https://github.com/antvis/layout MIT
     @types/js-cookie 3.0.2: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @antv/x6 1.32.7: https://github.com/antvis/x6 MIT
     @vueuse/core 8.8.0: https://github.com/vueuse/vueuse MIT

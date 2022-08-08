@@ -41,6 +41,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -67,19 +68,24 @@ public class QueueServiceTest {
 
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger queueServiceImplLogger = LoggerFactory.getLogger(QueueServiceImpl.class);
+
+    @InjectMocks
+    private QueueServiceImpl queueService;
+
+    @Mock
+    private QueueMapper queueMapper;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
+
     private static final String QUEUE = "queue";
     private static final String QUEUE_NAME = "queueName";
     private static final String EXISTS = "exists";
     private static final String NOT_EXISTS = "not_exists";
     private static final String NOT_EXISTS_FINAL = "not_exists_final";
-    @InjectMocks
-    private QueueServiceImpl queueService;
-    @Mock
-    private QueueMapper queueMapper;
-    @Mock
-    private UserMapper userMapper;
-    @Mock
-    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Before
     public void setUp() {
@@ -118,7 +124,7 @@ public class QueueServiceTest {
 
     @Test
     public void testCreateQueue() {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, getLoginUser().getId(), YARN_QUEUE_CREATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, null, getLoginUser().getId(), YARN_QUEUE_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, null, 0, baseServiceLogger)).thenReturn(true);
 
         // queue is null
@@ -141,8 +147,8 @@ public class QueueServiceTest {
         Mockito.when(queueMapper.selectById(1)).thenReturn(getQUEUE());
         Mockito.when(queueMapper.existQueue(EXISTS, null)).thenReturn(true);
         Mockito.when(queueMapper.existQueue(null, EXISTS)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, getLoginUser().getId(), YARN_QUEUE_UPDATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[] {0}, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, null, getLoginUser().getId(), YARN_QUEUE_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{0}, 0, baseServiceLogger)).thenReturn(true);
 
         // not exist
         Throwable exception = Assertions.assertThrows(ServiceException.class, () -> queueService.updateQueue(getLoginUser(), 0, QUEUE, QUEUE_NAME));
@@ -150,7 +156,7 @@ public class QueueServiceTest {
         Assertions.assertEquals(formatter, exception.getMessage());
 
         //no need update
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[] {1}, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{1}, 0, baseServiceLogger)).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class, () -> queueService.updateQueue(getLoginUser(), 1, QUEUE_NAME, QUEUE_NAME));
         Assertions.assertEquals(Status.NEED_NOT_UPDATE_QUEUE.getMsg(), exception.getMessage());
 

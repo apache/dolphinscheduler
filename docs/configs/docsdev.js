@@ -185,6 +185,10 @@ export default {
                                 title: 'SageMaker',
                                 link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
+                            {
+                                title: 'ChunJun',
+                                link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
                         ],
                     },
                     {
@@ -265,6 +269,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/alert/alert_plugin_user_guide.html',
                             },
                             {
+                                title: 'Email',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/email.html',
+                            },
+                            {
                                 title: 'Telegram',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/telegram.html',
                             },
@@ -287,6 +295,10 @@ export default {
                             {
                                 title: 'Http',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/http.html',
+                            },
+                            {
+                                title: 'Feishu',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/feishu.html',
                             },
                         ],
                     },
@@ -419,6 +431,164 @@ export default {
                     {
                         title: 'Health Check',
                         link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
+                title: 'Contribution',
+                children: [
+                    {
+                        title: 'Join',
+                        children: [
+                            {
+                                title: 'Security Report',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/security.html',
+                            },
+                            {
+                                title: 'How to Become a Committer',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/become-a-committer.html',
+                            },
+                            {
+                                title: 'Subscribe Mailing Lists',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/subscribe.html',
+                            },
+                            {
+                                title: 'Participate in Contributing',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/contribute.html',
+                            },
+                            {
+                                title: 'Code of Conduct',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/code-conduct.html',
+                            },
+                            {
+                                title: 'Review Issue or Pull Requests',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/review.html',
+                            },
+                            {
+                                title: 'E2E Contribution Guide',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/e2e-guide.html',
+                            },
+                            {
+                                title: 'Submit Code',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/submit-code.html',
+                            },
+                            {
+                                title: 'License Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/DS-License.html',
+                            },
+                            {
+                                title: 'Document Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/document.html',
+                            },
+                            {
+                                title: 'Issue Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/issue.html',
+                            },
+                            {
+                                title: 'Pull Request Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/pull-request.html',
+                            },
+                            {
+                                title: 'Commit Message Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/commit-message.html',
+                            },
+                            {
+                                title: 'Micro BenchMark Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/microbench.html',
+                            },
+                            {
+                                title: 'Unit Test Writing Guide',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/unit-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Development Environment Setup',
+                        link: '/en-us/docs/dev/user_doc/contribute/development-environment-setup.html',
+                    },
+                    {
+                        title: 'Design Document',
+                        children: [
+                            // TODO not support multiply level for now
+                            // {
+                            // title: 'SPI',
+                            // children: [
+                            {
+                                title: 'Architecture Design',
+                                link: '/en-us/docs/dev/user_doc/contribute/architecture-design.html',
+                            },
+                            {
+                                title: 'Alert SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/alert.html',
+                            },
+                            {
+                                title: 'Registry SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/registry.html',
+                            },
+                            {
+                                title: 'Task SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/task.html',
+                            },
+                            {
+                                title: 'Datasource SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/datasource.html',
+                            },
+                            {
+                                title: 'Mechanism Design',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/mechanism/overview.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Guidelines',
+                        children: [
+                            {
+                                title: 'Frontend Development',
+                                link: '/en-us/docs/dev/user_doc/contribute/frontend-development.html',
+                            },
+                            {
+                                title: 'API Standard',
+                                link: '/en-us/docs/dev/user_doc/contribute/api-standard.html',
+                            },
+                            {
+                                title: 'E2E Automation Test',
+                                link: '/en-us/docs/dev/user_doc/contribute/e2e-test.html',
+                            },
+                            {
+                                title: 'API Automation Test',
+                                link: '/en-us/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Release Guide',
+                        children: [
+                            {
+                                title: 'Release Preparation',
+                                link: '/en-us/docs/dev/user_doc/contribute/release/release-prepare.html',
+                            },
+                            {
+                                title: 'Release Guide',
+                                link: '/en-us/docs/dev/user_doc/contribute/release/release.html',
+                            },
+                            {
+                                title: 'Release Post',
+                                link: '/en-us/docs/dev/user_doc/contribute/release/release-post.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Questions & Communications',
+                        link: '/en-us/docs/dev/user_doc/contribute/have-questions.html',
+                    },
+                ],
+            },
+            {
+                title: 'DSIP',
+                children: [
+                    {
+                        title: 'DSIP',
+                        link: '/en-us/docs/dev/user_doc/DSIP.html',
                     },
                 ],
             },
@@ -618,6 +788,10 @@ export default {
                                 title: 'SageMaker',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
+                            {
+                                title: 'ChunJun',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
                         ],
                     },
                     {
@@ -674,6 +848,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/alert_plugin_user_guide.html',
                             },
                             {
+                                title: 'Email',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/email.html',
+                            },
+                            {
                                 title: 'Telegram',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/telegram.html',
                             },
@@ -696,6 +874,10 @@ export default {
                             {
                                 title: 'Http告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/http.html',
+                            },
+                            {
+                                title: '飞书告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/feishu.html',
                             },
                         ],
                     },
@@ -828,6 +1010,164 @@ export default {
                     {
                         title: '健康检查',
                         link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
+                title: '贡献指南',
+                children: [
+                    {
+                        title: '如何参与',
+                        children: [
+                            {
+                                title: '报告安全问题',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/security.html',
+                            },
+                            {
+                                title: '如何成为 Committer',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/become-a-committer.html',
+                            },
+                            {
+                                title: '订阅/取消订阅邮件列表',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/subscribe.html',
+                            },
+                            {
+                                title: '参与贡献',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/contribute.html',
+                            },
+                            {
+                                title: '行为准则',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/code-conduct.html',
+                            },
+                            {
+                                title: 'Review Issue or Pull Requests',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/review.html',
+                            },
+                            {
+                                title: 'E2E Contribution Guide',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/e2e-guide.html',
+                            },
+                            {
+                                title: '提交代码',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/submit-code.html',
+                            },
+                            {
+                                title: 'License须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/DS-License.html',
+                            },
+                            {
+                                title: '文档须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/document.html',
+                            },
+                            {
+                                title: 'Issue须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/issue.html',
+                            },
+                            {
+                                title: 'Pull Request须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/pull-request.html',
+                            },
+                            {
+                                title: 'Commit Message须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/commit-message.html',
+                            },
+                            {
+                                title: '微基准测试须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/microbench.html',
+                            },
+                            {
+                                title: '单元测试编写指南',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/unit-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '环境搭建',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/development-environment-setup.html',
+                    },
+                    {
+                        title: '设计文档',
+                        children: [
+                            // TODO not support multiply level for now
+                            // {
+                            // title: 'SPI',
+                            // children: [
+                            {
+                                title: '架构设计',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/architecture-design.html',
+                            },
+                            {
+                                title: 'Alert SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/alert.html',
+                            },
+                            {
+                                title: 'Registry SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/registry.html',
+                            },
+                            {
+                                title: 'Task SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/task.html',
+                            },
+                            {
+                                title: 'Datasource SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/datasource.html',
+                            },
+                            {
+                                title: '组件设计',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/mechanism/overview.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '规范',
+                        children: [
+                            {
+                                title: '前端开发',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/frontend-development.html',
+                            },
+                            {
+                                title: 'API规范',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/api-standard.html',
+                            },
+                            {
+                                title: 'E2E 自动化测试',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/e2e-test.html',
+                            },
+                            {
+                                title: 'API 自动化测试',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '发版指南',
+                        children: [
+                            {
+                                title: '发版准备',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-prepare.html',
+                            },
+                            {
+                                title: '发版指南',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release.html',
+                            },
+                            {
+                                title: '发版后续',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-post.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '问题与交流',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/have-questions.html',
+                    },
+                ],
+            },
+            {
+                title: 'DSIP',
+                children: [
+                    {
+                        title: 'DSIP',
+                        link: '/zh-cn/docs/dev/user_doc/DSIP.html',
                     },
                 ],
             },

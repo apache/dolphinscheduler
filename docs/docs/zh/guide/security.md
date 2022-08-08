@@ -149,6 +149,8 @@ worker.groups=default,test
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
+> 注意: 当无法在任务定义或工作流运行对话框中使用你想要使用的环境时，请检查您已经选择worker，并且您要使用的环境已经关联到您选择的worker中
+
 ## 集群管理
 
 > 创建/更新 集群

@@ -20,11 +20,11 @@ FROM openjdk:8-jre-slim-buster
 RUN apt update ; \
     apt install -y curl wget sudo openssh-server netcat-traditional ;
 
-#COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz /root/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
-COPY ./apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz /root/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
-RUN tar -zxvf /root/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz -C ~
+#COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
+COPY ./apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
+RUN tar -zxvf /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz -C ~
 
-ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-dev-SNAPSHOT-bin
+ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-*-SNAPSHOT-bin
 
 #Setting install.sh
 COPY .github/workflows/cluster-test/postgresql/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh

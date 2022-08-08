@@ -527,6 +527,7 @@ export default {
     datax_job_runtime_memory_xms: 'Low Limit Value',
     datax_job_runtime_memory_xmx: 'High Limit Value',
     datax_job_runtime_memory_unit: 'G',
+    chunjun_json_template: 'JSON script',
     current_hour: 'CurrentHour',
     last_1_hour: 'Last1Hour',
     last_2_hour: 'Last2Hours',
