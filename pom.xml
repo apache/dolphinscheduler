@@ -615,13 +615,6 @@
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
-                <!--                <dependencies>-->
-                <!--                    <dependency>-->
-                <!--                        <groupId>org.apache.maven.surefire</groupId>-->
-                <!--                        <artifactId>surefire-junit4</artifactId>-->
-                <!--                        <version>${maven-surefire-plugin.version}</version>-->
-                <!--                    </dependency>-->
-                <!--                </dependencies>-->
             </plugin>
 
             <!-- jenkins plugin jacoco report-->
