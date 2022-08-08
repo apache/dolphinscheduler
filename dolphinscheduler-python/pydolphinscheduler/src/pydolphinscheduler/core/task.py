@@ -26,6 +26,7 @@ from pydolphinscheduler.constants import (
     TaskPriority,
     TaskTimeoutFlag,
 )
+from pydolphinscheduler.exceptions import PyResPluginException
 from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
 from pydolphinscheduler.core import configuration
 from pydolphinscheduler.core.base import Base
@@ -203,16 +204,14 @@ class Task(Base):
         custom_attr |= self._task_custom_attr
         return self.get_define_custom(custom_attr=custom_attr)
 
-    def get_res(self):
-        """ """
+    def get_plugin(self):
         if self.resource_plugin is None:
             if self.process_definition.resource_plugin is not None:
-                res = self.process_definition.resource_plugin.resource
+                return self.process_definition.resource_plugin.resource
             else:
-                raise ValueError("")
+                raise PyResPluginException("The execution command of this task is a file, but the resource plugin is empty")
         else:
-            res = self.resource_plugin.resource
-        return res
+            return self.resource_plugin.resource
 
 
     def get_content(self):
@@ -226,25 +225,14 @@ class Task(Base):
 
         if _ext_attr is not None:
             if _ext_attr.endswith(tuple(self.ext)):
-
-                # res = self.get_res()
-
-                if self.resource_plugin is None:
-                    if self.process_definition.resource_plugin is not None:
-                        res = self.process_definition.resource_plugin.resource
-                    else:
-                        return
-                else:
-                    res = self.resource_plugin.resource
-
+                res = self.get_plugin()
                 content = res.read_file(_ext_attr)
-                setattr(self, self.ext_attr[1:], content)
+                setattr(self, self.ext_attr.lstrip("_"), content)
             else:
                 index = _ext_attr.rfind('.')
                 if index != -1:
                     raise ValueError('This task does not support files with suffix {}, only supports {}'.format(_ext_attr[index:], ",".join(str(suf) for suf in self.ext)))
-                setattr(self, self.ext_attr[1:], _ext_attr)
-        # print(getattr(self, self.ext_attr[1:]))
+                setattr(self, self.ext_attr.lstrip("_"), _ext_attr)
 
     def __hash__(self):
         return hash(self.code)

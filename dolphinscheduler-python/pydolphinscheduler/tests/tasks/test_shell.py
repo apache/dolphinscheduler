@@ -17,7 +17,7 @@
 
 """Test Task shell."""
 
-import os
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -28,11 +28,17 @@ from pydolphinscheduler.utils import file
 
 from tests.testing.file import delete_file
 
-## 路径file
 file_path = 'local_res.sh'
 file_content = "echo \"test res_local\""
-pwd = os.path.abspath(__file__)
-res_plugin_prefix = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".") + "/"
+res_plugin_prefix = Path(__file__).parent
+
+
+@pytest.fixture
+def setup_crt_first():
+    """Set up and teardown about create file first and then delete it."""
+    file.write(content=file_content, to_path=file_path)
+    yield
+    delete_file(file_path)
 
 
 @pytest.mark.parametrize(
@@ -97,14 +103,6 @@ def test_shell_get_define():
     ):
         shell = Shell(name, command)
         assert shell.get_define() == expect
-
-
-@pytest.fixture
-def setup_crt_first():
-    """Set up and teardown about create file first and then delete it."""
-    file.write(content=file_content, to_path=file_path)
-    yield
-    delete_file(file_path)
 
 
 @pytest.mark.parametrize(

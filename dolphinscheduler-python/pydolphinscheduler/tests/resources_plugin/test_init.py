@@ -1,91 +1,89 @@
-import os
-import shutil
+from collections import Counter
+from pathlib import Path
 
 import pytest
+
 from pydolphinscheduler.constants import ResourcePluginType
+from pydolphinscheduler.exceptions import PyDSConfException
 from pydolphinscheduler.resources_plugin import ResourcePlugin
-from pydolphinscheduler.exceptions import PyResPluginException
 
-modules_dir = 'modules'
-modules_names = ["a", "b", "c"]
-# res_plugin_prefix = Path(__file__).absolute().parent
-pwd = os.path.abspath(__file__)
-cur_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".") + "/"
-modules_path = cur_path + modules_dir
-
-
-@pytest.fixture
-def setup_crt_first():
-    """Set up and teardown about create folder first and then delete it."""
-    os.mkdir(modules_dir)
-    yield
-    shutil.rmtree(modules_dir)
-
-
-@pytest.fixture
-def create_modules(setup_crt_first):
-    """Temporarily create an empty module based on module_names."""
-    for modules_name in modules_names:
-        open(modules_path + "/" + "%s.py" % modules_name, "w")
-    yield
+all_res = ["local", "github", "gitlab"]
+project_root = Path(__file__).parent.parent.parent
+resources_plugin_path = project_root.joinpath("src", "pydolphinscheduler", "resources_plugin")
 
 
 @pytest.mark.parametrize(
-    "attr, expect",
+    "attr, expected",
     [
         (
             {
                 "type": ResourcePluginType.LOCAL,
                 "prefix": "/tmp/",
             },
-            modules_names
+            all_res
         )
     ],
 )
-def test_resources_get_modules_name(attr, expect, create_modules):
-    """Test resource plugin to get all model names under a package"""
+def test_resources_get_all_modules(attr, expected):
+    """Test resource plugin to get all res plugin names"""
     res = ResourcePlugin(**attr)
-    assert expect == res.get_modules(modules_path)
+    assert dict(Counter(expected)) == dict(Counter([ex.stem for ex in res.get_all_modules()]))
 
 
 @pytest.mark.parametrize(
-    "attr, expect",
+    "attrs, expected",
     [
         (
             {
                 "type": ResourcePluginType.LOCAL,
-                "prefix": "/tmp/",
+                "module_attr": {
+                    "script_name": "local.py",
+                    "script_path": resources_plugin_path.joinpath("local.py")
+                }
             },
-            "Local",
-        )
+            "Local"
+        ),
+        (
+            {
+                "type": ResourcePluginType.GITHUB,
+                "module_attr": {
+                    "script_name": "github.py",
+                    "script_path": resources_plugin_path.joinpath("github.py")
+                }
+            },
+            "Github"
+        ),
+        (
+            {
+                "type": ResourcePluginType.GITLAB,
+                "module_attr": {
+                    "script_name": "gitlab.py",
+                    "script_path": resources_plugin_path.joinpath("gitlab.py")
+                }
+            },
+            "Gitlab"
+        ),
     ],
 )
-def test_resources_import_modules(attr, expect):
+def test_resources_import_modules(attrs, expected):
     """Test resource plug-in to import model"""
-    res_plugin = ResourcePlugin(**attr)
-    script_name = "local.py"
-    script_path = "/home/chenrj/gitrep/dolphinscheduler/dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/resources_plugin/local.py"
-    res = res_plugin.import_module(script_name, script_path)
-    assert expect == res.__class__.__name__
-
+    res_plugin = ResourcePlugin(attrs.get("type"), "plugin-prefix")
+    res = res_plugin.import_module(**attrs.get("module_attr"))
+    assert expected == res.__class__.__name__
 
 @pytest.mark.parametrize(
-    "attr, expect",
+    "attr, expected",
     [
-        (
-            {
-                "type": ResourcePluginType.LOCAL,
-                "prefix": "/tmp/",
-            },
-            "Local",
-        )
+        (ResourcePluginType.LOCAL, "Local"),
+        (ResourcePluginType.GITLAB, "Gitlab"),
+        (ResourcePluginType.GITHUB, "Github"),
     ],
 )
-def test_resources_resources(attr, expect):
-    """Test the factory mode of the resource plugin, and return the corresponding plugin according to the plugin type"""
-    res_plugin = ResourcePlugin(**attr)
+def test_resources_resources(attr, expected):
+    """Test resource plugin factory"""
+    res_plugin = ResourcePlugin(attr, "/tmp/")
     res = res_plugin.resource
-    assert expect == res.__class__.__name__
+    assert expected == res.__class__.__name__
 
 
 @pytest.mark.parametrize(
@@ -100,13 +98,7 @@ def test_resources_resources(attr, expect):
 def test_resources_unsupported_res(attr):
     """Test unsupported plug-ins"""
     with pytest.raises(
-        ValueError, match="{} type is not supported".format(attr.get("type"))
+        PyDSConfException, match="{} type is not supported".format(attr.get("type"))
     ):
         res_plugin = ResourcePlugin(**attr)
-        res_plugin.resource
-
-
-
-
-
-
+        res_plugin.resource()
