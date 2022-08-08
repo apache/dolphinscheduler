@@ -179,7 +179,7 @@ https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-e2e/dolphin
 ##  III. Supplements
 
 When running E2E tests locally, First, you need to start the local service, you can refer to this page: 
-[development-environment-setup](./development-environment-setup.html)
+[development-environment-setup](./development-environment-setup.md)
 
 When running E2E tests locally, the `-Dlocal=true` parameter can be configured to connect locally and facilitate changes to the UI.
 

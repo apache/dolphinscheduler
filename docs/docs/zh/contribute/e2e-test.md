@@ -177,7 +177,7 @@ https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-e2e/dolphin
 
 ## 三、补充
 
-在本地运行的时候，首先需要启动相应的本地服务，可以参考该页面: [环境搭建](./development-environment-setup.html)
+在本地运行的时候，首先需要启动相应的本地服务，可以参考该页面: [环境搭建](./development-environment-setup.md)
 
 在本地运行 E2E 测试的时候，可以配置 `-Dlocal=true` 参数，用于连接本地，方便对于 UI 界面的更改。
 
