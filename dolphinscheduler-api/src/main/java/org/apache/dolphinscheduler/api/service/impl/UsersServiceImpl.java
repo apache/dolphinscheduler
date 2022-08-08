@@ -392,7 +392,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException("Function Disabled");
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            throw new ServiceException("User No Operation Perm");
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM.getMsg());
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
