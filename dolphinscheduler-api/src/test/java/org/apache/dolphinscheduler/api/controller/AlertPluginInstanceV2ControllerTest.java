@@ -21,6 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,12 +29,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.alert.AlertPluginInstanceListPagingResponse;
+import org.apache.dolphinscheduler.api.dto.alert.AlertPluginInstanceListResponse;
+import org.apache.dolphinscheduler.api.dto.alert.AlertPluginInstanceResponse;
+import org.apache.dolphinscheduler.api.dto.alert.AlertPluginQueryRequest;
+import org.apache.dolphinscheduler.api.dto.alert.CreatePluginRequest;
+import org.apache.dolphinscheduler.api.dto.alert.UpdatePluginRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -48,7 +60,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * alert plugin instance controller test
  */
-public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
+public class AlertPluginInstanceV2ControllerTest extends AbstractControllerTest {
 
     private static final int pluginDefineId = 1;
     private static final String instanceName = "instanceName";
@@ -71,21 +83,23 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateAlertPluginInstance() throws Exception {
         // Given
-        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
-        paramsMap.add("instanceName", instanceName);
-        paramsMap.add("pluginInstanceParams", pluginInstanceParams);
+        CreatePluginRequest request = CreatePluginRequest.builder()
+                .id(pluginDefineId)
+                .instanceName(instanceName)
+                .pluginInstanceParams(pluginInstanceParams)
+                .build();
 
         when(alertPluginInstanceService.create(any(User.class), eq(pluginDefineId), eq(instanceName),
                 eq(pluginInstanceParams)))
                         .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances")
+        final MvcResult mvcResult = mockMvc.perform(post("/v2/alert-plugin-instances")
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId)
-                .params(paramsMap))
+                .content(JSONUtils.toJsonString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
@@ -97,21 +111,22 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testUpdateAlertPluginInstance() throws Exception {
         // Given
-        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
-        paramsMap.add("instanceName", instanceName);
-        paramsMap.add("pluginInstanceParams", pluginInstanceParams);
+        UpdatePluginRequest request = UpdatePluginRequest.builder()
+                .instanceName(instanceName)
+                .pluginInstanceParams(pluginInstanceParams)
+                .build();
 
         when(alertPluginInstanceService.update(any(User.class), eq(pluginDefineId), eq(instanceName),
                 eq(pluginInstanceParams)))
                         .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(put("/alert-plugin-instances/{id}", pluginDefineId)
+        final MvcResult mvcResult = mockMvc.perform(put("/v2/alert-plugin-instances/{id}", pluginDefineId)
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId)
-                .params(paramsMap))
+                .content(JSONUtils.toJsonString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
@@ -125,18 +140,17 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         // Given
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
-        paramsMap.add("instanceName", instanceName);
-        paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.delete(any(User.class), eq(pluginDefineId)))
                 .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(delete("/alert-plugin-instances/{id}", pluginDefineId)
+        final MvcResult mvcResult = mockMvc.perform(delete("/v2/alert-plugin-instances/{id}", pluginDefineId)
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
@@ -151,40 +165,49 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
 
+        AlertPluginInstance instance = new AlertPluginInstance();
+        result.setData(instance);
+
         when(alertPluginInstanceService.get(any(User.class), eq(pluginDefineId)))
                 .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/{id}", pluginDefineId)
+        final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances/{id}", pluginDefineId)
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+        final AlertPluginInstanceResponse actualResponseContent =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), AlertPluginInstanceResponse.class);
+        assertThat(actualResponseContent.getData()).isNotNull();
     }
 
     @Test
     public void testGetAlertPluginInstanceList() throws Exception {
         // Given
+        List<AlertPluginInstance> list = new ArrayList<>();
+        result.setData(list);
+
         when(alertPluginInstanceService.queryAll())
                 .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/list")
+        final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances/list")
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+        final AlertPluginInstanceListResponse actualResponseContent =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                        AlertPluginInstanceListResponse.class);
+        assertThat(actualResponseContent.getData()).isNotNull();
     }
 
     @Test
@@ -201,7 +224,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 "{\"code\":0,\"msg\":\"success\",\"data\":null,\"failed\":false,\"success\":true}", Result.class);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
+        final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances/verify-name")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -229,7 +252,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 Result.class);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
+        final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances/verify-name")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -245,57 +268,56 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testListPaging() throws Exception {
         // Given
-        Result result = JSONUtils.parseObject(
-                "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}",
-                Result.class);
-
-        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
-        paramsMap.add("searchVal", "searchVal");
-        paramsMap.add("pageNo", String.valueOf(1));
-        paramsMap.add("pageSize", String.valueOf(10));
+        AlertPluginQueryRequest request = new AlertPluginQueryRequest();
+        request.setSearchVal("searchVal");
+        request.setPageNo(1);
+        request.setPageSize(10);
+        PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo();
+        result.setData(pageInfo);
 
         when(alertPluginInstanceService.listPaging(eq(user), eq("searchVal"), eq(1), eq(10)))
                 .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances")
+        final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances")
                 .header(SESSION_ID, sessionId)
-                .params(paramsMap))
+                .contentType(APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+        final AlertPluginInstanceListPagingResponse actualResponseContent =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                        AlertPluginInstanceListPagingResponse.class);
+        assertThat(actualResponseContent.getData()).isNotNull();
     }
 
     @Test
     public void testListPagingResultFalse() throws Exception {
         // Given
-        final Result expectResponseContent = JSONUtils.parseObject(
-                "{\"code\":10001,\"msg\":\"request parameter pageNo is not valid\",\"data\":null,\"success\":false,\"failed\":true}",
-                Result.class);
+        AlertPluginQueryRequest request = new AlertPluginQueryRequest();
+        request.setSearchVal("searchVal");
+        request.setPageNo(0);
+        request.setPageSize(0);
 
-        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
-        paramsMap.add("searchVal", "searchVal");
-        paramsMap.add("pageNo", String.valueOf(0));
-        paramsMap.add("pageSize", String.valueOf(0));
+        when(alertPluginInstanceService.listPaging(eq(user), eq("searchVal"), eq(0), eq(0)))
+                .thenReturn(result);
 
         // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances")
+        final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances")
                 .header(SESSION_ID, sessionId)
-                .params(paramsMap))
+                .contentType(APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+        final AlertPluginInstanceListPagingResponse actualResponseContent =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                        AlertPluginInstanceListPagingResponse.class);
+        assertThat(actualResponseContent.getData()).isNull();
     }
 }
