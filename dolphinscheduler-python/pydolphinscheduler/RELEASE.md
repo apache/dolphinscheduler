@@ -25,7 +25,7 @@ and it should be released together with [apache-dolphinscheduler](https://github
 ## To ASF Distribution Directory
 
 You could release to [ASF Distribution Directory](https://downloads.apache.org/dolphinscheduler/) according to
-[release guide](https://dolphinscheduler.apache.org/en-us/community/release-prepare.html) in DolphinScheduler
+[release guide](../../docs/docs/en/contribute/release/release-prepare.md) in DolphinScheduler
 website.
 
 ## To PyPi
