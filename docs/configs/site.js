@@ -129,6 +129,12 @@ export default {
       content: 'Do you need feedback? Please contact us through the following ways.',
       list: [
         {
+          name: 'Slack',
+          img1: '/img/slack.png',
+          img2: '/img/slack-selected.png',
+          link: 'https://s.apache.org/dolphinscheduler-slack',
+        },
+        {
           name: 'Email List',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
@@ -140,21 +146,9 @@ export default {
           img2: '/img/twitterblue.png',
           link: 'https://twitter.com/dolphinschedule',
         },
-        {
-          name: 'Stack Overflow',
-          img1: '/img/stackoverflow.png',
-          img2: '/img/stackoverflow-selected.png',
-          link: 'https://stackoverflow.com/questions/tagged/apache-dolphinscheduler',
-        },
-        {
-          name: 'Slack',
-          img1: '/img/slack.png',
-          img2: '/img/slack-selected.png',
-          link: 'https://s.apache.org/dolphinscheduler-slack',
-        },
       ],
     },
-    copyright: 'Copyright © 2019-2021 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
+    copyright: 'Copyright © 2019-2022 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
   },
   'zh-cn': {
     banner: {
@@ -260,6 +254,12 @@ export default {
       content: '有问题需要反馈？请通过以下方式联系我们。',
       list: [
         {
+          name: 'Slack',
+          img1: '/img/slack.png',
+          img2: '/img/slack-selected.png',
+          link: 'https://s.apache.org/dolphinscheduler-slack',
+        },
+        {
           name: '邮件列表',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
@@ -271,20 +271,8 @@ export default {
           img2: '/img/twitterblue.png',
           link: 'https://twitter.com/dolphinschedule',
         },
-        {
-          name: 'Stack Overflow',
-          img1: '/img/stackoverflow.png',
-          img2: '/img/stackoverflow-selected.png',
-          link: 'https://stackoverflow.com/questions/tagged/apache-dolphinscheduler',
-        },
-        {
-          name: 'Slack',
-          img1: '/img/slack.png',
-          img2: '/img/slack-selected.png',
-          link: 'https://s.apache.org/dolphinscheduler-slack',
-        },
       ],
     },
-    copyright: 'Copyright © 2019-2021 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
+    copyright: 'Copyright © 2019-2022 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
   },
 };
