@@ -125,7 +125,6 @@ public interface ExecutorService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param warningType warning type
      * @param warningGroupId notify group id
      * @param workerGroup worker group name
      * @param environmentCode environment code
@@ -134,7 +133,7 @@ public interface ExecutorService {
      */
     Map<String, Object> execTaskInstance(User loginUser, long projectCode,
                                             long taskDefinitionCode, int taskDefinitionVersion,
-                                            WarningType warningType, int warningGroupId,
+                                            int warningGroupId,
                                             String workerGroup, Long environmentCode,
                                             Map<String, String> startParams,
                                             int dryRun);

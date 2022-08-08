@@ -51,12 +51,10 @@ import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleException;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.runner.task.StreamTaskProcessor;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
@@ -77,7 +75,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.NonNull;
 
@@ -310,8 +307,10 @@ public class StreamTaskExecuteRunnable implements Runnable {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
 
-
         taskInstance.setTaskExecuteType(taskDefinition.getTaskExecuteType());
+        taskInstance.setExecutorId(taskExecuteStartCommand.getExecutorId());
+        taskInstance.setExecutorName(taskExecuteStartCommand.getExecutorName());
+
         return taskInstance;
     }
 
@@ -350,6 +349,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
         taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
+        // process instance id default 0
         taskExecutionContext.setProcessInstanceId(0);
 
         return taskExecutionContext;

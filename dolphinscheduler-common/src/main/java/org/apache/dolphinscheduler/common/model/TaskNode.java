@@ -279,8 +279,11 @@ public class TaskNode {
     }
 
     public boolean isForbidden() {
-        return (!StringUtils.isEmpty(this.runFlag)
-                && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
+        // skip stream task when run DAG
+        if (taskExecuteType == TaskExecuteType.STREAM) {
+            return true;
+        }
+        return StringUtils.isNotEmpty(this.runFlag) && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
     }
 
     @Override

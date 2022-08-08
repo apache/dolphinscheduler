@@ -416,7 +416,6 @@ public class ExecutorController extends BaseController {
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
                                        @RequestParam(value = "version", required = true) int version,
-                                       @RequestParam(value = "warningType", required = false) WarningType warningType,
                                        @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
@@ -429,7 +428,7 @@ public class ExecutorController extends BaseController {
         }
 
         Map<String, Object> result = execService.execTaskInstance(loginUser, projectCode, code, version,
-            warningType, warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
+            warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
 }

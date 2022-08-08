@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
@@ -37,13 +35,15 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class TaskExecuteStartCommand extends BaseCommand {
 
+    private int executorId;
+
+    private String executorName;
+
     private long projectCode;
 
     private long taskDefinitionCode;
 
     private int taskDefinitionVersion;
-
-    private WarningType warningType;
 
     private int warningGroupId;
 

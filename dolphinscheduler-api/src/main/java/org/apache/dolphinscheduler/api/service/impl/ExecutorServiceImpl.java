@@ -1012,7 +1012,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> execTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion, WarningType warningType,
+    public Map<String, Object> execTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion,
                                                 int warningGroupId, String workerGroup, Long environmentCode, Map<String, String> startParams, int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -1032,12 +1032,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Host host = new Host(masterServerList.get(0).getHost(), masterServerList.get(0).getPort());
 
         TaskExecuteStartCommand taskExecuteStartCommand = new TaskExecuteStartCommand();
+        taskExecuteStartCommand.setExecutorId(loginUser.getId());
+        taskExecuteStartCommand.setExecutorName(loginUser.getUserName());
         taskExecuteStartCommand.setProjectCode(projectCode);
         taskExecuteStartCommand.setTaskDefinitionCode(taskDefinitionCode);
         taskExecuteStartCommand.setTaskDefinitionVersion(taskDefinitionVersion);
         taskExecuteStartCommand.setWorkerGroup(workerGroup);
         taskExecuteStartCommand.setWarningGroupId(warningGroupId);
-        taskExecuteStartCommand.setWarningType(warningType);
         taskExecuteStartCommand.setEnvironmentCode(environmentCode);
         taskExecuteStartCommand.setStartParams(startParams);
         taskExecuteStartCommand.setDryRun(dryRun);

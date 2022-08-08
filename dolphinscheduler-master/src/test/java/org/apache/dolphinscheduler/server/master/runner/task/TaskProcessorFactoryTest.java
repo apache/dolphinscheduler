@@ -34,7 +34,7 @@ public class TaskProcessorFactoryTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("shell");
 
-        ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance);
+        ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
 
         Assert.assertNotNull(iTaskProcessor);
     }
