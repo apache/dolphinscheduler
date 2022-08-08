@@ -22,7 +22,7 @@ from typing import Dict, Optional, Tuple
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException, PyDSParamException
-from pydolphinscheduler.java_gateway import get_dependent_info
+from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models.base import Base
 
 DEPENDENT_ALL_TASK_IN_WORKFLOW = "0"
@@ -166,7 +166,7 @@ class DependentItem(Base):
             return self._code
         else:
             try:
-                self._code = get_dependent_info(*self.code_parameter)
+                self._code = JavaGate().get_dependent_info(*self.code_parameter)
                 return self._code
             except Exception:
                 raise PyDSJavaGatewayException("Function get_code_from_gateway error.")
