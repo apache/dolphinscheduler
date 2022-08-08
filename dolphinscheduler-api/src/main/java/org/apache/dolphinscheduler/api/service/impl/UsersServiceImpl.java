@@ -403,7 +403,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                throw new ServiceException(String.format("timeZone %s doesn't valid", timeZone));
+                throw new ServiceException(MessageFormat.format(Status.TIME_ZONE_ILLEGAL.getMsg(), timeZone));
             }
             user.setTimeZone(timeZone);
         }
