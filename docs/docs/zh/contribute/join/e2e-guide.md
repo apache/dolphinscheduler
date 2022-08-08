@@ -29,7 +29,7 @@ E2E 测试的主要目的是通过模拟真实的用户场景，验证被测系�
 
 ### 如何编写测试代码？
 
-在认领对应的任务之后，下一步就进入到编写代码的关键。很多同学可能对于 E2E 测试代码并不是很熟悉，因此可以参考该页面：[e2e-test](https://dolphinscheduler.apache.org/zh-cn/development/e2e-test.html)。
+在认领对应的任务之后，下一步就进入到编写代码的关键。很多同学可能对于 E2E 测试代码并不是很熟悉，因此可以参考该页面：[e2e-test](../e2e-test.md)。
 
 ### 如何提交 Pull Request ？
 
