@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +39,22 @@ public class HeartBeatTask implements Runnable {
     private final String serverType;
     private final HeartBeat heartBeat;
 
+    private final int heartBeatErrorThreshold;
+
+    private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
+
     public HeartBeatTask(long startupTime,
                          double maxCpuloadAvg,
                          double reservedMemory,
                          Set<String> heartBeatPaths,
                          String serverType,
-                         RegistryClient registryClient) {
+                         RegistryClient registryClient,
+                         int heartBeatErrorThreshold) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
         this.serverType = serverType;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
+        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
     public HeartBeatTask(long startupTime,
@@ -58,13 +65,14 @@ public class HeartBeatTask implements Runnable {
                          String serverType,
                          RegistryClient registryClient,
                          int workerThreadCount,
-                         int workerWaitingTaskCount
-    ) {
+                         int workerWaitingTaskCount,
+                         int heartBeatErrorThreshold) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
         this.workerWaitingTaskCount = workerWaitingTaskCount;
         this.serverType = serverType;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
+        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
     public String getHeartBeatInfo() {
@@ -88,8 +96,13 @@ public class HeartBeatTask implements Runnable {
             for (String heartBeatPath : heartBeatPaths) {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
+            heartBeatErrorTimes.set(0);
         } catch (Throwable ex) {
-            logger.error("error write heartbeat info", ex);
+            logger.error("HeartBeat task execute failed", ex);
+            if (heartBeatErrorTimes.incrementAndGet() >= heartBeatErrorThreshold) {
+                registryClient.getStoppable()
+                              .stop("HeartBeat task connect to zk failed too much times: " + heartBeatErrorTimes);
+            }
         }
     }
 }

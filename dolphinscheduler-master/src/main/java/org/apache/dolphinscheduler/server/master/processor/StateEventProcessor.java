@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
 
 import org.slf4j.Logger;
@@ -61,11 +62,20 @@ public class StateEventProcessor implements NettyRequestProcessor {
         }
         stateEvent.setProcessInstanceId(stateEventChangeCommand.getDestProcessInstanceId());
         stateEvent.setTaskInstanceId(stateEventChangeCommand.getDestTaskInstanceId());
-        StateEventType type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
+        StateEventType
+            type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
         stateEvent.setType(type);
 
-        logger.info("received command : {}", stateEvent);
-        stateEventResponseService.addResponse(stateEvent);
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                stateEvent.getTaskInstanceId());
+
+            logger.info("Received state change command, event: {}", stateEvent);
+            stateEventResponseService.addStateChangeEvent(stateEvent);
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
+
     }
 
 }

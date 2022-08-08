@@ -77,8 +77,6 @@ $ DOLPHINSCHEDULER_VERSION=<version>
 # Initialize the database, make sure database <DATABASE> already exists
 $ docker run -d --name dolphinscheduler-tools \
     -e DATABASE="postgresql" \
-    # Use "com.mysql.cj.jdbc.driver" if you use MySQL
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
@@ -87,7 +85,6 @@ $ docker run -d --name dolphinscheduler-tools \
 # Starting DolphinScheduler service
 $ docker run -d --name dolphinscheduler-master \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
@@ -96,7 +93,6 @@ $ docker run -d --name dolphinscheduler-master \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-worker \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
@@ -105,7 +101,6 @@ $ docker run -d --name dolphinscheduler-worker \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-api \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
@@ -114,7 +109,6 @@ $ docker run -d --name dolphinscheduler-api \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-alert-server \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
@@ -131,7 +125,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
 You could access DolphinScheduler web UI by click [http://localhost:12345/dolphinscheduler/ui](http://localhost:12345/dolphinscheduler/ui)
 and use `admin` and `dolphinscheduler123` as default username and password in the login page.
 
-![login](/img/new_ui/dev/quick-start/login.png)
+![login](../../../../img/new_ui/dev/quick-start/login.png)
 
 > Note: If you start the services by the way [using exists PostgreSQL ZooKeeper](#using-exists-postgresql-zookeeper), and
 > strating with multiple machine, you should change URL domain from `localhost` to IP or hostname the api server running.

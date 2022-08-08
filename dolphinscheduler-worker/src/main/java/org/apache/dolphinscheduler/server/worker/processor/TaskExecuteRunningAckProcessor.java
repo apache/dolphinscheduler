@@ -18,15 +18,17 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -41,22 +43,30 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningAckProcessor.class);
 
+    @Autowired
+    private MessageRetryRunner messageRetryRunner;
+
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+                                    String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteRunningAckCommand runningAckCommand = JSONUtils.parseObject(
-                command.getBody(), TaskExecuteRunningAckCommand.class);
-
+        TaskExecuteRunningAckMessage runningAckCommand = JSONUtils.parseObject(command.getBody(),
+                                                                               TaskExecuteRunningAckMessage.class);
         if (runningAckCommand == null) {
             logger.error("task execute running ack command is null");
             return;
         }
-        logger.info("task execute running ack command : {}", runningAckCommand);
+        try {
+            LoggerUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
+            logger.info("task execute running ack command : {}", runningAckCommand);
 
-        if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-            ResponseCache.get().removeRunningCache(runningAckCommand.getTaskInstanceId());
+            if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS) {
+                messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),
+                                                      CommandType.TASK_EXECUTE_RUNNING);
+            }
+        } finally {
+            LoggerUtils.removeTaskInstanceIdMDC();
         }
     }
 

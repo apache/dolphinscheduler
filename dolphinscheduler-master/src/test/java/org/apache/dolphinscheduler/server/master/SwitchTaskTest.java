@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ public class SwitchTaskTest {
         MasterConfig config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
         config.setTaskCommitRetryTimes(3);
-        config.setTaskCommitInterval(1000);
+        config.setTaskCommitInterval(Duration.ofSeconds(1));
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);

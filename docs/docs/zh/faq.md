@@ -24,7 +24,8 @@ A：DolphinScheduler 由 5 个服务组成，MasterServer、WorkerServer、ApiSe
 
 ## Q：系统支持哪些邮箱？
 
-A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在 alert.properties 中选择性配置
+A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在dolphinscheduler的ui中进行配置：
+[如何配置邮箱告警](../zh/guide/alert/email.md)。
 
 ---
 
@@ -117,7 +118,7 @@ A：  	   1，如果替换变量中包含特殊字符，**请用 \ 转移符进�
 
 ​	    4，monitorServerState="false"，服务监控脚本是否启动，默认是不启动服务监控脚本的。**如果启动服务监控脚本，则每 5 分钟定时来监控 master 和 worker 的服务是否 down 机，如果 down 机则会自动重启**
 
-​	    5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到conf根目录下
+​	    5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 resource.hdfs.fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到conf根目录下
 
 ​	注意：**1.0.x 版本是不会自动创建 hdfs 根目录的，需要自行创建，并且需要部署用户有hdfs的操作权限**
 
@@ -538,7 +539,7 @@ master 服务、worker 服务在 zookeeper 注册时，会以 ip:port 的形式�
 如果 ip 地址获取错误，请检查网络信息，如 Linux 系统通过 `ifconfig` 命令查看网络信息，以下图为例：
 
 <p align="center">
-  <img src="/img/network/network_config.png" width="60%" />
+  <img src="../../img/network/network_config.png" width="60%" />
 </p>
 
 可以使用 dolphinscheduler 提供的三种策略，获取可用 ip：

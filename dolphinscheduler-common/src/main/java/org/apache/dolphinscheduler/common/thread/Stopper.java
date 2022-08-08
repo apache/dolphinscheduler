@@ -19,22 +19,40 @@ package org.apache.dolphinscheduler.common.thread;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.experimental.UtilityClass;
+
 /**
- *  if the process closes, a signal is placed as true, and all threads get this flag to stop working
+ * If the process closes, a signal is placed as true, and all threads get this flag to stop working.
  */
+@UtilityClass
 public class Stopper {
 
-    private static AtomicBoolean signal = new AtomicBoolean(false);
+    private static final AtomicBoolean stoppedSignal = new AtomicBoolean(false);
 
-    public static final boolean isStopped() {
-        return signal.get();
+    /**
+     * Return the flag if the Server is stopped.
+     *
+     * @return True, if the server is stopped; False, the server is still running.
+     */
+    public static boolean isStopped() {
+        return stoppedSignal.get();
     }
 
-    public static final boolean isRunning() {
-        return !signal.get();
+    /**
+     * Return the flag if the Server is stopped.
+     *
+     * @return True, if the server is running, False, the server is stopped.
+     */
+    public static boolean isRunning() {
+        return !stoppedSignal.get();
     }
 
-    public static final void stop() {
-        signal.set(true);
+    /**
+     * Stop the server
+     *
+     * @return True, if the server stopped success. False, if the server is already stopped.
+     */
+    public static boolean stop() {
+        return stoppedSignal.compareAndSet(false, true);
     }
 }

@@ -21,8 +21,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -127,9 +131,13 @@ public abstract class AbstractCommandExecutor {
 
         // if sudo.enable=true,setting up user to run commands
         if (OSUtils.isSudoEnable()) {
-            command.add("sudo");
-            command.add("-u");
-            command.add(taskRequest.getTenantCode());
+            if (SystemUtils.IS_OS_LINUX && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
+                generateCgroupCommand(command);
+            } else {
+                command.add("sudo");
+                command.add("-u");
+                command.add(taskRequest.getTenantCode());
+            }
         }
         command.add(commandInterpreter());
         command.addAll(Collections.emptyList());
@@ -140,6 +148,39 @@ public abstract class AbstractCommandExecutor {
         process = processBuilder.start();
 
         printCommand(command);
+    }
+
+    /**
+     * generate systemd command.
+     * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryMax=200M --uid=root
+     * @param command command
+     */
+    private void generateCgroupCommand(List<String> command) {
+        Integer cpuQuota = taskRequest.getCpuQuota();
+        Integer memoryMax = taskRequest.getMemoryMax();
+
+        command.add("sudo");
+        command.add("systemd-run");
+        command.add("-q");
+        command.add("--scope");
+
+        if (cpuQuota == -1) {
+            command.add("-p");
+            command.add("CPUQuota=");
+        } else {
+            command.add("-p");
+            command.add(String.format("CPUQuota=%s%%", taskRequest.getCpuQuota()));
+        }
+
+        if (memoryMax == -1) {
+            command.add("-p");
+            command.add(String.format("MemoryMax=%s", "infinity"));
+        } else {
+            command.add("-p");
+            command.add(String.format("MemoryMax=%sM", taskRequest.getMemoryMax()));
+        }
+
+        command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
     }
 
     public TaskResponse run(String execCommand) throws IOException, InterruptedException {
@@ -363,48 +404,31 @@ public abstract class AbstractCommandExecutor {
      * @return app id list
      */
     private List<String> getAppIds(String logPath) {
-        List<String> logs = convertFile2List(logPath);
-
         List<String> appIds = new ArrayList<>();
+
+        File file = new File(logPath);
+        if (!file.exists()) {
+            return appIds;
+        }
+
         /*
          * analysis log?get submited yarn application id
          */
-        for (String log : logs) {
-            String appId = findAppId(log);
-            if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
-                logger.info("find app id: {}", appId);
-                appIds.add(appId);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(logPath), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String appId = findAppId(line);
+                if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
+                    logger.info("find app id: {}", appId);
+                    appIds.add(appId);
+                }
             }
+        } catch (Exception e) {
+            logger.error(String.format("read file: %s failed : ", logPath), e);
         }
         return appIds;
     }
 
-    /**
-     * convert file to list
-     *
-     * @param filename file name
-     * @return line list
-     */
-    private List<String> convertFile2List(String filename) {
-        List<String> lineList = new ArrayList<>(100);
-        File file = new File(filename);
-
-        if (!file.exists()) {
-            return lineList;
-        }
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                lineList.add(line);
-            }
-        } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ", filename), e);
-        }
-
-        return lineList;
-    }
-    
     /**
      * find var pool
      * @param line

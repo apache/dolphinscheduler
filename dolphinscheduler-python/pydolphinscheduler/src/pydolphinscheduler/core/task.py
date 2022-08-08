@@ -20,21 +20,24 @@
 from logging import getLogger
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
+from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import (
     Delimiter,
+    ResourceKey,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
 )
 from pydolphinscheduler.exceptions import PyResPluginException
 from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
     ProcessDefinitionContext,
 )
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.java_gateway import JavaGate
+from pydolphinscheduler.models import Base
 
 logger = getLogger(__name__)
 
@@ -63,10 +66,10 @@ class TaskRelation(Base):
     }
 
     def __init__(
-        self,
-        pre_task_code: int,
-        post_task_code: int,
-        name: Optional[str] = None,
+            self,
+            pre_task_code: int,
+            post_task_code: int,
+            name: Optional[str] = None,
     ):
         super().__init__(name)
         self.pre_task_code = pre_task_code
@@ -105,26 +108,26 @@ class Task(Base):
     DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
 
     def __init__(
-        self,
-        name: str,
-        task_type: str,
-        description: Optional[str] = None,
-        flag: Optional[str] = TaskFlag.YES,
-        task_priority: Optional[str] = TaskPriority.MEDIUM,
-        worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
-        delay_time: Optional[int] = 0,
-        fail_retry_times: Optional[int] = 0,
-        fail_retry_interval: Optional[int] = 1,
-        timeout_flag: Optional[int] = TaskTimeoutFlag.CLOSE,
-        timeout_notify_strategy: Optional = None,
-        timeout: Optional[int] = 0,
-        process_definition: Optional[ProcessDefinition] = None,
-        local_params: Optional[List] = None,
-        resource_list: Optional[List] = None,
-        dependence: Optional[Dict] = None,
-        wait_start_timeout: Optional[Dict] = None,
-        condition_result: Optional[Dict] = None,
-        resource_plugin: Optional[ResourcePlugin] = None,
+            self,
+            name: str,
+            task_type: str,
+            description: Optional[str] = None,
+            flag: Optional[str] = TaskFlag.YES,
+            task_priority: Optional[str] = TaskPriority.MEDIUM,
+            worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
+            delay_time: Optional[int] = 0,
+            fail_retry_times: Optional[int] = 0,
+            fail_retry_interval: Optional[int] = 1,
+            timeout_flag: Optional[int] = TaskTimeoutFlag.CLOSE,
+            timeout_notify_strategy: Optional = None,
+            timeout: Optional[int] = 0,
+            process_definition: Optional[ProcessDefinition] = None,
+            local_params: Optional[List] = None,
+            resource_list: Optional[List] = None,
+            dependence: Optional[Dict] = None,
+            wait_start_timeout: Optional[Dict] = None,
+            condition_result: Optional[Dict] = None,
+            resource_plugin: Optional[ResourcePlugin] = None,
     ):
 
         super().__init__(name, description)
@@ -140,7 +143,7 @@ class Task(Base):
         self.timeout = timeout
         self._process_definition = None
         self.process_definition: ProcessDefinition = (
-            process_definition or ProcessDefinitionContext.get()
+                process_definition or ProcessDefinitionContext.get()
         )
         self._upstream_task_codes: Set[int] = set()
         self._downstream_task_codes: Set[int] = set()
@@ -149,8 +152,8 @@ class Task(Base):
         self.code, self.version = self.gen_code_and_version()
         # Add task to process definition, maybe we could put into property process_definition latter
         if (
-            self.process_definition is not None
-            and self.code not in self.process_definition.tasks
+                self.process_definition is not None
+                and self.code not in self.process_definition.tasks
         ):
             self.process_definition.add_task(self)
         else:
@@ -161,7 +164,7 @@ class Task(Base):
 
         # Attribute for task param
         self.local_params = local_params or []
-        self.resource_list = resource_list or []
+        self._resource_list = resource_list or []
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
         self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
@@ -177,6 +180,32 @@ class Task(Base):
     def process_definition(self, process_definition: Optional[ProcessDefinition]):
         """Set attribute process_definition."""
         self._process_definition = process_definition
+
+    @property
+    def resource_list(self) -> List:
+        """Get task define attribute `resource_list`."""
+        resources = set()
+        for res in self._resource_list:
+            if type(res) == str:
+                resources.add(
+                    Resource(name=res, user_name=self.user_name).get_id_from_database()
+                )
+            elif type(res) == dict and res.get(ResourceKey.ID) is not None:
+                logger.warning(
+                    """`resource_list` should be defined using List[str] with resource paths,
+                       the use of ids to define resources will be remove in version 3.2.0.
+                    """
+                )
+                resources.add(res.get(ResourceKey.ID))
+        return [{ResourceKey.ID: r} for r in resources]
+
+    @property
+    def user_name(self) -> Optional[str]:
+        """Return user name of process definition."""
+        if self.process_definition:
+            return self.process_definition.user.name
+        else:
+            raise PyDSParamException("`user_name` cannot be empty.")
 
     @property
     def condition_result(self) -> Dict:
@@ -209,7 +238,8 @@ class Task(Base):
             if self.process_definition.resource_plugin is not None:
                 return self.process_definition.resource_plugin.resource
             else:
-                raise PyResPluginException("The execution command of this task is a file, but the resource plugin is empty")
+                raise PyResPluginException(
+                    "The execution command of this task is a file, but the resource plugin is empty")
         else:
             return self.resource_plugin.resource
 
@@ -239,7 +269,11 @@ class Task(Base):
             else:
                 index = _ext_attr.rfind('.')
                 if index != -1:
-                    raise ValueError('This task does not support files with suffix {}, only supports {}'.format(_ext_attr[index:], ",".join(str(suf) for suf in self.ext)))
+                    raise ValueError(
+                        'This task does not support files with suffix {}, only supports {}'.format(
+                            _ext_attr[index:], ",".join(str(suf) for suf in self.ext)
+                        )
+                    )
                 setattr(self, self.ext_attr.lstrip("_"), _ext_attr)
 
     def __hash__(self):
@@ -317,9 +351,8 @@ class Task(Base):
         equal to 0 by java gateway, otherwise if will return the exists code and version.
         """
         # TODO get code from specific project process definition and task name
-        gateway = launch_gateway()
-        result = gateway.entry_point.getCodeAndVersion(
-            self.process_definition._project, self.name
+        result = JavaGate().get_code_and_version(
+            self.process_definition._project, self.process_definition.name, self.name
         )
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)

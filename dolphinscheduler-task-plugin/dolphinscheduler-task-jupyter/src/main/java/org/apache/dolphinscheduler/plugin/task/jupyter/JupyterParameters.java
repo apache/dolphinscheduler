@@ -17,11 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
+import java.util.List;
 
 /**
  * jupyter parameters
  */
+@Getter
+@Setter
+@ToString
 public class JupyterParameters extends AbstractParameters {
 
     /**
@@ -69,77 +78,14 @@ public class JupyterParameters extends AbstractParameters {
      */
     private String others;
 
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
-    public String getCondaEnvName() {
-        return condaEnvName;
-    }
-
-    public void setCondaEnvName(String condaEnvName) {
-        this.condaEnvName = condaEnvName;
-    }
-
-    public String getInputNotePath() {
-        return inputNotePath;
-    }
-
-    public void setInputNotePath(String inputNotePath) {
-        this.inputNotePath = inputNotePath;
-    }
-
-    public String getOutputNotePath() {
-        return outputNotePath;
-    }
-
-    public void setOutputNotePath(String outputNotePath) {
-        this.outputNotePath = outputNotePath;
-    }
-
-    public String getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getKernel() {
-        return kernel;
-    }
-
-    public void setKernel(String kernel) {
-        this.kernel = kernel;
-    }
-
-    public String getEngine() {
-        return engine;
-    }
-
-    public void setEngine(String engine) {
-        this.engine = engine;
-    }
-
-    public String getExecutionTimeout() {
-        return executionTimeout;
-    }
-
-    public void setExecutionTimeout(String executionTimeout) {
-        this.executionTimeout = executionTimeout;
-    }
-
-    public String getStartTimeout() {
-        return startTimeout;
-    }
-
-    public void setStartTimeout(String startTimeout) {
-        this.startTimeout = startTimeout;
-    }
-
-    public String getOthers() {
-        return others;
-    }
-
-    public void setOthers(String others) {
-        this.others = others;
+    @Override
+    public List<ResourceInfo> getResourceFilesList() {
+        return resourceList;
     }
 
     @Override
@@ -147,18 +93,4 @@ public class JupyterParameters extends AbstractParameters {
         return condaEnvName != null && inputNotePath != null && outputNotePath != null;
     }
 
-    @Override
-    public String toString() {
-        return "JupyterParameters{" +
-                "condaEnvName='" + condaEnvName + '\'' +
-                ", inputNotePath='" + inputNotePath + '\'' +
-                ", outputNotePath='" + outputNotePath + '\'' +
-                ", parameters='" + parameters + '\'' +
-                ", kernel='" + kernel + '\'' +
-                ", engine='" + engine + '\'' +
-                ", executionTimeout=" + executionTimeout +
-                ", startTimeout=" + startTimeout +
-                ", others='" + others + '\'' +
-                '}';
-    }
 }

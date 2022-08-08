@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 
 import java.util.concurrent.TimeUnit;
@@ -29,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EventExecuteService extends Thread {
+public class EventExecuteService extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(EventExecuteService.class);
 
@@ -42,28 +44,42 @@ public class EventExecuteService extends Thread {
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
+    protected EventExecuteService() {
+        super("EventServiceStarted");
+    }
+
     @Override
     public synchronized void start() {
-        super.setName("EventServiceStarted");
+        logger.info("Master Event execute service starting");
         super.start();
+        logger.info("Master Event execute service started");
     }
 
     @Override
     public void run() {
-        logger.info("Event service started");
         while (Stopper.isRunning()) {
             try {
                 eventHandler();
                 TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS_SHORT);
+            } catch (InterruptedException interruptedException) {
+                logger.warn("Master event service interrupted, will exit this loop", interruptedException);
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
-                logger.error("Event service thread error", e);
+                logger.error("Master event execute service error", e);
             }
         }
     }
 
     private void eventHandler() {
-        for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
-            workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
+        for (WorkflowExecuteRunnable workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
+            try {
+                LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
+                workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
+
+            } finally {
+                LoggerUtils.removeWorkflowInstanceIdMDC();
+            }
         }
     }
 }

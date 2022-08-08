@@ -37,6 +37,11 @@ import { useZeppelin } from './use-zeppelin'
 import { useK8s } from './use-k8s'
 import { useJupyter } from './use-jupyter'
 import { useMlflow } from './use-mlflow'
+import { useOpenmldb } from './use-openmldb'
+import { useDvc } from './use-dvc'
+import { useDinky } from './use-dinky'
+import { userSagemaker } from './use-sagemaker'
+import { useChunjun } from './use-chunjun'
 
 export default {
   SHELL: useShell,
@@ -60,5 +65,10 @@ export default {
   ZEPPELIN: useZeppelin,
   K8S: useK8s,
   JUPYTER: useJupyter,
-  MLFLOW: useMlflow
+  MLFLOW: useMlflow,
+  OPENMLDB: useOpenmldb,
+  DVC: useDvc,
+  DINKY: useDinky,
+  SAGEMAKER: userSagemaker,
+  CHUNJUN: useChunjun
 }

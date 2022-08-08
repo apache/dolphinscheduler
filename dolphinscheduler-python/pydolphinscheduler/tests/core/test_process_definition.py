@@ -18,17 +18,17 @@
 """Test process definition."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, List
 from unittest.mock import patch
 
 import pytest
 from freezegun import freeze_time
 
-from pydolphinscheduler.constants import ProcessDefinitionReleaseState
-from pydolphinscheduler.core import configuration
+from pydolphinscheduler import configuration
 from pydolphinscheduler.core.process_definition import ProcessDefinition
+from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException
-from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.models import Project, Tenant, User
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 from pydolphinscheduler.utils.date import conv_to_schedule
 from tests.testing.task import Task
@@ -67,7 +67,7 @@ def test_process_definition_key_attr(func):
         ("worker_group", configuration.WORKFLOW_WORKER_GROUP),
         ("warning_type", configuration.WORKFLOW_WARNING_TYPE),
         ("warning_group_id", 0),
-        ("release_state", ProcessDefinitionReleaseState.ONLINE),
+        ("release_state", 1),
     ],
 )
 def test_process_definition_default_value(name, value):
@@ -90,8 +90,12 @@ def test_process_definition_default_value(name, value):
         ("warning_type", str, "FAILURE"),
         ("warning_group_id", int, 1),
         ("timeout", int, 1),
-        ("release_state", str, "OFFLINE"),
         ("param", dict, {"key": "value"}),
+        (
+            "resource_list",
+            List,
+            [Resource(name="/dev/test.py", content="hello world", description="desc")],
+        ),
     ],
 )
 def test_set_attr(name, cls, expect):
@@ -101,6 +105,41 @@ def test_set_attr(name, cls, expect):
         assert (
             getattr(pd, name) == expect
         ), f"ProcessDefinition set attribute `{name}` do not work expect"
+
+
+@pytest.mark.parametrize(
+    "value,expect",
+    [
+        ("online", 1),
+        ("offline", 0),
+    ],
+)
+def test_set_release_state(value, expect):
+    """Test process definition set release_state attributes."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, release_state=value) as pd:
+        assert (
+            getattr(pd, "release_state") == expect
+        ), "ProcessDefinition set attribute release_state do not return expect value."
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "oneline",
+        "offeline",
+        1,
+        0,
+        None,
+    ],
+)
+def test_set_release_state_error(value):
+    """Test process definition set release_state attributes with error."""
+    pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, release_state=value)
+    with pytest.raises(
+        PyDSParamException,
+        match="Parameter release_state only support `online` or `offline` but get.*",
+    ):
+        pd.release_state
 
 
 @pytest.mark.parametrize(
@@ -283,11 +322,12 @@ def test_process_definition_get_define_without_task():
         "warningType": configuration.WORKFLOW_WARNING_TYPE,
         "warningGroupId": 0,
         "timeout": 0,
-        "releaseState": ProcessDefinitionReleaseState.ONLINE,
+        "releaseState": 1,
         "param": None,
         "tasks": {},
         "taskDefinitionJson": [{}],
         "taskRelationJson": [{}],
+        "resourceList": [],
     }
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         assert pd.get_define() == expect

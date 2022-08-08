@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.clickhouse;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.clickhouse.param.ClickHouseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

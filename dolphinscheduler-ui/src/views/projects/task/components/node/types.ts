@@ -213,6 +213,7 @@ interface IRuleParameters {
   target_datasource_id?: number
   target_table?: string
   threshold?: string
+  mapping_columns?: string
 }
 
 interface ITaskParams {
@@ -264,6 +265,7 @@ interface ITaskParams {
   hadoopCustomParams?: ILocalParam[]
   sqoopAdvancedParams?: ILocalParam[]
   concurrency?: number
+  splitBy?: string
   modelType?: ModelType
   sourceType?: SourceType
   targetType?: SourceType
@@ -271,6 +273,7 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  masterUrl?: string
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
@@ -293,8 +296,13 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  stepsDefineJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
+  zeppelinRestEndpoint?: string
+  restEndpoint?: string
+  zeppelinProductionNoteDirectory?: string
+  productionNoteDirectory?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
@@ -330,9 +338,29 @@ interface ITaskParams {
   automlTool?: string
   registerModel?: boolean
   mlflowTaskType?: string
+  mlflowProjectRepository?: string
+  mlflowProjectVersion?: string
   deployType?: string
   deployPort?: string
   deployModelKey?: string
+  cpuLimit?: string
+  memoryLimit?: string
+  zk?: string
+  zkPath?: string
+  executeMode?: string
+  useCustom?: boolean
+  runMode?: string
+  dvcTaskType?: string
+  dvcRepository?: string
+  dvcVersion?: string
+  dvcDataLocation?: string
+  dvcMessage?: string
+  dvcLoadSaveDataPath?: string
+  dvcStoreUrl?: string
+  address?: string
+  taskId?: string
+  online?: boolean
+  sagemakerRequestJson?: string
 }
 
 interface INodeData
@@ -350,7 +378,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
-    IRuleParameters {
+    Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
   processName?: number
@@ -359,6 +387,8 @@ interface INodeData
   environmentCode?: number | null
   failRetryInterval?: number
   failRetryTimes?: number
+  cpuQuota?: number
+  memoryMax?: number
   flag?: 'YES' | 'NO'
   taskGroupId?: number
   taskGroupPriority?: number
@@ -377,7 +407,6 @@ interface INodeData
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
-  masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
   definition?: object
@@ -385,6 +414,7 @@ interface INodeData
   failedBranch?: number
   udfs?: string[]
   customConfig?: boolean
+  mapping_columns?: object[]
 }
 
 interface ITaskData

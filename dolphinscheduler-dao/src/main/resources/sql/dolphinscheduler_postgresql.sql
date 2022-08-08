@@ -404,6 +404,8 @@ CREATE TABLE t_ds_task_definition (
   task_group_id int DEFAULT NULL,
   task_group_priority int DEFAULT '0',
   resource_ids text ,
+  cpu_quota int DEFAULT '-1' NOT NULL,
+  memory_max int DEFAULT '-1' NOT NULL,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
@@ -441,6 +443,8 @@ CREATE TABLE t_ds_task_definition_log (
   task_group_id int DEFAULT NULL,
   task_group_priority int DEFAULT '0',
   operate_time timestamp DEFAULT NULL ,
+  cpu_quota int DEFAULT '-1' NOT NULL,
+  memory_max int DEFAULT '-1' NOT NULL,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
@@ -567,6 +571,8 @@ CREATE TABLE t_ds_project (
 ) ;
 
 create index user_id_index on t_ds_project (user_id);
+CREATE UNIQUE INDEX unique_name on t_ds_project (name);
+CREATE UNIQUE INDEX unique_code on t_ds_project (code);
 
 --
 -- Table structure for table t_ds_queue
@@ -581,7 +587,8 @@ CREATE TABLE t_ds_queue (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 );
-
+-- add unique key to t_ds_queue
+CREATE UNIQUE INDEX unique_queue_name on t_ds_queue (queue_name);
 
 --
 -- Table structure for table t_ds_relation_datasource_user
@@ -597,7 +604,6 @@ CREATE TABLE t_ds_relation_datasource_user (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-;
 
 --
 -- Table structure for table t_ds_relation_process_instance
@@ -611,6 +617,8 @@ CREATE TABLE t_ds_relation_process_instance (
   process_instance_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+create index idx_relation_process_instance_parent_process_task on t_ds_relation_process_instance (parent_process_instance_id, parent_task_instance_id);
+create index idx_relation_process_instance_process_instance_id on t_ds_relation_process_instance (process_instance_id);
 
 
 --
@@ -759,6 +767,8 @@ CREATE TABLE t_ds_task_instance (
   task_group_id int DEFAULT NULL,
   var_pool text ,
   dry_run int DEFAULT '0' ,
+  cpu_quota int DEFAULT '-1' NOT NULL,
+  memory_max int DEFAULT '-1' NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
@@ -779,6 +789,8 @@ CREATE TABLE t_ds_tenant (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+-- add unique key to t_ds_tenant
+CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
 
 --
 -- Table structure for table t_ds_udfs
@@ -800,6 +812,8 @@ CREATE TABLE t_ds_udfs (
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
 ) ;
+-- add unique key to t_ds_udfs
+CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
 
 --
 -- Table structure for table t_ds_user
@@ -958,7 +972,6 @@ ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_g
 DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
 CREATE SEQUENCE t_ds_worker_server_id_sequence;
 ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
-
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
@@ -1887,20 +1900,21 @@ CREATE TABLE t_ds_k8s (
 DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
    id serial NOT NULL,
+   code               bigint  NOT NULL,
    limits_memory      int DEFAULT NULL ,
    namespace          varchar(100) DEFAULT NULL ,
-   online_job_num     int DEFAULT '0' ,
    user_id            int DEFAULT NULL,
    pod_replicas       int DEFAULT NULL,
    pod_request_cpu    NUMERIC(13,4) NULL,
    pod_request_memory int DEFAULT NULL,
    limits_cpu         NUMERIC(13,4) NULL,
-   k8s                varchar(100) DEFAULT NULL,
+   cluster_code       bigint  NOT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
    PRIMARY KEY (id) ,
-   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,k8s)
+   CONSTRAINT k8s_namespace_unique UNIQUE (namespace,cluster_code)
 );
+
 
 --
 -- Table structure for table t_ds_relation_namespace_user
@@ -1931,4 +1945,24 @@ CREATE TABLE t_ds_alert_send_status (
     create_time                  timestamp DEFAULT NULL,
     PRIMARY KEY (id),
     CONSTRAINT alert_send_status_unique UNIQUE (alert_id,alert_plugin_instance_id)
+);
+
+
+--
+-- Table structure for table t_ds_cluster
+--
+
+DROP TABLE IF EXISTS t_ds_cluster;
+CREATE TABLE t_ds_cluster (
+    id serial NOT NULL,
+    code bigint NOT NULL,
+    name varchar(100) DEFAULT NULL,
+    config text DEFAULT NULL,
+    description text,
+    operator int DEFAULT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT cluster_name_unique UNIQUE (name),
+    CONSTRAINT cluster_code_unique UNIQUE (code)
 );

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -65,10 +66,10 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
         Date end = null;
         try {
             if (StringUtils.isNotEmpty(startTime)) {
-                start = DateUtils.getScheduleDate(startTime);
+                start = DateUtils.stringToDate(startTime);
             }
             if (StringUtils.isNotEmpty(endTime)) {
-                end = DateUtils.getScheduleDate(endTime);
+                end = DateUtils.stringToDate(endTime);
             }
         } catch (Exception e) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
@@ -86,7 +87,7 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
                 dqExecuteResultMapper.queryResultListPaging(
                         page,
                         searchVal,
-                        loginUser.getId(),
+                        loginUser,
                         statusArray,
                         ruleType,
                         start,

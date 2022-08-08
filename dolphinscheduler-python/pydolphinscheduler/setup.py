@@ -52,6 +52,7 @@ doc = [
     "sphinx_rtd_theme>=1.0",
     "sphinx-click>=3.0",
     "sphinx-inline-tabs",
+    "sphinx-copybutton>=0.4.0",
 ]
 
 test = [
@@ -146,7 +147,7 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     package_data={
-        "pydolphinscheduler": ["core/default_config.yaml"],
+        "pydolphinscheduler": ["default_config.yaml"],
     },
     platforms=["any"],
     classifiers=[

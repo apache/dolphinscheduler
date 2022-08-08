@@ -45,8 +45,10 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
     private K8sNamespace insertOne() {
         //insertOne
         K8sNamespace k8sNamespace = new K8sNamespace();
+        k8sNamespace.setCode(999L);
         k8sNamespace.setNamespace("testNamespace");
-        k8sNamespace.setK8s("ds_null_k8s");
+        k8sNamespace.setClusterCode(100L);
+        k8sNamespace.setClusterName("ds_null_k8s");
         k8sNamespace.setLimitsCpu(100.0);
         k8sNamespace.setLimitsMemory(100);
         k8sNamespace.setCreateTime(new Date());
