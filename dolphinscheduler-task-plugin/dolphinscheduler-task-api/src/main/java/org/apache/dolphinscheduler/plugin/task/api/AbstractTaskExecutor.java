@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Map;
@@ -25,6 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -37,6 +41,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+
     /**
      * constructor
      *
@@ -67,13 +72,14 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
     /**
      * regular expressions match the contents between two specified strings
      *
-     * @param content content
-     * @param rgex rgex
-     * @param sqlParamsMap sql params map
+     * @param content        content
+     * @param rgex           rgex
+     * @param sqlParamsMap   sql params map
      * @param paramsPropsMap params props map
+     * @return format SQL in case of condition IN
      */
-    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
-                                Map<String, Property> paramsPropsMap,int taskInstanceId) {
+    public String setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
+                                  Map<String, Property> paramsPropsMap, int taskInstanceId) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         int index = 1;
@@ -84,14 +90,26 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
 
             if (prop == null) {
                 logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
-                    + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskInstanceId);
+                        + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskInstanceId);
             } else {
-                sqlParamsMap.put(index, prop);
-                index++;
+                if (DataType.LIST.equals(prop.getType())) {
+                    String paramNameUnit = m.group(0).concat(TaskConstants.COMMA);
+                    StringBuilder paramNamePlaceHolder = new StringBuilder();
+                    ArrayNode values = JSONUtils.parseArray(prop.getValue());
+                    for (JsonNode node : values) {
+                        paramNamePlaceHolder.append(paramNameUnit);
+                        sqlParamsMap.put(index, new Property(prop.getProp(), prop.getDirect(), DataType.VARCHAR, node.asText()));
+                        index++;
+                    }
+                    paramNamePlaceHolder.deleteCharAt(paramNamePlaceHolder.lastIndexOf(TaskConstants.COMMA));
+                    content = m.replaceFirst(Matcher.quoteReplacement(paramNamePlaceHolder.toString()));
+                } else {
+                    sqlParamsMap.put(index, prop);
+                    index++;
+                }
                 logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
             }
-
         }
+        return content;
     }
-
 }
