@@ -29,7 +29,7 @@ In each issue, we list the content to be tested and the expected results, which 
 
 ### How to write test code?
 
-After taking up the corresponding task, the next step is to get to the crux of writing the code. Many partners may not be familiar with E2E test codes, so you can refer to this page: [e2e-test](https://dolphinscheduler.apache.org/en-us/development/e2e-test.html).
+After taking up the corresponding task, the next step is to get to the crux of writing the code. Many partners may not be familiar with E2E test codes, so you can refer to this page: [e2e-test](../e2e-test.md).
 
 ### How to submit a Pull Request?
 

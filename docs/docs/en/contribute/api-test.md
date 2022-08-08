@@ -87,7 +87,7 @@ https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/do
 ## Supplements
 
 When running API tests locally, First, you need to start the local service, you can refer to this page: 
-[development-environment-setup](https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html)
+[development-environment-setup](./development-environment-setup.md)
 
 When running API tests locally, the `-Dlocal=true` parameter can be configured to connect locally and facilitate changes to the UI.
 

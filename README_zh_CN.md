@@ -48,7 +48,7 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/dolphinsche
 ## 参与贡献
 
 非常欢迎大家来参与贡献，贡献流程请参考：
-[[参与贡献](https://dolphinscheduler.apache.org/zh-cn/community/development/contribute.html)]
+[[参与贡献](docs/docs/zh/contribute/join/contribute.md)]
 
 ## 快速试用 Docker
 
