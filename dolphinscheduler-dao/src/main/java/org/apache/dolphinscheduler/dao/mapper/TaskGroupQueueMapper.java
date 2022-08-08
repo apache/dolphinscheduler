@@ -74,6 +74,9 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
      */
     int updateStatusByTaskId(@Param("taskId") int taskId, @Param("status") int status);
 
+    /**
+     * Query the {@link TaskGroupQueue}, who's priority > the given <code>priority</code>
+     */
     List<TaskGroupQueue> queryHighPriorityTasks(@Param("groupId") int groupId, @Param("priority") int priority, @Param("status") int status);
 
     TaskGroupQueue queryTheHighestPriorityTasks(@Param("groupId") int groupId, @Param("status") int status,

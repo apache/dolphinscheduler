@@ -41,7 +41,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
     private static final Logger logger = LoggerFactory.getLogger(AbstractAuthenticator.class);
 
     @Autowired
-    private UsersService userService;
+    protected UsersService userService;
 
     @Autowired
     private SessionService sessionService;
