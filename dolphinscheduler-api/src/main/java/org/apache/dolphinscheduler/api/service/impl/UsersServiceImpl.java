@@ -396,7 +396,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new ServiceException("User Doesn't Exist");
+            throw new ServiceException(Status.USER_NOT_EXIST.getMsg());
         }
 
         checkUserParams(userName, userPassword, email, phone, state);
