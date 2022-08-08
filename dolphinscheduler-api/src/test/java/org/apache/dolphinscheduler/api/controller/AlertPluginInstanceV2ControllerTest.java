@@ -52,7 +52,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -225,10 +224,11 @@ public class AlertPluginInstanceV2ControllerTest extends AbstractControllerTest 
 
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances/verify-name")
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
@@ -253,10 +253,11 @@ public class AlertPluginInstanceV2ControllerTest extends AbstractControllerTest 
 
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/v2/alert-plugin-instances/verify-name")
+                .contentType(APPLICATION_JSON)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(APPLICATION_JSON))
                 .andReturn();
 
         // Then
