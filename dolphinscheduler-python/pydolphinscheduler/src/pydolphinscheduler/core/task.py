@@ -213,6 +213,14 @@ class Task(Base):
         else:
             return self.resource_plugin.resource
 
+    def get_plugin(self):
+        if self.resource_plugin is None:
+            if self.process_definition.resource_plugin is not None:
+                return self.process_definition.resource_plugin.resource
+            else:
+                raise ValueError
+        else:
+            return self.resource_plugin.resource
 
     def get_content(self):
         """Get the file content according to the resource plugin"""

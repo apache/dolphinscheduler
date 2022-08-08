@@ -268,11 +268,7 @@ def test_add_duplicate(caplog):
     new_callable=PropertyMock,
     return_value="_raw_script",
 )
-@patch(
-    "pydolphinscheduler.core.task.Task._raw_script",
-    create=True,
-    new_callable=PropertyMock,
-)
+@patch("pydolphinscheduler.core.task.Task._raw_script", create=True, new_callable=PropertyMock,)
 @patch("pydolphinscheduler.core.task.Task.get_plugin")
 def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version, val, expected):
     """Test task attribute ext_attr."""
