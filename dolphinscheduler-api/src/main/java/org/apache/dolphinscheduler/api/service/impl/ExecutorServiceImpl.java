@@ -1012,18 +1012,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> execTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion, CommandType commandType, FailureStrategy failureStrategy, WarningType warningType,
-                                                int warningGroupId, String workerGroup, Long environmentCode, Integer timeout, Map<String, String> startParams, int dryRun) {
+    public Map<String, Object> execTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion, WarningType warningType,
+                                                int warningGroupId, String workerGroup, Long environmentCode, Map<String, String> startParams, int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result =
             projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        // timeout is invalid
-        if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
-            putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
 
@@ -1040,14 +1035,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskExecuteStartCommand.setProjectCode(projectCode);
         taskExecuteStartCommand.setTaskDefinitionCode(taskDefinitionCode);
         taskExecuteStartCommand.setTaskDefinitionVersion(taskDefinitionVersion);
-        taskExecuteStartCommand.setTimeout(timeout);
-        taskExecuteStartCommand.setFailureStrategy(failureStrategy);
         taskExecuteStartCommand.setWorkerGroup(workerGroup);
         taskExecuteStartCommand.setWarningGroupId(warningGroupId);
         taskExecuteStartCommand.setWarningType(warningType);
         taskExecuteStartCommand.setEnvironmentCode(environmentCode);
         taskExecuteStartCommand.setStartParams(startParams);
-        taskExecuteStartCommand.setCommandType(commandType);
         taskExecuteStartCommand.setDryRun(dryRun);
 
         org.apache.dolphinscheduler.remote.command.Command response = stateEventCallbackService.sendSync(host, taskExecuteStartCommand.convert2Command());

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -182,7 +183,7 @@ public class TaskInstanceController extends BaseController {
     })
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_SAVEPOINT_ERROR)
+    @ApiException(TASK_STOP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> stopTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,

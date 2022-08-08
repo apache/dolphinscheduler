@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
 import org.apache.dolphinscheduler.service.process.ProcessService;

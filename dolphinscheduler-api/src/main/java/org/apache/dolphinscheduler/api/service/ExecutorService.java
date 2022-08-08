@@ -125,20 +125,17 @@ public interface ExecutorService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param commandType command type
-     * @param failureStrategy failure strategy
      * @param warningType warning type
      * @param warningGroupId notify group id
      * @param workerGroup worker group name
      * @param environmentCode environment code
-     * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
      */
     Map<String, Object> execTaskInstance(User loginUser, long projectCode,
                                             long taskDefinitionCode, int taskDefinitionVersion,
-                                            CommandType commandType,
-                                            FailureStrategy failureStrategy, WarningType warningType, int warningGroupId,
-                                            String workerGroup, Long environmentCode, Integer timeout,
-                                            Map<String, String> startParams, int dryRun);
+                                            WarningType warningType, int warningGroupId,
+                                            String workerGroup, Long environmentCode,
+                                            Map<String, String> startParams,
+                                            int dryRun);
 }

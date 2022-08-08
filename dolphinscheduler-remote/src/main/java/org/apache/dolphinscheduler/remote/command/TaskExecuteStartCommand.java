@@ -43,10 +43,6 @@ public class TaskExecuteStartCommand extends BaseCommand {
 
     private int taskDefinitionVersion;
 
-    private org.apache.dolphinscheduler.common.enums.CommandType commandType;
-
-    private FailureStrategy failureStrategy;
-
     private WarningType warningType;
 
     private int warningGroupId;
@@ -55,9 +51,9 @@ public class TaskExecuteStartCommand extends BaseCommand {
 
     private Long environmentCode;
 
-    private Integer timeout;
-
     private Map<String, String> startParams;
+
+    private int tenantId;
 
     private int dryRun;
 

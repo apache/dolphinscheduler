@@ -416,26 +416,20 @@ public class ExecutorController extends BaseController {
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
                                        @RequestParam(value = "version", required = true) int version,
-                                       @RequestParam(value = "failureStrategy", required = false) FailureStrategy failureStrategy,
-                                       @RequestParam(value = "execType", required = false) CommandType execType,
-                                       @RequestParam(value = "warningType") WarningType warningType,
+                                       @RequestParam(value = "warningType", required = false) WarningType warningType,
                                        @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                       @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
 
-        if (timeout == null) {
-            timeout = Constants.MAX_TASK_TIMEOUT;
-        }
         Map<String, String> startParamMap = null;
         if (startParams != null) {
             startParamMap = JSONUtils.toMap(startParams);
         }
 
         Map<String, Object> result = execService.execTaskInstance(loginUser, projectCode, code, version,
-            execType, failureStrategy, warningType, warningGroupId, workerGroup, environmentCode, timeout, startParamMap, dryRun);
+            warningType, warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
 }

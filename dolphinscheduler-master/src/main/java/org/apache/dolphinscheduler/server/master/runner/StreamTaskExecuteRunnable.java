@@ -25,13 +25,18 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -40,6 +45,7 @@ import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -54,16 +60,24 @@ import org.apache.dolphinscheduler.server.master.runner.task.StreamTaskProcessor
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import lombok.NonNull;
 
@@ -80,16 +94,19 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected ExecutorDispatcher dispatcher;
 
-    protected TaskDefinition taskDefinition;
+    protected ProcessTaskRelationMapper processTaskRelationMapper;
 
     protected TaskPluginManager taskPluginManager;
 
-    // todo remove task processor
-    protected StreamTaskProcessor streamTaskProcessor;
+    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
 
-    protected TaskExecuteStartCommand taskExecuteStartCommand;
+    protected TaskDefinition taskDefinition;
 
     protected TaskInstance taskInstance;
+
+    protected ProcessDefinition processDefinition;
+
+    protected TaskExecuteStartCommand taskExecuteStartCommand;
 
     /**
      * task event queue
@@ -103,7 +120,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         this.dispatcher = SpringApplicationContext.getBean(ExecutorDispatcher.class);
         this.taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
-        this.streamTaskProcessor = new StreamTaskProcessor();
+        this.processTaskRelationMapper = SpringApplicationContext.getBean(ProcessTaskRelationMapper.class);
+        this.streamTaskInstanceExecCacheManager = SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
         this.taskDefinition = taskDefinition;
         this.taskExecuteStartCommand = taskExecuteStartCommand;
     }
@@ -115,8 +133,17 @@ public class StreamTaskExecuteRunnable implements Runnable {
     @Override
     public void run() {
         // submit task
+        processService.updateTaskDefinitionResources(taskDefinition);
         taskInstance = newTaskInstance(taskDefinition);
         processService.saveTaskInstance(taskInstance);
+
+        // add cache
+        streamTaskInstanceExecCacheManager.cache(taskInstance.getId(), this);
+
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskDefinition.getCode());
+        long processDefinitionCode = processTaskRelationList.get(0).getProcessDefinitionCode();
+        int processDefinitionVersion = processTaskRelationList.get(0).getProcessDefinitionVersion();
+        processDefinition = processService.findProcessDefinition(processDefinitionCode, processDefinitionVersion);
 
         // dispatch task
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
@@ -151,6 +178,9 @@ public class StreamTaskExecuteRunnable implements Runnable {
             processService.saveTaskInstance(taskInstance);
             return;
         }
+
+        // set started flag
+        taskRunnableStatus = TaskRunnableStatus.STARTED;
 
         logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
             taskInstance.getId(),
@@ -273,6 +303,14 @@ public class StreamTaskExecuteRunnable implements Runnable {
             }
         }
 
+        if (taskInstance.getSubmitTime() == null) {
+            taskInstance.setSubmitTime(new Date());
+        }
+        if (taskInstance.getFirstSubmitTime() == null) {
+            taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
+        }
+
+
         taskInstance.setTaskExecuteType(taskDefinition.getTaskExecuteType());
         return taskInstance;
     }
@@ -284,37 +322,69 @@ public class StreamTaskExecuteRunnable implements Runnable {
      * @return TaskExecutionContext
      */
     protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance) {
-        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
-        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
+        int userId = taskDefinition == null ? 0 : taskDefinition.getUserId();
+        Tenant tenant = processService.getTenantForProcess(processDefinition.getTenantId(), userId);
 
         // verify tenant is null
         if (tenant == null) {
-            logger.error("tenant not exists,task instance id : {}",
-                taskInstance.getId());
+            logger.error("tenant not exists,task instance id : {}", taskInstance.getId());
             return null;
         }
 
-        // set queue for process instance, user-specified queue takes precedence over tenant queue
-        String userQueue = processService.queryUserQueueByProcessInstance(taskInstance.getProcessInstance());
-        taskInstance.getProcessInstance().setQueue(org.apache.dolphinscheduler.spi.utils.StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
-        taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        taskInstance.setResources(streamTaskProcessor.getResourceFullNames(taskInstance));
+        taskInstance.setResources(getResourceFullNames(taskInstance));
 
         TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
         ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
-        streamTaskProcessor.setTaskResourceInfo(resources);
 
         AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         Map<String, Property> propertyMap = paramParsingPreparation(taskInstance, baseParam);
-        return TaskExecutionContextBuilder.get()
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
             .buildTaskInstanceRelatedInfo(taskInstance)
-            .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
-            .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
-            .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
+            .buildTaskDefinitionRelatedInfo(taskDefinition)
             .buildResourceParametersInfo(resources)
             .buildBusinessParamsMap(new HashMap<>())
             .buildParamInfo(propertyMap)
             .create();
+
+        taskExecutionContext.setTenantCode(tenant.getTenantCode());
+        taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
+        taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
+        taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
+        taskExecutionContext.setProcessInstanceId(0);
+
+        return taskExecutionContext;
+    }
+
+    /**
+     * get resource map key is full name and value is tenantCode
+     */
+    protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
+        Map<String, String> resourcesMap = new HashMap<>();
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        if (baseParam != null) {
+            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
+            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
+
+                // filter the resources that the resource id equals 0
+                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
+                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
+                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
+                }
+
+                // get the resource id in order to get the resource names in batch
+                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
+                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
+
+                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
+                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
+
+                    List<Resource> resources = processService.listResourceByIds(resourceIds);
+                    resources.forEach(t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
+                }
+            }
+        }
+
+        return resourcesMap;
     }
 
     protected boolean handleTaskEvent(TaskEvent taskEvent)  throws StateEventHandleException, StateEventHandleError {
@@ -340,6 +410,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         sendAckToWorker(taskEvent);
 
         if (taskInstance.getState().typeIsFinished()) {
+            streamTaskInstanceExecCacheManager.removeByTaskInstanceId(taskInstance.getId());
             logger.info("The stream task instance is finish, taskInstanceId:{}, state:{}", taskInstance.getId(), taskEvent.getState());
         }
 
