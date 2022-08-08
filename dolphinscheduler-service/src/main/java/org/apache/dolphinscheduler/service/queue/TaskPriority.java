@@ -211,16 +211,45 @@ public class TaskPriority implements Comparable<TaskPriority> {
         }
         TaskPriority that = (TaskPriority) o;
         return processInstancePriority == that.processInstancePriority
-                && processInstanceId == that.processInstanceId
-                && taskInstancePriority == that.taskInstancePriority
-                && taskId == that.taskId
-                && taskGroupPriority == that.taskGroupPriority
-                && Objects.equals(groupName, that.groupName);
+            && processInstanceId == that.processInstanceId
+            && taskInstancePriority == that.taskInstancePriority
+            && taskId == that.taskId
+            && taskGroupPriority == that.taskGroupPriority
+            && Objects.equals(groupName, that.groupName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(processInstancePriority, processInstanceId, taskInstancePriority, taskId, taskGroupPriority, groupName);
+        return Objects.hash(processInstancePriority,
+            processInstanceId,
+            taskInstancePriority,
+            taskId,
+            taskGroupPriority,
+            groupName);
     }
 
+    @Override
+    public String toString() {
+        return "TaskPriority{"
+            + "processInstancePriority="
+            + processInstancePriority
+            + ", processInstanceId="
+            + processInstanceId
+            + ", taskInstancePriority="
+            + taskInstancePriority
+            + ", taskId="
+            + taskId
+            + ", taskExecutionContext="
+            + taskExecutionContext
+            + ", groupName='"
+            + groupName
+            + '\''
+            + ", context="
+            + context
+            + ", checkpoint="
+            + checkpoint
+            + ", taskGroupPriority="
+            + taskGroupPriority
+            + '}';
+    }
 }

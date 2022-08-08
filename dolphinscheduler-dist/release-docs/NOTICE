@@ -78,16 +78,6 @@ http://openjdk.java.net/legal/gplv2+ce.html
 
 
 ------
-OW2
-
-The following artifacts are licensed by the OW2 Foundation according to the
-terms of http://asm.ow2.org/license.html
-
-org.ow2.asm:asm-commons
-org.ow2.asm:asm
-
-
-------
 Apache
 
 The following artifacts are ASL2 licensed.
@@ -372,8 +362,8 @@ This product contains the Maven wrapper scripts from 'Maven Wrapper', that provi
 Spring Framework NOTICE
 
 ========================================================================
-Spring Framework 5.1.18.RELEASE
-Copyright (c) 2002-2020 Pivotal, Inc.
+Spring Framework 5.3.19
+Copyright (c) 2002-2022 Pivotal, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0
 (the "License"). You may not use this product except in compliance with
@@ -445,8 +435,8 @@ This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 =========================================================================
-    NOTICE file corresponding to section 4(d) of the Apache License,   
-    Version 2.0, in this case for the Apache Xerces Java distribution. 
+    NOTICE file corresponding to section 4(d) of the Apache License,
+    Version 2.0, in this case for the Apache Xerces Java distribution.
 =========================================================================
 
    Apache Xerces Java
@@ -510,7 +500,7 @@ Spring Framework
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
 ========================================================================
 
 
@@ -588,7 +578,7 @@ with the following copyright notice:
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-  
+
 ========================================================================
 
 
@@ -1761,16 +1751,6 @@ which has the following notices:
    are hosted at github and both modified and original are under GPL v2 with
    classpath exceptions.
    http://openjdk.java.net/legal/gplv2+ce.html
-
-
-   ------
-   OW2
-
-   The following artifacts are licensed by the OW2 Foundation according to the
-   terms of http://asm.ow2.org/license.html
-
-   org.ow2.asm:asm-commons
-   org.ow2.asm:asm
 
 
    ------

@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -34,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,15 +45,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * alert plugin instance service test
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AlertPluginInstanceServiceTest {
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
     AlertPluginInstanceServiceImpl alertPluginInstanceService;
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Mock
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
@@ -158,6 +169,8 @@ public class AlertPluginInstanceServiceTest {
     @Test
     public void testCreate() {
         Mockito.when(alertPluginInstanceMapper.existInstanceName("test")).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 1, ALART_INSTANCE_CREATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = alertPluginInstanceService.create(user, 1, "test", uiParams);
         Assert.assertEquals(Status.PLUGIN_INSTANCE_ALREADY_EXIT, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
@@ -170,6 +183,8 @@ public class AlertPluginInstanceServiceTest {
     public void testDelete() {
         List<String> ids = Arrays.asList("11,2,3", null, "98,1");
         Mockito.when(alertGroupMapper.queryInstanceIdsList()).thenReturn(ids);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 1, ALERT_PLUGIN_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = alertPluginInstanceService.delete(user, 1);
         Assert.assertEquals(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.deleteById(9)).thenReturn(1);
@@ -181,6 +196,8 @@ public class AlertPluginInstanceServiceTest {
     @Test
     public void testUpdate() {
         Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(0);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 1, ALERT_PLUGIN_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = alertPluginInstanceService.update(user, 1, "testUpdate", uiParams);
         Assert.assertEquals(Status.SAVE_ERROR, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(1);

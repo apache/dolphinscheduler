@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -52,6 +54,7 @@ public class WorkerExecService {
         this.execService = execService;
         this.listeningExecutorService = MoreExecutors.listeningDecorator(this.execService);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
+        WorkerServerMetrics.registerWorkerRunningTaskGauge(taskExecuteThreadMap::size);
     }
 
     public void submit(TaskExecuteThread taskExecuteThread) {
@@ -65,8 +68,10 @@ public class WorkerExecService {
 
             @Override
             public void onFailure(Throwable throwable) {
-                logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}", taskExecuteThread.getTaskExecutionContext().getProcessInstanceId()
-                    , taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(), throwable);
+                logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}",
+                             taskExecuteThread.getTaskExecutionContext().getProcessInstanceId(),
+                             taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(),
+                             throwable);
                 taskExecuteThreadMap.remove(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId());
             }
         };

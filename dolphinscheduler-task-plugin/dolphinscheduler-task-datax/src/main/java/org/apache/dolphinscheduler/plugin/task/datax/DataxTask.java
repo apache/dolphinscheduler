@@ -32,15 +32,15 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -82,6 +82,8 @@ public class DataxTask extends AbstractTaskExecutor {
      * jvm parameters
      */
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+
+    public static final String CUSTOM_PARAM = " -D%s=%s";
     /**
      * python process(datax only supports version 2.7 by default)
      */
@@ -150,13 +152,7 @@ public class DataxTask extends AbstractTaskExecutor {
     public void handle() throws Exception {
         try {
             // replace placeholder,and combine local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-            if (MapUtils.isEmpty(paramsMap)) {
-                paramsMap = new HashMap<>();
-            }
-            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-                paramsMap.putAll(taskExecutionContext.getParamsMap());
-            }
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
             // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
@@ -167,6 +163,7 @@ public class DataxTask extends AbstractTaskExecutor {
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
         } catch (Exception e) {
+            logger.error("datax task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         }
@@ -382,7 +379,7 @@ public class DataxTask extends AbstractTaskExecutor {
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId(),
-                OSUtils.isWindows() ? "bat" : "sh");
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
 
         Path path = new File(fileName).toPath();
 
@@ -397,6 +394,8 @@ public class DataxTask extends AbstractTaskExecutor {
         sbr.append(DATAX_PATH);
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
+        sbr.append(addCustomParameters(paramsMap));
+        sbr.append(" ");
         sbr.append(jobConfigFilePath);
 
         // replace placeholder
@@ -408,7 +407,7 @@ public class DataxTask extends AbstractTaskExecutor {
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
         FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
 
-        if (OSUtils.isWindows()) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             Files.createFile(path);
         } else {
             Files.createFile(path, attr);
@@ -417,6 +416,15 @@ public class DataxTask extends AbstractTaskExecutor {
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
+    }
+
+    private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
+        StringBuilder customParameters = new StringBuilder("-p\"");
+        for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
+        }
+        customParameters.append("\"");
+        return customParameters;
     }
 
     public String getPythonCommand() {

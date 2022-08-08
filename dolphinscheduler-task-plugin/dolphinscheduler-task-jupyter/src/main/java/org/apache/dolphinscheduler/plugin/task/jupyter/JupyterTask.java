@@ -17,24 +17,23 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,11 +103,25 @@ public class JupyterTask extends AbstractTaskExecutor {
          */
         List<String> args = new ArrayList<>();
         final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
+        final String timestamp = DateUtils.getTimestampString();
+        String condaEnvName = jupyterParameters.getCondaEnvName();
+        if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(JupyterConstants.EXECUTION_FLAG);
+            args.add(JupyterConstants.NEW_LINE_SYMBOL);
+        }
+
         args.add(JupyterConstants.CONDA_INIT);
         args.add(condaPath);
         args.add(JupyterConstants.JOINTER);
-        args.add(JupyterConstants.CONDA_ACTIVATE);
-        args.add(jupyterParameters.getCondaEnvName());
+        if (condaEnvName.endsWith(JupyterConstants.TAR_SUFFIX)) {
+            args.add(String.format(JupyterConstants.CREATE_ENV_FROM_TAR, condaEnvName));
+        } else if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(String.format(JupyterConstants.CREATE_ENV_FROM_TXT, timestamp, timestamp, condaEnvName));
+        } else {
+            args.add(JupyterConstants.CONDA_ACTIVATE);
+            args.add(jupyterParameters.getCondaEnvName());
+        }
+
         args.add(JupyterConstants.JOINTER);
         args.add(JupyterConstants.PAPERMILL);
         args.add(jupyterParameters.getInputNotePath());
@@ -120,22 +133,22 @@ public class JupyterTask extends AbstractTaskExecutor {
         // populate jupyter options
         args.addAll(populateJupyterOptions());
 
-        // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        // remove tmp conda env, if created from requirements.txt
+        if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
+            args.add(JupyterConstants.NEW_LINE_SYMBOL);
+            args.add(String.format(JupyterConstants.REMOVE_ENV, timestamp));
         }
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        // replace placeholder, and combining local and global parameters
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+
+        String command = ParameterUtils
+                .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
         logger.info("jupyter task command: {}", command);
 
         return command;
     }
-
 
     /**
      * build jupyter parameterization

@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Properties;
 
@@ -45,23 +48,26 @@ public class LdapService {
     @Value("${security.authentication.ldap.user.admin:null}")
     private String adminUserId;
 
-    @Value("${ldap.urls:null}")
+    @Value("${security.authentication.ldap.urls:null}")
     private String ldapUrls;
 
-    @Value("${ldap.base.dn:null}")
+    @Value("${security.authentication.ldap.base-dn:null}")
     private String ldapBaseDn;
 
-    @Value("${ldap.username:null}")
+    @Value("${security.authentication.ldap.username:null}")
     private String ldapSecurityPrincipal;
 
-    @Value("${ldap.password:null}")
+    @Value("${security.authentication.ldap.password:null}")
     private String ldapPrincipalPassword;
 
-    @Value("${ldap.user.identity.attribute:null}")
+    @Value("${security.authentication.ldap.user.identity-attribute:null}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${ldap.user.email.attribute:null}")
+    @Value("${security.authentication.ldap.user.email-attribute:null}")
     private String ldapEmailAttribute;
+
+    @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
+    private String ldapUserNotExistAction;
 
     /***
      * get user type by configured admin userId
@@ -81,9 +87,10 @@ public class LdapService {
      */
     public String ldapLogin(String userId, String userPwd) {
         Properties searchEnv = getManagerLdapEnv();
+        LdapContext ctx = null;
         try {
             //Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
-            LdapContext ctx = new InitialLdapContext(searchEnv, null);
+            ctx = new InitialLdapContext(searchEnv, null);
             SearchControls sc = new SearchControls();
             sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -93,7 +100,7 @@ public class LdapService {
             if (results.hasMore()) {
                 // get the users DN (distinguishedName) from the result
                 SearchResult result = results.next();
-                NamingEnumeration attrs = result.getAttributes().getAll();
+                NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
                 while (attrs.hasMore()) {
                     //Open another connection to the LDAP server with the found DN and the password
                     searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
@@ -104,7 +111,7 @@ public class LdapService {
                         logger.warn("invalid ldap credentials or ldap search error", e);
                         return null;
                     }
-                    Attribute attr = (Attribute) attrs.next();
+                    Attribute attr = attrs.next();
                     if (attr.getID().equals(ldapEmailAttribute)) {
                         return (String) attr.get();
                     }
@@ -113,7 +120,16 @@ public class LdapService {
         } catch (NamingException e) {
             logger.error("ldap search error", e);
             return null;
+        } finally {
+            try {
+                if (ctx != null) {
+                    ctx.close();
+                }
+            } catch (NamingException e) {
+                logger.error("ldap context close error", e);
+            }
         }
+
         return null;
     }
 
@@ -129,5 +145,18 @@ public class LdapService {
         env.put(Context.SECURITY_CREDENTIALS, ldapPrincipalPassword);
         env.put(Context.PROVIDER_URL, ldapUrls);
         return env;
+    }
+
+    public LdapUserNotExistActionType getLdapUserNotExistAction() {
+        if (StringUtils.isBlank(ldapUserNotExistAction)) {
+            logger.info("security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
+            return LdapUserNotExistActionType.CREATE;
+        }
+
+        return LdapUserNotExistActionType.valueOf(ldapUserNotExistAction);
+    }
+
+    public boolean createIfUserNotExists() {
+        return getLdapUserNotExistAction() == LdapUserNotExistActionType.CREATE;
     }
 }

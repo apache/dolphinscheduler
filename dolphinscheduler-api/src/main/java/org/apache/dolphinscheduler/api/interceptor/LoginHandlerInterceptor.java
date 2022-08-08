@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Date;
 
 /**
  * login interceptor, must log in first
@@ -71,7 +73,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
                 return false;
             }
         } else {
-            user = userMapper.queryUserByToken(token);
+            user = userMapper.queryUserByToken(token, new Date());
             if (user == null) {
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 logger.info("user token has expired");

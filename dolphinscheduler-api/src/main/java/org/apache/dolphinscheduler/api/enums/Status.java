@@ -193,8 +193,8 @@ public enum Status {
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR(10162, "query authorized and user created project error error", "查询授权的和用户创建的项目错误"),
-    DELETE_PROCESS_DEFINITION_BY_CODE_FAIL(10163, "delete process definition by code fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
-    CHECK_OS_TENANT_CODE_ERROR(10164, "Please enter the English os tenant code", "请输入英文操作系统租户"),
+    DELETE_PROCESS_DEFINITION_EXECUTING_FAIL(10163, "delete process definition by code fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    CHECK_OS_TENANT_CODE_ERROR(10164, "Tenant code invalid, should follow linux's users naming conventions", "非法的租户名，需要遵守 Linux 用户命名规范"),
     FORCE_TASK_SUCCESS_ERROR(10165, "force task success error", "强制成功任务实例错误"),
     TASK_INSTANCE_STATE_OPERATION_ERROR(10166, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
     DATASOURCE_TYPE_NOT_EXIST(10167, "data source type not exist", "数据源类型不存在"),
@@ -216,6 +216,10 @@ public enum Status {
     QUERY_AUTHORIZED_USER(10183, "query authorized user error", "查询拥有项目权限的用户错误"),
     PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
     TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
+    QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
+    DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL(10193, "delete process definition fail, cause used by other tasks: {0}", "删除工作流定时失败，被其他任务引用：{0}"),
+    DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, cause used by other tasks: {1}", "删除任务 {0} 失败，被其他任务引用：{1}"),
+    TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -330,7 +334,7 @@ public enum Status {
 
     //plugin
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
-    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
+    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query alarm plugins result is empty, please check the startup status of the alarm component and confirm that the relevant alarm plugin is successfully registered", "查询告警插件为空, 请检查告警组件启动状态并确认相关告警插件已注册成功"),
     QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
     QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
 
@@ -364,6 +368,24 @@ public enum Status {
     GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
     GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
     GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
+
+    CREATE_CLUSTER_ERROR(120020, "create cluster error", "创建集群失败"),
+    CLUSTER_NAME_EXISTS(120021, "this cluster name [{0}] already exists", "集群名称[{0}]已经存在"),
+    CLUSTER_NAME_IS_NULL(120022, "this cluster name shouldn't be empty.", "集群名称不能为空"),
+    CLUSTER_CONFIG_IS_NULL(120023, "this cluster config shouldn't be empty.", "集群配置信息不能为空"),
+    UPDATE_CLUSTER_ERROR(120024, "update cluster [{0}] info error", "更新集群[{0}]信息失败"),
+    DELETE_CLUSTER_ERROR(120025, "delete cluster error", "删除集群信息失败"),
+    DELETE_CLUSTER_RELATED_TASK_EXISTS(120026, "this cluster has been used in tasks,so you can't delete it.", "该集群已经被任务使用，所以不能删除该集群信息"),
+    QUERY_CLUSTER_BY_NAME_ERROR(1200027, "not found cluster [{0}] ", "查询集群名称[{0}]信息不存在"),
+    QUERY_CLUSTER_BY_CODE_ERROR(1200028, "not found cluster [{0}] ", "查询集群编码[{0}]不存在"),
+    QUERY_CLUSTER_ERROR(1200029, "login user query cluster error", "分页查询集群列表错误"),
+    VERIFY_CLUSTER_ERROR(1200030, "verify cluster error", "验证集群信息错误"),
+    CLUSTER_PROCESS_DEFINITIONS_IS_INVALID(1200031, "cluster worker groups is invalid format", "集群关联的工作组参数解析错误"),
+    UPDATE_CLUSTER_PROCESS_DEFINITION_RELATION_ERROR(1200032, "You can't modify the process definition, because the process definition [{0}] and this cluster [{1}] already be used in the task [{2}]",
+        "您不能修改集群选项，因为该工作流组 [{0}] 和 该集群 [{1}] 已经被用在任务 [{2}] 中"),
+    CLUSTER_NOT_EXISTS(120033, "this cluster can not found in db.", "集群配置数据库里查询不到为空"),
+    DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS(120034, "this cluster has been used in namespace,so you can't delete it.", "该集群已经被命名空间使用，所以不能删除该集群信息"),
+
     TASK_GROUP_NAME_EXSIT(130001, "this task group name is repeated in a project", "该任务组名称在一个项目中已经使用"),
     TASK_GROUP_SIZE_ERROR(130002, "task group size error", "任务组大小应该为大于1的整数"),
     TASK_GROUP_STATUS_ERROR(130003, "task group status error", "任务组已经被关闭"),
@@ -403,7 +425,14 @@ public enum Status {
     QUERY_AUTHORIZED_NAMESPACE_ERROR(1300013, "query authorized namespace error", "查询授权命名空间错误"),
     QUERY_CAN_USE_K8S_CLUSTER_ERROR(1300014, "login user query can used k8s cluster list error", "查询可用k8s集群错误"),
     RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource's fullname is too long error", "资源文件名过长"),
-    TENANT_FULL_NAME_TOO_LONG_ERROR(1300016, "tenant's fullname is too long error", "租户名过长");
+    TENANT_FULL_NAME_TOO_LONG_ERROR(1300016, "tenant's fullname is too long error", "租户名过长"),
+    USER_PASSWORD_LENGTH_ERROR(1300017, "user's password length error", "用户密码长度错误"),
+    QUERY_CAN_USE_K8S_NAMESPACE_ERROR(1300018, "login user query can used namespace list error", "查询可用命名空间错误"),
+
+    NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),
+    FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
+    SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
+    ;
 
     private final int code;
     private final String enMsg;

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.oracle.param.OracleConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

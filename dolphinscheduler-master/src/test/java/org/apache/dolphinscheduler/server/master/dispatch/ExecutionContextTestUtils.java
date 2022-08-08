@@ -24,12 +24,11 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.mockito.Mockito;
 
@@ -44,16 +43,18 @@ public class ExecutionContextTestUtils {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildProcessInstanceRelatedInfo(processInstance)
-                .buildProcessDefinitionRelatedInfo(processDefinition)
-                .create();
+                                                                  .buildTaskInstanceRelatedInfo(taskInstance)
+                                                                  .buildProcessInstanceRelatedInfo(processInstance)
+                                                                  .buildProcessDefinitionRelatedInfo(processDefinition)
+                                                                  .create();
 
-        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(context));
+        TaskDispatchCommand requestCommand = new TaskDispatchCommand(context,
+                                                                     "127.0.0.1:5678",
+                                                                     "127.0.0.1:5678",
+                                                                     System.currentTimeMillis());
         Command command = requestCommand.convert2Command();
 
-        ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER);
+        ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(port)));
 
         return executionContext;

@@ -32,7 +32,12 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
-import type { MaybeArray, OnUpdateValue, OnUpdateValueImpl } from './types'
+import type {
+  MaybeArray,
+  OnUpdateValue,
+  OnUpdateValueImpl,
+  monaco as Monaco
+} from './types'
 
 const props = {
   value: {
@@ -44,17 +49,12 @@ const props = {
   },
   'onUpdate:value': [Function, Array] as PropType<MaybeArray<OnUpdateValue>>,
   onUpdateValue: [Function, Array] as PropType<MaybeArray<OnUpdateValue>>,
-  language: {
-    type: String as PropType<string>,
-    default: 'shell'
-  },
-  readOnly: {
-    type: Boolean as PropType<boolean>,
-    default: false
-  },
   options: {
-    type: Object,
-    default: () => {}
+    type: Object as PropType<Monaco.editor.IStandaloneEditorConstructionOptions>,
+    default: () => ({
+      readOnly: false,
+      language: 'shell'
+    })
   }
 }
 
@@ -96,9 +96,11 @@ export default defineComponent({
           ...props.options,
           readOnly: formItem.mergedDisabledRef.value || props.options?.readOnly,
           value: props.defaultValue ?? props.value,
-          language: props.language,
           automaticLayout: true,
-          theme: monacoEditorThemeRef.value
+          theme: monacoEditorThemeRef.value,
+          scrollbar: {
+            alwaysConsumeMouseWheel: false
+          }
         })
         editor.onDidChangeModelContent(() => {
           const { onUpdateValue, 'onUpdate:value': _onUpdateValue } = props
