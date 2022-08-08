@@ -66,7 +66,7 @@ def gateway_result_checker(
 
 
 class JavaGate:
-    """Launch java gateway to pydolphinscheduler."""
+    """Launch java gateway to pydolphin scheduler."""
 
     def __init__(
         self,
