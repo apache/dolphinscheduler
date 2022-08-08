@@ -97,7 +97,10 @@ export default defineComponent({
           readOnly: formItem.mergedDisabledRef.value || props.options?.readOnly,
           value: props.defaultValue ?? props.value,
           automaticLayout: true,
-          theme: monacoEditorThemeRef.value
+          theme: monacoEditorThemeRef.value,
+          scrollbar: {
+            alwaysConsumeMouseWheel: false
+          }
         })
         editor.onDidChangeModelContent(() => {
           const { onUpdateValue, 'onUpdate:value': _onUpdateValue } = props
