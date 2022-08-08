@@ -25,7 +25,7 @@ from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base, Project, Tenant, User
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
@@ -392,14 +392,12 @@ class ProcessDefinition(Base):
         self._ensure_side_model_exists()
         self._pre_submit_check()
 
-        gateway = launch_gateway()
-        self._process_definition_code = gateway.entry_point.createOrUpdateProcessDefinition(
+        self._process_definition_code = JavaGate().create_or_update_process_definition(
             self._user,
             self._project,
             self.name,
             str(self.description) if self.description else "",
             json.dumps(self.param_json),
-            json.dumps(self.schedule_json) if self.schedule_json else None,
             self.warning_type,
             self.warning_group_id,
             json.dumps(self.task_location),
@@ -410,6 +408,7 @@ class ProcessDefinition(Base):
             # TODO add serialization function
             json.dumps(self.task_relation_json),
             json.dumps(self.task_definition_json),
+            json.dumps(self.schedule_json) if self.schedule_json else None,
             None,
             None,
         )
@@ -424,8 +423,7 @@ class ProcessDefinition(Base):
 
         which post to `start-process-instance` to java gateway
         """
-        gateway = launch_gateway()
-        gateway.entry_point.execProcessInstance(
+        JavaGate().exec_process_instance(
             self._user,
             self._project,
             self.name,
