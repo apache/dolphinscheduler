@@ -83,7 +83,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -339,7 +338,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return true;
         }
         if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
-            boolean acquireTaskGroup = processService.acquireTaskGroupAgain(taskGroupQueue);
+            boolean acquireTaskGroup = processService.robTaskGroupResource(taskGroupQueue);
             if (acquireTaskGroup) {
                 TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
@@ -416,6 +415,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param taskInstance
      */
     public void releaseTaskGroup(TaskInstance taskInstance) {
+        logger.info("Release task group");
         if (taskInstance.getTaskGroupId() > 0) {
             TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
             if (nextTaskInstance != null) {
@@ -692,15 +692,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public void endProcess() {
         this.stateEvents.clear();
-        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()) {
+        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
+            .typeIsSerialPriority()) {
             checkSerialProcess(processDefinition);
         }
         if (processInstance.getState().typeIsWaitingThread()) {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         if (processAlertManager.isNeedToSendWarning(processInstance)) {
-            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
             processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+        }
+        if (processInstance.getState().typeIsSuccess()) {
+            processAlertManager.closeAlert(processInstance);
         }
         if (checkTaskQueue()) {
             //release task group
@@ -926,6 +930,23 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
+
+            // if we use task group, then need to acquire the task group resource
+            // if there is no resource the current task instance will not be dispatched
+            // it will be weakup when other tasks release the resource.
+            int taskGroupId = taskInstance.getTaskGroupId();
+            if (taskGroupId > 0) {
+                boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
+                                                                           taskInstance.getName(),
+                                                                           taskGroupId,
+                                                                           taskInstance.getProcessInstanceId(),
+                                                                           taskInstance.getTaskGroupPriority());
+                if (!acquireTaskGroup) {
+                    logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
+                    return Optional.of(taskInstance);
+                }
+            }
+
             boolean dispatchSuccess = taskProcessor.action(TaskAction.DISPATCH);
             if (!dispatchSuccess) {
                 logger.error("process id:{} name:{} dispatch standby task id:{} name:{} failed!",
@@ -1673,7 +1694,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             taskInstance.getName(),
             taskInstance.getId(),
             taskInstance.getTaskCode());
-        TaskMetrics.incTaskSubmit();
+        TaskMetrics.incTaskInstanceByState("submit");
         readyToSubmitTaskQueue.put(taskInstance);
     }
 
@@ -1814,10 +1835,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         // todo: Can we use a better way to set the recover taskInstanceId list? rather then use the cmdParam
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
-            if (ArrayUtils.isNotEmpty(idList)) {
-                List<Integer> taskInstanceIds = Arrays.stream(idList).map(Integer::valueOf).collect(Collectors.toList());
-                return processService.findTaskInstanceByIdList(taskInstanceIds);
+            List<Integer> startTaskInstanceIds = Arrays.stream(paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING)
+                                                                   .split(COMMA))
+                .filter(StringUtils::isNotEmpty)
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(startTaskInstanceIds)) {
+                return processService.findTaskInstanceByIdList(startTaskInstanceIds);
             }
         }
         return Collections.emptyList();

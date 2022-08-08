@@ -32,8 +32,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.COPY_SUFFIX;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
@@ -1010,7 +1012,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (index > 0) {
             processDefinitionName = processDefinitionName.substring(0, index);
         }
-        processDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
+        processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
 
         ProcessDefinition processDefinition;
         List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
@@ -1206,8 +1208,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // generate import processDefinitionName
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
-        String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
-
+        String importProcessDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
         //unique check
         Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
@@ -1232,7 +1233,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         for (TaskDefinition taskDefinition : taskDefinitionList) {
             TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-            taskDefinitionLog.setName(taskDefinitionLog.getName() + "_import_" + DateUtils.getCurrentTimeStamp());
+            taskDefinitionLog.setName(taskDefinitionLog.getName());
             taskDefinitionLog.setProjectCode(projectCode);
             taskDefinitionLog.setUserId(loginUser.getId());
             taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
@@ -1716,6 +1717,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param targetProjectCode targetProjectCode
      */
     @Override
+    @Transactional
     public Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                           long projectCode,
                                                           String codes,
@@ -1824,7 +1826,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                     taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setVersion(0);
-                    taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                    taskDefinitionLog.setName(taskDefinitionLog.getName());
                 }
                 for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
                     if (processTaskRelationLog.getPreTaskCode() > 0) {
@@ -1834,6 +1836,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
                     }
                 }
+                final long oldProcessDefinitionCode = processDefinition.getCode();
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
@@ -1842,7 +1845,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 processDefinition.setId(0);
                 processDefinition.setUserId(loginUser.getId());
-                processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                processDefinition.setName(getNewName(processDefinition.getName(), COPY_SUFFIX));
                 final Date date = new Date();
                 processDefinition.setCreateTime(date);
                 processDefinition.setUpdateTime(date);
@@ -1855,6 +1858,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         jsonNodes.set(i, node);
                     }
                     processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
+                }
+                //copy timing configuration
+                Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
+                if (scheduleObj != null) {
+                    scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
+                    scheduleObj.setReleaseState(ReleaseState.OFFLINE);
+                    scheduleObj.setCreateTime(date);
+                    scheduleObj.setUpdateTime(date);
+                    int insertResult = scheduleMapper.insert(scheduleObj);
+                    if (insertResult != 1) {
+                        putMsg(result, Status.CREATE_SCHEDULE_ERROR);
+                        throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
+                    }
                 }
                 try {
                     result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson));
@@ -1874,6 +1890,28 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
             }
         }
+    }
+
+    /**
+     * get new Task name or Process name when copy or import operate
+     * @param originalName Task or Process original name
+     * @param suffix "_copy_" or "_import_"
+     * @return
+     */
+    public String getNewName(String originalName, String suffix) {
+        StringBuilder newName = new StringBuilder();
+        String regex = String.format(".*%s\\d{17}$", suffix);
+        if (originalName.matches(regex)) {
+            //replace timestamp of originalName
+            return newName.append(originalName, 0, originalName.lastIndexOf(suffix))
+                    .append(suffix)
+                    .append(DateUtils.getCurrentTimeStamp())
+                    .toString();
+        }
+        return newName.append(originalName)
+                .append(suffix)
+                .append(DateUtils.getCurrentTimeStamp())
+                .toString();
     }
 
     /**

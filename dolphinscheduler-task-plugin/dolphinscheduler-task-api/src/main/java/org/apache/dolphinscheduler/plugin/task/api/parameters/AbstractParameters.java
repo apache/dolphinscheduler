@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,7 +93,8 @@ public abstract class AbstractParameters implements IParameters {
         Map<String, Property> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
             for (Property property : localParams) {
-                if (Objects.equals(Direct.IN, property.getDirect())) {
+                // The direct of some tasks is empty, default IN
+                if (property.getDirect() == null || Objects.equals(Direct.IN, property.getDirect())) {
                     localParametersMaps.put(property.getProp(), property);
                 }
             }

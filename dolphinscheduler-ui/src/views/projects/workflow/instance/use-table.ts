@@ -30,7 +30,6 @@ import {
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import { renderTableTime, runningType } from '@/common/common'
-import styles from './index.module.scss'
 import { renderStateCell } from '../../task/instance/use-table'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -175,8 +174,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](6),
-        className: styles.operation,
+        ...COLUMN_WIDTH_CONFIG['operation'](7),
         render: (_row: IWorkflowInstance, index: number) =>
           h(TableAction, {
             row: _row,

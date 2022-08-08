@@ -63,6 +63,7 @@ public class TaskStateEventHandler implements StateEventHandler {
             }
             workflowExecuteRunnable.taskFinished(task);
             if (task.getTaskGroupId() > 0) {
+                logger.info("The task instance need to release task Group: {}", task.getTaskGroupId());
                 workflowExecuteRunnable.releaseTaskGroup(task);
             }
             return true;
@@ -96,17 +97,17 @@ public class TaskStateEventHandler implements StateEventHandler {
             return;
         }
         if (taskStateEvent.getExecutionStatus().typeIsFinished()) {
-            TaskMetrics.incTaskFinish();
+            TaskMetrics.incTaskInstanceByState("finish");
         }
         switch (taskStateEvent.getExecutionStatus()) {
             case STOP:
-                TaskMetrics.incTaskStop();
+                TaskMetrics.incTaskInstanceByState("stop");
                 break;
             case SUCCESS:
-                TaskMetrics.incTaskSuccess();
+                TaskMetrics.incTaskInstanceByState("success");
                 break;
             case FAILURE:
-                TaskMetrics.incTaskFailure();
+                TaskMetrics.incTaskInstanceByState("fail");
                 break;
             default:
                 break;

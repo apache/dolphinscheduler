@@ -35,8 +35,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -70,7 +68,7 @@ public class ProjectController extends BaseController {
     /**
      * create project
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
      * @param description description
      * @return returns an error if it exists
@@ -87,15 +85,14 @@ public class ProjectController extends BaseController {
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
-        Map<String, Object> result = projectService.createProject(loginUser, projectName, description);
-        return returnDataList(result);
+        return projectService.createProject(loginUser, projectName, description);
     }
 
     /**
      * update project
      *
-     * @param loginUser login user
-     * @param code project code
+     * @param loginUser   login user
+     * @param code        project code
      * @param projectName project name
      * @param description description
      * @return update result code
@@ -116,15 +113,14 @@ public class ProjectController extends BaseController {
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "userName") String userName) {
-        Map<String, Object> result = projectService.update(loginUser, code, projectName, description, userName);
-        return returnDataList(result);
+        return projectService.update(loginUser, code, projectName, description, userName);
     }
 
     /**
      * query project details by code
      *
      * @param loginUser login user
-     * @param code project code
+     * @param code      project code
      * @return project detail information
      */
     @ApiOperation(value = "queryProjectByCode", notes = "QUERY_PROJECT_BY_ID_NOTES")
@@ -137,8 +133,7 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable("code") long code) {
-        Map<String, Object> result = projectService.queryByCode(loginUser, code);
-        return returnDataList(result);
+        return projectService.queryByCode(loginUser, code);
     }
 
     /**
@@ -146,8 +141,8 @@ public class ProjectController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which the login user have permission to see
      */
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
@@ -179,7 +174,7 @@ public class ProjectController extends BaseController {
      * delete project by code
      *
      * @param loginUser login user
-     * @param code project code
+     * @param code      project code
      * @return delete result code
      */
     @ApiOperation(value = "delete", notes = "DELETE_PROJECT_BY_ID_NOTES")
@@ -192,15 +187,14 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code) {
-        Map<String, Object> result = projectService.deleteProject(loginUser, code);
-        return returnDataList(result);
+        return projectService.deleteProject(loginUser, code);
     }
 
     /**
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the projects which user have not permission to see
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
@@ -213,15 +207,14 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, userId);
-        return returnDataList(result);
+        return projectService.queryUnauthorizedProject(loginUser, userId);
     }
 
     /**
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     @ApiOperation(value = "queryAuthorizedProject", notes = "QUERY_AUTHORIZED_PROJECT_NOTES")
@@ -234,15 +227,14 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
-        return returnDataList(result);
+        return projectService.queryAuthorizedProject(loginUser, userId);
     }
 
     /**
      * query authorized user
      *
-     * @param loginUser     login user
-     * @param projectCode   project code
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return users        who have permission for the specified project
      */
     @ApiOperation(value = "queryAuthorizedUser", notes = "QUERY_AUTHORIZED_USER_NOTES")
@@ -254,9 +246,8 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_USER)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAuthorizedUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam("projectCode") Long projectCode) {
-        Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, projectCode);
-        return this.returnDataList(result);
+                                      @RequestParam("projectCode") Long projectCode) {
+        return projectService.queryAuthorizedUser(loginUser, projectCode);
     }
 
     /**
@@ -271,8 +262,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
-        return returnDataList(result);
+        return projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
     }
 
     /**
@@ -287,7 +277,6 @@ public class ProjectController extends BaseController {
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = projectService.queryAllProjectList(loginUser);
-        return returnDataList(result);
+        return projectService.queryAllProjectList(loginUser);
     }
 }
