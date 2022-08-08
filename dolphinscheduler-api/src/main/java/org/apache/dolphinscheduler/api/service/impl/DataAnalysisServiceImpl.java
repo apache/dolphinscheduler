@@ -166,8 +166,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = null;
         Date end = null;
         if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
+            start = DateUtils.stringToDate(startDate);
+            end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
@@ -258,15 +258,13 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return result;
         }
         Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
-        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
-
         // count normal command state
-        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(userId, start, end, projectCodeArray)
+        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
-        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(userId, start, end, projectCodeArray)
+        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 

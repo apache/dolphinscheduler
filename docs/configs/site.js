@@ -45,13 +45,13 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.0.0-beta-1)',
+            text: 'latest(3.0.0-beta-2)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
-            text: '1.3.9',
-            link: '/en-us/docs/1.3.9/user_doc/quick-start.html',
+            text: '2.0.6',
+            link: '/en-us/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',
@@ -70,14 +70,9 @@ export default {
         link: '/en-us/blog/index.html',
       },
       {
-        key: 'development',
-        text: 'DEVELOPMENT',
-        link: '/en-us/development/development-environment-setup.html',
-      },
-      {
         key: 'community',
         text: 'COMMUNITY',
-        link: '/en-us/community/team.html',
+        link: '/en-us/community/community.html',
       },
       {
         key: 'ASF',
@@ -129,48 +124,6 @@ export default {
         link: '/en-us/user/index.html',
       },
     ],
-    documentation: {
-      title: 'Documentation',
-      list: [
-        {
-          text: 'Overview',
-          link: '/en-us/development/architecture-design.html',
-        },
-        {
-          text: 'Quick start',
-          link: '/en-us/docs/latest/user_doc/guide/quick-start.html',
-        },
-        {
-          text: 'Developer guide',
-          link: '/en-us/development/development-environment-setup.html',
-        },
-      ],
-    },
-    asf: {
-      title: 'ASF',
-      list: [
-        {
-          text: 'Foundation',
-          link: 'http://www.apache.org',
-        },
-        {
-          text: 'License',
-          link: 'http://www.apache.org/licenses/',
-        },
-        {
-          text: 'Events',
-          link: 'http://www.apache.org/events/current-event',
-        },
-        {
-          text: 'Sponsorship',
-          link: 'http://www.apache.org/foundation/sponsorship.html',
-        },
-        {
-          text: 'Thanks',
-          link: 'http://www.apache.org/foundation/thanks.html',
-        },
-      ],
-    },
     contact: {
       title: 'About us',
       content: 'Do you need feedback? Please contact us through the following ways.',
@@ -221,13 +174,13 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.0.0-beta-1)',
+            text: '最新版本latest(3.0.0-beta-2)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
-            text: '1.3.9',
-            link: '/zh-cn/docs/1.3.9/user_doc/quick-start.html',
+            text: '2.0.6',
+            link: '/zh-cn/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',
@@ -247,14 +200,9 @@ export default {
         link: '/zh-cn/blog/index.html',
       },
       {
-        key: 'development',
-        text: '开发者',
-        link: '/zh-cn/development/development-environment-setup.html',
-      },
-      {
         key: 'community',
         text: '社区',
-        link: '/zh-cn/community/team.html',
+        link: '/zh-cn/community/community.html',
       },
       {
         key: 'ASF',
@@ -307,48 +255,6 @@ export default {
         link: '/zh-cn/user/index.html',
       },
     ],
-    documentation: {
-      title: '文档',
-      list: [
-        {
-          text: '概览',
-          link: '/zh-cn/development/architecture-design.html',
-        },
-        {
-          text: '快速开始',
-          link: '/zh-cn/docs/latest/user_doc/guide/quick-start.html',
-        },
-        {
-          text: '开发者指南',
-          link: '/zh-cn/development/development-environment-setup.html',
-        },
-      ],
-    },
-    asf: {
-      title: 'ASF',
-      list: [
-        {
-          text: '基金会',
-          link: 'http://www.apache.org',
-        },
-        {
-          text: '证书',
-          link: 'http://www.apache.org/licenses/',
-        },
-        {
-          text: '事件',
-          link: 'http://www.apache.org/events/current-event',
-        },
-        {
-          text: '赞助',
-          link: 'http://www.apache.org/foundation/sponsorship.html',
-        },
-        {
-          text: '致谢',
-          link: 'http://www.apache.org/foundation/thanks.html',
-        },
-      ],
-    },
     contact: {
       title: '联系我们',
       content: '有问题需要反馈？请通过以下方式联系我们。',

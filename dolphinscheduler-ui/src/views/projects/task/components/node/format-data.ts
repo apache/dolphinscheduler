@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { find, omit, cloneDeep } from 'lodash'
+import { omit, cloneDeep } from 'lodash'
 import type {
   INodeData,
   ITaskData,
@@ -88,6 +88,7 @@ export function formatParams(data: INodeData): {
       taskParams.hadoopCustomParams = data.hadoopCustomParams
       taskParams.sqoopAdvancedParams = data.sqoopAdvancedParams
       taskParams.concurrency = data.concurrency
+      taskParams.splitBy = data.splitBy
       taskParams.modelType = data.modelType
       taskParams.sourceType = data.sourceType
       taskParams.targetType = data.targetType
@@ -199,12 +200,23 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SEATUNNEL') {
-    if (data.deployMode === 'local') {
-      data.master = 'local'
-      data.masterUrl = ''
-      data.deployMode = 'client'
+    taskParams.engine = data.engine
+    taskParams.useCustom = data.useCustom
+    taskParams.rawScript = data.rawScript
+    switch (data.engine) {
+      case 'FLINK':
+        taskParams.runMode = data.runMode
+        taskParams.others = data.others
+        break
+      case 'SPARK':
+        taskParams.deployMode = data.deployMode
+        taskParams.master = data.master
+        taskParams.masterUrl = data.masterUrl
+        taskParams.queue = data.queue
+        break
+      default:
+        break
     }
-    buildRawScript(data)
   }
 
   if (data.taskType === 'SWITCH') {
@@ -310,12 +322,16 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'EMR') {
     taskParams.type = data.type
+    taskParams.programType = data.programType
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
+    taskParams.stepsDefineJson = data.stepsDefineJson
   }
 
   if (data.taskType === 'ZEPPELIN') {
-    taskParams.noteId = data.zeppelinNoteId
-    taskParams.paragraphId = data.zeppelinParagraphId
+    taskParams.noteId = data.noteId
+    taskParams.paragraphId = data.paragraphId
+    taskParams.restEndpoint = data.restEndpoint
+    taskParams.productionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
   }
 
@@ -360,7 +376,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DVC') {
-
     taskParams.dvcTaskType = data.dvcTaskType
     taskParams.dvcRepository = data.dvcRepository
     taskParams.dvcVersion = data.dvcVersion
@@ -370,6 +385,16 @@ export function formatParams(data: INodeData): {
     taskParams.dvcStoreUrl = data.dvcStoreUrl
   }
 
+  if (data.taskType === 'SAGEMAKER') {
+    taskParams.sagemakerRequestJson = data.sagemakerRequestJson
+  }
+
+  if (data.taskType === 'DINKY') {
+    taskParams.address = data.address
+    taskParams.taskId = data.taskId
+    taskParams.online = data.online
+  }
+
   if (data.taskType === 'OPENMLDB') {
     taskParams.zk = data.zk
     taskParams.zkPath = data.zkPath
@@ -377,9 +402,17 @@ export function formatParams(data: INodeData): {
     taskParams.sql = data.sql
   }
 
+  if (data.taskType === 'CHUNJUN') {
+    taskParams.customConfig = data.customConfig ? 1 : 0
+    taskParams.json = data.json
+    taskParams.deployMode = data.deployMode
+    taskParams.others = data.others
+  }
+
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
   }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
@@ -617,50 +650,4 @@ export function formatModel(data: ITaskData) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
   return params
-}
-
-const buildRawScript = (model: INodeData) => {
-  const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
-  if (!model.resourceList) return
-
-  let master = model.master
-  let masterUrl = model?.masterUrl ? model?.masterUrl : ''
-  let deployMode = model.deployMode
-  const queue = model.queue
-
-  if (model.deployMode === 'local') {
-    master = 'local'
-    masterUrl = ''
-    deployMode = 'client'
-  }
-
-  if (master === 'yarn' || master === 'local') {
-    masterUrl = ''
-  }
-
-  let localParams = ''
-  model?.localParams?.forEach((param: any) => {
-    localParams = localParams + ' --variable ' + param.prop + '=' + param.value
-  })
-
-  let rawScript = ''
-  model.resourceList?.forEach((id: number) => {
-    const item = find(model.resourceFiles, { id: id })
-
-    rawScript =
-      rawScript +
-      baseScript +
-      ' --master ' +
-      master +
-      masterUrl +
-      ' --deploy-mode ' +
-      deployMode +
-      ' --queue ' +
-      queue
-    if (item && item.fullName) {
-      rawScript = rawScript + ' --config ' + item.fullName
-    }
-    rawScript = rawScript + localParams + ' \n'
-  })
-  model.rawScript = rawScript ? rawScript : ''
 }

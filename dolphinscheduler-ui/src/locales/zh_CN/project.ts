@@ -195,7 +195,7 @@ export default {
     project_tips: '请选择项目',
     workflow_relation_no_data_result_title: '工作流关系不存在',
     workflow_relation_no_data_result_desc:
-        '目前没有任何工作流，请先创建工作流，再访问该页面'
+      '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
     cancel_full_screen: '取消全屏',
@@ -348,6 +348,7 @@ export default {
     init_script_tips: '请输入初始化脚本',
     resources: '资源',
     resources_tips: '请选择资源',
+    resources_limit_tips: '请重新选择，资源个数限制:',
     no_resources_tips: '请删除所有未授权或已删除资源',
     useless_resources_tips: '未授权或已删除资源',
     custom_parameters: '自定义参数',
@@ -393,7 +394,7 @@ export default {
     parallelism_tips: '请输入并行度',
     parallelism_number_tips: '并行度必须为正整数',
     parallelism_complement_tips:
-        '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
+      '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
     task_manager_number: 'TaskManager数量',
     task_manager_number_tips: '请输入TaskManager数量',
     http_url: '请求地址',
@@ -428,7 +429,7 @@ export default {
     procedure_method: 'SQL语句',
     procedure_method_tips: '请输入存储脚本',
     procedure_method_snippet:
-        '--请输入存储脚本 \n\n--调用存储过程: call <procedure-name>[(<arg1>,<arg2>, ...)] \n\n--调用存储函数：?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
+      '--请输入存储脚本 \n\n--调用存储过程: call <procedure-name>[(<arg1>,<arg2>, ...)] \n\n--调用存储函数：?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: '运行',
     edit: '编辑',
     copy: '复制节点',
@@ -490,6 +491,8 @@ export default {
     allow_insert: '无更新便插入',
     concurrency: '并发度',
     concurrency_tips: '请输入并发度',
+    concurrency_column: '并发键',
+    concurrency_column_tips: '请输入并发键',
     sea_tunnel_master: 'Master',
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: '队列',
@@ -497,6 +500,7 @@ export default {
     add_pre_task_check_condition: '添加前置检查条件',
     switch_condition: '条件',
     switch_branch_flow: '分支流转',
+    switch_branch_flow_tips: '请选择分支流转',
     and: '且',
     or: '或',
     datax_custom_template: '自定义模板',
@@ -516,6 +520,7 @@ export default {
     datax_job_runtime_memory_xms: '最小内存',
     datax_job_runtime_memory_xmx: '最大内存',
     datax_job_runtime_memory_unit: 'G',
+    chunjun_json_template: 'JSON 脚本',
     current_hour: '当前小时',
     last_1_hour: '前1小时',
     last_2_hour: '前2小时',
@@ -599,14 +604,20 @@ export default {
     required: '必填',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: '请输入工作流定义',
+    emr_steps_define_json: 'stepsDefineJson',
+    emr_steps_define_json_tips: '请输入EMR步骤定义',
     segment_separator: '分段执行符号',
     segment_separator_tips: '请输入分段执行符号',
-    zeppelin_note_id: 'zeppelin_note_id',
+    zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: '请输入zeppelin note id',
-    zeppelin_paragraph_id: 'zeppelin_paragraph_id',
+    zeppelin_paragraph_id: 'zeppelinParagraphId',
+    zeppelin_production_note_directory: '生产模式下存放克隆note的目录',
+    zeppelin_production_note_directory_tips: '请输入生产环境note目录以启用生产模式',
     zeppelin_paragraph_id_tips: '请输入zeppelin paragraph id',
     zeppelin_parameters: 'parameters',
     zeppelin_parameters_tips: '请输入zeppelin dynamic form参数',
+    zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+    zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips: '请输入papermill所在的conda环境名',
     jupyter_input_note_path: 'inputNotePath',
@@ -634,7 +645,7 @@ export default {
     mlflow_isSearchParams: '是否搜索参数',
     mlflow_dataPath: '数据路径',
     mlflow_dataPath_tips:
-        ' 文件/文件夹的绝对路径, 若文件需以.csv结尾, 文件夹需包含train.csv和test.csv ',
+      ' 文件/文件夹的绝对路径, 若文件需以.csv结尾, 文件夹需包含train.csv和test.csv ',
     mlflow_dataPath_error_tips: ' 数据路径不能为空 ',
     mlflow_experimentName: '实验名称',
     mlflow_experimentName_tips: 'experiment_001',
@@ -692,6 +703,15 @@ export default {
     please_enter_filter_expression: '请输入源表过滤条件',
     please_enter_column_only_single_column_is_supported: '请选择源表检测列',
     please_enter_threshold_number_is_needed: '请输入阈值',
-    please_enter_comparison_title: '请选择期望值类型'
+    please_enter_comparison_title: '请选择期望值类型',
+    custom_config: '自定义配置',
+    engine: '引擎',
+    engine_tips: '请选择引擎',
+    run_mode: '运行模式',
+    dinky_address: 'dinky 地址',
+    dinky_address_tips: '请输入 Dinky 地址',
+    dinky_task_id: 'dinky 作业ID',
+    dinky_task_id_tips: '请输入作业 ID',
+    dinky_online: '是否上线作业'
   }
 }

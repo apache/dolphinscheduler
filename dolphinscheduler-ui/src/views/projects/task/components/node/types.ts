@@ -265,6 +265,7 @@ interface ITaskParams {
   hadoopCustomParams?: ILocalParam[]
   sqoopAdvancedParams?: ILocalParam[]
   concurrency?: number
+  splitBy?: string
   modelType?: ModelType
   sourceType?: SourceType
   targetType?: SourceType
@@ -272,6 +273,7 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  masterUrl?: string
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
@@ -294,8 +296,13 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  stepsDefineJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
+  zeppelinRestEndpoint?: string
+  restEndpoint?: string
+  zeppelinProductionNoteDirectory?: string
+  productionNoteDirectory?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
@@ -341,6 +348,8 @@ interface ITaskParams {
   zk?: string
   zkPath?: string
   executeMode?: string
+  useCustom?: boolean
+  runMode?: string
   dvcTaskType?: string
   dvcRepository?: string
   dvcVersion?: string
@@ -348,6 +357,10 @@ interface ITaskParams {
   dvcMessage?: string
   dvcLoadSaveDataPath?: string
   dvcStoreUrl?: string
+  address?: string
+  taskId?: string
+  online?: boolean
+  sagemakerRequestJson?: string
 }
 
 interface INodeData
@@ -394,7 +407,6 @@ interface INodeData
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
-  masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
   definition?: object

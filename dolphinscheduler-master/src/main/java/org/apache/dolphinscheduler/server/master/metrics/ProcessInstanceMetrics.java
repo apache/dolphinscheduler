@@ -17,104 +17,73 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableSet;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
+import lombok.experimental.UtilityClass;
 
-public final class ProcessInstanceMetrics {
+@UtilityClass
+public class ProcessInstanceMetrics {
 
-    private ProcessInstanceMetrics() {
-        throw new UnsupportedOperationException("Utility class");
+    private final Map<String, Counter> processInstanceCounters = new HashMap<>();
+
+    private final Set<String> processInstanceStates = ImmutableSet.of(
+            "submit", "timeout", "finish", "failover", "success", "fail", "stop");
+
+    static {
+        for (final String state : processInstanceStates) {
+            processInstanceCounters.put(
+                    state,
+                    Counter.builder("ds.workflow.instance.count")
+                            .tag("state", state)
+                            .description(String.format("Process instance %s total count", state))
+                            .register(Metrics.globalRegistry)
+            );
+        }
+
     }
 
-    private static final Timer COMMAND_QUERY_TIMETER =
+    private final Timer commandQueryTimer =
         Timer.builder("ds.workflow.command.query.duration")
             .description("Command query duration")
             .register(Metrics.globalRegistry);
 
-    private static final Timer PROCESS_INSTANCE_GENERATE_TIMER =
+    private final Timer processInstanceGenerateTimer =
         Timer.builder("ds.workflow.instance.generate.duration")
             .description("Process instance generated duration")
             .register(Metrics.globalRegistry);
 
-    private static final Counter PROCESS_INSTANCE_SUBMIT_COUNTER =
-        Counter.builder("ds.workflow.instance.submit.count")
-            .description("Process instance submit total count")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_TIMEOUT_COUNTER =
-        Counter.builder("ds.workflow.instance.timeout.count")
-            .description("Process instance timeout total count")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_FINISH_COUNTER =
-            Counter.builder("ds.workflow.instance.finish.count")
-                    .description("Process instance finish total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_SUCCESS_COUNTER =
-            Counter.builder("ds.workflow.instance.success.count")
-                    .description("Process instance success total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_FAILURE_COUNTER =
-            Counter.builder("ds.workflow.instance.failure.count")
-                    .description("Process instance failure total count")
-                    .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_STOP_COUNTER =
-        Counter.builder("ds.workflow.instance.stop.count")
-            .description("Process instance stop total count")
-            .register(Metrics.globalRegistry);
-
-    private static final Counter PROCESS_INSTANCE_FAILOVER_COUNTER =
-        Counter.builder("ds.workflow.instance.failover.count")
-            .description("Process instance failover total count")
-            .register(Metrics.globalRegistry);
-
-    public static void recordCommandQueryTime(long milliseconds) {
-        COMMAND_QUERY_TIMETER.record(milliseconds, TimeUnit.MILLISECONDS);
+    public void recordCommandQueryTime(long milliseconds) {
+        commandQueryTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static void recordProcessInstanceGenerateTime(long milliseconds) {
-        PROCESS_INSTANCE_GENERATE_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
+    public void recordProcessInstanceGenerateTime(long milliseconds) {
+        processInstanceGenerateTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
+    public synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
         Gauge.builder("ds.workflow.instance.running", function)
             .description("The current running process instance count")
             .register(Metrics.globalRegistry);
     }
 
-    public static void incProcessInstanceSubmit() {
-        PROCESS_INSTANCE_SUBMIT_COUNTER.increment();
+    public synchronized void registerProcessInstanceResubmitGauge(Supplier<Number> function) {
+        Gauge.builder("ds.workflow.instance.resubmit", function)
+            .description("The current process instance need to resubmit count")
+            .register(Metrics.globalRegistry);
     }
 
-    public static void incProcessInstanceTimeout() {
-        PROCESS_INSTANCE_TIMEOUT_COUNTER.increment();
+    public void incProcessInstanceByState(final String state) {
+        processInstanceCounters.get(state).increment();
     }
 
-    public static void incProcessInstanceFinish() {
-        PROCESS_INSTANCE_FINISH_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceSuccess() {
-        PROCESS_INSTANCE_SUCCESS_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceFailure() {
-        PROCESS_INSTANCE_FAILURE_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceStop() {
-        PROCESS_INSTANCE_STOP_COUNTER.increment();
-    }
-
-    public static void incProcessInstanceFailover() {
-        PROCESS_INSTANCE_FAILOVER_COUNTER.increment();
-    }
 }

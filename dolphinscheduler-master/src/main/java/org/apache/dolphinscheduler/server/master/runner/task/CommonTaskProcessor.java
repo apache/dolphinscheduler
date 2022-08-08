@@ -51,24 +51,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     protected boolean submitTask() {
         this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
-        if (this.taskInstance == null) {
-            return false;
-        }
-
-        int taskGroupId = taskInstance.getTaskGroupId();
-        if (taskGroupId > 0) {
-            boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
-                    taskInstance.getName(),
-                    taskGroupId,
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskGroupPriority());
-            if (!acquireTaskGroup) {
-                logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
-                return true;
-            }
-        }
-        dispatchTask();
-        return true;
+        return this.taskInstance != null;
     }
 
     @Override
@@ -119,7 +102,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
-            logger.info("task ready to submit: taskInstanceId: {}", taskInstance.getId());
+            logger.info("task ready to dispatch to worker: taskInstanceId: {}", taskInstance.getId());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
@@ -167,7 +150,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
 
-            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
+            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
 
             Host host = Host.of(taskInstance.getHost());
             executionContext.setHost(host);

@@ -53,7 +53,7 @@ import com.google.common.collect.Sets;
  * <p>When the Master node startup, it will register in registry center. And schedule a {@link HeartBeatTask} to update its metadata in registry.
  */
 @Component
-public class MasterRegistryClient {
+public class MasterRegistryClient implements AutoCloseable {
 
     /**
      * logger
@@ -107,7 +107,8 @@ public class MasterRegistryClient {
         registryClient.setStoppable(stoppable);
     }
 
-    public void closeRegistry() {
+    @Override
+    public void close() {
         // TODO unsubscribe MasterRegistryDataListener
         deregister();
     }
@@ -189,11 +190,12 @@ public class MasterRegistryClient {
         String localNodePath = getCurrentNodePath();
         Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                masterConfig.getMaxCpuLoadAvg(),
-                masterConfig.getReservedMemory(),
-                Sets.newHashSet(localNodePath),
-                Constants.MASTER_TYPE,
-                registryClient);
+                                                        masterConfig.getMaxCpuLoadAvg(),
+                                                        masterConfig.getReservedMemory(),
+                                                        Sets.newHashSet(localNodePath),
+                                                        Constants.MASTER_TYPE,
+                                                        registryClient,
+                                                        masterConfig.getHeartbeatErrorThreshold());
 
         // remove before persist
         registryClient.remove(localNodePath);
