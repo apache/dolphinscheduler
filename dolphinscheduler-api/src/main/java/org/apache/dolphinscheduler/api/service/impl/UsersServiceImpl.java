@@ -1372,6 +1372,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
+        user = userMapper.queryDetailsById(user.getId());
         return user;
     }
 }

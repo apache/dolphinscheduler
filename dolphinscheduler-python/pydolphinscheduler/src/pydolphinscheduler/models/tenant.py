@@ -45,15 +45,14 @@ class Tenant(BaseSide):
     ) -> None:
         """Create Tenant if not exists."""
         gateway = launch_gateway()
-        tenant = gateway.entry_point.createTenant(self.name, self.description, queue_name)
+        tenant = gateway.entry_point.createTenant(self.code, self.description, queue_name)
         self.tenant_id = tenant.tenantId
         # gateway_result_checker(result, None)
 
-    @staticmethod
-    def get_tenant_list(user=configuration.USER_NAME, searchVal=None, pageNo=1, pageSize=10):
+    def get_tenant_list(self, user=configuration.USER_NAME, pageNo=1, pageSize=10):
         """Get Tenant list."""
         gateway = launch_gateway()
-        tenant_list = gateway.entry_point.getTenantList(user, searchVal, pageNo, pageSize)
+        tenant_list = gateway.entry_point.queryTenantList(user, self.description, pageNo, pageSize)
         return tenant_list
 
     def update(self, user=configuration.USER_NAME, code=None, queue_id=None, description=None) -> None:

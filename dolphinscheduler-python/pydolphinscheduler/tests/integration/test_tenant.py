@@ -16,6 +16,7 @@
 # under the License.
 
 """Test pydolphinscheduler tenant."""
+import pytest
 
 from pydolphinscheduler.models import Tenant
 
@@ -39,7 +40,7 @@ def test_create_tenant():
 def test_get_tenant():
     """Test get tenant from java gateway."""
     tenant = get_tenant()
-    tenant_list = Tenant().get_tenant_list()
+    tenant_list = Tenant(description=tenant.description).get_tenant_list()
     assert len(tenant_list) == 1
     tenant_ = tenant_list[0]
     assert tenant_.name == tenant.name

@@ -85,19 +85,18 @@ class User(BaseSide):
         gateway = launch_gateway()
         user = gateway.entry_point.queryUser(user_id)
         self.user_id = user.getId()
-        self.name = user.name
-        self.password = user.userPassword
-        self.email = user.email
-        self.phone = user.phone
-        self.tenant = user.tenant
-        self.queue = user.queue
-        self.status = user.status
+        self.name = user.getUserName()
+        self.password = user.getUserPassword()
+        self.email = user.getEmail()
+        self.phone = user.getPhone()
+        self.queue = user.getQueueName()
+        self.status = user.getState()
         return
 
     def update(self, password=None, email=None, phone=None, tenant=None, queue=None, status=None) -> None:
         """Update User."""
         gateway = launch_gateway()
-        gateway.entry_point.updateUser(
+        user = gateway.entry_point.updateUser(
             self.name,
             password,
             email,
@@ -106,24 +105,18 @@ class User(BaseSide):
             queue,
             status,
         )
-        self.password = password
-        self.email = email
-        self.phone = phone
-        self.tenant = tenant
-        self.queue = queue
-        self.status = status
+        self.user_id = user.getId()
+        self.name = user.getUserName()
+        self.password = user.getUserPassword()
+        self.email = user.getEmail()
+        self.phone = user.getPhone()
+        self.queue = user.getQueueName()
+        self.status = user.getState()
         return
 
     def delete(self) -> None:
         """Delete User."""
         gateway = launch_gateway()
         gateway.entry_point.deleteUser(self.name, self.user_id)
-        self.user_id = None
-        self.name = None
-        self.password = None
-        self.email = None
-        self.phone = None
-        self.tenant = None
-        self.queue = None
-        self.status = None
+        self.delete_all()
         return

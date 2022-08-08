@@ -17,13 +17,23 @@
 
 """Test pydolphinscheduler user."""
 
+import hashlib
+
+import pytest
+
 from pydolphinscheduler.models import User
+
+
+def genearteMD5(str):
+    hl = hashlib.md5()
+    hl.update(str.encode(encoding='utf-8'))
+    return hl.hexdigest()
 
 
 def get_user(name="test-name",
              password="test-password",
-             email="test-email",
-             phone="test-phone",
+             email="test-email@abc.com",
+             phone="17366637777",
              tenant="test-tenant",
              queue="test-queue",
              status=1):
@@ -35,7 +45,7 @@ def get_user(name="test-name",
 
 def test_create_user():
     """Test weather client could connect java gate way or not."""
-    user = User(name="test-name", password="test-password", email="test-email", phone="test-phone",
+    user = User(name="test-name", password="test-password", email="test-email@abc.com", phone="17366637777",
                 tenant="test-tenant", queue="test-queue", status=1)
     user.create_if_not_exists()
     assert user.user_id is not None
@@ -46,26 +56,22 @@ def test_get_user():
     user = get_user()
     user_ = User(user.name)
     user_.get_user(user.user_id)
-    assert user_.password == user.password
+    assert user_.password == genearteMD5(user.password)
     assert user_.email == user.email
     assert user_.phone == user.phone
-    assert user_.tenant == user.tenant
-    assert user_.queue == user.queue
     assert user_.status == user.status
 
 
 def test_update_user():
     """Test update user from java gateway."""
     user = get_user()
-    user.update(password="test-password-updated", email="test-email-updated", phone="test-phone-updated",
+    user.update(password="test-password-", email="test-email-updated@abc.com", phone="17366637766",
                 tenant="test-tenant-updated", queue="test-queue-updated", status=2)
     user_ = User(user.name)
-    User(user.name).get_user(user.user_id)
-    assert user_.password == "test-password-updated"
-    assert user_.email == "test-email-updated"
-    assert user_.phone == "test-phone-updated"
-    assert user_.tenant == "test-tenant-updated"
-    assert user_.queue == "test-queue-updated"
+    user_.get_user(user.user_id)
+    assert user_.password == genearteMD5("test-password-")
+    assert user_.email == "test-email-updated@abc.com"
+    assert user_.phone == "17366637766"
     assert user_.status == 2
 
 
@@ -73,4 +79,7 @@ def test_delete_user():
     """Test delete user from java gateway."""
     user = get_user()
     user.delete()
-    assert user.user_id is None
+    with pytest.raises(AttributeError) as excinfo:
+        var = user.user_id
+
+    assert excinfo.type == AttributeError

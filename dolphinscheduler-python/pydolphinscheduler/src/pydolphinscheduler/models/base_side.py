@@ -38,3 +38,10 @@ class BaseSide(Base):
     ):
         """Create Base if not exists."""
         raise NotImplementedError
+
+    def delete_all(self):
+        if not self:
+            return
+        listPro = [key for key in self.__dict__.keys()]
+        for key in listPro:
+            self.__delattr__(key)

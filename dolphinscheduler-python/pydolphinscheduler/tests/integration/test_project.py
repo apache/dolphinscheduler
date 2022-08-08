@@ -16,6 +16,7 @@
 # under the License.
 
 """Test pydolphinscheduler project."""
+import pytest
 
 from pydolphinscheduler.models import Project
 
@@ -62,3 +63,8 @@ def test_delete_project():
     project_ = Project()
     project_.get_project_by_name(name=project.name)
     assert project_.code is None
+
+    with pytest.raises(AttributeError) as excinfo:
+        var = project_.code
+
+    assert excinfo.type == AttributeError
