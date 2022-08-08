@@ -102,7 +102,7 @@ You are very welcome to communicate with the developers and users of Dolphin Sch
 
 ## How to Contribute
 
-The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html).
+The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](docs/docs/en/contribute/join/contribute.md).
 
 # Landscapes
 
