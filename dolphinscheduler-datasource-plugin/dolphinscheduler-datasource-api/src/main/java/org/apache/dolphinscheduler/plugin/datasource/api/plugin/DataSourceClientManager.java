@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
-import java.sql.Connection;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -65,20 +64,23 @@ public class DataSourceClientManager {
         return DataSourceClientManagerHolder.INSTANCE;
     }
 
-    public Connection getDataSource(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
+    public DataSourceClient getDataSource(DbType dbType, ConnectionParam connectionParam) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("Get connection from datasource {}", datasourceUniqueId);
 
-        DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
-            Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
-            if (null == dataSourceChannel) {
-                throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
-            }
-            return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
-        });
-        return dataSourceClient.getConnection();
+        try {
+            return uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
+                Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
+                DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+                if (null == dataSourceChannel) {
+                    throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+                }
+                return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
+            });
+        } catch (ExecutionException e) {
+            throw new RuntimeException(String.format("datasourceUniqueId '%s' is not found datasource", datasourceUniqueId));
+        }
     }
 
     private void initDataSourcePlugin() {
