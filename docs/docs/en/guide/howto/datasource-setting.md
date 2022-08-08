@@ -20,7 +20,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 ## Pseudo-Cluster/Cluster Initialize the Database
 
 DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
-which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`. Let's take MySQL as an example for how to initialize the database:
+which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs` and `tools/libs`. Let's take MySQL as an example for how to initialize the database:
 
 For mysql 5.6 / 5.7
 
