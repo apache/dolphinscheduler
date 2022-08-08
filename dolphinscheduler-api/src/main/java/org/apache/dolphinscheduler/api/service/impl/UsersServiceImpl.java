@@ -389,7 +389,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            throw new ServiceException("Function Disabled");
+            throw new ServiceException(Status.FUNCTION_DISABLED.getMsg());
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM.getMsg());
