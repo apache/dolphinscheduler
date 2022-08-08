@@ -30,7 +30,6 @@ import {
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import { renderTableTime, runningType } from '@/common/common'
-import styles from './index.module.scss'
 import { renderStateCell } from '../../task/instance/use-table'
 import {
   COLUMN_WIDTH_CONFIG,
