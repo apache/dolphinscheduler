@@ -369,3 +369,39 @@ def test_task_obtain_res_plugin_exception(m_get_content, m_code_version, attr):
         task = Task(**attr)
         task.get_plugin()
 
+
+@pytest.mark.parametrize(
+    "resources, expect",
+    [
+        (
+            ["/dev/test.py"],
+            [{"id": 1}],
+        ),
+        (
+            ["/dev/test.py", {"id": 2}],
+            [{"id": 1}, {"id": 2}],
+        ),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+@patch(
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
+    return_value=1,
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.user_name",
+    return_value="test_user",
+)
+def test_python_resource_list(
+    mock_code_version, mock_resource, mock_user_name, resources, expect
+):
+    """Test python task resource list."""
+    task = Task(
+        name="python_resource_list.",
+        task_type="PYTHON",
+        resource_list=resources,
+    )
+    assert task.resource_list == expect

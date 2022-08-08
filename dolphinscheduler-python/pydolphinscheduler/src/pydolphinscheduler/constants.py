@@ -120,3 +120,4 @@ class ResourceKey(str):
     """Constants for key of resource."""
 
     ID = "id"
+

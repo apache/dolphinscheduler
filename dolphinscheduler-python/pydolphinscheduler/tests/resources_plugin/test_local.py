@@ -102,22 +102,3 @@ def test_local_res_file_not_found(attr):
         local = Local(str(attr.get("prefix")))
         local.read_file(attr.get("file_name"))
 
-@pytest.mark.parametrize(
-    "attr",
-    [
-        {
-            "prefix": "/etc",
-            "file_name": "profile"
-        },
-    ],
-)
-#
-def test_local_res_file_no_permission(attr):
-    """test local resource plugin file does not have permission to access"""
-    with pytest.raises(
-        PyResPluginException, match="You don't have permission to access {}".format(Path(attr.get("prefix")).joinpath(attr.get("file_name")))
-    ):
-        local = Local(str(attr.get("prefix")))
-        path = Path(attr.get("prefix")).joinpath(attr.get("file_name"))
-        print(os.access(str(path), os.R_OK))
-        local.read_file(attr.get("file_name"))
