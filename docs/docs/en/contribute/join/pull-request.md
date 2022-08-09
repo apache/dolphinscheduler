@@ -64,7 +64,7 @@ Please refer to the commit message section.
 
 Code style is the thing you have to consider when you submit pull request for DolphinScheduler. We using [Checkstyle](https://checkstyle.sourceforge.io), a development tool to help programmers write Java code that adheres to a coding standard, in CI to keep DolphinScheduler codebase in the same style. Your pull request could not be merged if your code style checker failed. You could format your code by *Checkstyle* in your local environment before you submit your pull request to check code style. The activation step as below:
 
-1. Prepare Checkstyle configuration file: You could download it manually by [click here](https://github.com/apache/dolphinscheduler/blob/dev/style/checkstyle.xml), but find it in DolphinScheduler repository would be a better way. You could find configuration file in the path `style/checkstyle.xml` after you clone repository from Github.
+1. Prepare Checkstyle configuration file: You could download it manually by [click here](../../../../../style/checkstyle.xml), but find it in DolphinScheduler repository would be a better way. You could find configuration file in the path `style/checkstyle.xml` after you clone repository from Github.
 
 2. Download Checkstyle plugins in Intellij IDEA: Search plugin by keyword **CheckStyle-IDEA** or install in [this page](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea). You could see [install plugin](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_repo) if you do not know how to install plugin in Intellij IDEA
 

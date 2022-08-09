@@ -66,7 +66,7 @@ waste time。
 
 当你向 DolphinScheduler 提交 pull request 的时候 code-style 是你不得不考虑的问题。我们在 CI 中使用 Checkstyle [参考](https://checkstyle.sourceforge.io/)来保持代码风格的统一，它是一种帮助开发者编写遵循编码规范的 Java 代码开发工具。如果你的 pull request 没有通过 Checkstyle 的检测，那它将不会被合并到主库中。你可以在提交 pull request 前使用 Checkstyle 来检测或者格式化你的代码。如下的步骤将引领你配置并激活 Checkstyle
 
-1. 准备 Checkstyle 配置文件：你可以点击[这里](https://github.com/apache/dolphinscheduler/blob/dev/style/checkstyle.xml)手动下载，但是我们更加推荐在 DolphinScheduler 代码库中找到它。当你将代码库克隆下来后，你可以在路径 `style/checkstyle.xml` 下找到配置文件
+1. 准备 Checkstyle 配置文件：你可以点击[这里](../../../../../style/checkstyle.xml)手动下载，但是我们更加推荐在 DolphinScheduler 代码库中找到它。当你将代码库克隆下来后，你可以在路径 `style/checkstyle.xml` 下找到配置文件
 2. 下载 Intellij IDEA Checkstyle 插件：通过关键字**CheckStyle-IDEA**或者通过[这个页面](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea)安装均可。如果你不清楚如何安装Intellij IDEA插件，可以参考[这个连接](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_repo)
 3. 配置并激活 Checkstyles 以及 Intellij IDEA 代码风格：当完成上面几步后，你就可以配置并激活他们了。你可以在路径`Preferences -> Tool -> Checkstyle`中找到 Checkstyle，请参照下图完成其配置
 
