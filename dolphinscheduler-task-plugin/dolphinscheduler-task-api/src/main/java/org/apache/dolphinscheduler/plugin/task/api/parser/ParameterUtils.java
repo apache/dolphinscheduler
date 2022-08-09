@@ -21,8 +21,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_SHECDULE_TIME;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -152,7 +152,8 @@ public class ParameterUtils {
         }
     }
 
-    public static String replaceListParameter(Map<Integer, Property> params, String sql) {
+    public static String expandListParameter(Map<Integer, Property> params, String sql) {
+        Map<Integer, Property> expandMap = new HashMap<>();
         if (params == null || params.isEmpty()) {
             return sql;
         }
@@ -161,6 +162,7 @@ public class ParameterUtils {
             return sql;
         }
         StringBuilder ret = new StringBuilder(split[0]);
+        int index = 1;
         for (int i = 1; i < split.length; i++) {
             Property property = params.get(i);
             String value = property.getValue();
@@ -169,24 +171,42 @@ public class ParameterUtils {
                 if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
                     valueList.add(value);
                 }
-                valueList.forEach(v -> {
-                    if (v instanceof String) {
-                        ret.append("'").append(v).append("'");
-                    } else {
-                        ret.append(v);
+                for (int j = 0; j < valueList.size(); j++) {
+                    ret.append(PARAM_REPLACE_CHAR);
+                    if (j != valueList.size() - 1) {
+                        ret.append(",");
                     }
-                    ret.append(",");
-                });
-                ret.deleteCharAt(ret.length() - 1);
-                params.remove(i);
+                }
+                for (Object v : valueList ) {
+                    Property newProperty = new Property();
+                     if (v instanceof Integer) {
+                        newProperty.setType(DataType.INTEGER);
+                    } else if (v instanceof Long) {
+                        newProperty.setType(DataType.LONG);
+                    } else if (v instanceof Float) {
+                        newProperty.setType(DataType.FLOAT);
+                    } else if (v instanceof Double) {
+                        newProperty.setType(DataType.DOUBLE);
+                    } else {
+                        newProperty.setType(DataType.VARCHAR);
+                    }
+                    newProperty.setValue(v.toString());
+                    newProperty.setProp(property.getProp());
+                    newProperty.setDirect(property.getDirect());
+                    expandMap.put(index++, newProperty);
+                }
             } else {
                 ret.append(PARAM_REPLACE_CHAR);
+                expandMap.put(index++, property);
             }
             ret.append(split[i]);
         }
         if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
             ret.append(PARAM_REPLACE_CHAR);
+            expandMap.put(index, params.get(split.length));
         }
+        params.clear();
+        params.putAll(expandMap);
         return ret.toString();
     }
 

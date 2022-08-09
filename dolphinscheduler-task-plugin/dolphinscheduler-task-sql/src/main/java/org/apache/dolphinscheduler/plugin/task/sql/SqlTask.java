@@ -355,7 +355,7 @@ public class SqlTask extends AbstractTaskExecutor {
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
         try {
             Map<Integer, Property> params = sqlBinds.getParamsMap();
-            PreparedStatement stmt = connection.prepareStatement(ParameterUtils.replaceListParameter(params, sqlBinds.getSql()));
+            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
@@ -431,9 +431,10 @@ public class SqlTask extends AbstractTaskExecutor {
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
         String formatSql = sql.replaceAll(rgex, "?");
+        // Convert the list parameter
+        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
         sqlBuilder.append(formatSql);
-
-        // print repalce sql
+        // print replace sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
