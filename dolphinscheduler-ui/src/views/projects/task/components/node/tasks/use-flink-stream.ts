@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function useFlink({
+export function useFlinkStream({
   projectCode,
   from = 0,
   readonly,
@@ -31,7 +31,7 @@ export function useFlink({
   data?: ITaskData
 }) {
   const model = reactive<INodeData>({
-    taskType: 'FLINK',
+    taskType: 'FLINK_STREAM',
     name: '',
     flag: 'YES',
     description: '',
@@ -79,10 +79,7 @@ export function useFlink({
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
       Fields.useEnvironmentName(model, !data?.id),
-      ...Fields.useTaskGroup(model, projectCode),
-      ...Fields.useFailed(),
       Fields.useDelayTime(model),
-      ...Fields.useTimeoutAlarm(model),
       ...Fields.useFlink(model),
       Fields.usePreTasks()
     ] as IJsonItem[],

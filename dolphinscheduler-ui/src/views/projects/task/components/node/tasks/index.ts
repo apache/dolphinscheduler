@@ -16,6 +16,7 @@
  */
 
 import { useFlink } from './use-flink'
+import { useFlinkStream } from './use-flink-stream'
 import { useShell } from './use-shell'
 import { useSubProcess } from './use-sub-process'
 import { usePigeon } from './use-pigeon'
@@ -71,5 +72,5 @@ export default {
   DINKY: useDinky,
   SAGEMAKER: userSagemaker,
   CHUNJUN: useChunjun,
-  FLINK_STREAM: useFlink
+  FLINK_STREAM: useFlinkStream
 }
