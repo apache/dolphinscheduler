@@ -146,10 +146,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT, TENANT_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        if(checkDescriptionLength(desc)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
-        }
+
         Tenant tenant = new Tenant(tenantCode, desc, queueId);
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
@@ -214,10 +211,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        if(checkDescriptionLength(desc)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
-        }
+
         Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
         Tenant existsTenant = tenantMapper.queryById(id);
         updateTenantValid(existsTenant, updateTenant);
@@ -371,6 +365,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (checkTenantExists(tenantCode)) {
             return tenantMapper.queryByTenantCode(tenantCode);
         }
+
         Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
         Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
         createTenantValid(tenant);

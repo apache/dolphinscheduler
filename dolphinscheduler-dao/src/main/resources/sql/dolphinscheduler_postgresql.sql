@@ -562,7 +562,7 @@ CREATE TABLE t_ds_project (
   id int NOT NULL  ,
   name varchar(100) DEFAULT NULL ,
   code bigint NOT NULL,
-  description varchar(255) DEFAULT NULL ,
+  description varchar(200) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   flag int DEFAULT '1' ,
   create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
@@ -1854,7 +1854,7 @@ DROP TABLE IF EXISTS t_ds_task_group;
 CREATE TABLE t_ds_task_group (
    id serial NOT NULL,
    name        varchar(100) DEFAULT NULL ,
-   description varchar(255) DEFAULT NULL ,
+   description varchar(200) DEFAULT NULL ,
    group_size  int NOT NULL ,
    project_code bigint DEFAULT '0' ,
    use_size    int DEFAULT '0' ,

@@ -84,13 +84,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Transactional
     public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
+
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_CREATE);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-        if(checkDescriptionLength(description)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         if (name == null) {
@@ -137,10 +134,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP, ApiFuncIdentificationConstant.TASK_GROUP_EDIT);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-        if(checkDescriptionLength(description)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         if (name == null) {

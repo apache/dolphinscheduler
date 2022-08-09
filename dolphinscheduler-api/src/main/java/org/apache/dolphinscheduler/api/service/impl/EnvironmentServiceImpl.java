@@ -100,10 +100,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if(checkDescriptionLength(desc)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
-        }
+
         Map<String, Object> checkResult = checkParams(name,config,workerGroups);
         if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkResult;
@@ -357,10 +354,6 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         Map<String, Object> checkResult = checkParams(name,config,workerGroups);
         if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkResult;
-        }
-        if(checkDescriptionLength(desc)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
         }
 
         Environment environment = environmentMapper.queryByEnvironmentName(name);

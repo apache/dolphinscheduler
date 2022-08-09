@@ -114,13 +114,4 @@ public interface BaseService {
      * @return map<status,startDate,endDate>
      */
     Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
-
-    /**
-     * check checkDescriptionLength
-     *
-     * @param description input String
-     * @return ture if Length acceptable, Length exceeds return false
-     */
-    boolean checkDescriptionLength(String description);
-
 }

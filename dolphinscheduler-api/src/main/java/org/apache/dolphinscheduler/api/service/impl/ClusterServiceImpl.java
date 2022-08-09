@@ -283,11 +283,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             return result;
         }
 
-        if(checkDescriptionLength(desc)){
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
-        }
-
         Map<String, Object> checkResult = checkParams(name, config);
         if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkResult;
