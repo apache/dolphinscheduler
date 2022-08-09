@@ -113,7 +113,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     }
 
     @Override
-    public boolean operationPermissionCheck(Object authorizationType, Integer userId, String permissionKey, Logger logger) {
+    public boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId, String permissionKey, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
             logger.error("user id {} doesn't exist", userId);
@@ -433,7 +433,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return alertGroupMapper.listAuthorizedAlertGroupList(userId, null).stream().map(AlertGroup::getId).collect(toSet());
+            List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();
+            return alertGroupList.stream().map(AlertGroup::getId).collect(toSet());
         }
     }
 

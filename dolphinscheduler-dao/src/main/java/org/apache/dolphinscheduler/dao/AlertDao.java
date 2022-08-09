@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.codec.digest.DigestUtils;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class AlertDao {
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
-     * @param log log
+     * @param log alert results json
      * @param id id
      * @return update alert result
      */
@@ -260,7 +261,13 @@ public class AlertDao {
      */
     public List<Alert> listPendingAlerts() {
         LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
-                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
+            .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
+        return alertMapper.selectList(wrapper);
+    }
+
+    public List<Alert> listAlerts(int processInstanceId) {
+        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
+            .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
     }
 

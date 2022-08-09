@@ -273,9 +273,7 @@ public interface ProcessService {
                              String taskName, int groupId,
                              int processId, int priority);
 
-    boolean robTaskGroupResouce(TaskGroupQueue taskGroupQueue);
-
-    boolean acquireTaskGroupAgain(TaskGroupQueue taskGroupQueue);
+    boolean robTaskGroupResource(TaskGroupQueue taskGroupQueue);
 
     void releaseAllTaskGroup(int processInstanceId);
 
@@ -299,4 +297,6 @@ public interface ProcessService {
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
 
     public String findConfigYamlByName(String clusterName) ;
+
+    void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 }

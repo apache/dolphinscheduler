@@ -20,14 +20,13 @@ import {
   NButton,
   NIcon,
   NInput,
-  NCard,
   NDataTable,
-  NPagination
+  NPagination,
+  NSpace
 } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
-import styles from './index.module.scss'
 import { useTable } from './use-table'
 import FormModal from './components/form-modal'
 
@@ -146,21 +145,19 @@ const taskGroupOption = defineComponent({
     const { columns } = useTable(updateItem, resetTableData)
 
     return (
-      <div>
-        <NCard>
-          <div class={styles.toolbar}>
-            <div class={styles.left}>
-              <NButton
-                size='small'
-                type={'primary'}
-                onClick={() => this.onCreate()}
-              >
-                {t('resource.task_group_option.create')}
-              </NButton>
-            </div>
-            <div class={styles.right}>
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButton
+              size='small'
+              type={'primary'}
+              onClick={() => this.onCreate()}
+            >
+              {t('resource.task_group_option.create')}
+            </NButton>
+            <NSpace>
               <NInput
-                  allowInput={this.trim}
+                allowInput={this.trim}
                 size='small'
                 v-model={[this.name, 'value']}
                 placeholder={t(
@@ -172,14 +169,11 @@ const taskGroupOption = defineComponent({
                   <SearchOutlined />
                 </NIcon>
               </NButton>
-            </div>
-          </div>
-        </NCard>
-        <Card
-          class={styles['table-card']}
-          title={t('resource.task_group_option.option')}
-        >
-          <div>
+            </NSpace>
+          </NSpace>
+        </Card>
+        <Card title={t('resource.task_group_option.option')}>
+          <NSpace vertical>
             <NDataTable
               loading={loadingRef}
               columns={columns}
@@ -188,7 +182,7 @@ const taskGroupOption = defineComponent({
               striped
               scrollX={this.tableWidth}
             />
-            <div class={styles.pagination}>
+            <NSpace justify='center'>
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}
@@ -199,8 +193,8 @@ const taskGroupOption = defineComponent({
                 onUpdatePage={resetTableData}
                 onUpdatePageSize={onUpdatePageSize}
               />
-            </div>
-          </div>
+            </NSpace>
+          </NSpace>
         </Card>
         {showModalRef && (
           <FormModal
@@ -211,7 +205,7 @@ const taskGroupOption = defineComponent({
             status={modelStatusRef}
           />
         )}
-      </div>
+      </NSpace>
     )
   }
 })
