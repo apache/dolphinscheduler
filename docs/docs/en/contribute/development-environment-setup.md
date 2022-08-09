@@ -19,13 +19,27 @@ cd dolphinscheduler
 git clone git@github.com:apache/dolphinscheduler.git
 ```
 
-### compile source code
+### Compile Source Code
 
 Supporting system:
 * MacOS
 * Liunx
 
 Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+
+### Code Style
+
+DolphinScheduler uses `Spotless` for code style and formatting checks.
+You could run the following command and `Spotless` will automatically fix 
+the code style and formatting errors for you:
+
+```shell
+./mvnw spotless:apply
+```
+
+You could copy the `pre-commit hook` file `/style/pre-commit` to your `.git/hooks/`
+directory so that every time you commit your code with `git commit`, `Spotless` will automatically
+fix things for you.
 
 ## Docker image build
 

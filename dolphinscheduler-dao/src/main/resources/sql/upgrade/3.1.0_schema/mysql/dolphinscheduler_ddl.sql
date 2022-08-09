@@ -13,32 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-.toolbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 0 0 0;
-}
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+alter table `t_ds_project` modify `description` varchar(255)
+alter table `t_ds_task_group` modify `description` varchar(255)
 
-.table-card {
-  margin-top: 2px;
-
-  .table-action {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    button {
-      margin: 0 2px 0 0;
-    }
-    div {
-      margin: 0 2px 0 0;
-    }
-  }
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-}
