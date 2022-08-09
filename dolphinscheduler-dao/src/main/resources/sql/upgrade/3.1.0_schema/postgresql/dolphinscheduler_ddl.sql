@@ -16,7 +16,7 @@
 */
 
 delimiter d//
-ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
+ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
 ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
 return 'Success!';
 exception when others then
