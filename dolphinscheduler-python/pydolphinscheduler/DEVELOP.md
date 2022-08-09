@@ -195,7 +195,7 @@ including [Docker](https://docs.docker.com/get-docker/) and specific image build
 Here we would show you the step to run integrate test in directory `dolphinscheduler-python/pydolphinscheduler/tests/integration`.
 There are two ways to run integrate tests.
 
-#### Method 1: Start Docker locally
+#### Method 1: Launch Docker Container Locally
 
 ```shell
 # Go to project root directory and build Docker image
