@@ -188,11 +188,14 @@ It would not only run unit test but also show each file coverage which cover rat
 line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
 this command output.
 
-#### Integrate Test
+### Integrate Test
 
 Integrate Test can not run when you execute command `tox -e local-ci` because it needs external environment
 including [Docker](https://docs.docker.com/get-docker/) and specific image build by [maven](https://maven.apache.org/install.html).
 Here we would show you the step to run integrate test in directory `dolphinscheduler-python/pydolphinscheduler/tests/integration`.
+There are two ways to run integrate tests.
+
+#### Method 1: Start Docker locally
 
 ```shell
 # Go to project root directory and build Docker image
@@ -208,6 +211,15 @@ cd ../../
 
 # Go to pydolphinscheduler root directory and run integrate tests
 tox -e integrate-test
+```
+
+#### Method 2: Start the standalone server in IDEA
+
+```shell
+# Start the standalone server in IDEA
+
+# Go to pydolphinscheduler root directory and run integrate tests
+tox -e local-integrate-test
 ```
 
 ## Add LICENSE When New Dependencies Adding
