@@ -25,7 +25,8 @@ import {
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
   VersionReq,
-  ISingleSaveReq
+  ISingleSaveReq,
+  TaskDefinitionReq
 } from './types'
 
 export function queryTaskDefinitionListPaging(
@@ -158,9 +159,14 @@ export function updateWithUpstream(
   })
 }
 
-export function startTaskDefinition(projectCode: number, code: number) {
+export function startTaskDefinition(
+  projectCode: number,
+  code: number,
+  data: TaskDefinitionReq
+) {
   return axios({
     url: `projects/${projectCode}/executors/task-instance/${code}/start`,
-    method: 'post'
+    method: 'post',
+    data
   })
 }

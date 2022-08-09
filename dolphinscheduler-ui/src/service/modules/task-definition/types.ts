@@ -130,6 +130,16 @@ interface ISingleSaveReq {
   taskDefinitionJsonObj: string
 }
 
+interface TaskDefinitionReq {
+  version: number
+  warningType: string
+  warningGroupId: number
+  workerGroup?: string
+  environmentCode?: number
+  startParams?: string
+  dryRun?: number
+}
+
 export {
   PageReq,
   ListReq,
@@ -144,5 +154,6 @@ export {
   TaskDefinitionRes,
   TaskDefinitionVersionItem,
   TaskDefinitionVersionRes,
-  ISingleSaveReq
+  ISingleSaveReq,
+  TaskDefinitionReq
 }

@@ -31,6 +31,7 @@ import Card from '@/components/card'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import { useTable } from './use-stream-table'
 import { useTask } from './use-task'
+import StartModal from './components/start-modal'
 import type { INodeData } from './types'
 
 const StreamTaskDefinition = defineComponent({
@@ -144,6 +145,11 @@ const StreamTaskDefinition = defineComponent({
           from={1}
           readonly={task.taskReadonly}
           saving={task.taskSaving}
+        />
+        <StartModal
+          v-model:row={variables.row}
+          v-model:show={variables.startShow}
+          onUpdateList={getTableData}
         />
       </NSpace>
     )

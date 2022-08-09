@@ -20,10 +20,7 @@ import { NButton, NIcon, NSpace, NTooltip, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { useI18n } from 'vue-i18n'
 import { EditOutlined, PlayCircleOutlined } from '@vicons/antd'
-import {
-  queryTaskDefinitionListPaging,
-  startTaskDefinition
-} from '@/service/modules/task-definition'
+import { queryTaskDefinitionListPaging } from '@/service/modules/task-definition'
 import { useRoute } from 'vue-router'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -167,7 +164,8 @@ export function useTable(onEdit: Function) {
     searchWorkflowName: null,
     totalPage: 1,
     row: {},
-    loading: false
+    loading: false,
+    startShow: false
   })
 
   const getTableData = () => {
@@ -192,10 +190,8 @@ export function useTable(onEdit: Function) {
   }
 
   const onStart = (row: any) => {
-    startTaskDefinition(projectCode, row.taskCode).then(() => {
-      window.$message.success(t('project.workflow.success'))
-      getTableData()
-    })
+    variables.row = row
+    variables.startShow = true
   }
 
   return {
