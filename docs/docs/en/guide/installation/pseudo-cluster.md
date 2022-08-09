@@ -70,7 +70,7 @@ Go to the ZooKeeper installation directory, copy configure file `zoo_sample.cfg`
 ## Modify Configuration
 
 After completing the preparation of the basic environment, you need to modify the configuration file according to the
-environment you used. The configuration files are both in directory `bin/env` and named `install_env.sh` and `dolphinscheduler_env.sh`.
+environment you used. Change the environment configurations via `export <ENV_NAME>=<VALUE>`. The configuration files are located in directory `bin/env` as `install_env.sh` and `dolphinscheduler_env.sh`.
 
 ### Modify `install_env.sh`
 
@@ -83,6 +83,7 @@ each machine. You could find this file in the path `bin/env/install_env.sh` and 
 # ---------------------------------------------------------
 # Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
 ips="localhost"
+sshPort="22"
 masters="localhost"
 workers="localhost:default"
 alertServer="localhost"
