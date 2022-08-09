@@ -153,26 +153,6 @@ export default {
                                 title: 'Apache Zeppelin',
                                 link: '/en-us/docs/3.0.0/user_doc/guide/task/zeppelin.html',
                             },
-                            {
-                                title: 'Jupyter',
-                                link: '/en-us/docs/3.0.0/user_doc/guide/task/jupyter.html',
-                            },
-                            {
-                                title: 'Kubernetes',
-                                link: '/en-us/docs/3.0.0/user_doc/guide/task/kubernetes.html',
-                            },
-                            {
-                                title: 'MLflow',
-                                link: '/en-us/docs/3.0.0/user_doc/guide/task/mlflow.html',
-                            },
-                            {
-                                title: 'Openmldb',
-                                link: '/en-us/docs/3.0.0/user_doc/guide/task/openmldb.html',
-                            },
-                            {
-                                title: 'DVC',
-                                link: '/en-us/docs/3.0.0/user_doc/guide/task/dvc.html',
-                            },
                         ],
                     },
                     {
@@ -730,26 +710,6 @@ export default {
                             {
                                 title: 'Apache Zeppelin',
                                 link: '/zh-cn/docs/3.0.0/user_doc/guide/task/zeppelin.html',
-                            },
-                            {
-                                title: 'Jupyter',
-                                link: '/zh-cn/docs/3.0.0/user_doc/guide/task/jupyter.html',
-                            },
-                            {
-                                title: 'Kubernetes',
-                                link: '/zh-cn/docs/3.0.0/user_doc/guide/task/kubernetes.html',
-                            },
-                            {
-                                title: 'MLflow',
-                                link: '/zh-cn/docs/3.0.0/user_doc/guide/task/mlflow.html',
-                            },
-                            {
-                                title: 'Openmldb',
-                                link: '/zh-cn/docs/3.0.0/user_doc/guide/task/openmldb.html',
-                            },
-                            {
-                                title: 'DVC',
-                                link: '/zh-cn/docs/3.0.0/user_doc/guide/task/dvc.html',
                             },
                         ],
                     },
