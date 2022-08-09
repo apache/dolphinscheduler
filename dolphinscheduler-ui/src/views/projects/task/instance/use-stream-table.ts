@@ -39,7 +39,7 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import type { TaskInstancesRes, IRecord, ITaskState } from './types'
+import type { TaskInstancesRes, ITaskState } from './types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -50,7 +50,7 @@ export function useTable() {
   const variables = reactive({
     columns: [],
     tableWidth: DefaultTableWidth,
-    tableData: [] as IRecord[],
+    tableData: [] as any[],
     page: 1,
     pageSize: 10,
     searchVal: null,
@@ -97,7 +97,7 @@ export function useTable() {
         title: t('project.task.state'),
         key: 'state',
         ...COLUMN_WIDTH_CONFIG['state'],
-        render: (row: IRecord) => renderStateCell(row.state, t)
+        render: (row: any) => renderStateCell(row.state, t)
       },
       {
         title: t('project.task.executor'),
@@ -108,31 +108,31 @@ export function useTable() {
         title: t('project.task.host'),
         key: 'host',
         ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row: IRecord) => row.host || '-'
+        render: (row: any) => row.host || '-'
       },
       {
         title: t('project.task.app_id'),
         key: 'applicationID',
         ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row: IRecord) => row.applicationID || '-'
+        render: (row: any) => row.applicationID || '-'
       },
       {
         title: t('project.task.dry_run_flag'),
         key: 'dryRun',
         ...COLUMN_WIDTH_CONFIG['dryRun'],
-        render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
+        render: (row: any) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.start_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
         key: 'startTime',
-        render: (row: IRecord) => renderTableTime(row.startTime)
+        render: (row: any) => renderTableTime(row.startTime)
       },
       {
         title: t('project.task.end_time'),
         ...COLUMN_WIDTH_CONFIG['time'],
         key: 'endTime',
-        render: (row: IRecord) => renderTableTime(row.endTime)
+        render: (row: any) => renderTableTime(row.endTime)
       },
       {
         title: t('project.task.duration'),
@@ -302,7 +302,7 @@ export function useTable() {
 
     queryTaskListPaging(data, { projectCode })
       .then((res: TaskInstancesRes) => {
-        variables.tableData = [...res.totalList] as IRecord[]
+        variables.tableData = [...res.totalList]
         variables.totalPage = res.totalPage
       })
       .finally(() => (variables.loadingRef = false))
