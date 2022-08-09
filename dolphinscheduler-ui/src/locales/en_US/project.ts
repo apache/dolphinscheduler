@@ -243,7 +243,8 @@ export default {
     batch_task: 'Batch Task',
     stream_task: 'Stream Task',
     jump_tip: 'Jump, not open yet!',
-    savepoint: 'Savepoint'
+    savepoint: 'Savepoint',
+    success: 'Success'
   },
   dag: {
     create: 'Create Workflow',

@@ -123,7 +123,7 @@ export const useStart = (
       await startTaskDefinition(variables.startState.projectCode, code, {
         ...variables.startForm
       } as any)
-      window.$message.success(t('project.workflow.success'))
+      window.$message.success(t('project.task.success'))
       variables.saving = false
       ctx.emit('updateList')
       ctx.emit('update:show')

@@ -19,6 +19,7 @@ import {
   defineComponent,
   getCurrentInstance,
   onMounted,
+  onUnmounted,
   toRefs,
   watch
 } from 'vue'
@@ -46,6 +47,7 @@ import styles from './index.module.scss'
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
+    let setIntervalP: number
     const { t, variables, getTableData, createColumns } = useTable()
 
     const onUpdatePageSize = () => {
@@ -96,6 +98,13 @@ const BatchTaskInstance = defineComponent({
     onMounted(() => {
       createColumns(variables)
       getTableData()
+      setIntervalP = setInterval(() => {
+        getTableData()
+      }, 3000)
+    })
+
+    onUnmounted(() => {
+      clearInterval(setIntervalP)
     })
 
     watch(useI18n().locale, () => {
