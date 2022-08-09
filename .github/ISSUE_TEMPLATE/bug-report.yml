@@ -99,7 +99,7 @@ body:
         Which version of Apache DolphinScheduler are you running? We only accept bugs report from the LTS projects.
       options:
         - dev
-        - 3.0.0-beta-2
+        - 3.0.0
         - 2.0.6
         - 2.0.5
     validations:
