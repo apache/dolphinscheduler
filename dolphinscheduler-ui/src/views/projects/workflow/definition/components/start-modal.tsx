@@ -256,6 +256,18 @@ export default defineComponent({
             </NRadioGroup>
           </NFormItem>
           <NFormItem
+            label={t('project.workflow.node_execution')}
+            path='taskDependType'
+          >
+            <NRadioGroup v-model:value={this.startForm.taskDependType}>
+              <NSpace>
+                <NRadio value='TASK_POST'>{t('project.workflow.backward_execution')}</NRadio>
+                <NRadio value='TASK_PRE'>{t('project.workflow.forward_execution')}</NRadio>
+                <NRadio value='TASK_ONLY'>{t('project.workflow.current_node_execution')}</NRadio>
+              </NSpace>
+            </NRadioGroup>
+          </NFormItem>
+          <NFormItem
             label={t('project.workflow.notification_strategy')}
             path='warningType'
           >
