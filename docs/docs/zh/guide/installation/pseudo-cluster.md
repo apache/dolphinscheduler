@@ -73,7 +73,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 ### 修改 `install_env.sh` 文件
 
-文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，配置详情如下。
+文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，可通过以下方式更改env变量,export <ENV_NAME>=<VALUE>，配置详情如下。
 
 ```shell
 # ---------------------------------------------------------
@@ -81,6 +81,7 @@ chmod 600 ~/.ssh/authorized_keys
 # ---------------------------------------------------------
 # Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
 ips="localhost"
+sshPort="22"
 masters="localhost"
 workers="localhost:default"
 alertServer="localhost"
