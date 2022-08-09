@@ -17,26 +17,28 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-
-import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import lombok.Data;
+import java.time.Duration;
+
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 
 @Data
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "master")
 public class MasterConfig implements Validator {
+
     /**
      * The master RPC server listen port.
      */
@@ -67,10 +69,10 @@ public class MasterConfig implements Validator {
      * Master heart beat task execute interval.
      */
     private Duration heartbeatInterval = Duration.ofSeconds(10);
-    /**
-     * Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
-     */
-    private int heartbeatErrorThreshold = 5;
+    // /**
+    // * Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
+    // */
+    // private int heartbeatErrorThreshold = 5;
     /**
      * task submit max retry times.
      */
@@ -87,10 +89,13 @@ public class MasterConfig implements Validator {
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killYarnJobWhenTaskFailover = true;
-    /**
-     * ip:listenPort
-     */
+    private ConnectStrategyProperties connectStrategyProperties = new ConnectStrategyProperties();
+
+    // ip:listenPort
     private String masterAddress;
+
+    // /nodes/master/ip:listenPort
+    private String masterRegistryNodePath;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -133,9 +138,8 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        if (masterConfig.getHeartbeatErrorThreshold() <= 0) {
-            errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
-        }
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
+        masterConfig
+                .setMasterRegistryNodePath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
     }
 }

@@ -25,9 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-/**
- * Constants
- */
 public final class Constants {
 
     private Constants() {
@@ -44,13 +41,9 @@ public final class Constants {
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
     public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
     public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS =
-            "/lock/failover/startup-masters";
 
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";

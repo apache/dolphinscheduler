@@ -66,7 +66,7 @@ public class ExecutorDispatcherTest {
         nettyRemotingServer.start();
         //
         workerConfig.setListenPort(port);
-        workerRegistryClient.registry();
+        workerRegistryClient.start();
 
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(port);
         executorDispatcher.dispatch(executionContext);
