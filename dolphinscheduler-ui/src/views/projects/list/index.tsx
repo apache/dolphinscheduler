@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
@@ -28,9 +26,9 @@ import {
 } from 'naive-ui'
 import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import ProjectModal from './components/project-modal'
-import styles from './index.module.scss'
 import { useTable } from './use-table'
+import Card from '@/components/card'
+import ProjectModal from './components/project-modal'
 
 const list = defineComponent({
   name: 'list',
@@ -96,9 +94,9 @@ const list = defineComponent({
   render() {
     const { t, loadingRef } = this
     return (
-      <div>
-        <NCard>
-          <div class={styles['search-card']}>
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
             <NButton
               size='small'
               onClick={this.handleModalChange}
@@ -109,7 +107,7 @@ const list = defineComponent({
             </NButton>
             <NSpace>
               <NInput
-                  allowInput={this.trim}
+                allowInput={this.trim}
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('project.list.project_tips')}
@@ -121,31 +119,30 @@ const list = defineComponent({
                 </NIcon>
               </NButton>
             </NSpace>
-          </div>
-        </NCard>
-        <Card
-          title={t('project.list.project_list')}
-          class={styles['table-card']}
-        >
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-            row-class-name='items'
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+          </NSpace>
+        </Card>
+        <Card title={t('project.list.project_list')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
+              row-class-name='items'
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <ProjectModal
           showModalRef={this.showModalRef}
@@ -154,7 +151,7 @@ const list = defineComponent({
           onCancelModal={this.onCancelModal}
           onConfirmModal={this.onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })
