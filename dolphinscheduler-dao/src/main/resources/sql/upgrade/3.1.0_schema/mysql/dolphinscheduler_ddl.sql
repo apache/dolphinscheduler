@@ -18,3 +18,4 @@
 ALTER TABLE `t_ds_task_definition` ADD COLUMN `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream' AFTER `task_type`;
 ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream' AFTER `task_type`;
 ALTER TABLE `t_ds_task_instance` ADD COLUMN `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream' AFTER `task_type`;
+ALTER TABLE `t_ds_task_instance` DROP FOREIGN KEY foreign_key_instance_id;

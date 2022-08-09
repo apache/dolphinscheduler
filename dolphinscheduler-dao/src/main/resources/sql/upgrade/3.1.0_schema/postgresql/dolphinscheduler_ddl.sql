@@ -33,6 +33,8 @@ BEGIN
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT ''0''  ';
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition_log ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT ''0''  ';
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT ''0''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT ''0''  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance DROP CONSTRAINT foreign_key_instance_id';
 
 
 return 'Success!';

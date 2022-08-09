@@ -872,8 +872,7 @@ CREATE TABLE t_ds_task_instance
     dry_run                 int NULL DEFAULT 0,
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE
+    PRIMARY KEY (id)
 );
 
 -- ----------------------------
