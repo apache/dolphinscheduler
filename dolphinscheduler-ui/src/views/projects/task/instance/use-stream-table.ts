@@ -113,7 +113,14 @@ export function useTable() {
       {
         title: t('project.task.app_id'),
         key: 'applicationID',
-        ...COLUMN_WIDTH_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: IRecord) => row.applicationID || '-'
+      },
+      {
+        title: t('project.task.dry_run_flag'),
+        key: 'dryRun',
+        ...COLUMN_WIDTH_CONFIG['dryRun'],
+        render: (row: IRecord) => (row.dryRun === 1 ? 'YES' : 'NO')
       },
       {
         title: t('project.task.start_time'),
