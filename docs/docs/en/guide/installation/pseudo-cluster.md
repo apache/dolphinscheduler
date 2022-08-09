@@ -70,7 +70,7 @@ Go to the ZooKeeper installation directory, copy configure file `zoo_sample.cfg`
 ## Modify Configuration
 
 After completing the preparation of the basic environment, you need to modify the configuration file according to the
-environment you used.Env configuration can be changed in the following ways, export <ENV_NAME>=<VALUE>, The configuration files are both in directory `bin/env` and named `install_env.sh` and `dolphinscheduler_env.sh`.
+environment you used. Change the environment configurations via `export <ENV_NAME>=<VALUE>`. The configuration files are located in directory `bin/env` as `install_env.sh` and `dolphinscheduler_env.sh`.
 
 ### Modify `install_env.sh`
 
