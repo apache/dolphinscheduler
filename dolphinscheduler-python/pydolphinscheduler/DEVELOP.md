@@ -213,7 +213,7 @@ cd ../../
 tox -e integrate-test
 ```
 
-#### Method 2: Start the standalone server in IDEA
+#### Method 2: Start Standalone Server in IntelliJ IDEA
 
 ```shell
 # Start the standalone server in IDEA
