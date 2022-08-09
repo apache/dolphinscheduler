@@ -171,39 +171,49 @@ public class DateUtilsTest {
     public void testFormat2Duration() {
 
         // days hours minutes seconds
-        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        Date d2 = DateUtils.stringToDate("2020-01-21 12:10:10");
-        String duration = DateUtils.format2Duration(d2, d1);
+        Date start = DateUtils.stringToDate("2020-01-20 11:00:00");
+        Date end = DateUtils.stringToDate("2020-01-21 12:10:10");
+        String duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1d 1h 10m 10s", duration);
 
         // hours minutes seconds
-        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        d2 = DateUtils.stringToDate("2020-01-20 12:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:00:00");
+        end = DateUtils.stringToDate("2020-01-20 12:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1h 10m 10s", duration);
 
         // minutes seconds
-        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:00:00");
+        end = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("10m 10s", duration);
 
         // minutes seconds
-        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
-        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("10s", duration);
 
-        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
-        d2 = DateUtils.stringToDate("2020-01-21 11:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-21 11:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1d 10s", duration);
 
-        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
-        d2 = DateUtils.stringToDate("2020-01-20 16:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-20 16:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("5h 10s", duration);
 
+        // startTime = endTime, default 1s
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-20 11:10:00");
+        duration = DateUtils.format2Duration(start, end);
+        Assert.assertEquals("1s", duration);
+
+        // endTime is null, use current time
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        duration = DateUtils.format2Duration(start, null);
+        Assert.assertNotNull(duration);
     }
 
     @Test
