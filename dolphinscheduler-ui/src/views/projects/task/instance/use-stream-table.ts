@@ -309,11 +309,17 @@ export function useTable() {
   }
 
   const onExecute = (taskId: number) => {
-    streamTaskStop(projectCode, taskId).then(getTableData())
+    streamTaskStop(projectCode, taskId).then(() => {
+      window.$message.success(t('project.task.success'))
+      getTableData()
+    })
   }
 
   const onSavePoint = (taskId: number) => {
-    savePoint(projectCode, taskId).then(getTableData())
+    savePoint(projectCode, taskId).then(() => {
+      window.$message.success(t('project.task.success'))
+      getTableData()
+    })
   }
 
   return {
