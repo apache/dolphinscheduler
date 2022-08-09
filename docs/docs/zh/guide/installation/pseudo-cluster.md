@@ -81,7 +81,6 @@ chmod 600 ~/.ssh/authorized_keys
 # ---------------------------------------------------------
 # Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
 ips="localhost"
-# Modify Configurationexport export sshPort="22"
 sshPort=${sshPort：-"22"}
 masters="localhost"
 workers="localhost:default"
