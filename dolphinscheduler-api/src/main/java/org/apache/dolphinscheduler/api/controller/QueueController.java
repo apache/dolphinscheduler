@@ -30,8 +30,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,17 +72,16 @@ public class QueueController extends BaseController {
     @ApiException(QUERY_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = queueService.queryList(loginUser);
-        return returnDataList(result);
+        return queueService.queryList(loginUser);
     }
 
     /**
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
     @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
@@ -115,7 +112,7 @@ public class QueueController extends BaseController {
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
@@ -131,16 +128,15 @@ public class QueueController extends BaseController {
     public Result createQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
-        Map<String, Object> result = queueService.createQueue(loginUser, queue, queueName);
-        return returnDataList(result);
+        return queueService.createQueue(loginUser, queue, queueName);
     }
 
     /**
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */
@@ -158,15 +154,14 @@ public class QueueController extends BaseController {
                               @PathVariable(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
-        Map<String, Object> result = queueService.updateQueue(loginUser, id, queue, queueName);
-        return returnDataList(result);
+        return queueService.updateQueue(loginUser, id, queue, queueName);
     }
 
     /**
      * verify queue and queue name
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
@@ -181,9 +176,7 @@ public class QueueController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName
-    ) {
-
+                              @RequestParam(value = "queueName") String queueName) {
         return queueService.verifyQueue(queue, queueName);
     }
 }

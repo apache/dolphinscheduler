@@ -41,7 +41,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -101,8 +100,8 @@ public class QueueServiceTest {
         ids.add(1);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, getLoginUser().getId(), queueServiceImplLogger)).thenReturn(ids);
         Mockito.when(queueMapper.selectBatchIds(Mockito.anySet())).thenReturn(getQueueList());
-        Map<String, Object> result = queueService.queryList(getLoginUser());
-        List<Queue> queueList = (List<Queue>) result.get(Constants.DATA_LIST);
+        Result result = queueService.queryList(getLoginUser());
+        List<Queue> queueList = (List<Queue>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(queueList));
 
     }
@@ -138,8 +137,8 @@ public class QueueServiceTest {
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // correct
-        Map<String, Object> result = queueService.createQueue(getLoginUser(), QUEUE_NAME, QUEUE_NAME);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Result result = queueService.createQueue(getLoginUser(), QUEUE_NAME, QUEUE_NAME);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -172,18 +171,18 @@ public class QueueServiceTest {
 
         //success
         Mockito.when(userMapper.existUser(Mockito.anyString())).thenReturn(false);
-        Map<String, Object> result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS);
-        Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        Result result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
         // success update with same queue name
         Mockito.when(queueMapper.existQueue(NOT_EXISTS_FINAL, null)).thenReturn(false);
         result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS_FINAL, NOT_EXISTS);
-        Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
         // success update with same queue value
         Mockito.when(queueMapper.existQueue(null, NOT_EXISTS_FINAL)).thenReturn(false);
         result = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS_FINAL);
-        Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test

@@ -116,15 +116,15 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public Map<String, Object> queryList(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryList(User loginUser) {
+        Result result = new Result();
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
         if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
             ids = ids.isEmpty() ? new HashSet<>() : ids;
             ids.add(Constants.DEFAULT_QUEUE_ID);
         }
         List<Queue> queueList = queueMapper.selectBatchIds(ids);
-        result.put(Constants.DATA_LIST, queueList);
+        result.setData(queueList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -169,8 +169,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     @Override
     @Transactional
-    public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
+    public Result createQueue(User loginUser, String queue, String queueName) {
+        Result result = new Result();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -179,7 +179,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         createQueueValid(queueObj);
         queueMapper.insert(queueObj);
 
-        result.put(Constants.DATA_LIST, queueObj);
+        result.setData(queueObj);
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
         return result;
@@ -195,8 +195,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
+    public Result updateQueue(User loginUser, int id, String queue, String queueName) {
+        Result result = new Result();
         if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -213,7 +213,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         }
 
         queueMapper.updateById(updateQueue);
-
+        result.setData(updateQueue);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -231,7 +231,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Queue queueValidator = new Queue(queueName, queue);
         createQueueValid(queueValidator);
-
+        result.setData(queueValidator);
         putMsg(result, Status.SUCCESS);
         return result;
     }
