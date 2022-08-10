@@ -32,7 +32,11 @@ import sys
 from pathlib import Path
 
 # For sphinx-multiversion, related issue: https://github.com/Holzhaus/sphinx-multiversion/issues/42
-pkg_src_dir = Path(os.environ.get("SPHINX_MULTIVERSION_SOURCEDIR", default=".")).joinpath("../../src").resolve()
+pkg_src_dir = (
+    Path(os.environ.get("SPHINX_MULTIVERSION_SOURCEDIR", default="."))
+    .joinpath("../../src")
+    .resolve()
+)
 sys.path.insert(0, str(pkg_src_dir))
 # Debug to uncomment this to see the source path
 # print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -76,15 +80,15 @@ templates_path = ["_templates"]
 
 # sphinx_multiversion configuration
 html_sidebars = {
-    '**': [
-        'versioning.html',
+    "**": [
+        "versioning.html",
     ],
 }
-smv_tag_whitelist = r'^\d+\.\d+\.\d+$'
-smv_branch_whitelist = 'dev'
-smv_remote_whitelist = r'^(origin|upstream)$'
-smv_released_pattern = '^refs/tags/.*$'
-smv_outputdir_format = 'versions/{ref.name}'
+smv_tag_whitelist = r"^\d+\.\d+\.\d+$"
+smv_branch_whitelist = "dev"
+smv_remote_whitelist = r"^(origin|upstream)$"
+smv_released_pattern = "^refs/tags/.*$"
+smv_outputdir_format = "versions/{ref.name}"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
