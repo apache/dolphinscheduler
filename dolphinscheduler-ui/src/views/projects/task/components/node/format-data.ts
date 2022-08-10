@@ -36,9 +36,8 @@ export function formatParams(data: INodeData): {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
   if (
-    data.taskType === 'SPARK' ||
-    data.taskType === 'MR' ||
-    data.taskType === 'FLINK'
+    data.taskType &&
+    ['SPARK', 'MR', 'FLINK', 'FLINK_STREAM'].includes(data.taskType)
   ) {
     taskParams.programType = data.programType
     taskParams.mainClass = data.mainClass
@@ -60,7 +59,7 @@ export function formatParams(data: INodeData): {
     taskParams.executorCores = data.executorCores
   }
 
-  if (data.taskType === 'FLINK') {
+  if (data.taskType === 'FLINK' || data.taskType === 'FLINK_STREAM') {
     taskParams.flinkVersion = data.flinkVersion
     taskParams.jobManagerMemory = data.jobManagerMemory
     taskParams.taskManagerMemory = data.taskManagerMemory
@@ -456,7 +455,8 @@ export function formatParams(data: INodeData): {
       timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
       workerGroup: data.workerGroup,
       cpuQuota: data.cpuQuota || -1,
-      memoryMax: data.memoryMax || -1
+      memoryMax: data.memoryMax || -1,
+      taskExecuteType: data.taskExecuteType
     }
   } as {
     processDefinitionCode: string
