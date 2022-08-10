@@ -36,21 +36,7 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
@@ -81,6 +67,7 @@ import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 
 import java.util.ArrayList;
@@ -167,6 +154,9 @@ public class ProcessServiceTest {
 
     @Mock
     CuringParamsService curingGlobalParamsService;
+
+    @Mock
+    TaskPluginManager taskPluginManager;
 
     @Test
     public void testCreateSubCommand() {
@@ -682,6 +672,7 @@ public class ProcessServiceTest {
         return list;
     }
 
+    @Test
     public void testSaveTaskDefine() {
         User operator = new User();
         operator.setId(-1);
@@ -706,9 +697,10 @@ public class ProcessServiceTest {
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());
+        Mockito.when(taskPluginManager.getParameters(any())).thenReturn(null);
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
-        Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singletonList(taskDefinition.getCode()))).thenReturn(Collections.singletonList(taskDefinition));
         int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs, Boolean.TRUE);
         Assert.assertEquals(0, result);
     }
