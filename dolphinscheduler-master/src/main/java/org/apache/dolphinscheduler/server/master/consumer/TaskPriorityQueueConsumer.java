@@ -258,7 +258,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      */
     public boolean taskInstanceIsFinalState(int taskInstanceId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
-        return taskInstance.getState().typeIsFinished();
+        return taskInstance.getState().isFinished();
     }
 
     /**

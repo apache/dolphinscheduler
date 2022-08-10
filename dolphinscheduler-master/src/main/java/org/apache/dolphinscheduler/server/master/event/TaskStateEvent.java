@@ -15,40 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command.log;
+package org.apache.dolphinscheduler.server.master.event;
 
+import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import lombok.NonNull;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import java.io.Serializable;
-
-/**
- *  get log bytes request command
- */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetLogBytesRequestCommand implements Serializable {
+public class TaskStateEvent implements StateEvent {
 
-    /**
-     *  log path
-     */
-    private String path;
+    // todo: use wrapper type
+    private int processInstanceId;
 
-    /**
-     * package request command
-     *
-     * @return command
-     */
-    public Command convert2Command() {
-        Command command = new Command();
-        command.setType(CommandType.GET_LOG_BYTES_REQUEST);
-        byte[] body = JSONUtils.toJsonByteArray(this);
-        command.setBody(body);
-        return command;
-    }
+    private int taskInstanceId;
+
+    private long taskCode;
+
+    private TaskExecutionStatus status;
+
+    private @NonNull StateEventType type;
+
+    private String key;
+
+    private Channel channel;
+
+    private String context;
+
 }

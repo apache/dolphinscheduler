@@ -27,10 +27,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.Map;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +58,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public class TaskInstanceController extends BaseController {
 
     @Autowired
-    TaskInstanceService taskInstanceService;
+    private TaskInstanceService taskInstanceService;
 
     /**
      * query task list paging
@@ -78,17 +78,17 @@ public class TaskInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, type = "String"),
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type = "String"),
-        @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
-        @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
-        @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, type = "String"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+            @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type = "String"),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
+            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
+            @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -101,7 +101,7 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
                                       @RequestParam(value = "executorName", required = false) String executorName,
-                                      @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
+                                      @RequestParam(value = "stateType", required = false) TaskExecutionStatus stateType,
                                       @RequestParam(value = "host", required = false) String host,
                                       @RequestParam(value = "startDate", required = false) String startTime,
                                       @RequestParam(value = "endDate", required = false) String endTime,
@@ -127,7 +127,7 @@ public class TaskInstanceController extends BaseController {
      */
     @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+            @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
     })
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)

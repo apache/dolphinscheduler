@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -25,9 +28,15 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class TaskAlertContent implements Serializable {
+
     @JsonProperty("taskInstanceId")
     private int taskInstanceId;
     @JsonProperty("taskName")
@@ -43,7 +52,7 @@ public class TaskAlertContent implements Serializable {
     @JsonProperty("processInstanceName")
     private String processInstanceName;
     @JsonProperty("state")
-    private ExecutionStatus state;
+    private TaskExecutionStatus state;
     @JsonProperty("startTime")
     private Date startTime;
     @JsonProperty("endTime")
@@ -53,101 +62,4 @@ public class TaskAlertContent implements Serializable {
     @JsonProperty("logPath")
     private String logPath;
 
-    private TaskAlertContent(Builder builder) {
-        this.taskInstanceId = builder.taskInstanceId;
-        this.taskName = builder.taskName;
-        this.taskType = builder.taskType;
-        this.processDefinitionId = builder.processDefinitionId;
-        this.processDefinitionName = builder.processDefinitionName;
-        this.processInstanceId = builder.processInstanceId;
-        this.processInstanceName = builder.processInstanceName;
-        this.state = builder.state;
-        this.startTime = builder.startTime;
-        this.endTime = builder.endTime;
-        this.host = builder.host;
-        this.logPath = builder.logPath;
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private int taskInstanceId;
-        private String taskName;
-        private String taskType;
-        private int processDefinitionId;
-        private String processDefinitionName;
-        private int processInstanceId;
-        private String processInstanceName;
-        private ExecutionStatus state;
-        private Date startTime;
-        private Date endTime;
-        private String host;
-        private String logPath;
-
-        public Builder taskInstanceId(int taskInstanceId) {
-            this.taskInstanceId = taskInstanceId;
-            return this;
-        }
-
-        public Builder taskName(String taskName) {
-            this.taskName = taskName;
-            return this;
-        }
-
-        public Builder taskType(String taskType) {
-            this.taskType = taskType;
-            return this;
-        }
-
-        public Builder processDefinitionId(int processDefinitionId) {
-            this.processDefinitionId = processDefinitionId;
-            return this;
-        }
-
-        public Builder processDefinitionName(String processDefinitionName) {
-            this.processDefinitionName = processDefinitionName;
-            return this;
-        }
-
-        public Builder processInstanceId(int processInstanceId) {
-            this.processInstanceId = processInstanceId;
-            return this;
-        }
-
-        public Builder processInstanceName(String processInstanceName) {
-            this.processInstanceName = processInstanceName;
-            return this;
-        }
-
-        public Builder state(ExecutionStatus state) {
-            this.state = state;
-            return this;
-        }
-
-        public Builder startTime(Date startTime) {
-            this.startTime = startTime;
-            return this;
-        }
-
-        public Builder endTime(Date endTime) {
-            this.endTime = endTime;
-            return this;
-        }
-
-        public Builder host(String host) {
-            this.host = host;
-            return this;
-        }
-
-        public Builder logPath(String logPath) {
-            this.logPath = logPath;
-            return this;
-        }
-
-        public TaskAlertContent build() {
-            return new TaskAlertContent(this);
-        }
-    }
 }

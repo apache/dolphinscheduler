@@ -219,10 +219,9 @@ public class MasterRegistryClient implements AutoCloseable {
 
     public void deregister() {
         try {
-            String address = getLocalAddress();
             String localNodePath = getCurrentNodePath();
             registryClient.remove(localNodePath);
-            logger.info("Master node : {} unRegistry to register center.", address);
+            logger.info("Master node : {} unRegistry to register center.", masterAddress);
             heartBeatExecutor.shutdown();
             logger.info("MasterServer heartbeat executor shutdown");
             registryClient.close();
@@ -235,15 +234,7 @@ public class MasterRegistryClient implements AutoCloseable {
      * get master path
      */
     private String getCurrentNodePath() {
-        String address = getLocalAddress();
-        return REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + address;
-    }
-
-    /**
-     * get local address
-     */
-    private String getLocalAddress() {
-        return NetUtils.getAddr(masterConfig.getListenPort());
+        return REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterAddress;
     }
 
 }

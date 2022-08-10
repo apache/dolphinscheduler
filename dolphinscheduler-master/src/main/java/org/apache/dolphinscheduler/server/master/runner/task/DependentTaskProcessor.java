@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
@@ -67,7 +67,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
@@ -79,7 +80,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         initDependParameters();
@@ -139,7 +140,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean pauseTask() {
-        this.taskInstance.setState(ExecutionStatus.PAUSE);
+        this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;
@@ -147,7 +148,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean killTask() {
-        this.taskInstance.setState(ExecutionStatus.KILL);
+        this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;
@@ -164,7 +165,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             for (Map.Entry<String, DependResult> entry : dependentExecute.getDependResultMap().entrySet()) {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
-                    //save depend result to log
+                    // save depend result to log
                     logger.info("dependent item complete, task: {}, result: {}", entry.getKey(), entry.getValue());
                 }
             }
@@ -195,8 +196,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
      *
      */
     private void endTask() {
-        ExecutionStatus status;
-        status = (result == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
+        TaskExecutionStatus status;
+        status = (result == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);

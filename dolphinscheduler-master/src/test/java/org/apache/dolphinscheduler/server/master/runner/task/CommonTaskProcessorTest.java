@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -61,7 +61,7 @@ public class CommonTaskProcessorTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -71,7 +71,7 @@ public class CommonTaskProcessorTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -94,7 +94,7 @@ public class CommonTaskProcessorTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -108,7 +108,8 @@ public class CommonTaskProcessorTest {
         resourcesList.add(resource);
 
         Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
-        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
+        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(),
+                ResourceType.FILE);
         Assert.assertNotNull(map);
 
     }

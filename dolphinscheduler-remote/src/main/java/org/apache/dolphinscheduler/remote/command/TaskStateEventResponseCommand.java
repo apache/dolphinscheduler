@@ -15,18 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.remote.command;
 
-import junit.framework.TestCase;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-/**
- * execution status test.
- */
-public class ExecutionStatusTest extends TestCase {
+import java.io.Serializable;
 
-    public void testTypeIsRunning() {
-        assertTrue(ExecutionStatus.RUNNING_EXECUTION.typeIsRunning());
-        assertTrue(ExecutionStatus.WAITING_DEPEND.typeIsRunning());
-        assertTrue(ExecutionStatus.DELAY_EXECUTION.typeIsRunning());
+public class TaskStateEventResponseCommand implements Serializable {
+
+    private TaskExecutionStatus status;
+    private String key;
+
+    /**
+     * package response command
+     *
+     * @return command
+     */
+    public Command convert2Command() {
+        Command command = new Command();
+        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
+        byte[] body = JSONUtils.toJsonByteArray(this);
+        command.setBody(body);
+        return command;
     }
 }
