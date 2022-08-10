@@ -388,12 +388,8 @@ public class ExecutorController extends BaseController {
      * @param projectCode project code
      * @param code taskDefinitionCode
      * @param version taskDefinitionVersion
-     * @param failureStrategy failure strategy
-     * @param execType execute type
-     * @param warningType warning type
      * @param warningGroupId warning group id
      * @param workerGroup worker group
-     * @param timeout timeout
      * @return start task result code
      */
     @ApiOperation(value = "startTaskInstance", notes = "RUN_TASK_INSTANCE_NOTES")
@@ -412,7 +408,7 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result startTaskInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result startStreamTaskInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
                                        @RequestParam(value = "version", required = true) int version,
@@ -427,7 +423,7 @@ public class ExecutorController extends BaseController {
             startParamMap = JSONUtils.toMap(startParams);
         }
 
-        Map<String, Object> result = execService.execTaskInstance(loginUser, projectCode, code, version,
+        Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
             warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }

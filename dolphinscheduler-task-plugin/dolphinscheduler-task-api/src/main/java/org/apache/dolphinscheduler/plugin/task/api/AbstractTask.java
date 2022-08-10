@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,8 +125,8 @@ public abstract class AbstractTask {
      * @return
      * @throws IOException
      */
-    public List<String> getApplicationIds() throws IOException {
-        List<String> appIds = new ArrayList<>();
+    public Set<String> getApplicationIds() throws IOException {
+        Set<String> appIds = new HashSet<>();
 
         File file = new File(taskRequest.getLogPath());
         if (!file.exists()) {
@@ -138,7 +140,7 @@ public abstract class AbstractTask {
             String line;
             while ((line = br.readLine()) != null) {
                 String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
+                if (StringUtils.isNotEmpty(appId)) {
                     appIds.add(appId);
                 }
             }

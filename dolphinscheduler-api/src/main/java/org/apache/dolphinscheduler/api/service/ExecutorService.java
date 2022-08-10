@@ -121,7 +121,7 @@ public interface ExecutorService {
     WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
 
     /**
-     * execute task instance
+     * execute stream task instance
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -131,7 +131,7 @@ public interface ExecutorService {
      * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
      */
-    Map<String, Object> execTaskInstance(User loginUser, long projectCode,
+    Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode,
                                             long taskDefinitionCode, int taskDefinitionVersion,
                                             int warningGroupId,
                                             String workerGroup, Long environmentCode,

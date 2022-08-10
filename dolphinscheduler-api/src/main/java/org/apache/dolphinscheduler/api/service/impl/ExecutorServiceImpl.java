@@ -1016,7 +1016,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> execTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion,
+    public Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion,
                                                 int warningGroupId, String workerGroup, Long environmentCode, Map<String, String> startParams, int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
