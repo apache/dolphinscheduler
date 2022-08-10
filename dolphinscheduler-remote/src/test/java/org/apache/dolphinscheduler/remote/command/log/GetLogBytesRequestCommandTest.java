@@ -28,8 +28,7 @@ public class GetLogBytesRequestCommandTest {
 
     @Test
     public void testConvert2Command() {
-        GetLogBytesRequestCommand getLogBytesRequestCommand = new GetLogBytesRequestCommand();
-        getLogBytesRequestCommand.setPath("/opt/test");
+        GetLogBytesRequestCommand getLogBytesRequestCommand = new GetLogBytesRequestCommand("/opt/test");
         Command command = getLogBytesRequestCommand.convert2Command();
         Assert.assertEquals(CommandType.GET_LOG_BYTES_REQUEST, command.getType());
     }
