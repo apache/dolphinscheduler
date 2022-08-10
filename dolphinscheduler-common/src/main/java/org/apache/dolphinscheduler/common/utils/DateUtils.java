@@ -340,17 +340,20 @@ public final class DateUtils {
     }
 
     /**
-     * format time to duration
+     * format time to duration, if end date is null, use current time as end time
      *
-     * @param d1 d1
-     * @param d2 d2
+     * @param start start
+     * @param end end
      * @return format time
      */
-    public static String format2Duration(Date d1, Date d2) {
-        if (d1 == null || d2 == null) {
+    public static String format2Duration(Date start, Date end) {
+        if (start == null) {
             return null;
         }
-        return format2Duration(differMs(d1, d2));
+        if (end == null) {
+            end = new Date();
+        }
+        return format2Duration(differMs(start, end));
     }
 
     /**
@@ -365,6 +368,11 @@ public final class DateUtils {
         long hours = MILLISECONDS.toDurationHours(ms);
         long minutes = MILLISECONDS.toDurationMinutes(ms);
         long seconds = MILLISECONDS.toDurationSeconds(ms);
+
+        if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
+            // if duration is zero, set 1s
+            seconds = 1;
+        }
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder = days > 0 ? strBuilder.append(days).append("d").append(" ") : strBuilder;

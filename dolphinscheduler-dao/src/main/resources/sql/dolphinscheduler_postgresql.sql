@@ -390,6 +390,7 @@ CREATE TABLE t_ds_task_definition (
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   task_type varchar(50) DEFAULT NULL ,
+  task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
@@ -427,6 +428,7 @@ CREATE TABLE t_ds_task_definition_log (
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   task_type varchar(50) DEFAULT NULL ,
+  task_execute_type int(11) DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
@@ -739,6 +741,7 @@ CREATE TABLE t_ds_task_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   task_type varchar(50) DEFAULT NULL ,
+  task_execute_type int DEFAULT '0',
   task_code bigint NOT NULL,
   task_definition_version int DEFAULT NULL ,
   process_instance_id int DEFAULT NULL ,
@@ -769,8 +772,7 @@ CREATE TABLE t_ds_task_instance (
   dry_run int DEFAULT '0' ,
   cpu_quota int DEFAULT '-1' NOT NULL,
   memory_max int DEFAULT '-1' NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
+  PRIMARY KEY (id)
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);

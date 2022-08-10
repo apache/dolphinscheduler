@@ -64,6 +64,11 @@ public enum CommandType {
     MASTER_RESPONSE,
 
     /**
+     * task execute start, from api to master
+     */
+    TASK_EXECUTE_START,
+
+    /**
      * dispatch task request
      */
     TASK_DISPATCH_REQUEST,
@@ -95,6 +100,16 @@ public enum CommandType {
     TASK_REJECT,
 
     TASK_REJECT_ACK,
+
+    /**
+     * task savepoint, for stream task
+     */
+    TASK_SAVEPOINT_REQUEST,
+
+    /**
+     * task savepoint ack, for stream task
+     */
+    TASK_SAVEPOINT_RESPONSE,
 
     HEART_BEAT,
 

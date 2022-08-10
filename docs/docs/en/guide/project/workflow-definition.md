@@ -34,6 +34,11 @@ Click the plus sign on the right of the task node to connect the task; as shown 
 
 ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-dependent.png)
 
+### Dependencies with stream task
+If the DAG contains stream tasks, the relationship between stream tasks is displayed as a dotted line, and the execution of stream tasks will be skipped when the workflow instance is executed.
+
+  ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-definition-with-stream-task.png)
+
 **Delete dependencies:** Using your mouse to select the connection line, and click the "Delete" icon in the upper right corner <img src= "../../../../img/delete.png" width="35"/>, delete dependencies between tasks.
 
 ![workflow-delete](../../../../img/new_ui/dev/project/workflow-delete.png)

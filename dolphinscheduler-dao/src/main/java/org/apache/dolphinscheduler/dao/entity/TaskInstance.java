@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -88,6 +89,12 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private String processInstanceName;
+
+    /**
+     * process definition name
+     */
+    @TableField(exist = false)
+    private String processDefinitionName;
 
     /**
      * process instance name
@@ -288,6 +295,11 @@ public class TaskInstance implements Serializable {
      */
     private Integer memoryMax;
 
+    /**
+     * task execute type
+     */
+    private TaskExecuteType taskExecuteType;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -355,6 +367,11 @@ public class TaskInstance implements Serializable {
         return TASK_TYPE_BLOCKING.equalsIgnoreCase(this.taskType);
     }
 
+    public boolean isFirstRun() {
+        return endTime == null;
+    }
+
+
     /**
      * determine if a task instance can retry
      * if subProcess,
@@ -388,9 +405,4 @@ public class TaskInstance implements Serializable {
         // task retry does not over time, return false
         return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
-
-    public boolean isFirstRun() {
-        return endTime == null;
-    }
-
 }
