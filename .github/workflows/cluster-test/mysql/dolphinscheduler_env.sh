@@ -15,6 +15,9 @@
 # limitations under the License.
 #
 
+# Load system configuration
+source /etc/profile
+
 # JAVA_HOME, will use it to start DolphinScheduler server
 export JAVA_HOME=${JAVA_HOME:-/usr/local/openjdk-8}
 
