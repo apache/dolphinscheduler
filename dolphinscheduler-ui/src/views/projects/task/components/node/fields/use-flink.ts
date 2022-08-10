@@ -39,9 +39,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     model.flinkVersion === '<1.10' && model.deployMode !== 'local' ? 12 : 0
   )
 
-  const deployModeSpan = computed(() =>
-    model.deployMode !== 'local' ? 12 : 0
-  )
+  const deployModeSpan = computed(() => (model.deployMode !== 'local' ? 12 : 0))
 
   const appNameSpan = computed(() => (model.deployMode !== 'local' ? 24 : 0))
 
@@ -56,7 +54,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
           label: 'local',
           value: 'local'
         }
-      ];
+      ]
     } else {
       return [
         {
@@ -71,14 +69,17 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
           label: 'local',
           value: 'local'
         }
-      ];
+      ]
     }
   })
 
   watch(
     () => model.flinkVersion,
     () => {
-      if (model.flinkVersion === '<1.10' && model.deployMode === 'application') {
+      if (
+        model.flinkVersion === '<1.10' &&
+        model.deployMode === 'application'
+      ) {
         model.deployMode = 'cluster'
       }
     }
@@ -92,7 +93,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'select',
       field: 'programType',
-      span: 12,
+      span: 24,
       name: t('project.node.program_type'),
       options: PROGRAM_TYPES,
       props: {

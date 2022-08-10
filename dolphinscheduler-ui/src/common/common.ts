@@ -140,6 +140,34 @@ export const stateType = (t: any) => [
 ]
 
 /**
+ * Stream task state
+ */
+const streamTaskState = [
+  'SUBMITTED_SUCCESS',
+  'RUNNING_EXECUTION',
+  'FAILURE',
+  'STOP',
+  'KILL',
+  'SUCCESS'
+]
+
+/**
+ * Stream task State code table
+ */
+export const streamStateType = (t: any) => [
+  {
+    value: '',
+    label: `${t('project.workflow.all_status')}`
+  },
+  ...Object.entries(tasksState(t))
+    .filter(([key]) => streamTaskState.includes(key))
+    .map(([key, item]) => ({
+      value: key,
+      label: item.desc
+    }))
+]
+
+/**
  * Task status
  * @id id
  * @desc tooltip

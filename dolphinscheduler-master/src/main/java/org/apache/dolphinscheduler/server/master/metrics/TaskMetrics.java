@@ -84,6 +84,9 @@ public class TaskMetrics {
     }
 
     public void incTaskInstanceByState(final String state) {
+        if (taskInstanceCounters.get(state) == null) {
+            return;
+        }
         taskInstanceCounters.get(state).increment();
     }
 

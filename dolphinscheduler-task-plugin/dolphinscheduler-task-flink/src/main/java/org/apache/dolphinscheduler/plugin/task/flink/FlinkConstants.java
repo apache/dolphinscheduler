@@ -55,6 +55,11 @@ public class FlinkConstants {
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
     public static final String FLINK_PYTHON = "-py";
+    public static final String FLINK_SAVEPOINT = "savepoint";
+    public static final String FLINK_METRICS = "metrics";
+    public static final String FLINK_OVERVIEW = "overview";
+    public static final String FLINK_JOBS = "jobs";
+    public static final String FLINK_CANCEL = "cancel";
     // For Flink SQL
     public static final String FLINK_FORMAT_EXECUTION_TARGET = "set execution.target=%s";
     public static final String FLINK_FORMAT_YARN_APPLICATION_NAME = "set yarn.application.name=%s";

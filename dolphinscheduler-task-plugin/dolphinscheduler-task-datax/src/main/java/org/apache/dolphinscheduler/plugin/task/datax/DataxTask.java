@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClient
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -160,7 +161,7 @@ public class DataxTask extends AbstractTaskExecutor {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
         } catch (Exception e) {
             logger.error("datax task error", e);

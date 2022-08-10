@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -210,6 +211,11 @@ public class TaskDefinition {
      * max memory
      */
     private Integer memoryMax;
+
+    /**
+     * task execute type
+     */
+    private TaskExecuteType taskExecuteType;
 
     public TaskDefinition() {
     }
@@ -483,6 +489,14 @@ public class TaskDefinition {
         this.memoryMax = memoryMax;
     }
 
+    public TaskExecuteType getTaskExecuteType() {
+        return taskExecuteType;
+    }
+
+    public void setTaskExecuteType(TaskExecuteType taskExecuteType) {
+        this.taskExecuteType = taskExecuteType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -509,7 +523,8 @@ public class TaskDefinition {
             && taskGroupId == that.taskGroupId
             && taskGroupPriority == that.taskGroupPriority
             && Objects.equals(cpuQuota, that.cpuQuota)
-            && Objects.equals(memoryMax, that.memoryMax);
+            && Objects.equals(memoryMax, that.memoryMax)
+            && Objects.equals(taskExecuteType, that.taskExecuteType);
     }
 
     @Override
@@ -543,6 +558,7 @@ public class TaskDefinition {
                 + ", resourceIds='" + resourceIds + '\''
                 + ", cpuQuota=" + cpuQuota
                 + ", memoryMax=" + memoryMax
+                + ", taskExecuteType=" + taskExecuteType
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

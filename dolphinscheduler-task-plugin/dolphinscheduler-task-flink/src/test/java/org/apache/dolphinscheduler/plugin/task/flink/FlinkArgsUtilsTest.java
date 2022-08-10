@@ -58,7 +58,7 @@ public class FlinkArgsUtilsTest {
     @Test
     public void testRunJarInApplicationMode() throws Exception {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION);
-        List<String> commandLine = FlinkArgsUtils.buildCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
                 "flink run-application -t yarn-application -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
@@ -69,21 +69,21 @@ public class FlinkArgsUtilsTest {
     public void testRunJarInClusterMode() throws Exception {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setFlinkVersion("1.11");
-        List<String> commandLine1 = FlinkArgsUtils.buildCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine1 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
                 "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine1));
 
         flinkParameters.setFlinkVersion("<1.10");
-        List<String> commandLine2 = FlinkArgsUtils.buildCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine2 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
                 "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine2));
 
         flinkParameters.setFlinkVersion(">=1.12");
-        List<String> commandLine3 = FlinkArgsUtils.buildCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine3 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
                 "flink run -t yarn-per-job -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
@@ -93,7 +93,7 @@ public class FlinkArgsUtilsTest {
     @Test
     public void testRunJarInLocalMode() throws Exception {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL);
-        List<String> commandLine = FlinkArgsUtils.buildCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals(
                 "flink run -p 4 -sae -c org.example.Main /opt/job.jar",
@@ -104,7 +104,7 @@ public class FlinkArgsUtilsTest {
     public void testRunSql() throws Exception {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setProgramType(ProgramType.SQL);
-        List<String> commandLine = FlinkArgsUtils.buildCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assert.assertEquals("sql-client.sh -i /tmp/execution/app-id_init.sql -f /tmp/execution/app-id_node.sql",
                 joinStringListWithSpace(commandLine));

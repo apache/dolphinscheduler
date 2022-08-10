@@ -325,7 +325,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .create();
     }
 
-    private void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
+    public void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
         if (Objects.isNull(resourceParametersHelper)) {
             return;
         }
@@ -592,7 +592,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * get resource map key is full name and value is tenantCode
      */
-    protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
+    public Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
         Map<String, String> resourcesMap = new HashMap<>();
         AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
                 .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());

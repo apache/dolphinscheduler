@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -322,6 +323,7 @@ public class TaskDefinitionController extends BaseController {
      * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
+     * @param taskExecuteType taskExecuteType
      * @param pageNo page number
      * @param pageSize page size
      * @return task definition page
@@ -332,6 +334,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "searchWorkflowName", value = "SEARCH_WORKFLOW_NAME", required = false, type = "String"),
         @ApiImplicitParam(name = "searchTaskName", value = "SEARCH_TASK_NAME", required = false, type = "String"),
         @ApiImplicitParam(name = "taskType", value = "TASK_TYPE", required = false, dataType = "TaskType", example = "SHELL"),
+        @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataType = "TaskExecuteType", example = "STREAM"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
@@ -344,6 +347,7 @@ public class TaskDefinitionController extends BaseController {
                                                 @RequestParam(value = "searchWorkflowName", required = false) String searchWorkflowName,
                                                 @RequestParam(value = "searchTaskName", required = false) String searchTaskName,
                                                 @RequestParam(value = "taskType", required = false) String taskType,
+                                                @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
                                                 @RequestParam("pageNo") Integer pageNo,
                                                 @RequestParam("pageSize") Integer pageSize) {
         Result result = checkPageParams(pageNo, pageSize);
@@ -352,7 +356,7 @@ public class TaskDefinitionController extends BaseController {
         }
         searchWorkflowName = ParameterUtils.handleEscapes(searchWorkflowName);
         searchTaskName = ParameterUtils.handleEscapes(searchTaskName);
-        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchWorkflowName, searchTaskName, taskType, pageNo, pageSize);
+        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchWorkflowName, searchTaskName, taskType, taskExecuteType, pageNo, pageSize);
     }
 
     /**

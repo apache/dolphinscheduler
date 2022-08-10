@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
 
@@ -53,6 +54,9 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     @Autowired
     private List<TaskEventHandler> taskEventHandlerList;
 
+    @Autowired
+    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
+
     private Map<TaskEventType, TaskEventHandler> taskEventHandlerMap = new HashMap<>();
 
     /**
@@ -71,6 +75,11 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     public void submitTaskEvent(TaskEvent taskEvent) {
+        // stream task event handle
+        if (taskEvent.getProcessInstanceId() == 0 && streamTaskInstanceExecCacheManager.contains(taskEvent.getTaskInstanceId())) {
+            streamTaskInstanceExecCacheManager.getByTaskInstanceId(taskEvent.getTaskInstanceId()).addTaskEvent(taskEvent);
+            return;
+        }
         if (!processInstanceExecCacheManager.contains(taskEvent.getProcessInstanceId())) {
             logger.warn("Cannot find workflowExecuteThread from cacheManager, event: {}", taskEvent);
             return;

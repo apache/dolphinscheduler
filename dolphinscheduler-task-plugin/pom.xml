@@ -59,6 +59,7 @@
         <module>dolphinscheduler-task-dinky</module>
         <module>dolphinscheduler-task-sagemaker</module>
         <module>dolphinscheduler-task-chunjun</module>
+        <module>dolphinscheduler-task-flink-stream</module>
     </modules>
 
     <dependencyManagement>

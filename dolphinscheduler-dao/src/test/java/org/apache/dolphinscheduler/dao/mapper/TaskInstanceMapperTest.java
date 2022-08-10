@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
@@ -189,7 +190,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
-                Flag.NO);
+            Flag.NO);
 
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
@@ -355,16 +356,18 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page,
-                definition.getProjectCode(),
-                task.getProcessInstanceId(),
-                "",
-                "",
-                "",
-                0,
-                new int[0],
-                "",
-                null, null);
+            page,
+            definition.getProjectCode(),
+            task.getProcessInstanceId(),
+            "",
+            "",
+            "",
+            0,
+            new int[0],
+            "",
+            TaskExecuteType.BATCH,
+            null, null
+        );
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());

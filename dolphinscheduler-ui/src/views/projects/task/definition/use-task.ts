@@ -17,6 +17,7 @@
 
 import { reactive } from 'vue'
 import {
+  updateTask,
   genTaskCodeList,
   saveSingle,
   queryTaskDefinitionByCode,
@@ -98,11 +99,34 @@ export function useTask(projectCode: number) {
     task.taskReadonly = false
   }
 
+  const onUpdateTask = async (data: INodeData) => {
+    if (task.taskSaving || !data.code) return
+    task.taskSaving = true
+
+    const params = {
+      taskExecuteType: 'STREAM',
+      taskDefinitionJsonObj: JSON.stringify(
+        formatData(data).taskDefinitionJsonObj
+      )
+    }
+
+    try {
+      await updateTask(projectCode, data.code, params)
+
+      task.taskSaving = false
+      return true
+    } catch (err) {
+      task.taskSaving = false
+      return false
+    }
+  }
+
   return {
     task,
     onToggleShow,
     onTaskSave,
     onEditTask,
-    onInitTask
+    onInitTask,
+    onUpdateTask
   }
 }
