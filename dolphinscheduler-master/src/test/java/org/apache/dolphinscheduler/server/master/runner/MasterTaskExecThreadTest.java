@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -41,7 +41,6 @@ import org.springframework.context.ApplicationContext;
 @Ignore
 public class MasterTaskExecThreadTest {
 
-
     private SpringApplicationContext springApplicationContext;
 
     @Before
@@ -49,9 +48,9 @@ public class MasterTaskExecThreadTest {
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         this.springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
-        //  this.registryCenter = PowerMockito.mock(RegistryCenter.class);
-        //PowerMockito.when(SpringApplicationContext.getBean(RegistryCenter.class))
-        //       .thenReturn(this.registryCenter);
+        // this.registryCenter = PowerMockito.mock(RegistryCenter.class);
+        // PowerMockito.when(SpringApplicationContext.getBean(RegistryCenter.class))
+        // .thenReturn(this.registryCenter);
         ProcessService processService = Mockito.mock(ProcessService.class);
         Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
                 .thenReturn(processService);
@@ -61,15 +60,16 @@ public class MasterTaskExecThreadTest {
         taskDefinition.setTimeout(0);
         Mockito.when(processService.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
-        //this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
+        // this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
     }
 
     @Test
     public void testExistsValidWorkerGroup1() {
 
-       /* Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(Sets.newHashSet());
-        boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
-        Assert.assertFalse(b);*/
+        /*
+         * Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(Sets.newHashSet()); boolean b =
+         * masterTaskExecThread.existsValidWorkerGroup("default"); Assert.assertFalse(b);
+         */
     }
 
     @Test
@@ -78,19 +78,21 @@ public class MasterTaskExecThreadTest {
         workerGroups.add("test1");
         workerGroups.add("test2");
 
-        /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGroups);
-          boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
-        Assert.assertFalse(b);*/
+        /*
+         * Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGroups); boolean b =
+         * masterTaskExecThread.existsValidWorkerGroup("default"); Assert.assertFalse(b);
+         */
     }
 
     @Test
     public void testExistsValidWorkerGroup3() {
         Set<String> workerGroups = new HashSet<>();
         workerGroups.add("test1");
-        /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGroups);
-          Mockito.when(registryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGroups);
-        boolean b = masterTaskExecThread.existsValidWorkerGroup("test1");
-        Assert.assertTrue(b);*/
+        /*
+         * Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGroups);
+         * Mockito.when(registryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGroups); boolean b =
+         * masterTaskExecThread.existsValidWorkerGroup("test1"); Assert.assertTrue(b);
+         */
     }
 
     @Test
@@ -113,9 +115,9 @@ public class MasterTaskExecThreadTest {
         Mockito.when(processService.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
 
-        //MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
-        //masterTaskExecThread.pauseTask();
-        //org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
+        // MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
+        // masterTaskExecThread.pauseTask();
+        // org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
     }
 
     private TaskInstance getTaskInstance() {
@@ -124,7 +126,7 @@ public class MasterTaskExecThreadTest {
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);
-        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         taskInstance.setTaskCode(1L);
         taskInstance.setTaskDefinitionVersion(1);
         return taskInstance;

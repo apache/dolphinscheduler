@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -56,7 +55,7 @@ public class TaskDelayEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable =
-            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError("Cannot find related workflow instance from cache");
@@ -67,11 +66,11 @@ public class TaskDelayEventHandler implements TaskEventHandler {
             return;
         }
         TaskInstance taskInstance = taskInstanceOptional.get();
-        if (taskInstance.getState().typeIsFinished()) {
+        if (taskInstance.getState().isFinished()) {
             logger.warn(
-                "The current task status is: {}, will not handle the running event, this event is delay, will discard this event: {}",
-                taskInstance.getState(),
-                taskEvent);
+                    "The current task status is: {}, will not handle the running event, this event is delay, will discard this event: {}",
+                    taskInstance.getState(),
+                    taskEvent);
             sendAckToWorker(taskEvent);
             return;
         }
@@ -97,11 +96,12 @@ public class TaskDelayEventHandler implements TaskEventHandler {
             }
             throw new TaskEventHandleError("Handle task dispatch event error, update taskInstance to db failed", ex);
         }
-        StateEvent stateEvent = new StateEvent();
-        stateEvent.setProcessInstanceId(taskEvent.getProcessInstanceId());
-        stateEvent.setTaskInstanceId(taskEvent.getTaskInstanceId());
-        stateEvent.setExecutionStatus(taskEvent.getState());
-        stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+        TaskStateEvent stateEvent = TaskStateEvent.builder()
+                .processInstanceId(taskEvent.getProcessInstanceId())
+                .taskInstanceId(taskEvent.getTaskInstanceId())
+                .status(taskEvent.getState())
+                .type(StateEventType.TASK_STATE_CHANGE)
+                .build();
         workflowExecuteThreadPool.submitStateEvent(stateEvent);
 
     }
@@ -109,7 +109,7 @@ public class TaskDelayEventHandler implements TaskEventHandler {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-            new TaskExecuteRunningAckMessage(ExecutionStatus.SUCCESS, taskEvent.getTaskInstanceId());
+                new TaskExecuteRunningAckMessage(true, taskEvent.getTaskInstanceId());
         taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
     }
 
