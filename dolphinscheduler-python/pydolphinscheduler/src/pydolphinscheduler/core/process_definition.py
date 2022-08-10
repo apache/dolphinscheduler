@@ -21,7 +21,6 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
-
 from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.resource import Resource
