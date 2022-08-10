@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -45,7 +45,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     int setFailoverByHostAndStateArray(@Param("host") String host,
                                        @Param("states") int[] stateArray,
-                                       @Param("destStatus") ExecutionStatus destStatus);
+                                       @Param("destStatus") TaskExecutionStatus destStatus);
 
     TaskInstance queryByInstanceIdAndName(@Param("processInstanceId") int processInstanceId,
                                           @Param("name") String name);
@@ -83,7 +83,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(@Param("startTime") Date startTime,
                                                                                        @Param("endTime") Date endTime,
                                                                                        @Param("projectCodes") Long[] projectCodes,
-                                                                                       @Param("states") List<ExecutionStatus> states);
+                                                                                       @Param("states") List<TaskExecutionStatus> states);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,
@@ -109,8 +109,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("host") String host,
                                                     @Param("taskExecuteType") TaskExecuteType taskExecuteType,
                                                     @Param("startTime") Date startTime,
-                                                    @Param("endTime") Date endTime
-    );
+                                                    @Param("endTime") Date endTime);
 
-    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId, @Param("status") int status);
+    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,
+                                             @Param("status") int status);
 }

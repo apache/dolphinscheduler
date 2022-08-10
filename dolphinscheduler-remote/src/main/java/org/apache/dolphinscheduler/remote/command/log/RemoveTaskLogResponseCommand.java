@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -26,27 +29,15 @@ import java.io.Serializable;
 /**
  *  remove task log request command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RemoveTaskLogResponseCommand implements Serializable {
 
-    /*TaskPriorityQueueConsumer.*
-     *  log path
+    /*
+     * TaskPriorityQueueConsumer.* log path
      */
     private Boolean status;
-
-    public RemoveTaskLogResponseCommand() {
-    }
-
-    public RemoveTaskLogResponseCommand(Boolean status) {
-        this.status = status;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
 
     /**
      * package request command

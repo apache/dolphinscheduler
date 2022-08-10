@@ -38,16 +38,17 @@ public class TaskStateEventHandler implements StateEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(TaskStateEventHandler.class);
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException, StateEventHandleError {
-        measureTaskState(stateEvent);
-        workflowExecuteRunnable.checkTaskInstanceByStateEvent(stateEvent);
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError {
+        TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
+        measureTaskState(taskStateEvent);
+        workflowExecuteRunnable.checkTaskInstanceByStateEvent(taskStateEvent);
 
         Optional<TaskInstance> taskInstanceOptional =
-            workflowExecuteRunnable.getTaskInstance(stateEvent.getTaskInstanceId());
+                workflowExecuteRunnable.getTaskInstance(taskStateEvent.getTaskInstanceId());
 
         TaskInstance task = taskInstanceOptional.orElseThrow(() -> new StateEventHandleError(
-            "Cannot find task instance from taskMap by task instance id: " + stateEvent.getTaskInstanceId()));
+                "Cannot find task instance from taskMap by task instance id: " + taskStateEvent.getTaskInstanceId()));
 
         if (task.getState() == null) {
             throw new StateEventHandleError("Task state event handle error due to task state is null");
@@ -55,9 +56,9 @@ public class TaskStateEventHandler implements StateEventHandler {
 
         Map<Long, Integer> completeTaskMap = workflowExecuteRunnable.getCompleteTaskMap();
 
-        if (task.getState().typeIsFinished()) {
+        if (task.getState().isFinished()) {
             if (completeTaskMap.containsKey(task.getTaskCode())
-                && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
+                    && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
                 logger.warn("The task instance is already complete, stateEvent: {}", stateEvent);
                 return true;
             }
@@ -73,7 +74,7 @@ public class TaskStateEventHandler implements StateEventHandler {
             ITaskProcessor iTaskProcessor = activeTaskProcessMap.get(task.getTaskCode());
             iTaskProcessor.action(TaskAction.RUN);
 
-            if (iTaskProcessor.taskInstance().getState().typeIsFinished()) {
+            if (iTaskProcessor.taskInstance().getState().isFinished()) {
                 if (iTaskProcessor.taskInstance().getState() != task.getState()) {
                     task.setState(iTaskProcessor.taskInstance().getState());
                 }
@@ -82,7 +83,7 @@ public class TaskStateEventHandler implements StateEventHandler {
             return true;
         }
         throw new StateEventHandleException(
-            "Task state event handle error, due to the task is not in activeTaskProcessorMaps");
+                "Task state event handle error, due to the task is not in activeTaskProcessorMaps");
     }
 
     @Override
@@ -90,17 +91,17 @@ public class TaskStateEventHandler implements StateEventHandler {
         return StateEventType.TASK_STATE_CHANGE;
     }
 
-    private void measureTaskState(StateEvent taskStateEvent) {
-        if (taskStateEvent == null || taskStateEvent.getExecutionStatus() == null) {
+    private void measureTaskState(TaskStateEvent taskStateEvent) {
+        if (taskStateEvent == null || taskStateEvent.getStatus() == null) {
             // the event is broken
             logger.warn("The task event is broken..., taskEvent: {}", taskStateEvent);
             return;
         }
-        if (taskStateEvent.getExecutionStatus().typeIsFinished()) {
+        if (taskStateEvent.getStatus().isFinished()) {
             TaskMetrics.incTaskInstanceByState("finish");
         }
-        switch (taskStateEvent.getExecutionStatus()) {
-            case STOP:
+        switch (taskStateEvent.getStatus()) {
+            case KILL:
                 TaskMetrics.incTaskInstanceByState("stop");
                 break;
             case SUCCESS:

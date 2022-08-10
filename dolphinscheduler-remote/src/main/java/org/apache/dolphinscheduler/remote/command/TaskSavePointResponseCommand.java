@@ -22,10 +22,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * task savepoint response command

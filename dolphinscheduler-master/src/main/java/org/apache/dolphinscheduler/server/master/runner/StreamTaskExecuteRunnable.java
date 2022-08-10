@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -145,7 +145,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // dispatch task
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
         if (taskExecutionContext == null) {
-            taskInstance.setState(ExecutionStatus.FAILURE);
+            taskInstance.setState(TaskExecutionStatus.FAILURE);
             processService.saveTaskInstance(taskInstance);
             return;
         }
@@ -171,7 +171,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 executionContext.getHost());
 
             // set task instance fail
-            taskInstance.setState(ExecutionStatus.FAILURE);
+            taskInstance.setState(TaskExecutionStatus.FAILURE);
             processService.saveTaskInstance(taskInstance);
             return;
         }
@@ -248,7 +248,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
         taskInstance.setName(taskDefinition.getName());
         // task instance state
-        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         // set process instance id to 0
         taskInstance.setProcessInstanceId(0);
         // task instance type
@@ -409,7 +409,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // send ack
         sendAckToWorker(taskEvent);
 
-        if (taskInstance.getState().typeIsFinished()) {
+        if (taskInstance.getState().isFinished()) {
             streamTaskInstanceExecCacheManager.removeByTaskInstanceId(taskInstance.getId());
             logger.info("The stream task instance is finish, taskInstanceId:{}, state:{}", taskInstance.getId(), taskEvent.getState());
         }
@@ -423,11 +423,11 @@ public class StreamTaskExecuteRunnable implements Runnable {
             logger.warn("The task event is broken..., taskEvent: {}", taskEvent);
             return;
         }
-        if (taskEvent.getState().typeIsFinished()) {
+        if (taskEvent.getState().isFinished()) {
             TaskMetrics.incTaskInstanceByState("finish");
         }
         switch (taskEvent.getState()) {
-            case STOP:
+            case KILL:
                 TaskMetrics.incTaskInstanceByState("stop");
                 break;
             case SUCCESS:
@@ -470,7 +470,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-            new TaskExecuteRunningAckMessage(ExecutionStatus.SUCCESS, taskEvent.getTaskInstanceId());
+            new TaskExecuteRunningAckMessage(true, taskEvent.getTaskInstanceId());
         taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
     }
 

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -67,7 +67,6 @@ public abstract class AbstractTask {
      * other resource manager appId , for example : YARN etc
      */
     protected String appIds;
-
 
     /**
      * cancel flag
@@ -234,17 +233,17 @@ public abstract class AbstractTask {
      *
      * @return exit status
      */
-    public ExecutionStatus getExitStatus() {
-        ExecutionStatus status;
+    public TaskExecutionStatus getExitStatus() {
+        TaskExecutionStatus status;
         switch (getExitStatusCode()) {
             case TaskConstants.EXIT_CODE_SUCCESS:
-                status = ExecutionStatus.SUCCESS;
+                status = TaskExecutionStatus.SUCCESS;
                 break;
             case TaskConstants.EXIT_CODE_KILL:
-                status = ExecutionStatus.KILL;
+                status = TaskExecutionStatus.KILL;
                 break;
             default:
-                status = ExecutionStatus.FAILURE;
+                status = TaskExecutionStatus.FAILURE;
                 break;
         }
         return status;

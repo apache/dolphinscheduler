@@ -55,7 +55,7 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
@@ -102,7 +102,8 @@ import lombok.NonNull;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     protected boolean killed = false;
 
@@ -141,7 +142,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     protected javax.sql.DataSource defaultDataSource =
-                        SpringApplicationContext.getBean(javax.sql.DataSource.class);
+            SpringApplicationContext.getBean(javax.sql.DataSource.class);
 
     /**
      * pause task, common tasks donot need this.
@@ -281,7 +282,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            taskInstance.setState(ExecutionStatus.FAILURE);
+            taskInstance.setState(TaskExecutionStatus.FAILURE);
             processService.saveTaskInstance(taskInstance);
             return null;
         }
@@ -298,7 +299,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         // TODO to be optimized
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
-            setDataQualityTaskRelation(dataQualityTaskExecutionContext,taskInstance,tenant.getTenantCode());
+            setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
         }
         K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
         if (TASK_TYPE_K8S.equalsIgnoreCase(taskInstance.getTaskType())) {
@@ -307,8 +308,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(processInstance);
 
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
-        Map<String, Property> propertyMap = curingParamsService.paramParsingPreparation(taskInstance, baseParam, processInstance);
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        Map<String, Property> propertyMap =
+                curingParamsService.paramParsingPreparation(taskInstance, baseParam, processInstance);
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
@@ -365,7 +368,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         List<UdfFunc> udfFuncList = processService.queryUdfFunListByIds(map.keySet().toArray(new Integer[map.size()]));
 
         udfFuncList.forEach(udfFunc -> {
-            UdfFuncParameters udfFuncParameters = JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
+            UdfFuncParameters udfFuncParameters =
+                    JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
             udfFuncParameters.setDefaultFS(HadoopUtils.getInstance().getDefaultFS());
             String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
             udfFuncParameters.setTenantCode(tenantCode);
@@ -379,19 +383,20 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @param dataQualityTaskExecutionContext dataQualityTaskExecutionContext
      * @param taskInstance taskInstance
      */
-    private void setDataQualityTaskRelation(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, TaskInstance taskInstance, String tenantCode) {
+    private void setDataQualityTaskRelation(DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
+                                            TaskInstance taskInstance, String tenantCode) {
         DataQualityParameters dataQualityParameters =
                 JSONUtils.parseObject(taskInstance.getTaskParams(), DataQualityParameters.class);
         if (dataQualityParameters == null) {
             return;
         }
 
-        Map<String,String> config = dataQualityParameters.getRuleInputParameter();
+        Map<String, String> config = dataQualityParameters.getRuleInputParameter();
 
         int ruleId = dataQualityParameters.getRuleId();
         DqRule dqRule = processService.getDqRule(ruleId);
         if (dqRule == null) {
-            logger.error("can not get DqRule by id {}",ruleId);
+            logger.error("can not get DqRule by id {}", ruleId);
             return;
         }
 
@@ -401,7 +406,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
         if (CollectionUtils.isEmpty(ruleInputEntryList)) {
-            logger.error("{} rule input entry list is empty ",ruleId);
+            logger.error("{} rule input entry list is empty ", ruleId);
             return;
         }
         List<DqRuleExecuteSql> executeSqlList = processService.getDqExecuteSql(ruleId);
@@ -412,9 +417,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         // set the path used to store data quality task check error data
         dataQualityTaskExecutionContext.setHdfsPath(
                 PropertyUtils.getString(Constants.FS_DEFAULT_FS)
-                + PropertyUtils.getString(
-                        Constants.DATA_QUALITY_ERROR_OUTPUT_PATH,
-                        "/user/" + tenantCode + "/data_quality_error_data"));
+                        + PropertyUtils.getString(
+                                Constants.DATA_QUALITY_ERROR_OUTPUT_PATH,
+                                "/user/" + tenantCode + "/data_quality_error_data"));
 
         setSourceConfig(dataQualityTaskExecutionContext, config);
         setTargetConfig(dataQualityTaskExecutionContext, config);
@@ -460,7 +465,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     dqRuleExecuteSql.setIndex(1);
                     dqRuleExecuteSql.setSql(type.getExecuteSql());
                     dqRuleExecuteSql.setTableAlias(type.getOutputTable());
-                    executeSqlList.add(0,dqRuleExecuteSql);
+                    executeSqlList.add(0, dqRuleExecuteSql);
 
                     if (Boolean.TRUE.equals(type.getInnerSource())) {
                         dataQualityTaskExecutionContext.setComparisonNeedStatisticsValueTable(true);
@@ -480,17 +485,17 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     public DataSource getDefaultDataSource() {
         DataSource dataSource = new DataSource();
 
-        HikariDataSource hikariDataSource = (HikariDataSource)defaultDataSource;
+        HikariDataSource hikariDataSource = (HikariDataSource) defaultDataSource;
         dataSource.setUserName(hikariDataSource.getUsername());
         JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
         if (jdbcInfo != null) {
             Properties properties = new Properties();
-            properties.setProperty(USER,hikariDataSource.getUsername());
-            properties.setProperty(PASSWORD,hikariDataSource.getPassword());
+            properties.setProperty(USER, hikariDataSource.getUsername());
+            properties.setProperty(PASSWORD, hikariDataSource.getPassword());
             properties.setProperty(DATABASE, jdbcInfo.getDatabase());
-            properties.setProperty(ADDRESS,jdbcInfo.getAddress());
-            properties.setProperty(OTHER,jdbcInfo.getParams());
-            properties.setProperty(JDBC_URL,jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            properties.setProperty(ADDRESS, jdbcInfo.getAddress());
+            properties.setProperty(OTHER, jdbcInfo.getParams());
+            properties.setProperty(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
             dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
             dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
         }
@@ -532,9 +537,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @param dataQualityTaskExecutionContext
      * @param config
      */
-    private void setTargetConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+    private void setTargetConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
+                                 Map<String, String> config) {
         if (StringUtils.isNotEmpty(config.get(TARGET_DATASOURCE_ID))) {
-            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(TARGET_DATASOURCE_ID)));
+            DataSource dataSource =
+                    processService.findDataSourceById(Integer.parseInt(config.get(TARGET_DATASOURCE_ID)));
             if (dataSource != null) {
                 ConnectorType targetConnectorType = ConnectorType.of(
                         DbType.of(Integer.parseInt(config.get(TARGET_CONNECTOR_TYPE))).isHive() ? 1 : 0);
@@ -551,7 +558,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @param dataQualityTaskExecutionContext
      * @param config
      */
-    private void setSourceConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+    private void setSourceConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
+                                 Map<String, String> config) {
         if (StringUtils.isNotEmpty(config.get(SRC_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(SRC_DATASOURCE_ID)));
             if (dataSource != null) {
@@ -586,15 +594,18 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     public Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
         Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
-                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
+                Set<ResourceInfo> oldVersionResources =
+                        projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
+                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(),
+                            processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
                 }
 
                 // get the resource id in order to get the resource names in batch
@@ -605,7 +616,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
+                    resources.forEach(t -> resourcesMap.put(t.getFullName(),
+                            processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
                 }
             }
         }
@@ -619,8 +631,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @param taskInstance taskInstance
      */
     private void setK8sTaskRelation(K8sTaskExecutionContext k8sTaskExecutionContext, TaskInstance taskInstance) {
-        K8sTaskParameters k8sTaskParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
-        Map<String,String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
+        K8sTaskParameters k8sTaskParameters =
+                JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
+        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
         String clusterName = namespace.get(CLUSTER);
         String configYaml = processService.findConfigYamlByName(clusterName);
         if (configYaml != null) {
