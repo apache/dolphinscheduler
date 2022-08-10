@@ -29,7 +29,6 @@ public class SeatunnelSparkParameters extends SeatunnelParameters {
     private DeployModeEnum deployMode;
     private MasterTypeEnum master;
     private String masterUrl;
-    private String queue;
 
     @Override
     public boolean checkParameters() {
