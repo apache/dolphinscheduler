@@ -15,29 +15,38 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+package org.apache.dolphinscheduler.server.master.event;
 
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
+import io.netty.channel.Channel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-    button {
-      margin-left: 10px;
-    }
-  }
-}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskStateEvent implements StateEvent {
 
-.table-card {
-  margin-top: 8px;
+    // todo: use wrapper type
+    private int processInstanceId;
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+    private int taskInstanceId;
+
+    private long taskCode;
+
+    private TaskExecutionStatus status;
+
+    private @NonNull StateEventType type;
+
+    private String key;
+
+    private Channel channel;
+
+    private String context;
+
 }

@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.CheckType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqFailureStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -67,11 +67,11 @@ public class DataQualityResultOperator {
                             Integer.parseInt(String.valueOf(taskInstance.getProcessInstanceId())));
 
             // when the task is failure or cancel, will delete the execute result and statistics value
-            if (taskResponseEvent.getState().typeIsFailure()
-                    || taskResponseEvent.getState().typeIsCancel()) {
+            if (taskResponseEvent.getState().isFailure()
+                    || taskResponseEvent.getState().isKill()) {
                 processService.deleteDqExecuteResultByTaskInstanceId(taskInstance.getId());
                 processService.deleteTaskStatisticsValueByTaskInstanceId(taskInstance.getId());
-                sendDqTaskErrorAlert(taskInstance,processInstance);
+                sendDqTaskErrorAlert(taskInstance, processInstance);
                 return;
             }
 
@@ -79,7 +79,7 @@ public class DataQualityResultOperator {
             DqExecuteResult dqExecuteResult =
                     processService.getDqExecuteResultByTaskInstanceId(taskInstance.getId());
             if (dqExecuteResult != null) {
-                //check the result ,if result is failure do some operator by failure strategy
+                // check the result ,if result is failure do some operator by failure strategy
                 checkDqExecuteResult(taskResponseEvent, dqExecuteResult, processInstance);
             }
         }
@@ -99,13 +99,13 @@ public class DataQualityResultOperator {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
             if (dqFailureStrategy != null) {
                 dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
-                sendDqTaskResultAlert(dqExecuteResult,processInstance);
+                sendDqTaskResultAlert(dqExecuteResult, processInstance);
                 switch (dqFailureStrategy) {
                     case ALERT:
                         logger.info("task is failure, continue and alert");
                         break;
                     case BLOCK:
-                        taskResponseEvent.setState(ExecutionStatus.FAILURE);
+                        taskResponseEvent.setState(TaskExecutionStatus.FAILURE);
                         logger.info("task is failure, end and alert");
                         break;
                     default:
@@ -139,23 +139,23 @@ public class DataQualityResultOperator {
             switch (checkType) {
                 case COMPARISON_MINUS_STATISTICS:
                     srcValue = comparisonValue - statisticsValue;
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailure = getCompareResult(operatorType, srcValue, threshold);
                     break;
                 case STATISTICS_MINUS_COMPARISON:
                     srcValue = statisticsValue - comparisonValue;
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailure = getCompareResult(operatorType, srcValue, threshold);
                     break;
                 case STATISTICS_COMPARISON_PERCENTAGE:
                     if (comparisonValue > 0) {
                         srcValue = statisticsValue / comparisonValue * 100;
                     }
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailure = getCompareResult(operatorType, srcValue, threshold);
                     break;
                 case STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE:
                     if (comparisonValue > 0) {
                         srcValue = Math.abs(comparisonValue - statisticsValue) / comparisonValue * 100;
                     }
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailure = getCompareResult(operatorType, srcValue, threshold);
                     break;
                 default:
                     break;
@@ -166,11 +166,11 @@ public class DataQualityResultOperator {
     }
 
     private void sendDqTaskResultAlert(DqExecuteResult dqExecuteResult, ProcessInstance processInstance) {
-        alertManager.sendDataQualityTaskExecuteResultAlert(dqExecuteResult,processInstance);
+        alertManager.sendDataQualityTaskExecuteResultAlert(dqExecuteResult, processInstance);
     }
 
     private void sendDqTaskErrorAlert(TaskInstance taskInstance, ProcessInstance processInstance) {
-        alertManager.sendTaskErrorAlert(taskInstance,processInstance);
+        alertManager.sendTaskErrorAlert(taskInstance, processInstance);
     }
 
     private boolean getCompareResult(OperatorType operatorType, double srcValue, double targetValue) {
