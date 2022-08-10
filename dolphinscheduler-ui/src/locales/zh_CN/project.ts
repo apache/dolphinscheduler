@@ -245,7 +245,19 @@ export default {
     stream_task: '实时任务',
     jump_tip: '跳转，暂未开放!',
     savepoint: 'Savepoint',
-    success: '成功'
+    success: '成功',
+    none_send: '都不发',
+    success_send: '成功发',
+    failure_send: '失败发',
+    all_send: '成功或失败都发',
+    set_parameters_before_starting: '启动前请先设置参数',
+    notification_strategy: '通知策略',
+    worker_group: 'Worker分组',
+    environment_name: '环境名称',
+    alarm_group: '告警组',
+    startup_parameter: '启动参数',
+    whether_dry_run: '是否空跑',
+    please_choose: '请选择'
   },
   dag: {
     create: '创建工作流',

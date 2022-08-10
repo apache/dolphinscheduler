@@ -244,7 +244,19 @@ export default {
     stream_task: 'Stream Task',
     jump_tip: 'Jump, not open yet!',
     savepoint: 'Savepoint',
-    success: 'Success'
+    success: 'Success',
+    none_send: 'None',
+    success_send: 'Success',
+    failure_send: 'Failure',
+    all_send: 'All',
+    set_parameters_before_starting: 'Please set the parameters before starting',
+    notification_strategy: 'Notification Strategy',
+    worker_group: 'Worker group',
+    environment_name: 'Environment Name',
+    alarm_group: 'Alarm group',
+    startup_parameter: 'Startup Parameter',
+    whether_dry_run: 'Whether Dry-Run',
+    please_choose: 'Please Choose'
   },
   dag: {
     create: 'Create Workflow',

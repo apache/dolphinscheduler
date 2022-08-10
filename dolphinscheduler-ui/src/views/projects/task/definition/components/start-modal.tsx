@@ -54,7 +54,7 @@ const props = {
 }
 
 export default defineComponent({
-  name: 'workflowDefinitionStart',
+  name: 'task-definition-start',
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
@@ -71,19 +71,19 @@ export default defineComponent({
     const generalWarningTypeListOptions = () => [
       {
         value: 'NONE',
-        label: t('project.workflow.none_send')
+        label: t('project.task.none_send')
       },
       {
         value: 'SUCCESS',
-        label: t('project.workflow.success_send')
+        label: t('project.task.success_send')
       },
       {
         value: 'FAILURE',
-        label: t('project.workflow.failure_send')
+        label: t('project.task.failure_send')
       },
       {
         value: 'ALL',
-        label: t('project.workflow.all_send')
+        label: t('project.task.all_send')
       }
     ]
 
@@ -154,22 +154,19 @@ export default defineComponent({
     return (
       <Modal
         show={this.show}
-        title={t('project.workflow.set_parameters_before_starting')}
+        title={t('project.task.set_parameters_before_starting')}
         onCancel={this.hideModal}
         onConfirm={this.handleStart}
         confirmLoading={this.saving}
       >
         <NForm ref='startFormRef' model={this.startForm}>
-          <NFormItem
-            label={t('project.workflow.workflow_name')}
-            path='workflow_name'
-          >
-            <div class={styles.formItem} title={this.row.name}>
+          <NFormItem label={t('project.task.task_name')} path='task_name'>
+            <div class={styles.formItem} title={this.row.taskName}>
               {this.row.taskName}
             </div>
           </NFormItem>
           <NFormItem
-            label={t('project.workflow.notification_strategy')}
+            label={t('project.task.notification_strategy')}
             path='warningType'
           >
             <NSelect
@@ -177,10 +174,7 @@ export default defineComponent({
               v-model:value={this.startForm.warningType}
             />
           </NFormItem>
-          <NFormItem
-            label={t('project.workflow.worker_group')}
-            path='workerGroup'
-          >
+          <NFormItem label={t('project.task.worker_group')} path='workerGroup'>
             <NSelect
               options={this.workerGroups}
               onUpdateValue={this.updateWorkerGroup}
@@ -188,7 +182,7 @@ export default defineComponent({
             />
           </NFormItem>
           <NFormItem
-            label={t('project.workflow.environment_name')}
+            label={t('project.task.environment_name')}
             path='environmentCode'
           >
             <NSelect
@@ -200,18 +194,18 @@ export default defineComponent({
             />
           </NFormItem>
           <NFormItem
-            label={t('project.workflow.alarm_group')}
+            label={t('project.task.alarm_group')}
             path='warningGroupId'
           >
             <NSelect
               options={this.alertGroups}
-              placeholder={t('project.workflow.please_choose')}
+              placeholder={t('project.task.please_choose')}
               v-model:value={this.startForm.warningGroupId}
               clearable
             />
           </NFormItem>
           <NFormItem
-            label={t('project.workflow.startup_parameter')}
+            label={t('project.task.startup_parameter')}
             path='startup_parameter'
           >
             {this.startParamsList.length === 0 ? (
@@ -259,10 +253,7 @@ export default defineComponent({
               </NSpace>
             )}
           </NFormItem>
-          <NFormItem
-            label={t('project.workflow.whether_dry_run')}
-            path='dryRun'
-          >
+          <NFormItem label={t('project.task.whether_dry_run')} path='dryRun'>
             <NSwitch
               checkedValue={1}
               uncheckedValue={0}
