@@ -17,6 +17,8 @@
 
 """py.test conftest.py file for package integration test."""
 
+import os
+
 import pytest
 
 from tests.testing.docker_wrapper import DockerWrapper
@@ -33,14 +35,17 @@ def docker_setup_teardown():
         For more information about conftest.py see:
         https://docs.pytest.org/en/latest/example/simple.html#package-directory-level-fixtures-setups
     """
-    docker_wrapper = DockerWrapper(
-        image="apache/dolphinscheduler-standalone-server:ci",
-        container_name="ci-dolphinscheduler-standalone-server",
-    )
-    ports = {"25333/tcp": 25333}
-    container = docker_wrapper.run_until_log(
-        log="Started StandaloneServer in", tty=True, ports=ports
-    )
-    assert container is not None
-    yield
-    docker_wrapper.remove_container()
+    if os.environ.get("skip_launch_docker") == "true":
+        yield True
+    else:
+        docker_wrapper = DockerWrapper(
+            image="apache/dolphinscheduler-standalone-server:ci",
+            container_name="ci-dolphinscheduler-standalone-server",
+        )
+        ports = {"25333/tcp": 25333}
+        container = docker_wrapper.run_until_log(
+            log="Started StandaloneServer in", tty=True, ports=ports
+        )
+        assert container is not None
+        yield
+        docker_wrapper.remove_container()
