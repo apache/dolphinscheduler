@@ -32,7 +32,7 @@ if sys.version_info[0] < 3:
 
 logger = logging.getLogger(__name__)
 
-version = "dev"
+version = "2.0.4"
 
 # Start package required
 prod = [
