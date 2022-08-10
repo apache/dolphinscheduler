@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -577,19 +576,8 @@ public class PythonGateway {
      * @param userName user who query resource
      * @param fullName full name of the resource
      */
-    public Map<String, Object> queryResourcesFileInfo(String userName, String fullName) {
-        Map<String, Object> result = new HashMap<>();
-        User user = usersService.queryUser(userName);
-        Result<Object> resourceResponse = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
-        if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
-            String msg = String.format("Can not find valid resource by name %s", fullName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        Resource resource = (Resource) resourceResponse.getData();
-        result.put("id", resource.getId());
-        result.put("name", resource.getFullName());
-        return result;
+    public Resource queryResourcesFileInfo(String userName, String fullName) {
+        return resourceService.queryResourcesFileInfo(userName, fullName);
     }
 
     /**

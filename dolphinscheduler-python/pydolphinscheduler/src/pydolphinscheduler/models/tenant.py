@@ -20,7 +20,7 @@
 from typing import Optional
 
 from pydolphinscheduler import configuration
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import BaseSide
 
 
@@ -45,7 +45,7 @@ class Tenant(BaseSide):
     ) -> None:
         """Create Tenant if not exists."""
         gateway = launch_gateway()
-        tenant = gateway.entry_point.createTenant(self.name, self.description, queue_name)
+        tenant = JavaGate().createTenant(self.name, self.description, queue_name)
         self.tenant_id = tenant.tenantId
         # gateway_result_checker(result, None)
 

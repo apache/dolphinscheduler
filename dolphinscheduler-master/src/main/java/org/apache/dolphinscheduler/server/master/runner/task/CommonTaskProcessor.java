@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -49,25 +49,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
-        if (this.taskInstance == null) {
-            return false;
-        }
-
-        int taskGroupId = taskInstance.getTaskGroupId();
-        if (taskGroupId > 0) {
-            boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
-                    taskInstance.getName(),
-                    taskGroupId,
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskGroupPriority());
-            if (!acquireTaskGroup) {
-                logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
-                return true;
-            }
-        }
-        return true;
+        return this.taskInstance != null;
     }
 
     @Override
@@ -108,21 +93,24 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (taskUpdateQueue == null) {
                 this.initQueue();
             }
-            if (taskInstance.getState().typeIsFinished()) {
-                logger.info("submit task , but task [{}] state [{}] is already  finished. ", taskInstance.getName(), taskInstance.getState());
+            if (taskInstance.getState().isFinished()) {
+                logger.info("submit task , but task [{}] state [{}] is already  finished. ", taskInstance.getName(),
+                        taskInstance.getState());
                 return true;
             }
             // task cannot be submitted because its execution state is RUNNING or DELAY.
-            if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
-                    || taskInstance.getState() == ExecutionStatus.DELAY_EXECUTION) {
-                logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
+            if (taskInstance.getState() == TaskExecutionStatus.RUNNING_EXECUTION
+                    || taskInstance.getState() == TaskExecutionStatus.DELAY_EXECUTION) {
+                logger.info("submit task, but the status of the task {} is already running or delayed.",
+                        taskInstance.getName());
                 return true;
             }
             logger.info("task ready to dispatch to worker: taskInstanceId: {}", taskInstance.getId());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
-                    taskInstance.getId(), taskInstance.getTaskGroupPriority(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+                    taskInstance.getId(), taskInstance.getTaskGroupPriority(),
+                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
             if (taskExecutionContext == null) {
@@ -153,11 +141,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (taskInstance == null) {
                 return true;
             }
-            if (taskInstance.getState().typeIsFinished()) {
+            if (taskInstance.getState().isFinished()) {
                 return true;
             }
             if (StringUtils.isBlank(taskInstance.getHost())) {
-                taskInstance.setState(ExecutionStatus.KILL);
+                taskInstance.setState(TaskExecutionStatus.KILL);
                 taskInstance.setEndTime(new Date());
                 processService.updateTaskInstance(taskInstance);
                 return true;
@@ -166,7 +154,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
 
-            ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
+            ExecutionContext executionContext =
+                    new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
 
             Host host = Host.of(taskInstance.getHost());
             executionContext.setHost(host);

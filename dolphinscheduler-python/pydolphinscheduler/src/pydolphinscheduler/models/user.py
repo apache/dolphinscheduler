@@ -20,7 +20,7 @@
 from typing import Optional
 
 from pydolphinscheduler import configuration
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import BaseSide, Tenant
 
 
@@ -66,7 +66,7 @@ class User(BaseSide):
         # Should make sure queue already exists.
         self.create_tenant_if_not_exists()
         gateway = launch_gateway()
-        user = gateway.entry_point.createUser(
+        user = JavaGate().createUser(
             self.name,
             self.password,
             self.email,
