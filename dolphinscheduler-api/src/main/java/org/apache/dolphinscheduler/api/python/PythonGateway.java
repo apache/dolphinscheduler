@@ -394,7 +394,7 @@ public class PythonGateway {
 
     public Project queryProjectByName(String userName, String projectName) {
         User user = usersService.queryUser(userName);
-        return (Project) projectService.queryByName(user, projectName);
+        return (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
     }
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {

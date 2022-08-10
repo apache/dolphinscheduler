@@ -40,17 +40,16 @@ class Project(BaseSide):
         """Create Project if not exists."""
         gateway = launch_gateway()
         project = gateway.entry_point.createOrGrantProject(user, self.name, self.description)
-        self.code = project.projectCode
         # TODO recover result checker
         # gateway_result_checker(result, None)
 
     def get_project_by_name(self, user=configuration.USER_NAME, name=None) -> None:
         """Get Project by name."""
         gateway = launch_gateway()
-        project = gateway.entry_point.getProjectByName(user, name)
-        self.name = project.name
-        self.description = project.description
-        self.code = project.code
+        project = gateway.entry_point.queryProjectByName(user, name)
+        self.name = project.getName()
+        self.description = project.getDescription()
+        self.code = project.getCode()
         return
 
     def update(self, user=configuration.USER_NAME, project_code=None, project_name=None, description=None) -> None:
@@ -64,3 +63,5 @@ class Project(BaseSide):
         """Delete Project."""
         gateway = launch_gateway()
         gateway.entry_point.deleteProject(user, self.code)
+        self.delete_all()
+        return

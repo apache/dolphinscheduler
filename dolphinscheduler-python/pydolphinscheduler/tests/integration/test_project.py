@@ -18,7 +18,20 @@
 """Test pydolphinscheduler project."""
 import pytest
 
-from pydolphinscheduler.models import Project
+from pydolphinscheduler.models import Project, User
+
+
+def get_user(name="test-name",
+             password="test-password",
+             email="test-email@abc.com",
+             phone="17366637777",
+             tenant="test-tenant",
+             queue="test-queue",
+             status=1):
+    """Get a test user."""
+    user = User(name, password, email, phone, tenant, queue, status)
+    user.create_if_not_exists()
+    return user
 
 
 def get_project(name="test-name-1",
@@ -26,45 +39,37 @@ def get_project(name="test-name-1",
                 code="test-project-code"):
     """Get a test project."""
     project = Project(name, description, code=code)
-    project.create_if_not_exists(name)
+    user = get_user()
+    project.create_if_not_exists(user=user.name)
     return project
 
 
-def test_create_project():
-    """Test create project from java gateway."""
-    project = get_project()
-    assert project.code is not None
-
-
-def test_get_project():
-    """Test get project from java gateway."""
+def test_create_and_get_project():
+    """Test create and get project from java gateway."""
     project = get_project()
     project_ = Project()
-    project_.get_project_by_name(name=project.name)
+    project_.get_project_by_name(user="test-name", name=project.name)
     assert project_.name == project.name
     assert project_.description == project.description
-    assert project_.code == project.code
 
 
 def test_update_project():
     """Test update project from java gateway."""
     project = get_project()
-    project.update(project_code=project.code, project_name="test-name-updated", description="test-description-updated")
+    project.get_project_by_name(user="test-name", name=project.name)
+    project.update(user="test-name", project_code=project.code, project_name="test-name-updated", description="test-description-updated")
     project_ = Project()
-    project_.get_project_by_name(name="test-name-updated")
+    project_.get_project_by_name(user="test-name", name="test-name-updated")
     assert project_.description == "test-description-updated"
-    assert project_.name == "test-name-updated"
 
 
 def test_delete_project():
     """Test delete project from java gateway."""
     project = get_project()
-    project.delete()
-    project_ = Project()
-    project_.get_project_by_name(name=project.name)
-    assert project_.code is None
+    project.get_project_by_name(user="test-name", name=project.name)
+    project.delete(user="test-name")
 
     with pytest.raises(AttributeError) as excinfo:
-        var = project_.code
+        var = project.name
 
     assert excinfo.type == AttributeError
