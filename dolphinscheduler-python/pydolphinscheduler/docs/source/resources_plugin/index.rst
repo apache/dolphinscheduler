@@ -27,5 +27,3 @@ In this section
    how-to-develop
    resource-plugin
    local
-
-
