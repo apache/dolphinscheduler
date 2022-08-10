@@ -362,6 +362,7 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
+          startButtonDisplay={!props.instance}
           startReadonly={startReadonly.value}
           menuReadonly={menuReadonly.value}
           taskInstance={taskInstance.value}
