@@ -135,33 +135,9 @@ public class WorkerRegistryClient implements AutoCloseable {
         // sleep 1s, waiting master failover remove
         ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
 
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval,
+        this.heartBeatExecutor.scheduleWithFixedDelay(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval,
                 TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
-    }
-
-    /**
-     * remove registry info
-     */
-    public void unRegistry() throws IOException {
-        try {
-            String address = getLocalAddress();
-            Set<String> workerZkPaths = getWorkerZkPaths();
-            for (String workerZkPath : workerZkPaths) {
-                registryClient.remove(workerZkPath);
-                logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
-            }
-        } catch (Exception ex) {
-            logger.error("remove worker zk path exception", ex);
-        }
-
-        if (heartBeatExecutor != null) {
-            heartBeatExecutor.shutdownNow();
-            logger.info("Heartbeat executor shutdown");
-        }
-
-        registryClient.close();
-        logger.info("registry client closed");
     }
 
     /**
@@ -198,7 +174,12 @@ public class WorkerRegistryClient implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        unRegistry();
+        if (heartBeatExecutor != null) {
+            heartBeatExecutor.shutdownNow();
+            logger.info("Heartbeat executor shutdown");
+        }
+        registryClient.close();
+        logger.info("registry client closed");
     }
 
 }

@@ -62,7 +62,7 @@ public class ExecutorDispatcherTest {
         serverConfig.setListenPort(port);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(CommandType.TASK_DISPATCH_REQUEST, Mockito.mock(
-            TaskDispatchProcessor.class));
+                TaskDispatchProcessor.class));
         nettyRemotingServer.start();
         //
         workerConfig.setListenPort(port);
@@ -71,6 +71,6 @@ public class ExecutorDispatcherTest {
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(port);
         executorDispatcher.dispatch(executionContext);
 
-        workerRegistryClient.unRegistry();
+        workerRegistryClient.close();
     }
 }

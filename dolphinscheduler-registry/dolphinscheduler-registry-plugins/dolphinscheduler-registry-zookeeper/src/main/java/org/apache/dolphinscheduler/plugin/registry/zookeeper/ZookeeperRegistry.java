@@ -123,10 +123,16 @@ public final class ZookeeperRegistry implements Registry {
     @Override
     public void connectUntilTimeout(@NonNull Duration timeout) throws RegistryException {
         try {
-            client.blockUntilConnected((int) timeout.toMillis(), MILLISECONDS);
+            if (!client.blockUntilConnected((int) timeout.toMillis(), MILLISECONDS)) {
+                throw new RegistryException(
+                        String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()));
+            }
+        } catch (RegistryException e) {
+            throw e;
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RegistryException(
-                    String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()));
+                    String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()), e);
         }
     }
 

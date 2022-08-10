@@ -184,7 +184,7 @@ public class MasterRegistryClient implements AutoCloseable {
         // sleep 1s, waiting master failover remove
         ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, masterHeartbeatInterval.getSeconds(),
+        this.heartBeatExecutor.scheduleWithFixedDelay(heartBeatTask, 0L, masterHeartbeatInterval.getSeconds(),
                 TimeUnit.SECONDS);
         logger.info("Master node : {} registered to registry center successfully with heartBeatInterval : {}s",
                 masterConfig.getMasterAddress(), masterHeartbeatInterval);

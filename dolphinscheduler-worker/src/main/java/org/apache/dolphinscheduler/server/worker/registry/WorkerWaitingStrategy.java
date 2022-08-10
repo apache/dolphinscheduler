@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 
 @Service
-@ConditionalOnProperty(prefix = "master.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
+@ConditionalOnProperty(prefix = "worker.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
 public class WorkerWaitingStrategy implements WorkerConnectStrategy {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerWaitingStrategy.class);
@@ -64,8 +64,10 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
         try {
             ServerLifeCycleManager.toWaiting();
             clearWorkerResource();
-            Duration maxWaitingTime = workerConfig.getConnectStrategyProperties().getMaxWaitingTime();
+            Duration maxWaitingTime = workerConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
+                logger.info("Worker disconnect from registry will try to reconnect in {} s",
+                        maxWaitingTime.getSeconds());
                 registryClient.connectUntilTimeout(maxWaitingTime);
             } catch (RegistryException ex) {
                 throw new ServerLifeCycleException(
@@ -113,15 +115,21 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     private void clearWorkerResource() {
         // close the worker resource, if close failed should stop the worker server
         workerRpcServer.close();
+        logger.warn("Worker server close the RPC server due to lost connection from registry");
         workerRpcClient.close();
-        messageRetryRunner.clearMessage();
+        logger.warn("Worker server close the RPC client due to lost connection from registry");
         workerManagerThread.clearTask();
+        logger.warn("Worker server clear the tasks due to lost connection from registry");
+        messageRetryRunner.clearMessage();
+        logger.warn("Worker server clear the retry message due to lost connection from registry");
 
     }
 
     private void reStartWorkerResource() {
         // reopen the resource, if reopen failed should stop the worker server
         workerRpcServer.start();
+        logger.warn("Worker server restart PRC server due to reconnect to registry");
         workerRpcClient.start();
+        logger.warn("Worker server restart PRC client due to reconnect to registry");
     }
 }

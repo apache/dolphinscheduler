@@ -113,9 +113,9 @@ master:
   kill-yarn-job-when-task-failover: true
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
-    strategy: stop
+    strategy: waiting
     # The max waiting time to reconnect to registry if you set the strategy to waiting
-    maxWaitingTime: 100s
+    max-waiting-time: 100s
 
 server:
   port: 5679

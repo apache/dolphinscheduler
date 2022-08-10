@@ -65,8 +65,10 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
             ServerLifeCycleManager.toWaiting();
             // todo: clear the current resource
             clearMasterResource();
-            Duration maxWaitingTime = masterConfig.getConnectStrategyProperties().getMaxWaitingTime();
+            Duration maxWaitingTime = masterConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
+                logger.info("Master disconnect from registry will try to reconnect in {} s",
+                        maxWaitingTime.getSeconds());
                 registryClient.connectUntilTimeout(maxWaitingTime);
             } catch (RegistryException ex) {
                 throw new ServerLifeCycleException(
@@ -114,14 +116,19 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     private void clearMasterResource() {
         // close the worker resource, if close failed should stop the worker server
         masterRPCServer.close();
+        logger.warn("Master closed RPC server due to lost registry connection");
         workflowEventQueue.clearWorkflowEventQueue();
+        logger.warn("Master clear workflow event queue due to lost registry connection");
         processInstanceExecCacheManager.clearCache();
+        logger.warn("Master clear process instance cache due to lost registry connection");
         stateWheelExecuteThread.clearAllTasks();
+        logger.warn("Master clear all state wheel task due to lost registry connection");
 
     }
 
     private void reStartMasterResource() {
         // reopen the resource, if reopen failed should stop the worker server
         masterRPCServer.start();
+        logger.warn("Master restarted RPC server due to reconnect to registry");
     }
 }
