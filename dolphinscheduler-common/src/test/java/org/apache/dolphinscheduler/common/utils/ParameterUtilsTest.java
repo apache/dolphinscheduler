@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils.replacePlaceholders;
+
+import static org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils.replacePlaceholders;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
 import java.text.ParseException;
 import java.util.Date;
