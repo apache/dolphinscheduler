@@ -53,6 +53,7 @@ doc = [
     "sphinx-click>=3.0",
     "sphinx-inline-tabs",
     "sphinx-copybutton>=0.4.0",
+    "sphinx-multiversion",
 ]
 
 test = [

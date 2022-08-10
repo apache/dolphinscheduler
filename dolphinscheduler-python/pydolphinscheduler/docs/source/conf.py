@@ -60,10 +60,23 @@ extensions = [
     # Add inline tabbed content
     "sphinx_inline_tabs",
     "sphinx_copybutton",
+    "sphinx_multiversion",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+
+# sphinx_multiversion configuration
+html_sidebars = {
+    '**': [
+        'versioning.html',
+    ],
+}
+smv_tag_whitelist = r'^\d+\.\d+\.\d+$'
+smv_branch_whitelist = 'dev'
+# smv_released_pattern = r'^tags/\d+\.\d+\.\d+(-alpha|-beta)(-\d+)$'
+smv_remote_whitelist = r'^(origin|upstream)$'
+smv_outputdir_format = 'versions/{ref.name}'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

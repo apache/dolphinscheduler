@@ -164,6 +164,9 @@ cd pydolphinscheduler/docs/
 make clean && make html
 ```
 
+> NOTE: We support build multiple versions of documents with [sphinx-multiversion](https://holzhaus.github.io/sphinx-multiversion/master/index.html),
+> you can build with command `make clean && make multiversion`
+
 ## Testing
 
 pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
