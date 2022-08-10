@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,7 +70,6 @@ public class ProcessAlertManagerTest {
         processAlertManager.sendAlertWorkerToleranceFault(processInstance, taskInstanceList);
     }
 
-
     /**
      * send worker alert fault tolerance
      */
@@ -79,7 +78,7 @@ public class ProcessAlertManagerTest {
         // process instance
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setWarningType(WarningType.SUCCESS);
-        processInstance.setState(ExecutionStatus.SUCCESS);
+        processInstance.setState(WorkflowExecutionStatus.SUCCESS);
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         processInstance.setWarningGroupId(1);
 
@@ -101,7 +100,7 @@ public class ProcessAlertManagerTest {
         processInstance.setId(1);
         processInstance.setName("test-process-01");
         processInstance.setCommandType(CommandType.START_PROCESS);
-        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRunTimes(0);
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
@@ -110,6 +109,6 @@ public class ProcessAlertManagerTest {
 
         ProjectUser projectUser = new ProjectUser();
 
-        processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+        processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
     }
 }

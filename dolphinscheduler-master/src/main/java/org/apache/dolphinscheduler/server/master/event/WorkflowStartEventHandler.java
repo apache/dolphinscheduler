@@ -50,32 +50,30 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
     private WorkflowEventQueue workflowEventQueue;
 
     @Override
-    public void handleWorkflowEvent(WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
+    public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
         logger.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-            processInstanceExecCacheManager.getByProcessInstanceId(workflowEvent.getWorkflowInstanceId());
+        WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
+            workflowEvent.getWorkflowInstanceId());
         if (workflowExecuteRunnable == null) {
             throw new WorkflowEventHandleError(
                 "The workflow start event is invalid, cannot find the workflow instance from cache");
         }
-        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
         ProcessInstanceMetrics.incProcessInstanceByState("submit");
-        CompletableFuture<WorkflowSubmitStatue> workflowSubmitFuture =
-            CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool);
-        workflowSubmitFuture.thenAccept(workflowSubmitStatue -> {
-            if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
-                // submit failed will resend the event to workflow event queue
-                logger.info("Success submit the workflow instance");
-                if (processInstance.getTimeout() > 0) {
-                    stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
+        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool)
+            .thenAccept(workflowSubmitStatue -> {
+                if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
+                    // submit failed will resend the event to workflow event queue
+                    logger.info("Success submit the workflow instance");
+                    if (processInstance.getTimeout() > 0) {
+                        stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
+                    }
+                } else {
+                    logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
+                                 workflowEvent);
+                    workflowEventQueue.addEvent(workflowEvent);
                 }
-            } else {
-                logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
-                             workflowEvent);
-                workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
-                                                              processInstance.getId()));
-            }
-        });
+            });
     }
 
     @Override

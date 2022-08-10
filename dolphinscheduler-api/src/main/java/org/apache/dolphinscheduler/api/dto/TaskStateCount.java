@@ -17,58 +17,17 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-/**
- * task state count
- */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskStateCount {
 
+    private TaskExecutionStatus taskStateType;
     private int count;
-    private ExecutionStatus taskStateType;
 
-    public TaskStateCount(ExecutionStatus taskStateType, int count) {
-        this.taskStateType = taskStateType;
-        this.count = count;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public ExecutionStatus getTaskStateType() {
-        return taskStateType;
-    }
-
-    public void setTaskStateType(ExecutionStatus taskStateType) {
-        this.taskStateType = taskStateType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        TaskStateCount that = (TaskStateCount) o;
-
-        if (count != that.count) {
-            return false;
-        }
-        return taskStateType == that.taskStateType;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = count;
-        result = 31 * result + (taskStateType != null ? taskStateType.hashCode() : 0);
-        return result;
-    }
 }

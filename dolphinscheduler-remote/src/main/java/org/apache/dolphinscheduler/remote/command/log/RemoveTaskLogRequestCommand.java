@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -26,27 +29,15 @@ import java.io.Serializable;
 /**
  *  remove task log request command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RemoveTaskLogRequestCommand implements Serializable {
 
     /**
      *  log path
      */
     private String path;
-
-    public RemoveTaskLogRequestCommand() {
-    }
-
-    public RemoveTaskLogRequestCommand(String path) {
-        this.path = path;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 
     /**
      * package request command

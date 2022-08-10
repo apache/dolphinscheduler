@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 
@@ -26,35 +29,14 @@ import java.io.Serializable;
  * task execute running ack command
  * from master to worker
  */
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskExecuteRunningAckMessage implements Serializable {
 
+    private boolean success;
     private int taskInstanceId;
-    private ExecutionStatus status;
-
-    public TaskExecuteRunningAckMessage() {
-        super();
-    }
-
-    public TaskExecuteRunningAckMessage(ExecutionStatus status, int taskInstanceId) {
-        this.status = status;
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public ExecutionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ExecutionStatus status) {
-        this.status = status;
-    }
 
     /**
      * package response command
@@ -69,8 +51,4 @@ public class TaskExecuteRunningAckMessage implements Serializable {
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "TaskExecuteRunningAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
-    }
 }

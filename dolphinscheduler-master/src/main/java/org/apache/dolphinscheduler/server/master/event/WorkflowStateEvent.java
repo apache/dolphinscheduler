@@ -15,32 +15,34 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.server.master.event;
 
-import lombok.Data;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import io.netty.channel.Channel;
+import lombok.*;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
-/**
- * dependent item
- */
 @Data
-public class DependentItem {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class WorkflowStateEvent implements StateEvent {
 
-    private long projectCode;
-    private long definitionCode;
-    private long depTaskCode;
-    private String cycle;
-    private String dateValue;
-    private DependResult dependResult;
-    private TaskExecutionStatus status;
+    // todo: use wrapper type
+    private int processInstanceId;
 
-    public String getKey() {
-        return String.format("%d-%d-%s-%s",
-                getDefinitionCode(),
-                getDepTaskCode(),
-                getCycle(),
-                getDateValue());
-    }
+    /**
+     * Some event may contains taskInstanceId
+     */
+    private int taskInstanceId;
 
+    private WorkflowExecutionStatus status;
+
+    private @NonNull StateEventType type;
+
+    private String key;
+
+    private Channel channel;
+
+    private String context;
 }

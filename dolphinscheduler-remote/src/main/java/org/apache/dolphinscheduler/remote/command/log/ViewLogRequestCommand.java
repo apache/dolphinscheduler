@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -26,27 +29,15 @@ import java.io.Serializable;
 /**
  *  view log request command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ViewLogRequestCommand implements Serializable {
 
     /**
      *  log path
      */
     private String path;
-
-    public ViewLogRequestCommand() {
-    }
-
-    public ViewLogRequestCommand(String path) {
-        this.path = path;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 
     /**
      * package request command

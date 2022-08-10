@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.dto;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Collection;
 import java.util.Date;
@@ -43,7 +37,7 @@ public class WorkflowExecuteDto {
 
     private int processDefinitionVersion;
 
-    private ExecutionStatus state;
+    private WorkflowExecutionStatus state;
 
     /**
      * recovery flag for failover

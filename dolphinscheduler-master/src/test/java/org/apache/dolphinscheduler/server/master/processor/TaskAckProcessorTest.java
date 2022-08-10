@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -65,9 +65,9 @@ public class TaskAckProcessorTest {
         taskResponseEvent = PowerMockito.mock(TaskEvent.class);
 
         taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
-                                                                  " 127.0.0.1:1234",
-                                                                  System.currentTimeMillis());
-        taskExecuteRunningMessage.setStatus(ExecutionStatus.RUNNING_EXECUTION);
+                " 127.0.0.1:1234",
+                System.currentTimeMillis());
+        taskExecuteRunningMessage.setStatus(TaskExecutionStatus.RUNNING_EXECUTION);
         taskExecuteRunningMessage.setExecutePath("/dolphinscheduler/worker");
         taskExecuteRunningMessage.setHost("localhost");
         taskExecuteRunningMessage.setLogPath("/temp/worker.log");
@@ -78,17 +78,18 @@ public class TaskAckProcessorTest {
 
     @Test
     public void testProcess() {
-//        Command command = taskExecuteAckCommand.convert2Command();
-//        Assert.assertEquals(CommandType.TASK_EXECUTE_ACK,command.getType());
-//        InetSocketAddress socketAddress = new InetSocketAddress("localhost",12345);
-//        PowerMockito.when(channel.remoteAddress()).thenReturn(socketAddress);
-//        PowerMockito.mockStatic(TaskResponseEvent.class);
-//
-//        PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), channel))
-//                .thenReturn(taskResponseEvent);
-//        TaskInstance taskInstance = PowerMockito.mock(TaskInstance.class);
-//        PowerMockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-//
-//        taskAckProcessor.process(channel,command);
+        // Command command = taskExecuteAckCommand.convert2Command();
+        // Assert.assertEquals(CommandType.TASK_EXECUTE_ACK,command.getType());
+        // InetSocketAddress socketAddress = new InetSocketAddress("localhost",12345);
+        // PowerMockito.when(channel.remoteAddress()).thenReturn(socketAddress);
+        // PowerMockito.mockStatic(TaskResponseEvent.class);
+        //
+        // PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(),
+        // Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), channel))
+        // .thenReturn(taskResponseEvent);
+        // TaskInstance taskInstance = PowerMockito.mock(TaskInstance.class);
+        // PowerMockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
+        //
+        // taskAckProcessor.process(channel,command);
     }
 }

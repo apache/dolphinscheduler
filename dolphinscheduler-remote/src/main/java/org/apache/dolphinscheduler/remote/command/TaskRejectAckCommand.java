@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,15 +31,15 @@ import lombok.ToString;
 public class TaskRejectAckCommand extends BaseCommand {
 
     private int taskInstanceId;
-    private ExecutionStatus status;
+    private boolean success;
 
-    public TaskRejectAckCommand(ExecutionStatus status,
+    public TaskRejectAckCommand(boolean success,
                                 int taskInstanceId,
                                 String messageSenderAddress,
                                 String messageReceiverAddress,
                                 long messageSendTime) {
         super(messageSenderAddress, messageReceiverAddress, messageSendTime);
-        this.status = status;
+        this.success = success;
         this.taskInstanceId = taskInstanceId;
     }
 

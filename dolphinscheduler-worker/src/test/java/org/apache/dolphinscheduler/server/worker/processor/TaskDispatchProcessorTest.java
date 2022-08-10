@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class, WorkerConfig.class, FileUtils.class, JsonSerializer.class,
-    JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
+        JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
 @Ignore
 public class TaskDispatchProcessorTest {
 
@@ -90,12 +90,12 @@ public class TaskDispatchProcessorTest {
         command = new Command();
         command.setType(CommandType.TASK_DISPATCH_REQUEST);
         ackCommand = new TaskExecuteRunningCommand("127.0.0.1:1234",
-                                                   "127.0.0.1:5678",
-                                                   System.currentTimeMillis()).convert2Command();
+                "127.0.0.1:5678",
+                System.currentTimeMillis()).convert2Command();
         taskRequestCommand = new TaskDispatchCommand(taskExecutionContext,
-                                                     "127.0.0.1:5678",
-                                                     "127.0.0.1:1234",
-                                                     System.currentTimeMillis());
+                "127.0.0.1:5678",
+                "127.0.0.1:1234",
+                System.currentTimeMillis());
         alertClientService = PowerMockito.mock(AlertClientService.class);
         workerExecService = PowerMockito.mock(ExecutorService.class);
         PowerMockito.when(workerExecService.submit(Mockito.any(TaskExecuteThread.class))).thenReturn(null);
@@ -113,42 +113,42 @@ public class TaskDispatchProcessorTest {
 
         storageOperate = PowerMockito.mock(StorageOperate.class);
         PowerMockito.when(workerManager.offer(new TaskExecuteThread(taskExecutionContext,
-                                                                    "127.0.0.1:5678",
-                                                                    workerMessageSender,
-                                                                    alertClientService,
-                                                                    storageOperate))).thenReturn(Boolean.TRUE);
+                "127.0.0.1:5678",
+                workerMessageSender,
+                alertClientService,
+                storageOperate))).thenReturn(Boolean.TRUE);
 
         PowerMockito.when(SpringApplicationContext.getBean(WorkerManagerThread.class)).thenReturn(workerManager);
 
         PowerMockito.mockStatic(ThreadUtils.class);
         PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread",
-                                                                   workerConfig.getExecThreads())).thenReturn(
-            workerExecService);
+                workerConfig.getExecThreads())).thenReturn(
+                        workerExecService);
 
         PowerMockito.mockStatic(JsonSerializer.class);
         PowerMockito.when(JsonSerializer.deserialize(command.getBody(), TaskDispatchCommand.class)).thenReturn(
-            taskRequestCommand);
+                taskRequestCommand);
 
         PowerMockito.mockStatic(JSONUtils.class);
         PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class)).thenReturn(
-            taskRequestCommand);
+                taskRequestCommand);
 
         PowerMockito.mockStatic(FileUtils.class);
         PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                                                      taskExecutionContext.getProcessDefineCode(),
-                                                      taskExecutionContext.getProcessDefineVersion(),
-                                                      taskExecutionContext.getProcessInstanceId(),
-                                                      taskExecutionContext.getTaskInstanceId())).thenReturn(
-            taskExecutionContext.getExecutePath());
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId())).thenReturn(
+                        taskExecutionContext.getExecutePath());
         PowerMockito.doNothing().when(FileUtils.class, "createWorkDirIfAbsent", taskExecutionContext.getExecutePath());
 
         SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(new TaskExecutionContext(),
-                                                                                      workerMessageSender,
-                                                                                      "127.0.0.1:5678",
-                                                                                      LoggerFactory.getLogger(
-                                                                                          TaskDispatchProcessorTest.class),
-                                                                                      alertClientService,
-                                                                                      storageOperate);
+                workerMessageSender,
+                "127.0.0.1:5678",
+                LoggerFactory.getLogger(
+                        TaskDispatchProcessorTest.class),
+                alertClientService,
+                storageOperate);
         PowerMockito.whenNew(TaskExecuteThread.class).withAnyArguments().thenReturn(simpleTaskExecuteThread);
     }
 
@@ -157,7 +157,7 @@ public class TaskDispatchProcessorTest {
         TaskDispatchProcessor processor = new TaskDispatchProcessor();
         processor.process(null, command);
 
-        Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
+        Assert.assertEquals(TaskExecutionStatus.RUNNING_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
     }
 
     @Test
@@ -166,7 +166,7 @@ public class TaskDispatchProcessorTest {
         TaskDispatchProcessor processor = new TaskDispatchProcessor();
         processor.process(null, command);
 
-        Assert.assertEquals(ExecutionStatus.DELAY_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
+        Assert.assertEquals(TaskExecutionStatus.DELAY_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
     }
 
     public TaskExecutionContext getTaskExecutionContext() {
