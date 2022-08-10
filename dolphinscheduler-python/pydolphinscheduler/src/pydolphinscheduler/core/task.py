@@ -29,7 +29,7 @@ from pydolphinscheduler.constants import (
     TaskTimeoutFlag,
 )
 from pydolphinscheduler.exceptions import PyResPluginException
-from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
+from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
     ProcessDefinitionContext,
