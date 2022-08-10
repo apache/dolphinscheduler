@@ -146,10 +146,24 @@ python -m flake8
 
 #### Testing
 
-## Build Docs
+## Build Document
 
 We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in 
-GitHub. You may locally ensure docs could be built suceessfully in case the failure blocks CI.
+GitHub. You may locally ensure docs could be built successfully in case the failure blocks CI, you can build by tox or manual.
+
+### Build Document Automatically with tox
+
+We integrated document build process into tox, you can build the latest document and all document(including history documents) via
+single command
+
+```shell
+# Build the latest document in dev branch
+tox -e doc-build
+# Build all documents, which including the latest and all history documents
+tox -e doc-build-multi
+```
+
+### Build Document Manually
 
 To build docs locally, install sphinx and related python modules first via:
 
@@ -157,7 +171,7 @@ To build docs locally, install sphinx and related python modules first via:
 python -m pip install '.[doc]'
 ``` 
 
-Then 
+Then go to document directory and execute the build command
 
 ```shell
 cd pydolphinscheduler/docs/
@@ -165,7 +179,7 @@ make clean && make html
 ```
 
 > NOTE: We support build multiple versions of documents with [sphinx-multiversion](https://holzhaus.github.io/sphinx-multiversion/master/index.html),
-> you can build with command `make clean && make multiversion`
+> you can build with command `git fetch --tags && make clean && make multiversion`
 
 ## Testing
 
