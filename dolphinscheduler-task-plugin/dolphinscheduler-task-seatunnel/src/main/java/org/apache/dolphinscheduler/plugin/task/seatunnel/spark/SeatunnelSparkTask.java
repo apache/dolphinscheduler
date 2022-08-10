@@ -64,10 +64,6 @@ public class SeatunnelSparkTask extends SeatunnelTask {
             args.add(seatunnelParameters.getMasterUrl());
         }
 
-        if (StringUtils.isNotBlank(seatunnelParameters.getQueue())) {
-            args.add(QUEUE_OPTIONS);
-            args.add(seatunnelParameters.getQueue());
-        }
         return args;
     }
 }
