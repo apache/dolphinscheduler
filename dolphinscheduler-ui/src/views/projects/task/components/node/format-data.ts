@@ -212,7 +212,6 @@ export function formatParams(data: INodeData): {
         taskParams.deployMode = data.deployMode
         taskParams.master = data.master
         taskParams.masterUrl = data.masterUrl
-        taskParams.queue = data.queue
         break
       default:
         break
