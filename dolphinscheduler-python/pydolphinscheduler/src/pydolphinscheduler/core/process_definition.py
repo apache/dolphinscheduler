@@ -29,7 +29,7 @@ from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundExc
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base, Project, Tenant, User
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
-from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
+from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 
 class ProcessDefinitionContext:

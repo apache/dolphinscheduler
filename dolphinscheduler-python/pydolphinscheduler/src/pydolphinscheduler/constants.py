@@ -107,10 +107,6 @@ class Time(str):
 class ResourcePluginType(str):
     """Constants for resources plugin type, it will also show you which kind we support up to now."""
     LOCAL = "local"
-    GITHUB = "github"
-    GITLAB = "gitlab"
-    S3 = "S3"
-    OSS = "OSS"
 
 
 # [end res_plugin_constants_definition]
