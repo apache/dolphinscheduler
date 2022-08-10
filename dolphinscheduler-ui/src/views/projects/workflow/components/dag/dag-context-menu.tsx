@@ -26,6 +26,10 @@ import { IWorkflowTaskInstance } from './types'
 import { NButton } from 'naive-ui'
 
 const props = {
+  startButtonDisplay: {
+    type: Boolean as PropType<boolean>,
+    default: true
+  },
   startReadonly: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -127,13 +131,15 @@ export default defineComponent({
           class={styles['dag-context-menu']}
           style={{ left: `${this.left}px`, top: `${this.top}px` }}
         >
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.startReadonly}
-            onClick={this.startRunning}
-          >
-            {t('project.node.start')}
-          </NButton>
+          {this.startButtonDisplay && (
+            <NButton
+              class={`${styles['menu-item']}`}
+              disabled={this.startReadonly}
+              onClick={this.startRunning}
+            >
+              {t('project.node.start')}
+            </NButton>)
+          }
           <NButton
             class={`${styles['menu-item']}`}
             disabled={this.menuReadonly}
