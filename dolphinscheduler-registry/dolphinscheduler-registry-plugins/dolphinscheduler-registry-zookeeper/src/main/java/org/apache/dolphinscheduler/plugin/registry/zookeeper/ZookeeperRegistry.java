@@ -111,6 +111,7 @@ public final class ZookeeperRegistry implements Registry {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("Zookeeper registry start failed", e);
         }
     }
 
