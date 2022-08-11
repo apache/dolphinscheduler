@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
@@ -78,12 +78,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [ubuntu-18.04, macOS-latest, windows-latest]
+        # YAML parse `3.10` to `3.1`, so we have to add quotes for `'3.10'`, see also:
+        # https://github.com/actions/setup-python/issues/160#issuecomment-724485470
+        python-version: [3.6, 3.7, 3.8, 3.9, '3.10', 3.11-dev]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        # Skip because dependence [py4j](https://pypi.org/project/py4j/) not work on those environments
+        exclude:
+          - os: windows-latest
+            python-version: '3.10'
+          - os: windows-latest
+            python-version: 3.11-dev
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependences
@@ -104,7 +112,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
@@ -123,7 +131,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences
@@ -163,7 +171,7 @@ jobs:
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Dependences

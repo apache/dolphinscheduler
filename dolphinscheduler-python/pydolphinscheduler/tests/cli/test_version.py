@@ -17,9 +17,11 @@
 
 """Test command line interface subcommand `version`."""
 
+from unittest.mock import patch
+
 import pytest
 
-from pydolphinscheduler import __version__
+import pydolphinscheduler
 from pydolphinscheduler.cli.commands import cli
 from tests.testing.cli import CliTestWrapper
 
@@ -27,21 +29,27 @@ from tests.testing.cli import CliTestWrapper
 def test_version():
     """Test whether subcommand `version` correct."""
     cli_test = CliTestWrapper(cli, ["version"])
-    cli_test.assert_success(output=f"{__version__}")
+    cli_test.assert_success(output=f"{pydolphinscheduler.__version__}")
 
 
 @pytest.mark.parametrize(
-    "part, idx",
+    "version, part, idx",
     [
-        ("major", 0),
-        ("minor", 1),
-        ("micro", 2),
+        ("1.2.3", "major", 0),
+        ("0.1.3", "minor", 1),
+        ("3.1.0", "micro", 2),
+        ("1.2.3-beta-1", "micro", 2),
+        ("1.2.3-alpha", "micro", 2),
+        ("1.2.3a2", "micro", 2),
+        ("1.2.3b1", "micro", 2),
     ],
 )
-def test_version_part(part: str, idx: int):
+@patch("pydolphinscheduler.__version__")
+def test_version_part(mock_version, version: str, part: str, idx: int):
     """Test subcommand `version` option `--part`."""
+    mock_version.return_value = version
     cli_test = CliTestWrapper(cli, ["version", "--part", part])
-    cli_test.assert_success(output=f"{__version__.split('.')[idx]}")
+    cli_test.assert_success(output=f"{pydolphinscheduler.__version__.split('.')[idx]}")
 
 
 @pytest.mark.parametrize(
