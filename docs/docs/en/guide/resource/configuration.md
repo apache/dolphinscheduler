@@ -1,21 +1,22 @@
-# HDFS Resource Configuration
+# Resource Center Configuration
 
-When it is necessary to use the Resource Center to create or upload relevant files, all files and resources will be stored on HDFS. Therefore the following configuration is required.
+- You could use `Resource Center` to upload text files, UDFs and other task-related files.
+- You could configure `Resource Center` to use distributed file system like `HDFS` (2.6+), `MinIO` or remote storage products like `AWS S3`, `Alibaba Cloud OSS`, etc.
+- You could configure `Resource Center` to use local file system. If you deploy `DolphinScheduler` in `Standalone` mode, you could configure it to use local file system for `Resouce Center` without the need of an external `HDFS` system or `S3`.
+- Furthermore, if you deploy `DolphinScheduler` in `Cluster` mode, you could use `S3FS-FUSE` to mount `S3` or `Jindo-FUSE` to mount `OSS` to your machines and use the local file system for `Resouce Center`. In this way, you could operate remote files as if on your local machines.
 
-## Local File Resource Configuration
+## Use Local File System
 
-For a single machine, you can choose to use local file directory as the upload directory (no need to deploy Hadoop) by making the following configuration.
+### Configure `common.properties`
 
-### Configuring the `common.properties`
+Configure `api-server/conf/common.properties` and `worker-server/conf/common.properties` as follows:
 
-Configure the file in the following paths: `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
+- Change `resource.storage.upload.base.path` to your local directory path. Please make sure the `tenant resource.hdfs.root.user` has read and write permissions for `resource.storage.upload.base.path`, e,g. `/tmp/storage/dolphinscheduler`. `DolphinScheduler` will create the directory you configure if it does not exist.
+- Modify `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///`.
 
-- Change `data.basedir.path` to the local directory path. Please make sure the user who deploy dolphinscheduler have read and write permissions, such as: `data.basedir.path=/tmp/dolphinscheduler`. And the directory you configured will be auto-created if it does not exists.
-- Modify the following two parameters, `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///`.
+## Use HDFS or Remote Object Storage
 
-## Configuring the common.properties
-
-After version 3.0.0-alpha, if you want to upload resources using HDFS or S3 from the Resource Center, you will need to configure the following paths The following paths need to be configured: `api-server/conf/common.properties` and `worker-server/conf/common.properties`. This can be found as follows.
+After version 3.0.0-alpha, if you want to upload resources to `Resource Center` connected to `HDFS` or `S3`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
 
 ```properties
 #
@@ -44,7 +45,7 @@ data.basedir.path=/tmp/dolphinscheduler
 # resource storage type: HDFS, S3, NONE
 resource.storage.type=NONE
 # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
-resource.storage.upload.base.path=/dolphinscheduler
+resource.storage.upload.base.path=/tmp/storage/dolphinscheduler
 
 # The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.access.key.id=minioadmin
