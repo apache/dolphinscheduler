@@ -40,7 +40,7 @@ class ResourcePlugin:
         self.type = type
         self.prefix = prefix
 
-    def get_all_modules(self) -> Generator[Path, Any, None]:
+    def get_all_modules(self) -> Generator[Path]:
         """Get all res files path in resources_plugin directory."""
         return (ex for ex in path_resources_plugin.iterdir() if ex.is_file() and not ex.name.startswith("__"))
 
