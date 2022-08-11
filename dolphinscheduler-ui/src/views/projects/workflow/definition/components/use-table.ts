@@ -107,7 +107,7 @@ export function useTable(
                             {
                               circle: true,
                               type: 'info',
-                              size: 'tiny',
+                              size: 'small',
                               disabled: _row.version === variables.row.version
                             },
                             {
@@ -139,7 +139,7 @@ export function useTable(
                             {
                               circle: true,
                               type: 'error',
-                              size: 'tiny',
+                              size: 'small',
                               disabled: _row.version === variables.row.version
                             },
                             {

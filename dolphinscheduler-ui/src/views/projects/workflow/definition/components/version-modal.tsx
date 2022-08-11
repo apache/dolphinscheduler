@@ -20,9 +20,8 @@ import { useI18n } from 'vue-i18n'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
 import { useTable } from './use-table'
-import { NDataTable, NPagination } from 'naive-ui'
+import { NDataTable, NPagination, NSpace } from 'naive-ui'
 import Modal from '@/components/modal'
-import styles from '../index.module.scss'
 import type { IDefinitionData } from '../types'
 
 const props = {
@@ -100,22 +99,23 @@ export default defineComponent({
         onCancel={this.hideModal}
         onConfirm={this.hideModal}
       >
-        <NDataTable
-          loading={loadingRef}
-          columns={this.columns}
-          data={this.tableData}
-          striped
-          size={'small'}
-          class={styles.table}
-        />
-        <div class={styles.pagination}>
-          <NPagination
-            v-model:page={this.page}
-            v-model:page-size={this.pageSize}
-            page-count={this.totalPage}
-            onUpdatePage={requestData}
+        <NSpace vertical>
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
+            striped
+            size={'small'}
           />
-        </div>
+          <NSpace justify='center'>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              onUpdatePage={requestData}
+            />
+          </NSpace>
+        </NSpace>
       </Modal>
     )
   }
