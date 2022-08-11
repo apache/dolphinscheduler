@@ -31,8 +31,6 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
 
 import com.google.auto.service.AutoService;
@@ -131,12 +129,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (taskInstance.getState().typeIsFinished()) {
                 return true;
             }
-            if (StringUtils.isBlank(taskInstance.getHost())) {
-                taskInstance.setState(ExecutionStatus.KILL);
-                taskInstance.setEndTime(new Date());
-                processService.updateTaskInstance(taskInstance);
-                return true;
-            }
+            // we don't wait the kill response
+            taskInstance.setState(ExecutionStatus.KILL);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
 
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
