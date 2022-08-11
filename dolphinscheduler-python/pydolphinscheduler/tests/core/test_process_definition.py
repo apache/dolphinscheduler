@@ -108,11 +108,7 @@ def test_set_attr(name, cls, expect):
 
 
 @pytest.mark.parametrize(
-    "value,expect",
-    [
-        ("online", 1),
-        ("offline", 0),
-    ],
+    "value,expect", [("online", 1), ("offline", 0),],
 )
 def test_set_release_state(value, expect):
     """Test process definition set release_state attributes."""
@@ -123,14 +119,7 @@ def test_set_release_state(value, expect):
 
 
 @pytest.mark.parametrize(
-    "value",
-    [
-        "oneline",
-        "offeline",
-        1,
-        0,
-        None,
-    ],
+    "value", ["oneline", "offeline", 1, 0, None,],
 )
 def test_set_release_state_error(value):
     """Test process definition set release_state attributes with error."""
@@ -181,12 +170,7 @@ def test__parse_datetime(val, expect):
 
 
 @pytest.mark.parametrize(
-    "val",
-    [
-        20210101,
-        (2021, 1, 1),
-        {"year": "2021", "month": "1", "day": 1},
-    ],
+    "val", [20210101, (2021, 1, 1), {"year": "2021", "month": "1", "day": 1},],
 )
 def test__parse_datetime_not_support_type(val: Any):
     """Test process definition function _parse_datetime not support type error."""
@@ -196,11 +180,7 @@ def test__parse_datetime_not_support_type(val: Any):
 
 
 @pytest.mark.parametrize(
-    "val",
-    [
-        "ALLL",
-        "nonee",
-    ],
+    "val", ["ALLL", "nonee",],
 )
 def test_warn_type_not_support_type(val: str):
     """Test process definition param warning_type not support type error."""
@@ -213,43 +193,17 @@ def test_warn_type_not_support_type(val: str):
 @pytest.mark.parametrize(
     "param, expect",
     [
-        (
-            None,
-            [],
-        ),
-        (
-            {},
-            [],
-        ),
+        (None, [],),
+        ({}, [],),
         (
             {"key1": "val1"},
-            [
-                {
-                    "prop": "key1",
-                    "direct": "IN",
-                    "type": "VARCHAR",
-                    "value": "val1",
-                }
-            ],
+            [{"prop": "key1", "direct": "IN", "type": "VARCHAR", "value": "val1",}],
         ),
         (
-            {
-                "key1": "val1",
-                "key2": "val2",
-            },
+            {"key1": "val1", "key2": "val2",},
             [
-                {
-                    "prop": "key1",
-                    "direct": "IN",
-                    "type": "VARCHAR",
-                    "value": "val1",
-                },
-                {
-                    "prop": "key2",
-                    "direct": "IN",
-                    "type": "VARCHAR",
-                    "value": "val2",
-                },
+                {"prop": "key1", "direct": "IN", "type": "VARCHAR", "value": "val1",},
+                {"prop": "key2", "direct": "IN", "type": "VARCHAR", "value": "val2",},
             ],
         ),
     ],
@@ -261,8 +215,7 @@ def test_property_param_json(param, expect):
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test__pre_submit_check_switch_without_param(mock_code_version):
     """Test :func:`_pre_submit_check` if process definition with switch but without attribute param."""
@@ -286,8 +239,7 @@ def test__pre_submit_check_switch_without_param(mock_code_version):
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test__pre_submit_check_switch_with_local_params(mock_code_version):
     """Test :func:`_pre_submit_check` if process definition with switch with local params of task."""
@@ -381,9 +333,7 @@ def test_process_definition_simple_separate():
     pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME)
     for i in range(expect_tasks_num):
         curr_task = Task(
-            name=f"task-{i}",
-            task_type=f"type-{i}",
-            process_definition=pd,
+            name=f"task-{i}", task_type=f"type-{i}", process_definition=pd,
         )
         # Set deps task i as i-1 parent
         if i > 0:
@@ -394,10 +344,7 @@ def test_process_definition_simple_separate():
 
 
 @pytest.mark.parametrize(
-    "user_attrs",
-    [
-        {"tenant": "tenant_specific"},
-    ],
+    "user_attrs", [{"tenant": "tenant_specific"},],
 )
 def test_set_process_definition_user_attr(user_attrs):
     """Test user with correct attributes if we specific assigned to process definition object."""
@@ -420,10 +367,7 @@ def test_set_process_definition_user_attr(user_attrs):
 
 def test_schedule_json_none_schedule():
     """Test function schedule_json with None as schedule."""
-    with ProcessDefinition(
-        TEST_PROCESS_DEFINITION_NAME,
-        schedule=None,
-    ) as pd:
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME, schedule=None,) as pd:
         assert pd.schedule_json is None
 
 

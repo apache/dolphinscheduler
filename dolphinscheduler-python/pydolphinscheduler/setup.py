@@ -132,12 +132,7 @@ setup(
     author_email="dev@dolphinscheduler.apache.org",
     url="https://dolphinscheduler.apache.org/",
     python_requires=">=3.6",
-    keywords=[
-        "dolphinscheduler",
-        "workflow",
-        "scheduler",
-        "taskflow",
-    ],
+    keywords=["dolphinscheduler", "workflow", "scheduler", "taskflow",],
     project_urls={
         "Homepage": "https://dolphinscheduler.apache.org",
         "Documentation": "https://dolphinscheduler.apache.org/python/dev/index.html",
@@ -151,9 +146,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     include_package_data=True,
-    package_data={
-        "pydolphinscheduler": ["default_config.yaml"],
-    },
+    package_data={"pydolphinscheduler": ["default_config.yaml"],},
     platforms=["any"],
     classifiers=[
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -185,9 +178,7 @@ setup(
         "doc": doc,
         "build": build,
     },
-    cmdclass={
-        "pre_clean": CleanCommand,
-    },
+    cmdclass={"pre_clean": CleanCommand,},
     entry_points={
         "console_scripts": [
             "pydolphinscheduler = pydolphinscheduler.cli.commands:cli",
