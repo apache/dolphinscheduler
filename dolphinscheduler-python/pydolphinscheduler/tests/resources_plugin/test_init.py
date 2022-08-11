@@ -5,9 +5,9 @@ import pytest
 
 from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.exceptions import PyDSConfException
-from pydolphinscheduler.resources_plugin import ResourcePlugin
+from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
 
-all_res = ["local", "github", "gitlab"]
+all_res = ["local"]
 project_root = Path(__file__).parent.parent.parent
 resources_plugin_path = project_root.joinpath("src", "pydolphinscheduler", "resources_plugin")
 
@@ -17,8 +17,8 @@ resources_plugin_path = project_root.joinpath("src", "pydolphinscheduler", "reso
     [
         (
             {
-                "type": ResourcePluginType.LOCAL,
-                "prefix": "/tmp/",
+                "type": "res_type",
+                "prefix": "res_prefix",
             },
             all_res
         )

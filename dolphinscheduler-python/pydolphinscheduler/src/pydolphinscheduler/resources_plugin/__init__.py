@@ -20,7 +20,7 @@
 import importlib
 import importlib.util
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Any
 
 from pydolphinscheduler.exceptions import PyDSConfException
 
@@ -45,7 +45,7 @@ class ResourcePlugin:
     # [end init]
 
     # [start get_all_modules]
-    def get_all_modules(self) -> Generator[Path]:
+    def get_all_modules(self) -> Path:
         """Get all res files path in resources_plugin directory."""
         return (ex for ex in path_resources_plugin.iterdir() if ex.is_file() and not ex.name.startswith("__"))
 
@@ -69,6 +69,6 @@ class ResourcePlugin:
         for ex in self.get_all_modules():
             if ex.stem == self.type:
                 return self.import_module(ex.name, str(ex))
-        raise PyDSConfException('{} type is not supported'.format(self.type))
+        raise PyDSConfException('{} type is not supported.'.format(self.type))
     # [end resource]
 # [end resource_plugin_definition]
