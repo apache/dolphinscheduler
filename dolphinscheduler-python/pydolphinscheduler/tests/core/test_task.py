@@ -18,11 +18,11 @@
 """Test Task class function."""
 import logging
 import re
-from unittest.mock import patch, PropertyMock
+from unittest.mock import PropertyMock, patch
 
 import pytest
-from pydolphinscheduler.constants import TaskType, ResourcePluginType
 
+from pydolphinscheduler.constants import ResourcePluginType, TaskType
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
 from pydolphinscheduler.exceptions import PyResPluginException

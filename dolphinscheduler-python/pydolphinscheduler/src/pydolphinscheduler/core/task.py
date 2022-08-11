@@ -33,8 +33,7 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.core.resource import Resource
-from pydolphinscheduler.exceptions import PyDSParamException
-from pydolphinscheduler.exceptions import PyResPluginException
+from pydolphinscheduler.exceptions import PyDSParamException, PyResPluginException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base
 from pydolphinscheduler.resources_plugin import ResourcePlugin
