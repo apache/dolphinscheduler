@@ -53,6 +53,10 @@ doc = [
     "sphinx-click>=3.0",
     "sphinx-inline-tabs",
     "sphinx-copybutton>=0.4.0",
+    # Unreleased package have a feature we want(use correct version package for API ref), so we install from
+    # GitHub directly, see also:
+    # https://github.com/Holzhaus/sphinx-multiversion/issues/42#issuecomment-1210539786
+    "sphinx-multiversion @ git+https://github.com/Holzhaus/sphinx-multiversion#egg=sphinx-multiversion",
 ]
 
 test = [
