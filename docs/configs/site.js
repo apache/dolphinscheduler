@@ -30,7 +30,7 @@ export default {
   'en-us': {
     banner: {
       text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
-      link: 'https://s.apache.org/dolphinscheduler-slack'
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g'
     },
     pageMenu: [
       {
@@ -132,7 +132,7 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://s.apache.org/dolphinscheduler-slack',
+          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g',
         },
         {
           name: 'Email List',
@@ -153,7 +153,7 @@ export default {
   'zh-cn': {
     banner: {
       text: '🤔 有关于 Apache DolphinScheduler 的疑问，加入 Slack 频道来讨论他们 ',
-      link: 'https://s.apache.org/dolphinscheduler-slack'
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g'
     },
     pageMenu: [
       {
@@ -257,7 +257,7 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://s.apache.org/dolphinscheduler-slack',
+          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g',
         },
         {
           name: '邮件列表',

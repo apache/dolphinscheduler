@@ -8,7 +8,7 @@ The following chat rooms are officially part of Apache DolphinScheduler:
 
 ​	The Slack workspace URL: http://asf-dolphinscheduler.slack.com/.
 
-​	You can join through invitation url: https://s.apache.org/dolphinscheduler-slack.
+​	You can join through invitation url: https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g.
 
 This chat room is used for questions and discussions related to using DolphinScheduler.
 
