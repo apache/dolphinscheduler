@@ -243,6 +243,11 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.password|password|LDAP password|
 |security.authentication.ldap.user.identity.attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email.attribute|mail|LDAP user email attribute|
+|traffic.control.global.switch|false|traffic control global switch|
+|traffic.control.max-global-qps-rate|300|global max request number per second|
+|traffic.control.tenant-switch|false|traffic control tenant switch|
+|traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
+|traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
 
 ### Master Server related configuration
 Location: `master-server/conf/application.yaml`
