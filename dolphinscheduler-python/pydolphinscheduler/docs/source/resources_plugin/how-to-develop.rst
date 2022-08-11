@@ -18,7 +18,6 @@
 How to develop
 ==============
 
-How to develop a plugin
 You need your plugin class created under dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/resources_plugin folder.
 
 Your plugin class needs two indispensable methods, one is the __init__ method, the parameter is the prefix of type str, the other is
