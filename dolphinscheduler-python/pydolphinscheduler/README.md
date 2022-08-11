@@ -84,4 +84,4 @@ If you are interested in how to release **PyDolphinScheduler**, you could go and
 
 ## What's more
 
-For more detail information, please go to see **PyDolphinScheduler** [document](https://dolphinscheduler.apache.org/python/3.0.0/index.html)
+For more detail information, please go to see **PyDolphinScheduler** [document](https://dolphinscheduler.apache.org/python/dev/index.html)

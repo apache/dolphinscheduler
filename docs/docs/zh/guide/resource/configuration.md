@@ -1,9 +1,9 @@
 # 资源中心配置详情
 
 - 资源中心通常用于上传文件、UDF 函数，以及任务组管理等操作。
-- 资源中心可以对接分布式的文件存储系统，如`Hadoop`（2.6+）或者`MinIO`集群，也可以对接远端的对象存储，如`AWS`的`S3`或者`阿里云`的`OSS`等。
+- 资源中心可以对接分布式的文件存储系统，如[Hadoop](https://hadoop.apache.org/docs/r2.7.0/)（2.6+）或者[MinIO](https://github.com/minio/minio)集群，也可以对接远端的对象存储，如[AWS S3](https://aws.amazon.com/s3/)或者[阿里云 OSS](https://www.aliyun.com/product/oss)等。
 - 资源中心也可以直接对接本地文件系统。在单机模式下，您无需依赖`Hadoop`或`S3`一类的外部存储系统，可以方便地对接本地文件系统进行体验。
-- 除此之外，对于集群模式下的部署，您可以通过使用`S3FS-FUSE`将`S3`挂载到本地，或者使用`Jindo-FUSE`将`OSS`挂载到本地等，再用资源中心对接本地文件系统方式来操作远端对象存储中的文件。
+- 除此之外，对于集群模式下的部署，您可以通过使用[S3FS-FUSE](https://github.com/s3fs-fuse/s3fs-fuse)将`S3`挂载到本地，或者使用[JINDO-FUSE](https://help.aliyun.com/document_detail/187410.html)将`OSS`挂载到本地等，再用资源中心对接本地文件系统方式来操作远端对象存储中的文件。
 
 ## 对接本地文件系统
 
@@ -11,8 +11,10 @@
 
 对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
 
-- 将 `resource.storage.upload.base.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`resource.storage.upload.base.path=/tmp/storage/dolphinscheduler`。当路径不存在时会自动创建文件夹
+- 将 `resource.storage.upload.base.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`resource.storage.upload.base.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
 - 修改 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
+
+>    **注意**：如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
 
 ## 对接分布式或远端对象存储
 
@@ -48,7 +50,7 @@ resource.storage.type=HDFS
 
 # resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration,
 # please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
-resource.storage.upload.base.path=/tmp/storage/dolphinscheduler
+resource.storage.upload.base.path=/tmp/dolphinscheduler
 
 # The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.access.key.id=minioadmin
