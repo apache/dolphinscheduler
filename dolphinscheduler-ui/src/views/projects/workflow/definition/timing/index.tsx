@@ -23,7 +23,6 @@ import { useRouter } from 'vue-router'
 import { useTable } from './use-table'
 import Card from '@/components/card'
 import TimingModal from '../components/timing-modal'
-import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 
 export default defineComponent({
@@ -92,7 +91,6 @@ export default defineComponent({
               data={this.tableData}
               striped
               size={'small'}
-              class={styles.table}
               scrollX={this.tableWidth}
             />
             <NSpace justify='center'>
