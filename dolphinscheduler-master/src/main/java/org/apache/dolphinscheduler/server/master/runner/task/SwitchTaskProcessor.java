@@ -104,7 +104,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean pauseTask() {
-        this.taskInstance.setState(TaskExecutionStatus.KILL);
+        this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;

@@ -85,7 +85,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     @Override
     protected boolean pauseTask() {
         // todo: task cannot be pause
-        taskInstance.setState(TaskExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.PAUSE);
         taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         logger.info("blocking task has been paused");
