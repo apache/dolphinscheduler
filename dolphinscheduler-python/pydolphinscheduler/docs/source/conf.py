@@ -31,7 +31,8 @@ import os
 import sys
 from pathlib import Path
 
-# For sphinx-multiversion, related issue: https://github.com/Holzhaus/sphinx-multiversion/issues/42
+# For sphinx-multiversion, we need to build API docs of the corresponding package version, related issue:
+# https://github.com/Holzhaus/sphinx-multiversion/issues/42
 pkg_src_dir = (
     Path(os.environ.get("SPHINX_MULTIVERSION_SOURCEDIR", default="."))
     .joinpath("../../src")
@@ -41,6 +42,7 @@ sys.path.insert(0, str(pkg_src_dir))
 # Debug to uncomment this to see the source path
 # print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 # print(pkg_src_dir)
+# [print(p) for p in sys.path]
 # print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 
 
@@ -84,7 +86,8 @@ html_sidebars = {
         "versioning.html",
     ],
 }
-smv_tag_whitelist = r"^\d+\.\d+\.\d+$"
+# Match all exists tag for pydolphinscheduler expect version 2.0.4(not release apache dolphinscheduler)
+smv_tag_whitelist = r"^(?!2.0.4)\d+\.\d+\.\d+$"
 smv_branch_whitelist = "dev"
 smv_remote_whitelist = r"^(origin|upstream)$"
 smv_released_pattern = "^refs/tags/.*$"
