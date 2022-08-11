@@ -436,6 +436,7 @@ public enum Status {
     NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
+    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
     ;
 
     private final int code;
