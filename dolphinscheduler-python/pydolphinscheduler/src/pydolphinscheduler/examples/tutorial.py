@@ -37,8 +37,6 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 
 # Import task Shell object cause we would create some shell tasks later
 from pydolphinscheduler.tasks.shell import Shell
-from pydolphinscheduler.constants import ResourcePluginType
-from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
 
 # [end package_import]
 
@@ -48,43 +46,13 @@ with ProcessDefinition(
     schedule="0 0 0 * * ? *",
     start_time="2021-01-01",
     tenant="tenant_exists",
-    resource_plugin=ResourcePlugin(
-        type=ResourcePluginType.LOCAL,
-        prefix='/opt/',
-    )
 ) as pd:
     # [end workflow_declare]
     # [start task_declare]
-    task_parent = Shell(
-        name="task_parent",
-        command="parent.zsh",
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix='/opt/',
-        )
-    )
-
-    task_child_one = Shell(
-        name="task_child_one",
-        command="child_one.sh",
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix='/opt/',
-        )
-    )
-
-    task_child_two = Shell(
-        name="task_child_two",
-        command="child_two.sh",
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix='/opt/',
-        )
-    )
-    task_union = Shell(
-        name="task_union",
-        command="echo union1 ab",
-    )
+    task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")
+    task_child_one = Shell(name="task_child_one", command="echo 'child one'")
+    task_child_two = Shell(name="task_child_two", command="echo 'child two'")
+    task_union = Shell(name="task_union", command="echo union")
     # [end task_declare]
 
     # [start task_relation_declare]
