@@ -23,7 +23,6 @@ In this section
 .. toctree::
    :maxdepth: 1
 
-   how-to-use
-   how-to-develop
+   develop
    resource-plugin
    local

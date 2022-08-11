@@ -32,7 +32,9 @@ Example
     :start-after: [start init_method]
     :end-before: [end init_method]
 
-- Method `read_file `: Get content from the given URI, <add your distribution>
+- Method `read_file `: Get content from the given URI, The function parameter is the suffix of the file path.
+The file prefix has been initialized in init of the resource plug-in. The prefix plus suffix is the absolute
+path of the file in this resource
 .. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/local.py
     :start-after: [start read_file_method]
     :end-before: [end read_file_method]
