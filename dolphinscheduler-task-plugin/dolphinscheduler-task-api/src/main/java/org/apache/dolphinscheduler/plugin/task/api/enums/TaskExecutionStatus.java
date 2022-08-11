@@ -26,6 +26,7 @@ public enum TaskExecutionStatus {
 
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
+    PAUSE(3, "pause"),
     FAILURE(6, "failure"),
     SUCCESS(7, "success"),
     NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
@@ -82,8 +83,12 @@ public enum TaskExecutionStatus {
         return this == TaskExecutionStatus.FAILURE;
     }
 
+    public boolean isPause() {
+        return this == TaskExecutionStatus.PAUSE;
+    }
+
     public boolean isFinished() {
-        return isSuccess() || isKill() || isFailure();
+        return isSuccess() || isKill() || isFailure() || isPause();
     }
 
     public boolean isNeedFaultTolerance() {
