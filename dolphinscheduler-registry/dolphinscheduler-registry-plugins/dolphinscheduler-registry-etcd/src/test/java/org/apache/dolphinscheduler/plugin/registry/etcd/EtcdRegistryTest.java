@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -90,7 +91,7 @@ public class EtcdRegistryTest {
             }
         }).start();
         try {
-            preCountDownLatch.await();
+            preCountDownLatch.await(5,TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +109,7 @@ public class EtcdRegistryTest {
 
         }).start();
         try {
-            allCountDownLatch.await();
+            allCountDownLatch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

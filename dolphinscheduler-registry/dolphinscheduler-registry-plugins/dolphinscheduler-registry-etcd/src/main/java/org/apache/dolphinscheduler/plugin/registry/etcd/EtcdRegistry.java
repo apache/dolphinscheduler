@@ -166,7 +166,7 @@ public class EtcdRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get data error", e);
         } catch (ExecutionException e) {
-            throw new RegistryException("etcd get data error, key = "+ key, e);
+            throw new RegistryException("etcd get data error, key = " + key, e);
         }
     }
 
@@ -227,7 +227,7 @@ public class EtcdRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get children error", e);
         } catch (ExecutionException e) {
-            throw new RegistryException("etcd get children error, key: "+key, e);
+            throw new RegistryException("etcd get children error, key: " + key, e);
         }
     }
 

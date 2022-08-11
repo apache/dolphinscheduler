@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -86,7 +87,7 @@ public class ZookeeperRegistryTest {
                 allCountDownLatch.countDown();
             }
         }).start();
-        preCountDownLatch.await();
+        preCountDownLatch.await(5, TimeUnit.SECONDS);
         new Thread(() -> {
             try {
                 logger.info(Thread.currentThread().getName() + " :I am trying to acquire the lock");
@@ -100,7 +101,7 @@ public class ZookeeperRegistryTest {
             }
 
         }).start();
-        allCountDownLatch.await();
+        allCountDownLatch.await(5, TimeUnit.SECONDS);
         Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
 
     }
