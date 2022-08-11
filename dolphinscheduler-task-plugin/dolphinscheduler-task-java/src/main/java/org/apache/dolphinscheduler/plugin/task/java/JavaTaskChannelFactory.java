@@ -28,9 +28,9 @@ import com.google.auto.service.AutoService;
 @AutoService(TaskChannelFactory.class)
 public class JavaTaskChannelFactory implements TaskChannelFactory {
     /**
-     * @description: Construct a channel for a Java task
-     * @param: []
-     * @return: org.apache.dolphinscheduler.plugin.task.api.TaskChannel
+     * Construct a channel for a Java task
+     *
+     * @return TaskChannel
      **/
     @Override
     public TaskChannel create() {
@@ -38,9 +38,9 @@ public class JavaTaskChannelFactory implements TaskChannelFactory {
     }
 
     /**
-     * @description: Get a unique identifier of the Java task
-     * @param: []
-     * @return: java.lang.String
+     * Get a unique identifier of the Java task
+     *
+     * @return String
      **/
     @Override
     public String getName() {
@@ -48,9 +48,9 @@ public class JavaTaskChannelFactory implements TaskChannelFactory {
     }
 
     /**
-     * @description: Gets the plug-in parameters for the Java task
-     * @param: []
-     * @return: java.util.List<org.apache.dolphinscheduler.spi.params.base.PluginParams>
+     * Gets the plug-in parameters for the Java task
+     *
+     * @return List<PluginParams>
      **/
     @Override
     public List<PluginParams> getParams() {

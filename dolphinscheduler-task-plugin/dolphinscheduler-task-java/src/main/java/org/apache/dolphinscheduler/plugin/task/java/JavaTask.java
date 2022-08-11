@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
-import static org.apache.dolphinscheduler.common.Constant.Constants.SINGLE_SLASH;
-
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -55,9 +54,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 
-/**
- * java task
- */
 public class JavaTask extends AbstractTaskExecutor {
 
     /**
@@ -80,11 +76,6 @@ public class JavaTask extends AbstractTaskExecutor {
      */
     private static final Pattern classNamePattern = Pattern.compile(PUBLIC_CLASS_NAME_REGEX);
 
-    /**
-     * @description: Construct a Java task
-     * @param: [org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext]
-     * @return: JavaTask
-     **/
     public JavaTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskRequest = taskRequest;
@@ -94,9 +85,8 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Initializes a Java task
-     * @param: []
-     * @return: void
+     * Initializes a Java task
+     * @return void
      **/
     @Override
     public void init() {
@@ -111,9 +101,9 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Gets the Java source file that was initially processed
-     * @param: []
-     * @return: java.lang.String
+     *  Gets the Java source file that was initially processed
+     *
+     * @return String
      **/
     @Override
     public String getPreScript() {
@@ -121,23 +111,24 @@ public class JavaTask extends AbstractTaskExecutor {
         try {
             rawJavaScript = convertJavaSourceCodePlaceholders(rawJavaScript);
         } catch (StringIndexOutOfBoundsException e) {
-            logger.error("setShareVar field format error, raw java script : {}", rawJavaScript);
+            logger.error("setShareVar field format error, raw java script: {}", rawJavaScript);
         }
         return rawJavaScript;
     }
 
     /**
-     * @description: Execute Java tasks
-     * @param: []
-     * @return: void
-     **/
+     * Execute Java tasks
+     *
+     * @return void
+     * @throws Exception
+     */
     @Override
     public void handle() throws Exception {
         try {
             // Step 1: judge if is java or jar run type.
-            // Step 2 case1: The jar run type builds the command directly, adding resource to the java -jar class when building the command
-            // Step 2 case2: The java run type, first replace the custom parameters, then compile the code, and then build the command will add resource
-            // Step 3: To run the command
+            // Step 2 case1: the jar run type builds the command directly, adding resource to the java -jar class when building the command
+            // Step 2 case2: the java run type, first replace the custom parameters, then compile the code, and then build the command will add resource
+            // Step 3: to run the command
             String command = null;
             switch (javaParameters.getRunType()) {
                 case JavaConstants.RUN_TYPE_JAVA:
@@ -151,7 +142,7 @@ public class JavaTask extends AbstractTaskExecutor {
             }
             Preconditions.checkNotNull(command, "command not be null.");
             TaskResponse taskResponse = shellCommandExecutor.run(command);
-            logger.info("java task run result : {}", taskResponse);
+            logger.info("java task run result: {}", taskResponse);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
@@ -172,19 +163,22 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Construct a shell command for the java Run mode
-     * @param: []
-     * @return: java.lang.String
+     * Construct a shell command for the java Run mode
+     *
+     * @return String
+     * @throws Exception
      **/
     protected String buildJavaCommand() throws Exception {
-        String sourceCode = buildJavaSourceContent();
-        String className = compilerRawScript(sourceCode);
         StringBuilder builder = new StringBuilder();
-        builder.append(getJavaCommandPath())
+        String sourceCode = buildJavaSourceContent();
+        builder.append(buildJavaCompileCommand(sourceCode))
+                .append(";")
+                .append(getJavaCommandPath())
                 .append("java").append(" ")
                 .append(buildResourcePath())
                 .append(" ")
-                .append(className).append(" ")
+                .append(getPublicClassName(sourceCode))
+                .append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
         return builder.toString();
@@ -198,9 +192,9 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Construct a shell command for the java -jar Run mode
-     * @param: []
-     * @return: java.lang.String
+     * Construct a shell command for the java -jar Run mode
+     *
+     * @return String
      **/
     protected String buildJarCommand() {
         String fullName = javaParameters.getMainJar().getResourceName();
@@ -239,13 +233,17 @@ public class JavaTask extends AbstractTaskExecutor {
         return javaParameters;
     }
 
+
     /**
-     * @description: Replaces placeholders such as local variables in source files
-     * @param: [java.lang.String]
-     * @return: java.lang.String
-     **/
+     * Replaces placeholders such as local variables in source files
+     *
+     * @param rawScript
+     * @return String
+     * @throws StringIndexOutOfBoundsException
+     */
     protected static String convertJavaSourceCodePlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
         int len = "${setShareVar(${".length();
+
         int scriptStart = 0;
         while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
             int start = -1;
@@ -270,23 +268,20 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Creates a Java source file when it does not exist
-     * @param: [java.lang.String, java.lang.String]
-     * @return: java.lang.String
+     * Creates a Java source file when it does not exist
+     *
+     * @param sourceCode
+     * @param fileName
+     * @return String
      **/
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
         logger.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
-
         if (!Files.exists(Paths.get(fileName))) {
             logger.info("generate java source file: {}", fileName);
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(sourceCode);
-            logger.info(sb.toString());
-
+            logger.info("the java source code: {}", sourceCode);
             // write data to file
             FileUtils.writeStringToFile(new File(fileName),
-                    sb.toString(),
+                    sourceCode,
                     StandardCharsets.UTF_8);
         } else {
             throw new JavaSourceFileExistException("java source file exists, please report an issue on official.");
@@ -294,18 +289,18 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Construct the full path name of the Java source file from the temporary execution path of the task
-     * @param: []
-     * @return: java.lang.String
+     * Construct the full path name of the Java source file from the temporary execution path of the task
+     *
+     * @return String
      **/
     protected String buildJavaSourceCodeFileFullName(String publicClassName) {
         return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(), publicClassName);
     }
 
     /**
-     * @description: Construct a Classpath or module path based on isModulePath
-     * @param: []
-     * @return: java.lang.String
+     * Construct a Classpath or module path based on isModulePath
+     *
+     * @return String
      **/
     protected String buildResourcePath() {
         StringBuilder builder = new StringBuilder();
@@ -326,48 +321,17 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Compile the Java source file
-     * @param: [java.lang.String]
-     * @return: java.lang.String
+     * Constructs a shell command compiled from a Java source file
+     *
+     * @param fileName
+     * @param sourceCode
+     * @return String
+     * @throws IOException
      **/
-    protected String compilerRawScript(String sourceCode) throws IOException, InterruptedException {
+    protected String buildJavaCompileCommand(String sourceCode) throws IOException {
         String publicClassName = getPublicClassName(sourceCode);
         String fileName =  buildJavaSourceCodeFileFullName(publicClassName);
         createJavaSourceFileIfNotExists(sourceCode, fileName);
-        String compileCommand = buildJavaCompileCommand(fileName, sourceCode);
-        Preconditions.checkNotNull(compileCommand, "command not be null.");
-        TaskResponse compileResponse = shellCommandExecutor.run(compileCommand);
-        // must drop the command file ,if do not ,the next command will not run. because be limited the ShellCommandExecutor's create file rules
-        dropShellCommandFile();
-        shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                logger);
-        logger.info("java task code compile result: " + compileResponse);
-        return publicClassName;
-    }
-
-    /**
-     * @description: Delete the shell file generated by the compile command to make the Java command work properly
-     * @param: []
-     * @return: void
-     **/
-    private void dropShellCommandFile() throws IOException {
-        String commandFilePath = String.format("%s/%s.%s"
-                , taskRequest.getExecutePath()
-                , taskRequest.getTaskAppId()
-                , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
-        Path path = Paths.get(commandFilePath);
-        if (Files.exists(path)) {
-            Files.delete(path);
-        }
-    }
-
-    /**
-     * @description: Constructs a shell command compiled from a Java source file
-     * @param: [java.lang.String, java.lang.String]
-     * @return: java.lang.String
-     **/
-    protected String buildJavaCompileCommand(String fileName, String sourceCode) throws IOException {
 
         StringBuilder compilerCommand = new StringBuilder()
                 .append(getJavaCommandPath())
@@ -378,9 +342,9 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Work with Java source file content, such as replacing local variables
-     * @param: []
-     * @return: java.lang.String
+     * Work with Java source file content, such as replacing local variables
+     *
+     * @return String
      **/
     protected String buildJavaSourceContent() {
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
@@ -399,23 +363,24 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     /**
-     * @description: Gets the operating system absolute path to the Java command
-     * @param: []
-     * @return: java.lang.String
+     * Gets the operating system absolute path to the Java command
+     *
+     * @return String
      **/
     private String getJavaCommandPath() {
-        return JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
+        return JAVA_HOME_VAR + File.separator + "bin" + File.separator;
     }
 
     /**
-     * @description: Gets the public class name from the Java source file
-     * @param: [java.lang.String]
-     * @return: java.lang.String
+     * Gets the public class name from the Java source file
+     *
+     * @param sourceCode
+     * @return String
      **/
     public String getPublicClassName(String sourceCode) {
         Matcher matcher = classNamePattern.matcher(sourceCode);
         if (!matcher.find()) {
-            throw new PublicClassNotFoundException("public class is not be found in sourcecode : " + sourceCode);
+            throw new PublicClassNotFoundException("public class is not be found in source code : " + sourceCode);
         }
         return matcher.group(2).trim();
     }

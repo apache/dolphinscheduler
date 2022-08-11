@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import java.io.File;
+
 public class JavaConstants {
 
     private JavaConstants() {
@@ -44,11 +46,6 @@ public class JavaConstants {
     public static final String PATH_SEPARATOR = System.getProperty("path.separator");
 
     /**
-     * This constant is the file delimiter for different operating systems
-     **/
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-
-    /**
      * This constant represents the current directory in the Classpath or module path
      **/
     public static final String CLASSPATH_CURRENT_DIR = ".";
@@ -61,7 +58,5 @@ public class JavaConstants {
     /**
      * This constant is the regular expression to get the class name of the source file
      **/
-    public static final String PUBLIC_CLASS_NAME_REGEX = "(.*\\s+public\\s+class\\s+)([a-zA-Z_]+[//w_]*)([.\\s\\S]*)";
-
-
+    public static final String PUBLIC_CLASS_NAME_REGEX = "(.*\\s*public\\s+class\\s+)([a-zA-Z_]+[//w_]*)([.\\s\\S]*)";
 }

@@ -27,9 +27,10 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 public class JavaTaskChannel implements TaskChannel {
 
     /**
-     * @description: Cancel the mission
-     * @param: [boolean]
-     * @return: void
+     * Cancel the mission
+     *
+     * @param status
+     * @return void
      **/
     @Override
     public void cancelApplication(boolean status) {
@@ -37,9 +38,10 @@ public class JavaTaskChannel implements TaskChannel {
     }
 
     /**
-     * @description: Create a task
-     * @param: [org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext]
-     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
+     * Create a task
+     *
+     * @param taskRequest This parameter is the Echternach of the mission
+     * @return JavaTask
      **/
     @Override
     public JavaTask createTask(TaskExecutionContext taskRequest) {
@@ -47,8 +49,9 @@ public class JavaTaskChannel implements TaskChannel {
     }
 
     /**
-     * @description: Parses Java task parameters
-     * @param: [org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode]
+     * Parses Java task parameters
+     *
+     * @param parametersNode
      * @return: org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
      **/
     @Override
@@ -57,9 +60,10 @@ public class JavaTaskChannel implements TaskChannel {
     }
 
     /**
-     * @description: Gets a list of the resources that the task depends on
-     * @param: [java.lang.String]
-     * @return: org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper
+     * Gets a list of the resources that the task depends on
+     *
+     * @param parameters
+     * @return ResourceParametersHelper
      **/
     @Override
     public ResourceParametersHelper getResources(String parameters) {

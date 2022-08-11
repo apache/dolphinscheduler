@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoun
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -42,23 +43,38 @@ import org.junit.Test;
 
 public class JavaTaskTest {
 
+    @Test
+    public void testGetPubllicClassName(){
+        JavaTask javaTask = runJavaType();
+        Assert.assertEquals(javaTask.getPublicClassName("import java.io.IOException;\n" +
+                "public class JavaTaskTest {\n" +
+                "    public static void main(String[] args) throws IOException {\n" +
+                "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" +
+                "        for (String arg : args) {\n" +
+                "            builder.append(arg).append(\" \");\n" +
+                "        }\n" +
+                "        System.out.println(builder);\n" +
+                "    }\n" +
+                "}\n"), "JavaTaskTest");
+    }
+
     /**
-     * @description: Construct a java -jar command
-     * @param: []
-     * @return: void
+     * Construct a java -jar command
+     *
+     * @return void
      **/
     @Test
     public void buildJarCommand() {
-        String homeBinPath = JavaConstants.JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
+        String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
         JavaTask javaTask = runJarType();
         Assert.assertEquals(javaTask.buildJarCommand(), homeBinPath
                 + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
-     * @description: Construct the compile command
-     * @param: []
-     * @return: void
+     * Construct the compile command
+     *
+     * @return void
      **/
     @Test
     public void buildJavaCompileCommand() throws IOException {
@@ -68,15 +84,14 @@ public class JavaTaskTest {
         Assert.assertEquals("JavaTaskTest", publicClassName);
         String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
         try {
-            String homeBinPath = JavaConstants.JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
+            String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
                 Files.delete(path);
             }
-            javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
             Assert.assertEquals(homeBinPath
                             + "javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
-                    javaTask.buildJavaCompileCommand(fileName, sourceCode));
+                    javaTask.buildJavaCompileCommand(sourceCode));
         } finally {
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
@@ -87,13 +102,13 @@ public class JavaTaskTest {
     }
 
     /**
-     * @description: Construct java to run the command
-     * @param: []
-     * @return: void
+     * Construct java to run the command
+     *
+     *  @return void
      **/
     @Test
     public void buildJavaCommand() throws Exception {
-        String homeBinPath = JavaConstants.JAVA_HOME_VAR + JavaConstants.FILE_SEPARATOR + "bin" + JavaConstants.FILE_SEPARATOR;
+        String wantJavaCommand = "${JAVA_HOME}/bin/javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m";
         JavaTask javaTask = runJavaType();
         String sourceCode = javaTask.buildJavaSourceContent();
         String publicClassName = javaTask.getPublicClassName(sourceCode);
@@ -103,13 +118,12 @@ public class JavaTaskTest {
         if (Files.exists(path)) {
             Files.delete(path);
         }
-        Assert.assertEquals(javaTask.buildJavaCommand(), homeBinPath + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
+        Assert.assertEquals(wantJavaCommand, javaTask.buildJavaCommand());
     }
 
     /**
-     * @description: There is no exception to overwriting the Java source file
-     * @param: []
-     * @return: void
+     * There is no exception to overwriting the Java source file
+     * @return void
      * @throws IOException
      **/
     @Test(expected = JavaSourceFileExistException.class)
@@ -134,9 +148,9 @@ public class JavaTaskTest {
     }
 
     /**
-     * @description: The override class name could not find an exception
-     * @param: []
-     * @return: void
+     * The override class name could not find an exception
+     *
+     * @return void
      **/
     @Test(expected = PublicClassNotFoundException.class)
     public void  coverPublicClassNotFoundException() {
@@ -145,9 +159,9 @@ public class JavaTaskTest {
     }
 
     /**
-     * @description: The override run mode could not find an exception
-     * @param: []
-     * @return: void
+     * The override run mode could not find an exception
+     *
+     * @return void
      * @throws Exception
      **/
     @Test(expected = RunTypeNotFoundException.class)
@@ -161,9 +175,10 @@ public class JavaTaskTest {
     }
 
     /**
-     * @description: Create a Java task parameter mock object
-     * @param: [java.lang.String]
-     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaParameters
+     * Create a Java task parameter mock object
+     *
+     * @param runType
+     * @return JavaParameters
      **/
     public JavaParameters createJavaParametersObject(String runType) {
         JavaParameters javaParameters = new JavaParameters();
@@ -204,9 +219,9 @@ public class JavaTaskTest {
     }
 
     /**
-     * @description: A Java task that constructs the Java runtime pattern
-     * @param: []
-     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
+     * A Java task that constructs the Java runtime pattern
+     *
+     * @return JavaTask
      **/
     public JavaTask runJavaType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
@@ -219,9 +234,9 @@ public class JavaTaskTest {
     }
 
     /**
-     * @description: The Java task to construct the jar run mode
-     * @param: []
-     * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
+     * The Java task to construct the jar run mode
+     *
+     *  @return JavaTask
      **/
     public JavaTask runJarType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();

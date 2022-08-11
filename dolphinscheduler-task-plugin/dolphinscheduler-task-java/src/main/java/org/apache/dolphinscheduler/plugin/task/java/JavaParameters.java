@@ -62,19 +62,19 @@ public class JavaParameters extends AbstractParameters {
     private List<ResourceInfo> resourceList;
 
     /**
-     * @description: Check that the parameters are valid
-     * @param: []
-     * @return: boolean
-     **/
+     * Check that the parameters are valid
+     *
+     * @returnboolean
+     */
     @Override
     public boolean checkParameters() {
         return runType != null && (rawScript != null && !rawScript.isEmpty()) || mainJar != null;
     }
 
     /**
-     * @description: Gets a list of known resource files
-     * @param: []
-     * @return: java.util.List<org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo>
+     * Gets a list of known resource files
+     *
+     * @return List<ResourceInfo>
      **/
     @Override
     public List<ResourceInfo> getResourceFilesList() {
