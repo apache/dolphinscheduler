@@ -42,7 +42,7 @@ def docker_setup_teardown():
             image="apache/dolphinscheduler-standalone-server:ci",
             container_name="ci-dolphinscheduler-standalone-server",
         )
-        ports = {"25333/tcp": 25333}
+        ports = {"25333/tcp": 25333, "12345/tcp": 12345}
         container = docker_wrapper.run_until_log(
             log="Started StandaloneServer in", tty=True, ports=ports
         )
