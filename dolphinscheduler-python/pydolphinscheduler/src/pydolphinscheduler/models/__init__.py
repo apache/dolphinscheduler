@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init Side package, Side package keep object related to DolphinScheduler but not in the Core part."""
+"""Init Models package, keeping object related to DolphinScheduler covert from Java Gateway Service."""
 
 from pydolphinscheduler.models.base import Base
 from pydolphinscheduler.models.base_side import BaseSide
