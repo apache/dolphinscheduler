@@ -61,6 +61,6 @@ CREATE TABLE IF NOT EXISTS "t_ds_cluster" (
 ALTER TABLE t_ds_task_definition ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT '0';
 ALTER TABLE t_ds_task_definition_log ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT '0';
 ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT '0';
-ALTER TABLE t_ds_task_instance DROP CONSTRAINT foreign_key_instance_id;
+ALTER TABLE t_ds_task_instance DROP CONSTRAINT IF EXISTS foreign_key_instance_id;
 ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
 ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
