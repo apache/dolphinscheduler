@@ -45,6 +45,9 @@ pydolphinscheduler version
 # 0.1.0
 ```
 
+> NOTE: package apache-dolphinscheduler not work on above Python version 3.10(including itself) in Window operating system
+> due to dependence [py4j](https://pypi.org/project/py4j/) not work on those environments.
+
 Here we show you how to install and run a simple example of pydolphinscheduler
 
 ### Start Server And Run Example
