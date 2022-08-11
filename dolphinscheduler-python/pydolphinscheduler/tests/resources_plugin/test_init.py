@@ -5,7 +5,7 @@ import pytest
 
 from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.exceptions import PyDSConfException
-from pydolphinscheduler.resources_plugin.__init__ import ResourcePlugin
+from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 all_res = ["local"]
 project_root = Path(__file__).parent.parent.parent
