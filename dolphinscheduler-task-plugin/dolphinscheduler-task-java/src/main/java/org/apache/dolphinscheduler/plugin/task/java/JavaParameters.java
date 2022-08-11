@@ -22,13 +22,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class JavaParameters extends AbstractParameters {
     /**
      * origin java script
@@ -67,7 +63,6 @@ public class JavaParameters extends AbstractParameters {
 
     /**
      * @description: Check that the parameters are valid
-     * @date: 7/22/22 2:35 AM
      * @param: []
      * @return: boolean
      **/
@@ -78,7 +73,6 @@ public class JavaParameters extends AbstractParameters {
 
     /**
      * @description: Gets a list of known resource files
-     * @date: 7/22/22 2:34 AM
      * @param: []
      * @return: java.util.List<org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo>
      **/

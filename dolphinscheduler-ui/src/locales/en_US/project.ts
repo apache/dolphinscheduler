@@ -147,7 +147,7 @@ export default {
     rerun: 'Rerun',
     stop: 'Stop',
     pause: 'Pause',
-    recovery_waiting_thread:  'Recovery waiting thread',
+    recovery_waiting_thread: 'Recovery waiting thread',
     recover_serial_wait: 'Recover serial wait',
     recovery_suspend: 'Recovery Suspend',
     recovery_failed: 'Recovery Failed',

@@ -44,7 +44,6 @@ public class JavaTaskTest {
 
     /**
      * @description: Construct a java -jar command
-     * @date: 7/22/22 2:38 AM
      * @param: []
      * @return: void
      **/
@@ -58,7 +57,6 @@ public class JavaTaskTest {
 
     /**
      * @description: Construct the compile command
-     * @date: 7/22/22 2:38 AM
      * @param: []
      * @return: void
      **/
@@ -90,7 +88,6 @@ public class JavaTaskTest {
 
     /**
      * @description: Construct java to run the command
-     * @date: 7/22/22 2:38 AM
      * @param: []
      * @return: void
      **/
@@ -111,7 +108,6 @@ public class JavaTaskTest {
 
     /**
      * @description: There is no exception to overwriting the Java source file
-     * @date: 7/22/22 2:38 AM
      * @param: []
      * @return: void
      * @throws IOException
@@ -139,7 +135,6 @@ public class JavaTaskTest {
 
     /**
      * @description: The override class name could not find an exception
-     * @date: 7/22/22 2:38 AM
      * @param: []
      * @return: void
      **/
@@ -151,7 +146,6 @@ public class JavaTaskTest {
 
     /**
      * @description: The override run mode could not find an exception
-     * @date: 7/22/22 2:38 AM
      * @param: []
      * @return: void
      * @throws Exception
@@ -168,7 +162,6 @@ public class JavaTaskTest {
 
     /**
      * @description: Create a Java task parameter mock object
-     * @date: 7/22/22 2:39 AM
      * @param: [java.lang.String]
      * @return: org.apache.dolphinscheduler.plugin.task.java.JavaParameters
      **/
@@ -212,7 +205,6 @@ public class JavaTaskTest {
 
     /**
      * @description: A Java task that constructs the Java runtime pattern
-     * @date: 7/22/22 2:39 AM
      * @param: []
      * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
      **/
@@ -228,7 +220,6 @@ public class JavaTaskTest {
 
     /**
      * @description: The Java task to construct the jar run mode
-     * @date: 7/22/22 2:39 AM
      * @param: []
      * @return: org.apache.dolphinscheduler.plugin.task.java.JavaTask
      **/
