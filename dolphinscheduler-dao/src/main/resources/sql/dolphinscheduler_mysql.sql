@@ -638,7 +638,7 @@ CREATE TABLE `t_ds_project` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(100) DEFAULT NULL COMMENT 'project name',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `description` varchar(200) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -1859,7 +1859,7 @@ DROP TABLE IF EXISTS `t_ds_task_group`;
 CREATE TABLE `t_ds_task_group` (
    `id`  int(11)  NOT NULL AUTO_INCREMENT COMMENT'key',
    `name` varchar(100) DEFAULT NULL COMMENT 'task_group name',
-   `description` varchar(200) DEFAULT NULL,
+   `description` varchar(255) DEFAULT NULL,
    `group_size` int (11) NOT NULL COMMENT'group size',
    `use_size` int (11) DEFAULT '0' COMMENT 'used size',
    `user_id` int(11) DEFAULT NULL COMMENT 'creator id',

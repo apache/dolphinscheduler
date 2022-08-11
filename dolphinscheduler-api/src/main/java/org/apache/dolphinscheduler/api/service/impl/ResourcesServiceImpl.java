@@ -159,6 +159,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
+
+        if(checkDescriptionLength(description)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
+
         String fullName = getFullName(currentDir, name);
         result = verifyResource(loginUser, type, fullName, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -238,6 +244,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         result = verifyPid(loginUser, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -367,6 +377,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -1070,6 +1084,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         if (FileUtils.directoryTraversal(fileName)) {
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
