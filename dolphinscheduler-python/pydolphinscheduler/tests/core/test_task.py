@@ -22,6 +22,7 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
+from pydolphinscheduler.constants import ResourcePluginType, TaskType
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
 from pydolphinscheduler.exceptions import PyResPluginException
