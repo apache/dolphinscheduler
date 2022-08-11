@@ -78,7 +78,6 @@ public class EtcdRegistry implements Registry {
 
     private static Long TIME_TO_LIVE_SECONDS = 30L;
     public EtcdRegistry(EtcdRegistryProperties registryProperties) {
-        LOGGER.info("Starting Etcd Registry...");
         ClientBuilder clientBuilder = Client.builder()
                 .endpoints(Util.toURIs(Splitter.on(",").trimResults().splitToList(registryProperties.getEndpoints())))
                 .namespace(byteSequence(registryProperties.getNamespace()))
@@ -167,7 +166,7 @@ public class EtcdRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get data error", e);
         } catch (ExecutionException e) {
-            throw new RegistryException("etcd get data error", e);
+            throw new RegistryException("etcd get data error, key = "+ key, e);
         }
     }
 
@@ -228,7 +227,7 @@ public class EtcdRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get children error", e);
         } catch (ExecutionException e) {
-            throw new RegistryException("etcd get children error", e);
+            throw new RegistryException("etcd get children error, key: "+key, e);
         }
     }
 
@@ -251,7 +250,7 @@ public class EtcdRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd check key is existed error", e);
         } catch (ExecutionException e) {
-            throw new RegistryException("etcd check key is existed error", e);
+            throw new RegistryException("etcd check key is existed error, key: " + key, e);
         }
         return false;
     }
@@ -281,7 +280,7 @@ public class EtcdRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get lock error", e);
         } catch (ExecutionException e) {
-            throw new RegistryException("etcd get lock error", e);
+            throw new RegistryException("etcd get lock error, lockKey: " + key, e);
         }
     }
 
@@ -298,7 +297,7 @@ public class EtcdRegistry implements Registry {
                 threadLocalLockMap.remove();
             }
         } catch (Exception e) {
-            throw new RegistryException("etcd release lock error", e);
+            throw new RegistryException("etcd release lock error, lockKey: " + key, e);
         }
         return true;
     }

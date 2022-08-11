@@ -260,6 +260,7 @@
                 <groupId>io.etcd</groupId>
                 <artifactId>jetcd-test</artifactId>
                 <version>${jetcd.test.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>

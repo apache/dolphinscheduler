@@ -1,10 +1,10 @@
 # Introduction
 
-This module is the etcd registry plugin module, this plugin will use etcd as the registry center.
+This module is the zookeeper registry plugin module, this plugin will use zookeeper as the registry center.
 
 # How to use
 
-If you want to set the registry center as mysql,you need to set the registry properties in master/worker/api's appplication.yml
+If you want to set the registry center as zookeeper,you need to set the registry properties in master/worker/api's appplication.yml
 
 ```yaml
 registry:
