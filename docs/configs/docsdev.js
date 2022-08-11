@@ -381,7 +381,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/3.0.0/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -915,7 +915,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/3.0.0/index.html',
                     },
                     {
                         title: '健康检查',
