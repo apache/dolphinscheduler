@@ -25,11 +25,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -101,18 +103,20 @@ public class TaskInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE)).thenReturn(result);
         Result projectAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser,
-                projectCode,
-                0,
-                "",
-                "",
-                "test_user",
-                "2019-02-26 19:48:00",
-                "2019-02-26 19:48:22",
-                "",
-                null,
-                "",
-                1,
-                20);
+            projectCode,
+            0,
+            "",
+            "",
+            "",
+            "test_user",
+            "2019-02-26 19:48:00",
+            "2019-02-26 19:48:22",
+            "",
+            null,
+            "",
+            TaskExecuteType.BATCH,
+            1,
+            20);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) projectAuthFailRes.getCode());
 
         // data parameter check
@@ -120,18 +124,20 @@ public class TaskInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE)).thenReturn(result);
         Result dataParameterRes = taskInstanceService.queryTaskListPaging(loginUser,
-                projectCode,
-                1,
-                "",
-                "",
-                "test_user",
-                "20200101 00:00:00",
-                "2020-01-02 00:00:00",
-                "",
-                TaskExecutionStatus.SUCCESS,
-                "192.168.xx.xx",
-                1,
-                20);
+            projectCode,
+            1,
+            "",
+            "",
+            "",
+            "test_user",
+            "20200101 00:00:00",
+            "2020-01-02 00:00:00",
+            "",
+            TaskExecutionStatus.SUCCESS,
+            "192.168.xx.xx",
+            TaskExecuteType.BATCH,
+            1,
+            20);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) dataParameterRes.getCode());
 
         // project
@@ -148,53 +154,47 @@ public class TaskInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""),
-                eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1), eq(""), eq(""), eq(""),
+            eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), eq(start), eq(end))).thenReturn(pageReturn);
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
         when(processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId()))
                 .thenReturn(processInstance);
 
-        Result successRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS,
-                "192.168.xx.xx", 1, 20);
+        Result successRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
+            "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
-        // executor name empty
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""),
-                eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
-        Result executorEmptyRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", 1,
-                20);
+        //executor name empty
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1), eq(""), eq(""), eq(""),
+            eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), eq(start), eq(end))).thenReturn(pageReturn);
+        Result executorEmptyRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
+            "", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorEmptyRes.getCode());
 
         // executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
-        Result executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS,
-                "192.168.xx.xx", 1, 20);
+
+        Result executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
+            "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorNullRes.getCode());
 
-        // start/end date null
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""),
-                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
-        Result executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "", null, null, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        //start/end date null
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1), eq(""), eq(""), eq(""),
+            eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any())).thenReturn(pageReturn);
+        Result executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
+            "", null, null, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorNullDateRes.getCode());
 
-        // start date error format
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""),
-                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        //start date error format
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1), eq(""), eq(""), eq(""),
+            eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any())).thenReturn(pageReturn);
 
-        Result executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "", "error date", null, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Result executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
+            "", "error date", null, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) executorErrorStartDateRes.getCode());
-        Result executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
-                "", null, "error date", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Result executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
+            "", null, "error date", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) executorErrorEndDateRes.getCode());
     }
 
@@ -253,6 +253,8 @@ public class TaskInstanceServiceTest {
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
         taskInstance.setExecutorId(-1);
+        taskInstance.setTaskExecuteType(TaskExecuteType.BATCH);
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;
     }
 

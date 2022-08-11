@@ -1570,7 +1570,7 @@ public class ProcessServiceImpl implements ProcessService {
             return null;
         }
         if (processInstanceState == WorkflowExecutionStatus.READY_PAUSE) {
-            taskInstance.setState(TaskExecutionStatus.KILL);
+            taskInstance.setState(TaskExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
@@ -1614,7 +1614,7 @@ public class ProcessServiceImpl implements ProcessService {
         // return pasue /stop if process instance state is ready pause / stop
         // or return submit success
         if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE) {
-            state = TaskExecutionStatus.KILL;
+            state = TaskExecutionStatus.PAUSE;
         } else if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP
                 || !checkProcessStrategy(taskInstance, processInstance)) {
             state = TaskExecutionStatus.KILL;
@@ -2849,6 +2849,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
                 taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
+                taskNode.setTaskExecuteType(taskDefinitionLog.getTaskExecuteType());
                 taskNodeList.add(taskNode);
             }
         }
