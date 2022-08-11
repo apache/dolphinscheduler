@@ -114,4 +114,14 @@ public interface TenantService {
      * @return Tenant object
      */
     Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName);
+
+    /**
+     * Grant tenant to user
+     *
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param tenantCode tenant code
+     * @param userName user name
+     */
+    void grantTenantToUser(String userName, String tenantCode) throws Exception;
 }

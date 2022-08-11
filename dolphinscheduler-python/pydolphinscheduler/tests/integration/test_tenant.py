@@ -18,15 +18,29 @@
 """Test pydolphinscheduler tenant."""
 import pytest
 
-from pydolphinscheduler.models import Tenant
+from pydolphinscheduler.models import Tenant, User
+
+
+def get_user(name="test-name",
+             password="test-password",
+             email="test-email@abc.com",
+             phone="17366637777",
+             tenant="test-tenant",
+             queue="test-queue",
+             status=1):
+    """Get a test user."""
+    user = User(name, password, email, phone, tenant, queue, status)
+    user.create_if_not_exists()
+    return user
 
 
 def get_tenant(name="test-name-1",
                queue="test-queue-1",
                description="test-description",
-               tenant_code="test-tenant-code"):
+               tenant_code="test-tenant-code",
+               user_name=None):
     """Get a test tenant."""
-    tenant = Tenant(name, queue, description, code=tenant_code)
+    tenant = Tenant(name, queue, description, code=tenant_code, user_name=user_name)
     tenant.create_if_not_exists(name)
     return tenant
 
@@ -40,30 +54,30 @@ def test_create_tenant():
 def test_get_tenant():
     """Test get tenant from java gateway."""
     tenant = get_tenant()
-    tenant_list = Tenant(description=tenant.description).get_tenant_list()
-    assert len(tenant_list) == 1
-    tenant_ = tenant_list[0]
-    assert tenant_.name == tenant.name
-    assert tenant_.queue == tenant.queue
-    assert tenant_.description == tenant.description
-    assert tenant_.code == tenant.code
+    tenant_ = Tenant(code=tenant.code)
+    tenant_.get_tenant()
+    assert tenant_.tenant_id == tenant.tenant_id
 
 
 def test_update_tenant():
     """Test update tenant from java gateway."""
-    tenant = get_tenant()
+    user = get_user()
+    tenant = get_tenant(user_name=user.name)
     tenant.update(code="test-code-updated", queue_id=1, description="test-description-updated")
-    tenant_list = Tenant().get_tenant_list()
-    assert len(tenant_list) == 1
-    tenant_ = tenant_list[0]
+    tenant_ = Tenant(code=tenant.code)
+    tenant_.get_tenant()
     assert tenant_.code == "test-code-updated"
     assert tenant_.queue == 1
-    assert tenant_.description == "test-description-updated"
 
 
 def test_delete_tenant():
     """Test delete tenant from java gateway."""
-    tenant = get_tenant()
+    user = get_user()
+    tenant = get_tenant(user_name=user.name)
     tenant.delete()
-    tenant_list = Tenant().get_tenant_list()
-    assert len(tenant_list) == 0
+    tenant_ = Tenant(code=tenant.code)
+    tenant_.get_tenant()
+    with pytest.raises(AttributeError) as excinfo:
+        var = tenant_.tenant_id
+
+    assert excinfo.type == AttributeError

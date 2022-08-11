@@ -146,12 +146,20 @@ class JavaGate:
             tenant_name, description, queue_name
         )
 
-    def query_tenant_list(
-            self, user: str, description: str, page_no: int, page_size: int
+    def query_tenant(
+            self, tenant_code: str
     ):
-        """Query tenant list through java gateway."""
-        return self.java_gateway.entry_point.queryTenantList(
-            user, description, page_no, page_size
+        """Query tenant through java gateway."""
+        return self.java_gateway.entry_point.queryTenantByCode(
+            tenant_code
+        )
+
+    def grant_tenant_to_user(
+            self, user_name: str, tenant_code: str
+    ):
+        """Grant tenant to user through java gateway."""
+        return self.java_gateway.entry_point.grantTenantToUser(
+            user_name, tenant_code
         )
 
     def update_tenant(
@@ -166,7 +174,7 @@ class JavaGate:
             self, user: str, tenant_id: int
     ):
         """Delete tenant through java gateway."""
-        return self.java_gateway.entry_point.deleteTenant(
+        return self.java_gateway.entry_point.deleteTenantById(
             user, tenant_id
         )
 

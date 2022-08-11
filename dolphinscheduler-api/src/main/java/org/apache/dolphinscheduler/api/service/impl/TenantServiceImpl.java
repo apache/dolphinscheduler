@@ -377,4 +377,14 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenantMapper.insert(tenant);
         return tenant;
     }
+
+    @Override
+    public void grantTenantToUser(String userName, String tenantCode) throws Exception {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        Tenant tenant = (Tenant) queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
+        if (PropertyUtils.getResUploadStartupState()) {
+            storageOperate.createTenantDirIfNotExists(tenantCode);
+        }
+        permissionPostHandle(AuthorizationType.TENANT, user.getId(), Collections.singletonList(tenant.getId()), logger);
+    }
 }

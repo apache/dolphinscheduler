@@ -34,27 +34,33 @@ class Tenant(BaseSide):
         description: Optional[str] = None,
         tenant_id: Optional[int] = None,
         code: Optional[str] = None,
+        user_name: Optional[str] = None,
     ):
         super().__init__(name, description)
         self.tenant_id = tenant_id
         self.queue = queue
         self.code = code
+        self.user_name = user_name
 
     def create_if_not_exists(
         self, queue_name: str, user=configuration.USER_NAME
     ) -> None:
         """Create Tenant if not exists."""
         tenant = JavaGate().create_tenant(self.name, self.description, queue_name)
-        self.tenant_id = tenant.tenantId
+        self.tenant_id = tenant.getId()
+        self.code = tenant.getTenantCode()
         # gateway_result_checker(result, None)
 
-    def get_tenant_list(self, user=configuration.USER_NAME, pageNo=1, pageSize=10):
+    def get_tenant(self):
         """Get Tenant list."""
-        tenant_list = JavaGate().query_tenant_list(user, self.description, pageNo, pageSize)
-        return tenant_list
+        tenant = JavaGate().query_tenant(self.code)
+        self.tenant_id = tenant.getId()
+        self.code = tenant.getTenantCode()
+        return
 
     def update(self, user=configuration.USER_NAME, code=None, queue_id=None, description=None) -> None:
         """Update Tenant."""
+        JavaGate().grant_tenant_to_user(self.user_name, code)
         JavaGate().update_tenant(user, self.tenant_id, code, queue_id, description)
         # TODO: check queue_id and queue_name
         self.queue = str(queue_id)
@@ -62,8 +68,9 @@ class Tenant(BaseSide):
         self.description = description
         return
 
-    def delete(self, user=configuration.USER_NAME) -> None:
+    def delete(self) -> None:
         """Delete Tenant."""
-        JavaGate().delete_tenant(user, self.tenant_id)
+        JavaGate().grant_tenant_to_user(self.user_name, self.code)
+        JavaGate().delete_tenant(self.user_name, self.tenant_id)
         self.delete_all()
         return
