@@ -49,25 +49,25 @@ StateRunning="Running"
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
-  masterState=`ssh -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status master-server;"`
+  masterState=`ssh -o StrictHostKeyChecking=no -p $sshPort $master  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status master-server;"`
   echo "$master  $masterState"
 done
 
 # 2.worker server check state
 for worker in ${workerNames[@]}
 do
-  workerState=`ssh -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status worker-server;"`
+  workerState=`ssh -o StrictHostKeyChecking=no -p $sshPort $worker  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status worker-server;"`
   echo "$worker  $workerState"
 done
 
 # 3.alter server check state
-alertState=`ssh -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status alert-server;"`
+alertState=`ssh -o StrictHostKeyChecking=no -p $sshPort $alertServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status alert-server;"`
 echo "$alertServer  $alertState"
 
 # 4.api server check state
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-  apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status api-server;"`
+  apiState=`ssh -o StrictHostKeyChecking=no -p $sshPort $apiServer  "cd $installPath/; bash bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
 done
