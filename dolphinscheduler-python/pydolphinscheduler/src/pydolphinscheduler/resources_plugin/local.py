@@ -19,6 +19,7 @@
 
 import os
 from pathlib import Path
+
 from pydolphinscheduler.exceptions import PyResPluginException
 
 
@@ -46,4 +47,3 @@ class Local:
             content = f.read()
         return content
 # [end local_res_definition]
-

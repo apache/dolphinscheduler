@@ -20,7 +20,8 @@
 import importlib
 import importlib.util
 from pathlib import Path
-from typing import Any, Generator
+from typing import Generator
+
 from pydolphinscheduler.exceptions import PyDSConfException
 
 path_resources_plugin = Path(__file__).parent

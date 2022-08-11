@@ -28,16 +28,16 @@ from pydolphinscheduler.constants import (
     TaskPriority,
     TaskTimeoutFlag,
 )
-from pydolphinscheduler.exceptions import PyResPluginException
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.exceptions import PyResPluginException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base
+from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 logger = getLogger(__name__)
 
