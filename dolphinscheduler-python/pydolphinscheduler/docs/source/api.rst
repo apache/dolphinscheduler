@@ -25,7 +25,7 @@ Core
   :inherited-members:
 
 models
------
+------
 
 .. automodule:: pydolphinscheduler.models
   :inherited-members:
