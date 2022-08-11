@@ -97,6 +97,10 @@ jobs:
     timeout-minutes: 15
     needs: lint
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env-list: [doc-build, doc-build-multi]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.7
@@ -106,9 +110,9 @@ jobs:
       - name: Install Dependences
         run: |
           python -m pip install --upgrade ${{ env.DEPENDENCES }}
-      - name: Run Tests Build Docs
+      - name: Run Build Docs Tests ${{ matrix.env-list }}
         run: |
-          python -m tox -vv -e doc-build-test
+          python -m tox -vv -e ${{ matrix.env-list }}
   local-ci:
     name: Local CI
     timeout-minutes: 15
