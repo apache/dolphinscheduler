@@ -16,6 +16,9 @@
 */
 
 delimiter d//
+
+
+
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
     )
     RETURNS character varying
@@ -28,6 +31,9 @@ v_schema varchar;
 BEGIN
     ---get schema name
     v_schema =current_schema();
+    
+ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
+ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
 
 --- add column
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT ''0''  ';
@@ -40,10 +46,13 @@ EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance DROP CONS
 return 'Success!';
 exception when others then
         ---Raise EXCEPTION '(%)',SQLERRM;
+
         return SQLERRM;
 END;
 $BODY$;
 
 select dolphin_update_metadata();
 
+
 d//
+
