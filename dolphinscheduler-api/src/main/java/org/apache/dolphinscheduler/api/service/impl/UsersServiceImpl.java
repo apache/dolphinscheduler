@@ -202,25 +202,32 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            String phone,
                            String queue,
                            int state) {
-        User user = new User();
         Date now = new Date();
+        checkUserParams(userPassword, email, phone, state);
 
-        checkUserParams(userName, userPassword, email, phone, state);
+        if (StringUtils.isNotEmpty(userName)) {
 
-        user.setUserName(userName);
-        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setTenantId(tenantId);
-        user.setState(state);
+            if (!CheckUtils.checkUserName(userName)) {
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            }
+
+            User tempUser = userMapper.queryByUserNameAccurately(userName);
+            if (tempUser != null) {
+                throw new ServiceException(Status.NAME_EXIST, userName);
+            }
+        } else {
+            throw new ServiceException(Status.NAME_NULL);
+        }
+
+        User user = new User(userName, userPassword, email, phone, tenantId, state);
+
         // create general users, administrator users are currently built-in
         user.setUserType(UserType.GENERAL_USER);
-        user.setCreateTime(now);
-        user.setUpdateTime(now);
         if (StringUtils.isEmpty(queue)) {
             queue = "";
         }
         user.setQueue(queue);
+        user.setCreateTime(now);
 
         // save user
         userMapper.insert(user);
@@ -399,7 +406,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.USER_NOT_EXIST.getMsg());
         }
 
-        checkUserParams(userName, userPassword, email, phone, state);
+        checkUserParams(userPassword, email, phone, state);
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
@@ -408,15 +415,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             user.setTimeZone(timeZone);
         }
 
-        user.setUserName(userName);
-        user.setUserPassword(EncryptionUtils.getMd5(userPassword));
-        user.setEmail(email);
-        user.setPhone(phone);
+        user = new User(userName, userPassword, email, phone, tenantId, state);
+
         user.setQueue(queue);
-        user.setState(state);
-        Date now = new Date();
-        user.setUpdateTime(now);
-        user.setTenantId(tenantId);
         // updateProcessInstance user
         int update = userMapper.updateById(user);
         if (update > 0) {
@@ -1107,46 +1108,31 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * @return if check failed throw error, otherwise return null
      */
-    private void checkUserParams(String userName, String userPassword, String email, String phone, Integer state) {
-
-        if (StringUtils.isNotEmpty(userName)) {
-
-            if (!CheckUtils.checkUserName(userName)) {
-                throw new ServiceException(String.format("userName %s doesn't valid", userName));
-            }
-
-            User tempUser = userMapper.queryByUserNameAccurately(userName);
-            if (tempUser != null) {
-                throw new ServiceException(String.format("userName %s exist", userName));
-            }
-        } else {
-            throw new ServiceException("userName can't be null");
-        }
-
+    private void checkUserParams(String userPassword, String email, String phone, Integer state) {
         if (StringUtils.isNotEmpty(userPassword)) {
             if (!CheckUtils.checkPasswordLength(userPassword)) {
-                throw new ServiceException(String.format("userPassword %s length error", userPassword));
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userPassword);
             }
         } else {
-            throw new ServiceException("userPassword can't be null");
+            throw new ServiceException(Status.DATA_IS_NULL);
         }
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
-                throw new ServiceException(String.format("email %s doesn't valid", email));
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
             }
         } else {
-            throw new ServiceException("email can't be null");
+            throw new ServiceException(Status.DATA_IS_NULL);
         }
 
         if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
-            throw new ServiceException(String.format("phone %s doesn't valid", phone));
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
         } else if (StringUtils.isEmpty(phone)) {
-            throw new ServiceException("phone can't be null");
+            throw new ServiceException(Status.DATA_IS_NULL);
         }
 
         if (state == 0) {
-            throw new ServiceException(String.format("state %s doesn't allow to disable own account", state));
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, state);
         }
     }
 

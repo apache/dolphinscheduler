@@ -23,6 +23,8 @@ import java.util.Date;
 
 import lombok.Data;
 
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -64,7 +66,7 @@ public class User {
     private UserType userType;
 
     /**
-     *  tenant id
+     * tenant id
      */
     private int tenantId;
 
@@ -127,6 +129,20 @@ public class User {
         }
         return userName.equals(user.userName);
 
+    }
+
+    public User() {
+    }
+
+    public User(String userName, String userPassword, String email, String phone, Integer tenantId, Integer state) {
+        Date now = new Date();
+        this.userName = userName;
+        this.userPassword = EncryptionUtils.getMd5(userPassword);
+        this.email = email;
+        this.phone = phone;
+        this.tenantId = tenantId;
+        this.state = state;
+        this.updateTime = now;
     }
 
     @Override

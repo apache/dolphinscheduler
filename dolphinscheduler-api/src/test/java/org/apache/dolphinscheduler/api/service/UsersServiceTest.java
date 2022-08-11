@@ -171,7 +171,7 @@ public class UsersServiceTest {
 
             //userName null
             Throwable exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(null, finalUserPassword, finalEmail, tenantId, finalPhone, queueName, state));
-            Assertions.assertEquals("userName can't be null", exception.getMessage());
+            Assertions.assertEquals(Status.NAME_NULL.getMsg(), exception.getMessage());
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
@@ -182,7 +182,7 @@ public class UsersServiceTest {
 
             //userPassword null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, null, finalEmail, tenantId, finalPhone, queueName, state));
-            Assertions.assertEquals("userPassword can't be null", exception.getMessage());
+            Assertions.assertEquals(Status.DATA_IS_NULL.getMsg(), exception.getMessage());
 
             userPassword = "userTest0001";
             email = "1q.com";
@@ -193,7 +193,7 @@ public class UsersServiceTest {
 
             //email null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, finalUserPassword, null, tenantId, finalPhone, queueName, state));
-            Assertions.assertEquals("email can't be null", exception.getMessage());
+            Assertions.assertEquals(Status.DATA_IS_NULL.getMsg(), exception.getMessage());
 
             email = "122222@qq.com";
             phone = "2233";
@@ -204,7 +204,7 @@ public class UsersServiceTest {
 
             //phone null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, finalUserPassword, finalEmail, tenantId, null, queueName, state));
-            Assertions.assertEquals("phone can't be null", exception.getMessage());
+            Assertions.assertEquals(Status.DATA_IS_NULL.getMsg(), exception.getMessage());
 
             phone = "13456432345";
             // tenantId not exists
@@ -323,7 +323,7 @@ public class UsersServiceTest {
             //user not exist
             Throwable exception =
                 Assertions.assertThrows(ServiceException.class, () -> usersService.updateUser(getLoginUser(), 0, userName, userPassword, "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai"));
-            Assertions.assertEquals("User Doesn't Exist", exception.getMessage());
+            Assertions.assertEquals(Status.USER_NOT_EXIST.getMsg(), exception.getMessage());
 
             // success
             when(userMapper.selectById(1)).thenReturn(getUser());
