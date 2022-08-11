@@ -4,6 +4,9 @@
 
 We here use MySQL as an example to illustrate how to configure an external database:
 
+> NOTE: If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
+which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
+
 * First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 * Set the following environment variables in your terminal or modify the `bin/env/dolphinscheduler_env.sh` with your database username and password for `{user}` and `{password}`:
 
@@ -19,9 +22,9 @@ export SPRING_DATASOURCE_PASSWORD={password}
 
 ## Pseudo-Cluster/Cluster Initialize the Database
 
-DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
-which is `api-server/libs/` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`, just ignore this steps if you use PostgreSQL. Let's walk through how to initialize the database in MySQL
- and PostgreSQL :
+DolphinScheduler metadata is stored in the relational database. Currently, supports PostgreSQL and MySQL. Let's walk through how to initialize the database in MySQL and PostgreSQL :
+
+> If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
 
 For mysql 5.6 / 5.7
 
