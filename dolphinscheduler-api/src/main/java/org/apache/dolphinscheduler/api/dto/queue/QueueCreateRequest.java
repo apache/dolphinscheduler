@@ -31,6 +31,6 @@ public class QueueCreateRequest {
     @ApiModelProperty(example = "queue11", required = true)
     private String queue;
 
-    @ApiModelProperty(example = "queue11", required = true)
+    @ApiModelProperty(example = "test_queue11", required = true)
     private String queueName;
 }
