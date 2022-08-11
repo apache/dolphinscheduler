@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from pydolphinscheduler.constants import ResourcePluginType
-from pydolphinscheduler.exceptions import PyDSConfException
+from pydolphinscheduler.exceptions import PyDSConfException, PyResPluginException
 from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 all_res = ["local"]
@@ -76,7 +76,7 @@ def test_resources_resources(attr, expected):
 def test_resources_unsupported_res(attr):
     """Test unsupported plug-ins"""
     with pytest.raises(
-        PyDSConfException, match="{} type is not supported".format(attr.get("type"))
+        PyResPluginException, match="{} type is not supported".format(attr.get("type"))
     ):
         res_plugin = ResourcePlugin(**attr)
         res_plugin.resource()

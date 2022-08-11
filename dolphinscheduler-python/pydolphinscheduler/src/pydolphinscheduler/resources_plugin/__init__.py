@@ -20,9 +20,8 @@
 import importlib
 import importlib.util
 from pathlib import Path
-from typing import Generator, Any
 
-from pydolphinscheduler.exceptions import PyDSConfException
+from pydolphinscheduler.exceptions import PyDSConfException, PyResPluginException
 
 path_resources_plugin = Path(__file__).parent
 
@@ -69,6 +68,6 @@ class ResourcePlugin:
         for ex in self.get_all_modules():
             if ex.stem == self.type:
                 return self.import_module(ex.name, str(ex))
-        raise PyDSConfException('{} type is not supported.'.format(self.type))
+        raise PyResPluginException('{} type is not supported.'.format(self.type))
     # [end resource]
 # [end resource_plugin_definition]

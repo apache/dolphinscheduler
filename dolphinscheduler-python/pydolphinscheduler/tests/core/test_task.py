@@ -300,7 +300,7 @@ def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version
                 "process_definition": ProcessDefinition(
                     name="process_definition",
                     resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.GITHUB,
+                        type=ResourcePluginType.LOCAL,
                         prefix="prefix",
                     ),
                 )
@@ -312,11 +312,11 @@ def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
                 "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.GITLAB,
+                    type=ResourcePluginType.LOCAL,
                     prefix="prefix",
                 ),
             },
-            "Gitlab"
+            "Local"
         ),
         (
             {
@@ -325,12 +325,12 @@ def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version
                 "process_definition": ProcessDefinition(
                     name="process_definition",
                     resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.GITHUB,
+                        type=ResourcePluginType.LOCAL,
                         prefix="prefix",
                     ),
                 )
             },
-            "Github"
+            "Local"
         ),
     ],
 )

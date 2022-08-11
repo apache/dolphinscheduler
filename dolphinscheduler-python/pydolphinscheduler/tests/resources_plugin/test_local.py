@@ -69,11 +69,11 @@ def test_task_obtain_res_plugin(m_raw_script, m_ext_attr, m_ext, m_code_version,
     "attr, expected",
     [
         (
-                {
-                    "prefix": res_plugin_prefix,
-                    "file_name": file_name
-                },
-                file_content
+            {
+                "prefix": res_plugin_prefix,
+                "file_name": file_name
+            },
+            file_content
         )
     ],
 )
@@ -96,8 +96,8 @@ def test_local_res_read_file(attr, expected, setup_crt_first):
 def test_local_res_file_not_found(attr):
     """test local resource plugin file does not exist"""
     with pytest.raises(
-            PyResPluginException,
-            match="{} is not found".format(Path(attr.get("prefix")).joinpath(attr.get("file_name")))
+        PyResPluginException,
+        match="{} is not found".format(Path(attr.get("prefix")).joinpath(attr.get("file_name")))
     ):
         local = Local(str(attr.get("prefix")))
         local.read_file(attr.get("file_name"))
