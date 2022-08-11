@@ -239,7 +239,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.PAUSE);
         TaskExecutionStatus status = taskInstance.getState();
-        Assert.assertEquals(TaskExecutionStatus.KILL, status);
+        Assert.assertEquals(TaskExecutionStatus.PAUSE, status);
     }
 
     @Test
