@@ -38,15 +38,13 @@ class Project(BaseSide):
 
     def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
         """Create Project if not exists."""
-        gateway = launch_gateway()
-        project = JavaGate().createOrGrantProject(user, self.name, self.description)
+        project = JavaGate().create_or_grant_project(user, self.name, self.description)
         # TODO recover result checker
         # gateway_result_checker(result, None)
 
     def get_project_by_name(self, user=configuration.USER_NAME, name=None) -> None:
         """Get Project by name."""
-        gateway = launch_gateway()
-        project = gateway.entry_point.queryProjectByName(user, name)
+        project = JavaGate().query_project_by_name(user, name)
         self.name = project.getName()
         self.description = project.getDescription()
         self.code = project.getCode()
@@ -54,14 +52,12 @@ class Project(BaseSide):
 
     def update(self, user=configuration.USER_NAME, project_code=None, project_name=None, description=None) -> None:
         """Update Project."""
-        gateway = launch_gateway()
-        gateway.entry_point.updateProject(user, project_code, project_name, description)
+        JavaGate().update_project(user, project_code, project_name, description)
         self.name = project_name
         self.description = description
 
     def delete(self, user=configuration.USER_NAME) -> None:
         """Delete Project."""
-        gateway = launch_gateway()
-        gateway.entry_point.deleteProject(user, self.code)
+        JavaGate().delete_project(user, self.code)
         self.delete_all()
         return

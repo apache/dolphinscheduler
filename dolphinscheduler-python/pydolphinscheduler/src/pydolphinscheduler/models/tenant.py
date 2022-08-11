@@ -44,21 +44,18 @@ class Tenant(BaseSide):
         self, queue_name: str, user=configuration.USER_NAME
     ) -> None:
         """Create Tenant if not exists."""
-        gateway = launch_gateway()
-        tenant = JavaGate().createTenant(self.name, self.description, queue_name)
+        tenant = JavaGate().create_tenant(self.name, self.description, queue_name)
         self.tenant_id = tenant.tenantId
         # gateway_result_checker(result, None)
 
     def get_tenant_list(self, user=configuration.USER_NAME, pageNo=1, pageSize=10):
         """Get Tenant list."""
-        gateway = launch_gateway()
-        tenant_list = gateway.entry_point.queryTenantList(user, self.description, pageNo, pageSize)
+        tenant_list = JavaGate().query_tenant_list(user, self.description, pageNo, pageSize)
         return tenant_list
 
     def update(self, user=configuration.USER_NAME, code=None, queue_id=None, description=None) -> None:
         """Update Tenant."""
-        gateway = launch_gateway()
-        gateway.entry_point.updateTenant(user, self.tenant_id, code, queue_id, description)
+        JavaGate().update_tenant(user, self.tenant_id, code, queue_id, description)
         # TODO: check queue_id and queue_name
         self.queue = str(queue_id)
         self.code = code
@@ -67,6 +64,6 @@ class Tenant(BaseSide):
 
     def delete(self, user=configuration.USER_NAME) -> None:
         """Delete Tenant."""
-        gateway = launch_gateway()
-        gateway.entry_point.deleteTenant(user, self.tenant_id)
+        JavaGate().delete_tenant(user, self.tenant_id)
+        self.delete_all()
         return

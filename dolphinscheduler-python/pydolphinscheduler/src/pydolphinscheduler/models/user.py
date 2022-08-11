@@ -65,8 +65,7 @@ class User(BaseSide):
         """Create User if not exists."""
         # Should make sure queue already exists.
         self.create_tenant_if_not_exists()
-        gateway = launch_gateway()
-        user = JavaGate().createUser(
+        user = JavaGate().create_user(
             self.name,
             self.password,
             self.email,
@@ -82,8 +81,7 @@ class User(BaseSide):
 
     def get_user(self, user_id) -> None:
         """Get User."""
-        gateway = launch_gateway()
-        user = gateway.entry_point.queryUser(user_id)
+        user = JavaGate().query_user(user_id)
         self.user_id = user.getId()
         self.name = user.getUserName()
         self.password = user.getUserPassword()
@@ -95,8 +93,7 @@ class User(BaseSide):
 
     def update(self, password=None, email=None, phone=None, tenant=None, queue=None, status=None) -> None:
         """Update User."""
-        gateway = launch_gateway()
-        user = gateway.entry_point.updateUser(
+        user = JavaGate().update_user(
             self.name,
             password,
             email,
@@ -116,7 +113,6 @@ class User(BaseSide):
 
     def delete(self) -> None:
         """Delete User."""
-        gateway = launch_gateway()
-        gateway.entry_point.deleteUser(self.name, self.user_id)
+        JavaGate().delete_user(self.name, self.user_id)
         self.delete_all()
         return
