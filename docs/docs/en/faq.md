@@ -575,6 +575,12 @@ Modify the configuration in `common.properties`:
 # dolphin.scheduler.network.priority.strategy=default
 ```
 
+In addition, if you would like to obtain the ip address from the specified network card, modify the configuration `dolphin.scheduler.network.interface.preferred` in `common.properties`. For example, you could modify the configuration in `common.properties` as follows to obtain the ip address from the network card `eth1`:
+
+```shell
+dolphin.scheduler.network.interface.preferred=eth1
+```
+
 After configuration is modified, restart the service to activation
 
 If the ip address is still wrong, please download [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) to the machine, execute the following commands and feedback the output to the community developers:
