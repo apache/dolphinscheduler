@@ -45,9 +45,7 @@ def test_flink_get_define(mock_resource):
         "taskType": "FLINK",
         "taskParams": {
             "mainClass": main_class,
-            "mainJar": {
-                "id": 1,
-            },
+            "mainJar": {"id": 1,},
             "programType": program_type,
             "deployMode": deploy_mode,
             "flinkVersion": FlinkVersion.LOW_VERSION,

@@ -27,8 +27,6 @@ class Queue(BaseSide):
     """DolphinScheduler Queue object."""
 
     def __init__(
-        self,
-        name: str = configuration.WORKFLOW_QUEUE,
-        description: Optional[str] = "",
+        self, name: str = configuration.WORKFLOW_QUEUE, description: Optional[str] = "",
     ):
         super().__init__(name, description)

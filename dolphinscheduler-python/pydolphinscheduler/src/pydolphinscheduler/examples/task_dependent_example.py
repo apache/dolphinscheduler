@@ -40,19 +40,13 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.dependent import And, Dependent, DependentItem, Or
 from pydolphinscheduler.tasks.shell import Shell
 
-with ProcessDefinition(
-    name="task_dependent_external",
-    tenant="tenant_exists",
-) as pd:
+with ProcessDefinition(name="task_dependent_external", tenant="tenant_exists",) as pd:
     task_1 = Shell(name="task_1", command="echo task 1")
     task_2 = Shell(name="task_2", command="echo task 2")
     task_3 = Shell(name="task_3", command="echo task 3")
     pd.submit()
 
-with ProcessDefinition(
-    name="task_dependent_example",
-    tenant="tenant_exists",
-) as pd:
+with ProcessDefinition(name="task_dependent_example", tenant="tenant_exists",) as pd:
     task = Dependent(
         name="task_dependent",
         dependence=And(

@@ -124,11 +124,7 @@ def test_dependent_item_date_error():
 
 
 @pytest.mark.parametrize(
-    "task_name, result",
-    [
-        ({"dependent_task_name": TEST_TASK}, TEST_TASK),
-        ({}, None),
-    ],
+    "task_name, result", [({"dependent_task_name": TEST_TASK}, TEST_TASK), ({}, None),],
 )
 def test_dependent_item_code_parameter(task_name: dict, result: Optional[str]):
     """Test dependent item property code_parameter."""
@@ -710,8 +706,7 @@ def test_operator_dependent_task_list_multi_dependent_list(
     },
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_dependent_get_define(mock_code_version, mock_dep_code):
     """Test task dependent function get_define."""
