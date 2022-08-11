@@ -17,19 +17,23 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
 
 /**
  * db task final result response command
  */
-public class StateEventChangeCommand implements Serializable {
+@Data
+@NoArgsConstructor
+public class WorkflowStateEventChangeCommand implements Serializable {
 
     private String key;
 
-    private ExecutionStatus sourceStatus;
+    private WorkflowExecutionStatus sourceStatus;
 
     private int sourceProcessInstanceId;
 
@@ -39,15 +43,11 @@ public class StateEventChangeCommand implements Serializable {
 
     private int destTaskInstanceId;
 
-    public StateEventChangeCommand() {
-        super();
-    }
-
-    public StateEventChangeCommand(int sourceProcessInstanceId, int sourceTaskInstanceId,
-                                   ExecutionStatus sourceStatus,
-                                   int destProcessInstanceId,
-                                   int destTaskInstanceId
-    ) {
+    public WorkflowStateEventChangeCommand(int sourceProcessInstanceId,
+                                           int sourceTaskInstanceId,
+                                           WorkflowExecutionStatus sourceStatus,
+                                           int destProcessInstanceId,
+                                           int destTaskInstanceId) {
         this.key = String.format("%d-%d-%d-%d",
                 sourceProcessInstanceId,
                 sourceTaskInstanceId,
@@ -59,14 +59,6 @@ public class StateEventChangeCommand implements Serializable {
         this.sourceTaskInstanceId = sourceTaskInstanceId;
         this.destProcessInstanceId = destProcessInstanceId;
         this.destTaskInstanceId = destTaskInstanceId;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     /**
@@ -82,50 +74,4 @@ public class StateEventChangeCommand implements Serializable {
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "StateEventResponseCommand{"
-                + "key=" + key
-                + '}';
-    }
-
-    public ExecutionStatus getSourceStatus() {
-        return sourceStatus;
-    }
-
-    public void setSourceStatus(ExecutionStatus sourceStatus) {
-        this.sourceStatus = sourceStatus;
-    }
-
-    public int getSourceProcessInstanceId() {
-        return sourceProcessInstanceId;
-    }
-
-    public void setSourceProcessInstanceId(int sourceProcessInstanceId) {
-        this.sourceProcessInstanceId = sourceProcessInstanceId;
-    }
-
-    public int getSourceTaskInstanceId() {
-        return sourceTaskInstanceId;
-    }
-
-    public void setSourceTaskInstanceId(int sourceTaskInstanceId) {
-        this.sourceTaskInstanceId = sourceTaskInstanceId;
-    }
-
-    public int getDestProcessInstanceId() {
-        return destProcessInstanceId;
-    }
-
-    public void setDestProcessInstanceId(int destProcessInstanceId) {
-        this.destProcessInstanceId = destProcessInstanceId;
-    }
-
-    public int getDestTaskInstanceId() {
-        return destTaskInstanceId;
-    }
-
-    public void setDestTaskInstanceId(int destTaskInstanceId) {
-        this.destTaskInstanceId = destTaskInstanceId;
-    }
 }

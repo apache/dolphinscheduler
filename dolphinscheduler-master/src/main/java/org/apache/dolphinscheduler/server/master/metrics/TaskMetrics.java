@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
-
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import lombok.experimental.UtilityClass;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 @UtilityClass
 public class TaskMetrics {
@@ -35,7 +34,7 @@ public class TaskMetrics {
     private final Map<String, Counter> taskInstanceCounters = new HashMap<>();
 
     private final Set<String> taskInstanceStates = ImmutableSet.of(
-            "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "fail", "stop");
+            "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "kill", "fail", "stop");
 
     static {
         for (final String state : taskInstanceStates) {
@@ -44,8 +43,7 @@ public class TaskMetrics {
                     Counter.builder("ds.task.instance.count")
                             .tags("state", state)
                             .description(String.format("Process instance %s total count", state))
-                            .register(Metrics.globalRegistry)
-            );
+                            .register(Metrics.globalRegistry));
         }
 
     }
@@ -84,6 +82,9 @@ public class TaskMetrics {
     }
 
     public void incTaskInstanceByState(final String state) {
+        if (taskInstanceCounters.get(state) == null) {
+            return;
+        }
         taskInstanceCounters.get(state).increment();
     }
 

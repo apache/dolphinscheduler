@@ -50,7 +50,6 @@ export function useSeaTunnel({
     runMode: 'RUN',
     useCustom: true,
     deployMode: 'client',
-    queue: 'default',
     master: 'YARN',
     masterUrl: '',
     resourceFiles: [],

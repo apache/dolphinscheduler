@@ -15,18 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.plugin.task.api;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * execution status test.
- */
-public class ExecutionStatusTest extends TestCase {
+public class AbstractTaskTest {
 
-    public void testTypeIsRunning() {
-        assertTrue(ExecutionStatus.RUNNING_EXECUTION.typeIsRunning());
-        assertTrue(ExecutionStatus.WAITING_DEPEND.typeIsRunning());
-        assertTrue(ExecutionStatus.DELAY_EXECUTION.typeIsRunning());
+    @Test
+    public void testFindFlinkJobId() {
+        String jobId = "cca7bc1061d61cf15238e92312c2fc20";
+        Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
+        Matcher matcher = FLINK_APPLICATION_REGEX.matcher("Job has been submitted with JobID " + jobId);
+        String str = null;
+        if (matcher.find()) {
+            str = matcher.group();
+        }
+        Assert.assertNotNull(str);
+        Assert.assertEquals(jobId, str.substring(6));
     }
+
 }

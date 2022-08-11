@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * task count dto
- */
+@Data
 public class TaskCountDto {
 
     /**
@@ -45,10 +44,10 @@ public class TaskCountDto {
     }
 
     private void countTaskDtos(List<ExecuteStatusCount> taskInstanceStateCounts) {
-        Map<ExecutionStatus, Integer> statusCountMap = taskInstanceStateCounts.stream()
-                .collect(Collectors.toMap(ExecuteStatusCount::getExecutionStatus, ExecuteStatusCount::getCount, Integer::sum));
+        Map<TaskExecutionStatus, Integer> statusCountMap = taskInstanceStateCounts.stream()
+                .collect(Collectors.toMap(ExecuteStatusCount::getState, ExecuteStatusCount::getCount, Integer::sum));
 
-        taskCountDtos = Arrays.stream(ExecutionStatus.values())
+        taskCountDtos = Arrays.stream(TaskExecutionStatus.values())
                 .map(status -> new TaskStateCount(status, statusCountMap.getOrDefault(status, 0)))
                 .collect(Collectors.toList());
 
@@ -58,7 +57,7 @@ public class TaskCountDto {
     }
 
     // remove the specified state
-    public void removeStateFromCountList(ExecutionStatus status) {
+    public void removeStateFromCountList(TaskExecutionStatus status) {
         for (TaskStateCount count : this.taskCountDtos) {
             if (count.getTaskStateType().equals(status)) {
                 this.taskCountDtos.remove(count);
@@ -67,19 +66,4 @@ public class TaskCountDto {
         }
     }
 
-    public List<TaskStateCount> getTaskCountDtos() {
-        return taskCountDtos;
-    }
-
-    public void setTaskCountDtos(List<TaskStateCount> taskCountDtos) {
-        this.taskCountDtos = taskCountDtos;
-    }
-
-    public int getTotalCount() {
-        return totalCount;
-    }
-
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
-    }
 }

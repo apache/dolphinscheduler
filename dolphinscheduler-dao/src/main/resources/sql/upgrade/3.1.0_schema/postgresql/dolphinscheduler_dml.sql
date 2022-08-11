@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 delimiter d//
 
 return 'Success!';
@@ -26,3 +27,4 @@ $BODY$;
 select dolphin_insert_dq_initial_data();
 
 d//
+
