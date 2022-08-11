@@ -234,21 +234,15 @@ class Task(Base):
         return self.get_define_custom(custom_attr=custom_attr)
 
     def get_plugin(self):
+        """Return the resource plug-in according to parameter resource_plugin and parameter
+        process_definition.resource_plugin.
+        """
         if self.resource_plugin is None:
             if self.process_definition.resource_plugin is not None:
                 return self.process_definition.resource_plugin.resource
             else:
                 raise PyResPluginException(
                     "The execution command of this task is a file, but the resource plugin is empty")
-        else:
-            return self.resource_plugin.resource
-
-    def get_plugin(self):
-        if self.resource_plugin is None:
-            if self.process_definition.resource_plugin is not None:
-                return self.process_definition.resource_plugin.resource
-            else:
-                raise ValueError
         else:
             return self.resource_plugin.resource
 

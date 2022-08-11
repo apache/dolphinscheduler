@@ -34,7 +34,7 @@ class ResourcePlugin:
         Its value should be taken from the constant of ResourceType in constants.py.
         :param prefix: A string representing the prefix of ResourcePlugin.
 
-        """
+    """
 
     def __init__(self, type: str, prefix: str):
         self.type = type

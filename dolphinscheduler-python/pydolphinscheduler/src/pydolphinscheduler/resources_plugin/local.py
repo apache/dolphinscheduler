@@ -35,7 +35,8 @@ class Local:
 
     def read_file(self, suf: str):
         """Get the content of the file, the address of the file is
-        the prefix of the resource plugin plus the parameter suf """
+        the prefix of the resource plugin plus the parameter suf
+        """
         path = Path(self.prefix).joinpath(suf)
         if not path.exists():
             raise PyResPluginException("{} is not found".format(str(path)))
