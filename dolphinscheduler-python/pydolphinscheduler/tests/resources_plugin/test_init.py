@@ -43,26 +43,6 @@ def test_resources_get_all_modules(attr, expected):
             },
             "Local"
         ),
-        (
-            {
-                "type": ResourcePluginType.GITHUB,
-                "module_attr": {
-                    "script_name": "github.py",
-                    "script_path": resources_plugin_path.joinpath("github.py")
-                }
-            },
-            "Github"
-        ),
-        (
-            {
-                "type": ResourcePluginType.GITLAB,
-                "module_attr": {
-                    "script_name": "gitlab.py",
-                    "script_path": resources_plugin_path.joinpath("gitlab.py")
-                }
-            },
-            "Gitlab"
-        ),
     ],
 )
 def test_resources_import_modules(attrs, expected):
@@ -75,8 +55,6 @@ def test_resources_import_modules(attrs, expected):
     "attr, expected",
     [
         (ResourcePluginType.LOCAL, "Local"),
-        (ResourcePluginType.GITLAB, "Gitlab"),
-        (ResourcePluginType.GITHUB, "Github"),
     ],
 )
 def test_resources_resources(attr, expected):
