@@ -99,7 +99,7 @@ public class WorkerRegistryClient implements AutoCloseable {
         Set<String> workerZkPaths = getWorkerZkPaths();
         long workerHeartbeatInterval = workerConfig.getHeartbeatInterval().getSeconds();
 
-        WorkerHeartBeatListener heartBeatListener = new WorkerHeartBeatListener(startupTime,
+        WorkerHeartBeatTask heartBeatListener = new WorkerHeartBeatTask(startupTime,
                                                                                 workerConfig.getMaxCpuLoadAvg(),
                                                                                 workerConfig.getReservedMemory(),
                                                                                 workerConfig.getHostWeight(),

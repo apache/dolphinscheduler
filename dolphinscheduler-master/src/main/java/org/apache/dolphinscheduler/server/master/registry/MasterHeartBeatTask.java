@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.registry;
+package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
@@ -28,35 +27,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Worker heart beat listener
+ * Master heart beat task
  */
-public class WorkerHeartBeatListener implements Runnable {
+public class MasterHeartBeatTask implements Runnable {
 
-    private final Logger logger = LoggerFactory.getLogger(WorkerHeartBeatListener.class);
+    private final Logger logger = LoggerFactory.getLogger(MasterHeartBeatTask.class);
 
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
-    private final WorkerManagerThread workerManagerThread;
     private final String serverType;
     private final HeartBeat heartBeat;
     private final int heartBeatErrorThreshold;
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
-    public WorkerHeartBeatListener(long startupTime,
-                                   double maxCpuloadAvg,
-                                   double reservedMemory,
-                                   int hostWeight,
-                                   Set<String> heartBeatPaths,
-                                   String serverType,
-                                   RegistryClient registryClient,
-                                   int workerThreadCount,
-                                   WorkerManagerThread workerManagerThread,
-                                   int heartBeatErrorThreshold) {
+    public MasterHeartBeatTask(long startupTime,
+                               double maxCpuloadAvg,
+                               double reservedMemory,
+                               Set<String> heartBeatPaths,
+                               String serverType,
+                               RegistryClient registryClient,
+                               int heartBeatErrorThreshold) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
-        this.workerManagerThread = workerManagerThread;
         this.serverType = serverType;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
+        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
         this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
@@ -74,12 +68,6 @@ public class WorkerHeartBeatListener implements Runnable {
                     return;
                 }
             }
-
-            if (workerManagerThread != null) {
-                // update waiting task count
-                heartBeat.setWorkerWaitingTaskCount(workerManagerThread.getThreadPoolQueueSize());
-            }
-
             for (String heartBeatPath : heartBeatPaths) {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }

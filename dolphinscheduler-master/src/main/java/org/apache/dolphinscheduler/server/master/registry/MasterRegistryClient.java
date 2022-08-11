@@ -49,7 +49,7 @@ import com.google.common.collect.Sets;
 
 /**
  * <p>DolphinScheduler master register client, used to connect to registry and hand the registry events.
- * <p>When the Master node startup, it will register in registry center. And schedule a {@link MasterHeartBeatListener} to update its metadata in registry.
+ * <p>When the Master node startup, it will register in registry center. And schedule a {@link MasterHeartBeatTask} to update its metadata in registry.
  */
 @Component
 public class MasterRegistryClient implements AutoCloseable {
@@ -188,7 +188,7 @@ public class MasterRegistryClient implements AutoCloseable {
         logger.info("Master node : {} registering to registry center", masterAddress);
         String localNodePath = getCurrentNodePath();
         Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
-        MasterHeartBeatListener heartBeatListener = new MasterHeartBeatListener(startupTime,
+        MasterHeartBeatTask heartBeatListener = new MasterHeartBeatTask(startupTime,
                                                                                 masterConfig.getMaxCpuLoadAvg(),
                                                                                 masterConfig.getReservedMemory(),
                                                                                 Sets.newHashSet(localNodePath),
