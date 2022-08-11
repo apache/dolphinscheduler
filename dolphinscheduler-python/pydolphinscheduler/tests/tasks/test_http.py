@@ -68,8 +68,7 @@ def test_attr_exists(class_name, attrs):
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_property_task_params(mock_code_version, attr, expect):
     """Test task http property."""
@@ -90,8 +89,7 @@ def test_property_task_params(mock_code_version, attr, expect):
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_http_task_param_not_support_param(mock_code, param):
     """Test HttpTaskParams not support parameter."""
