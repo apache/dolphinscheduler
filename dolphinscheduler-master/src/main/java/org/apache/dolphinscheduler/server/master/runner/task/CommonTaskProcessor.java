@@ -144,12 +144,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (taskInstance.getState().isFinished()) {
                 return true;
             }
-            if (StringUtils.isBlank(taskInstance.getHost())) {
-                taskInstance.setState(TaskExecutionStatus.KILL);
-                taskInstance.setEndTime(new Date());
-                processService.updateTaskInstance(taskInstance);
-                return true;
-            }
+            // we don't wait the kill response
+            taskInstance.setState(TaskExecutionStatus.KILL);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
 
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
