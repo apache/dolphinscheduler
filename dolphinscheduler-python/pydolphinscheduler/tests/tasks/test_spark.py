@@ -45,9 +45,7 @@ def test_spark_get_define(mock_resource):
         "taskType": "SPARK",
         "taskParams": {
             "mainClass": main_class,
-            "mainJar": {
-                "id": 1,
-            },
+            "mainJar": {"id": 1,},
             "programType": program_type,
             "deployMode": deploy_mode,
             "sparkVersion": SparkVersion.SPARK2,

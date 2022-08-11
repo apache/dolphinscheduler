@@ -69,8 +69,7 @@ def foo():  # noqa: D103
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_property_task_params(mock_code_version, attr, expect):
     """Test task python property."""
@@ -79,15 +78,10 @@ def test_property_task_params(mock_code_version, attr, expect):
 
 
 @pytest.mark.parametrize(
-    "script_code",
-    [
-        123,
-        ("print", "hello world"),
-    ],
+    "script_code", [123, ("print", "hello world"),],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_python_task_not_support_code(mock_code, script_code):
     """Test python task parameters."""

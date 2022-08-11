@@ -46,7 +46,11 @@ class ResourcePlugin:
     # [start get_all_modules]
     def get_all_modules(self) -> Path:
         """Get all res files path in resources_plugin directory."""
-        return (ex for ex in path_resources_plugin.iterdir() if ex.is_file() and not ex.name.startswith("__"))
+        return (
+            ex
+            for ex in path_resources_plugin.iterdir()
+            if ex.is_file() and not ex.name.startswith("__")
+        )
 
     # [end get_all_modules]
 
@@ -68,6 +72,9 @@ class ResourcePlugin:
         for ex in self.get_all_modules():
             if ex.stem == self.type:
                 return self.import_module(ex.name, str(ex))
-        raise PyResPluginException('{} type is not supported.'.format(self.type))
+        raise PyResPluginException("{} type is not supported.".format(self.type))
+
     # [end resource]
+
+
 # [end resource_plugin_definition]

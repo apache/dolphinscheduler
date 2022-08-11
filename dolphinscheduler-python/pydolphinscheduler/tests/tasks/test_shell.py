@@ -28,8 +28,8 @@ from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.utils import file
 from tests.testing.file import delete_file
 
-file_path = 'local_res.sh'
-file_content = "echo \"test res_local\""
+file_path = "local_res.sh"
+file_content = 'echo "test res_local"'
 res_plugin_prefix = Path(__file__).parent
 
 
@@ -58,8 +58,7 @@ def setup_crt_first():
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_property_task_params(mock_code_version, attr, expect):
     """Test task shell task property."""
@@ -113,19 +112,19 @@ def test_shell_get_define():
                 "name": "test-local-res-command-content",
                 "command": file_path,
                 "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix=res_plugin_prefix
-                )
+                    type=ResourcePluginType.LOCAL, prefix=res_plugin_prefix
+                ),
             },
-            file_content
+            file_content,
         )
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
-def test_resources_local_shell_command_content(mock_code_version, attr, expect, setup_crt_first):
+def test_resources_local_shell_command_content(
+    mock_code_version, attr, expect, setup_crt_first
+):
     """Test task shell task command content through the local resource plug-in."""
     task = Shell(**attr)
     assert expect == getattr(task, "raw_script")

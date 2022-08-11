@@ -30,17 +30,10 @@ TEST_DATABASE_KEY = "datasource"
 
 
 @pytest.mark.parametrize(
-    "expect",
-    [
-        {
-            TEST_DATABASE_TYPE_KEY: "mock_type",
-            TEST_DATABASE_KEY: 1,
-        }
-    ],
+    "expect", [{TEST_DATABASE_TYPE_KEY: "mock_type", TEST_DATABASE_KEY: 1,}],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.database.Database.get_database_info",

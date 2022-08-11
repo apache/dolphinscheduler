@@ -65,10 +65,7 @@ class TaskRelation(Base):
     }
 
     def __init__(
-        self,
-        pre_task_code: int,
-        post_task_code: int,
-        name: Optional[str] = None,
+        self, pre_task_code: int, post_task_code: int, name: Optional[str] = None,
     ):
         super().__init__(name)
         self.pre_task_code = pre_task_code
@@ -142,7 +139,7 @@ class Task(Base):
         self.timeout = timeout
         self._process_definition = None
         self.process_definition: ProcessDefinition = (
-                process_definition or ProcessDefinitionContext.get()
+            process_definition or ProcessDefinitionContext.get()
         )
         self._upstream_task_codes: Set[int] = set()
         self._downstream_task_codes: Set[int] = set()
@@ -151,8 +148,8 @@ class Task(Base):
         self.code, self.version = self.gen_code_and_version()
         # Add task to process definition, maybe we could put into property process_definition latter
         if (
-                self.process_definition is not None
-                and self.code not in self.process_definition.tasks
+            self.process_definition is not None
+            and self.code not in self.process_definition.tasks
         ):
             self.process_definition.add_task(self)
         else:
@@ -241,7 +238,8 @@ class Task(Base):
                 return self.process_definition.resource_plugin.resource
             else:
                 raise PyResPluginException(
-                    "The execution command of this task is a file, but the resource plugin is empty")
+                    "The execution command of this task is a file, but the resource plugin is empty"
+                )
         else:
             return self.resource_plugin.resource
 
@@ -259,10 +257,10 @@ class Task(Base):
                 content = res.read_file(_ext_attr)
                 setattr(self, self.ext_attr.lstrip("_"), content)
             else:
-                index = _ext_attr.rfind('.')
+                index = _ext_attr.rfind(".")
                 if index != -1:
                     raise ValueError(
-                        'This task does not support files with suffix {}, only supports {}'.format(
+                        "This task does not support files with suffix {}, only supports {}".format(
                             _ext_attr[index:], ",".join(str(suf) for suf in self.ext)
                         )
                     )
@@ -292,7 +290,7 @@ class Task(Base):
         return self
 
     def _set_deps(
-            self, tasks: Union["Task", Sequence["Task"]], upstream: bool = True
+        self, tasks: Union["Task", Sequence["Task"]], upstream: bool = True
     ) -> None:
         """
         Set parameter tasks dependent to current task.

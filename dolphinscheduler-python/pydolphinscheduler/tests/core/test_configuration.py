@@ -48,13 +48,7 @@ def teardown_file_env():
 
 
 @pytest.mark.parametrize(
-    "val, expect",
-    [
-        ("1", 1),
-        ("123", 123),
-        ("4567", 4567),
-        (b"1234", 1234),
-    ],
+    "val, expect", [("1", 1), ("123", 123), ("4567", 4567), (b"1234", 1234),],
 )
 def test_get_int(val: Any, expect: int):
     """Test function :func:`configuration.get_int`."""
@@ -62,13 +56,7 @@ def test_get_int(val: Any, expect: int):
 
 
 @pytest.mark.parametrize(
-    "val",
-    [
-        "a",
-        "1a",
-        "1d2",
-        "1723-",
-    ],
+    "val", ["a", "1a", "1d2", "1723-",],
 )
 def test_get_int_error(val: Any):
     """Test function :func:`configuration.get_int`."""
@@ -113,12 +101,7 @@ def test_config_path(home: Any, expect: str):
 
 
 @pytest.mark.parametrize(
-    "home",
-    [
-        None,
-        "/tmp/pydolphinscheduler",
-        "/tmp/test_abc",
-    ],
+    "home", [None, "/tmp/pydolphinscheduler", "/tmp/test_abc",],
 )
 def test_init_config_file(teardown_file_env, home: Any):
     """Test init config file."""
@@ -136,12 +119,7 @@ def test_init_config_file(teardown_file_env, home: Any):
 
 
 @pytest.mark.parametrize(
-    "home",
-    [
-        None,
-        "/tmp/pydolphinscheduler",
-        "/tmp/test_abc",
-    ],
+    "home", [None, "/tmp/pydolphinscheduler", "/tmp/test_abc",],
 )
 def test_init_config_file_duplicate(teardown_file_env, home: Any):
     """Test raise error with init config file which already exists."""

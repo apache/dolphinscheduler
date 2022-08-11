@@ -31,12 +31,7 @@ def test_version():
 
 
 @pytest.mark.parametrize(
-    "part, idx",
-    [
-        ("major", 0),
-        ("minor", 1),
-        ("micro", 2),
-    ],
+    "part, idx", [("major", 0), ("minor", 1), ("micro", 2),],
 )
 def test_version_part(part: str, idx: int):
     """Test subcommand `version` option `--part`."""

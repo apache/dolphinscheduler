@@ -55,8 +55,7 @@ sagemaker_request_json = json.dumps(
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_property_task_params(mock_code_version, attr, expect):
     """Test task sagemaker task property."""

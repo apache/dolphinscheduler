@@ -52,8 +52,7 @@ TEST_PROCEDURE_DATASOURCE_NAME = "test_datasource"
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.database.Database.get_database_info",
@@ -66,8 +65,7 @@ def test_property_task_params(mock_datasource, mock_code_version, attr, expect):
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.database.Database.get_database_info",

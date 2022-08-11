@@ -31,8 +31,7 @@ TEST_PROGRAM_TYPE = ProgramType.JAVA
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.engine.Engine.get_resource_info",
@@ -64,9 +63,7 @@ def test_get_jar_detail(mock_resource, mock_code_version):
             },
             {
                 "mainClass": "org.apache.examples.mock.Mock",
-                "mainJar": {
-                    "id": 1,
-                },
+                "mainJar": {"id": 1,},
                 "programType": ProgramType.JAVA,
                 "localParams": [],
                 "resourceList": [],
@@ -78,8 +75,7 @@ def test_get_jar_detail(mock_resource, mock_code_version):
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.engine.Engine.get_resource_info",
@@ -111,9 +107,7 @@ def test_property_task_params(mock_resource, mock_code_version, attr, expect):
                 "taskType": "test-engine",
                 "taskParams": {
                     "mainClass": "org.apache.examples.mock.Mock",
-                    "mainJar": {
-                        "id": 1,
-                    },
+                    "mainJar": {"id": 1,},
                     "programType": ProgramType.JAVA,
                     "localParams": [],
                     "resourceList": [],
@@ -134,8 +128,7 @@ def test_property_task_params(mock_resource, mock_code_version, attr, expect):
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.engine.Engine.get_resource_info",

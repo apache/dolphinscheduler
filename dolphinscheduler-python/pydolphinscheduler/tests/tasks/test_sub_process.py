@@ -57,8 +57,7 @@ TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
     ),
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 def test_property_task_params(mock_code_version, mock_pd_info, attr, expect):
     """Test task sub process property."""

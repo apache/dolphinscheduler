@@ -44,8 +44,10 @@ class Local:
         if not path.exists():
             raise PyResPluginException("{} is not found".format(str(path)))
         if not os.access(str(path), os.R_OK):
-            raise PyResPluginException("You don't have permission to access {}".format(self.prefix + suf))
-        with open(path, 'r') as f:
+            raise PyResPluginException(
+                "You don't have permission to access {}".format(self.prefix + suf)
+            )
+        with open(path, "r") as f:
             content = f.read()
         return content
 

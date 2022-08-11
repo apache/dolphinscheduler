@@ -38,14 +38,14 @@ TEST_TASK_RELATION_SIZE = 0
     "attr, expect",
     [
         (
-                dict(),
-                {
-                    "localParams": [],
-                    "resourceList": [],
-                    "dependence": {},
-                    "waitStartTimeout": {},
-                    "conditionResult": {"successNode": [""], "failedNode": [""]},
-                },
+            dict(),
+            {
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
         ),
         (
             {
@@ -66,20 +66,14 @@ TEST_TASK_RELATION_SIZE = 0
     ],
 )
 @patch(
-    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
-    return_value=1,
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database", return_value=1,
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.user_name",
-    return_value="test_user",
+    "pydolphinscheduler.core.task.Task.user_name", return_value="test_user",
 )
 def test_property_task_params(mock_resource, mock_user_name, attr, expect):
     """Test class task property."""
-    task = testTask(
-        "test-property-task-params",
-        "test-task",
-        **attr,
-    )
+    task = testTask("test-property-task-params", "test-task", **attr,)
     assert expect == task.task_params
 
 
@@ -171,8 +165,8 @@ def test_task_get_define():
         "timeout": 0,
     }
     with patch(
-            "pydolphinscheduler.core.task.Task.gen_code_and_version",
-            return_value=(code, version),
+        "pydolphinscheduler.core.task.Task.gen_code_and_version",
+        return_value=(code, version),
     ):
         task = Task(name=name, task_type=task_type)
         assert task.get_define() == expect
@@ -193,12 +187,12 @@ def test_two_tasks_shift(shift: str):
     else:
         assert False, f"Unexpect bit operator type {shift}."
     assert (
-            1 == len(upstream._downstream_task_codes)
-            and downstream.code in upstream._downstream_task_codes
+        1 == len(upstream._downstream_task_codes)
+        and downstream.code in upstream._downstream_task_codes
     ), "Task downstream task attributes error, downstream codes size or specific code failed."
     assert (
-            1 == len(downstream._upstream_task_codes)
-            and upstream.code in downstream._upstream_task_codes
+        1 == len(downstream._upstream_task_codes)
+        and upstream.code in downstream._upstream_task_codes
     ), "Task upstream task attributes error, upstream codes size or upstream code failed."
 
 
@@ -263,8 +257,7 @@ def test_add_duplicate(caplog):
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.task.Task.ext",
@@ -276,9 +269,15 @@ def test_add_duplicate(caplog):
     new_callable=PropertyMock,
     return_value="_raw_script",
 )
-@patch("pydolphinscheduler.core.task.Task._raw_script", create=True, new_callable=PropertyMock,)
+@patch(
+    "pydolphinscheduler.core.task.Task._raw_script",
+    create=True,
+    new_callable=PropertyMock,
+)
 @patch("pydolphinscheduler.core.task.Task.get_plugin")
-def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version, val, expected):
+def test_task_ext_attr(
+    m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version, val, expected
+):
     """Test task attribute ext_attr."""
     m_plugin.return_value.read_file.return_value = expected
     m_raw_script.return_value = val
@@ -294,29 +293,26 @@ def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
                 "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix="prefix",
+                    type=ResourcePluginType.LOCAL, prefix="prefix",
                 ),
                 "process_definition": ProcessDefinition(
                     name="process_definition",
                     resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.LOCAL,
-                        prefix="prefix",
+                        type=ResourcePluginType.LOCAL, prefix="prefix",
                     ),
-                )
+                ),
             },
-            "Local"
+            "Local",
         ),
         (
             {
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
                 "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix="prefix",
+                    type=ResourcePluginType.LOCAL, prefix="prefix",
                 ),
             },
-            "Local"
+            "Local",
         ),
         (
             {
@@ -325,18 +321,16 @@ def test_task_ext_attr(m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version
                 "process_definition": ProcessDefinition(
                     name="process_definition",
                     resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.LOCAL,
-                        prefix="prefix",
+                        type=ResourcePluginType.LOCAL, prefix="prefix",
                     ),
-                )
+                ),
             },
-            "Local"
+            "Local",
         ),
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch("pydolphinscheduler.core.task.Task.get_content")
 def test_task_obtain_res_plugin(m_get_content, m_code_version, attr, expected):
@@ -344,27 +338,26 @@ def test_task_obtain_res_plugin(m_get_content, m_code_version, attr, expected):
     task = Task(**attr)
     assert expected == task.get_plugin().__class__.__name__
 
+
 @pytest.mark.parametrize(
     "attr",
     [
         {
             "name": "test_task_abtain_res_plugin",
             "task_type": "TaskType",
-            "process_definition": ProcessDefinition(
-                name="process_definition",
-            )
+            "process_definition": ProcessDefinition(name="process_definition",),
         },
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch("pydolphinscheduler.core.task.Task.get_content")
 def test_task_obtain_res_plugin_exception(m_get_content, m_code_version, attr):
     """Test task obtaining resource plug-in exception."""
     with pytest.raises(
-        PyResPluginException, match="The execution command of this task is a file, but the resource plugin is empty"
+        PyResPluginException,
+        match="The execution command of this task is a file, but the resource plugin is empty",
     ):
         task = Task(**attr)
         task.get_plugin()
@@ -373,35 +366,24 @@ def test_task_obtain_res_plugin_exception(m_get_content, m_code_version, attr):
 @pytest.mark.parametrize(
     "resources, expect",
     [
-        (
-            ["/dev/test.py"],
-            [{"id": 1}],
-        ),
-        (
-            ["/dev/test.py", {"id": 2}],
-            [{"id": 1}, {"id": 2}],
-        ),
+        (["/dev/test.py"], [{"id": 1}],),
+        (["/dev/test.py", {"id": 2}], [{"id": 1}, {"id": 2}],),
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.core.resource.Resource.get_id_from_database",
-    return_value=1,
+    "pydolphinscheduler.core.resource.Resource.get_id_from_database", return_value=1,
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.user_name",
-    return_value="test_user",
+    "pydolphinscheduler.core.task.Task.user_name", return_value="test_user",
 )
 def test_python_resource_list(
     mock_code_version, mock_resource, mock_user_name, resources, expect
 ):
     """Test python task resource list."""
     task = Task(
-        name="python_resource_list.",
-        task_type="PYTHON",
-        resource_list=resources,
+        name="python_resource_list.", task_type="PYTHON", resource_list=resources,
     )
     assert task.resource_list == expect
