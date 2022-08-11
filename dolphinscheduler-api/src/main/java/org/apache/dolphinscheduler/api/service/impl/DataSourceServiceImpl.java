@@ -114,6 +114,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
+        if(checkDescriptionLength(datasourceParam.getNote())){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // check connect
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
         Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParam);
@@ -172,6 +176,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         //check name can use or not
         if (!dataSource.getName().trim().equals(dataSource.getName()) && checkName(dataSource.getName())) {
             putMsg(result, Status.DATASOURCE_EXIST);
+            return result;
+        }
+        if(checkDescriptionLength(dataSourceParam.getNote())){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         //check password，if the password is not updated, set to the old password.
