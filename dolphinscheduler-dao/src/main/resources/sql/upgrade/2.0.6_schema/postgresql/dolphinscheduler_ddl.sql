@@ -29,6 +29,9 @@ BEGIN
     ---get schema name
     v_schema =current_schema();
 
+ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
+ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
+
     --- alter column
     EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
 

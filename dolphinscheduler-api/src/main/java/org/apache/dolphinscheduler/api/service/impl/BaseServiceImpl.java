@@ -214,4 +214,9 @@ public class BaseServiceImpl implements BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    @Override
+    public boolean checkDescriptionLength(String description) {
+        return description!=null && description.codePointCount(0, description.length()) > 255;
+    }
 }

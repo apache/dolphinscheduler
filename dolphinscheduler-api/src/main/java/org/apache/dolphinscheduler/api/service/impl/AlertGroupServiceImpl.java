@@ -168,7 +168,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         AlertGroup alertGroup = new AlertGroup();
         Date now = new Date();
 
@@ -215,7 +218,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
 
         if (alertGroup == null) {

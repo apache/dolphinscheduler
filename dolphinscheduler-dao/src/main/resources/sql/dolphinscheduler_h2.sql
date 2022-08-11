@@ -629,7 +629,7 @@ CREATE TABLE t_ds_project
     id          int(11) NOT NULL AUTO_INCREMENT,
     name        varchar(100) DEFAULT NULL,
     code        bigint(20) NOT NULL,
-    description varchar(200) DEFAULT NULL,
+    description varchar(255) DEFAULT NULL,
     user_id     int(11) DEFAULT NULL,
     flag        tinyint(4) DEFAULT '1',
     create_time datetime NOT NULL,
@@ -1860,7 +1860,7 @@ CREATE TABLE t_ds_task_group
 (
    id          int(11)  NOT NULL AUTO_INCREMENT ,
    name        varchar(100) DEFAULT NULL ,
-   description varchar(200) DEFAULT NULL ,
+   description varchar(255) DEFAULT NULL ,
    group_size  int(11) NOT NULL ,
    project_code  bigint(20) DEFAULT '0',
    use_size    int(11) DEFAULT '0' ,
