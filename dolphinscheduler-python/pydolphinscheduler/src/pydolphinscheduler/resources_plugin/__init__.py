@@ -21,7 +21,7 @@ import importlib
 import importlib.util
 from pathlib import Path
 
-from pydolphinscheduler.exceptions import PyDSConfException, PyResPluginException
+from pydolphinscheduler.exceptions import PyResPluginException
 
 path_resources_plugin = Path(__file__).parent
 

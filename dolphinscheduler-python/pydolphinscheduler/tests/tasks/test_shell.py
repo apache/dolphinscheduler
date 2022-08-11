@@ -21,11 +21,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.utils import file
-
 from tests.testing.file import delete_file
 
 file_path = 'local_res.sh'

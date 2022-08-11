@@ -37,15 +37,14 @@ task_union does not use resource plug-ins
 it will instantiate and run all the task it have.
 """
 
+from pydolphinscheduler.constants import ResourcePluginType
 # [start tutorial]
 # [start package_import]
 # Import ProcessDefinition object to define your workflow attributes
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-
+from pydolphinscheduler.resources_plugin import ResourcePlugin
 # Import task Shell object cause we would create some shell tasks later
 from pydolphinscheduler.tasks.shell import Shell
-from pydolphinscheduler.constants import ResourcePluginType
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 # [end package_import]
 

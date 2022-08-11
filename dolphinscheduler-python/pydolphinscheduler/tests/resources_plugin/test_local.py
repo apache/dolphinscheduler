@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from unittest.mock import patch, PropertyMock
 
@@ -6,7 +5,7 @@ import pytest
 
 from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.core import Task
-from pydolphinscheduler.exceptions import PyDSConfException, PyResPluginException
+from pydolphinscheduler.exceptions import PyResPluginException
 from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.local import Local
 from pydolphinscheduler.utils import file
@@ -101,4 +100,3 @@ def test_local_res_file_not_found(attr):
     ):
         local = Local(str(attr.get("prefix")))
         local.read_file(attr.get("file_name"))
-
