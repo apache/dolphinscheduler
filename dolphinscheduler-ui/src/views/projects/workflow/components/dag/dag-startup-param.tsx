@@ -43,10 +43,7 @@ export default defineComponent({
 
     const getAlertGroupList = () => {
       listAlertGroupById().then((res: any) => {
-        alertGroupListRef.value = res.map((item: any) => ({
-          label: item.groupName,
-          value: item.id
-        }))
+        alertGroupListRef.value = res
       })
     }
 
@@ -83,7 +80,7 @@ export default defineComponent({
 
       const o = _.filter(alertGroupListRef.value, (v) => v.id === id)
       if (o && o.length) {
-        return o[0].code
+        return o[0].groupName
       }
       return '-'
     })
