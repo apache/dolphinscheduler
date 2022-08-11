@@ -248,10 +248,9 @@ class Task(Base):
 
     def get_content(self):
         """Get the file content according to the resource plugin"""
-        if self.ext_attr is None:
-            raise ValueError('ext_attr is None')
-        if self.ext is None:
-            raise ValueError('ext is None')
+
+        if self.ext_attr is None and self.ext is None:
+            return
 
         _ext_attr = getattr(self, self.ext_attr)
 
