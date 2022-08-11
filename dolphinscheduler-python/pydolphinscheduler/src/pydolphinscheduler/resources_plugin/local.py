@@ -23,17 +23,19 @@ from pathlib import Path
 from pydolphinscheduler.exceptions import PyResPluginException
 
 
-# [start local_res_definition]
 class Local:
-
+    # [init_method]
     def __init__(self, prefix: str):
         self._prefix = prefix
+
+    # [end init_method]
 
     @property
     def prefix(self):
         """Get the _prefix attribute"""
         return self._prefix
 
+    # [start read_file_method]
     def read_file(self, suf: str):
         """Get the content of the file, the address of the file is
         the prefix of the resource plugin plus the parameter suf
@@ -46,4 +48,5 @@ class Local:
         with open(path, 'r') as f:
             content = f.read()
         return content
-# [end local_res_definition]
+
+    # [start read_file_method]

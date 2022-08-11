@@ -103,13 +103,13 @@ class Time(str):
     FMT_NO_COLON_TIME = "%H%M%S"
 
 
-# [start res_plugin_constants_definition]
+# [start class_resource]
 class ResourcePluginType(str):
     """Constants for resources plugin type, it will also show you which kind we support up to now."""
     LOCAL = "local"
 
 
-# [end res_plugin_constants_definition]
+# [end class_resource]
 
 
 class ResourceKey(str):
