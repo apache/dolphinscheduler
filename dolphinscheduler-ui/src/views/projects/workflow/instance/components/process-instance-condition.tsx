@@ -102,7 +102,7 @@ export default defineComponent({
         <NSelect
           options={options}
           size='small'
-          style={{width: '120px'}}
+          style={{width: '210px'}}
           defaultValue={''}
           v-model:value={this.stateTypeRef}
         />
