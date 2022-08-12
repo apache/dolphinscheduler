@@ -172,25 +172,36 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
             Thread.currentThread().setName(threadLoggerInfoName);
         }
-        switch (taskAction) {
-            case STOP:
-                return stop();
-            case PAUSE:
-                return pause();
-            case TIMEOUT:
-                return timeout();
-            case SUBMIT:
-                return submit();
-            case RUN:
-                return run();
-            case DISPATCH:
-                return dispatch();
-            default:
-                logger.error("unknown task action: {}", taskAction);
+        boolean result = false;
+        try {
+            switch (taskAction) {
+                case STOP:
+                    result = stop();
+                    break;
+                case PAUSE:
+                    result = pause();
+                    break;
+                case TIMEOUT:
+                    result = timeout();
+                    break;
+                case SUBMIT:
+                    result = submit();
+                    break;
+                case RUN:
+                    result = run();
+                    break;
+                case DISPATCH:
+                    result = dispatch();
+                    break;
+                default:
+                    logger.error("unknown task action: {}", taskAction);
+            }
+            return result;
+        } finally {
+            // reset thread name
+            Thread.currentThread().setName(threadName);
+
         }
-        // reset thread name
-        Thread.currentThread().setName(threadName);
-        return false;
     }
 
     protected boolean submit() {
