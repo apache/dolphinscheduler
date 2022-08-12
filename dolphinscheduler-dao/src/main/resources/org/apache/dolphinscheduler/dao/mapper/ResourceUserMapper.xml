@@ -18,7 +18,9 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper">
-
+    <sql id="baseSql">
+        id, user_id, resources_id, perm, create_time, update_time
+    </sql>
     <select id="queryResourcesIdListByUserIdAndPerm" resultType="java.lang.Integer">
         select
         resources_id
@@ -58,4 +60,13 @@
             </foreach>
         </if>
     </delete>
+
+    <select id="queryResourceRelation" resultType="org.apache.dolphinscheduler.dao.entity.ResourcesUser">
+        select
+        <include refid="baseSql"/>
+        from t_ds_relation_resources_user
+        where resources_id = #{resourceId}
+        and user_id = #{userId}
+        limit 1
+    </select>
 </mapper>

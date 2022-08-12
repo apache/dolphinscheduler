@@ -41,14 +41,12 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -347,6 +345,34 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private boolean checkResourceExists(String fullName, int type) {
         Boolean existResource = resourcesMapper.existResource(fullName, type);
         return Boolean.TRUE.equals(existResource);
+    }
+
+    @Override
+    public boolean hasResourceAndWritePerm(User loginUser, Resource resource, Result<Object> result) {
+        boolean checkResult = false;
+        if (resource == null) {
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+        } else {
+            // case 1: user is admin
+            if (loginUser.getUserType() == UserType.ADMIN_USER) {
+                return true;
+            }
+            // case 2: user is resource owner
+            if (resource.getUserId() == loginUser.getId()) {
+                return true;
+            }
+            // case 3: check user permission level
+            ResourcesUser resourcesUser = resourceUserMapper.queryResourceRelation(resource.getId(), loginUser.getId());
+
+            if(resourcesUser.getPerm()!=Constants.AUTHORIZE_WRITABLE_PERM || resourcesUser == null) {
+                putMsg(result, Status.USER_NO_WRITE_RESOURCE_PERM, loginUser.getUserName(), resource.getFileName());
+                checkResult = false;
+            }
+            else {
+                checkResult = true;
+            }
+        }
+        return checkResult;
     }
 
     /**

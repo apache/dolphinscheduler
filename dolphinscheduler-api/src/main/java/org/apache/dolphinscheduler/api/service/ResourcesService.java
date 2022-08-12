@@ -71,6 +71,9 @@ public interface ResourcesService {
                                   int pid,
                                   String currentDir);
 
+
+    boolean hasResourceAndWritePerm(User loginUser, Resource resource, Result<Object> result);
+
     /**
      * update resource
      * @param loginUser     login user
