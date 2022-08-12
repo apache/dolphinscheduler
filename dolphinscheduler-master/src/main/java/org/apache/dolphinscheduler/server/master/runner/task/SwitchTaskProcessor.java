@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -58,18 +58,20 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
         this.setTaskExecutionLogger();
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+        taskInstance.setLogPath(
+                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion(),
+                        taskInstance.getProcessInstanceId(),
+                        taskInstance.getId()));
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         return true;
@@ -78,7 +80,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     @Override
     public boolean runTask() {
         try {
-            if (!this.taskInstance().getState().typeIsFinished() && setSwitchResult()) {
+            if (!this.taskInstance().getState().isFinished() && setSwitchResult()) {
                 endTaskState();
             }
         } catch (Exception e) {
@@ -102,7 +104,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean pauseTask() {
-        this.taskInstance.setState(ExecutionStatus.PAUSE);
+        this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;
@@ -110,7 +112,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean killTask() {
-        this.taskInstance.setState(ExecutionStatus.KILL);
+        this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;
@@ -128,9 +130,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     private boolean setSwitchResult() {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId()
-        );
-        Map<String, ExecutionStatus> completeTaskList = new HashMap<>();
+                taskInstance.getProcessInstanceId());
+        Map<String, TaskExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());
         }
@@ -172,7 +173,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
         if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
             conditionResult = DependResult.FAILED;
-            logger.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult, finalConditionLocation);
+            logger.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult,
+                    finalConditionLocation);
             return true;
         }
 
@@ -184,7 +186,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
      * update task state
      */
     private void endTaskState() {
-        ExecutionStatus status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
+        TaskExecutionStatus status =
+                (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setEndTime(new Date());
         taskInstance.setState(status);
         processService.updateTaskInstance(taskInstance);

@@ -8,7 +8,7 @@
 
 伪分布式部署 DolphinScheduler 需要有外部软件的支持
 
-* JDK：下载[JDK][jdk] (1.8+)，并将 JAVA_HOME 配置到以及 PATH 变量中。如果你的环境中已存在，可以跳过这步。
+* JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 * 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download/download.html)下载 DolphinScheduler 二进制包
 * 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.16
 * 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)，[下载地址][zookeeper]
@@ -73,7 +73,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 ### 修改 `install_env.sh` 文件
 
-文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，配置详情如下。
+文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，可通过以下方式更改env变量,export <ENV_NAME>=<VALUE>，配置详情如下。
 
 ```shell
 # ---------------------------------------------------------
@@ -81,6 +81,7 @@ chmod 600 ~/.ssh/authorized_keys
 # ---------------------------------------------------------
 # Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
 ips="localhost"
+sshPort="22"
 masters="localhost"
 workers="localhost:default"
 alertServer="localhost"

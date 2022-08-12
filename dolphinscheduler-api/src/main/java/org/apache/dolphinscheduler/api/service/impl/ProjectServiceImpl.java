@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -66,7 +65,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * project service impl
  **/
 @Service
-public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService{
+public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
@@ -82,8 +81,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * create project
@@ -149,7 +146,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param desc   desc
      */
     public static void checkDesc(Result result, String desc) {
-        if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
+        if (!StringUtils.isEmpty(desc) && desc.codePointCount(0, desc.length()) > 255) {
             result.setCode(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
             result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
