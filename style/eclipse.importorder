@@ -15,7 +15,9 @@
 # limitations under the License.
 #
 #Organize Import Order
-0=java
-1=javax
-2=org
-3=com
+0=org.apache.dolphinscheduler
+1=org.apache
+2=java
+3=javax
+4=org
+5=com
