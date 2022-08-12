@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
@@ -122,7 +122,7 @@ public class DependentExecute {
             }
             // need to check workflow for updates, so get all task and check the task state
             if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                if (!processInstance.getState().typeIsFinished()) {
+                if (!processInstance.getState().isFinished()) {
                     logger.info("Wait for the dependent workflow to complete, processDefiniteCode:{}, taskCode:{}, processInstanceId:{}, processInstance state:{}",
                             dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(), processInstance.getId(), processInstance.getState());
                     return DependResult.WAITING;
@@ -142,7 +142,7 @@ public class DependentExecute {
      * depend type = depend_all
      */
     private DependResult dependResultByProcessInstance(ProcessInstance processInstance, DateInterval dateInterval) {
-        if (processInstance.getState().typeIsSuccess()) {
+        if (processInstance.getState().isSuccess()) {
             List<ProcessTaskRelation> taskRelations = processService.findRelationByCode(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
             if (!taskRelations.isEmpty()) {
@@ -172,13 +172,13 @@ public class DependentExecute {
                         });
                         definiteTask.remove(instance.getTaskCode());
                     }
-                    List<TaskInstance> instanceFail = taskInstanceMap.values().stream().filter(instance -> instance.getState().typeIsFailure()).collect(Collectors.toList());
+                    List<TaskInstance> instanceFail = taskInstanceMap.values().stream().filter(instance -> instance.getState().isFailure()).collect(Collectors.toList());
                     if (!instanceFail.isEmpty()) {
                         List<String> log = instanceFail.stream().map(instance -> instance.getId() + "|" + instance.getTaskCode() + "|" + instance.getName()).collect(Collectors.toList());
                         logger.warn("The fail task: {}", StringUtils.join(log, Constants.COMMA));
                         return DependResult.FAILED;
                     }
-                    List<TaskInstance> instanceRunning = taskInstanceMap.values().stream().filter(instance -> instance.getState().typeIsRunning()).collect(Collectors.toList());
+                    List<TaskInstance> instanceRunning = taskInstanceMap.values().stream().filter(instance -> instance.getState().isRunning()).collect(Collectors.toList());
                     if (!instanceRunning.isEmpty()) {
                         List<String> log = instanceRunning.stream().map(instance -> instance.getId() + "|" + instance.getTaskCode() + "|" + instance.getName()).collect(Collectors.toList());
                         logger.info("The running task: {}", StringUtils.join(log, Constants.COMMA));
@@ -210,7 +210,7 @@ public class DependentExecute {
                 logger.warn("Cannot find the task instance, but the task is forbidden, so dependent success, taskCode: {}, taskName: {}", taskCode, taskDefinition.getName());
                 return DependResult.SUCCESS;
             }
-            if (!processInstance.getState().typeIsFinished()) {
+            if (!processInstance.getState().isFinished()) {
                 logger.info("Wait for the dependent workflow to complete, taskCode:{}, processInstanceId:{}, processInstance state:{}",
                     taskCode, processInstance.getId(), processInstance.getState());
                 return DependResult.WAITING;
@@ -258,10 +258,10 @@ public class DependentExecute {
      * @param state state
      * @return DependResult
      */
-    private DependResult getDependResultByState(ExecutionStatus state) {
-        if (!state.typeIsFinished()) {
+    private DependResult getDependResultByState(TaskExecutionStatus state) {
+        if (!state.isFinished()) {
             return DependResult.WAITING;
-        } else if (state.typeIsSuccess()) {
+        } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
             return DependResult.FAILED;
