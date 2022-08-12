@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import kong.unirest.Unirest;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -30,10 +34,8 @@ import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ZeppelinTask extends AbstractTaskExecutor {
 
@@ -51,7 +53,6 @@ public class ZeppelinTask extends AbstractTaskExecutor {
      * zeppelin api client
      */
     private ZeppelinClient zClient;
-
 
     /**
      * constructor
@@ -121,7 +122,8 @@ public class ZeppelinTask extends AbstractTaskExecutor {
 
                 resultContent = resultContentBuilder.toString();
             } else {
-                final ParagraphResult paragraphResult = this.zClient.executeParagraph(noteId, paragraphId, zeppelinParamsMap);
+                final ParagraphResult paragraphResult =
+                        this.zClient.executeParagraph(noteId, paragraphId, zeppelinParamsMap);
                 resultContent = paragraphResult.getResultInText();
                 status = paragraphResult.getStatus();
             }
