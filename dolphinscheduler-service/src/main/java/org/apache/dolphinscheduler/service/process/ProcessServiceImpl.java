@@ -2559,17 +2559,26 @@ public class ProcessServiceImpl implements ProcessService {
         }
         int insertResult = 0;
         int updateResult = 0;
-        for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
-            TaskDefinition task = taskDefinitionMapper.queryByCode(taskDefinitionToUpdate.getCode());
-            if (task == null) {
-                newTaskDefinitionLogs.add(taskDefinitionToUpdate);
-            } else {
-                insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-                if (Boolean.TRUE.equals(syncDefine)) {
-                    taskDefinitionToUpdate.setId(task.getId());
-                    updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+        if (!updateTaskDefinitionLogs.isEmpty()) {
+            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs.stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
+            for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
+                TaskDefinition task = null;
+                for (TaskDefinition taskDefinition : taskDefinitions) {
+                    if (taskDefinitionToUpdate.getCode() == taskDefinition.getCode()) {
+                        task = taskDefinition;
+                        break;
+                    }
+                }
+                if (task == null) {
+                    newTaskDefinitionLogs.add(taskDefinitionToUpdate);
                 } else {
-                    updateResult++;
+                    insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
+                    if (Boolean.TRUE.equals(syncDefine)) {
+                        taskDefinitionToUpdate.setId(task.getId());
+                        updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+                    } else {
+                        updateResult++;
+                    }
                 }
             }
         }
