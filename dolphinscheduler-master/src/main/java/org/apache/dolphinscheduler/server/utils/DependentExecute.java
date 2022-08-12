@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * dependent item execute
  */
 public class DependentExecute {
+
     /**
      * process service
      */
@@ -91,7 +92,8 @@ public class DependentExecute {
      * @return DependResult
      */
     private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime) {
-        List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
+        List<DateInterval> dateIntervals =
+                DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
         return calculateResultForTasks(dependentItem, dateIntervals);
     }
 
@@ -185,12 +187,8 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionCode, dateInterval.getStartTime(), dateInterval.getEndTime());
-        if (runningProcess != null) {
-            return runningProcess;
-        }
-
-        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
+        ProcessInstance lastSchedulerProcess =
+                processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
 
         ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval);
 
@@ -201,7 +199,8 @@ public class DependentExecute {
             return lastManualProcess;
         }
 
-        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess : lastSchedulerProcess;
+        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess
+                : lastSchedulerProcess;
     }
 
     /**
