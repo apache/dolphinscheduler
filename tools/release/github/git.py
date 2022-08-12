@@ -39,12 +39,9 @@ class Git:
             return self.repo.iter_commits(self.branch)
         return self.repo.iter_commits()
 
-    def has_commit(self, sha: str) -> bool:
-        try:
-            self.repo.commit(sha)
-            return True
-        except ValueError:
-            return False
+    def has_commit_current(self, sha: str) -> bool:
+        branches = self.repo.git.branch('--contains', sha)
+        return self.repo.active_branch in branches
 
     def has_commit_global(self, sha: str) -> bool:
         try:
@@ -55,9 +52,12 @@ class Git:
 
     def cherry_pick_pr(self, pr: Dict) -> None:
         sha = pr['merge_commit_sha']
-        if self.has_commit(sha):
-            return
-        popen = Popen(f"git cherry-pick -x {sha}", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-        stdout, nothing = popen.communicate()
-        if stdout:
-            raise RuntimeError("Cherry-pick SHA: %s error with message %s, please make sure you local default branch is up-to-date", (sha, stdout))
+        if self.has_commit_global(sha):
+            raise RuntimeError("Cherry-pick SHA %s error beacuse SHA not exists, please make sure you local default branch is up-to-date", sha)
+        if self.has_commit_current(sha):
+            print("SHA %s already in current active branch, skip it.", sha)
+        self.repo.git.cherry_pick(sha)
+        # popen = Popen(f"git cherry-pick -x {sha}", shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        # stdout, nothing = popen.communicate()
+        # if stdout:
+        #     raise RuntimeError("Cherry-pick SHA: %s error with message %s, please make sure you local default branch is up-to-date", (sha, stdout))
