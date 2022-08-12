@@ -86,6 +86,9 @@ public class FailoverServiceTest {
     @Mock
     private NettyExecutorManager nettyExecutorManager;
 
+    @Mock
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -104,7 +107,7 @@ public class FailoverServiceTest {
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
         MasterFailoverService masterFailoverService =
-                new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager);
+                new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager, processInstanceExecCacheManager);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
                 masterConfig,
                 processService,
