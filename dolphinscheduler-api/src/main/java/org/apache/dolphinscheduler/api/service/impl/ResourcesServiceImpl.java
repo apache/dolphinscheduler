@@ -403,6 +403,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -417,6 +418,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (checkDescriptionLength(desc)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
+
+        //Check User's permission level on the file
+        boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, result);
+        if (!hasResourceAndWritePerm) {
             return result;
         }
 
@@ -864,6 +871,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 checkResourceType(resource.getType()), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(resultCheck, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return resultCheck;
+        }
+
+        //Check User's permission level on the file
+        boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, resultCheck);
+        if (!hasResourceAndWritePerm) {
             return resultCheck;
         }
 
@@ -1405,6 +1418,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+
+        //Check User's permission level on the file
+        boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, result);
+        if (!hasResourceAndWritePerm) {
+            return result;
+        }
+
         // check can edit by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
