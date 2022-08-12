@@ -125,9 +125,9 @@ public class ParameterUtilsTest {
         Assert.assertEquals("065901",
                 ParameterUtils.convertParameterPlaceholders("$[HHmmss-2/24/60]", params));
 
-        String sql = "select JSON_EXTRACT(json_val, CONCAT('$[', id - 1, '].input1') from test";
+        String sql = "select JSON_EXTRACT(json_val, CONCAT('$[', id - 1, '].input1')) from test";
         String sqlScript = ParameterUtils.convertParameterPlaceholders(sql, params);
-        Assert.assertEquals("select JSON_EXTRACT(json_val, CONCAT('$[', id - 1, '].input1') from test",
+        Assert.assertEquals("select JSON_EXTRACT(json_val, CONCAT('$[', id - 1, '].input1')) from test",
                 sqlScript);
     }
 
