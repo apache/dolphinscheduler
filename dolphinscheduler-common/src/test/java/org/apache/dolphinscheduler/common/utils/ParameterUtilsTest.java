@@ -17,30 +17,20 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils.replacePlaceholders;
+
+import static org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils.replacePlaceholders;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.expand.TimePlaceholderResolverExpandService;
-import org.apache.dolphinscheduler.common.expand.TimePlaceholderResolverExpandServiceImpl;
-import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +38,6 @@ import org.slf4j.LoggerFactory;
 @RunWith(MockitoJUnitRunner.class)
 public class ParameterUtilsTest {
     public static final Logger logger = LoggerFactory.getLogger(ParameterUtilsTest.class);
-
-    @Mock
-    private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
-
-    @InjectMocks
-    private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
 
     /**
      * Test convertParameterPlaceholders

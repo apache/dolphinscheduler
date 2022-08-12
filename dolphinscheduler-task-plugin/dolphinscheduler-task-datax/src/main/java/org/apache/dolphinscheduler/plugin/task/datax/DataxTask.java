@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClient
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -82,6 +83,8 @@ public class DataxTask extends AbstractTaskExecutor {
      * jvm parameters
      */
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+
+    public static final String CUSTOM_PARAM = " -D%s=%s";
     /**
      * python process(datax only supports version 2.7 by default)
      */
@@ -150,13 +153,7 @@ public class DataxTask extends AbstractTaskExecutor {
     public void handle() throws Exception {
         try {
             // replace placeholder,and combine local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-            if (MapUtils.isEmpty(paramsMap)) {
-                paramsMap = new HashMap<>();
-            }
-            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-                paramsMap.putAll(taskExecutionContext.getParamsMap());
-            }
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
             // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
@@ -164,7 +161,7 @@ public class DataxTask extends AbstractTaskExecutor {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
         } catch (Exception e) {
             logger.error("datax task error", e);
@@ -398,6 +395,8 @@ public class DataxTask extends AbstractTaskExecutor {
         sbr.append(DATAX_PATH);
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
+        sbr.append(addCustomParameters(paramsMap));
+        sbr.append(" ");
         sbr.append(jobConfigFilePath);
 
         // replace placeholder
@@ -418,6 +417,15 @@ public class DataxTask extends AbstractTaskExecutor {
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
+    }
+
+    private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
+        StringBuilder customParameters = new StringBuilder("-p\"");
+        for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
+        }
+        customParameters.append("\"");
+        return customParameters;
     }
 
     public String getPythonCommand() {

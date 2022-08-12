@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,6 +38,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONTokener;
 
 public class DefaultHTMLTemplate implements AlertTemplate {
 
@@ -118,6 +124,16 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTextTypeMessage(String content) {
 
         if (StringUtils.isNotEmpty(content)) {
+            // Converts an object type to an array type to prevent subsequent conversions from reporting errors
+            try {
+                Object contentObject = new JSONTokener(content).nextValue();
+                if (!(contentObject instanceof JSONArray)) {
+                    ObjectNode jsonNodes = JSONUtils.parseObject(content);
+                    content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
+                }
+            } catch (JSONException e) {
+                logger.error("alert content is null");
+            }
             ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);
             for (JsonNode jsonNode : list) {

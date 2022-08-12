@@ -41,8 +41,9 @@ without error(here is a example after Python 3.8.7 installed)
 
 .. code-block:: bash
 
-    $ python --version
-    Python 3.8.7
+   python --version
+
+Will see detail of Python version, such as *Python 3.8.7*
 
 Installing PyDolphinScheduler
 -----------------------------
@@ -52,16 +53,24 @@ After Python is already installed on your machine following section
 
 .. code-block:: bash
 
-    $ pip install apache-dolphinscheduler
+   python -m pip install apache-dolphinscheduler
 
 The latest version of *PyDolphinScheduler* would be installed after you run above
 command in your terminal. You could go and `start Python Gateway Service`_ to finish
 the prepare, and then go to :doc:`tutorial` to make your hand dirty. But if you
 want to install the unreleased version of *PyDolphinScheduler*, you could go and see
-section `installing PyDolphinScheduler in dev`_ for more detail.
+section `installing PyDolphinScheduler in dev branch`_ for more detail.
 
-Installing PyDolphinScheduler In Dev
-------------------------------------
+.. note::
+
+   Currently, we released multiple pre-release package in PyPI, you can see all released package
+   including pre-release in `release history <https://pypi.org/project/apache-dolphinscheduler/#history>`_.
+   You can fix the the package version if you want to install pre-release package, for example if
+   you want to install version `3.0.0-beta-2` package, you can run command
+   :code:`python -m pip install apache-dolphinscheduler==3.0.0b2`.
+
+Installing PyDolphinScheduler In DEV Branch
+-------------------------------------------
 
 Because the project is developing and some of the features still not release.
 If you want to try some thing unreleased you could install from the source code
@@ -69,13 +78,21 @@ which we hold in GitHub
 
 .. code-block:: bash
 
-    # Clone Apache DolphinScheduler repository
-    $ git clone git@github.com:apache/dolphinscheduler.git
-    # Install PyDolphinScheduler in develop mode
-    $ cd dolphinscheduler-python/pydolphinscheduler && pip install -e .
+   # Clone Apache DolphinScheduler repository
+   git clone git@github.com:apache/dolphinscheduler.git
+   # Install PyDolphinScheduler in develop mode
+   cd dolphinscheduler-python/pydolphinscheduler && python -m pip install -e .
 
 After you installed *PyDolphinScheduler*, please remember `start Python Gateway Service`_
 which waiting for *PyDolphinScheduler*'s workflow definition require.
+
+Above command will clone whole dolphinscheduler source code to local, maybe you want to install latest pydolphinscheduler
+package directly and do not care about other code(including Python gateway service code), you can execute command
+
+.. code-block:: bash
+
+   # Must escape the '&' character by adding '\' 
+   pip install -e "git+https://github.com/apache/dolphinscheduler.git#egg=apache-dolphinscheduler&subdirectory=dolphinscheduler-python/pydolphinscheduler"
 
 Start Python Gateway Service
 ----------------------------
@@ -88,18 +105,18 @@ go `install Apache DolphinScheduler`_ for more detail
 
 .. code-block:: bash
 
-    # Start DolphinScheduler api-server which including python gateway service
-    $ ./bin/dolphinscheduler-daemon.sh start api-server
+   # Start DolphinScheduler api-server which including python gateway service
+   ./bin/dolphinscheduler-daemon.sh start api-server
 
 To check whether the server is alive or not, you could run :code:`jps`. And
 the server is health if keyword `ApiApplicationServer` in the console.
 
 .. code-block:: bash
 
-    $ jps
-    ....
-    201472 ApiApplicationServer
-    ....
+   jps
+   # ....
+   # 201472 ApiApplicationServer
+   # ....
 
 .. note::
 
@@ -115,23 +132,23 @@ single bash command to get it
 
 .. code-block:: bash
 
-   $ wget https://raw.githubusercontent.com/apache/dolphinscheduler/dev/dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/examples/tutorial.py
+   wget https://raw.githubusercontent.com/apache/dolphinscheduler/dev/dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/examples/tutorial.py
 
 or you could copy-paste the content from `tutorial source code`_. And then you could run the example in your
 terminal
 
 .. code-block:: bash
 
-   $ python tutorial.py
+   python tutorial.py
 
 If you want to submit your workflow to a remote API server, which means that your workflow script is different
 from the API server, you should first change pydolphinscheduler configuration and then submit the workflow script
 
 .. code-block:: bash
 
-   $ pydolphinscheduler config --init
-   $ pydolphinscheduler config --set java_gateway.address <your-api-server-ip-or-hostname>
-   $ python tutorial.py
+   pydolphinscheduler config --init
+   pydolphinscheduler config --set java_gateway.address <YOUR-API-SERVER-IP-OR-HOSTNAME>
+   python tutorial.py
 
 .. note::
 

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
@@ -67,6 +68,10 @@ public class MasterConfig implements Validator {
      */
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     /**
+     * Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
+     */
+    private int heartbeatErrorThreshold = 5;
+    /**
      * task submit max retry times.
      */
     private int taskCommitRetryTimes = 5;
@@ -82,6 +87,10 @@ public class MasterConfig implements Validator {
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killYarnJobWhenTaskFailover = true;
+    /**
+     * ip:listenPort
+     */
+    private String masterAddress;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -124,5 +133,9 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
+        if (masterConfig.getHeartbeatErrorThreshold() <= 0) {
+            errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
+        }
+        masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
     }
 }

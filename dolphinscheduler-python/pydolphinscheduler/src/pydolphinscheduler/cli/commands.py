@@ -20,8 +20,8 @@
 import click
 from click import echo
 
-from pydolphinscheduler import __version__
-from pydolphinscheduler.core.configuration import (
+import pydolphinscheduler
+from pydolphinscheduler.configuration import (
     get_single_config,
     init_config_file,
     set_single_config,
@@ -48,9 +48,9 @@ def version(part: str) -> None:
     """Show current version of pydolphinscheduler."""
     if part:
         idx = version_option_val.index(part)
-        echo(f"{__version__.split('.')[idx]}")
+        echo(f"{pydolphinscheduler.__version__.split('.')[idx]}")
     else:
-        echo(f"{__version__}")
+        echo(f"{pydolphinscheduler.__version__}")
 
 
 @cli.command()

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
@@ -38,11 +39,23 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -57,16 +70,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * executor controller
@@ -359,6 +362,69 @@ public class ExecutorController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startCheckProcessDefinition(@RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
         Map<String, Object> result = execService.startCheckByProcessDefinedCode(processDefinitionCode);
+        return returnDataList(result);
+    }
+
+    /**
+     * query execute data of processInstance from master
+     */
+    @ApiOperation(value = "queryExecutingWorkflow", notes = "QUERY_WORKFLOW_EXECUTE_DATA")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+    })
+    @GetMapping(value = "/query-executing-workflow")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
+    @AccessLogAnnotation
+    public Result queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
+        WorkflowExecuteDto workflowExecuteDto = execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
+        return Result.success(workflowExecuteDto);
+    }
+
+    /**
+     * execute task instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code taskDefinitionCode
+     * @param version taskDefinitionVersion
+     * @param warningGroupId warning group id
+     * @param workerGroup worker group
+     * @return start task result code
+     */
+    @ApiOperation(value = "startTaskInstance", notes = "RUN_TASK_INSTANCE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "version", value = "VERSION", dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
+        @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
+        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
+        @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+    })
+    @PostMapping(value = "/task-instance/{code}/start")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result startStreamTaskInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                       @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
+                                       @RequestParam(value = "version", required = true) int version,
+                                       @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
+                                       @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                       @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                       @RequestParam(value = "startParams", required = false) String startParams,
+                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
+
+        Map<String, String> startParamMap = null;
+        if (startParams != null) {
+            startParamMap = JSONUtils.toMap(startParams);
+        }
+
+        Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
+            warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
 }

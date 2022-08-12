@@ -38,7 +38,7 @@ public class TaskGroupQueue implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
     /**
-     * taskIntanceid
+     * taskInstanceId
      */
     private int taskId;
     /**
@@ -65,7 +65,7 @@ public class TaskGroupQueue implements Serializable {
      */
     private int groupId;
     /**
-     * processInstace id
+     * processInstance id
      */
     private int processId;
     /**

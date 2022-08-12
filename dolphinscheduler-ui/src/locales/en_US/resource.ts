@@ -40,6 +40,8 @@ export default {
     enter_name_tips: 'Please enter name',
     enter_description_tips: 'Please enter description',
     enter_content_tips: 'Please enter the resource content',
+    enter_suffix_tips: 'Please enter the suffix',
+    duplicate_suffix_tips: 'Duplicate file suffix',
     file_format: 'File Format',
     file_content: 'File Content',
     delete_confirm: 'Delete?',

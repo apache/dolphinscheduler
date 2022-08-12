@@ -33,7 +33,7 @@ public interface TaskPriorityQueue<T> {
      * @param taskInfo taskInfo
      * @throws TaskPriorityQueueException
      */
-    void put(T taskInfo) throws TaskPriorityQueueException;
+    void put(T taskInfo);
 
     /**
      * take taskInfo

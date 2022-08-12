@@ -38,19 +38,22 @@ your workflow by python code, aka workflow-as-codes.
 
 ```shell
 # Install
-$ pip install apache-dolphinscheduler
+python -m pip install apache-dolphinscheduler
 
 # Verify installation is successful, it will show the version of apache-dolphinscheduler, here we use 0.1.0 as example
-$ pydolphinscheduler version
-0.1.0
+pydolphinscheduler version
+# 0.1.0
 ```
+
+> NOTE: package apache-dolphinscheduler not work on above Python version 3.10(including itself) in Window operating system
+> due to dependence [py4j](https://pypi.org/project/py4j/) not work on those environments.
 
 Here we show you how to install and run a simple example of pydolphinscheduler
 
 ### Start Server And Run Example
 
 Before you run an example, you have to start backend server. You could follow
-[development setup](https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html)
+[development setup](../../docs/docs/en/contribute/development-environment-setup.md)
 section "DolphinScheduler Standalone Quick Start" to set up developer environment. You have to start backend
 and frontend server in this step, which mean that you could view DolphinScheduler UI in your browser with URL
 http://localhost:12345/dolphinscheduler
@@ -84,4 +87,4 @@ If you are interested in how to release **PyDolphinScheduler**, you could go and
 
 ## What's more
 
-For more detail information, please go to see **PyDolphinScheduler** [document](https://dolphinscheduler.apache.org/python/index.html)
+For more detail information, please go to see **PyDolphinScheduler** latest(unreleased) [document](https://dolphinscheduler.apache.org/python/dev/index.html)

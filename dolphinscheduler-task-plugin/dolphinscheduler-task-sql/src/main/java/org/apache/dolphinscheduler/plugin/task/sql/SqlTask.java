@@ -370,7 +370,6 @@ public class SqlTask extends AbstractTaskExecutor {
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
         }
-
     }
 
     /**
@@ -405,7 +404,7 @@ public class SqlTask extends AbstractTaskExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -430,9 +429,10 @@ public class SqlTask extends AbstractTaskExecutor {
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
         String formatSql = sql.replaceAll(rgex, "?");
+        // Convert the list parameter
+        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
         sqlBuilder.append(formatSql);
-
-        // print repalce sql
+        // print replace sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }

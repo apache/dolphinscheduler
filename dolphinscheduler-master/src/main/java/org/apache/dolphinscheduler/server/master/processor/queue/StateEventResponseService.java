@@ -17,34 +17,27 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.netty.channel.Channel;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * task manager
- */
 @Component
 public class StateEventResponseService {
 
@@ -83,7 +76,8 @@ public class StateEventResponseService {
             eventQueue.drainTo(remainEvents);
             for (StateEvent event : remainEvents) {
                 try {
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(),
+                            event.getTaskInstanceId());
                     this.persist(event);
 
                 } finally {
@@ -96,8 +90,9 @@ public class StateEventResponseService {
     /**
      * put task to attemptQueue
      */
-    public void addResponse(StateEvent stateEvent) {
+    public void addStateChangeEvent(StateEvent stateEvent) {
         try {
+            // check the event is validated
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
             logger.error("Put state event : {} error", stateEvent, e);
@@ -121,7 +116,8 @@ public class StateEventResponseService {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                            stateEvent.getTaskInstanceId());
                     persist(stateEvent);
                 } catch (InterruptedException e) {
                     logger.warn("State event loop service interrupted, will stop this loop", e);
@@ -135,10 +131,10 @@ public class StateEventResponseService {
         }
     }
 
-    private void writeResponse(StateEvent stateEvent, ExecutionStatus status) {
+    private void writeResponse(StateEvent stateEvent) {
         Channel channel = stateEvent.getChannel();
         if (channel != null) {
-            StateEventResponseCommand command = new StateEventResponseCommand(status.getCode(), stateEvent.getKey());
+            StateEventResponseCommand command = new StateEventResponseCommand(stateEvent.getKey());
             channel.writeAndFlush(command.convert2Command());
         }
     }
@@ -147,12 +143,14 @@ public class StateEventResponseService {
         try {
             if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
                 logger.warn("Persist event into workflow execute thread error, "
-                    + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
-                writeResponse(stateEvent, ExecutionStatus.FAILURE);
+                        + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
+                writeResponse(stateEvent);
                 return;
             }
 
-            WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            WorkflowExecuteRunnable workflowExecuteThread =
+                    this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            // We will refresh the task instance status first, if the refresh failed the event will not be removed
             switch (stateEvent.getType()) {
                 case TASK_STATE_CHANGE:
                     workflowExecuteThread.refreshTaskInstance(stateEvent.getTaskInstanceId());
@@ -163,7 +161,8 @@ public class StateEventResponseService {
                 default:
             }
             workflowExecuteThreadPool.submitStateEvent(stateEvent);
-            writeResponse(stateEvent, ExecutionStatus.SUCCESS);
+            // this response is not needed.
+            writeResponse(stateEvent);
         } catch (Exception e) {
             logger.error("Persist event queue error, event: {}", stateEvent, e);
         }

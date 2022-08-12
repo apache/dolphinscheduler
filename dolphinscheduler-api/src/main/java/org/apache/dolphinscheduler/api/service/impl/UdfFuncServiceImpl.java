@@ -77,6 +77,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return create result code
      */
     @Override
+    @Transactional
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
@@ -90,6 +91,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_CREATE);
         if (!canOperatorPermissions){
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         // if resource upload startup
@@ -202,7 +207,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // verify udfFunc is exist
         UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
@@ -335,7 +343,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Result<Object> delete(User loginUser, int id) {
         Result<Object> result = new Result<>();
 
