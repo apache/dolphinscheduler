@@ -93,8 +93,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     @Transactional
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
-
-        Map<String, Object> result = checkDesc(desc);
+        Map<String, Object> result = new HashMap<>();
+        if( checkDescriptionLength(desc)) {
+            result.put(Constants.STATUS,Status.FAILED);
+            result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
+        }
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -102,7 +105,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
         Project project = projectMapper.queryByName(name);
         if (project != null) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, name);
@@ -333,10 +335,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> update(User loginUser, Long projectCode, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
-
-        Map<String, Object> descCheck = checkDesc(desc);
-        if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
-            return descCheck;
+        if( checkDescriptionLength(desc)) {
+            result.put(Constants.STATUS,Status.FAILED);
+            result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
+        }
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
 
         Project project = projectMapper.queryByCode(projectCode);
