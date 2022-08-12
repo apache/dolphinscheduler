@@ -233,13 +233,7 @@ public class DependentExecute {
      * @return ProcessInstance
      */
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionCode, dateInterval.getStartTime(), dateInterval.getEndTime());
-        if (runningProcess != null) {
-            return runningProcess;
-        }
-
         ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
-
         ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval);
 
         if (lastManualProcess == null) {
