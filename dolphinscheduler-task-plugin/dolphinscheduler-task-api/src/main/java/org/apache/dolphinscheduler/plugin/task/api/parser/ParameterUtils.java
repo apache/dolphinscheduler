@@ -46,7 +46,7 @@ public class ParameterUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ParameterUtils.class);
 
-    private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\$\\]]+)]";
+    private static final String DATE_PARSE_PATTERN = "\\$\\[(\\w+[^\\$\\]]+)]";
 
     private static final String DATE_START_PATTERN = "^[0-9]";
 
