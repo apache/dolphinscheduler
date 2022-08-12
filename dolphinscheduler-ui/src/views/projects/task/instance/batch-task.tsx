@@ -30,18 +30,16 @@ import {
   NButton,
   NIcon,
   NDataTable,
-  NPagination,
-  NCard
+  NPagination
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
-import LogModal from '@/components/log-modal'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/common/common'
-import styles from './index.module.scss'
+import Card from '@/components/card'
+import LogModal from '@/components/log-modal'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
@@ -154,8 +152,8 @@ const BatchTaskInstance = defineComponent({
     } = this
 
     return (
-      <>
-        <NCard>
+      <NSpace vertical>
+        <Card>
           <NSpace justify='end' wrap={false}>
             <NInput
               allowInput={this.trim}
@@ -202,35 +200,33 @@ const BatchTaskInstance = defineComponent({
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>
-              {{
-                icon: () => (
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                )
-              }}
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
             </NButton>
           </NSpace>
-        </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestTableData}
-              onUpdatePageSize={onUpdatePageSize}
+        </Card>
+        <Card title={t('project.task.batch_task')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestTableData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <LogModal
           showModalRef={this.showModalRef}
@@ -240,7 +236,7 @@ const BatchTaskInstance = defineComponent({
           onConfirmModal={onConfirmModal}
           onRefreshLogs={refreshLogs}
         />
-      </>
+      </NSpace>
     )
   }
 })

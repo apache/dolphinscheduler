@@ -81,6 +81,7 @@ import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 
 import java.util.ArrayList;
@@ -167,6 +168,9 @@ public class ProcessServiceTest {
 
     @Mock
     CuringParamsService curingGlobalParamsService;
+
+    @Mock
+    TaskPluginManager taskPluginManager;
 
     @Test
     public void testCreateSubCommand() {
@@ -682,6 +686,7 @@ public class ProcessServiceTest {
         return list;
     }
 
+    @Test
     public void testSaveTaskDefine() {
         User operator = new User();
         operator.setId(-1);
@@ -706,9 +711,10 @@ public class ProcessServiceTest {
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());
+        Mockito.when(taskPluginManager.getParameters(any())).thenReturn(null);
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
-        Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singletonList(taskDefinition.getCode()))).thenReturn(Collections.singletonList(taskDefinition));
         int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs, Boolean.TRUE);
         Assert.assertEquals(0, result);
     }
