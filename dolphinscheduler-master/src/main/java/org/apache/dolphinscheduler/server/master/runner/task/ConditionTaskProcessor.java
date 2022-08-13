@@ -62,24 +62,27 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
         if (this.taskInstance == null) {
             return false;
         }
         this.setTaskExecutionLogger();
-        initTaskParameters();
-        logger.info("dependent task start");
+        logger.info("condition task submit success");
         return true;
     }
 
     @Override
     public boolean runTask() {
+        initTaskParameters();
+        logger.info("condition task start");
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
             endTask();
         } else {
             endTask();
         }
+        logger.info("condition task finished");
         return true;
     }
 
@@ -136,7 +139,8 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     private void setConditionResult() {
 
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+        List<TaskInstance> taskInstances =
+                processService.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
@@ -147,7 +151,8 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
             for (DependentItem item : dependentTaskModel.getDependItemList()) {
                 itemDependResult.add(getDependResultForItem(item));
             }
-            DependResult modelResult = DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
+            DependResult modelResult =
+                    DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
             modelResultList.add(modelResult);
         }
         conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), modelResultList);
@@ -167,11 +172,12 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         }
         ExecutionStatus executionStatus = completeTaskList.get(item.getDepTaskCode());
         if (executionStatus != item.getStatus()) {
-            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(), item.getStatus(), executionStatus);
+            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(),
+                    item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
-        logger.info("dependent item complete {} {},{}",
-                Constants.DEPENDENT_SPLIT, item.getDepTaskCode(), dependResult);
+        logger.info("dependent item complete, dependentTaskCode: {}, dependResult: {}", item.getDepTaskCode(),
+                dependResult);
         return dependResult;
     }
 
@@ -179,7 +185,8 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      *
      */
     private void endTask() {
-        ExecutionStatus status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
+        ExecutionStatus status =
+                (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
         processService.updateTaskInstance(taskInstance);
