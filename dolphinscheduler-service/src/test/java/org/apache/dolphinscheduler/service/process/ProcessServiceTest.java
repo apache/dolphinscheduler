@@ -471,7 +471,7 @@ public class ProcessServiceTest {
         Mockito.when(processInstanceMapper.updateById(processInstance)).thenReturn(1);
         Mockito.when(commandMapper.deleteById(9)).thenReturn(1);
         ProcessInstance processInstance10 = processService.handleCommand(host, command9);
-        Assert.assertTrue(processInstance10 == null);
+        Assert.assertTrue(processInstance10 != null);
     }
 
     @Test(expected = ServiceException.class)
