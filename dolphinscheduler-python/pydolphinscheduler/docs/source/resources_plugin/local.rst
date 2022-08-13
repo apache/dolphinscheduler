@@ -21,10 +21,10 @@ Local
 `Local` is a local resource plugin for pydolphinscheduler.
 
 When using a local resource plugin, you do not need to use this class explicitly, you only need to add the
-resource_plugin parameter in the task subclass or workflow definition. The resource_plugin parameter type is
-ResourcePlugin.
+`resource_plugin` parameter in the task subclass or workflow definition.
+The data type of parameter `resource_plugin` is `ResourcePlugin`
 
-The use of specific resource plugins can be viewed: :doc:`./how-to-use`
+For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
 
 Dive Into
 ---------

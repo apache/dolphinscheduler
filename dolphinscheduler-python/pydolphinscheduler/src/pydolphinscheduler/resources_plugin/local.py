@@ -30,7 +30,7 @@ class Local:
 
     """
 
-    # [init_method]
+    # [start init_method]
     def __init__(self, prefix: str):
         self._prefix = prefix
 
@@ -58,4 +58,4 @@ class Local:
             content = f.read()
         return content
 
-    # [start read_file_method]
+    # [end read_file_method]

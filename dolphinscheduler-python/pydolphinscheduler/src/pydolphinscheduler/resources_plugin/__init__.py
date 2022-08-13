@@ -31,17 +31,19 @@ class ResourcePlugin:
     """ResourcePlugin object, declare resource plugin for task and workflow to dolphinscheduler.
 
     :param type: A unique, meaningful string for the ResourcePlugin,
+
     Its value should be taken from the constant of ResourceType in constants.py.
+
     :param prefix: A string representing the prefix of ResourcePlugin.
 
     """
 
-    # [start init]
+    # [start init_method]
     def __init__(self, type: str, prefix: str):
         self.type = type
         self.prefix = prefix
 
-    # [end init]
+    # [end init_method]
 
     # [start get_all_modules]
     def get_all_modules(self) -> Path:
