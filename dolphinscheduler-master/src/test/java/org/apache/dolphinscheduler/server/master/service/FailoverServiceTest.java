@@ -100,7 +100,7 @@ public class FailoverServiceTest {
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
         MasterFailoverService masterFailoverService =
-            new MasterFailoverService(registryClient, masterConfig, processService);
+            new MasterFailoverService(registryClient, masterConfig, processService, cacheManager);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
             masterConfig,
             processService,

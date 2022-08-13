@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+import lombok.NonNull;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -29,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
@@ -36,23 +42,15 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactor
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
-import lombok.NonNull;
 
 @Service
 public class MasterFailoverService {
@@ -63,13 +61,17 @@ public class MasterFailoverService {
     private final ProcessService processService;
     private final String localAddress;
 
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
-                                 @NonNull ProcessService processService) {
+                                 @NonNull ProcessService processService,
+                                 @NonNull ProcessInstanceExecCacheManager processInstanceExecCacheManager) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
         this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
 
     }
 
@@ -253,6 +255,15 @@ public class MasterFailoverService {
 
         if (processInstance.getStartTime().after(beFailoveredMasterStartupTime)) {
             // The processInstance is newly created
+            return false;
+        }
+        if (processInstance.getRestartTime() != null && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
+            // the processInstance is already be failovered.
+            return false;
+        }
+
+        if (processInstanceExecCacheManager.contains(processInstance.getId())) {
+            // the processInstance is a running process instance in the current master
             return false;
         }
 
