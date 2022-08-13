@@ -39,7 +39,12 @@ with ProcessDefinition(name="task_condition_example", tenant="tenant_exists") as
     pre_task_1 = Shell(name="pre_task_1", command="echo pre_task_1")
     pre_task_2 = Shell(name="pre_task_2", command="echo pre_task_2")
     pre_task_3 = Shell(name="pre_task_3", command="echo pre_task_3")
-    cond_operator = And(And(SUCCESS(pre_task_1, pre_task_2), FAILURE(pre_task_3),),)
+    cond_operator = And(
+        And(
+            SUCCESS(pre_task_1, pre_task_2),
+            FAILURE(pre_task_3),
+        ),
+    )
 
     success_branch = Shell(name="success_branch", command="echo success_branch")
     fail_branch = Shell(name="fail_branch", command="echo fail_branch")

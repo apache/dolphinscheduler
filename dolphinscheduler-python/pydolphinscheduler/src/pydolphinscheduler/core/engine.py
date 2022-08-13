@@ -86,7 +86,9 @@ class Engine(Task):
         custom_params = {
             "programType": self.program_type,
             "mainClass": self.main_class,
-            "mainJar": {"id": self.get_jar_id(),},
+            "mainJar": {
+                "id": self.get_jar_id(),
+            },
         }
         params.update(custom_params)
         return params
