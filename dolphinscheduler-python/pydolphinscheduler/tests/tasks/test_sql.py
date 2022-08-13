@@ -62,7 +62,8 @@ from pydolphinscheduler.tasks.sql import Sql, SqlType
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.database.Database.get_database_info",
@@ -103,7 +104,8 @@ def test_get_sql_type(
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.database.Database.get_database_info",

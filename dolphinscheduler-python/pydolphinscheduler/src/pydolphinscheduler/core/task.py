@@ -65,7 +65,10 @@ class TaskRelation(Base):
     }
 
     def __init__(
-        self, pre_task_code: int, post_task_code: int, name: Optional[str] = None,
+        self,
+        pre_task_code: int,
+        post_task_code: int,
+        name: Optional[str] = None,
     ):
         super().__init__(name)
         self.pre_task_code = pre_task_code

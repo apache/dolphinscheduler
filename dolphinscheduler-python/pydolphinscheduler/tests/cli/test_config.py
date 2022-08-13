@@ -44,7 +44,12 @@ def teardown_file_env():
 
 
 @pytest.mark.parametrize(
-    "home", [None, "/tmp/pydolphinscheduler", "/tmp/test_abc",],
+    "home",
+    [
+        None,
+        "/tmp/pydolphinscheduler",
+        "/tmp/test_abc",
+    ],
 )
 def test_config_init(teardown_file_env, home):
     """Test command line interface `config --init`."""
