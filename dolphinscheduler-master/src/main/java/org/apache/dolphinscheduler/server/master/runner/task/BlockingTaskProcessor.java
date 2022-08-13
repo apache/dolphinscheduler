@@ -114,19 +114,21 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
-        initTaskParameters();
-        logger.info("blocking task start");
+        logger.info("blocking task submit success");
         return true;
     }
 
     @Override
     protected boolean runTask() {
+        logger.info("blocking task starting");
+        initTaskParameters();
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
             endTask();
         } else {
             endTask();
         }
+        logger.info("blocking task finished");
         return true;
     }
 
