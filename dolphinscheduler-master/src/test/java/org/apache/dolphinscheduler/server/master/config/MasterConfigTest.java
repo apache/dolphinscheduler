@@ -36,6 +36,6 @@ public class MasterConfigTest {
     @Test
     public void getMasterDispatchTaskNumber() {
         int masterDispatchTaskNumber = masterConfig.getDispatchTaskNumber();
-        Assert.assertEquals(3, masterDispatchTaskNumber);
+        Assert.assertEquals(4, masterDispatchTaskNumber);
     }
 }
