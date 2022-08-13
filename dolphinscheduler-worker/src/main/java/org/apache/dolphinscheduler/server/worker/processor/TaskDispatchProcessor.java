@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -96,7 +96,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
@@ -115,7 +115,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
         }
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                                                        taskExecutionContext.getTaskInstanceId());
+                    taskExecutionContext.getTaskInstanceId());
 
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
@@ -129,10 +129,11 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
 
             if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
                 boolean osUserExistFlag;
-                //if Using distributed is true and Currently supported systems are linux,Should not let it automatically
-                //create tenants,so TenantAutoCreate has no effect
+                // if Using distributed is true and Currently supported systems are linux,Should not let it
+                // automatically
+                // create tenants,so TenantAutoCreate has no effect
                 if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
-                    //use the id command to judge in linux
+                    // use the id command to judge in linux
                     osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
                 } else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
                     // if not exists this user, then create
@@ -145,14 +146,14 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 // check if the OS user exists
                 if (!osUserExistFlag) {
                     logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
-                                 taskExecutionContext.getTenantCode(),
-                                 taskExecutionContext.getTaskInstanceId());
+                            taskExecutionContext.getTenantCode(),
+                            taskExecutionContext.getTaskInstanceId());
                     TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                    taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
+                    taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
                     taskExecutionContext.setEndTime(new Date());
                     workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                                                             masterAddress,
-                                                             CommandType.TASK_EXECUTE_RESULT);
+                            masterAddress,
+                            CommandType.TASK_EXECUTE_RESULT);
                     return;
                 }
 
@@ -165,41 +166,41 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                     FileUtils.createWorkDirIfAbsent(execLocalPath);
                 } catch (Throwable ex) {
                     logger.error("create execLocalPath fail, path: {}, taskInstanceId: {}",
-                                 execLocalPath,
-                                 taskExecutionContext.getTaskInstanceId(),
-                                 ex);
+                            execLocalPath,
+                            taskExecutionContext.getTaskInstanceId(),
+                            ex);
                     TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                    taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
+                    taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
                     workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                                                             masterAddress,
-                                                             CommandType.TASK_EXECUTE_RESULT);
+                            masterAddress,
+                            CommandType.TASK_EXECUTE_RESULT);
                     return;
                 }
             }
 
             // delay task process
             long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                                                      taskExecutionContext.getDelayTime() * 60L);
+                    taskExecutionContext.getDelayTime() * 60L);
             if (remainTime > 0) {
                 logger.info("delay the execution of task instance {}, delay time: {} s",
-                            taskExecutionContext.getTaskInstanceId(),
-                            remainTime);
-                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
+                        taskExecutionContext.getTaskInstanceId(),
+                        remainTime);
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
                 taskExecutionContext.setStartTime(null);
                 workerMessageSender.sendMessage(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
             }
 
             // submit task to manager
             boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext,
-                                                                      masterAddress,
-                                                                      workerMessageSender,
-                                                                      alertClientService,
-                                                                      taskPluginManager,
-                                                                      storageOperate));
+                    masterAddress,
+                    workerMessageSender,
+                    alertClientService,
+                    taskPluginManager,
+                    storageOperate));
             if (!offer) {
                 logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
-                            workerManager.getWaitSubmitQueueSize(),
-                            taskExecutionContext.getTaskInstanceId());
+                        workerManager.getWaitSubmitQueueSize(),
+                        taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_REJECT);
             }
         } finally {

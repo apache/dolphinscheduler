@@ -159,6 +159,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
+
+        if(checkDescriptionLength(description)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
+
         String fullName = getFullName(currentDir, name);
         result = verifyResource(loginUser, type, fullName, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -238,6 +244,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         result = verifyPid(loginUser, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -367,6 +377,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -1072,6 +1086,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
 
         //check file suffix
         String nameSuffix = fileSuffix.trim();
@@ -1446,6 +1464,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         result.put(Constants.DATA_LIST, list);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public Resource queryResourcesFileInfo(String userName, String fullName) {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE);
+        if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
+            String msg = String.format("Can not find valid resource by name %s", fullName);
+            throw new IllegalArgumentException(msg);
+        }
+        return (Resource) resourceResponse.getData();
     }
 
     /**

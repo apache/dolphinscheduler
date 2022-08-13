@@ -32,7 +32,9 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinition,
     ProcessDefinitionContext,
 )
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base
 
 logger = getLogger(__name__)
@@ -175,17 +177,27 @@ class Task(Base):
     def resource_list(self) -> List:
         """Get task define attribute `resource_list`."""
         resources = set()
-        for resource in self._resource_list:
-            if type(resource) == str:
-                resources.add(self.query_resource(resource).get(ResourceKey.ID))
-            elif type(resource) == dict and resource.get(ResourceKey.ID) is not None:
+        for res in self._resource_list:
+            if type(res) == str:
+                resources.add(
+                    Resource(name=res, user_name=self.user_name).get_id_from_database()
+                )
+            elif type(res) == dict and res.get(ResourceKey.ID) is not None:
                 logger.warning(
                     """`resource_list` should be defined using List[str] with resource paths,
                        the use of ids to define resources will be remove in version 3.2.0.
                     """
                 )
-                resources.add(resource.get(ResourceKey.ID))
+                resources.add(res.get(ResourceKey.ID))
         return [{ResourceKey.ID: r} for r in resources]
+
+    @property
+    def user_name(self) -> Optional[str]:
+        """Return user name of process definition."""
+        if self.process_definition:
+            return self.process_definition.user.name
+        else:
+            raise PyDSParamException("`user_name` cannot be empty.")
 
     @property
     def condition_result(self) -> Dict:
@@ -288,17 +300,9 @@ class Task(Base):
         equal to 0 by java gateway, otherwise if will return the exists code and version.
         """
         # TODO get code from specific project process definition and task name
-        gateway = launch_gateway()
-        result = gateway.entry_point.getCodeAndVersion(
+        result = JavaGate().get_code_and_version(
             self.process_definition._project, self.process_definition.name, self.name
         )
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")
-
-    def query_resource(self, full_name):
-        """Get resource info from java gateway, contains resource id, name."""
-        gateway = launch_gateway()
-        return gateway.entry_point.queryResourcesFileInfo(
-            self.process_definition.user.name, full_name
-        )
