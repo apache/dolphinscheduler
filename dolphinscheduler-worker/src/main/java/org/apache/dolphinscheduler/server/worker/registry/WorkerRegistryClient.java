@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
@@ -25,6 +26,9 @@ import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
@@ -35,12 +39,18 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 @Slf4j
 @Service
-public class WorkerRegistryClient {
+public class WorkerRegistryClient implements AutoCloseable {
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -50,6 +60,9 @@ public class WorkerRegistryClient {
 
     @Autowired
     private RegistryClient registryClient;
+
+    @Autowired
+    private WorkerConnectStrategy workerConnectStrategy;
 
     private WorkerHeartBeatTask workerHeartBeatTask;
 
@@ -61,11 +74,19 @@ public class WorkerRegistryClient {
                 () -> workerManagerThread.getWaitSubmitQueueSize());
     }
 
-    /**
-     * registry
-     */
-    public void registry() {
+    public void start() {
+        try {
+            registry();
+            registryClient.addConnectionStateListener(
+                    new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
+        } catch (Exception ex) {
+            throw new RegistryException("Worker registry client start up error", ex);
+        }
+    }
+
+    private void registry() {
         WorkerHeartBeat workerHeartBeat = workerHeartBeatTask.getHeartBeat();
+
 
         for (String workerZKPath : workerConfig.getWorkerGroupRegistryPaths()) {
             // remove before persist
@@ -81,36 +102,21 @@ public class WorkerRegistryClient {
         // sleep 1s, waiting master failover remove
         ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
 
-        // delete dead server
-        registryClient.handleDeadServer(workerConfig.getWorkerGroupRegistryPaths(), NodeType.WORKER, Constants.DELETE_OP);
         workerHeartBeatTask.start();
 
         log.info("Worker node: {} registry finished", workerConfig.getWorkerAddress());
     }
 
-    /**
-     * remove registry info
-     */
-    public void unRegistry() throws IOException {
-        try {
-            for (String workerZkPath : workerConfig.getWorkerGroupRegistryPaths()) {
-                registryClient.remove(workerZkPath);
-                log.info("Worker node : {} unRegistry from ZK {}.", workerConfig.getWorkerAddress(), workerZkPath);
-            }
-        } catch (Exception ex) {
-            log.error("Remove worker zk path exception", ex);
-        }
-
-        registryClient.close();
-        log.info("Worker registry client closed");
-    }
-
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) {
-        registryClient.handleDeadServer(nodeSet, nodeType, opType);
-    }
-
     public void setRegistryStoppable(IStoppable stoppable) {
         registryClient.setStoppable(stoppable);
+    }
+
+    @Override
+    public void close() throws IOException {
+        workerHeartBeatTask.shutdown();
+
+        registryClient.close();
+        log.info("registry client closed");
     }
 
 }

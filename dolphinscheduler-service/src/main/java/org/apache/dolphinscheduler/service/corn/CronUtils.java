@@ -23,7 +23,7 @@ import com.cronutils.parser.CronParser;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -127,7 +127,7 @@ public class CronUtils {
     public static List<Date> getFireDateList(Date startTime, Date endTime, CronExpression cronExpression) {
         List<Date> dateList = new ArrayList<>();
 
-        while (Stopper.isRunning()) {
+        while (ServerLifeCycleManager.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
             if (startTime.after(endTime)) {
                 break;
@@ -172,7 +172,7 @@ public class CronUtils {
     public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression) {
         List<Date> dateList = new ArrayList<>();
 
-        while (Stopper.isRunning()) {
+        while (ServerLifeCycleManager.isRunning()) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
             if (startTime.after(endTime) || startTime.equals(endTime)) {
                 break;

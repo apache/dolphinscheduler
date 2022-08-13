@@ -68,8 +68,11 @@ public class WorkerRegistryClientTest {
 
     @Mock
     private WorkerManagerThread workerManagerThread;
-    
-    //private static final Set<String> workerGroups;
+
+    @Mock
+    private WorkerConnectStrategy workerConnectStrategy;
+
+    // private static final Set<String> workerGroups;
 
     static {
         // workerGroups = Sets.newHashSet(DEFAULT_WORKER_GROUP, TEST_WORKER_GROUP);
@@ -78,27 +81,25 @@ public class WorkerRegistryClientTest {
     @Before
     public void before() {
         given(workerConfig.getGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
-        //given(heartBeatExecutor.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
-        //scheduleAtFixedRate
-        given(heartBeatExecutor.scheduleAtFixedRate(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(TimeUnit.class))).willReturn(null);
+        // given(heartBeatExecutor.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
+        // scheduleAtFixedRate
+        given(heartBeatExecutor.scheduleAtFixedRate(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(),
+                Mockito.any(TimeUnit.class))).willReturn(null);
 
     }
 
     @Test
-    public void testRegistry() {
+    public void testStart() {
         workerRegistryClient.initWorkRegistry();
 
         given(workerManagerThread.getThreadPoolQueueSize()).willReturn(1);
 
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(NodeType.class))).willReturn(true);
 
-        given(workerConfig.getHeartbeatInterval()).willReturn(Duration.ofSeconds(1L));
+        given(workerConfig.getHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
 
-        workerRegistryClient.registry();
+        workerRegistryClient.start();
 
-        Mockito.verify(registryClient, Mockito.times(1)).handleDeadServer(Mockito.anyCollection(),
-                                                                          Mockito.any(NodeType.class),
-                                                                          Mockito.anyString());
     }
 
     @Test

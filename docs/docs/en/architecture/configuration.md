@@ -181,28 +181,40 @@ security.authentication.type|PASSWORD| authentication type
 
 |Parameters | Default value| Description|
 |--|--|--|
-master.listen.port|5678|master listen port
-master.exec.threads|100|master-service execute thread number, used to limit the number of process instances in parallel
-master.exec.task.num|20|defines the number of parallel tasks for each process instance of the master-service
-master.dispatch.task.num|3|defines the number of dispatch tasks for each batch of the master-service
-master.host.selector|LowerWeight|master host selector, to select a suitable worker to run the task, optional value: random, round-robin, lower weight
-master.heartbeat.interval|10|master heartbeat interval, the unit is second
-master.task.commit.retryTimes|5|master commit task retry times
-master.task.commit.interval|1000|master commit task interval, the unit is millisecond
-master.max.cpuload.avg|-1|master max CPU load avg, only higher than the system CPU load average, master server can schedule. default value -1: the number of CPU cores * 2
-master.reserved.memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
+|master.listen-port|5678|master listen port|
+|master.fetch-command-num|10|the number of commands fetched by master|
+|master.pre-exec-threads|10|master prepare execute thread number to limit handle commands in parallel|
+|master.exec-threads|100|master execute thread number to limit process instances in parallel|
+|master.dispatch-task-number|3|master dispatch task number per batch|
+|master.host-selector|lower_weight|master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight|
+|master.heartbeat-interval|10|master heartbeat interval, the unit is second|
+|master.task-commit-retry-times|5|master commit task retry times|
+|master.task-commit-interval|1000|master commit task interval, the unit is millisecond|
+|master.state-wheel-interval|5|time to check status|
+|master.max-cpu-load-avg|-1|master max CPU load avg, only higher than the system CPU load average, master server can schedule. default value -1: the number of CPU cores * 2|
+|master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G|
+|master.failover-interval|10|failover interval, the unit is minute|
+|master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
+|master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
+|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
 
 
 ### worker.properties [worker-service log config]
 
 |Parameters | Default value| Description|
 |--|--|--|
-worker.listen.port|1234|worker-service listen port
-worker.exec.threads|100|worker-service execute thread number, used to limit the number of task instances in parallel
-worker.heartbeat.interval|10|worker-service heartbeat interval, the unit is second
-worker.max.cpuload.avg|-1|worker max CPU load avg, only higher than the system CPU load average, worker server can be dispatched tasks. default value -1: the number of CPU cores * 2
-worker.reserved.memory|0.3|worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
-worker.groups|default|worker groups separated by comma, e.g., 'worker.groups=default,test' <br> worker will join corresponding group according to this config when startup
+|worker.listen-port|1234|worker-service listen port|
+|worker.exec-threads|100|worker-service execute thread number, used to limit the number of task instances in parallel|
+|worker.heartbeat-interval|10|worker-service heartbeat interval, the unit is second|
+|worker.host-weight|100|worker host weight to dispatch tasks|
+|worker.tenant-auto-create|true|tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.|
+|worker.max-cpu-load-avg|-1|worker max CPU load avg, only higher than the system CPU load average, worker server can be dispatched tasks. default value -1: the number of CPU cores * 2|
+|worker.reserved-memory|0.3|worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G|
+|worker.groups|default|worker groups separated by comma, e.g., 'worker.groups=default,test' <br> worker will join corresponding group according to this config when startup|
+|worker.alert-listen-host|localhost|the alert listen host of worker|
+|worker.alert-listen-port|50052|the alert listen port of worker|
+|worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
+|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
 
 
 ### alert.properties [alert-service log config]

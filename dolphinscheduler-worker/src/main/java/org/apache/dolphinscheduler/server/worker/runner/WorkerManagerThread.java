@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import com.facebook.presto.jdbc.internal.javax.annotation.Nullable;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.slf4j.Logger;
@@ -103,8 +104,11 @@ public class WorkerManagerThread implements Runnable {
     @Override
     public void run() {
         Thread.currentThread().setName("Worker-Execute-Manager-Thread");
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
+                if (!ServerLifeCycleManager.isRunning()) {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                }
                 final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
                 workerExecService.submit(workerDelayTaskExecuteRunnable);
             } catch (Exception e) {

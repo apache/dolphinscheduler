@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskCallbackFunction;
@@ -56,12 +56,16 @@ public class AsyncTaskLooper extends BaseDaemonThread {
 
     @Override
     public void run() {
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
                 AsyncTaskExecutionContext asyncTaskExecutionContext = AsyncTaskDelayQueue.pollAsyncTask();
                 if (asyncTaskExecutionContext == null) {
                     continue;
                 }
+                if (!ServerLifeCycleManager.isRunning()) {
+                    continue;
+                }
+
                 final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
                 if (TaskExecutionContextCacheManager.getByTaskInstanceId(taskExecutionContext.getTaskInstanceId()) == null) {
                     logger.warn("Cannot find the taskInstance from TaskExecutionContextCacheManager, the task may already been killed");

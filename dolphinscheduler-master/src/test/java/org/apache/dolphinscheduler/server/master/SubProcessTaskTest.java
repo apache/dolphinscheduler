@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Stopper.class})
+@PrepareForTest({ServerLifeCycleManager.class})
 public class SubProcessTaskTest {
 
     /**
@@ -72,8 +72,8 @@ public class SubProcessTaskTest {
         config.setTaskCommitRetryTimes(3);
         config.setTaskCommitInterval(Duration.ofSeconds(1L));
 
-        PowerMockito.mockStatic(Stopper.class);
-        PowerMockito.when(Stopper.isRunning()).thenReturn(true);
+        PowerMockito.mockStatic(ServerLifeCycleManager.class);
+        PowerMockito.when(ServerLifeCycleManager.isStopped()).thenReturn(false);
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
@@ -85,17 +85,17 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = getTaskInstance();
 
         Mockito.when(processService
-                        .findProcessInstanceById(processInstance.getId()))
+                .findProcessInstanceById(processInstance.getId()))
                 .thenReturn(processInstance);
 
         // for SubProcessTaskExecThread.setTaskInstanceState
         Mockito.when(processService
-                        .updateTaskInstance(Mockito.any()))
+                .updateTaskInstance(Mockito.any()))
                 .thenReturn(true);
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                        .submitTask(processInstance, taskInstance))
+                .submitTask(processInstance, taskInstance))
                 .thenAnswer(t -> t.getArgument(0));
 
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -113,10 +113,10 @@ public class SubProcessTaskTest {
         subProcessInstance.setVarPool(getProperty());
         // for SubProcessTaskExecThread.waitTaskQuit
         Mockito.when(processService
-                        .findProcessInstanceById(subProcessInstance.getId()))
+                .findProcessInstanceById(subProcessInstance.getId()))
                 .thenReturn(subProcessInstance);
         Mockito.when(processService
-                        .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
+                .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
                 .thenReturn(subProcessInstance);
 
         return taskInstance;
@@ -125,9 +125,9 @@ public class SubProcessTaskTest {
     @Test
     public void testBasicSuccess() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
-        //SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        // SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
+        // taskExecThread.call();
+        // Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     @Test

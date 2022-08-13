@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -46,8 +47,10 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,16 +58,11 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 /**
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
  */
 @Service
-public class MasterSchedulerBootstrap extends BaseDaemonThread {
+public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerBootstrap.class);
 
@@ -116,7 +114,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
      * constructor of MasterSchedulerService
      */
     public void init() {
-        this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
+        this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils
+                .newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
     }
 
@@ -138,11 +137,15 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
      */
     @Override
     public void run() {
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
+                if (!ServerLifeCycleManager.isRunning()) {
+                    // the current server is not at running status, cannot consume command.
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 boolean isOverload =
-                    OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
+                        OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
                 if (isOverload) {
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -167,18 +170,19 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
                     try {
                         LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                         if (processInstanceExecCacheManager.contains(processInstance.getId())) {
-                            logger.error("The workflow instance is already been cached, this case shouldn't be happened");
+                            logger.error(
+                                    "The workflow instance is already been cached, this case shouldn't be happened");
                         }
                         WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance,
-                                                                                               processService,
-                                                                                               nettyExecutorManager,
-                                                                                               processAlertManager,
-                                                                                               masterConfig,
-                                                                                               stateWheelExecuteThread,
-                                                                                               curingGlobalParamsService);
+                                processService,
+                                nettyExecutorManager,
+                                processAlertManager,
+                                masterConfig,
+                                stateWheelExecuteThread,
+                                curingGlobalParamsService);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
-                                                                      processInstance.getId()));
+                                processInstance.getId()));
                     } finally {
                         LoggerUtils.removeWorkflowInstanceIdMDC();
                     }
@@ -227,9 +231,11 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
 
         // make sure to finish handling command each time before next scan
         latch.await();
-        logger.info("Master schedule bootstrap transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
-            commands.size(), processInstances.size());
-        ProcessInstanceMetrics.recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
+        logger.info(
+                "Master schedule bootstrap transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
+                commands.size(), processInstances.size());
+        ProcessInstanceMetrics
+                .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
     }
 
@@ -262,10 +268,12 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
             }
             int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
-            final List<Command> result = processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+            final List<Command> result =
+                    processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             if (CollectionUtils.isNotEmpty(result)) {
-                logger.info("Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
-                    result.size(), thisMasterSlot, masterCount);
+                logger.info(
+                        "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
+                        result.size(), thisMasterSlot, masterCount);
             }
             ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
             return result;

@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -34,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_NODE;
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
@@ -44,39 +41,30 @@ import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
  * <p>When the Master node startup, it will register in registry center. And start a {@link MasterHeartBeatTask} to update its metadata in registry.
  */
 @Component
-public class MasterRegistryClient {
+public class MasterRegistryClient implements AutoCloseable {
 
-    /**
-     * logger
-     */
     private static final Logger logger = LoggerFactory.getLogger(MasterRegistryClient.class);
 
-    /**
-     * failover service
-     */
     @Autowired
     private FailoverService failoverService;
 
     @Autowired
     private RegistryClient registryClient;
 
-    /**
-     * master config
-     */
     @Autowired
     private MasterConfig masterConfig;
 
-    private MasterHeartBeatTask masterHeartBeatTask;
+    @Autowired
+    private MasterConnectStrategy masterConnectStrategy;
 
-    public void init() {
-        this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, registryClient);
-    }
+    private MasterHeartBeatTask masterHeartBeatTask;
 
     public void start() {
         try {
-            // master registry
+            masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, registryClient);
             registry();
-            registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConfig.getMasterRegistryPath(), registryClient));
+            registryClient.addConnectionStateListener(
+                    new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -87,7 +75,8 @@ public class MasterRegistryClient {
         registryClient.setStoppable(stoppable);
     }
 
-    public void closeRegistry() {
+    @Override
+    public void close() {
         // TODO unsubscribe MasterRegistryDataListener
         deregister();
     }
@@ -116,11 +105,8 @@ public class MasterRegistryClient {
         try {
             if (!registryClient.exists(path)) {
                 logger.info("path: {} not exists", path);
-                // handle dead server
-                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
             }
-
-            //failover server
+            // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
@@ -148,11 +134,9 @@ public class MasterRegistryClient {
                 }
                 if (!registryClient.exists(path)) {
                     logger.info("path: {} not exists", path);
-                    // handle dead server
-                    registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
                 }
             }
-            //failover server
+            // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
@@ -180,8 +164,6 @@ public class MasterRegistryClient {
         // sleep 1s, waiting master failover remove
         ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
-        // delete dead server
-        registryClient.handleDeadServer(Collections.singleton(masterRegistryPath), NodeType.MASTER, Constants.DELETE_OP);
         masterHeartBeatTask.start();
         logger.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
 
