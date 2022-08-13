@@ -233,7 +233,9 @@ class Task(Base):
         return self.get_define_custom(custom_attr=custom_attr)
 
     def get_plugin(self):
-        """Return the resource plug-in according to parameter resource_plugin and parameter
+        """Return the resource plug-in.
+
+        according to parameter resource_plugin and parameter
         process_definition.resource_plugin.
         """
         if self.resource_plugin is None:
@@ -247,8 +249,7 @@ class Task(Base):
             return self.resource_plugin.resource
 
     def get_content(self):
-        """Get the file content according to the resource plugin"""
-
+        """Get the file content according to the resource plugin."""
         if self.ext_attr is None and self.ext is None:
             return
 

@@ -24,6 +24,12 @@ from pydolphinscheduler.exceptions import PyResPluginException
 
 
 class Local:
+    """Local object, declare local resource plugin for task and workflow to dolphinscheduler.
+
+    :param prefix: A string representing the prefix of Local.
+
+    """
+
     # [init_method]
     def __init__(self, prefix: str):
         self._prefix = prefix
@@ -32,13 +38,14 @@ class Local:
 
     @property
     def prefix(self):
-        """Get the _prefix attribute"""
+        """Get the _prefix attribute."""
         return self._prefix
 
     # [start read_file_method]
     def read_file(self, suf: str):
-        """Get the content of the file, the address of the file is
-        the prefix of the resource plugin plus the parameter suf
+        """Get the content of the file.
+
+        The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
         path = Path(self.prefix).joinpath(suf)
         if not path.exists():

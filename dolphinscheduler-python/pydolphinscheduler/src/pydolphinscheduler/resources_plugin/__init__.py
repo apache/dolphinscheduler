@@ -56,7 +56,7 @@ class ResourcePlugin:
 
     # [start import_module]
     def import_module(self, script_name, script_path):
-        """Import module"""
+        """Import module."""
         spec = importlib.util.spec_from_file_location(script_name, script_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -68,7 +68,7 @@ class ResourcePlugin:
     @property
     # [start resource]
     def resource(self):
-        """Dynamically return resource plugin"""
+        """Dynamically return resource plugin."""
         for ex in self.get_all_modules():
             if ex.stem == self.type:
                 return self.import_module(ex.name, str(ex))
