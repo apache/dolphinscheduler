@@ -174,13 +174,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
         if (!taskDispatchFailedQueue.isEmpty()) {
-            consumerThreadPoolExecutor.submit(() -> {
-                try {
-                    dispatchFailedBackToTaskPriorityQueue(fetchTaskNum);
-                } catch (Exception e) {
-                    logger.warn("dispatch failed back to task priority queue error", e);
-                }
-            });
+            consumerThreadPoolExecutor.submit(() -> dispatchFailedBackToTaskPriorityQueue(fetchTaskNum));
         }
 
         for (int i = 0; i < fetchTaskNum; i++) {
@@ -212,17 +206,21 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     /**
      * put the failed dispatch task into the dispatch queue again
      */
-    private void dispatchFailedBackToTaskPriorityQueue(int fetchTaskNum) throws InterruptedException {
+    private void dispatchFailedBackToTaskPriorityQueue(int fetchTaskNum) {
         for (int i = 0; i < fetchTaskNum; i++) {
-            TaskPriority dispatchFailedTaskPriority = taskDispatchFailedQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
-            if (Objects.isNull(dispatchFailedTaskPriority)){
-                continue;
-            }
-            if (canRetry(dispatchFailedTaskPriority)){
-                dispatchFailedTaskPriority.setDispatchFailedRetryTimes(dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
-                taskPriorityQueue.put(dispatchFailedTaskPriority);
-            } else {
-                taskDispatchFailedQueue.put(dispatchFailedTaskPriority);
+            try {
+                TaskPriority dispatchFailedTaskPriority = taskDispatchFailedQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+                if (Objects.isNull(dispatchFailedTaskPriority)){
+                    continue;
+                }
+                if (canRetry(dispatchFailedTaskPriority)){
+                    dispatchFailedTaskPriority.setDispatchFailedRetryTimes(dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
+                    taskPriorityQueue.put(dispatchFailedTaskPriority);
+                } else {
+                    taskDispatchFailedQueue.put(dispatchFailedTaskPriority);
+                }
+            } catch (Exception e) {
+                logger.error("dispatch failed back to task priority queue error", e);
             }
         }
     }
