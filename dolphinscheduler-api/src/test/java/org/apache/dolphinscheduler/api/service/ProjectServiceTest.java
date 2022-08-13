@@ -207,6 +207,33 @@ public class ProjectServiceTest {
     }
 
     @Test
+    public void testHasProjectAndWritePerm() {
+
+        // Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
+        User loginUser = getLoginUser();
+        Project project = getProject();
+        Map<String, Object> result = new HashMap<>();
+        // not exist user
+        User tempUser = new User();
+        tempUser.setId(Integer.MAX_VALUE);
+        tempUser.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        boolean checkResult = projectService.hasProjectAndWritePerm(tempUser, project, result);
+        logger.info(result.toString());
+        Assert.assertFalse(checkResult);
+
+        //success
+        result = new HashMap<>();
+        project.setUserId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{project.getId()}, 0, baseServiceLogger)).thenReturn(true);
+        checkResult = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        logger.info(result.toString());
+        Assert.assertTrue(checkResult);
+    }
+
+    @Test
     public void testDeleteProject() {
         User loginUser = getLoginUser();
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject());
