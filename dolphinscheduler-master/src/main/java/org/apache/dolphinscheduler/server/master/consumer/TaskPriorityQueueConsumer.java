@@ -235,7 +235,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         long now = System.currentTimeMillis();
         // retry more than 100 times with 100 seconds delay each time
         if (dispatchFailedRetryTimes >= Constants.DEFAULT_MAX_RETRY_COUNT){
-            return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[Constants.DEFAULT_MAX_RETRY_COUNT];
+            return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[Constants.DEFAULT_MAX_RETRY_COUNT - 1];
         }
         return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[dispatchFailedRetryTimes];
     }
