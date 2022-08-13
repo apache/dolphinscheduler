@@ -39,7 +39,7 @@ it will instantiate and run all the task it have.
 
 from pydolphinscheduler.constants import ResourcePluginType
 
-# [start tutorial]
+# [start tutorial_resource_plugin]
 # [start package_import]
 # Import ProcessDefinition object to define your workflow attributes
 from pydolphinscheduler.core.process_definition import ProcessDefinition
@@ -52,7 +52,7 @@ from pydolphinscheduler.tasks.shell import Shell
 
 # [start workflow_declare]
 with ProcessDefinition(
-    name="tutorial",
+    name="tutorial_resource_plugin",
     schedule="0 0 0 * * ? *",
     start_time="2021-01-01",
     tenant="tenant_exists",
@@ -60,7 +60,7 @@ with ProcessDefinition(
         type=ResourcePluginType.LOCAL,
         prefix="/opt/",
     ),
-) as pd:
+) as process_definition:
     # [end workflow_declare]
     # [start task_declare]
     task_parent = Shell(
@@ -103,6 +103,6 @@ with ProcessDefinition(
     # [end task_relation_declare]
 
     # [start submit_or_run]
-    pd.run()
+    process_definition.run()
     # [end submit_or_run]
-# [end tutorial]
+# [end tutorial_resource_plugin]
