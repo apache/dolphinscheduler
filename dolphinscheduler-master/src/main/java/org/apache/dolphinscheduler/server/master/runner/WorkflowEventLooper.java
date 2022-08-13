@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
@@ -28,17 +28,15 @@ import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandleExcept
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandler;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class WorkflowEventLooper extends BaseDaemonThread {
@@ -59,8 +57,9 @@ public class WorkflowEventLooper extends BaseDaemonThread {
 
     @PostConstruct
     public void init() {
-        workflowEventHandlerList.forEach(workflowEventHandler -> workflowEventHandlerMap.put(workflowEventHandler.getHandleWorkflowEventType(),
-                                                                                             workflowEventHandler));
+        workflowEventHandlerList.forEach(
+                workflowEventHandler -> workflowEventHandlerMap.put(workflowEventHandler.getHandleWorkflowEventType(),
+                        workflowEventHandler));
     }
 
     @Override
@@ -72,13 +71,13 @@ public class WorkflowEventLooper extends BaseDaemonThread {
 
     public void run() {
         WorkflowEvent workflowEvent = null;
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
                 workflowEvent = workflowEventQueue.poolEvent();
                 LoggerUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
                 logger.info("Workflow event looper receive a workflow event: {}, will handle this", workflowEvent);
                 WorkflowEventHandler workflowEventHandler =
-                    workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());
+                        workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());
                 workflowEventHandler.handleWorkflowEvent(workflowEvent);
             } catch (InterruptedException e) {
                 logger.warn("WorkflowEventLooper thread is interrupted, will close this loop", e);
@@ -86,17 +85,17 @@ public class WorkflowEventLooper extends BaseDaemonThread {
                 break;
             } catch (WorkflowEventHandleException workflowEventHandleException) {
                 logger.error("Handle workflow event failed, will add this event to event queue again, event: {}",
-                    workflowEvent, workflowEventHandleException);
+                        workflowEvent, workflowEventHandleException);
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (WorkflowEventHandleError workflowEventHandleError) {
                 logger.error("Handle workflow event error, will drop this event, event: {}",
-                             workflowEvent,
-                             workflowEventHandleError);
+                        workflowEvent,
+                        workflowEventHandleError);
             } catch (Exception unknownException) {
                 logger.error(
-                    "Handle workflow event failed, get a unknown exception, will add this event to event queue again, event: {}",
-                    workflowEvent, unknownException);
+                        "Handle workflow event failed, get a unknown exception, will add this event to event queue again, event: {}",
+                        workflowEvent, unknownException);
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } finally {

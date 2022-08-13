@@ -45,4 +45,7 @@ public class WorkflowEventQueue {
         return workflowEventQueue.take();
     }
 
+    public void clearWorkflowEventQueue() {
+        workflowEventQueue.clear();
+    }
 }

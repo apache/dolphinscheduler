@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
@@ -61,7 +61,7 @@ public class EventExecuteService extends BaseDaemonThread {
 
     @Override
     public void run() {
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
                 workflowEventHandler();
                 streamTaskEventHandler();
