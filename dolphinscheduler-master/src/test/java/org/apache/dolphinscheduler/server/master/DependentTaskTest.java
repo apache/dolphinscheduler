@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -35,17 +35,16 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.time.Duration;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
+
+import java.time.Duration;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * DependentTaskTest
@@ -298,7 +297,7 @@ public class DependentTaskTest {
     @Test
     public void testWaitAndCancel() {
         // for the poor independence of UT, error on other place may causes the condition happens
-        if (!Stopper.isRunning()) {
+        if (!ServerLifeCycleManager.isRunning()) {
             return;
         }
 
