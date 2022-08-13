@@ -118,6 +118,7 @@ public class StateEventResponseService {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
                     if (!ServerLifeCycleManager.isRunning()) {
+                        // will drop the event
                         continue;
                     }
 

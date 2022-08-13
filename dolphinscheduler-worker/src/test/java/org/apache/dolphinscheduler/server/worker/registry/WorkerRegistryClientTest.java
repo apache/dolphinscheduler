@@ -92,7 +92,7 @@ public class WorkerRegistryClientTest {
     public void testStart() {
         workerRegistryClient.start();
 
-        given(workerManagerThread.getThreadPoolQueueSize()).willReturn(1);
+        given(workerManagerThread.getThreadPoolRunningTaskNum()).willReturn(1);
 
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(NodeType.class))).willReturn(true);
 
