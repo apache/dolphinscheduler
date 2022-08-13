@@ -21,6 +21,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import okhttp3.HttpUrl;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,12 +47,6 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import okhttp3.HttpUrl;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 
 /**
  * Test HttpTask
@@ -68,11 +71,11 @@ public class HttpTaskTest {
 
     @Test
     public void testHandleCheckCodeDefaultSuccess() throws Exception {
-        HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, 200);
-        HttpTask postHttpTask = generateHttpTask(HttpMethod.POST, 200);
-        HttpTask headHttpTask = generateHttpTask(HttpMethod.HEAD, 200);
-        HttpTask putHttpTask = generateHttpTask(HttpMethod.PUT, 200);
-        HttpTask deleteHttpTask = generateHttpTask(HttpMethod.DELETE, 200);
+        HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_OK);
+        HttpTask postHttpTask = generateHttpTask(HttpMethod.POST, HttpStatus.SC_OK);
+        HttpTask headHttpTask = generateHttpTask(HttpMethod.HEAD, HttpStatus.SC_OK);
+        HttpTask putHttpTask = generateHttpTask(HttpMethod.PUT, HttpStatus.SC_OK);
+        HttpTask deleteHttpTask = generateHttpTask(HttpMethod.DELETE, HttpStatus.SC_OK);
         getHttpTask.handle();
         postHttpTask.handle();
         headHttpTask.handle();
@@ -87,17 +90,18 @@ public class HttpTaskTest {
 
     @Test
     public void testHandleCheckCodeDefaultError() throws Exception {
-        HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, 400);
+        HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_BAD_REQUEST);
         getHttpTask.handle();
         Assert.assertEquals(EXIT_CODE_FAILURE, getHttpTask.getExitStatusCode());
     }
 
     @Test
     public void testHandleCheckCodeCustom() throws Exception {
+        String condition = HttpStatus.SC_CREATED + "";
         HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
-                "201", 201, "");
+                condition, HttpStatus.SC_CREATED, "");
         HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
-                "201", 200, "");
+                condition, HttpStatus.SC_OK, "");
         httpTask.handle();
         httpErrorTask.handle();
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
@@ -107,9 +111,9 @@ public class HttpTaskTest {
     @Test
     public void testHandleCheckBodyContains() throws Exception {
         HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_CONTAINS,
-                "success", 200, "{\"status\": \"success\"}");
+                "success", HttpStatus.SC_OK, "{\"status\": \"success\"}");
         HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_CONTAINS,
-                "success", 200, "{\"status\": \"failed\"}");
+                "success", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
         httpTask.handle();
         httpErrorTask.handle();
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
@@ -119,9 +123,9 @@ public class HttpTaskTest {
     @Test
     public void testHandleCheckBodyNotContains() throws Exception {
         HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
-                "failed", 200, "{\"status\": \"success\"}");
+                "failed", HttpStatus.SC_OK, "{\"status\": \"success\"}");
         HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
-                "failed", 200, "{\"status\": \"failed\"}");
+                "failed", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
         httpTask.handle();
         httpErrorTask.handle();
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
@@ -143,7 +147,7 @@ public class HttpTaskTest {
         // So we just need to check if the response body contains string "20220812"
         HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
-                200, "");
+                HttpStatus.SC_OK, "");
         httpTask.handle();
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
@@ -163,7 +167,7 @@ public class HttpTaskTest {
         // So we just need to check if the response body contains string "20220812"
         HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY, HttpMethod.POST,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
-                200, "");
+                HttpStatus.SC_OK, "");
         httpTask.handle();
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
@@ -257,7 +261,7 @@ public class HttpTaskTest {
                 } else if (request.getPath().startsWith(path)) {
                     mockResponse.setBody(actualResponseBody);
                 } else {
-                    mockResponse.setResponseCode(404);
+                    mockResponse.setResponseCode(HttpStatus.SC_NOT_FOUND);
                 }
                 return mockResponse;
             }
