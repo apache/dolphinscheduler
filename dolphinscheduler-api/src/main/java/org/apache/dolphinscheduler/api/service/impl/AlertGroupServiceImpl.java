@@ -168,7 +168,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -218,7 +218,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

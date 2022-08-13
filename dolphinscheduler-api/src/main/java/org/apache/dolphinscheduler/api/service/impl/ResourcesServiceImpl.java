@@ -158,7 +158,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if(checkDescriptionLength(description)){
+        if(checkDescriptionLengthIllegal(description)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -244,7 +244,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -379,7 +379,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -1090,7 +1090,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

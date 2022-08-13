@@ -94,11 +94,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Transactional
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
         Map<String, Object> result = new HashMap<>();
-        if( checkDescriptionLength(desc)) {
+
+        if(checkDescriptionLengthIllegal(desc)) {
             result.put(Constants.STATUS,Status.FAILED);
             result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
-        }
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         if (!canOperatorPermissions(loginUser, null,AuthorizationType.PROJECTS, PROJECT_CREATE)) {
@@ -335,11 +334,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> update(User loginUser, Long projectCode, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
-        if( checkDescriptionLength(desc)) {
+        if(checkDescriptionLengthIllegal(desc)) {
             result.put(Constants.STATUS,Status.FAILED);
             result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
-        }
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 

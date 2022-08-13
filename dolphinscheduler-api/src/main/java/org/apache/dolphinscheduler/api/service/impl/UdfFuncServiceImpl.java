@@ -93,7 +93,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -207,7 +207,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if(checkDescriptionLengthIllegal(desc)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
