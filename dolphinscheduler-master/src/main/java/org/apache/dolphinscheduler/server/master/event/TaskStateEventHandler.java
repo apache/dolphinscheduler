@@ -81,8 +81,8 @@ public class TaskStateEventHandler implements StateEventHandler {
             }
             return true;
         }
-        throw new StateEventHandleException(
-            "Task state event handle error, due to the task is not in activeTaskProcessorMaps");
+        throw new StateEventHandleError(
+                "Task state event handle error, due to the task is not in activeTaskProcessorMaps");
     }
 
     @Override
