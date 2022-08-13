@@ -84,7 +84,18 @@ with open(path_default_config_yaml, "r") as f:
 
 @pytest.mark.parametrize(
     "src, delimiter, expect",
-    [(param[0], "|", expects[0],), (param[1], "/", expects[1],),],
+    [
+        (
+            param[0],
+            "|",
+            expects[0],
+        ),
+        (
+            param[1],
+            "/",
+            expects[1],
+        ),
+    ],
 )
 def test_yaml_parser_specific_delimiter(src: str, delimiter: str, expect: Dict):
     """Test specific delimiter for :class:`YamlParser`."""
@@ -110,7 +121,17 @@ def test_yaml_parser_specific_delimiter(src: str, delimiter: str, expect: Dict):
 
 
 @pytest.mark.parametrize(
-    "src, expect", [(param[0], expects[0],), (param[1], expects[1],),],
+    "src, expect",
+    [
+        (
+            param[0],
+            expects[0],
+        ),
+        (
+            param[1],
+            expects[1],
+        ),
+    ],
 )
 def test_yaml_parser_contains(src: str, expect: Dict):
     """Test magic function :func:`YamlParser.__contain__` also with `key in obj` syntax."""
@@ -124,7 +145,17 @@ def test_yaml_parser_contains(src: str, expect: Dict):
 
 
 @pytest.mark.parametrize(
-    "src, expect", [(param[0], expects[0],), (param[1], expects[1],),],
+    "src, expect",
+    [
+        (
+            param[0],
+            expects[0],
+        ),
+        (
+            param[1],
+            expects[1],
+        ),
+    ],
 )
 def test_yaml_parser_get(src: str, expect: Dict):
     """Test magic function :func:`YamlParser.__getitem__` also with `obj[key]` syntax."""
@@ -146,7 +177,17 @@ def test_yaml_parser_get(src: str, expect: Dict):
 
 
 @pytest.mark.parametrize(
-    "src, expect", [(param[0], expects[0],), (param[1], expects[1],),],
+    "src, expect",
+    [
+        (
+            param[0],
+            expects[0],
+        ),
+        (
+            param[1],
+            expects[1],
+        ),
+    ],
 )
 def test_yaml_parser_set(src: str, expect: Dict):
     """Test magic function :func:`YamlParser.__setitem__` also with `obj[key] = val` syntax."""

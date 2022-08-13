@@ -72,7 +72,10 @@ JSON_TEMPLATE = {
     }
 }
 
-with ProcessDefinition(name="task_datax_example", tenant="tenant_exists",) as pd:
+with ProcessDefinition(
+    name="task_datax_example",
+    tenant="tenant_exists",
+) as pd:
     # This task synchronizes the data in `t_ds_project`
     # of `first_mysql` database to `target_project` of `second_mysql` database.
     # You have to make sure data source named `first_mysql` and `second_mysql` exists
