@@ -58,7 +58,8 @@ def setup_crt_first():
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 def test_property_task_params(mock_code_version, attr, expect):
     """Test task shell task property."""
@@ -120,7 +121,8 @@ def test_shell_get_define():
     ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 def test_resources_local_shell_command_content(
     mock_code_version, attr, expect, setup_crt_first

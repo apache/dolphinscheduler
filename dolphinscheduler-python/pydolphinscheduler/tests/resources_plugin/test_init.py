@@ -33,7 +33,16 @@ resources_plugin_path = project_root.joinpath(
 
 
 @pytest.mark.parametrize(
-    "attr, expected", [({"type": "res_type", "prefix": "res_prefix",}, all_res)],
+    "attr, expected",
+    [
+        (
+            {
+                "type": "res_type",
+                "prefix": "res_prefix",
+            },
+            all_res,
+        )
+    ],
 )
 def test_resources_get_all_modules(attr, expected):
     """Test resource plugin to get all res plugin names"""
@@ -66,7 +75,10 @@ def test_resources_import_modules(attrs, expected):
 
 
 @pytest.mark.parametrize(
-    "attr, expected", [(ResourcePluginType.LOCAL, "Local"),],
+    "attr, expected",
+    [
+        (ResourcePluginType.LOCAL, "Local"),
+    ],
 )
 def test_resources_resources(attr, expected):
     """Test resource plugin factory"""
@@ -76,7 +88,13 @@ def test_resources_resources(attr, expected):
 
 
 @pytest.mark.parametrize(
-    "attr", [{"type": "a", "prefix": "/tmp/",}],
+    "attr",
+    [
+        {
+            "type": "a",
+            "prefix": "/tmp/",
+        }
+    ],
 )
 def test_resources_unsupported_res(attr):
     """Test unsupported plug-ins"""

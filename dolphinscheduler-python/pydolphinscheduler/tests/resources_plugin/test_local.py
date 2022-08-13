@@ -44,15 +44,21 @@ def setup_crt_first():
 
 
 @pytest.mark.parametrize(
-    "val, expected", [(file_name, file_content),],
+    "val, expected",
+    [
+        (file_name, file_content),
+    ],
 )
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 @patch(
     "pydolphinscheduler.core.task.Task.ext",
     new_callable=PropertyMock,
-    return_value={".sh",},
+    return_value={
+        ".sh",
+    },
 )
 @patch(
     "pydolphinscheduler.core.task.Task.ext_attr",
@@ -73,7 +79,8 @@ def test_task_obtain_res_plugin(
         name="test_task_ext_attr",
         task_type=ResourcePluginType.LOCAL,
         resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL, prefix=str(res_plugin_prefix),
+            type=ResourcePluginType.LOCAL,
+            prefix=str(res_plugin_prefix),
         ),
     )
     assert expected == getattr(task, "raw_script")
@@ -91,7 +98,10 @@ def test_local_res_read_file(attr, expected, setup_crt_first):
 
 
 @pytest.mark.parametrize(
-    "attr", [{"prefix": res_plugin_prefix, "file_name": file_name},],
+    "attr",
+    [
+        {"prefix": res_plugin_prefix, "file_name": file_name},
+    ],
 )
 def test_local_res_file_not_found(attr):
     """test local resource plugin file does not exist"""

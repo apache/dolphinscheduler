@@ -56,28 +56,43 @@ with ProcessDefinition(
     schedule="0 0 0 * * ? *",
     start_time="2021-01-01",
     tenant="tenant_exists",
-    resource_plugin=ResourcePlugin(type=ResourcePluginType.LOCAL, prefix="/opt/",),
+    resource_plugin=ResourcePlugin(
+        type=ResourcePluginType.LOCAL,
+        prefix="/opt/",
+    ),
 ) as pd:
     # [end workflow_declare]
     # [start task_declare]
     task_parent = Shell(
         name="task_parent",
         command="parent.zsh",
-        resource_plugin=ResourcePlugin(type=ResourcePluginType.LOCAL, prefix="/opt/",),
+        resource_plugin=ResourcePlugin(
+            type=ResourcePluginType.LOCAL,
+            prefix="/opt/",
+        ),
     )
 
     task_child_one = Shell(
         name="task_child_one",
         command="child_one.sh",
-        resource_plugin=ResourcePlugin(type=ResourcePluginType.LOCAL, prefix="/opt/",),
+        resource_plugin=ResourcePlugin(
+            type=ResourcePluginType.LOCAL,
+            prefix="/opt/",
+        ),
     )
 
     task_child_two = Shell(
         name="task_child_two",
         command="child_two.sh",
-        resource_plugin=ResourcePlugin(type=ResourcePluginType.LOCAL, prefix="/opt/",),
+        resource_plugin=ResourcePlugin(
+            type=ResourcePluginType.LOCAL,
+            prefix="/opt/",
+        ),
     )
-    task_union = Shell(name="task_union", command="echo union",)
+    task_union = Shell(
+        name="task_union",
+        command="echo union",
+    )
     # [end task_declare]
 
     # [start task_relation_declare]

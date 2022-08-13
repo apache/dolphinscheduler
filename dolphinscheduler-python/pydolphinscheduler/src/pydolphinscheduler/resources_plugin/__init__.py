@@ -30,9 +30,9 @@ path_resources_plugin = Path(__file__).parent
 class ResourcePlugin:
     """ResourcePlugin object, declare resource plugin for task and workflow to dolphinscheduler.
 
-        :param type: A unique, meaningful string for the ResourcePlugin,
-        Its value should be taken from the constant of ResourceType in constants.py.
-        :param prefix: A string representing the prefix of ResourcePlugin.
+    :param type: A unique, meaningful string for the ResourcePlugin,
+    Its value should be taken from the constant of ResourceType in constants.py.
+    :param prefix: A string representing the prefix of ResourcePlugin.
 
     """
 

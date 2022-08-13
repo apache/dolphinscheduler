@@ -29,7 +29,17 @@ TASK_NAME = f"task_{PROCESS_DEFINITION_NAME}"
 
 
 @pytest.mark.parametrize(
-    "pre, post", [({"user": "pre_user",}, {"user": "post_user",},)],
+    "pre, post",
+    [
+        (
+            {
+                "user": "pre_user",
+            },
+            {
+                "user": "post_user",
+            },
+        )
+    ],
 )
 def test_change_process_definition_attr(pre: Dict, post: Dict):
     """Test whether process definition success when specific attribute change."""

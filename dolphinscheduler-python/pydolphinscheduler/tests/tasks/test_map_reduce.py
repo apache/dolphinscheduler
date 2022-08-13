@@ -45,7 +45,9 @@ def test_mr_get_define(mock_resource):
         "taskType": "MR",
         "taskParams": {
             "mainClass": main_class,
-            "mainJar": {"id": 1,},
+            "mainJar": {
+                "id": 1,
+            },
             "programType": program_type,
             "appName": None,
             "mainArgs": main_args,

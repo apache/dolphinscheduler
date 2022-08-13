@@ -232,7 +232,12 @@ class ProcessDefinition(Base):
         if not self.param:
             return []
         return [
-            {"prop": k, "direct": "IN", "type": "VARCHAR", "value": v,}
+            {
+                "prop": k,
+                "direct": "IN",
+                "type": "VARCHAR",
+                "value": v,
+            }
             for k, v in self.param.items()
         ]
 

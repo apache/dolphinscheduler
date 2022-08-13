@@ -48,7 +48,12 @@ def task_switch_arg_wrapper(obj, task: Task, exp: Optional[str] = None) -> Switc
 
 
 @pytest.mark.parametrize(
-    "obj", [SwitchBranch, Branch, Default,],
+    "obj",
+    [
+        SwitchBranch,
+        Branch,
+        Default,
+    ],
 )
 def test_switch_branch_attr_next_node(obj: SwitchBranch):
     """Test get attribute from class switch branch."""
@@ -58,7 +63,11 @@ def test_switch_branch_attr_next_node(obj: SwitchBranch):
 
 
 @pytest.mark.parametrize(
-    "obj", [SwitchBranch, Default,],
+    "obj",
+    [
+        SwitchBranch,
+        Default,
+    ],
 )
 def test_switch_branch_get_define_without_condition(obj: SwitchBranch):
     """Test function :func:`get_define` with None value of attribute condition from class switch branch."""
@@ -69,7 +78,11 @@ def test_switch_branch_get_define_without_condition(obj: SwitchBranch):
 
 
 @pytest.mark.parametrize(
-    "obj", [SwitchBranch, Branch,],
+    "obj",
+    [
+        SwitchBranch,
+        Branch,
+    ],
 )
 def test_switch_branch_get_define_condition(obj: SwitchBranch):
     """Test function :func:`get_define` with specific attribute condition from class switch branch."""
@@ -86,7 +99,10 @@ def test_switch_branch_get_define_condition(obj: SwitchBranch):
 @pytest.mark.parametrize(
     "args, msg",
     [
-        ((1,), ".*?parameter only support SwitchBranch but got.*?",),
+        (
+            (1,),
+            ".*?parameter only support SwitchBranch but got.*?",
+        ),
         (
             (Default(Task(TEST_NAME, TEST_TYPE)), 2),
             ".*?parameter only support SwitchBranch but got.*?",
@@ -197,7 +213,8 @@ def test_switch_condition_get_define_mix_branch_and_default():
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 def test_switch_get_define(mock_task_code_version):
     """Test task switch :func:`get_define`."""
@@ -245,7 +262,8 @@ def test_switch_get_define(mock_task_code_version):
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 def test_switch_set_dep_workflow(mock_task_code_version):
     """Test task switch set dependence in workflow level."""

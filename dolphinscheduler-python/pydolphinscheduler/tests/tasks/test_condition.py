@@ -44,7 +44,12 @@ TEST_OPERATOR_LIST = ("AND", "OR")
 
 
 @pytest.mark.parametrize(
-    "obj, expect", [(Status, "STATUS"), (SUCCESS, "SUCCESS"), (FAILURE, "FAILURE"),],
+    "obj, expect",
+    [
+        (Status, "STATUS"),
+        (SUCCESS, "SUCCESS"),
+        (FAILURE, "FAILURE"),
+    ],
 )
 def test_class_status_status_name(obj: Status, expect: str):
     """Test class status and sub class property status_name."""
@@ -84,13 +89,23 @@ def test_class_status_depend_item_list_no_expect_type(obj: Status, tasks: Tuple)
 def test_class_status_depend_item_list(obj: Status, tasks: Tuple):
     """Test class status and sub class function :func:`depend_item_list`."""
     status = obj.status_name()
-    expect = [{"depTaskCode": i.code, "status": status,} for i in tasks]
+    expect = [
+        {
+            "depTaskCode": i.code,
+            "status": status,
+        }
+        for i in tasks
+    ]
     assert obj(*tasks).get_define() == expect
 
 
 @pytest.mark.parametrize(
     "obj, expect",
-    [(ConditionOperator, "CONDITIONOPERATOR"), (And, "AND"), (Or, "OR"),],
+    [
+        (ConditionOperator, "CONDITIONOPERATOR"),
+        (And, "AND"),
+        (Or, "OR"),
+    ],
 )
 def test_condition_operator_operator_name(obj: ConditionOperator, expect: str):
     """Test class ConditionOperator and sub class class function :func:`operator_name`."""
@@ -99,7 +114,11 @@ def test_condition_operator_operator_name(obj: ConditionOperator, expect: str):
 
 @pytest.mark.parametrize(
     "obj, expect",
-    [(ConditionOperator, "CONDITIONOPERATOR"), (And, "AND"), (Or, "OR"),],
+    [
+        (ConditionOperator, "CONDITIONOPERATOR"),
+        (And, "AND"),
+        (Or, "OR"),
+    ],
 )
 def test_condition_operator_relation(obj: ConditionOperator, expect: str):
     """Test class ConditionOperator and sub class class property `relation`."""
@@ -116,7 +135,10 @@ def test_condition_operator_relation(obj: ConditionOperator, expect: str):
         ),
         (
             ConditionOperator,
-            [Status(Task("1", TEST_TYPE)), 1.0,],
+            [
+                Status(Task("1", TEST_TYPE)),
+                1.0,
+            ],
             ".*?operator parameter support ConditionTask and ConditionOperator.*?",
         ),
         (
@@ -240,7 +262,10 @@ def test_condition_operator_set_define_attr_operator(
         {
             "relation": obj.operator_name(),
             "dependItemList": [
-                {"depTaskCode": task.code, "status": status.status_name(),}
+                {
+                    "depTaskCode": task.code,
+                    "status": status.status_name(),
+                }
             ],
         }
         for _ in range(task_num)
@@ -279,7 +304,10 @@ def test_condition_operator_set_define_attr_mix_operator(
             {
                 "relation": cond.operator_name(),
                 "dependItemList": [
-                    {"depTaskCode": task.code, "status": status.status_name(),}
+                    {
+                        "depTaskCode": task.code,
+                        "status": status.status_name(),
+                    }
                 ],
             }
         )
@@ -289,7 +317,8 @@ def test_condition_operator_set_define_attr_mix_operator(
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(12345, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(12345, 1),
 )
 @patch(
     "pydolphinscheduler.tasks.condition.Condition.gen_code_and_version",
@@ -299,8 +328,14 @@ def test_condition_get_define(mock_condition_code_version, mock_task_code_versio
     """Test task condition :func:`get_define`."""
     common_task = Task(name="common_task", task_type="test_task_condition")
     cond_operator = And(
-        And(SUCCESS(common_task, common_task), FAILURE(common_task, common_task),),
-        Or(SUCCESS(common_task, common_task), FAILURE(common_task, common_task),),
+        And(
+            SUCCESS(common_task, common_task),
+            FAILURE(common_task, common_task),
+        ),
+        Or(
+            SUCCESS(common_task, common_task),
+            FAILURE(common_task, common_task),
+        ),
     )
 
     name = "test_condition_get_define"
@@ -360,7 +395,8 @@ def test_condition_get_define(mock_condition_code_version, mock_task_code_versio
 
 
 @patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version", return_value=(123, 1),
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
 )
 def test_condition_set_dep_workflow(mock_task_code_version):
     """Test task condition set dependence in workflow level."""
@@ -368,7 +404,12 @@ def test_condition_set_dep_workflow(mock_task_code_version):
         pre_task_1 = Task(name="pre_task_1", task_type=TEST_TYPE)
         pre_task_2 = Task(name="pre_task_2", task_type=TEST_TYPE)
         pre_task_3 = Task(name="pre_task_3", task_type=TEST_TYPE)
-        cond_operator = And(And(SUCCESS(pre_task_1, pre_task_2), FAILURE(pre_task_3),),)
+        cond_operator = And(
+            And(
+                SUCCESS(pre_task_1, pre_task_2),
+                FAILURE(pre_task_3),
+            ),
+        )
 
         success_branch = Task(name="success_branch", task_type=TEST_TYPE)
         fail_branch = Task(name="fail_branch", task_type=TEST_TYPE)
@@ -410,6 +451,10 @@ def test_condition_set_dep_workflow(mock_task_code_version):
         assert all(
             [
                 child._downstream_task_codes == {condition.code}
-                for child in [pre_task_1, pre_task_2, pre_task_3,]
+                for child in [
+                    pre_task_1,
+                    pre_task_2,
+                    pre_task_3,
+                ]
             ]
         )

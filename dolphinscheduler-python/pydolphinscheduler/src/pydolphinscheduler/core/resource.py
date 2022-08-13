@@ -66,5 +66,8 @@ class Resource(Base):
                 "`user_name` and `content` are required when create or update resource from python gate."
             )
         JavaGate().create_or_update_resource(
-            self.user_name, self.name, self.content, self.description,
+            self.user_name,
+            self.name,
+            self.content,
+            self.description,
         )
