@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -112,7 +112,7 @@ public class StateEventResponseService {
         @Override
         public void run() {
             logger.info("State event loop service started");
-            while (Stopper.isRunning()) {
+            while (!ServerLifeCycleManager.isStopped()) {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();

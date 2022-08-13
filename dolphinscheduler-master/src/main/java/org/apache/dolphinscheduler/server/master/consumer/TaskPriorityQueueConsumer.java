@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -39,9 +40,12 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import org.apache.commons.collections.CollectionUtils;
-
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,13 +54,6 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * TaskUpdateQueue consumer
@@ -116,7 +113,8 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
     @PostConstruct
     public void init() {
-        this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
+        this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils
+                .newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
         logger.info("Task priority queue consume thread staring");
         super.start();
         logger.info("Task priority queue consume thread started");
@@ -125,7 +123,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     @Override
     public void run() {
         int fetchTaskNum = masterConfig.getDispatchTaskNumber();
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
@@ -189,23 +187,24 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         boolean result = false;
         try {
             WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskPriority.getProcessInstanceId());
+                    processInstanceExecCacheManager.getByProcessInstanceId(taskPriority.getProcessInstanceId());
             if (workflowExecuteRunnable == null) {
                 logger.error("Cannot find the related processInstance of the task, taskPriority: {}", taskPriority);
                 return true;
             }
             Optional<TaskInstance> taskInstanceOptional =
-                workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
+                    workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
             if (!taskInstanceOptional.isPresent()) {
                 logger.error("Cannot find the task instance from related processInstance, taskPriority: {}",
-                    taskPriority);
+                        taskPriority);
                 // we return true, so that we will drop this task.
                 return true;
             }
             TaskInstance taskInstance = taskInstanceOptional.get();
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
             ExecutionContext executionContext =
-                new ExecutionContext(toCommand(context), ExecutorType.WORKER, context.getWorkerGroup(), taskInstance);
+                    new ExecutionContext(toCommand(context), ExecutorType.WORKER, context.getWorkerGroup(),
+                            taskInstance);
 
             if (isTaskNeedToCheck(taskPriority)) {
                 if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
@@ -218,13 +217,13 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
             if (result) {
                 logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
-                    taskPriority.getTaskId(),
-                    executionContext.getHost());
+                        taskPriority.getTaskId(),
+                        executionContext.getHost());
                 addDispatchEvent(context, executionContext);
             } else {
                 logger.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
-                    taskPriority.getTaskId(),
-                    executionContext.getHost());
+                        taskPriority.getTaskId(),
+                        executionContext.getHost());
             }
         } catch (RuntimeException | ExecuteException e) {
             logger.error("Master dispatch task to worker error, taskPriority: {}", taskPriority, e);
@@ -236,16 +235,17 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      * add dispatch event
      */
     private void addDispatchEvent(TaskExecutionContext context, ExecutionContext executionContext) {
-        TaskEvent taskEvent = TaskEvent.newDispatchEvent(context.getProcessInstanceId(), context.getTaskInstanceId(), executionContext.getHost().getAddress());
+        TaskEvent taskEvent = TaskEvent.newDispatchEvent(context.getProcessInstanceId(), context.getTaskInstanceId(),
+                executionContext.getHost().getAddress());
         taskEventService.addEvent(taskEvent);
     }
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         // todo: we didn't set the host here, since right now we didn't need to retry this message.
         TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
-                                                                     masterConfig.getMasterAddress(),
-                                                                     taskExecutionContext.getHost(),
-                                                                     System.currentTimeMillis());
+                masterConfig.getMasterAddress(),
+                taskExecutionContext.getHost(),
+                System.currentTimeMillis());
         return requestCommand.convert2Command();
     }
 

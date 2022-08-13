@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.consumer;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -347,7 +347,7 @@ public class TaskPriorityQueueConsumerTest {
 
     @After
     public void close() {
-        Stopper.stop();
+        ServerLifeCycleManager.toStopped();
     }
 
 }

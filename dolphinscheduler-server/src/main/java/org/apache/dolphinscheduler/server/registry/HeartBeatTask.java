@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Heart beat task
@@ -36,10 +36,7 @@ public class HeartBeatTask implements Runnable {
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
     private int workerWaitingTaskCount;
-    private final String serverType;
     private final HeartBeat heartBeat;
-
-    private final int heartBeatErrorThreshold;
 
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
@@ -47,14 +44,10 @@ public class HeartBeatTask implements Runnable {
                          double maxCpuloadAvg,
                          double reservedMemory,
                          Set<String> heartBeatPaths,
-                         String serverType,
-                         RegistryClient registryClient,
-                         int heartBeatErrorThreshold) {
+                         RegistryClient registryClient) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
-        this.serverType = serverType;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
-        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
     public HeartBeatTask(long startupTime,
@@ -62,17 +55,13 @@ public class HeartBeatTask implements Runnable {
                          double reservedMemory,
                          int hostWeight,
                          Set<String> heartBeatPaths,
-                         String serverType,
                          RegistryClient registryClient,
                          int workerThreadCount,
-                         int workerWaitingTaskCount,
-                         int heartBeatErrorThreshold) {
+                         int workerWaitingTaskCount) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
         this.workerWaitingTaskCount = workerWaitingTaskCount;
-        this.serverType = serverType;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
-        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
     public String getHeartBeatInfo() {
@@ -82,14 +71,9 @@ public class HeartBeatTask implements Runnable {
     @Override
     public void run() {
         try {
-            // check dead or not in zookeeper
-            for (String heartBeatPath : heartBeatPaths) {
-                if (registryClient.checkIsDeadServer(heartBeatPath, serverType)) {
-                    registryClient.getStoppable().stop("i was judged to death, release resources and stop myself");
-                    return;
-                }
+            if (!ServerLifeCycleManager.isRunning()) {
+                return;
             }
-
             // update waiting task count
             heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
 
@@ -98,11 +82,7 @@ public class HeartBeatTask implements Runnable {
             }
             heartBeatErrorTimes.set(0);
         } catch (Throwable ex) {
-            logger.error("HeartBeat task execute failed", ex);
-            if (heartBeatErrorTimes.incrementAndGet() >= heartBeatErrorThreshold) {
-                registryClient.getStoppable()
-                              .stop("HeartBeat task connect to zk failed too much times: " + heartBeatErrorTimes);
-            }
+            logger.error("HeartBeat task execute failed, errorTimes: {}", heartBeatErrorTimes.get(), ex);
         }
     }
 }

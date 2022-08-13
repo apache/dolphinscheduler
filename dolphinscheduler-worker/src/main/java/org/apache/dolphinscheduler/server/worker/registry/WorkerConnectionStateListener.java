@@ -15,36 +15,35 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.registry;
+package org.apache.dolphinscheduler.server.worker.registry;
 
 import lombok.NonNull;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MasterConnectionStateListener implements ConnectionListener {
+public class WorkerConnectionStateListener implements ConnectionListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MasterConnectionStateListener.class);
-
-    private final MasterConfig masterConfig;
+    private final Logger logger = LoggerFactory.getLogger(WorkerConnectionStateListener.class);
+    private final WorkerConfig workerConfig;
     private final RegistryClient registryClient;
-    private final MasterConnectStrategy masterConnectStrategy;
+    private final WorkerConnectStrategy workerConnectStrategy;
 
-    public MasterConnectionStateListener(@NonNull MasterConfig masterConfig,
+    public WorkerConnectionStateListener(@NonNull WorkerConfig workerConfig,
                                          @NonNull RegistryClient registryClient,
-                                         @NonNull MasterConnectStrategy masterConnectStrategy) {
-        this.masterConfig = masterConfig;
+                                         @NonNull WorkerConnectStrategy workerConnectStrategy) {
+        this.workerConfig = workerConfig;
         this.registryClient = registryClient;
-        this.masterConnectStrategy = masterConnectStrategy;
+        this.workerConnectStrategy = workerConnectStrategy;
     }
 
     @Override
     public void onUpdate(ConnectionState state) {
-        logger.info("Master received a {} event from registry, the current server state is {}", state,
+        logger.info("Worker received a {} event from registry, the current server state is {}", state,
                 ServerLifeCycleManager.getServerStatus());
         switch (state) {
             case CONNECTED:
@@ -52,11 +51,10 @@ public class MasterConnectionStateListener implements ConnectionListener {
             case SUSPENDED:
                 break;
             case RECONNECTED:
-                masterConnectStrategy.reconnect();
+                workerConnectStrategy.reconnect();
                 break;
             case DISCONNECTED:
-                masterConnectStrategy.disconnect();
-                break;
+                workerConnectStrategy.disconnect();
             default:
         }
     }

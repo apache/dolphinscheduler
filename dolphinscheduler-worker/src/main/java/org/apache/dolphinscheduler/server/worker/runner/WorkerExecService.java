@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,6 +34,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 public class WorkerExecService {
+
     /**
      * logger of WorkerExecService
      */
@@ -50,7 +52,8 @@ public class WorkerExecService {
      */
     private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap;
 
-    public WorkerExecService(ExecutorService execService, ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap) {
+    public WorkerExecService(ExecutorService execService,
+                             ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap) {
         this.execService = execService;
         this.listeningExecutorService = MoreExecutors.listeningDecorator(this.execService);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
@@ -61,6 +64,7 @@ public class WorkerExecService {
         taskExecuteThreadMap.put(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(), taskExecuteThread);
         ListenableFuture future = this.listeningExecutorService.submit(taskExecuteThread);
         FutureCallback futureCallback = new FutureCallback() {
+
             @Override
             public void onSuccess(Object o) {
                 taskExecuteThreadMap.remove(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId());
@@ -69,9 +73,9 @@ public class WorkerExecService {
             @Override
             public void onFailure(Throwable throwable) {
                 logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}",
-                             taskExecuteThread.getTaskExecutionContext().getProcessInstanceId(),
-                             taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(),
-                             throwable);
+                        taskExecuteThread.getTaskExecutionContext().getProcessInstanceId(),
+                        taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(),
+                        throwable);
                 taskExecuteThreadMap.remove(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId());
             }
         };
@@ -87,4 +91,8 @@ public class WorkerExecService {
         return ((ThreadPoolExecutor) this.execService).getQueue().size();
     }
 
-} 
+    public Map<Integer, TaskExecuteThread> getTaskExecuteThreadMap() {
+        return taskExecuteThreadMap;
+    }
+
+}
