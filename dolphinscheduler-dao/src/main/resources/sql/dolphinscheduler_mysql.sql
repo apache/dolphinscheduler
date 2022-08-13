@@ -473,6 +473,7 @@ CREATE TABLE `t_ds_task_definition` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream',
   `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
@@ -507,6 +508,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream',
   `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
@@ -636,7 +638,7 @@ CREATE TABLE `t_ds_project` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(100) DEFAULT NULL COMMENT 'project name',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `description` varchar(200) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -834,6 +836,7 @@ CREATE TABLE `t_ds_task_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(255) DEFAULT NULL COMMENT 'task name',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream',
   `task_code` bigint(20) NOT NULL COMMENT 'task definition code',
   `task_definition_version` int(11) DEFAULT '0' COMMENT 'task definition version',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
@@ -866,8 +869,7 @@ CREATE TABLE `t_ds_task_instance` (
   `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
-  KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
-  CONSTRAINT `foreign_key_instance_id` FOREIGN KEY (`process_instance_id`) REFERENCES `t_ds_process_instance` (`id`) ON DELETE CASCADE
+  KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -1857,7 +1859,7 @@ DROP TABLE IF EXISTS `t_ds_task_group`;
 CREATE TABLE `t_ds_task_group` (
    `id`  int(11)  NOT NULL AUTO_INCREMENT COMMENT'key',
    `name` varchar(100) DEFAULT NULL COMMENT 'task_group name',
-   `description` varchar(200) DEFAULT NULL,
+   `description` varchar(255) DEFAULT NULL,
    `group_size` int (11) NOT NULL COMMENT'group size',
    `use_size` int (11) DEFAULT '0' COMMENT 'used size',
    `user_id` int(11) DEFAULT NULL COMMENT 'creator id',

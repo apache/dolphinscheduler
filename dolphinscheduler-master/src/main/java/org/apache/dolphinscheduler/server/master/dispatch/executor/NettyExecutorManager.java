@@ -62,13 +62,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     private ServerNodeManager serverNodeManager;
 
     @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-
-    @Autowired
     private TaskKillResponseProcessor taskKillResponseProcessor;
-
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
 
     @Autowired
     private TaskRecallProcessor taskRecallProcessor;
@@ -115,7 +109,8 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 doExecute(host, command);
                 success = true;
                 context.setHost(host);
-                // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be failovered, due to the taskInstance's host
+                // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be
+                // failovered, due to the taskInstance's host
                 // is not belongs to the down worker ISSUE-10842.
                 context.getTaskInstance().setHost(host.getAddress());
             } catch (ExecuteException ex) {
@@ -197,7 +192,4 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         return nodes;
     }
 
-    public NettyRemotingClient getNettyRemotingClient() {
-        return nettyRemotingClient;
-    }
 }

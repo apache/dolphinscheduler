@@ -29,8 +29,7 @@ public class GetLogBytesResponseCommandTest {
 
     @Test
     public void testConvert2Command() {
-        GetLogBytesResponseCommand getLogBytesResponseCommand = new GetLogBytesResponseCommand();
-        getLogBytesResponseCommand.setData(data);
+        GetLogBytesResponseCommand getLogBytesResponseCommand = new GetLogBytesResponseCommand(data);
         Command command = getLogBytesResponseCommand.convert2Command(122);
         Assert.assertNotNull(command);
     }

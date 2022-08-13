@@ -25,6 +25,7 @@ DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreS
 
 > 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
 
+
 对于mysql 5.6 / 5.7：
 
 ```shell

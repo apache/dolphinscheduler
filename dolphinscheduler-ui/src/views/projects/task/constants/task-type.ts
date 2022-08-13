@@ -42,6 +42,9 @@ export type TaskType =
   | 'DINKY'
   | 'SAGEMAKER'
   | 'CHUNJUN'
+  | 'FLINK_STREAM'
+
+export type TaskExecuteType = 'STREAM' | 'BATCH'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -138,5 +141,16 @@ export const TASK_TYPES_MAP = {
   CHUNJUN: {
     alias: 'CHUNJUN',
     helperLinkDisable: true
+  },
+  FLINK_STREAM: {
+    alias: 'FLINK_STREAM',
+    helperLinkDisable: true,
+    taskExecuteType: 'STREAM'
   }
-} as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }
+} as {
+  [key in TaskType]: {
+    alias: string
+    helperLinkDisable?: boolean
+    taskExecuteType?: TaskExecuteType
+  }
+}
