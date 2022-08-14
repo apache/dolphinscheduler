@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -60,6 +59,7 @@ import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
 import io.etcd.jetcd.watch.WatchEvent;
+import lombok.NonNull;
 
 /**
  * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd cluster to
