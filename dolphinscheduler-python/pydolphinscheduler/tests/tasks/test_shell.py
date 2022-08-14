@@ -28,9 +28,10 @@ from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.utils import file
 from tests.testing.file import delete_file
 
-file_path = "local_res.sh"
+file_name = "local_res.sh"
 file_content = 'echo "test res_local"'
 res_plugin_prefix = Path(__file__).parent
+file_path = res_plugin_prefix.joinpath(file_name)
 
 
 @pytest.fixture
@@ -111,7 +112,7 @@ def test_shell_get_define():
         (
             {
                 "name": "test-local-res-command-content",
-                "command": file_path,
+                "command": file_name,
                 "resource_plugin": ResourcePlugin(
                     type=ResourcePluginType.LOCAL, prefix=res_plugin_prefix
                 ),
