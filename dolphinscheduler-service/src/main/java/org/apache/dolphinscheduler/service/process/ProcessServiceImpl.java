@@ -283,7 +283,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     @Transactional
     public ProcessInstance handleCommand(String host,
-                                         Command command) throws CronParseException, CodeGenerateException {
+                                         Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
