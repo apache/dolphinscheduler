@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -39,6 +40,8 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,13 +56,14 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
  * TaskUpdateQueue consumer
  */
 @Component
-public class TaskPriorityQueueConsumer extends Thread {
+public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
     /**
      * logger of TaskUpdateQueueConsumer
@@ -69,8 +73,14 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * taskUpdateQueue
      */
-    @Autowired
+    @Qualifier(Constants.TASK_PRIORITY_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+
+    /**
+     * taskDispatchFailedQueue
+     */
+    @Qualifier(Constants.TASK_DISPATCH_FAILED_QUEUE)
+    private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueue;
 
     /**
      * processService
@@ -107,6 +117,10 @@ public class TaskPriorityQueueConsumer extends Thread {
      */
     private ThreadPoolExecutor consumerThreadPoolExecutor;
 
+    protected TaskPriorityQueueConsumer() {
+        super("TaskPriorityQueueConsumeThread");
+    }
+
     @PostConstruct
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
@@ -122,14 +136,11 @@ public class TaskPriorityQueueConsumer extends Thread {
             try {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
-                if (!failedDispatchTasks.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
-                        taskPriorityQueue.put(dispatchFailedTask);
-                    }
-                    // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
-                    if (fetchTaskNum == failedDispatchTasks.size()) {
-                        TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                        // put into failure queue after failure
+                        taskDispatchFailedQueue.put(dispatchFailedTask);
                     }
                 }
             } catch (Exception e) {
@@ -154,11 +165,16 @@ public class TaskPriorityQueueConsumer extends Thread {
             }
 
             consumerThreadPoolExecutor.submit(() -> {
-                boolean dispatchResult = this.dispatchTask(taskPriority);
-                if (!dispatchResult) {
-                    failedDispatchTasks.add(taskPriority);
+                try {
+                    boolean dispatchResult = this.dispatchTask(taskPriority);
+                    if (!dispatchResult) {
+                        taskPriority.setLastDispatchTime(System.currentTimeMillis());
+                        failedDispatchTasks.add(taskPriority);
+                    }
+                } finally {
+                    // make sure the latch countDown
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
 
