@@ -23,11 +23,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -43,7 +41,6 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -54,8 +51,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -349,116 +344,6 @@ public class SqlTask extends AbstractTaskExecutor {
                 logger.error("close connection error : {}", e.getMessage(), e);
             }
         }
-    }
-
-    /**
-     * preparedStatement bind
-     *
-     * @param connection connection
-     * @param sqlBinds sqlBinds
-     * @return PreparedStatement
-     * @throws Exception Exception
-     */
-    private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) {
-        // is the timeout set
-        boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
-                || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        try {
-            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
-            if (timeoutFlag) {
-                stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
-            }
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
-            if (params != null) {
-                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                    Property prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
-                }
-            }
-            logger.info("prepare statement replace sql : {} ", stmt);
-            return stmt;
-        } catch (Exception exception) {
-            throw new TaskException("SQL task prepareStatementAndBind error", exception);
-        }
-    }
-
-    /**
-     * print replace sql
-     *
-     * @param content content
-     * @param formatSql format sql
-     * @param rgex rgex
-     * @param sqlParamsMap sql params map
-     */
-    private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
-        //parameter print style
-        logger.info("after replace sql , preparing : {}", formatSql);
-        StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
-        if (sqlParamsMap == null) {
-            logger.info("printReplacedSql: sqlParamsMap is null.");
-        } else {
-            for (int i = 1; i <= sqlParamsMap.size(); i++) {
-                logPrint.append(sqlParamsMap.get(i).getValue()).append("(").append(sqlParamsMap.get(i).getType()).append(")");
-            }
-        }
-        logger.info("Sql Params are {}", logPrint);
-    }
-
-    /**
-     * ready to execute SQL and parameter entity Map
-     *
-     * @return SqlBinds
-     */
-    private SqlBinds getSqlAndSqlParamsMap(String sql) {
-        Map<Integer, Property> sqlParamsMap = new HashMap<>();
-        StringBuilder sqlBuilder = new StringBuilder();
-
-        // combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-
-        // spell SQL according to the final user-defined variable
-        if (paramsMap == null) {
-            sqlBuilder.append(sql);
-            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-        }
-
-        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
-                    ParamUtils.convert(paramsMap));
-            logger.info("SQL title : {}", title);
-            sqlParameters.setTitle(title);
-        }
-
-        //new
-        //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
-        // special characters need to be escaped, ${} needs to be escaped
-        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap,taskExecutionContext.getTaskInstanceId());
-        //Replace the original value in sql ！{...} ，Does not participate in precompilation
-        String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
-        sql = replaceOriginalValue(sql, rgexo, paramsMap);
-        // replace the ${} of the SQL statement with the Placeholder
-        String formatSql = sql.replaceAll(rgex, "?");
-        // Convert the list parameter
-        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
-        sqlBuilder.append(formatSql);
-        // print replace sql
-        printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
-        return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-    }
-
-    private String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
-        Pattern pattern = Pattern.compile(rgex);
-        while (true) {
-            Matcher m = pattern.matcher(content);
-            if (!m.find()) {
-                break;
-            }
-            String paramName = m.group(1);
-            String paramValue = sqlParamsMap.get(paramName).getValue();
-            content = m.replaceFirst(paramValue);
-        }
-        return content;
     }
 
     /**
