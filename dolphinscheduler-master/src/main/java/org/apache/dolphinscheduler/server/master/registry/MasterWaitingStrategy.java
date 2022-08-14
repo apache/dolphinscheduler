@@ -62,8 +62,10 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
+    @Autowired
     @Qualifier(Constants.TASK_PRIORITY_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+    @Autowired
     @Qualifier(Constants.TASK_DISPATCH_FAILED_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueue;
 

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
 
-@Service(Constants.TASK_DISPATCH_FAILED_QUEUE)
+@Service(value = Constants.TASK_DISPATCH_FAILED_QUEUE)
 public class TaskDispatchFailedQueue implements TaskPriorityQueue<TaskPriority> {
 
     /**

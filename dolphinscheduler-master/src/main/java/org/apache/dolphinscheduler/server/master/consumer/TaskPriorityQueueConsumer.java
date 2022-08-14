@@ -70,17 +70,16 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      */
     private static final Logger logger = LoggerFactory.getLogger(TaskPriorityQueueConsumer.class);
 
-    /**
-     * taskUpdateQueue
-     */
+    @Autowired
     @Qualifier(Constants.TASK_PRIORITY_QUEUE)
-    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+    private TaskPriorityQueue<TaskPriority> taskPriorityQueueImpl;
 
     /**
      * taskDispatchFailedQueue
      */
+    @Autowired
     @Qualifier(Constants.TASK_DISPATCH_FAILED_QUEUE)
-    private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueue;
+    private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueueImpl;
 
     /**
      * processService
@@ -141,7 +140,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         // put into failure queue after failure
-                        taskDispatchFailedQueue.put(dispatchFailedTask);
+                        taskDispatchFailedQueueImpl.put(dispatchFailedTask);
                     }
                 }
             } catch (Exception e) {
@@ -159,7 +158,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
         for (int i = 0; i < fetchTaskNum; i++) {
-            TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+            TaskPriority taskPriority = taskPriorityQueueImpl.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
             if (Objects.isNull(taskPriority)) {
                 latch.countDown();
                 continue;
