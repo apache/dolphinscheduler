@@ -67,7 +67,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     ) as process_definition:
         # [end workflow_declare]
         # [start task_declare]
-        tmp = tempfile.NamedTemporaryFile(dir=tmpdir, suffix=".sh")
+        tmp = tempfile.NamedTemporaryFile(mode="w", dir=tmpdir, suffix=".sh")
         with open(tmp.name, "w") as f:
             f.write("echo tutorial resource plugin")
         task_parent = Shell(
