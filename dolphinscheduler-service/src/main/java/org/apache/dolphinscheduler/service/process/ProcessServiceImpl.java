@@ -331,26 +331,12 @@ public class ProcessServiceImpl implements ProcessService {
                 saveProcessInstance(processInstance);
             }
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
-<<<<<<< HEAD
-            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE, processInstance.getId());
-            if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-                saveProcessInstance(processInstance);
-                return;
-            }
-            for (ProcessInstance info : runningProcessInstances) {
-                if (Objects.nonNull(info.getState()) && (ExecutionStatus.READY_STOP.equals(info.getState()) || info.getState().typeIsFinished())) {
-                    continue;
-                }
-=======
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
                             processInstance.getProcessDefinitionCode(),
                             processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             for (ProcessInstance info : runningProcessInstances) {
->>>>>>> 13d400ceb... [Fix-11465] Serial first, the last executing instance will be stopped (#11466)
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(ExecutionStatus.READY_STOP);
@@ -368,7 +354,7 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                 }
             }
-            processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
+            processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
             saveProcessInstance(processInstance);
         }
     }
