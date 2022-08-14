@@ -47,12 +47,14 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
     /**
      * taskPriorityQueue
      */
+    @Autowired
     @Qualifier(Constants.TASK_PRIORITY_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
     /**
      * taskDispatchFailedQueue
      */
+    @Autowired
     @Qualifier(Constants.TASK_DISPATCH_FAILED_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueue;
 
@@ -77,7 +79,7 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
         }
     }
 
-    protected TaskDispatchFailedQueueConsumer(String threadName) {
+    protected TaskDispatchFailedQueueConsumer() {
         super("TaskDispatchFailedQueueConsumerThread");
     }
 

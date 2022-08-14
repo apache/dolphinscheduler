@@ -73,12 +73,14 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     /**
      * taskUpdateQueue
      */
+    @Autowired
     @Qualifier(Constants.TASK_PRIORITY_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
     /**
      * taskDispatchFailedQueue
      */
+    @Autowired
     @Qualifier(Constants.TASK_DISPATCH_FAILED_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueue;
 
