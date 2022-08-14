@@ -26,7 +26,13 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -93,6 +99,12 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
 
     @Autowired
     private WorkflowEventLooper workflowEventLooper;
+
+    @Autowired
+    private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private StateEventCallbackService stateEventCallbackService;
 
     private String masterAddress;
 
@@ -202,6 +214,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
                     if (processInstance != null) {
                         processInstances.add(processInstance);
                         logger.info("Master handle command {} end, create process instance {}", command.getId(), processInstance.getId());
+                        sendRpcCommand(processInstance);
                     }
                 } catch (Exception e) {
                     logger.error("Master handle command {} error ", command.getId(), e);
@@ -218,6 +231,24 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread {
             commands.size(), processInstances.size());
         ProcessInstanceMetrics.recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
+    }
+
+    private void sendRpcCommand(ProcessInstance processInstance) {
+        ProcessDefinition processDefinition = processInstance.getProcessDefinition();
+        if (processDefinition.getExecutionType().typeIsSerialPriority()){
+            List<ProcessInstance> runningProcessInstances =
+                    processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
+                            processInstance.getProcessDefinitionCode(),
+                            processInstance.getProcessDefinitionVersion(), new int[]{ExecutionStatus.READY_STOP.getCode()},
+                            processInstance.getId());
+            for (ProcessInstance runningProcessInstance : runningProcessInstances) {
+                StateEventChangeCommand workflowStateEventChangeCommand =
+                        new StateEventChangeCommand(
+                                runningProcessInstance.getId(), 0, runningProcessInstance.getState(), runningProcessInstance.getId(), 0);
+                Host host = new Host(runningProcessInstance.getHost());
+                stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+            }
+        }
     }
 
     private List<Command> findCommands() throws MasterException {

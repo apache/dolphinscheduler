@@ -340,19 +340,8 @@ public class ProcessServiceImpl implements ProcessService {
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(ExecutionStatus.READY_STOP);
-                int update = updateProcessInstance(info);
-                // determine whether the process is normal
-                if (update > 0) {
-                    StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                        info.getId(), 0, info.getState(), info.getId(), 0
-                    );
-                    try {
-                        Host host = new Host(info.getHost());
-                        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
-                    } catch (Exception e) {
-                        logger.error("sendResultError", e);
-                    }
-                }
+                processService.updateProcessInstance(info);
+                // TODO rpc after command handle complete, but this is not better
             }
             processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
             saveProcessInstance(processInstance);
