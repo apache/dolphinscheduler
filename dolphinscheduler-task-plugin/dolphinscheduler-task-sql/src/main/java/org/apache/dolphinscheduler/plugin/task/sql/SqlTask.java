@@ -23,9 +23,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -41,6 +43,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -51,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -171,6 +176,7 @@ public class SqlTask extends AbstractTaskExecutor {
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(sql, ParamUtils.convert(paramsMap));
     }
+
     /**
      * execute function and sql
      *
@@ -454,13 +460,6 @@ public class SqlTask extends AbstractTaskExecutor {
         }
         return content;
     }
-
-    private String parseSql(String sql) {
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
-        return ParameterUtils.convertParameterPlaceholders(sql, ParamUtils.convert(paramsMap));
-    }
-
-
 
     /**
      * create function list
