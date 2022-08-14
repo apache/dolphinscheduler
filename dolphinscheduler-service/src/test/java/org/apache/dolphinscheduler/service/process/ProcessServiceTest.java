@@ -103,6 +103,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -119,6 +120,8 @@ public class ProcessServiceTest {
 
     @InjectMocks
     private ProcessServiceImpl processService;
+    @Mock
+    private ProcessService service;
     @Mock
     private CommandMapper commandMapper;
     @Mock
