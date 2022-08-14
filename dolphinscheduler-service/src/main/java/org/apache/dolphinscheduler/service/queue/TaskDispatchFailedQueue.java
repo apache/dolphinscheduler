@@ -52,4 +52,9 @@ public class TaskDispatchFailedQueue implements TaskPriorityQueue<TaskPriority> 
     public int size() throws TaskPriorityQueueException {
         return taskDispatchFailedQueue.size();
     }
+
+    @Override
+    public void clear() {
+        taskDispatchFailedQueue.clear();
+    }
 }
