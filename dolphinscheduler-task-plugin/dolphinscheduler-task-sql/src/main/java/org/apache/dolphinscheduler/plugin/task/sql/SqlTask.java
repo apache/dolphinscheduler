@@ -304,7 +304,7 @@ public class SqlTask extends AbstractTaskExecutor {
         }
     }
 
-    private String executeUpdate(Connection connection, List<String> sqls, String handlerType) throws Exception {
+    private String executeUpdate(Connection connection, List<String> sqls, String handlerType) throws SQLException {
         int result = 0;
         for (String sql : sqls) {
             try (Statement statement = connection.createStatement()) {
