@@ -36,8 +36,9 @@ task_union does not use resource plug-ins
 
 it will instantiate and run all the task it have.
 """
-
+import os
 import tempfile
+from pathlib import Path
 
 from pydolphinscheduler.constants import ResourcePluginType
 
@@ -67,7 +68,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     ) as process_definition:
         # [end workflow_declare]
         # [start task_declare]
-        tmp = tempfile.NamedTemporaryFile(mode="w", dir=tmpdir, suffix=".sh")
+        tmp = tempfile.NamedTemporaryFile(delete=False, mode="w", dir=tmpdir, suffix=".sh")
         with open(tmp.name, "w") as f:
             f.write("echo tutorial resource plugin")
         task_parent = Shell(
@@ -75,6 +76,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
             command=tmp.name,
         )
         print(task_parent.task_params)
+        os.remove(tmp.name)
         # [end task_declare]
 
     # [start submit_or_run]
