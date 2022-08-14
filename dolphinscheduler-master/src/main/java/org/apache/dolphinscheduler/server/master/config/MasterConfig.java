@@ -64,7 +64,7 @@ public class MasterConfig implements Validator {
     /**
      * The task dispatch thread pool size.
      */
-    private int dispatchTaskNumber = 4;
+    private int dispatchTaskNumber = 3;
     /**
      * Worker select strategy.
      */

@@ -847,4 +847,8 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
 
     public static final Integer DEFAULT_MAX_RETRY_COUNT = 100;
+
+    public static final String TASK_PRIORITY_QUEUE = "TASK_PRIORITY_QUEUE";
+
+    public static final String TASK_DISPATCH_FAILED_QUEUE = "TASK_DISPATCH_FAILED_QUEUE";
 }

@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +56,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -73,8 +73,14 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     /**
      * taskUpdateQueue
      */
-    @Autowired
+    @Qualifier(Constants.TASK_PRIORITY_QUEUE)
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+
+    /**
+     * taskDispatchFailedQueue
+     */
+    @Qualifier(Constants.TASK_DISPATCH_FAILED_QUEUE)
+    private TaskPriorityQueue<TaskPriority> taskDispatchFailedQueue;
 
     /**
      * processService
@@ -110,27 +116,6 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      * consumer thread pool
      */
     private ThreadPoolExecutor consumerThreadPoolExecutor;
-
-    /**
-     * task dispatch failed queue
-     */
-    private final PriorityBlockingQueue<TaskPriority> taskDispatchFailedQueue = new PriorityBlockingQueue<>(1000);
-
-    /**
-     * delay time for retries
-     */
-    private static final Long[] TIME_DELAY;
-
-    /**
-     * initialization failure retry delay rule
-     */
-    static {
-        TIME_DELAY = new Long[Constants.DEFAULT_MAX_RETRY_COUNT];
-        for (int i = 0; i < Constants.DEFAULT_MAX_RETRY_COUNT; i++) {
-            int delayTime = (i + 1) * 1000;
-            TIME_DELAY[i] = (long) delayTime;
-        }
-    }
 
     protected TaskPriorityQueueConsumer() {
         super("TaskPriorityQueueConsumeThread");
@@ -173,10 +158,6 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         List<TaskPriority> failedDispatchTasks = Collections.synchronizedList(new ArrayList<>());
         CountDownLatch latch = new CountDownLatch(fetchTaskNum);
 
-        if (!taskDispatchFailedQueue.isEmpty()) {
-            consumerThreadPoolExecutor.submit(() -> dispatchFailedBackToTaskPriorityQueue(fetchTaskNum));
-        }
-
         for (int i = 0; i < fetchTaskNum; i++) {
             TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
             if (Objects.isNull(taskPriority)) {
@@ -201,41 +182,6 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         latch.await();
 
         return failedDispatchTasks;
-    }
-
-    /**
-     * put the failed dispatch task into the dispatch queue again
-     */
-    private void dispatchFailedBackToTaskPriorityQueue(int fetchTaskNum) {
-        for (int i = 0; i < fetchTaskNum; i++) {
-            try {
-                TaskPriority dispatchFailedTaskPriority = taskDispatchFailedQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
-                if (Objects.isNull(dispatchFailedTaskPriority)){
-                    continue;
-                }
-                if (canRetry(dispatchFailedTaskPriority)){
-                    dispatchFailedTaskPriority.setDispatchFailedRetryTimes(dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
-                    taskPriorityQueue.put(dispatchFailedTaskPriority);
-                } else {
-                    taskDispatchFailedQueue.put(dispatchFailedTaskPriority);
-                }
-            } catch (Exception e) {
-                logger.error("dispatch failed back to task priority queue error", e);
-            }
-        }
-    }
-
-    /**
-     * the time interval is adjusted according to the number of retries
-     */
-    private boolean canRetry (TaskPriority taskPriority){
-        int dispatchFailedRetryTimes = taskPriority.getDispatchFailedRetryTimes();
-        long now = System.currentTimeMillis();
-        // retry more than 100 times with 100 seconds delay each time
-        if (dispatchFailedRetryTimes >= Constants.DEFAULT_MAX_RETRY_COUNT){
-            return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[Constants.DEFAULT_MAX_RETRY_COUNT - 1];
-        }
-        return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[dispatchFailedRetryTimes];
     }
 
     /**

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
 import java.util.concurrent.PriorityBlockingQueue;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Service;
 /**
  * A singleton of a task queue implemented using PriorityBlockingQueue
  */
-@Service
+@Service(Constants.TASK_PRIORITY_QUEUE)
 public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
 
     /**
