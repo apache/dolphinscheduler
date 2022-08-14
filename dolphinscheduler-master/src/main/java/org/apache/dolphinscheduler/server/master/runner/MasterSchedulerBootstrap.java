@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -27,7 +27,12 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -41,16 +46,19 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
@@ -91,6 +99,12 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private WorkflowEventLooper workflowEventLooper;
+
+    @Autowired
+    private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private StateEventCallbackService stateEventCallbackService;
 
     private String masterAddress;
 
@@ -212,6 +226,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         processInstances.add(processInstance);
                         logger.info("Master handle command {} end, create process instance {}", command.getId(),
                                 processInstance.getId());
+                        sendRpcCommand(processInstance);
                     }
                 } catch (Exception e) {
                     logger.error("Master handle command {} error ", command.getId(), e);
@@ -230,6 +245,24 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         ProcessInstanceMetrics
                 .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
+    }
+
+    private void sendRpcCommand(ProcessInstance processInstance) {
+        ProcessDefinition processDefinition = processInstance.getProcessDefinition();
+        if (processDefinition.getExecutionType().typeIsSerialPriority()){
+            List<ProcessInstance> runningProcessInstances =
+                    processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
+                            processInstance.getProcessDefinitionCode(),
+                            processInstance.getProcessDefinitionVersion(), new int[]{WorkflowExecutionStatus.READY_STOP.getCode()},
+                            processInstance.getId());
+            for (ProcessInstance runningProcessInstance : runningProcessInstances) {
+                WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
+                        new WorkflowStateEventChangeCommand(
+                                runningProcessInstance.getId(), 0, runningProcessInstance.getState(), runningProcessInstance.getId(), 0);
+                Host host = new Host(runningProcessInstance.getHost());
+                stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+            }
+        }
     }
 
     private List<Command> findCommands() throws MasterException {

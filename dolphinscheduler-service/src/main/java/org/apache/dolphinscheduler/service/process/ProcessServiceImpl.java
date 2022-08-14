@@ -34,7 +34,16 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -116,7 +125,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -345,19 +353,8 @@ public class ProcessServiceImpl implements ProcessService {
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(WorkflowExecutionStatus.READY_STOP);
-                int update = updateProcessInstance(info);
-                // determine whether the process is normal
-                if (update > 0) {
-                    WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
-                            new WorkflowStateEventChangeCommand(
-                                    info.getId(), 0, info.getState(), info.getId(), 0);
-                    try {
-                        Host host = new Host(info.getHost());
-                        stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
-                    } catch (Exception e) {
-                        logger.error("sendResultError", e);
-                    }
-                }
+                processService.updateProcessInstance(info);
+                // TODO rpc after command handle complete, but this is not better
             }
             processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
             saveProcessInstance(processInstance);
@@ -3039,9 +3036,9 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             } while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode()
                     && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
-                            taskGroup.getUseSize(),
-                            thisTaskGroupQueue.getId(),
-                            TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
+                    taskGroup.getUseSize(),
+                    thisTaskGroupQueue.getId(),
+                    TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
         } catch (Exception e) {
             logger.error("release the task group error", e);
             return null;
