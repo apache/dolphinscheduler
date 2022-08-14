@@ -37,6 +37,8 @@ task_union does not use resource plug-ins
 it will instantiate and run all the task it have.
 """
 
+import tempfile
+
 from pydolphinscheduler.constants import ResourcePluginType
 
 # [start tutorial_resource_plugin]
@@ -51,56 +53,29 @@ from pydolphinscheduler.tasks.shell import Shell
 # [end package_import]
 
 # [start workflow_declare]
-with ProcessDefinition(
-    name="tutorial_resource_plugin",
-    schedule="0 0 0 * * ? *",
-    start_time="2021-01-01",
-    tenant="tenant_exists",
-    resource_plugin=ResourcePlugin(
-        type=ResourcePluginType.LOCAL,
-        prefix="/opt/",
-    ),
-) as process_definition:
-    # [end workflow_declare]
-    # [start task_declare]
-    task_parent = Shell(
-        name="task_parent",
-        command="parent.zsh",
+with tempfile.TemporaryDirectory() as tmpdir:
+
+    with ProcessDefinition(
+        name="tutorial_resource_plugin",
+        schedule="0 0 0 * * ? *",
+        start_time="2021-01-01",
+        tenant="tenant_exists",
         resource_plugin=ResourcePlugin(
             type=ResourcePluginType.LOCAL,
-            prefix="/opt/",
+            prefix=tmpdir,
         ),
-    )
-
-    task_child_one = Shell(
-        name="task_child_one",
-        command="child_one.sh",
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix="/opt/",
-        ),
-    )
-
-    task_child_two = Shell(
-        name="task_child_two",
-        command="child_two.sh",
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix="/opt/",
-        ),
-    )
-    task_union = Shell(
-        name="task_union",
-        command="echo union",
-    )
-    # [end task_declare]
-
-    # [start task_relation_declare]
-    task_group = [task_child_one, task_child_two]
-    task_parent.set_downstream(task_group)
-
-    task_union << task_group
-    # [end task_relation_declare]
+    ) as process_definition:
+        # [end workflow_declare]
+        # [start task_declare]
+        tmp = tempfile.NamedTemporaryFile(dir=tmpdir, suffix=".sh")
+        with open(tmp.name, "w") as f:
+            f.write("echo tutorial resource plugin")
+        task_parent = Shell(
+            name="local-resource-example",
+            command=tmp.name,
+        )
+        print(task_parent.task_params)
+        # [end task_declare]
 
     # [start submit_or_run]
     process_definition.run()
