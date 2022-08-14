@@ -45,6 +45,7 @@
   import { mapState, mapActions, mapMutations } from 'vuex'
   import { findComponentDownward, uuid } from '@/module/util/'
   import MenuItem from './menuItem.vue'
+  import { cloneDeep } from 'lodash'
 
   export default {
     name: 'dag-context-menu',
@@ -114,9 +115,9 @@
         const targetNode = nodes.find(
           (node) => node.id === this.currentTask.code
         )
-        const targetTask = this.tasks.find(
+        const targetTask = cloneDeep(this.tasks.find(
           (task) => task.code === this.currentTask.code
-        )
+        ))
 
         if (!targetNode || !targetTask) return
 
