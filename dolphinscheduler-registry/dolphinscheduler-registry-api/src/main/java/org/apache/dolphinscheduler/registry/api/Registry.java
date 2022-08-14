@@ -19,10 +19,11 @@
 
 package org.apache.dolphinscheduler.registry.api;
 
-import lombok.NonNull;
-
 import java.io.Closeable;
+import java.time.Duration;
 import java.util.Collection;
+
+import lombok.NonNull;
 
 /**
  * Registry

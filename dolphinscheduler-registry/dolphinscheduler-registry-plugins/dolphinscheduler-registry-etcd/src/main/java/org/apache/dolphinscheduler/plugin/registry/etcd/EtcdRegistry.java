@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.registry.etcd;
 
+import lombok.NonNull;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
@@ -109,6 +111,11 @@ public class EtcdRegistry implements Registry {
         LOGGER.info("Starting Etcd ConnectionListener...");
         etcdConnectionStateListener.start();
         LOGGER.info("Started Etcd ConnectionListener...");
+    }
+
+    @Override
+    public void connectUntilTimeout(@NonNull Duration timeout) throws RegistryException {
+        // The connectTimeout has been set in the constructor
     }
 
     /**
