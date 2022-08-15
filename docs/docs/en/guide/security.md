@@ -118,7 +118,7 @@ public  void doPOSTParam()throws Exception{
 
 ## Worker Grouping
 
-Each worker node belongs to some worker groups, and the default group is "default".
+Each worker node belongs to some worker groups, and the default group is `default`.
 
 When DolphinScheduler executes a task, it will assign the task to the configured worker group and the worker nodes in the group will execute the task.
 
@@ -133,7 +133,8 @@ worker:
 ......
   groups:
     - default
-    - worker1
+    - group-1
+    - group-2
 ......
 ```
 

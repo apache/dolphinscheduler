@@ -127,7 +127,8 @@ worker:
 ......
   groups:
     - default
-    - worker1
+    - group1
+    - group2
 ......
 ```
 
