@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -41,16 +40,19 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
@@ -72,9 +74,6 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
 
-    /**
-     * master prepare exec service
-     */
     private ThreadPoolExecutor masterPrepareExecService;
 
     @Autowired
@@ -131,6 +130,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 if (!ServerLifeCycleManager.isRunning()) {
                     // the current server is not at running status, cannot consume command.
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    continue;
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 boolean isOverload =
@@ -150,6 +150,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 List<ProcessInstance> processInstances = command2ProcessInstance(commands);
                 if (CollectionUtils.isEmpty(processInstances)) {
                     // indicate that the command transform to processInstance error, sleep for 1s
+                    // this case will not happen
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
@@ -172,6 +173,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
                                 processInstance.getId()));
+                    } catch (Exception ex) {
+                        processInstanceExecCacheManager.removeByProcessInstanceId(processInstance.getId());
+                        throw ex;
                     } finally {
                         LoggerUtils.removeWorkflowInstanceIdMDC();
                     }

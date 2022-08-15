@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 /**
  * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
  */
@@ -86,12 +85,12 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+                String.format("Invalid command type : %s", command.getType()));
 
         TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
         if (taskDispatchCommand == null) {
-            logger.error("task execute request command content is null");
+            logger.error("Task execute request command content is null");
             return;
         }
         final String workflowMasterAddress = taskDispatchCommand.getMessageSenderAddress();
@@ -100,7 +99,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
         TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
 
         if (taskExecutionContext == null) {
-            logger.error("task execution context is null");
+            logger.error("Task execution context is null, will drop this dispatch message: {}", taskDispatchCommand);
             return;
         }
         try {
@@ -131,9 +130,15 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);
             if (!offer) {
-                logger.warn("submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master", workerManager.getWaitSubmitQueueSize());
+                logger.warn("Submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master", workerManager.getWaitSubmitQueueSize());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress, CommandType.TASK_REJECT);
+            } else {
+                logger.info("Submit task to wait queue success");
             }
+        } catch (Exception ex) {
+            logger.error("Worker handle the dispatch task message failed, will remove the taskExecutionContext: {} from cache", taskExecutionContext);
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            throw ex;
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }

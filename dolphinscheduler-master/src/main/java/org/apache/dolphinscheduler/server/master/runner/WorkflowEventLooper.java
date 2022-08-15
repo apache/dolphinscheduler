@@ -28,15 +28,17 @@ import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandleExcept
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandler;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class WorkflowEventLooper extends BaseDaemonThread {
@@ -74,6 +76,11 @@ public class WorkflowEventLooper extends BaseDaemonThread {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 workflowEvent = workflowEventQueue.poolEvent();
+                if (!ServerLifeCycleManager.isRunning()) {
+                    logger.info("The current server is not running, will drop this event: {}", workflowEvent);
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    continue;
+                }
                 LoggerUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
                 logger.info("Workflow event looper receive a workflow event: {}, will handle this", workflowEvent);
                 WorkflowEventHandler workflowEventHandler =

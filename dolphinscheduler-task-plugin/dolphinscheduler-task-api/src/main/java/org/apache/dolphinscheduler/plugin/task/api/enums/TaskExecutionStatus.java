@@ -17,38 +17,39 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 public enum TaskExecutionStatus {
 
-    SUBMITTED_SUCCESS(0, "submit success"),
-    RUNNING_EXECUTION(1, "running"),
-    PAUSE(3, "pause"),
-    FAILURE(6, "failure"),
-    SUCCESS(7, "success"),
-    NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
-    KILL(9, "kill"),
-    DELAY_EXECUTION(12, "delay execution"),
-    FORCED_SUCCESS(13, "forced success"),
-    DISPATCH(17, "dispatch"),
+    SUBMITTED_SUCCESS(0, true, false, "submit success"),
+    RUNNING_EXECUTION(1, true, false, "running"),
+    PAUSE(3, false, true, "pause"),
+    FAILURE(6, false, true, "failure"),
+    SUCCESS(7, false, true, "success"),
+    NEED_FAULT_TOLERANCE(8, false, true, "need fault tolerance"),
+    KILL(9, false, true, "kill"),
+    DELAY_EXECUTION(12, true, false, "delay execution"),
+    FORCED_SUCCESS(13, false, true, "forced success"),
+    DISPATCH(17, true, false, "dispatch"),
 
     ;
 
     private static final Map<Integer, TaskExecutionStatus> CODE_MAP = new HashMap<>();
-    private static final int[] NEED_FAILOVER_STATES = new int[]{
-            SUBMITTED_SUCCESS.getCode(),
-            DISPATCH.getCode(),
-            RUNNING_EXECUTION.getCode(),
-            DELAY_EXECUTION.getCode(),
-    };
+    private static final int[] NEED_FAILOVER_STATES;
 
     static {
         for (TaskExecutionStatus executionStatus : TaskExecutionStatus.values()) {
             CODE_MAP.put(executionStatus.getCode(), executionStatus);
         }
+        NEED_FAILOVER_STATES =
+                Arrays.stream(TaskExecutionStatus.values())
+                        .filter(TaskExecutionStatus::shouldFailover)
+                        .mapToInt(TaskExecutionStatus::getCode)
+                        .toArray();
     }
 
     /**
@@ -88,7 +89,7 @@ public enum TaskExecutionStatus {
     }
 
     public boolean isFinished() {
-        return isSuccess() || isKill() || isFailure() || isPause();
+        return finished;
     }
 
     public boolean isNeedFaultTolerance() {
@@ -100,19 +101,22 @@ public enum TaskExecutionStatus {
     }
 
     public boolean shouldFailover() {
-        return SUBMITTED_SUCCESS == this
-                || DISPATCH == this
-                || RUNNING_EXECUTION == this
-                || DELAY_EXECUTION == this;
+        return shouldBeFailover;
     }
 
     @EnumValue
     private final int code;
+
+    private final boolean shouldBeFailover;
     private final String desc;
 
-    TaskExecutionStatus(int code, String desc) {
+    private final boolean finished;
+
+    TaskExecutionStatus(int code, boolean shouldBeFailover, boolean finished, String desc) {
         this.code = code;
+        this.shouldBeFailover = shouldBeFailover;
         this.desc = desc;
+        this.finished = finished;
     }
 
     public int getCode() {
@@ -121,11 +125,6 @@ public enum TaskExecutionStatus {
 
     public String getDesc() {
         return desc;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskExecutionStatus{" + "code=" + code + ", desc='" + desc + '\'' + '}';
     }
 
 }

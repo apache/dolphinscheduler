@@ -93,30 +93,32 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             return;
         }
 
-        int processId = taskExecutionContext.getProcessId();
-        if (processId == 0) {
+        try {
+            LoggerUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
+            int processId = taskExecutionContext.getProcessId();
+            if (processId == 0) {
+                this.cancelApplication(taskInstanceId);
+                workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
+                sendTaskKillResponseCommand(channel, taskExecutionContext);
+                logger.info("The task has not been executed and has been cancelled");
+                return;
+            }
+
+            // if processId > 0, it should call cancelApplication to cancel remote application too.
             this.cancelApplication(taskInstanceId);
-            workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
-            taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+            Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
+
+            taskExecutionContext.setCurrentExecutionStatus(
+                    result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
+            taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
             sendTaskKillResponseCommand(channel, taskExecutionContext);
-            logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
-            return;
+
+            messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
+        } finally {
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            LoggerUtils.removeTaskInstanceIdMDC();
         }
-
-        // if processId > 0, it should call cancelApplication to cancel remote application too.
-        this.cancelApplication(taskInstanceId);
-        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
-
-        taskExecutionContext.setCurrentExecutionStatus(
-                result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
-        sendTaskKillResponseCommand(channel, taskExecutionContext);
-
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
-
-        logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
     }
 
     private void sendTaskKillResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {
@@ -160,20 +162,20 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     protected void cancelApplication(int taskInstanceId) {
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
         if (workerTaskExecuteRunnable == null) {
-            logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
+            logger.warn("Cannot find the taskExecuteThread in worker, taskInstanceId:{}", taskInstanceId);
             return;
         }
         AbstractTask task = workerTaskExecuteRunnable.getTask();
         if (task == null) {
-            logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
+            logger.warn("Cannot find the task in task execute thread, the task may doesn't been initialized, taskInstanceId:{}", taskInstanceId);
             return;
         }
         try {
             task.cancelApplication(true);
+            logger.info("Success Kill task by execute cancelApplication method, taskInstanceId:{}", taskInstanceId);
         } catch (Exception e) {
-            logger.error("kill task error", e);
+            logger.error("Execute the task cancelApplication method failed, taskInstanceId: {}", taskInstanceId, e);
         }
-        logger.info("kill task by cancelApplication, task id:{}", taskInstanceId);
     }
 
     /**
@@ -196,7 +198,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             }
         } catch (Exception e) {
             processFlag = false;
-            logger.error("kill task error", e);
+            logger.error("kill task process error, tenantCode: {}, processId: {}", tenantCode, processId, e);
         }
         return processFlag;
     }
@@ -228,7 +230,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             }
             return Pair.of(true, appIds);
         } catch (Exception e) {
-            logger.error("kill yarn job error", e);
+            logger.error("kill yarn job error, logPath: {}, tenantCode: {}", logPath, tenantCode, e);
         }
         return Pair.of(false, Collections.emptyList());
     }

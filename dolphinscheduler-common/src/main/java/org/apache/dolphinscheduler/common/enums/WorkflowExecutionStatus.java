@@ -17,42 +17,51 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.NonNull;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.NonNull;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 public enum WorkflowExecutionStatus {
+
     // This class is split from <code>ExecutionStatus</code> #11339.
     // In order to compatible with the old value, the code is not consecutive
-    SUBMITTED_SUCCESS(0, "submit success"),
-    RUNNING_EXECUTION(1, "running"),
-    READY_PAUSE(2, "ready pause"),
-    PAUSE(3, "pause"),
-    READY_STOP(4, "ready stop"),
-    STOP(5, "stop"),
-    FAILURE(6, "failure"),
-    SUCCESS(7, "success"),
-    DELAY_EXECUTION(12, "delay execution"),
-    SERIAL_WAIT(14, "serial wait"),
-    READY_BLOCK(15, "ready block"),
-    BLOCK(16, "block"),
+    SUBMITTED_SUCCESS(0, true, false, "submit success"),
+    RUNNING_EXECUTION(1, true, false, "running"),
+    READY_PAUSE(2, true, false, "ready pause"),
+    PAUSE(3, false, true, "pause"),
+    READY_STOP(4, true, false, "ready stop"),
+    STOP(5, false, true, "stop"),
+    FAILURE(6, false, true, "failure"),
+    SUCCESS(7, false, true, "success"),
+    DELAY_EXECUTION(12, true, false, "delay execution"),
+    SERIAL_WAIT(14, false, false, "serial wait"),
+    READY_BLOCK(15, true, false, "ready block"),
+    BLOCK(16, false, true, "block"),
     ;
 
     private static final Map<Integer, WorkflowExecutionStatus> CODE_MAP = new HashMap<>();
-    private static final int[] NEED_FAILOVER_STATES = new int[]{
-            SUBMITTED_SUCCESS.getCode(),
-            RUNNING_EXECUTION.getCode(),
-            DELAY_EXECUTION.getCode(),
-            READY_PAUSE.getCode(),
-            READY_STOP.getCode()
+    private static final int[] NEED_FAILOVER_STATES;
+
+    private static final int[] NOT_TERMINATED_STATES = new int[]{
+            WorkflowExecutionStatus.SUBMITTED_SUCCESS.getCode(),
+            WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
+            WorkflowExecutionStatus.DELAY_EXECUTION.getCode(),
+            WorkflowExecutionStatus.READY_PAUSE.getCode(),
+            WorkflowExecutionStatus.READY_STOP.getCode(),
     };
 
     static {
         for (WorkflowExecutionStatus executionStatus : WorkflowExecutionStatus.values()) {
             CODE_MAP.put(executionStatus.getCode(), executionStatus);
         }
+        NEED_FAILOVER_STATES = Arrays.stream(WorkflowExecutionStatus.values())
+                .filter(WorkflowExecutionStatus::shouldFailover)
+                .mapToInt(WorkflowExecutionStatus::getCode)
+                .toArray();
     }
 
     /**
@@ -76,8 +85,7 @@ public enum WorkflowExecutionStatus {
     }
 
     public boolean isFinished() {
-        // todo: do we need to remove pause/block in finished judge?
-        return isSuccess() || isFailure() || isStop() || isPause() || isBlock();
+        return finished;
     }
 
     /**
@@ -116,10 +124,16 @@ public enum WorkflowExecutionStatus {
     @EnumValue
     private final int code;
 
+    private final boolean shouldBeFailover;
+
+    private final boolean finished;
+
     private final String desc;
 
-    WorkflowExecutionStatus(int code, String desc) {
+    WorkflowExecutionStatus(int code, boolean shouldBeFailover, boolean finished, String desc) {
         this.code = code;
+        this.shouldBeFailover = shouldBeFailover;
+        this.finished = finished;
         this.desc = desc;
     }
 
@@ -131,8 +145,8 @@ public enum WorkflowExecutionStatus {
         return desc;
     }
 
-    @Override
-    public String toString() {
-        return "WorkflowExecutionStatus{" + "code=" + code + ", desc='" + desc + '\'' + '}';
+    public boolean shouldFailover() {
+        return shouldBeFailover;
     }
+
 }

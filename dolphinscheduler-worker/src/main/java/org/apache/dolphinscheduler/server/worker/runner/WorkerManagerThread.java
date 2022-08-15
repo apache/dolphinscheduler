@@ -86,9 +86,9 @@ public class WorkerManagerThread implements Runnable {
      */
     public void killTaskBeforeExecuteByInstanceId(Integer taskInstanceId) {
         waitSubmitQueue.stream()
-                .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext()
-                        .getTaskInstanceId() == taskInstanceId)
+                .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
                 .forEach(waitSubmitQueue::remove);
+        taskExecuteThreadMap.remove(taskInstanceId);
     }
 
     public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
@@ -118,6 +118,7 @@ public class WorkerManagerThread implements Runnable {
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    continue;
                 }
                 if (this.getThreadPoolQueueSize() <= workerExecThreads) {
                     final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();

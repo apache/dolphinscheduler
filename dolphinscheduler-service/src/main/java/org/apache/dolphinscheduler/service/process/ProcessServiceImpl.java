@@ -418,7 +418,10 @@ public class ProcessServiceImpl implements ProcessService {
         if (masterCount <= 0) {
             return Lists.newArrayList();
         }
-        return commandMapper.queryCommandPageBySlot(pageSize, pageNumber * pageSize, masterCount, thisMasterSlot);
+        // filter in memory in order to decrease the db pressure.
+        return commandMapper.queryCommandPage(pageSize, pageNumber * pageSize).stream()
+                .filter(command -> command.getId() % masterCount == thisMasterSlot)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -2554,7 +2557,8 @@ public class ProcessServiceImpl implements ProcessService {
         int insertResult = 0;
         int updateResult = 0;
         if (!updateTaskDefinitionLogs.isEmpty()) {
-            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs.stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
+            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs
+                    .stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
             for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
                 TaskDefinition task = null;
                 for (TaskDefinition taskDefinition : taskDefinitions) {
