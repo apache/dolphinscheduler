@@ -1025,11 +1025,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.error("Delete process definition error, processDefinitionCode:{}.", code);
             throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
-        int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
-        if (deleteRelation == 0) {
-            logger.warn(
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(project.getCode(), processDefinition.getCode());
+        if (!processTaskRelations.isEmpty()) {
+            int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
+            if (deleteRelation == 0) {
+                logger.warn(
                     "The process definition has not relation, it will be delete successfully, processDefinitionCode:{}.",
                     code);
+            } else {
+                // delete relation task definition
+                List<Long> taskCodeList = processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toList());
+                int deleteTask = taskDefinitionMapper.deleteByCodeList(taskCodeList);
+                if (deleteTask == 0) {
+                    throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+                }
+            }
         }
         deleteOtherRelation(project, new HashMap<>(), processDefinition);
     }

@@ -99,6 +99,14 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     int deleteByCode(@Param("code") long code);
 
     /**
+     * delete task definition by batch code
+     *
+     * @param codeList codeList
+     * @return int
+     */
+    int deleteByCodeList(@Param("codeList") List<Long> codeList);
+
+    /**
      * batch insert task definitions
      *
      * @param taskDefinitions taskDefinitions

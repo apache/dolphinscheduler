@@ -51,6 +51,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
+import com.google.common.collect.Lists;
+
 @RunWith(MockitoJUnitRunner.class)
 public class TaskDefinitionServiceImplTest {
 
@@ -181,11 +183,14 @@ public class TaskDefinitionServiceImplTest {
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,TASK_DEFINITION_DELETE )).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_DELETE)).thenReturn(result);
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(getTaskDefinition());
         Mockito.when(processTaskRelationMapper.queryDownstreamByTaskCode(taskCode))
             .thenReturn(new ArrayList<>());
         Mockito.when(taskDefinitionMapper.deleteByCode(taskCode))
+            .thenReturn(1);
+
+        Mockito.when(taskDefinitionMapper.deleteByCodeList(Lists.newArrayList(taskCode)))
             .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
