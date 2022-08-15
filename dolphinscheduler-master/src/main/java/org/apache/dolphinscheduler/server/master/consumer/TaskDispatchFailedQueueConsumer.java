@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -99,6 +98,8 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
             } catch (Exception e) {
                 TaskMetrics.incTaskDispatchError();
                 logger.error("failed task retry error", e);
+            } finally {
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 10L);
             }
         }
     }
