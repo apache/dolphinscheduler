@@ -567,6 +567,10 @@ export default {
                                 title: 'API Automation Test',
                                 link: '/en-us/docs/dev/user_doc/contribute/api-test.html',
                             },
+                            {
+                                title: 'Log Specification',
+                                link: '/en-us/docs/dev/user_doc/contribute/log-specification.html',
+                            },
                         ],
                     },
                     {
@@ -1154,6 +1158,10 @@ export default {
                             {
                                 title: 'API 自动化测试',
                                 link: '/zh-cn/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                            {
+                                title: '日志规范',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/log-specification.html',
                             },
                         ],
                     },
