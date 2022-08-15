@@ -18,21 +18,7 @@
 r"""
 A tutorial example take you to experience pydolphinscheduler resource plugin.
 
-After tutorial_resource_plugin.py file submit to Apache DolphinScheduler server a DAG would be create,
-and workflow DAG graph as below:
-
-                  --> task_child_one
-                /                    \
-task_parent -->                        -->  task_union
-                \                    /
-                  --> task_child_two
-
 Resource plug-ins can be defined in workflows and tasks
-
-task_parent uses local resource plugin.
-task_child_one uses local resource plugin.
-task_child_two uses local resource plugin.
-task_union does not use resource plug-ins
 
 it will instantiate and run all the task it have.
 """
