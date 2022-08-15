@@ -77,7 +77,7 @@ export function useTable() {
         render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
-        title: t('project.workflow.workflow_name'),
+        title: t('project.workflow.workflow_instance_name'),
         key: 'name',
         ...COLUMN_WIDTH_CONFIG['linkName'],
         className: 'workflow-name',
