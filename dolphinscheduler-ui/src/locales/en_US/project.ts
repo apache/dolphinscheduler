@@ -43,6 +43,7 @@ export default {
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
     workflow_name: 'Workflow Name',
+    workflow_instance_name: 'Workflow Instance Name',
     current_selection: 'Current Selection',
     online: 'Online',
     offline: 'Offline',
