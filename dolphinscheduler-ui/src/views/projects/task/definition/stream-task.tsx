@@ -85,29 +85,26 @@ const StreamTaskDefinition = defineComponent({
     return () => (
       <NSpace vertical>
         <Card>
-          <NSpace justify='space-between'>
-            <NSpace />
-            <NSpace>
-              <NInput
-                allowInput={trim}
-                size='small'
-                clearable
-                v-model={[variables.searchTaskName, 'value']}
-                placeholder={t('project.task.task_name')}
-              />
-              <NInput
-                allowInput={trim}
-                size='small'
-                clearable
-                v-model={[variables.searchWorkflowName, 'value']}
-                placeholder={t('project.task.workflow_name')}
-              />
-              <NButton size='small' type='primary' onClick={onSearch}>
-                <NIcon>
-                  <SearchOutlined />
-                </NIcon>
-              </NButton>
-            </NSpace>
+          <NSpace justify='end'>
+            <NInput
+              allowInput={trim}
+              size='small'
+              clearable
+              v-model={[variables.searchTaskName, 'value']}
+              placeholder={t('project.task.task_name')}
+            />
+            <NInput
+              allowInput={trim}
+              size='small'
+              clearable
+              v-model={[variables.searchWorkflowName, 'value']}
+              placeholder={t('project.task.workflow_name')}
+            />
+            <NButton size='small' type='primary' onClick={onSearch}>
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
+            </NButton>
           </NSpace>
         </Card>
         <Card>
