@@ -107,9 +107,7 @@ def test_local_res_file_not_found(attr):
     """Test local resource plugin file does not exist."""
     with pytest.raises(
         PyResPluginException,
-        match="{} is not found".format(
-            Path(attr.get("prefix")).joinpath(attr.get("file_name"))
-        ),
+        match=".* is not found",
     ):
         local = Local(str(attr.get("prefix")))
         local.read_file(attr.get("file_name"))
