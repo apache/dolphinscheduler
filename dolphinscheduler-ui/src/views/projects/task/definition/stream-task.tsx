@@ -27,11 +27,11 @@ import {
   NPagination
 } from 'naive-ui'
 import { useRoute } from 'vue-router'
-import Card from '@/components/card'
-import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import { useTable } from './use-stream-table'
 import { useTask } from './use-task'
 import StartModal from './components/start-modal'
+import Card from '@/components/card'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import type { INodeData } from './types'
 
 const StreamTaskDefinition = defineComponent({
@@ -103,13 +103,9 @@ const StreamTaskDefinition = defineComponent({
                 placeholder={t('project.task.workflow_name')}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>
