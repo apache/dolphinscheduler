@@ -274,7 +274,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
-        }  else if (!checkSubProcessDefinitionValid(processDefinition)) {
+        } else if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
+            // check process definition online
+            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(processDefineCode), version);
+        } else if (!checkSubProcessDefinitionValid(processDefinition)) {
             // check sub process definition online
             putMsg(result, Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
         } else {
@@ -355,6 +358,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
             result =
                     checkProcessDefinitionValid(projectCode, processDefinition,
