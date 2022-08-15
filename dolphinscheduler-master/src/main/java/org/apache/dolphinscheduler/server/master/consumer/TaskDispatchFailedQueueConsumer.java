@@ -99,7 +99,7 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
                 TaskMetrics.incTaskDispatchError();
                 logger.error("failed task retry error", e);
             } finally {
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 10L);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         }
     }
