@@ -27,11 +27,11 @@ import {
   NPagination
 } from 'naive-ui'
 import { useRoute } from 'vue-router'
-import Card from '@/components/card'
-import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import { useTable } from './use-stream-table'
 import { useTask } from './use-task'
 import StartModal from './components/start-modal'
+import Card from '@/components/card'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import type { INodeData } from './types'
 
 const StreamTaskDefinition = defineComponent({
@@ -85,33 +85,26 @@ const StreamTaskDefinition = defineComponent({
     return () => (
       <NSpace vertical>
         <Card>
-          <NSpace justify='space-between'>
-            <NSpace />
-            <NSpace>
-              <NInput
-                allowInput={trim}
-                size='small'
-                clearable
-                v-model={[variables.searchTaskName, 'value']}
-                placeholder={t('project.task.task_name')}
-              />
-              <NInput
-                allowInput={trim}
-                size='small'
-                clearable
-                v-model={[variables.searchWorkflowName, 'value']}
-                placeholder={t('project.task.workflow_name')}
-              />
-              <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
-              </NButton>
-            </NSpace>
+          <NSpace justify='end'>
+            <NInput
+              allowInput={trim}
+              size='small'
+              clearable
+              v-model={[variables.searchTaskName, 'value']}
+              placeholder={t('project.task.task_name')}
+            />
+            <NInput
+              allowInput={trim}
+              size='small'
+              clearable
+              v-model={[variables.searchWorkflowName, 'value']}
+              placeholder={t('project.task.workflow_name')}
+            />
+            <NButton size='small' type='primary' onClick={onSearch}>
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
+            </NButton>
           </NSpace>
         </Card>
         <Card>
