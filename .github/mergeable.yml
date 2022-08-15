@@ -22,7 +22,7 @@ mergeable:
   # GitHub action workflow `pull_requests` https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request like,
   # which only trigger runs when a pull_request event's activity type is opened, synchronize, or reopened
   - when: pull_request.opened, pull_request.reopened, pull_request.synchronize
-    name: synchronize change for sql files
+    name: sync-sql-ddl
     validate:
       # Sql files must change synchronize
       - do: dependent
@@ -44,3 +44,15 @@ mergeable:
     pass:
       - do: labels
         delete: 'sql not sync'
+
+  - when: pull_request.*
+    name: milestone-label-check
+    validate:
+      - do: milestone
+        no_empty:
+          enabled: true # Cannot be empty when true.
+          message: 'Milestone is required and cannot be empty.'
+      - do: label
+        must_include:
+          regex: 'feature|bug|improvement|document|chore'
+          message: 'Label must include one of the following: `feature`, `bug`, `improvement`, `document`, `chore`'
