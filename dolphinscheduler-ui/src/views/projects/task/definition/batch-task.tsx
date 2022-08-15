@@ -25,7 +25,6 @@ import {
 import { useRoute } from 'vue-router'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
