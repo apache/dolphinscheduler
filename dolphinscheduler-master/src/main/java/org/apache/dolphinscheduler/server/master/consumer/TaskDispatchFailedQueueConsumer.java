@@ -74,7 +74,7 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
     static {
         TIME_DELAY = new Long[Constants.DEFAULT_MAX_RETRY_COUNT];
         for (int i = 0; i < Constants.DEFAULT_MAX_RETRY_COUNT; i++) {
-            int delayTime = (i + 9) * 1000;
+            long delayTime = (i + 1) * Constant.SLEEP_TIME_MILLIS;
             TIME_DELAY[i] = (long) delayTime;
         }
     }
