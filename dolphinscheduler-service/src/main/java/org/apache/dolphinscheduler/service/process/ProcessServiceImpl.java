@@ -266,9 +266,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private CuringParamsService curingGlobalParamsService;
 
-    @Autowired
-    private ProcessService processService;
-
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -1261,7 +1258,7 @@ public class ProcessServiceImpl implements ProcessService {
             try {
                 // submit task to db
                 // Only want to use transaction here
-                task = processService.submitTask(processInstance, taskInstance);
+                task = submitTask(processInstance, taskInstance);
                 if (task != null && task.getId() != 0) {
                     break;
                 }

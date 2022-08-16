@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -79,6 +80,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     @Autowired
     private MasterConfig masterConfig;
 
+    @Lazy
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
