@@ -34,7 +34,7 @@ Now, we should install all dependence to make sure we could run test or check co
 
 ```shell
 cd dolphinscheduler/dolphinscheduler-python/pydolphinscheduler
-python -m pip install .[dev]
+python -m pip install -e '.[dev]'
 ```
 
 Next, we have to open pydolphinscheduler project in you editor. We recommend you use [pycharm][pycharm]
@@ -146,10 +146,24 @@ python -m flake8
 
 #### Testing
 
-## Build Docs
+## Build Document
 
 We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in 
-GitHub. You may locally ensure docs could be built suceessfully in case the failure blocks CI.
+GitHub. You may locally ensure docs could be built successfully in case the failure blocks CI, you can build by tox or manual.
+
+### Build Document Automatically with tox
+
+We integrated document build process into tox, you can build the latest document and all document(including history documents) via
+single command
+
+```shell
+# Build the latest document in dev branch
+tox -e doc-build
+# Build all documents, which including the latest and all history documents
+tox -e doc-build-multi
+```
+
+### Build Document Manually
 
 To build docs locally, install sphinx and related python modules first via:
 
@@ -157,12 +171,15 @@ To build docs locally, install sphinx and related python modules first via:
 python -m pip install '.[doc]'
 ``` 
 
-Then 
+Then go to document directory and execute the build command
 
 ```shell
 cd pydolphinscheduler/docs/
 make clean && make html
 ```
+
+> NOTE: We support build multiple versions of documents with [sphinx-multiversion](https://holzhaus.github.io/sphinx-multiversion/master/index.html),
+> you can build with command `git fetch --tags && make clean && make multiversion`
 
 ## Testing
 
@@ -188,11 +205,14 @@ It would not only run unit test but also show each file coverage which cover rat
 line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
 this command output.
 
-#### Integrate Test
+### Integrate Test
 
 Integrate Test can not run when you execute command `tox -e local-ci` because it needs external environment
 including [Docker](https://docs.docker.com/get-docker/) and specific image build by [maven](https://maven.apache.org/install.html).
 Here we would show you the step to run integrate test in directory `dolphinscheduler-python/pydolphinscheduler/tests/integration`.
+There are two ways to run integrate tests.
+
+#### Method 1: Launch Docker Container Locally
 
 ```shell
 # Go to project root directory and build Docker image
@@ -208,6 +228,15 @@ cd ../../
 
 # Go to pydolphinscheduler root directory and run integrate tests
 tox -e integrate-test
+```
+
+#### Method 2: Start Standalone Server in IntelliJ IDEA
+
+```shell
+# Start the standalone server in IDEA
+
+# Go to pydolphinscheduler root directory and run integrate tests
+tox -e local-integrate-test
 ```
 
 ## Add LICENSE When New Dependencies Adding

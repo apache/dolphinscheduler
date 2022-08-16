@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,9 +32,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,8 +163,36 @@ public final class DateUtils {
         return format(date, YYYY_MM_DD_HH_MM_SS, timezone);
     }
 
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @return zone date time string
+     */
     public static String dateToString(ZonedDateTime zonedDateTime) {
         return YYYY_MM_DD_HH_MM_SS.format(zonedDateTime);
+    }
+
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @param timezone      time zone
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime, String timezone) {
+        return dateToString(zonedDateTime, ZoneId.of(timezone));
+    }
+
+    /**
+     * convert zone date time to yyyy-MM-dd HH:mm:ss format
+     *
+     * @param zonedDateTime zone date time
+     * @param zoneId        zone id
+     * @return zone date time string
+     */
+    public static String dateToString(ZonedDateTime zonedDateTime, ZoneId zoneId) {
+        return DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS).withZone(zoneId).format(zonedDateTime);
     }
 
     /**
@@ -313,17 +340,20 @@ public final class DateUtils {
     }
 
     /**
-     * format time to duration
+     * format time to duration, if end date is null, use current time as end time
      *
-     * @param d1 d1
-     * @param d2 d2
+     * @param start start
+     * @param end end
      * @return format time
      */
-    public static String format2Duration(Date d1, Date d2) {
-        if (d1 == null || d2 == null) {
+    public static String format2Duration(Date start, Date end) {
+        if (start == null) {
             return null;
         }
-        return format2Duration(differMs(d1, d2));
+        if (end == null) {
+            end = new Date();
+        }
+        return format2Duration(differMs(start, end));
     }
 
     /**
@@ -338,6 +368,11 @@ public final class DateUtils {
         long hours = MILLISECONDS.toDurationHours(ms);
         long minutes = MILLISECONDS.toDurationMinutes(ms);
         long seconds = MILLISECONDS.toDurationSeconds(ms);
+
+        if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
+            // if duration is zero, set 1s
+            seconds = 1;
+        }
 
         StringBuilder strBuilder = new StringBuilder();
         strBuilder = days > 0 ? strBuilder.append(days).append("d").append(" ") : strBuilder;

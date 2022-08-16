@@ -161,4 +161,86 @@
         </if>
         AND a.task_type = 'DEPENDENT'
     </select>
+
+    <select id="queryTaskSubProcessDepOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
+        select td.id
+            , td.name as taskName
+            , td.code as taskCode
+            , td.version as taskVersion
+            , td.task_type as taskType
+            , ptr.process_definition_code as processDefinitionCode
+            , pd.name as processDefinitionName
+            , pd.version as processDefinitionVersion
+            , pd.release_state as processReleaseState
+        from t_ds_task_definition td
+        join t_ds_process_task_relation ptr on ptr.post_task_code = td.code and td.version = ptr.post_task_version
+        join t_ds_process_definition pd on pd.code = ptr.process_definition_code and pd.version = ptr.process_definition_version
+        <where>
+            <if test="projectCode != 0">
+                and ptr.project_code = #{projectCode}
+            </if>
+            <!-- ptr.process_definition_code != #{processDefinitionCode} query task not in current workflow -->
+            <!-- For subprocess task type, using `concat('%"processDefinitionCode":', #{processDefinitionCode}, '%')` -->
+            <if test="processDefinitionCode != 0">
+                and td.task_type = 'SUB_PROCESS'
+                and ptr.process_definition_code != #{processDefinitionCode}
+                and td.task_params like concat('%"processDefinitionCode":', #{processDefinitionCode}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryTaskDependentDepOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
+        select td.id
+        , td.name as taskName
+        , td.code as taskCode
+        , td.version as taskVersion
+        , td.task_type as taskType
+        , ptr.process_definition_code as processDefinitionCode
+        , pd.name as processDefinitionName
+        , pd.version as processDefinitionVersion
+        , pd.release_state as processReleaseState
+        from t_ds_task_definition td
+        join t_ds_process_task_relation ptr on ptr.post_task_code = td.code and td.version = ptr.post_task_version
+        join t_ds_process_definition pd on pd.code = ptr.process_definition_code and pd.version = ptr.process_definition_version
+        <where>
+            <if test="projectCode != 0">
+                and ptr.project_code = #{projectCode}
+            </if>
+            <!-- ptr.process_definition_code != #{processDefinitionCode} query task not in current workflow -->
+            <!-- For dependnet task type, using `like concat('%"definitionCode":', #{processDefinitionCode}, '%')` -->
+            <if test="processDefinitionCode != 0">
+                and td.task_type = 'DEPENDENT'
+                and ptr.process_definition_code != #{processDefinitionCode}
+                and td.task_params like concat('%"definitionCode":', #{processDefinitionCode}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryTaskDepOnTask" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
+        select td.id
+             , td.name as taskName
+             , td.code as taskCode
+             , td.version as taskVersion
+             , td.task_type as taskType
+             , ptr.process_definition_code as processDefinitionCode
+             , pd.name as processDefinitionName
+             , pd.version as processDefinitionVersion
+             , pd.release_state as processReleaseState
+        from t_ds_task_definition td
+        join t_ds_process_task_relation ptr on ptr.post_task_code = td.code and td.version = ptr.post_task_version
+        join t_ds_process_definition pd on pd.code = ptr.process_definition_code and pd.version = ptr.process_definition_version
+        <where>
+            <if test="projectCode != 0">
+                and ptr.project_code = #{projectCode}
+            </if>
+            <!-- ptr.process_definition_code != #{processDefinitionCode} query task not in current workflow -->
+            <if test="processDefinitionCode != 0">
+                and ptr.process_definition_code != #{processDefinitionCode}
+                and td.task_params like concat('%"definitionCode":', #{processDefinitionCode}, '%')
+            </if>
+            <if test="taskCode != 0">
+                and td.task_params like concat('%"depTaskCode":', #{taskCode}, '%')
+            </if>
+        </where>
+    </select>
 </mapper>

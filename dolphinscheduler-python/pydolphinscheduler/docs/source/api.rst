@@ -24,10 +24,10 @@ Core
 .. automodule:: pydolphinscheduler.core
   :inherited-members:
 
-Sides
------
+Models
+------
 
-.. automodule:: pydolphinscheduler.side
+.. automodule:: pydolphinscheduler.models
   :inherited-members:
 
 Tasks

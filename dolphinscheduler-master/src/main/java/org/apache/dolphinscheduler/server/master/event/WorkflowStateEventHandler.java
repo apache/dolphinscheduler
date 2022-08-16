@@ -17,17 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
+import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
 public class WorkflowStateEventHandler implements StateEventHandler {
@@ -35,34 +32,34 @@ public class WorkflowStateEventHandler implements StateEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowStateEventHandler.class);
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException {
-        measureProcessState(stateEvent);
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleException {
+        WorkflowStateEvent workflowStateEvent = (WorkflowStateEvent) stateEvent;
+        measureProcessState(workflowStateEvent);
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
 
-        logger.info("process:{} state {} change to {}",
-            processInstance.getId(),
-            processInstance.getState(),
-            stateEvent.getExecutionStatus());
+        logger.info(
+                "Handle workflow instance state event, the current workflow instance state {} will be changed to {}",
+                processInstance.getState(), workflowStateEvent.getStatus());
 
-        if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+        if (workflowStateEvent.getStatus().isStop()) {
             // serial wait execution type needs to wake up the waiting process
             if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
-                .typeIsSerialPriority()) {
+                    .typeIsSerialPriority()) {
                 workflowExecuteRunnable.endProcess();
                 return true;
             }
-            workflowExecuteRunnable.updateProcessInstanceState(stateEvent);
+            workflowExecuteRunnable.updateProcessInstanceState(workflowStateEvent);
             return true;
         }
         if (workflowExecuteRunnable.processComplementData()) {
             return true;
         }
-        if (stateEvent.getExecutionStatus().typeIsFinished()) {
+        if (workflowStateEvent.getStatus().isFinished()) {
             workflowExecuteRunnable.endProcess();
         }
-        if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+        if (processInstance.getState().isReadyStop()) {
             workflowExecuteRunnable.killAllTasks();
         }
 
@@ -74,19 +71,19 @@ public class WorkflowStateEventHandler implements StateEventHandler {
         return StateEventType.PROCESS_STATE_CHANGE;
     }
 
-    private void measureProcessState(StateEvent processStateEvent) {
-        if (processStateEvent.getExecutionStatus().typeIsFinished()) {
-            ProcessInstanceMetrics.incProcessInstanceFinish();
+    private void measureProcessState(WorkflowStateEvent processStateEvent) {
+        if (processStateEvent.getStatus().isFinished()) {
+            ProcessInstanceMetrics.incProcessInstanceByState("finish");
         }
-        switch (processStateEvent.getExecutionStatus()) {
+        switch (processStateEvent.getStatus()) {
             case STOP:
-                ProcessInstanceMetrics.incProcessInstanceStop();
+                ProcessInstanceMetrics.incProcessInstanceByState("stop");
                 break;
             case SUCCESS:
-                ProcessInstanceMetrics.incProcessInstanceSuccess();
+                ProcessInstanceMetrics.incProcessInstanceByState("success");
                 break;
             case FAILURE:
-                ProcessInstanceMetrics.incProcessInstanceFailure();
+                ProcessInstanceMetrics.incProcessInstanceByState("fail");
                 break;
             default:
                 break;

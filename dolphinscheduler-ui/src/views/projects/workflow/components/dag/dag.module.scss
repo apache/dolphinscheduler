@@ -116,7 +116,8 @@ $bgLight: #ffffff;
     &.icon-sql {
       background-image: url('/images/task-icons/sql.png');
     }
-    &.icon-flink {
+    &.icon-flink,
+    &.icon-flink_stream {
       background-image: url('/images/task-icons/flink.png');
     }
     &.icon-mr {
@@ -176,6 +177,12 @@ $bgLight: #ffffff;
     &.icon-dinky {
       background-image: url('/images/task-icons/dinky.png');
     }
+    &.icon-sagemaker {
+      background-image: url('/images/task-icons/sagemaker.png');
+    }
+    &.icon-chunjun {
+      background-image: url('/images/task-icons/chunjun.png');
+    }
   }
 
   &:hover {
@@ -195,7 +202,8 @@ $bgLight: #ffffff;
       &.icon-sql {
         background-image: url('/images/task-icons/sql_hover.png');
       }
-      &.icon-flink {
+      &.icon-flink,
+      &.icon-flink_stream {
         background-image: url('/images/task-icons/flink_hover.png');
       }
       &.icon-mr {
@@ -254,6 +262,12 @@ $bgLight: #ffffff;
       }
       &.icon-dinky {
         background-image: url('/images/task-icons/dinky_hover.png');
+      }
+      &.icon-sagemaker {
+        background-image: url('/images/task-icons/sagemaker_hover.png');
+      }
+      &.icon-chunjun {
+        background-image: url('/images/task-icons/chunjun_hover.png');
       }
     }
   }

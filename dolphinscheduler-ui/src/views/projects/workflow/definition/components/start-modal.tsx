@@ -22,9 +22,12 @@ import {
   h,
   onMounted,
   ref,
-  watch
+  watch,
+  getCurrentInstance,
+  computed
 } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from "vue-router"
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
@@ -73,6 +76,7 @@ export default defineComponent({
   setup(props, ctx) {
     const parallelismRef = ref(false)
     const { t } = useI18n()
+    const route = useRoute()
     const { startState } = useForm()
     const {
       variables,
@@ -143,6 +147,8 @@ export default defineComponent({
       }
     ]
 
+    const showTaskDependType = computed(() => route.name === 'workflow-definition-detail')
+
     const renderLabel = (option: any) => {
       return [
         h(
@@ -183,6 +189,8 @@ export default defineComponent({
       variables.startParamsList.splice(index, 1)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       getWorkerGroups()
       getAlertGroups()
@@ -202,6 +210,7 @@ export default defineComponent({
 
     return {
       t,
+      showTaskDependType,
       parallelismRef,
       hideModal,
       handleStart,
@@ -214,13 +223,13 @@ export default defineComponent({
       updateParamsList,
       ...toRefs(variables),
       ...toRefs(startState),
-      ...toRefs(props)
+      ...toRefs(props),
+      trim
     }
   },
 
   render() {
     const { t } = this
-
     return (
       <Modal
         show={this.show}
@@ -251,6 +260,20 @@ export default defineComponent({
               </NSpace>
             </NRadioGroup>
           </NFormItem>
+          {this.showTaskDependType && (
+            <NFormItem
+              label={t('project.workflow.node_execution')}
+              path='taskDependType'
+            >
+              <NRadioGroup v-model:value={this.startForm.taskDependType}>
+                <NSpace>
+                  <NRadio value='TASK_POST'>{t('project.workflow.backward_execution')}</NRadio>
+                  <NRadio value='TASK_PRE'>{t('project.workflow.forward_execution')}</NRadio>
+                  <NRadio value='TASK_ONLY'>{t('project.workflow.current_node_execution')}</NRadio>
+                </NSpace>
+              </NRadioGroup>
+            </NFormItem>)
+          }
           <NFormItem
             label={t('project.workflow.notification_strategy')}
             path='warningType'
@@ -357,6 +380,7 @@ export default defineComponent({
                       {t('project.workflow.custom_parallelism')}
                     </NCheckbox>
                     <NInput
+                  allowInput={this.trim}
                       disabled={!this.parallelismRef}
                       placeholder={t(
                         'project.workflow.please_enter_parallelism'
@@ -395,6 +419,7 @@ export default defineComponent({
                       />
                     ) : (
                       <NInput
+                  allowInput={this.trim}
                         clearable
                         type='textarea'
                         v-model:value={this.startForm.scheduleTime}
@@ -420,6 +445,7 @@ export default defineComponent({
                 {this.startParamsList.map((item, index) => (
                   <NSpace class={styles.startup} key={Date.now() + index}>
                     <NInput
+                  allowInput={this.trim}
                       pair
                       separator=':'
                       placeholder={['prop', 'value']}

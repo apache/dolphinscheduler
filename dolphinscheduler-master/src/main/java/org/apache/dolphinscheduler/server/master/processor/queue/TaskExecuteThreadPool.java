@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
-import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -48,21 +51,13 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    /**
-     * process service
-     */
     @Autowired
-    private ProcessService processService;
-
-    /**
-     * data quality result operator
-     */
-    @Autowired
-    private DataQualityResultOperator dataQualityResultOperator;
-
+    private List<TaskEventHandler> taskEventHandlerList;
 
     @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
+
+    private Map<TaskEventType, TaskEventHandler> taskEventHandlerMap = new HashMap<>();
 
     /**
      * task event thread map
@@ -75,19 +70,22 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
         this.setThreadNamePrefix("Task-Execute-Thread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
         this.setCorePoolSize(masterConfig.getExecThreads());
+        taskEventHandlerList.forEach(
+            taskEventHandler -> taskEventHandlerMap.put(taskEventHandler.getHandleEventType(), taskEventHandler));
     }
 
     public void submitTaskEvent(TaskEvent taskEvent) {
+        // stream task event handle
+        if (taskEvent.getProcessInstanceId() == 0 && streamTaskInstanceExecCacheManager.contains(taskEvent.getTaskInstanceId())) {
+            streamTaskInstanceExecCacheManager.getByTaskInstanceId(taskEvent.getTaskInstanceId()).addTaskEvent(taskEvent);
+            return;
+        }
         if (!processInstanceExecCacheManager.contains(taskEvent.getProcessInstanceId())) {
             logger.warn("Cannot find workflowExecuteThread from cacheManager, event: {}", taskEvent);
             return;
         }
         TaskExecuteRunnable taskExecuteRunnable = taskExecuteThreadMap.computeIfAbsent(taskEvent.getProcessInstanceId(),
-            (processInstanceId) -> new TaskExecuteRunnable(processInstanceId,
-                processService,
-                workflowExecuteThreadPool,
-                processInstanceExecCacheManager,
-                dataQualityResultOperator));
+            (processInstanceId) -> new TaskExecuteRunnable(processInstanceId, taskEventHandlerMap));
         taskExecuteRunnable.addEvent(taskEvent);
     }
 
