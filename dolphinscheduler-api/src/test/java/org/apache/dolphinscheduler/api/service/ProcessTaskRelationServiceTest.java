@@ -525,4 +525,17 @@ public class ProcessTaskRelationServiceTest {
             1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
+
+    @Test
+    public void testDeleteByProcessCode() {
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setProjectCode(1L);
+        processTaskRelationLog.setProcessDefinitionCode(10L);
+        processTaskRelationLog.setPreTaskCode(0L);
+        processTaskRelationLog.setPreTaskVersion(0);
+        processTaskRelationLog.setPostTaskCode(1L);
+        processTaskRelationLog.setPostTaskVersion(1);
+        Mockito.when(processTaskRelationLogMapper.insert(processTaskRelationLog)).thenReturn(1);
+        Mockito.when(processTaskRelationLogMapper.deleteByProcessCode(10L)).thenReturn(1);
+    }
 }

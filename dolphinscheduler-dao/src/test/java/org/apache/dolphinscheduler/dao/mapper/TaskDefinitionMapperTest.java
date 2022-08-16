@@ -32,6 +32,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Lists;
+
 public class TaskDefinitionMapperTest extends BaseDaoTest {
 
     @Autowired
@@ -155,7 +157,13 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         TaskDefinition taskDefinition = insertOne();
         int i = taskDefinitionMapper.deleteByCode(taskDefinition.getCode());
         Assert.assertNotEquals(i, 0);
+    }
 
+    @Test
+    public void testDeleteByCodeList() {
+        TaskDefinition taskDefinition = insertOne();
+        int i = taskDefinitionMapper.deleteByCodeList(Lists.newArrayList(taskDefinition.getCode()));
+        Assert.assertNotEquals(0, i);
     }
 
     @Test

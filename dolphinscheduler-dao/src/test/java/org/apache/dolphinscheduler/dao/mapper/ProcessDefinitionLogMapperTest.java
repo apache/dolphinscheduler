@@ -151,9 +151,15 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     @Test
     public void testDeleteByProcessDefinitionCodeAndVersion() {
         insertOne();
-        Page<ProcessDefinitionLog> page = new Page(1, 3);
         int processDefinitionLogs = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(1L, 1);
         Assert.assertNotEquals(processDefinitionLogs, 0);
+    }
+
+    @Test
+    public void testDeleteByProcessDefinitionCode() {
+        insertOne();
+        int processDefinitionLogs = processDefinitionLogMapper.deleteByProcessDefinitionCode(1L);
+        Assert.assertNotEquals(0, processDefinitionLogs);
     }
 
     @Test

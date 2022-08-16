@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,13 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
         Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
+    }
+
+    @Test
+    public void testDeleteByCodeList() {
+        TaskDefinitionLog taskDefinitionLog = insertOne();
+        int i = taskDefinitionLogMapper.deleteByCodeList(Lists.newArrayList(taskDefinitionLog.getCode()));
+        Assert.assertNotEquals(0, i);
     }
 
 }
