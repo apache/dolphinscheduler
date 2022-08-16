@@ -422,6 +422,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
         if (taskDefinition.equals(taskDefinitionToUpdate)) {
+            putMsg(result, Status.TASK_DEFINITION_NOT_CHANGE);
             return null;
         }
         if (taskDefinitionToUpdate == null) {
