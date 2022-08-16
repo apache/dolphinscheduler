@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.enums;
 
-import lombok.NonNull;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+public enum TaskExecuteType {
+    SYNC(0, "Will use SyncWorkerDelayTaskExecuteRunnable to execute the task"),
 
-public interface TaskChannel {
+    ;
 
-    void cancelApplication(boolean status);
+    private final int code;
+    private final String desc;
 
-    AbstractTask createTask(TaskExecutionContext taskRequest);
-
-    AbstractParameters parseParameters(ParametersNode parametersNode);
-
-    ResourceParametersHelper getResources(String parameters);
-
-    default @NonNull TaskExecuteType getTaskExecuteType() {
-        return TaskExecuteType.SYNC;
+    TaskExecuteType(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
 }

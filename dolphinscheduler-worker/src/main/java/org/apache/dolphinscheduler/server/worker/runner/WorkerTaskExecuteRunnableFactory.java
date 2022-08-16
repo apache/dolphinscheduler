@@ -15,26 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.server.worker.runner;
 
-import lombok.NonNull;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+public interface WorkerTaskExecuteRunnableFactory<T> {
 
-public interface TaskChannel {
-
-    void cancelApplication(boolean status);
-
-    AbstractTask createTask(TaskExecutionContext taskRequest);
-
-    AbstractParameters parseParameters(ParametersNode parametersNode);
-
-    ResourceParametersHelper getResources(String parameters);
-
-    default @NonNull TaskExecuteType getTaskExecuteType() {
-        return TaskExecuteType.SYNC;
-    }
-
+    T createWorkerTaskExecuteRunnable();
 }
