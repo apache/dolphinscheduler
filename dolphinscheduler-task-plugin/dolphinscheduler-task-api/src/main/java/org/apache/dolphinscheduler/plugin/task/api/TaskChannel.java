@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import lombok.NonNull;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -30,5 +32,9 @@ public interface TaskChannel {
     AbstractParameters parseParameters(ParametersNode parametersNode);
 
     ResourceParametersHelper getResources(String parameters);
+
+    default @NonNull TaskExecuteType getTaskExecuteType() {
+        return TaskExecuteType.SYNC;
+    }
 
 }

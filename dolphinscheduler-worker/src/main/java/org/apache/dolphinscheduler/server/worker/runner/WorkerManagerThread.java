@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import com.facebook.presto.jdbc.internal.javax.annotation.Nullable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.DelayQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
 
 /**
  * Manage tasks
@@ -37,30 +36,27 @@ public class WorkerManagerThread implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerManagerThread.class);
 
-    /**
-     * task queue
-     */
-    private final BlockingQueue<TaskExecuteThread> waitSubmitQueue;
+    private final DelayQueue<WorkerDelayTaskExecuteRunnable> waitSubmitQueue;
 
-    /**
-     * thread executor service
-     */
     private final WorkerExecService workerExecService;
+
+    private final int workerExecThreads;
 
     /**
      * running task
      */
-    private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
+        workerExecThreads = workerConfig.getExecThreads();
         this.waitSubmitQueue = new DelayQueue<>();
-        workerExecService = new WorkerExecService(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread",
-                                                                                           workerConfig.getExecThreads()),
-                                                  taskExecuteThreadMap);
+        workerExecService = new WorkerExecService(
+                ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
+                taskExecuteThreadMap);
     }
 
-    public TaskExecuteThread getTaskExecuteThread(Integer taskInstanceId) {
-        return this.taskExecuteThreadMap.get(taskInstanceId);
+    public @Nullable WorkerTaskExecuteRunnable getTaskExecuteThread(Integer taskInstanceId) {
+        return taskExecuteThreadMap.get(taskInstanceId);
     }
 
     /**
@@ -78,7 +74,7 @@ public class WorkerManagerThread implements Runnable {
      * @return queue size
      */
     public int getThreadPoolQueueSize() {
-        return this.workerExecService.getThreadPoolQueueSize();
+        return workerExecService.getThreadPoolQueueSize();
     }
 
     /**
@@ -87,20 +83,13 @@ public class WorkerManagerThread implements Runnable {
      */
     public void killTaskBeforeExecuteByInstanceId(Integer taskInstanceId) {
         waitSubmitQueue.stream()
-                       .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext()
-                                                                     .getTaskInstanceId() == taskInstanceId)
-                       .forEach(waitSubmitQueue::remove);
+                .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext()
+                        .getTaskInstanceId() == taskInstanceId)
+                .forEach(waitSubmitQueue::remove);
     }
 
-
-    /**
-     * submit task
-     *
-     * @param taskExecuteThread taskExecuteThread
-     * @return submit result
-     */
-    public boolean offer(TaskExecuteThread taskExecuteThread) {
-        return waitSubmitQueue.offer(taskExecuteThread);
+    public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
+        return waitSubmitQueue.offer(workerDelayTaskExecuteRunnable);
     }
 
     public void start() {
@@ -114,15 +103,20 @@ public class WorkerManagerThread implements Runnable {
     @Override
     public void run() {
         Thread.currentThread().setName("Worker-Execute-Manager-Thread");
-        TaskExecuteThread taskExecuteThread;
         while (Stopper.isRunning()) {
             try {
-                taskExecuteThread = waitSubmitQueue.take();
-                workerExecService.submit(taskExecuteThread);
+                final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
+                workerExecService.submit(workerDelayTaskExecuteRunnable);
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "
-                    + "the exception will be ignored and this thread will continue to run", e);
+                        + "the exception will be ignored and this thread will continue to run", e);
             }
         }
+    }
+
+    public void clearTask() {
+        waitSubmitQueue.clear();
+        workerExecService.getTaskExecuteThreadMap().values().forEach(WorkerTaskExecuteRunnable::cancelTask);
+        workerExecService.getTaskExecuteThreadMap().clear();
     }
 }

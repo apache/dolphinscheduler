@@ -42,7 +42,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
@@ -52,7 +52,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
         } catch (Exception e) {
             logger.error("yarn process failure", e);
             exitStatusCode = -1;
-            throw e;
+            throw new TaskException("Execute task failed", e);
         }
     }
 
