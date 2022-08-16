@@ -658,6 +658,15 @@
                             <replacement>$1</replacement>
                         </replaceRegex>
                     </java>
+                    <sql>
+                        <includes>
+                            <include>dolphinscheduler-dao/src/main/resources/**/*.sql</include>
+                        </includes>
+                        <dbeaver>
+                            <configFile>style/dbeaver.properties</configFile>
+                            <!-- configFile is optional -->
+                        </dbeaver>
+                    </sql>
                     <pom>
                         <sortPom>
                             <encoding>UTF-8</encoding>
