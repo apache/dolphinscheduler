@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.dolphinscheduler.api.enums.SortEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -358,9 +359,8 @@ public class ProcessDefinitionControllerTest {
         putMsg(result, Status.SUCCESS);
         result.setData(new PageInfo<Resource>(1, 10));
 
-        Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize)).thenReturn(result);
-        Result response = processDefinitionController.queryProcessDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize);
-
+        Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize, SortEnum.UpdateTimeDesc)).thenReturn(result);
+        Result response = processDefinitionController.queryProcessDefinitionListPaging(user, projectCode, searchVal, "", userId, SortEnum.UpdateTimeDesc,pageNo,pageSize);
         Assert.assertTrue(response != null && response.isSuccess());
     }
 

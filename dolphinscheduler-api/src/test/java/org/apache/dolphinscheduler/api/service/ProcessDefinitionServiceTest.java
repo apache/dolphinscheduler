@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 
+import org.apache.dolphinscheduler.api.enums.SortEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
@@ -193,7 +194,7 @@ public class ProcessDefinitionServiceTest {
 
         //project not found
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION)).thenReturn(result);
-        Result map = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, "", "", 1, 5, 0);
+        Result map = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, "", "", 1, 5, 0,SortEnum.UpdateTimeDesc);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) map.getCode());
 
         putMsg(result, Status.SUCCESS, projectCode);
@@ -206,10 +207,11 @@ public class ProcessDefinitionServiceTest {
                 , Mockito.eq("")
                 , Mockito.eq(loginUser.getId())
                 , Mockito.eq(project.getCode())
-                , Mockito.anyBoolean())).thenReturn(page);
+                , Mockito.anyBoolean()
+                , Mockito.any())).thenReturn(page);
 
         Result map1 = processDefinitionService.queryProcessDefinitionListPaging(
-                loginUser, 1L, "", "",1, 10, loginUser.getId());
+                loginUser, 1L, "", "",1, 10, loginUser.getId(), SortEnum.UpdateTimeDesc);
 
         Assert.assertEquals(Status.SUCCESS.getMsg(), map1.getMsg());
     }
