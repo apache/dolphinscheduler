@@ -31,30 +31,30 @@ public class TaskDispatchFailedQueue implements TaskPriorityQueue<TaskPriority> 
     /**
      * task dispatch failed queue
      */
-    private final PriorityBlockingQueue<TaskPriority> taskDispatchFailedQueue = new PriorityBlockingQueue<>(1000);
+    private final PriorityBlockingQueue<TaskPriority> dispatchFailedQueue = new PriorityBlockingQueue<>(1000);
 
     @Override
     public void put(TaskPriority taskInfo) {
-        taskDispatchFailedQueue.put(taskInfo);
+        dispatchFailedQueue.put(taskInfo);
     }
 
     @Override
     public TaskPriority take() throws TaskPriorityQueueException, InterruptedException {
-        return taskDispatchFailedQueue.take();
+        return dispatchFailedQueue.take();
     }
 
     @Override
     public TaskPriority poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException, InterruptedException {
-        return taskDispatchFailedQueue.poll(timeout, unit);
+        return dispatchFailedQueue.poll(timeout, unit);
     }
 
     @Override
     public int size() throws TaskPriorityQueueException {
-        return taskDispatchFailedQueue.size();
+        return dispatchFailedQueue.size();
     }
 
     @Override
     public void clear() {
-        taskDispatchFailedQueue.clear();
+        dispatchFailedQueue.clear();
     }
 }
