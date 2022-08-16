@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.dolphinscheduler.api.enums.SortEnum;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -88,13 +89,13 @@ public interface ProcessDefinitionService {
     /**
      * query process definition list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param searchVal search value
+     * @param loginUser       login user
+     * @param projectCode     project code
+     * @param searchVal       search value
      * @param otherParamsJson otherParamsJson handle other params
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param userId user id
+     * @param pageNo          page number
+     * @param pageSize        page size
+     * @param userId          user id
      * @return process definition page
      */
     Result queryProcessDefinitionListPaging(User loginUser,
@@ -103,7 +104,8 @@ public interface ProcessDefinitionService {
                                             String otherParamsJson,
                                             Integer userId,
                                             Integer pageNo,
-                                            Integer pageSize);
+                                            Integer pageSize,
+                                            SortEnum sortType);
 
     /**
      * query detail of process definition

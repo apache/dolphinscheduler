@@ -84,7 +84,29 @@
         <if test=" userId != 0">
             and td.user_id = #{userId}
         </if>
-        order by td.update_time desc,td.id asc
+        <choose>
+            <when test="sortType!=null and sortType!=''">
+                --         sort by create time or update time
+                <choose>
+                   <when test="sortType=='CreateTimeDesc'">
+                       order by td.create_time desc ,td.id asc
+                   </when>
+                   <when test="sortType=='CreateTimeAsc'">
+                       order by td.create_time asc ,td.id asc
+                   </when>
+                   <when test="sortType=='UpdateTimeDesc'">
+                       order by td.update_time desc ,td.id asc
+                   </when>
+                   <when test="sortType=='UpdateTimeAsc'">
+                       order by td.update_time asc ,td.id asc
+                   </when>
+               </choose>
+            </when >
+            <otherwise>
+                --                        default desc for update time
+                order by td.update_time desc ,td.id asc
+            </otherwise>
+        </choose>
     </select>
 
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">

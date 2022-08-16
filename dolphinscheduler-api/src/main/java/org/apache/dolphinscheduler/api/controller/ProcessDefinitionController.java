@@ -32,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.enums.SortEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -465,22 +466,22 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query process definition list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param searchVal search value
+     * @param loginUser       login user
+     * @param projectCode     project code
+     * @param searchVal       search value
      * @param otherParamsJson otherParamsJson handle other params
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param userId user id
+     * @param pageNo          page number
+     * @param pageSize        page size
+     * @param userId          user id
      * @return process definition page
      */
     @ApiOperation(value = "queryListPaging", notes = "QUERY_PROCESS_DEFINITION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "otherParamsJson", value = "OTHER_PARAMS_JSON", required = false, type = "String")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "otherParamsJson", value = "OTHER_PARAMS_JSON", required = false, type = "String")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -491,6 +492,7 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
+                                                   @RequestParam(value = "sortEnum", required = false) SortEnum sortType,
                                                    @RequestParam("pageNo") Integer pageNo,
                                                    @RequestParam("pageSize") Integer pageSize) {
         Result result = checkPageParams(pageNo, pageSize);
@@ -499,7 +501,7 @@ public class ProcessDefinitionController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
 
-        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize);
+        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize, sortType);
     }
 
     /**

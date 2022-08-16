@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
+import org.apache.dolphinscheduler.api.enums.SortEnum;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -461,18 +462,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * query process definition list paging
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param searchVal search value
-     * @param userId user id
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param searchVal   search value
+     * @param userId      user id
+     * @param pageNo      page number
+     * @param pageSize    page size
      * @return process definition page
      */
     @Override
     public Result queryProcessDefinitionListPaging(User loginUser, long projectCode, String searchVal,
                                                    String otherParamsJson, Integer userId, Integer pageNo,
-                                                   Integer pageSize) {
+                                                   Integer pageSize, SortEnum sortType) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
@@ -486,7 +487,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Page<ProcessDefinition> page = new Page<>(pageNo, pageSize);
         IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
-                page, searchVal, userId, project.getCode(), isAdmin(loginUser));
+                page, searchVal, userId, project.getCode(), isAdmin(loginUser),sortType==null?null:sortType.toString());
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
         for (ProcessDefinition pd : records) {
