@@ -17,18 +17,18 @@
 
 import { defineComponent, onMounted, onUnmounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
 import {
   NButton,
   NDataTable,
   NPagination,
   NPopconfirm,
-  NTooltip
+  NTooltip,
+  NSpace
 } from 'naive-ui'
 import { useTable } from './use-table'
+import Card from '@/components/card'
 import ProcessInstanceCondition from './components/process-instance-condition'
-import { IWorkflowInstanceSearch } from './types'
-import styles from './index.module.scss'
+import type { IWorkflowInstanceSearch } from './types'
 
 export default defineComponent({
   name: 'WorkflowInstanceList',
@@ -92,37 +92,36 @@ export default defineComponent({
     const { loadingRef } = this
 
     return (
-      <div class={styles.content}>
-        <Card class={styles.card}>
-          <div class={styles.header}>
-            <ProcessInstanceCondition onHandleSearch={this.handleSearch} />
-          </div>
+      <NSpace vertical>
+        <Card>
+          <ProcessInstanceCondition onHandleSearch={this.handleSearch} />
         </Card>
         <Card title={t('project.workflow.workflow_instance')}>
-          <NDataTable
-            loading={loadingRef}
-            rowKey={(row) => row.id}
-            columns={this.columns}
-            data={this.tableData}
-            striped
-            size={'small'}
-            class={styles.table}
-            scrollX={this.tableWidth}
-            v-model:checked-row-keys={this.checkedRowKeys}
-            row-class-name='items-workflow-instances'
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              rowKey={(row) => row.id}
+              columns={this.columns}
+              data={this.tableData}
+              striped
+              size={'small'}
+              scrollX={this.tableWidth}
+              v-model:checked-row-keys={this.checkedRowKeys}
+              row-class-name='items-workflow-instances'
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </NSpace>
+          </NSpace>
           <NTooltip>
             {{
               default: () => t('project.workflow.delete'),
@@ -145,7 +144,7 @@ export default defineComponent({
             }}
           </NTooltip>
         </Card>
-      </div>
+      </NSpace>
     )
   }
 })

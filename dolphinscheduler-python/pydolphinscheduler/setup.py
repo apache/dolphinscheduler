@@ -32,7 +32,7 @@ if sys.version_info[0] < 3:
 
 logger = logging.getLogger(__name__)
 
-version = "2.0.4"
+version = "dev"
 
 # Start package required
 prod = [
@@ -53,6 +53,10 @@ doc = [
     "sphinx-click>=3.0",
     "sphinx-inline-tabs",
     "sphinx-copybutton>=0.4.0",
+    # Unreleased package have a feature we want(use correct version package for API ref), so we install from
+    # GitHub directly, see also:
+    # https://github.com/Holzhaus/sphinx-multiversion/issues/42#issuecomment-1210539786
+    "sphinx-multiversion @ git+https://github.com/Holzhaus/sphinx-multiversion#egg=sphinx-multiversion",
 ]
 
 test = [
@@ -135,7 +139,7 @@ setup(
     ],
     project_urls={
         "Homepage": "https://dolphinscheduler.apache.org",
-        "Documentation": "https://dolphinscheduler.apache.org/python/index.html",
+        "Documentation": "https://dolphinscheduler.apache.org/python/dev/index.html",
         "Source": "https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/"
         "pydolphinscheduler",
         "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues?"
@@ -152,7 +156,7 @@ setup(
     platforms=["any"],
     classifiers=[
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
@@ -165,6 +169,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: User Interfaces",

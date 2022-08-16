@@ -138,7 +138,12 @@ export default defineComponent({
         color: '#d69f5b',
         image: `${import.meta.env.BASE_URL}images/task-icons/dinky.png`
       },
-      { taskType: 'DAG', color: '#bbdde9' }
+      { taskType: 'DAG', color: '#bbdde9' },
+      {
+        taskType: 'FLINK_STREAM',
+        color: '#d68f5b',
+        image: `${import.meta.env.BASE_URL}images/task-icons/flink.png`
+      }
     ])
 
     const initTaskStateMap = () => {

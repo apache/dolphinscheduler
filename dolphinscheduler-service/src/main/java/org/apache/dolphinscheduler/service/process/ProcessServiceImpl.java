@@ -341,16 +341,7 @@ public class ProcessServiceImpl implements ProcessService {
                             processInstance.getProcessDefinitionCode(),
                             processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
-            if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
-                saveProcessInstance(processInstance);
-                return;
-            }
             for (ProcessInstance info : runningProcessInstances) {
-                if (Objects.nonNull(info.getState()) && (WorkflowExecutionStatus.READY_STOP.equals(info.getState())
-                        || info.getState().isFinished())) {
-                    continue;
-                }
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(WorkflowExecutionStatus.READY_STOP);
@@ -368,6 +359,8 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                 }
             }
+            processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
+            saveProcessInstance(processInstance);
         }
     }
 
@@ -1570,7 +1563,7 @@ public class ProcessServiceImpl implements ProcessService {
             return null;
         }
         if (processInstanceState == WorkflowExecutionStatus.READY_PAUSE) {
-            taskInstance.setState(TaskExecutionStatus.KILL);
+            taskInstance.setState(TaskExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
@@ -1614,7 +1607,7 @@ public class ProcessServiceImpl implements ProcessService {
         // return pasue /stop if process instance state is ready pause / stop
         // or return submit success
         if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE) {
-            state = TaskExecutionStatus.KILL;
+            state = TaskExecutionStatus.PAUSE;
         } else if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP
                 || !checkProcessStrategy(taskInstance, processInstance)) {
             state = TaskExecutionStatus.KILL;
@@ -2559,17 +2552,26 @@ public class ProcessServiceImpl implements ProcessService {
         }
         int insertResult = 0;
         int updateResult = 0;
-        for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
-            TaskDefinition task = taskDefinitionMapper.queryByCode(taskDefinitionToUpdate.getCode());
-            if (task == null) {
-                newTaskDefinitionLogs.add(taskDefinitionToUpdate);
-            } else {
-                insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-                if (Boolean.TRUE.equals(syncDefine)) {
-                    taskDefinitionToUpdate.setId(task.getId());
-                    updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+        if (!updateTaskDefinitionLogs.isEmpty()) {
+            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs.stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
+            for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
+                TaskDefinition task = null;
+                for (TaskDefinition taskDefinition : taskDefinitions) {
+                    if (taskDefinitionToUpdate.getCode() == taskDefinition.getCode()) {
+                        task = taskDefinition;
+                        break;
+                    }
+                }
+                if (task == null) {
+                    newTaskDefinitionLogs.add(taskDefinitionToUpdate);
                 } else {
-                    updateResult++;
+                    insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
+                    if (Boolean.TRUE.equals(syncDefine)) {
+                        taskDefinitionToUpdate.setId(task.getId());
+                        updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+                    } else {
+                        updateResult++;
+                    }
                 }
             }
         }
@@ -2849,6 +2851,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
                 taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
+                taskNode.setTaskExecuteType(taskDefinitionLog.getTaskExecuteType());
                 taskNodeList.add(taskNode);
             }
         }

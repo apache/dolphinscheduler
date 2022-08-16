@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
-
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -30,9 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
 /**
  * switch task processor
@@ -65,6 +63,13 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
+        logger.info("switch task submit success");
+        return true;
+    }
+
+    @Override
+    public boolean runTask() {
+        logger.info("switch task starting");
         taskInstance.setLogPath(
                 LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion(),
@@ -74,21 +79,12 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
-        return true;
-    }
 
-    @Override
-    public boolean runTask() {
-        try {
-            if (!this.taskInstance().getState().isFinished() && setSwitchResult()) {
-                endTaskState();
-            }
-        } catch (Exception e) {
-            logger.error("update work flow {} switch task {} state error:",
-                    this.processInstance.getId(),
-                    this.taskInstance.getId(),
-                    e);
+        if (!this.taskInstance().getState().isFinished()) {
+            setSwitchResult();
         }
+        endTaskState();
+        logger.info("switch task finished");
         return true;
     }
 
@@ -104,7 +100,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean pauseTask() {
-        this.taskInstance.setState(TaskExecutionStatus.KILL);
+        this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
         return true;

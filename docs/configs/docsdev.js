@@ -386,6 +386,15 @@ export default {
                         title: 'Kubernetes Deployment',
                         link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
+                    {
+                        title: 'integration',
+                        children: [
+                            {
+                                title: 'Rainbond Deployment',
+                                link: '/en-us/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
                 ],
             },
             {
@@ -426,7 +435,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/dev/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -965,6 +974,15 @@ export default {
                         title: 'Kubernetes部署(Kubernetes)',
                         link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
+                    {
+                        title: '集成',
+                        children: [
+                            {
+                                title: '基于Rainbond部署(Cluster)',
+                                link: '/zh-cn/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
                 ],
             },
             {
@@ -1005,7 +1023,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/dev/index.html',
                     },
                     {
                         title: '健康检查',

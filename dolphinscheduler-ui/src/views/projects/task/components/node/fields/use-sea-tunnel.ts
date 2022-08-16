@@ -36,13 +36,6 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       ? 12
       : 0
   )
-  const queueSpan = computed(() =>
-    model.engine === 'SPARK' &&
-    model.deployMode != 'local' &&
-    model.master === 'YARN'
-      ? 24
-      : 0
-  )
 
   return [
     {
@@ -106,13 +99,6 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
           }
         }
       }
-    },
-    {
-      type: 'input',
-      field: 'queue',
-      name: t('project.node.sea_tunnel_queue'),
-      value: model.queue,
-      span: queueSpan
     },
 
     // SeaTunnel config parameter

@@ -17,44 +17,45 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import lombok.NonNull;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.NonNull;
 
 public class MasterConnectionStateListener implements ConnectionListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterConnectionStateListener.class);
 
-    private final String masterNodePath;
+    private final MasterConfig masterConfig;
     private final RegistryClient registryClient;
+    private final MasterConnectStrategy masterConnectStrategy;
 
-    public MasterConnectionStateListener(@NonNull String masterNodePath, @NonNull RegistryClient registryClient) {
-        this.masterNodePath = masterNodePath;
+    public MasterConnectionStateListener(@NonNull MasterConfig masterConfig,
+                                         @NonNull RegistryClient registryClient,
+                                         @NonNull MasterConnectStrategy masterConnectStrategy) {
+        this.masterConfig = masterConfig;
         this.registryClient = registryClient;
+        this.masterConnectStrategy = masterConnectStrategy;
     }
 
     @Override
     public void onUpdate(ConnectionState state) {
+        logger.info("Master received a {} event from registry, the current server state is {}", state,
+                ServerLifeCycleManager.getServerStatus());
         switch (state) {
             case CONNECTED:
-                logger.debug("registry connection state is {}", state);
                 break;
             case SUSPENDED:
-                logger.warn("registry connection state is {}, ready to retry connection", state);
                 break;
             case RECONNECTED:
-                logger.debug("registry connection state is {}, clean the node info", state);
-                registryClient.remove(masterNodePath);
-                registryClient.persistEphemeral(masterNodePath, "");
+                masterConnectStrategy.reconnect();
                 break;
             case DISCONNECTED:
-                logger.warn("registry connection state is {}, ready to stop myself", state);
-                registryClient.getStoppable().stop("registry connection state is DISCONNECTED, stop myself");
+                masterConnectStrategy.disconnect();
                 break;
             default:
         }

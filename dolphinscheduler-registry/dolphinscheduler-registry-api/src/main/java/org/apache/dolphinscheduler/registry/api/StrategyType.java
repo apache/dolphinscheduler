@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-.table-card {
-  margin-top: 8px;
+package org.apache.dolphinscheduler.registry.api;
 
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+public enum StrategyType {
+
+    STOP,
+    WAITING,
+    ;
 }

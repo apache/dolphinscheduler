@@ -15,30 +15,26 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+package org.apache.dolphinscheduler.plugin.task.api;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
+import org.junit.Assert;
+import org.junit.Test;
 
-    button,
-    input {
-      margin-left: 10px;
+public class AbstractTaskTest {
+
+    @Test
+    public void testFindFlinkJobId() {
+        String jobId = "cca7bc1061d61cf15238e92312c2fc20";
+        Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
+        Matcher matcher = FLINK_APPLICATION_REGEX.matcher("Job has been submitted with JobID " + jobId);
+        String str = null;
+        if (matcher.find()) {
+            str = matcher.group();
+        }
+        Assert.assertNotNull(str);
+        Assert.assertEquals(jobId, str.substring(6));
     }
-  }
-}
 
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
 }
