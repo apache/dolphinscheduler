@@ -16,8 +16,8 @@
  */
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
-import io.fabric8.kubernetes.api.model.batch.v1.Job;
-import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
+import io.fabric8.kubernetes.api.model.batch.Job;
+import io.fabric8.kubernetes.api.model.batch.JobStatus;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
@@ -62,17 +62,6 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setMinCpuCores(minCpuCores);
         k8sTaskMainParameters.setMinMemorySpace(minMemorySpace);
         job = k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
-    }
-    @Test
-    public void testBuildK8sJobNormal() {
-        String jobStr = "Job(apiVersion=batch/v1, kind=Job, metadata=ObjectMeta(annotations=null, clusterName=null, creationTimestamp=null, deletionGracePeriodSeconds=null, deletionTimestamp=null, finalizers=[], generateName=null, generation=null, labels={k8s.cn/layer=batch, k8s.cn/name=k8s_task_test-1000}, managedFields=[], name=k8s_task_test-1000, namespace=default, ownerReferences=[], resourceVersion=null, selfLink=null, uid=null, additionalProperties={}), spec=JobSpec(activeDeadlineSeconds=null, backoffLimit=0, completionMode=null, completions=null, manualSelector=null, parallelism=null, selector=null, suspend=null, template=PodTemplateSpec(metadata=null, spec=PodSpec(activeDeadlineSeconds=null, affinity=null, automountServiceAccountToken=null, containers=[Container(args=[], command=[], env=[EnvVar(name=taskInstanceId, value=1000, valueFrom=null, additionalProperties={})], envFrom=[], image=ds-dev, imagePullPolicy=Always, lifecycle=null, livenessProbe=null, name=k8s_task_test-1000, ports=[], readinessProbe=null, resources=ResourceRequirements(limits={memory=20.0Mi, cpu=4.0}, requests={memory=10.0Mi, cpu=2.0}, additionalProperties={}), securityContext=null, startupProbe=null, stdin=null, stdinOnce=null, terminationMessagePath=null, terminationMessagePolicy=null, tty=null, volumeDevices=[], volumeMounts=[], workingDir=null, additionalProperties={})], dnsConfig=null, dnsPolicy=null, enableServiceLinks=null, ephemeralContainers=[], hostAliases=[], hostIPC=null, hostNetwork=null, hostPID=null, hostname=null, imagePullSecrets=[], initContainers=[], nodeName=null, nodeSelector=null, overhead=null, preemptionPolicy=null, priority=null, priorityClassName=null, readinessGates=[], restartPolicy=Never, runtimeClassName=null, schedulerName=null, securityContext=null, serviceAccount=null, serviceAccountName=null, setHostnameAsFQDN=null, shareProcessNamespace=null, subdomain=null, terminationGracePeriodSeconds=null, tolerations=[], topologySpreadConstraints=[], volumes=[], additionalProperties={}), additionalProperties={}), ttlSecondsAfterFinished=300, additionalProperties={}), status=null, additionalProperties={})";
-        Assert.assertEquals(jobStr, job.toString());
-    }
-    @Test
-    public void testGetJobNormal() {
-        k8sTaskExecutor.setJob(job);
-        String jobStr = "Job(apiVersion=batch/v1, kind=Job, metadata=ObjectMeta(annotations=null, clusterName=null, creationTimestamp=null, deletionGracePeriodSeconds=null, deletionTimestamp=null, finalizers=[], generateName=null, generation=null, labels={k8s.cn/layer=batch, k8s.cn/name=k8s_task_test-1000}, managedFields=[], name=k8s_task_test-1000, namespace=default, ownerReferences=[], resourceVersion=null, selfLink=null, uid=null, additionalProperties={}), spec=JobSpec(activeDeadlineSeconds=null, backoffLimit=0, completionMode=null, completions=null, manualSelector=null, parallelism=null, selector=null, suspend=null, template=PodTemplateSpec(metadata=null, spec=PodSpec(activeDeadlineSeconds=null, affinity=null, automountServiceAccountToken=null, containers=[Container(args=[], command=[], env=[EnvVar(name=taskInstanceId, value=1000, valueFrom=null, additionalProperties={})], envFrom=[], image=ds-dev, imagePullPolicy=Always, lifecycle=null, livenessProbe=null, name=k8s_task_test-1000, ports=[], readinessProbe=null, resources=ResourceRequirements(limits={memory=20.0Mi, cpu=4.0}, requests={memory=10.0Mi, cpu=2.0}, additionalProperties={}), securityContext=null, startupProbe=null, stdin=null, stdinOnce=null, terminationMessagePath=null, terminationMessagePolicy=null, tty=null, volumeDevices=[], volumeMounts=[], workingDir=null, additionalProperties={})], dnsConfig=null, dnsPolicy=null, enableServiceLinks=null, ephemeralContainers=[], hostAliases=[], hostIPC=null, hostNetwork=null, hostPID=null, hostname=null, imagePullSecrets=[], initContainers=[], nodeName=null, nodeSelector=null, overhead=null, preemptionPolicy=null, priority=null, priorityClassName=null, readinessGates=[], restartPolicy=Never, runtimeClassName=null, schedulerName=null, securityContext=null, serviceAccount=null, serviceAccountName=null, setHostnameAsFQDN=null, shareProcessNamespace=null, subdomain=null, terminationGracePeriodSeconds=null, tolerations=[], topologySpreadConstraints=[], volumes=[], additionalProperties={}), additionalProperties={}), ttlSecondsAfterFinished=300, additionalProperties={}), status=null, additionalProperties={})";
-        Assert.assertEquals(jobStr,k8sTaskExecutor.getJob().toString());
     }
     @Test
     public void testGetK8sJobStatusNormal() {
