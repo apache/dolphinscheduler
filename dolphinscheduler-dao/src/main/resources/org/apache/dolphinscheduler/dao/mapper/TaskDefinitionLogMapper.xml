@@ -70,6 +70,13 @@
         where code = #{code}
           and version = #{version}
     </delete>
+    <delete id="deleteByCodeList">
+        delete from t_ds_task_definition_log
+        where code in
+        <foreach collection="codeList" item="code" separator="," open="(" close=")">
+            #{code}
+        </foreach>
+    </delete>
     <select id="queryTaskDefinitionVersionsPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
         select
         <include refid="baseSql"/>

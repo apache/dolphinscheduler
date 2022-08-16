@@ -208,7 +208,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     @Autowired
-    TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -1025,20 +1025,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.error("Delete process definition error, processDefinitionCode:{}.", code);
             throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(project.getCode(), processDefinition.getCode());
+        processDefinitionLogMapper.deleteByProcessDefinitionCode(code);
+        List<ProcessTaskRelation> processTaskRelations =
+                processTaskRelationMapper.queryByProcessCode(project.getCode(), code);
         if (!processTaskRelations.isEmpty()) {
-            int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
+            int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), code);
             if (deleteRelation == 0) {
                 logger.warn(
                     "The process definition has not relation, it will be delete successfully, processDefinitionCode:{}.",
                     code);
             } else {
+                processTaskRelationLogMapper.deleteByProcessCode(code);
                 // delete relation task definition
-                List<Long> taskCodeList = processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toList());
+                List<Long> taskCodeList = processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode)
+                        .collect(Collectors.toList());
                 int deleteTask = taskDefinitionMapper.deleteByCodeList(taskCodeList);
                 if (deleteTask == 0) {
                     throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
                 }
+                taskDefinitionLogMapper.deleteByCodeList(taskCodeList);
             }
         }
         deleteOtherRelation(project, new HashMap<>(), processDefinition);

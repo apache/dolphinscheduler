@@ -66,6 +66,14 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
+     * delete the certain task definition by code list
+     *
+     * @param codeList task code list
+     * @return int
+     */
+    int deleteByCodeList(@Param("codeList") List<Long> codeList);
+
+    /**
      * query max version for definition
      *
      * @param code taskDefinitionCode
@@ -94,5 +102,6 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param code process definition code
      * @return the paging task definition version list
      */
-    IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code, @Param("projectCode") long projectCode);
+    IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code,
+                                                               @Param("projectCode") long projectCode);
 }
