@@ -65,7 +65,7 @@ public class PytorchTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             String command = buildPythonExecuteCommand();
             TaskResponse taskResponse = shellCommandExecutor.run(command);
@@ -75,7 +75,7 @@ public class PytorchTask extends AbstractTaskExecutor {
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Pytorch task execute failed", e);
         }
     }
 

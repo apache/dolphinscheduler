@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -51,7 +49,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
@@ -62,7 +60,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
         } catch (Exception e) {
             logger.error("yarn process failure", e);
             exitStatusCode = -1;
-            throw e;
+            throw new TaskException("Execute task failed", e);
         }
     }
 
