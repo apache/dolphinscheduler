@@ -58,7 +58,6 @@ def test_write_not_create_parent(teardown_del_file):
     if file_test_dir.exists():
         shutil.rmtree(str(file_test_dir))
     assert not file_test_dir.exists()
-    #
     with pytest.raises(
         ValueError,
         match="Parent directory do not exists and set param `create` to `False`",
@@ -80,7 +79,6 @@ def test_write_overwrite_error(setup_crt_first):
     assert Path(file_path).exists()
 
     new_content = f"new_{content}"
-    #
     with pytest.raises(
         FileExistsError, match=".*already exists and you choose not overwrite mode\\."
     ):
