@@ -24,6 +24,7 @@ import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_G
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -111,7 +112,7 @@ public class EmrTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws InterruptedException {
+    public void handle() throws TaskException {
         ClusterStatus clusterStatus = null;
         try {
             RunJobFlowRequest runJobFlowRequest = createRunJobFlowRequest();
@@ -132,6 +133,9 @@ public class EmrTask extends AbstractTaskExecutor {
 
         } catch (EmrTaskException | SdkBaseException e) {
             logger.error("emr task submit failed with error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TaskException("Execute emr task failed", e);
         } finally {
             final int exitStatusCode = calculateExitStatusCode(clusterStatus);
             setExitStatusCode(exitStatusCode);

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -85,12 +86,14 @@ public abstract class AbstractTask {
         return null;
     }
 
+    public abstract void handle() throws TaskException;
+
     /**
-     * task handle
-     *
-     * @throws Exception exception
+     * This is used for Async task
      */
-    public abstract void handle() throws Exception;
+    public AsyncTaskExecuteFunction getAsyncTaskExecuteFunction() throws TaskException {
+        throw new TaskException("This is not supported");
+    }
 
     /**
      * cancel application

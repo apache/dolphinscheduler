@@ -116,7 +116,7 @@ public class SqlTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
@@ -157,8 +157,8 @@ public class SqlTask extends AbstractTaskExecutor {
 
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("sql task error: {}", e.toString());
-            throw e;
+            logger.error("sql task error", e);
+            throw new TaskException("Execute sql task failed", e);
         }
     }
 

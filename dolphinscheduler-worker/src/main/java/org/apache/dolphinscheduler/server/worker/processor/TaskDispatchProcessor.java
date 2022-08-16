@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.Constants;
+import com.google.common.base.Preconditions;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -36,25 +36,15 @@ import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerDelayTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnableFactoryBuilder;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import org.apache.commons.lang.SystemUtils;
-
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
-
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
-import io.netty.channel.Channel;
 
 /**
  * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
@@ -91,12 +81,12 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Autowired(required = false)
     private StorageOperate storageOperate;
 
-    @Counted(value = "dolphinscheduler_task_execution_count", description = "task execute total count")
-    @Timed(value = "dolphinscheduler_task_execution_timer", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
+    @Counted(value = "ds.task.execution.count", description = "task execute total count")
+    @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
@@ -104,7 +94,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             logger.error("task execute request command content is null");
             return;
         }
-        final String masterAddress = taskDispatchCommand.getMessageSenderAddress();
+        final String workflowMasterAddress = taskDispatchCommand.getMessageSenderAddress();
         logger.info("task execute request message: {}", taskDispatchCommand);
 
         TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
@@ -114,100 +104,40 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             return;
         }
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                                                        taskExecutionContext.getTaskInstanceId());
-
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
-
             // set cache, it will be used when kill task
             TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
-
-            // todo custom logger
-
             taskExecutionContext.setHost(workerConfig.getWorkerAddress());
             taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
-            if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
-            if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
-                    OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
-                }
-
-                // check if the OS user exists
-            if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
-                    logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
-                                 taskExecutionContext.getTenantCode(),
-                                 taskExecutionContext.getTaskInstanceId());
-                    TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                    taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-                    taskExecutionContext.setEndTime(new Date());
-                    workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                                                             masterAddress,
-                                                             CommandType.TASK_EXECUTE_RESULT);
-                    return;
-                }
-
-                // local execute path
-                String execLocalPath = getExecLocalPath(taskExecutionContext);
-                logger.info("task instance local execute path : {}", execLocalPath);
-                taskExecutionContext.setExecutePath(execLocalPath);
-
-                try {
-                    FileUtils.createWorkDirIfAbsent(execLocalPath);
-                } catch (Throwable ex) {
-                    logger.error("create execLocalPath fail, path: {}, taskInstanceId: {}",
-                                 execLocalPath,
-                                 taskExecutionContext.getTaskInstanceId(),
-                                 ex);
-                    TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                    taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-                    workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                                                             masterAddress,
-                                                             CommandType.TASK_EXECUTE_RESULT);
-                    return;
-                }
-            }
-
             // delay task process
-            long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                                                      taskExecutionContext.getDelayTime() * 60L);
+            long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
             if (remainTime > 0) {
-                logger.info("delay the execution of task instance {}, delay time: {} s",
-                            taskExecutionContext.getTaskInstanceId(),
-                            remainTime);
+                logger.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-                taskExecutionContext.setStartTime(null);
-                workerMessageSender.sendMessage(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessage(taskExecutionContext, workflowMasterAddress, CommandType.TASK_EXECUTE_RESULT);
             }
 
+            WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder.createWorkerDelayTaskExecuteRunnableFactory(
+                            taskExecutionContext,
+                            workerConfig,
+                            workflowMasterAddress,
+                            workerMessageSender,
+                            alertClientService,
+                            taskPluginManager,
+                            storageOperate)
+                    .createWorkerTaskExecuteRunnable();
             // submit task to manager
-            boolean offer = workerManager.offer(new TaskExecuteThread(taskExecutionContext,
-                                                                      masterAddress,
-                                                                      workerMessageSender,
-                                                                      alertClientService,
-                                                                      taskPluginManager,
-                                                                      storageOperate));
+            boolean offer = workerManager.offer(workerTaskExecuteRunnable);
             if (!offer) {
-                logger.warn("submit task to wait queue error, queue is full, queue size is {}, taskInstanceId: {}",
-                    workerManager.getWaitSubmitQueueSize(), taskExecutionContext.getTaskInstanceId());
                 taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.FAILURE);
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
+                logger.warn("submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master", workerManager.getWaitSubmitQueueSize());
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress, CommandType.TASK_EXECUTE_RESULT);
             }
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
-    /**
-     * get execute local path
-     *
-     * @param taskExecutionContext taskExecutionContext
-     * @return execute local path
-     */
-    private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
-        return FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
-    }
 }
