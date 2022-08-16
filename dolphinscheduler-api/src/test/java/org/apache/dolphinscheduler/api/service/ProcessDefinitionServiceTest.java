@@ -61,9 +61,11 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
@@ -160,6 +162,12 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private WorkFlowLineageService workFlowLineageService;
+
+    @Mock
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+
+    @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     protected User user;
     protected Exception exception;
@@ -468,8 +476,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(scheduleMapper.deleteById(46)).thenReturn(1);
         Mockito.when(processDefinitionMapper.deleteById(processDefinition.getId())).thenReturn(1);
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode()))
-                .thenReturn(1);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         processDefinitionService.deleteProcessDefinitionByCode(user, 46L);
@@ -496,8 +502,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setReleaseState(ReleaseState.OFFLINE);
         Mockito.when(processDefinitionMapper.deleteById(46)).thenReturn(1);
         Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode()))
-                .thenReturn(1);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
