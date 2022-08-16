@@ -17,16 +17,21 @@
 
 package org.apache.dolphinscheduler.dao;
 
-import static java.util.Objects.requireNonNull;
-
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
-
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.requireNonNull;
+
 @Component
 public class PluginDao {
+
+    private final Logger logger = LoggerFactory.getLogger(PluginDao.class);
+
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
@@ -51,10 +56,22 @@ public class PluginDao {
 
         PluginDefine currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (currPluginDefine == null) {
-            if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() > 0) {
-                return pluginDefine.getId();
+            try {
+                if (pluginDefineMapper.insert(pluginDefine) == 1) {
+                    return pluginDefine.getId();
+                } else {
+                    throw new TaskPluginException(String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s", pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                }
+            } catch (TaskPluginException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                logger.info("Insert plugin definition error, there may already exist a plugin");
+                currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+                if (currPluginDefine == null) {
+                    throw new TaskPluginException(String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s", pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                }
+                throw new IllegalStateException("Failed to insert plugin definition");
             }
-            throw new IllegalStateException("Failed to insert plugin definition");
         }
         if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
             currPluginDefine.setUpdateTime(pluginDefine.getUpdateTime());

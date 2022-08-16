@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.service.task;
 
-import static java.lang.String.format;
-
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -29,6 +27,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,9 +40,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import static java.lang.String.format;
 
 // todo: make this class to be utils
 @Component
@@ -106,10 +105,7 @@ public class TaskPluginManager {
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
             PluginDefine pluginDefine = new PluginDefine(name, PluginType.TASK.getDesc(), paramsJson);
-            int count = pluginDao.addOrUpdatePluginDefine(pluginDefine);
-            if (count <= 0) {
-                throw new TaskPluginException("Failed to update task plugin: " + name);
-            }
+            pluginDao.addOrUpdatePluginDefine(pluginDefine);
         });
     }
 }
