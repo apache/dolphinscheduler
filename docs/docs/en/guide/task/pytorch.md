@@ -4,7 +4,7 @@
 
 [Pytorch](https://pytorch.org) is a mainstream Python machine learning library.
 
-In order to enable users to **run Pytorch project in DolphinScheduler more convenient,** Pytorch task plugin is implemented. It provides convenient Python environment management and supports the running of Python projects.
+`Pytorch` task plugin enables users to run `Pytorch` projects in DolphinScheduler more conveniently. In addition, it supports handy Python environment management.
 
 Unlike the Python task plugin, this component allows users to **quickly use existing Python environments or create new ones (using Virtualenv or Conda)**. **Support for running Python projects (native or Git projects)** instead of just Python scripts.
 
