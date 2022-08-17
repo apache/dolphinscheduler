@@ -135,7 +135,7 @@ public class DependentExecute {
      *
      * @return
      */
-    private DependResult dependResultByProcessInstance(ProcessInstance processInstance) {
+    protected DependResult dependResultByProcessInstance(ProcessInstance processInstance) {
         if (!processInstance.getState().isFinished()) {
             return DependResult.WAITING;
         }
@@ -152,7 +152,7 @@ public class DependentExecute {
      * @param processInstance
      * @return
      */
-    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance) {
+    protected DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance) {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -188,7 +188,7 @@ public class DependentExecute {
      * @param dateInterval   date interval
      * @return ProcessInstance
      */
-    private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
+    protected ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
 
         ProcessInstance lastSchedulerProcess =
                 processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);

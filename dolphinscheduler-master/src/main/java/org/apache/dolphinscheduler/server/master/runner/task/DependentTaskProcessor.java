@@ -43,12 +43,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ITaskProcessor.class)
 public class DependentTaskProcessor extends BaseTaskProcessor {
 
-    private DependentParameters dependentParameters;
+    protected DependentParameters dependentParameters;
 
     /**
      * dependent task list
      */
-    private List<DependentExecute> dependentTaskList = new ArrayList<>();
+    protected List<DependentExecute> dependentTaskList = new ArrayList<>();
 
     /**
      * depend item result map
@@ -59,7 +59,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      * dependent date
      */
-    private Date dependentDate;
+    protected Date dependentDate;
 
     DependResult result;
 
