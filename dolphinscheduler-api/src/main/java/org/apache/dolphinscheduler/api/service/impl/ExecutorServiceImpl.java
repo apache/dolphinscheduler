@@ -324,7 +324,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
+     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
+
+
      *
      * @param loginUser         login user
      * @param projectCode       project code
