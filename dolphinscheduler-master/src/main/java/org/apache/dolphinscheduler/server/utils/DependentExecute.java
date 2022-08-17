@@ -25,9 +25,11 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,6 +60,7 @@ public class DependentExecute {
      */
     private DependentRelation relation;
 
+
     /**
      * depend result
      */
@@ -76,12 +79,11 @@ public class DependentExecute {
     /**
      * constructor
      *
-     * @param itemList item list
-     * @param relation relation
+     * @param taskModel taskModel
      */
-    public DependentExecute(List<DependentItem> itemList, DependentRelation relation) {
-        this.dependItemList = itemList;
-        this.relation = relation;
+    public DependentExecute(DependentTaskModel taskModel) {
+        this.dependItemList = taskModel.getDependItemList();
+        this.relation = taskModel.getRelation();
     }
 
     /**

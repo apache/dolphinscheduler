@@ -26,6 +26,7 @@ public class DependentTaskModel {
 
     private List<DependentItem> dependItemList;
     private DependentRelation relation;
+    private String dependStrategy;
 
     public List<DependentItem> getDependItemList() {
         return dependItemList;
@@ -41,5 +42,13 @@ public class DependentTaskModel {
 
     public void setRelation(DependentRelation relation) {
         this.relation = relation;
+    }
+
+    public String getDependStrategy() {
+        return dependStrategy;
+    }
+
+    public void setDependStrategy(String dependStrategy) {
+        this.dependStrategy = dependStrategy;
     }
 }

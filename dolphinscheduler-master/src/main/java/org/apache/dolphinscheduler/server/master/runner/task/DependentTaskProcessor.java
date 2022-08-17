@@ -124,7 +124,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     private void initDependParameters() {
         this.dependentParameters = taskInstance.getDependency();
         for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
-            this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation()));
+            this.dependentTaskList.add(new DependentExecute(taskModel));
         }
         if (processInstance.getScheduleTime() != null) {
             this.dependentDate = this.processInstance.getScheduleTime();
