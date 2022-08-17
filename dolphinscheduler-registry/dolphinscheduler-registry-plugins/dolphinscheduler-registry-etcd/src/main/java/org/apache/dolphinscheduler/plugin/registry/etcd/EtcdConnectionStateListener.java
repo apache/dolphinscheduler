@@ -39,7 +39,7 @@ public class EtcdConnectionStateListener implements AutoCloseable {
     // monitored client
     private final Client client;
     // The state of the last monitor
-    private ConnectionState connectionState;
+    private volatile ConnectionState connectionState;
 
     public EtcdConnectionStateListener(Client client) {
         this.client = client;
