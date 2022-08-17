@@ -15,33 +15,32 @@
  * limitations under the License.
  */
 
-import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useTaskNodeStore } from '@/store/project/task-node'
-import type { IJsonItem } from '../types'
+import { useTaskType, useProcessName } from '.'
+import type { IJsonItem, ITaskData } from '../types'
 
-export function usePreTasks(): IJsonItem {
-  const { t } = useI18n()
-  const taskStore = useTaskNodeStore()
-  const options = ref(taskStore.getPreTaskOptions)
-
-  watch(
-    () => taskStore.getPreTaskOptions,
-    (value) => {
-      options.value = value
-    }
-  )
-
-  return {
-    type: 'select',
-    field: 'preTasks',
-    span: 24,
-    class: 'pre-tasks-model',
-    name: t('project.node.pre_tasks'),
-    props: {
-      multiple: true,
-      filterable: true
-    },
-    options
-  }
+export const useTaskDefinition = ({
+  projectCode,
+  from = 0,
+  readonly,
+  data,
+  model
+}: {
+  projectCode: number
+  from?: number
+  readonly?: boolean
+  data?: ITaskData
+  model: { [field: string]: any }
+}): IJsonItem[] => {
+  if (from === 0) return []
+  return [
+    useTaskType(model, readonly),
+    useProcessName({
+      model,
+      projectCode,
+      isCreate: !data?.id,
+      from,
+      processName: data?.processName,
+      taskCode: data?.code
+    })
+  ]
 }
