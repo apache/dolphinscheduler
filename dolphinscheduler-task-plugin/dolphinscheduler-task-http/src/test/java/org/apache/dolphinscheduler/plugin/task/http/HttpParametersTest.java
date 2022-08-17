@@ -89,9 +89,7 @@ public class HttpParametersTest  {
 
         String body = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
                 + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        //Set custom parameters
         List<Property> localParams = new ArrayList<>();
-        //Setting output Parameters
         Property property = new Property();
         property.setProp("body");
         property.setDirect(Direct.OUT);
@@ -103,6 +101,5 @@ public class HttpParametersTest  {
         List<Property> varPool = new ArrayList<>();
         httpParameters.setVarPool(varPool.toString());
         httpParameters.dealOutParam(result);
-        Map<String, Property> varPoolMap = httpParameters.getVarPoolMap();
     }
 }
