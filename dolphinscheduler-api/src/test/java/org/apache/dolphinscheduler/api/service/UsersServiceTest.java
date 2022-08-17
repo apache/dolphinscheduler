@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -30,7 +28,6 @@ import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -253,17 +250,13 @@ public class UsersServiceTest {
         user.setId(1);
 
         //no operate
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,null, 1, USER_MANAGER, serviceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(false);
         Map<String, Object> result = usersService.queryUserList(user);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         //success
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,null, 1, USER_MANAGER, serviceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(true);
         user.setUserType(UserType.ADMIN_USER);
-        when(userMapper.selectList(null)).thenReturn(getUserList());
+        when(userMapper.queryEnabledUsers()).thenReturn(getUserList());
         result = usersService.queryUserList(user);
         List<User> userList = (List<User>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(userList.size() > 0);
