@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.async;
 
 import lombok.Data;
 import lombok.NonNull;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -26,16 +27,16 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class AsyncTaskExecutionContext implements Delayed {
 
-    private final int taskInstanceId;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private final @NonNull AsyncTaskExecuteFunction asyncTaskExecuteFunction;
+    private final AsyncTaskExecuteFunction asyncTaskExecuteFunction;
 
-    private final @NonNull AsyncTaskCallbackFunction asyncTaskCallbackFunction;
+    private final AsyncTaskCallbackFunction asyncTaskCallbackFunction;
 
-    public AsyncTaskExecutionContext(int taskInstanceId,
+    public AsyncTaskExecutionContext(@NonNull TaskExecutionContext taskExecutionContext,
                                      @NonNull AsyncTaskExecuteFunction asyncTaskExecuteFunction,
                                      @NonNull AsyncTaskCallbackFunction asyncTaskCallbackFunction) {
-        this.taskInstanceId = taskInstanceId;
+        this.taskExecutionContext = taskExecutionContext;
         this.asyncTaskExecuteFunction = asyncTaskExecuteFunction;
         this.asyncTaskCallbackFunction = asyncTaskCallbackFunction;
     }

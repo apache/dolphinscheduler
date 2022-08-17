@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskCallbackFunction;
 import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecuteFunction;
@@ -61,12 +62,13 @@ public class AsyncTaskLooper extends BaseDaemonThread {
                 if (asyncTaskExecutionContext == null) {
                     continue;
                 }
-
-                if (TaskExecutionContextCacheManager.getByTaskInstanceId(asyncTaskExecutionContext.getTaskInstanceId()) == null) {
+                final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
+                if (TaskExecutionContextCacheManager.getByTaskInstanceId(taskExecutionContext.getTaskInstanceId()) == null) {
                     logger.warn("Cannot find the taskInstance from TaskExecutionContextCacheManager, the task may already been killed");
                     continue;
                 }
                 asyncCheckThreadPool.submit(() -> {
+                    Thread.currentThread().setName(taskExecutionContext.getTaskLogName());
                     final AsyncTaskExecuteFunction asyncTaskExecuteFunction = asyncTaskExecutionContext.getAsyncTaskExecuteFunction();
                     final AsyncTaskCallbackFunction asyncTaskCallbackFunction = asyncTaskExecutionContext.getAsyncTaskCallbackFunction();
                     try {
