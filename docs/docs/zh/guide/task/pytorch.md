@@ -18,7 +18,7 @@
 
 组件图示如下：
 
-![pytorch](../../../../img/tasks/demo/pytorch_zh.png)
+![pytorch](../../../../img/tasks/demo/pytorch_en.png)
 
 ### 首先介绍一些DS通用参数
 
@@ -73,7 +73,7 @@
 
 可以设置
 
-![pytorch_note](../../../../img/tasks/demo/pytorch_note_zh.png)
+![pytorch_note](../../../../img/tasks/demo/pytorch_note_en.png)
 
 
 另外如果代码存放在资源中心，则可以使用`资源`参数下载代码，并将相关参数写成对应资源的路径即可。
