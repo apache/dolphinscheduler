@@ -55,7 +55,7 @@ public class AsyncWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecuteR
         task.handle();
         // submit the task to async task queue
         asyncTaskExecutionContext = new AsyncTaskExecutionContext(
-                taskExecutionContext.getTaskInstanceId(),
+                taskExecutionContext,
                 task.getAsyncTaskExecuteFunction(),
                 new AsyncTaskCallbackFunctionImpl(this)
         );

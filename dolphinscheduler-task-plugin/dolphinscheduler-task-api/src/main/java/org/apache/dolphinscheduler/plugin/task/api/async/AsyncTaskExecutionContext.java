@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.async;
 
 import lombok.Data;
 import lombok.NonNull;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -26,24 +27,42 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class AsyncTaskExecutionContext implements Delayed {
 
-    private final int taskInstanceId;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private final @NonNull AsyncTaskExecuteFunction asyncTaskExecuteFunction;
+    private final AsyncTaskExecuteFunction asyncTaskExecuteFunction;
 
-    private final @NonNull AsyncTaskCallbackFunction asyncTaskCallbackFunction;
+    private final AsyncTaskCallbackFunction asyncTaskCallbackFunction;
 
-    public AsyncTaskExecutionContext(int taskInstanceId,
+    private long currentStartTime;
+    private int executeTimes;
+    private final long executeInterval;
+
+
+    public AsyncTaskExecutionContext(@NonNull TaskExecutionContext taskExecutionContext,
                                      @NonNull AsyncTaskExecuteFunction asyncTaskExecuteFunction,
                                      @NonNull AsyncTaskCallbackFunction asyncTaskCallbackFunction) {
-        this.taskInstanceId = taskInstanceId;
+        this.taskExecutionContext = taskExecutionContext;
         this.asyncTaskExecuteFunction = asyncTaskExecuteFunction;
         this.asyncTaskCallbackFunction = asyncTaskCallbackFunction;
+        this.currentStartTime = System.currentTimeMillis();
+        this.executeTimes = 0;
+        this.executeInterval = Math.max(asyncTaskExecuteFunction.getTaskExecuteInterval().toMillis(), 1000L);
+    }
+
+    public void refreshStartTime() {
+        currentStartTime = System.currentTimeMillis();
     }
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return unit.toSeconds(asyncTaskExecuteFunction.getTaskExecuteInterval().toMillis());
+        // The first time doesn't have delay
+        if (executeTimes == 0) {
+            executeTimes++;
+            return 0;
+        }
+        return unit.convert(currentStartTime + executeInterval - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
     }
+
 
     @Override
     public int compareTo(Delayed o) {
