@@ -15,8 +15,32 @@
  * limitations under the License.
  */
 
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
+import { useTaskType, useProcessName } from '.'
+import type { IJsonItem, ITaskData } from '../types'
+
+export const useTaskDefinition = ({
+  projectCode,
+  from = 0,
+  readonly,
+  data,
+  model
+}: {
+  projectCode: number
+  from?: number
+  readonly?: boolean
+  data?: ITaskData
+  model: { [field: string]: any }
+}): IJsonItem[] => {
+  if (from === 0) return []
+  return [
+    useTaskType(model, readonly),
+    useProcessName({
+      model,
+      projectCode,
+      isCreate: !data?.id,
+      from,
+      processName: data?.processName,
+      taskCode: data?.code
+    })
+  ]
 }
