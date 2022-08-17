@@ -19,11 +19,15 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskCallbackFunction;
+import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecutionStatus;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.TimeUnit;
 
 @UtilityClass
 public class AsyncTaskDelayQueue {
@@ -31,11 +35,12 @@ public class AsyncTaskDelayQueue {
     private final DelayQueue<AsyncTaskExecutionContext> asyncTaskCheckDelayQueue = new DelayQueue<>();
 
     public void addAsyncTask(@NonNull AsyncTaskExecutionContext asyncTaskExecutionContext) {
+        asyncTaskExecutionContext.refreshStartTime();
         asyncTaskCheckDelayQueue.add(asyncTaskExecutionContext);
     }
 
     public @Nullable AsyncTaskExecutionContext pollAsyncTask() throws InterruptedException {
-        return asyncTaskCheckDelayQueue.poll(1, TimeUnit.MINUTES);
+        return asyncTaskCheckDelayQueue.take();
     }
 
 }
