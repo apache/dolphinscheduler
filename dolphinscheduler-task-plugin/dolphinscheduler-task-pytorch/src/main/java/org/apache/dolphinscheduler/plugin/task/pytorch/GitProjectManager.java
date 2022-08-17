@@ -29,16 +29,12 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class GitProjectManager {
-    private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)");
     public static final String GIT_PATH_LOCAL = "GIT_PROJECT";
+    private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)");
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private String path;
     private String baseDir = ".";

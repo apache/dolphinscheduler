@@ -17,13 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class PythonEnvManager {
 
     public static final String ENV_TOOL_VENV = "virtualenv";

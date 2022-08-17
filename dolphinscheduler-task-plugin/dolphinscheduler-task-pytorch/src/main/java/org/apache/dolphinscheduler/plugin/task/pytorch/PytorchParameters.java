@@ -26,13 +26,9 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class PytorchParameters extends AbstractParameters {
 
     private Boolean isCreateEnvironment = false;
