@@ -21,6 +21,7 @@ import {
   querySimpleList,
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
+import { useTaskNodeStore } from '@/store/project/task-node'
 import type { IJsonItem } from '../types'
 
 export function useProcessName({
@@ -28,16 +29,18 @@ export function useProcessName({
   projectCode,
   isCreate,
   from,
-  processName
+  processName,
+  taskCode
 }: {
   model: { [field: string]: any }
   projectCode: number
   isCreate: boolean
   from?: number
   processName?: number
+  taskCode?: number
 }): IJsonItem {
   const { t } = useI18n()
-
+  const taskStore = useTaskNodeStore()
   const options = ref([] as { label: string; value: string }[])
   const loading = ref(false)
 
@@ -55,6 +58,7 @@ export function useProcessName({
     if (!processCode) return
     const res = await queryProcessDefinitionByCode(processCode, projectCode)
     model.definition = res
+    taskStore.updateDefinition(res, taskCode)
   }
 
   const onChange = (code: number) => {
