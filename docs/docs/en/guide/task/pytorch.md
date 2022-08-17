@@ -6,7 +6,7 @@
 
 `Pytorch` task plugin enables users to run `Pytorch` projects in DolphinScheduler more conveniently. In addition, it supports handy Python environment management.
 
-Unlike the Python task plugin, this component allows users to **quickly use existing Python environments or create new ones (using Virtualenv or Conda)**. **Support for running Python projects (native or Git projects)** instead of just Python scripts.
+`Pytorch task plugin` is more than `Python task plugin`, which allows users to **conveniently use existing Python environments or create new ones (using `Virtualenv` or `Conda`)**. **It supports running Python projects (native or Git projects)** instead of just Python scripts.
 
 ## Create Task
 
