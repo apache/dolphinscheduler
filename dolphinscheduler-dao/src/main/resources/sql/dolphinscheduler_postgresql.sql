@@ -751,7 +751,7 @@ CREATE TABLE t_ds_task_instance (
   end_time timestamp DEFAULT NULL ,
   host varchar(135) DEFAULT NULL ,
   execute_path varchar(200) DEFAULT NULL ,
-  log_path varchar(200) DEFAULT NULL ,
+  log_path text DEFAULT NULL ,
   alert_flag int DEFAULT NULL ,
   retry_times int DEFAULT '0' ,
   pid int DEFAULT NULL ,
@@ -866,23 +866,6 @@ CREATE TABLE t_ds_worker_group (
   CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
---
--- Table structure for table t_ds_worker_server
---
-
-DROP TABLE IF EXISTS t_ds_worker_server;
-CREATE TABLE t_ds_worker_server (
-  id int NOT NULL  ,
-  host varchar(45) DEFAULT NULL ,
-  port int DEFAULT NULL ,
-  zk_directory varchar(64)   DEFAULT NULL ,
-  res_info varchar(255) DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  last_heartbeat_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
-) ;
-
-
 DROP SEQUENCE IF EXISTS t_ds_access_token_id_sequence;
 CREATE SEQUENCE  t_ds_access_token_id_sequence;
 ALTER TABLE t_ds_access_token ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_access_token_id_sequence');
@@ -971,13 +954,10 @@ ALTER TABLE t_ds_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_version_id_se
 DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
 ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
-CREATE SEQUENCE t_ds_worker_server_id_sequence;
-ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
-VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', 'Asia/Shanghai');
+VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)

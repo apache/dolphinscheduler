@@ -29,11 +29,15 @@ BEGIN
     ---get schema name
     v_schema =current_schema();
 
-EXECUTE 'DROP INDEX IF EXISTS "idx_task_definition_log_project_code"';
-EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_definition_log_project_code ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("project_code")';
+EXECUTE 'DROP INDEX IF EXISTS "idx_code_relation"';
+EXECUTE 'DROP INDEX IF EXISTS "idx_process_code_version_relation_log"';
+EXECUTE 'DROP INDEX IF EXISTS "idx_code_version_task_log"';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_code_relation ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("project_code","process_definition_code")';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_process_code_version_relation_log ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation_log USING Btree("process_definition_code","process_definition_version")';
+EXECUTE 'CREATE INDEX IF NOT EXISTS idx_code_version_task_log ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("code","version")';
 
-EXECUTE 'DROP INDEX IF EXISTS "idx_task_instance_code_version"';
-EXECUTE 'CREATE INDEX IF NOT EXISTS idx_task_instance_code_version ON' || quote_ident(v_schema) ||'.t_ds_task_instance USING Btree("task_code","task_definition_version")';
+EXECUTE 'ALTER TABLE t_ds_resources alter COLUMN is_directory TYPE bool using (is_directory::bool)';
+EXECUTE 'ALTER TABLE t_ds_resources alter COLUMN is_directory SET DEFAULT FALSE';
 
 return 'Success!';
 exception when others then

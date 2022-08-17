@@ -14,13 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
-alter table t_ds_process_definition drop primary key, ADD PRIMARY KEY (`id`,`code`);
-ALTER TABLE t_ds_process_definition drop KEY `process_definition_unique`;
-ALTER TABLE t_ds_process_definition drop KEY `process_definition_index`;
-alter table t_ds_process_definition drop process_definition_json;
-alter table t_ds_process_definition drop connects;
-alter table t_ds_process_definition drop receivers;
-alter table t_ds_process_definition drop receivers_cc;
-alter table t_ds_process_definition drop modify_by;
-alter table t_ds_process_definition drop resource_ids;
