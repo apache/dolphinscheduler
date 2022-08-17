@@ -197,10 +197,10 @@ public class DependentExecute {
 
         ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval);
 
-        if (lastManualProcess == null) {
+        if (lastManualProcess == null || lastManualProcess.getEndTime() == null) {
             return lastSchedulerProcess;
         }
-        if (lastSchedulerProcess == null) {
+        if (lastSchedulerProcess == null || lastSchedulerProcess.getEndTime() == null) {
             return lastManualProcess;
         }
 

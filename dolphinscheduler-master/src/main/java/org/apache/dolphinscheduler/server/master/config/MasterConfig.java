@@ -76,7 +76,7 @@ public class MasterConfig implements Validator {
     /**
      * state wheel check interval, if this value is bigger, may increase the delay of task/processInstance.
      */
-    private Duration stateWheelInterval = Duration.ofMillis(5);
+    private Duration stateWheelInterval = Duration.ofSeconds(5);
     private double maxCpuLoadAvg = -1;
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
