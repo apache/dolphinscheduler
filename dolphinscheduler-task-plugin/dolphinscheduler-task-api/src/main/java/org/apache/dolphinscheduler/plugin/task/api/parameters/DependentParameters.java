@@ -26,7 +26,7 @@ public class DependentParameters extends AbstractParameters {
 
     private List<DependentTaskModel> dependTaskList;
     private DependentRelation relation;
-    private String dependStrategy;
+    private String otherParams;
 
     @Override
     public boolean checkParameters() {
@@ -49,11 +49,11 @@ public class DependentParameters extends AbstractParameters {
         this.relation = relation;
     }
 
-    public String getDependStrategy() {
-        return dependStrategy;
+    public String getOtherParams() {
+        return otherParams;
     }
 
-    public void setDependStrategy(String dependStrategy) {
-        this.dependStrategy = dependStrategy;
+    public void setOtherParams(String otherParams) {
+        this.otherParams = otherParams;
     }
 }
