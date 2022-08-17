@@ -27,6 +27,7 @@ DataX task type for executing DataX programs. For DataX nodes, the worker will e
 | Timeout alarm | Check the timeout alarm and timeout failure. When the task exceeds the "timeout period", an alarm email will be sent and the task execution will fail. |
 | Custom template | Custom the content of the DataX node's json profile when the default data source provided does not meet the required requirements. |
 | json | json configuration file for DataX synchronization. |
+| Resource | When using custom json, if the cluster has kerberos authentication enabled, and datax needs to use the relevant keytab, xml file, etc. when reading or writing plug-ins such as hdfs and hbase, you can use this option. and the files uploaded or created in Resource Center - File Management.|
 | Custom parameters | SQL task type, and stored procedure is a custom parameter order to set values for the method. The custom parameter type and data type are the same as the stored procedure task type. The difference is that the SQL task type custom parameter will replace the \${variable} in the SQL statement. |
 | Data source | Select the data source from which the data will be extracted. |
 | sql statement | the sql statement used to extract data from the target database, the sql query column name is automatically parsed when the node is executed, and mapped to the target table synchronization column name. When the source table and target table column names are inconsistent, they can be converted by column alias. |

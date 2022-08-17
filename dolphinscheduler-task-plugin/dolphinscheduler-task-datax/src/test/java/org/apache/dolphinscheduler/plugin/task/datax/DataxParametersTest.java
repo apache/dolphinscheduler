@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataxParametersTest {
 
@@ -51,6 +55,12 @@ public class DataxParametersTest {
     public void testToString()   {
 
         DataxParameters dataxParameters = new DataxParameters();
+        List<ResourceInfo> resourceInfoList = new ArrayList<>();
+        ResourceInfo resourceInfo = new ResourceInfo();
+        resourceInfo.setId(2);
+        resourceInfo.setResourceName("/hdfs.keytab");
+        resourceInfoList.add(resourceInfo);
+
         dataxParameters.setCustomConfig(0);
         dataxParameters.setXms(0);
         dataxParameters.setXmx(-100);
@@ -61,6 +71,7 @@ public class DataxParametersTest {
         dataxParameters.setJobSpeedByte(1);
         dataxParameters.setJobSpeedRecord(1);
         dataxParameters.setJson("json");
+        dataxParameters.setResourceList(resourceInfoList);
 
         String expected = "DataxParameters"
                 + "{"
@@ -77,7 +88,8 @@ public class DataxParametersTest {
                 + "jobSpeedByte=1, "
                 + "jobSpeedRecord=1, "
                 + "xms=0, "
-                + "xmx=-100"
+                + "xmx=-100, "
+                + "resourceList=[{\"id\":2,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"
                 + "}";
 
         Assert.assertEquals(expected,dataxParameters.toString());
