@@ -16,7 +16,7 @@
  */
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {useCustomParams, useDatasource, useResources} from '.'
+import { useCustomParams, useDatasource, useResources } from '.'
 import type { IJsonItem } from '../types'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
@@ -124,10 +124,16 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       jobSpeedSpan.value = 12
       customParameterSpan.value = 0
       useResourcesSpan.value = 0
-
     }
   }
-
+  const supportedDatasourceType = [
+    'MYSQL',
+    'POSTGRESQL',
+    'ORACLE',
+    'SQLSERVER',
+    'CLICKHOUSE',
+    'HIVE'
+  ]
   onMounted(() => {
     initConstants()
   })
@@ -147,7 +153,8 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     ...useDatasource(model, {
       typeField: 'dsType',
       sourceField: 'dataSource',
-      span: datasourceSpan
+      span: datasourceSpan,
+      supportedDatasourceType
     }),
     {
       type: 'editor',
@@ -175,7 +182,8 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     ...useDatasource(model, {
       typeField: 'dtType',
       sourceField: 'dataTarget',
-      span: destinationDatasourceSpan
+      span: destinationDatasourceSpan,
+      supportedDatasourceType
     }),
     {
       type: 'input',
