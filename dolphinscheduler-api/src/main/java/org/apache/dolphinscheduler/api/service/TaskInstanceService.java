@@ -18,8 +18,9 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public interface TaskInstanceService {
      * @param host host
      * @param startDate start time
      * @param endDate end time
+     * @param taskExecuteType task execute type
      * @param pageNo page number
      * @param pageSize page size
      * @return task list page
@@ -48,13 +50,15 @@ public interface TaskInstanceService {
                                long projectCode,
                                Integer processInstanceId,
                                String processInstanceName,
+                               String processDefinitionName,
                                String taskName,
                                String executorName,
                                String startDate,
                                String endDate,
                                String searchVal,
-                               ExecutionStatus stateType,
+                               TaskExecutionStatus stateType,
                                String host,
+                               TaskExecuteType taskExecuteType,
                                Integer pageNo,
                                Integer pageSize);
 
@@ -69,4 +73,22 @@ public interface TaskInstanceService {
     Map<String, Object> forceTaskSuccess(User loginUser,
                                          long projectCode,
                                          Integer taskInstanceId);
+
+    /**
+     * task savepoint
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId);
+
+    /**
+     * stop task
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    Result stopTask(User loginUser, long projectCode, Integer taskInstanceId);
 }

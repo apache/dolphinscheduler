@@ -1,10 +1,12 @@
 # Hardware Environment
 
-DolphinScheduler, as an open-source distributed workflow task scheduling system, can deploy and run smoothly in Intel architecture server environments and mainstream virtualization environments and supports mainstream Linux operating system environments.
+This section briefs about the hardware requirements for DolphinScheduler. DolphinScheduler works as an open-source distributed workflow task scheduling system. It can deploy and run smoothly in Intel architecture server environments and mainstream virtualization environments. It also supports mainstream Linux operating system environments and ARM architecture.
 
 ## Linux Operating System Version Requirements
 
-| OS       | Version         |
+The Linux operating systems specified below can run on physical servers and mainstream virtualization environments such as VMware, KVM, and XEN.
+
+| Operating System | Version         |
 | :----------------------- | :----------: |
 | Red Hat Enterprise Linux | 7.0 and above   |
 | CentOS                   | 7.0 and above   |
@@ -14,9 +16,9 @@ DolphinScheduler, as an open-source distributed workflow task scheduling system,
 > **Note:**
 >The above Linux operating systems can run on physical servers and mainstream virtualization environments such as VMware, KVM, and XEN.
 
-## Recommended Server Configuration
+## Server Configuration
 
-DolphinScheduler supports 64-bit hardware platforms with Intel x86-64 architecture. The following shows the recommended server requirements in a production environment:
+DolphinScheduler supports 64-bit hardware platforms with Intel x86-64 architecture. The following table shows the recommended server requirements in a production environment:
 
 ### Production Environment
 
@@ -27,7 +29,6 @@ DolphinScheduler supports 64-bit hardware platforms with Intel x86-64 architectu
 > **Note:**
 > - The above recommended configuration is the minimum configuration for deploying DolphinScheduler. Higher configuration is strongly recommended for production environments.
 > - The recommended hard disk size is more than 50GB and separate the system disk and data disk.
-
 
 ## Network Requirements
 
@@ -45,4 +46,4 @@ DolphinScheduler provides the following network port configurations for normal o
 
 ## Browser Requirements
 
-DolphinScheduler recommends Chrome and the latest browsers which use Chrome Kernel to access the front-end UI page.
+The minimum supported version of Google Chrome is version 85, but version 90 or above is recommended.

@@ -64,6 +64,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
                 break;
             case REMOVE:
                 masterRegistryClient.removeMasterNodePath(path, NodeType.MASTER, true);
+
                 break;
             default:
                 break;

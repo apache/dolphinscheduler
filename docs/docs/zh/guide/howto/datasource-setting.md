@@ -20,7 +20,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 ## 伪分布式/分布式安装初始化数据库
 
 DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreSQL 和 MySQL，如果使用 MySQL 则需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下
-其中包括 `api-server/libs/` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。下面以 MySQL 为例，说明如何初始化数据库
+其中包括 `api-server/libs/` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs` 和 `tools/libs`。下面以 MySQL 为例，说明如何初始化数据库
 
 对于mysql 5.6 / 5.7：
 
@@ -64,7 +64,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
 
 ```shell
-sh tools/bin/upgrade-schema.sh
+bash tools/bin/upgrade-schema.sh
 ```
 
 ## 数据源中心

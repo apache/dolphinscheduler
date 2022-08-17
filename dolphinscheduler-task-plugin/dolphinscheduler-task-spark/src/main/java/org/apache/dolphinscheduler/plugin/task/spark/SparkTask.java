@@ -229,7 +229,7 @@ public class SparkTask extends AbstractYarnTask {
         Path path = file.toPath();
 
         if (!Files.exists(path)) {
-            String script = sparkParameters.getRawScript().replaceAll("\\r\\n", "\n");
+            String script = replaceParam(sparkParameters.getRawScript());
             sparkParameters.setRawScript(script);
 
             logger.info("raw script : {}", sparkParameters.getRawScript());
@@ -253,6 +253,14 @@ public class SparkTask extends AbstractYarnTask {
 
         }
         return scriptFileName;
+    }
+
+    private String replaceParam(String script) {
+        script = script.replaceAll("\\r\\n", "\n");
+        // replace placeholder, and combining local and global parameters
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        return script;
     }
 
     @Override

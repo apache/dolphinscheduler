@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -112,7 +112,6 @@ public class TaskExecutionContext implements Serializable {
      */
     private int processInstanceId;
 
-
     /**
      * process instance schedule time
      */
@@ -123,18 +122,15 @@ public class TaskExecutionContext implements Serializable {
      */
     private String globalParams;
 
-
     /**
      * execute user id
      */
     private int executorId;
 
-
     /**
      * command type if complement
      */
     private int cmdTypeIfComplement;
-
 
     /**
      * tenant code
@@ -145,7 +141,6 @@ public class TaskExecutionContext implements Serializable {
      * task queue
      */
     private String queue;
-
 
     /**
      * process define id
@@ -215,10 +210,11 @@ public class TaskExecutionContext implements Serializable {
     /**
      * current execution status
      */
-    private ExecutionStatus currentExecutionStatus;
+    private TaskExecutionStatus currentExecutionStatus;
 
     /**
-     *  Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
+     * Task Logger name should be like:
+     * TaskAppId=TASK-{firstSubmitTime}-{processDefineCode}_{processDefineVersion}-{processInstanceId}-{taskInstanceId}
      */
     private String taskLogName;
 

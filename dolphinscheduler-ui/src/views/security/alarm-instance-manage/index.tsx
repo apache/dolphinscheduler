@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
 import {
   NButton,
   NInput,
   NIcon,
   NDataTable,
   NPagination,
-  NSpace,
-  NCard
+  NSpace
 } from 'naive-ui'
 import DetailModal from './detail'
+import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useUserInfo } from './use-userinfo'
@@ -65,6 +65,8 @@ const AlarmInstanceManage = defineComponent({
       currentRecord.value = {}
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       changePage(1)
       columns.value = getColumns()
@@ -85,7 +87,8 @@ const AlarmInstanceManage = defineComponent({
       changePageSize,
       onCreate,
       onCloseModal,
-      onUpdatedList: updateList
+      onUpdatedList: updateList,
+      trim
     }
   },
   render() {
@@ -109,7 +112,7 @@ const AlarmInstanceManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           {{
             default: () => (
               <NSpace justify='space-between'>
@@ -123,6 +126,7 @@ const AlarmInstanceManage = defineComponent({
                   wrap={false}
                 >
                   <NInput
+                  allowInput={this.trim}
                     v-model={[this.searchVal, 'value']}
                     size='small'
                     placeholder={`${t(
@@ -138,8 +142,8 @@ const AlarmInstanceManage = defineComponent({
               </NSpace>
             )
           }}
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.alarm_instance_manage')}>
           <NSpace vertical>
             <NDataTable columns={columns} data={list} loading={loading} striped />
             <NSpace justify='center'>
@@ -153,7 +157,7 @@ const AlarmInstanceManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         {IS_ADMIN && (
           <DetailModal
             show={showDetailModal}

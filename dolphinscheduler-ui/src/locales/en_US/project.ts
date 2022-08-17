@@ -43,6 +43,7 @@ export default {
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
     workflow_name: 'Workflow Name',
+    workflow_instance_name: 'Workflow Instance Name',
     current_selection: 'Current Selection',
     online: 'Online',
     offline: 'Offline',
@@ -90,6 +91,10 @@ export default {
     next_five_execution_times: 'Next five execution times',
     execute_time: 'Execute time',
     failure_strategy: 'Failure Strategy',
+    node_execution: 'Node Execution',
+    backward_execution: 'Backward execution',
+    forward_execution: 'Forward execution',
+    current_node_execution: 'Execute only the current node',
     notification_strategy: 'Notification Strategy',
     workflow_priority: 'Workflow Priority',
     worker_group: 'Worker Group',
@@ -193,9 +198,9 @@ export default {
     project_name: 'Project Name',
     project_tips: 'Please select project name',
     workflow_relation_no_data_result_title:
-        'Can not find any relations of workflows.',
+      'Can not find any relations of workflows.',
     workflow_relation_no_data_result_desc:
-        'There is not any workflows. Please create a workflow, and then visit this page again.'
+      'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
     cancel_full_screen: 'Cancel full screen',
@@ -236,7 +241,27 @@ export default {
     forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
-    refresh: 'Refresh'
+    refresh: 'Refresh',
+    app_id: 'Application ID',
+    execute: 'Execute',
+    stop: 'Stop',
+    batch_task: 'Batch Task',
+    stream_task: 'Stream Task',
+    jump_tip: 'Jump, not open yet!',
+    savepoint: 'Savepoint',
+    success: 'Success',
+    none_send: 'None',
+    success_send: 'Success',
+    failure_send: 'Failure',
+    all_send: 'All',
+    set_parameters_before_starting: 'Please set the parameters before starting',
+    notification_strategy: 'Notification Strategy',
+    worker_group: 'Worker group',
+    environment_name: 'Environment Name',
+    alarm_group: 'Alarm group',
+    startup_parameter: 'Startup Parameter',
+    whether_dry_run: 'Whether Dry-Run',
+    please_choose: 'Please Choose'
   },
   dag: {
     create: 'Create Workflow',
@@ -308,7 +333,7 @@ export default {
     task_priority: 'Task priority',
     worker_group: 'Worker group',
     worker_group_tips:
-        'The Worker group no longer exists, please select the correct Worker group!',
+      'The Worker group no longer exists, please select the correct Worker group!',
     environment_name: 'Environment Name',
     task_group_name: 'Task group name',
     task_group_queue_priority: 'Priority',
@@ -335,11 +360,11 @@ export default {
     success: 'Success',
     failed: 'Failed',
     backfill_tips:
-        'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
+      'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
     task_instance_tips:
-        'The task has not been executed and cannot enter the sub-Process',
+      'The task has not been executed and cannot enter the sub-Process',
     branch_tips:
-        'Cannot select the same node for successful branch flow and failed branch flow',
+      'Cannot select the same node for successful branch flow and failed branch flow',
     timeout_alarm: 'Timeout alarm',
     timeout_strategy: 'Timeout strategy',
     timeout_strategy_tips: 'Timeout strategy must be selected',
@@ -399,8 +424,8 @@ export default {
     parallelism_tips: 'Please enter Parallelism',
     parallelism_number_tips: 'Parallelism number should be positive integer',
     parallelism_complement_tips:
-        'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
-        'set the complement task thread to a reasonable value to avoid too large impact on the server.',
+      'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
+      'set the complement task thread to a reasonable value to avoid too large impact on the server.',
     task_manager_number: 'TaskManager Number',
     task_manager_number_tips: 'Please enter TaskManager number',
     http_url: 'Http Url',
@@ -435,7 +460,7 @@ export default {
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
     procedure_method_snippet:
-        '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
+      '--Please enter the procedure script \n\n--call procedure:call <procedure-name>[(<arg1>,<arg2>, ...)]\n\n--call function:?= call <procedure-name>[(<arg1>,<arg2>, ...)]',
     start: 'Start',
     edit: 'Edit',
     copy: 'Copy',
@@ -497,14 +522,17 @@ export default {
     allow_insert: 'AllowInsert',
     concurrency: 'Concurrency',
     concurrency_tips: 'Please enter Concurrency',
+    concurrency_column: 'Concurrency Column',
+    concurrency_column_tips: 'Please enter Concurrency Column',
     sea_tunnel_master: 'Master',
     sea_tunnel_master_url: 'Master URL',
     sea_tunnel_queue: 'Queue',
     sea_tunnel_master_url_tips:
-        'Please enter the master url, e.g., 127.0.0.1:7077',
+      'Please enter the master url, e.g., 127.0.0.1:7077',
     add_pre_task_check_condition: 'Add pre task check condition',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
+    switch_branch_flow_tips: 'Please select branch flow',
     and: 'and',
     or: 'or',
     datax_custom_template: 'Custom Template',
@@ -524,6 +552,7 @@ export default {
     datax_job_runtime_memory_xms: 'Low Limit Value',
     datax_job_runtime_memory_xmx: 'High Limit Value',
     datax_job_runtime_memory_unit: 'G',
+    chunjun_json_template: 'JSON script',
     current_hour: 'CurrentHour',
     last_1_hour: 'Last1Hour',
     last_2_hour: 'Last2Hours',
@@ -607,6 +636,8 @@ export default {
     required: 'required',
     emr_flow_define_json: 'jobFlowDefineJson',
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
+    emr_steps_define_json: 'stepsDefineJson',
+    emr_steps_define_json_tips: 'Please enter the definition of the emr step.',
     segment_separator: 'Segment Execution Separator',
     segment_separator_tips: 'Please enter the segment execution separator',
     zeppelin_note_id: 'zeppelinNoteId',
@@ -614,26 +645,32 @@ export default {
     zeppelin_paragraph_id: 'zeppelinParagraphId',
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
+    zeppelin_parameters: 'parameters',
+    zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
+    zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+    zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
+    zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
+    zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
-        'Please enter the conda environment name of papermill',
+      'Please enter the conda environment name of papermill',
     jupyter_input_note_path: 'inputNotePath',
     jupyter_input_note_path_tips: 'Please enter the input jupyter note path',
     jupyter_output_note_path: 'outputNotePath',
     jupyter_output_note_path_tips: 'Please enter the output jupyter note path',
     jupyter_parameters: 'parameters',
     jupyter_parameters_tips:
-        'Please enter the parameters for jupyter parameterization',
+      'Please enter the parameters for jupyter parameterization',
     jupyter_kernel: 'kernel',
     jupyter_kernel_tips: 'Please enter the jupyter kernel name',
     jupyter_engine: 'engine',
     jupyter_engine_tips: 'Please enter the engine name',
     jupyter_execution_timeout: 'executionTimeout',
     jupyter_execution_timeout_tips:
-        'Please enter the execution timeout for each jupyter note cell',
+      'Please enter the execution timeout for each jupyter note cell',
     jupyter_start_timeout: 'startTimeout',
     jupyter_start_timeout_tips:
-        'Please enter the start timeout for jupyter kernel',
+      'Please enter the start timeout for jupyter kernel',
     jupyter_others: 'others',
     jupyter_others_tips:
       'Please enter the other options you need for papermill',
@@ -646,7 +683,7 @@ export default {
     mlflow_isSearchParams: 'Search Parameters',
     mlflow_dataPath: 'Data Path',
     mlflow_dataPath_tips:
-        ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
+      ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
     mlflow_dataPath_error_tips: ' data data can not be empty ',
     mlflow_experimentName: 'Experiment Name',
     mlflow_experimentName_tips: 'experiment_001',

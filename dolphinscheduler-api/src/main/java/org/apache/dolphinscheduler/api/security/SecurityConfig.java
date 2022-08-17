@@ -72,4 +72,8 @@ public class SecurityConfig {
         beanFactory.autowireBean(authenticator);
         return authenticator;
     }
+
+    public String getType() {
+        return type;
+    }
 }

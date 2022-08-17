@@ -32,6 +32,7 @@
     <node.version>v16.13.1</node.version>
     <pnpm.version>v6.32.6</pnpm.version>
     <sonar.sources>src</sonar.sources>
+    <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
   </properties>
 
   <profiles>

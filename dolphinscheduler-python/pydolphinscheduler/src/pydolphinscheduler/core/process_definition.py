@@ -21,12 +21,12 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
+from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base import Base
+from pydolphinscheduler.core.resource import Resource
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
-from pydolphinscheduler.java_gateway import launch_gateway
-from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.java_gateway import JavaGate
+from pydolphinscheduler.models import Base, Project, Tenant, User
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
 
@@ -63,6 +63,9 @@ class ProcessDefinition(Base):
         thought Web UI after it :func:`submit` or :func:`run`. It will create a new project belongs to
         ``user`` if it does not exists. And when ``project`` exists but project's create do not belongs
         to ``user``, will grant `project` to ``user`` automatically.
+    :param resource_list: Resource files required by the current process definition.You can create and modify
+        resource files from this field. When the process definition is submitted, these resource files are
+        also submitted along with it.
     """
 
     # key attribute for identify ProcessDefinition object
@@ -88,6 +91,7 @@ class ProcessDefinition(Base):
         "tasks",
         "task_definition_json",
         "task_relation_json",
+        "resource_list",
     }
 
     def __init__(
@@ -107,6 +111,7 @@ class ProcessDefinition(Base):
         timeout: Optional[int] = 0,
         release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
+        resource_list: Optional[List[Resource]] = None,
     ):
         super().__init__(name, description)
         self.schedule = schedule
@@ -132,6 +137,7 @@ class ProcessDefinition(Base):
         # TODO how to fix circle import
         self._task_relations: set["TaskRelation"] = set()  # noqa: F821
         self._process_definition_code = None
+        self.resource_list = resource_list or []
 
     def __enter__(self) -> "ProcessDefinition":
         ProcessDefinitionContext.set(self)
@@ -164,7 +170,7 @@ class ProcessDefinition(Base):
     def user(self) -> User:
         """Get user object.
 
-        For now we just get from python side but not from java gateway side, so it may not correct.
+        For now we just get from python models but not from java gateway models, so it may not correct.
         """
         return User(name=self._user, tenant=self._tenant)
 
@@ -352,10 +358,10 @@ class ProcessDefinition(Base):
         self.start()
 
     def _ensure_side_model_exists(self):
-        """Ensure process definition side model exists.
+        """Ensure process definition models model exists.
 
-        For now, side object including :class:`pydolphinscheduler.side.project.Project`,
-        :class:`pydolphinscheduler.side.tenant.Tenant`, :class:`pydolphinscheduler.side.user.User`.
+        For now, models object including :class:`pydolphinscheduler.models.project.Project`,
+        :class:`pydolphinscheduler.models.tenant.Tenant`, :class:`pydolphinscheduler.models.user.User`.
         If these model not exists, would create default value in
         :class:`pydolphinscheduler.constants.ProcessDefinitionDefault`.
         """
@@ -386,14 +392,12 @@ class ProcessDefinition(Base):
         self._ensure_side_model_exists()
         self._pre_submit_check()
 
-        gateway = launch_gateway()
-        self._process_definition_code = gateway.entry_point.createOrUpdateProcessDefinition(
+        self._process_definition_code = JavaGate().create_or_update_process_definition(
             self._user,
             self._project,
             self.name,
             str(self.description) if self.description else "",
             json.dumps(self.param_json),
-            json.dumps(self.schedule_json) if self.schedule_json else None,
             self.warning_type,
             self.warning_group_id,
             json.dumps(self.task_location),
@@ -404,9 +408,14 @@ class ProcessDefinition(Base):
             # TODO add serialization function
             json.dumps(self.task_relation_json),
             json.dumps(self.task_definition_json),
+            json.dumps(self.schedule_json) if self.schedule_json else None,
             None,
             None,
         )
+        if len(self.resource_list) > 0:
+            for res in self.resource_list:
+                res.user_name = self._user
+                res.create_or_update_resource()
         return self._process_definition_code
 
     def start(self) -> None:
@@ -414,8 +423,7 @@ class ProcessDefinition(Base):
 
         which post to `start-process-instance` to java gateway
         """
-        gateway = launch_gateway()
-        gateway.entry_point.execProcessInstance(
+        JavaGate().exec_process_instance(
             self._user,
             self._project,
             self.name,

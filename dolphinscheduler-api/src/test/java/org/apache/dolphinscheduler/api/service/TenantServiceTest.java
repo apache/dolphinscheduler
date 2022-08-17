@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -78,6 +79,9 @@ public class TenantServiceTest {
     private TenantServiceImpl tenantService;
 
     @Mock
+    private QueueService queueService;
+
+    @Mock
     private TenantMapper tenantMapper;
 
     @Mock
@@ -94,13 +98,15 @@ public class TenantServiceTest {
 
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
+    private static final String queue = "queue";
+    private static final String queueName = "queue_name";
 
     @Test
     public void testCreateTenant() throws Exception {
 
         User loginUser = getLoginUser();
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result;
 
@@ -163,19 +169,25 @@ public class TenantServiceTest {
     @Test
     public void testUpdateTenant() throws Exception {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
 
+        // update not exists tenant
         Throwable exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc));
         Assertions.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
 
+        // success
         Map<String, Object> result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // success update with same tenant code
+        result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testDeleteTenantById() throws Exception {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES))
@@ -221,6 +233,23 @@ public class TenantServiceTest {
         // success
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+    }
+
+    @Test
+    public void testCreateTenantIfNotExists() {
+        Tenant tenant;
+
+        // Tenant exists
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
+        Assert.assertEquals(getTenant(), tenant);
+
+        // Tenant not exists
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(false);
+        Mockito.when(queueService.createQueueIfNotExists(queue, queueName)).thenReturn(getQueue());
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
+        Assert.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId()), tenant);
     }
 
     /**
@@ -276,6 +305,12 @@ public class TenantServiceTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinitions.add(processDefinition);
         return processDefinitions;
+    }
+
+    private Queue getQueue() {
+        Queue queue = new Queue();
+        queue.setId(1);
+        return queue;
     }
 
 }

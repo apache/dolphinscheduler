@@ -15,84 +15,10 @@
  * limitations under the License.
  */
 
-.content {
-  width: 100%;
-
-  .card {
-    margin-bottom: 8px;
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0;
-    .right {
-      > .search {
-        .list {
-          float: right;
-          margin: 3px 0 3px 4px;
-        }
-      }
-    }
-  }
-}
-
-.table {
-  table {
-    width: 100%;
-    tr {
-      height: 40px;
-      font-size: 12px;
-      th,
-      td {
-        &:nth-child(1) {
-          width: 50px;
-          text-align: center;
-        }
-      }
-      th {
-        &:nth-child(1) {
-          width: 60px;
-          text-align: center;
-        }
-        > span {
-          font-size: 12px;
-          color: #555;
-        }
-      }
-    }
-  }
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-}
-
-.operation {
-  > div {
-    > div {
-      margin-right: 5px !important;
-    }
-  }
-}
-
 .startup {
   align-items: center;
   > div:first-child {
     width: 86%;
-  }
-}
-
-.batch-button {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  > div {
-    margin-right: 5px;
   }
 }
 
@@ -101,23 +27,4 @@
   text-overflow: ellipsis;
   overflow: hidden;
   word-break: break-all;
-}
-
-.workflow-name {
-  :global {
-    div:first-child {
-      width: calc(100% - 32px);
-
-      .n-button,
-      .n-button__content {
-        width: 100%;
-        span {
-          padding-bottom: 1px;
-        }
-      }
-    }
-  }
-}
-.width-100 {
-  width: 100%;
 }
