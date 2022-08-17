@@ -34,7 +34,9 @@ public class AsyncTaskExecutionContext implements Delayed {
     private final AsyncTaskCallbackFunction asyncTaskCallbackFunction;
 
     private long currentStartTime;
+    private int executeTimes;
     private final long executeInterval;
+
 
     public AsyncTaskExecutionContext(@NonNull TaskExecutionContext taskExecutionContext,
                                      @NonNull AsyncTaskExecuteFunction asyncTaskExecuteFunction,
@@ -43,6 +45,7 @@ public class AsyncTaskExecutionContext implements Delayed {
         this.asyncTaskExecuteFunction = asyncTaskExecuteFunction;
         this.asyncTaskCallbackFunction = asyncTaskCallbackFunction;
         this.currentStartTime = System.currentTimeMillis();
+        this.executeTimes = 0;
         this.executeInterval = Math.max(asyncTaskExecuteFunction.getTaskExecuteInterval().toMillis(), 1000L);
     }
 
@@ -52,6 +55,11 @@ public class AsyncTaskExecutionContext implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
+        // The first time doesn't have delay
+        if (executeTimes == 0) {
+            executeTimes++;
+            return 0;
+        }
         return unit.convert(currentStartTime + executeInterval - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
