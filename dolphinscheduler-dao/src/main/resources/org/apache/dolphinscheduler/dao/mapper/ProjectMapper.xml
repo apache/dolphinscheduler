@@ -167,8 +167,8 @@
         </include>
         from t_ds_project p
         <if test="userId != 0">
-            right join t_ds_relation_project_user rpu on p.id = rpu.project_id
-            where rpu.user_id = #{userId}
+            left join t_ds_relation_project_user rpu on p.id = rpu.project_id
+            where rpu.user_id = #{userId} or p.user_id=#{userId}
         </if>
     </select>
 
