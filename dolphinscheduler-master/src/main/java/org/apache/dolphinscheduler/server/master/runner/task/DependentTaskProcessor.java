@@ -126,7 +126,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      * init dependent parameters
      */
-    private void initDependParameters() {
+    protected void initDependParameters() {
         this.dependentParameters = taskInstance.getDependency();
         for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
             this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation()));

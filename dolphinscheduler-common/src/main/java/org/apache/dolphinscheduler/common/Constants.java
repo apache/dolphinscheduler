@@ -548,6 +548,7 @@ public final class Constants {
     public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
+    public static final String OTHER_PARAMS = "otherParams";
     public static final String CONDITION_RESULT = "conditionResult";
     public static final String SWITCH_RESULT = "switchResult";
     public static final String WAIT_START_TIMEOUT = "waitStartTimeout";

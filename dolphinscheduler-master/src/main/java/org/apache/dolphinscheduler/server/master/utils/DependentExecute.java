@@ -73,6 +73,9 @@ public class DependentExecute {
      */
     private Logger logger = LoggerFactory.getLogger(DependentExecute.class);
 
+    public DependentExecute() {
+    }
+
     /**
      * constructor
      *
@@ -104,7 +107,7 @@ public class DependentExecute {
      * @param dateIntervals date intervals
      * @return dateIntervals
      */
-    private DependResult calculateResultForTasks(DependentItem dependentItem,
+    public DependResult calculateResultForTasks(DependentItem dependentItem,
                                                  List<DateInterval> dateIntervals) {
 
         DependResult result = DependResult.FAILED;
