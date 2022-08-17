@@ -42,7 +42,8 @@ public class AsyncTaskExecutionContext implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return unit.toSeconds(asyncTaskExecuteFunction.getTaskExecuteInterval().toMillis());
+        long intervalSeconds = Math.max(asyncTaskExecuteFunction.getTaskExecuteInterval().getSeconds(), 1);
+        return unit.convert(intervalSeconds, TimeUnit.SECONDS);
     }
 
     @Override
