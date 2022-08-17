@@ -53,7 +53,7 @@ The preceding two parameters are used to minimize the running of the configurati
 
 - **Project Path** ：Set environment variable `PYTHONPATH` to load the Python package/project code at this path when running Python scripts。Support for local paths or Git URL.
   - If it is a local path, it is used as environment variable `PYTHONPATH`.
-  - If the GIT URL (`git @ | https:// | http://` prefix), can download the project, and the deposit after download path as new `Project Path`, if need to run a folder under the project, you can add `#subdirectory` after GIT URL.
+  - If the GIT URL (`git @ | https:// | http://` prefix), can download the project, and the path after downloading will be set as new `Project Path`, if need to run a folder under the project, you can add `#subdirectory` after GIT URL.
 
 #### Python environment parameters
 
@@ -65,12 +65,13 @@ The preceding two parameters are used to minimize the running of the configurati
 
 *yes*
 
-- **Python Environment Manager Tool** ：You can choose Virtualenv or Conda。
+- **Python Environment Manager Tool** ：You can choose `virtualenv` or `conda`.
   - if choose `virtualenv`，that may use `virtualenv` to create a new environment. Use command `virtualenv -p ${PYTHON_HOME} venv`.
   - if choose `conda`, ，that may use `conda` to create a new environment，And you need to specify the Python version.
 - **Requirement File** ：The defualt is requirements.txt。
 
-If the `Project Path` parameter is configured, then the `Python Script` and `Script Input Parameters` parameters are allowed to enter relative paths.
+
+We can use relative paths of `Python Script` and `Requirement File` if we set `Project Path` which contains the python script or required requirement file.
 
 #### Demo
 
@@ -91,18 +92,18 @@ The environment configuration mainly depends on the choice of runtime Python env
 
 It is applicable to the Python environment where the project has been run on the worker, so you can directly configure the `Python Command Path` as the corresponding Python environment in the component. If you do not know the environment address, you can use `which python` to obtain it.
 
-### Create a new environment using Conda
+### Create a new environment using `Conda`
 
-It applies to a new environment to run the project. You need to create an environment in 'Security' - 'Environment Manage'. You can change the environment to the actual environment by referring to the following.
+It applies to a new environment to run the project. You need to create an environment in `Security` - `Environment Manage`. You can change the environment to the actual environment by referring to the following.
 
 ```shell
 # Add the directory for the conda command
 export PATH=$HOME/anaconda3/bin:$PATH
 ```
 
-### Create a new environment using Virtualenv
+### Create a new environment using `Virtualenv`
 
-It applies to a new environment to run the project. You need to create an environment in 'Security' - 'Environment Manage'. You can change the environment to the actual environment by referring to the following.
+It applies to a new environment to run the project. You need to create an environment in `Security` - `Environment Manage`. You can change the environment to the actual environment by referring to the following.
 
 ```shell
 # Add the directory for the virtualenv command
@@ -112,6 +113,6 @@ export PYTHON_HOME=/usr/local/bin/python3.7
 
 ## Other
 
-This task plugin can also run XGBoost, LightGBM, SkLearn, TensorFlow, Keras and other projects. This component is available as an upgrade to Python task plugin running machine learning tasks.
+This task plugin can also run XGBoost, LightGBM, SkLearn, TensorFlow, Keras and other projects. This task plugin is available as an upgrade to Python task plugin running machine learning tasks.
 
-If necessary, subsequent recommendations can be uniformly named PythonML components to run machine learning projects.
+If necessary, we can call this task plugin `PythonML`,which easily run machine learning projects in DolphinScheduler.
