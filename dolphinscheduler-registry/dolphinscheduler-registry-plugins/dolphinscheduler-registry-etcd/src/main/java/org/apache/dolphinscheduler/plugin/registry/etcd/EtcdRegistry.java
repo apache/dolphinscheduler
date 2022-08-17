@@ -78,7 +78,7 @@ public class EtcdRegistry implements Registry {
 
     private final Map<String, Watch.Watcher> watcherMap = new ConcurrentHashMap<>();
 
-    private static Long TIME_TO_LIVE_SECONDS = 30L;
+    private static final long TIME_TO_LIVE_SECONDS = 30L;
     public EtcdRegistry(EtcdRegistryProperties registryProperties) {
         ClientBuilder clientBuilder = Client.builder()
                 .endpoints(Util.toURIs(Splitter.on(",").trimResults().splitToList(registryProperties.getEndpoints())))
