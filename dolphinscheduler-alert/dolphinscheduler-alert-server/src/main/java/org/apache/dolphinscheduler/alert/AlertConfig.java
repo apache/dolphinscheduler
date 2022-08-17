@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties("alert")
 public final class AlertConfig {
+
     private int port;
 
     private int waitTimeout;
@@ -42,5 +43,4 @@ public final class AlertConfig {
     public void setWaitTimeout(final int waitTimeout) {
         this.waitTimeout = waitTimeout;
     }
-
 }

@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 -->
-<profiles version="13">
+<profiles version="22">
     <profile kind="CodeFormatterProfile" name="'DolphinScheduler Apache Current'" version="13">
         <setting id="org.eclipse.jdt.core.compiler.source" value="1.8" />
         <setting id="org.eclipse.jdt.core.compiler.compliance" value="1.8" />
@@ -47,5 +47,6 @@
         <setting id="org.eclipse.jdt.core.formatter.alignment_for_parameters_in_constructor_declaration" value="106" />
         <setting id="org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_constructor_declaration" value="106" />
         <setting id="org.eclipse.jdt.core.formatter.alignment_for_arguments_in_explicit_constructor_call.count_dependent" value="16|5|80" />
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_at_end_of_file_if_missing" value="insert"/>
     </profile>
 </profiles>
