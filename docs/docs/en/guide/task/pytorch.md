@@ -115,4 +115,4 @@ export PYTHON_HOME=/usr/local/bin/python3.7
 
 This task plugin can also run XGBoost, LightGBM, SkLearn, TensorFlow, Keras and other projects. This task plugin is available as an upgrade to Python task plugin running machine learning tasks.
 
-If necessary, we can call this task plugin `PythonML`,which easily run machine learning projects in DolphinScheduler.
+If necessary, we can call this task plugin `PythonML`,which can run machine learning projects easily in DolphinScheduler.
