@@ -23,14 +23,17 @@ CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
-    v_schema varchar;
+v_schema varchar;
 BEGIN
     ---get schema name
     v_schema =current_schema();
 
-    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "restart_time" timestamp DEFAULT NULL';
-	return 'Success!';
-	exception when others then
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "restart_time" timestamp DEFAULT NULL';
+
+EXECUTE 'CREATE INDEX IF NOT EXISTS project_code_process_definition_code_index ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation USING Btree("project_code","process_definition_code")';
+
+return 'Success!';
+exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
         return SQLERRM;
 END;
