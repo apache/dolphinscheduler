@@ -29,21 +29,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
-public class AsyncConditionTaskLooper extends BaseDaemonThread {
+public class AsyncTaskLooper extends BaseDaemonThread {
 
-    private final Logger logger = LoggerFactory.getLogger(AsyncConditionTaskLooper.class);
+    private final Logger logger = LoggerFactory.getLogger(AsyncTaskLooper.class);
 
     private final ExecutorService asyncCheckThreadPool = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors() * 2, new NamedThreadFactory("AsyncTaskCheckThreadPool"));
 
-    protected AsyncConditionTaskLooper() {
+    protected AsyncTaskLooper() {
         super("AsyncConditionTaskLooper");
     }
 
+    @PostConstruct
     @Override
     public synchronized void start() {
         logger.info("Master Event execute service starting");
