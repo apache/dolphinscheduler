@@ -280,6 +280,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         } else {
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
+
         // worker groups from zookeeper
         String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
         Collection<String> workerGroupList = null;
@@ -309,7 +310,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
-            handleChildrenNodes(childrenNodes);
+            handleChildrenNodes(workerGroup,childrenNodes);
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
             if (isPaging) {
@@ -321,16 +322,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 wg.setSystemDefault(true);
                 wg.setDescription(workerGroupMapper.queryDescription(workerGroup));
             }
-            handleDefault(wg);
-            workerGroups.add(wg);
+            handleDefault(workerGroups, workerGroup, wg);
         }
         return workerGroups;
     }
 
-    protected void handleDefault(WorkerGroup wg) {
+    protected void handleDefault(List<WorkerGroup> workerGroups, String workerGroup, WorkerGroup wg) {
+        workerGroups.add(wg);
     }
 
-    protected void handleChildrenNodes(Collection<String> childrenNodes) {
+    protected void handleChildrenNodes(String workerGroup, Collection<String> childrenNodes) {
     }
 
     /**
