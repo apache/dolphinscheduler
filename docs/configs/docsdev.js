@@ -189,6 +189,10 @@ export default {
                                 title: 'ChunJun',
                                 link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
                             },
+                            {
+                                title: 'Pytorch',
+                                link: '/en-us/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
                         ],
                     },
                     {
@@ -804,6 +808,10 @@ export default {
                             {
                                 title: 'ChunJun',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
+                            {
+                                title: 'Pytorch',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/pytorch.html',
                             },
                         ],
                     },
