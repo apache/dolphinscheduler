@@ -33,8 +33,10 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.common.Constants.NULL;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
@@ -477,7 +479,8 @@ public class TaskInstance implements Serializable {
             Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
             });
             this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
-            this.dependency.setOtherParams((Map<String, Object>) taskParamsMap.get(Constants.OTHER_PARAMS));
+            Map<String, Object> otherMap = taskParamsMap.get(Constants.OTHER_PARAMS)==null?new HashMap<>(): (Map<String, Object>) taskParamsMap.get(Constants.OTHER_PARAMS);
+            this.dependency.setOtherParams(otherMap);
         }
         return this.dependency;
     }
