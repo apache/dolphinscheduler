@@ -13,26 +13,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-import { ITaskState } from '@/common/types'
+*/
+ALTER TABLE `t_ds_datasource` ADD COLUMN `test_flag` tinyint(4) DEFAULT NULL COMMENT 'test flag：0 normal, 1 testDataSource';
+ALTER TABLE `t_ds_datasource` ADD COLUMN `bind_test_id` int(11) DEFAULT NULL COMMENT 'bind testDataSource id';
+ALTER TABLE `t_ds_command` ADD COLUMN `test_flag` tinyint(4) DEFAULT '0' COMMENT 'test flag：0 normal, 1 test run';
+ALTER TABLE `t_ds_error_command` ADD COLUMN `test_flag` tinyint(4) DEFAULT '0' COMMENT 'test flag：0 normal, 1 test run';
+ALTER TABLE `t_ds_process_instance` ADD COLUMN `test_flag` tinyint(4) DEFAULT '0' COMMENT 'test flag：0 normal, 1 test run';
+ALTER TABLE `t_ds_task_instance` ADD COLUMN `test_flag` tinyint(4) DEFAULT '0' COMMENT 'test flag：0 normal, 1 test run';
 
-export type { Router } from 'vue-router'
-export type { TaskInstancesRes } from '@/service/modules/task-instances/types'
 
-interface IRecord {
-  name: string
-  processInstanceName: string
-  executorName: string
-  taskType: string
-  state: ITaskState
-  submitTime: string
-  startTime: string
-  endTime: string
-  duration?: string
-  retryTimes: number
-  dryRun: number
-  host: string
-  testFlag: number
-}
-
-export { ITaskState, IRecord }
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));

@@ -149,6 +149,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param timeout                   timeout
      * @param startParams               the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param testFlag testFlag
      * @return execute process instance code
      */
     @Override
@@ -160,7 +161,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Priority processInstancePriority, String workerGroup,
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
-                                                   int dryRun, ComplementDependentMode complementDependentMode) {
+                                                   int dryRun, int testFlag, ComplementDependentMode complementDependentMode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -206,7 +207,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup,
-                        environmentCode, startParams, expectedParallelismNumber, dryRun, complementDependentMode);
+                        environmentCode, startParams, expectedParallelismNumber, dryRun, testFlag, complementDependentMode);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -393,15 +394,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         switch (executeType) {
             case REPEAT_RUNNING:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams);
+                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams,processInstance.getTestFlag());
                 break;
             case RECOVER_SUSPENDED_PROCESS:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
+                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams,processInstance.getTestFlag());
                 break;
             case START_FAILURE_TASK_PROCESS:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
+                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams,processInstance.getTestFlag());
                 break;
             case STOP:
                 if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
@@ -571,7 +572,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode,
-                                              int processVersion, CommandType commandType, String startParams) {
+                                              int processVersion, CommandType commandType, String startParams,int testFlag) {
         Map<String, Object> result = new HashMap<>();
 
         // To add startParams only when repeat running is needed
@@ -588,7 +589,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setExecutorId(loginUser.getId());
         command.setProcessDefinitionVersion(processVersion);
         command.setProcessInstanceId(instanceId);
-
+        command.setTestFlag(testFlag);
         if (!processService.verifyIsNeedCreateCommand(command)) {
             putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, String.valueOf(processDefinitionCode));
             return result;
@@ -660,6 +661,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode                 runMode
      * @param processInstancePriority processInstancePriority
      * @param workerGroup             workerGroup
+     * @param testFlag                testFlag
      * @param environmentCode         environmentCode
      * @return command id
      */
@@ -668,7 +670,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               WarningType warningType, int executorId, int warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
-                              ComplementDependentMode complementDependentMode) {
+                              int testFlag, ComplementDependentMode complementDependentMode) {
 
         /**
          * instantiate command schedule instance
@@ -705,6 +707,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setWorkerGroup(workerGroup);
         command.setEnvironmentCode(environmentCode);
         command.setDryRun(dryRun);
+        command.setTestFlag(testFlag);
         ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(processDefineCode);
         if (processDefinition != null) {
             command.setProcessDefinitionVersion(processDefinition.getVersion());

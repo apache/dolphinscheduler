@@ -23,7 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis , NTag } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -115,6 +115,32 @@ export function useTable() {
         title: t('project.task.executor'),
         key: 'executorName',
         ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('project.task.operating_environment'),
+        key: 'testFlag',
+        width: 160,
+        render: (row: IRecord) => {
+          if (row.testFlag===0) {
+            return h(
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.task.on_line')
+                }
+            )
+          } else if(row.testFlag===1){
+            return h(
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.task.test')
+                }
+            )
+          }else {
+            return '-'
+          }
+        }
       },
       {
         title: t('project.task.node_type'),

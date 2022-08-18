@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -135,7 +136,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         Map<Integer, DataSource> datasourceMap = createDataSourceMap(userId, "test");
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByType(
-                0, DbType.MYSQL.ordinal());
+                0, DbType.MYSQL.ordinal(), Constants.TEST_FLAG_NO);
 
         assertThat(actualDataSources.size(), greaterThanOrEqualTo(2));
 
@@ -354,6 +355,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         dataSource.setType(DbType.MYSQL);
         dataSource.setNote("mysql test");
         dataSource.setConnectionParams("hello mysql");
+        dataSource.setTestFlag(Constants.TEST_FLAG_NO);
         dataSource.setUpdateTime(DateUtils.getCurrentDate());
         dataSource.setCreateTime(DateUtils.getCurrentDate());
 

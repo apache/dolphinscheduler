@@ -138,6 +138,12 @@ public class Command {
     @TableField("process_definition_version")
     private int processDefinitionVersion;
 
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -160,7 +166,8 @@ public class Command {
             Priority processInstancePriority,
             int dryRun,
             int processInstanceId,
-            int processDefinitionVersion
+            int processDefinitionVersion,
+            int testFlag
     ) {
         this.commandType = commandType;
         this.executorId = executorId;
@@ -179,6 +186,7 @@ public class Command {
         this.dryRun = dryRun;
         this.processInstanceId = processInstanceId;
         this.processDefinitionVersion = processDefinitionVersion;
+        this.testFlag = testFlag;
     }
 
     public TaskDependType getTaskDependType() {
@@ -325,6 +333,14 @@ public class Command {
         this.processDefinitionVersion = processDefinitionVersion;
     }
 
+    public int getTestFlag() {
+        return testFlag;
+    }
+
+    public void setTestFlag(int testFlag) {
+        this.testFlag = testFlag;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -386,6 +402,10 @@ public class Command {
         if (processDefinitionVersion != command.getProcessDefinitionVersion()) {
             return false;
         }
+
+        if (testFlag != command.testFlag){
+            return false;
+        }
         return !(updateTime != null ? !updateTime.equals(command.updateTime) : command.updateTime != null);
     }
 
@@ -409,32 +429,33 @@ public class Command {
         result = 31 * result + dryRun;
         result = 31 * result + processInstanceId;
         result = 31 * result + processDefinitionVersion;
+        result = 31 * result + testFlag;
         return result;
     }
 
     @Override
     public String toString() {
-        return "Command{"
-                + "id=" + id
-                + ", commandType=" + commandType
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", executorId=" + executorId
-                + ", commandParam='" + commandParam + '\''
-                + ", taskDependType=" + taskDependType
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", warningGroupId=" + warningGroupId
-                + ", scheduleTime=" + scheduleTime
-                + ", startTime=" + startTime
-                + ", processInstancePriority=" + processInstancePriority
-                + ", updateTime=" + updateTime
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", dryRun='" + dryRun + '\''
-                + ", processInstanceId='" + processInstanceId + '\''
-                + ", processDefinitionVersion='" + processDefinitionVersion + '\''
-                + '}';
+        return "Command{" +
+                "id=" + id +
+                ", commandType=" + commandType +
+                ", processDefinitionCode=" + processDefinitionCode +
+                ", executorId=" + executorId +
+                ", commandParam='" + commandParam + '\'' +
+                ", taskDependType=" + taskDependType +
+                ", failureStrategy=" + failureStrategy +
+                ", warningType=" + warningType +
+                ", warningGroupId=" + warningGroupId +
+                ", scheduleTime=" + scheduleTime +
+                ", startTime=" + startTime +
+                ", processInstancePriority=" + processInstancePriority +
+                ", updateTime=" + updateTime +
+                ", workerGroup='" + workerGroup + '\'' +
+                ", environmentCode=" + environmentCode +
+                ", dryRun=" + dryRun +
+                ", processInstanceId=" + processInstanceId +
+                ", processDefinitionVersion=" + processDefinitionVersion +
+                ", testFlag=" + testFlag +
+                '}';
     }
-
 }
 

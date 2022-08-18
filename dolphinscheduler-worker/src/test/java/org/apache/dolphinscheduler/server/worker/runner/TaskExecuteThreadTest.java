@@ -84,4 +84,25 @@ public class TaskExecuteThreadTest {
 
         }
     }
+
+    /**
+     * unbound error
+     */
+    @Test
+    public void checkTestDataSource() {
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext,
+                "127.0.0.1:5678",
+                workerMessageSender,
+                alertClientService,
+                taskPluginManager,
+                storageOperate);
+        taskExecutionContext.setProcessId(1);
+        taskExecutionContext.setTaskInstanceId(2);
+        taskExecutionContext.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":2,\"sql\":\"select * from order\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
+        try {
+            taskExecuteThread.run();
+        } catch (Exception e) {
+
+        }
+    }
 }

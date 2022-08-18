@@ -339,7 +339,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         Map<String, Property> propertyMap = paramParsingPreparation(taskInstance, baseParam);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
             .buildTaskInstanceRelatedInfo(taskInstance)
-            .buildTaskDefinitionRelatedInfo(taskDefinition)
+            .buildTaskDefinitionRelatedInfo(taskDefinition,taskInstance)
             .buildResourceParametersInfo(resources)
             .buildBusinessParamsMap(new HashMap<>())
             .buildParamInfo(propertyMap)

@@ -87,6 +87,7 @@ public class PythonGateway {
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
     private static final int DEFAULT_DRY_RUN = 0;
+    private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
 
     @Autowired
@@ -250,7 +251,7 @@ public class PythonGateway {
             processDefinitionCode = processDefinition.getCode();
         }
 
-        // Fresh process definition schedule 
+        // Fresh process definition schedule
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
@@ -352,6 +353,7 @@ public class PythonGateway {
                 null,
                 null,
                 DEFAULT_DRY_RUN,
+                DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE
         );
     }

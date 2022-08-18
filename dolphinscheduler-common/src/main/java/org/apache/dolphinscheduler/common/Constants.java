@@ -845,4 +845,11 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    /**
+     * test flag
+     */
+    public static final int TEST_FLAG_NO = 0;
+    public static final int TEST_FLAG_YES = 1;
+
 }

@@ -17,7 +17,10 @@
 
 import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getKerberosStartupState } from '@/service/modules/data-source'
+import {
+  getKerberosStartupState,
+  queryDataSourceList
+} from '@/service/modules/data-source'
 import type { FormRules } from 'naive-ui'
 import type {
   IDataSourceDetail,
@@ -27,7 +30,7 @@ import type {
   IDataSource
 } from './types'
 import utils from '@/utils'
-
+import {TypeReq} from "@/service/modules/data-source/types";
 export function useForm(id?: number) {
   const { t } = useI18n()
 
@@ -45,7 +48,9 @@ export function useForm(id?: number) {
     password: '',
     database: '',
     connectType: '',
-    other: ''
+    other: '',
+    testFlag: undefined,
+    bindTestId: undefined
   } as IDataSourceDetail
 
   const state = reactive({
@@ -54,6 +59,7 @@ export function useForm(id?: number) {
     requiredDataBase: true,
     showConnectType: false,
     showPrincipal: false,
+    bindTestDataSourceExample: [] as { label: string; value: number }[],
     rules: {
       name: {
         trigger: ['input'],
@@ -118,7 +124,23 @@ export function useForm(id?: number) {
             return new Error(t('datasource.jdbc_format_tips'))
           }
         }
+      },
+    testFlag: {
+      trigger: ['input'],
+      validator() {
+        if (state.detailForm.testFlag ===undefined) {
+          return new Error(t('datasource.datasource_test_flag_tips'))
+        }
       }
+    },
+    bindTestId: {
+      trigger: ['input'],
+      validator() {
+        if (!state.detailForm.bindTestId && !state.detailForm.testFlag) {
+          return new Error(t('datasource.datasource_bind_test_id_tips'))
+        }
+      }
+    }
     } as FormRules
   })
 
@@ -137,6 +159,7 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
+    if (!state.detailForm.id) await getSameTypeTestDataSource()
   }
 
   const changePort = async () => {
@@ -144,17 +167,39 @@ export function useForm(id?: number) {
     const currentDataBaseOption = datasourceType[state.detailForm.type]
     currentDataBaseOption.previousPort = state.detailForm.port
   }
+  const changeTestFlag = async (testFlag: IDataBase) => {
+    if (testFlag) {
+      state.detailForm.bindTestId = undefined
+    }
+    if (state.detailForm.id) await getSameTypeTestDataSource()
+  }
+
+
+  const getSameTypeTestDataSource = async () => {
+    const params = { type: state.detailForm.type,testFlag: 1 } as TypeReq
+    const result = await queryDataSourceList(params)
+    state.bindTestDataSourceExample = result.map(
+        (TestDataSourceExample: { name: string; id: number }) => ({
+          label: TestDataSourceExample.name,
+          value: TestDataSourceExample.id
+        })
+    ).filter((value: { label: string; value: number }) => {
+      if (state.detailForm.id && state.detailForm.id === value.value) return false
+      return true
+    } )
+  }
 
   const resetFieldsValue = () => {
     state.detailForm = { ...initialValues }
   }
 
-  const setFieldsValue = (values: IDataSource) => {
+  const setFieldsValue = async (values: IDataSource) => {
     state.detailForm = {
       ...state.detailForm,
       ...values,
       other: values.other ? JSON.stringify(values.other) : values.other
     }
+    await getSameTypeTestDataSource()
   }
 
   const getFieldsValue = () => state.detailForm
@@ -163,6 +208,7 @@ export function useForm(id?: number) {
     state,
     changeType,
     changePort,
+    changeTestFlag,
     resetFieldsValue,
     setFieldsValue,
     getFieldsValue

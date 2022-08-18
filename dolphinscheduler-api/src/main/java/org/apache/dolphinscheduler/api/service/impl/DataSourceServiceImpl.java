@@ -138,6 +138,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
+        dataSource.setTestFlag(datasourceParam.getTestFlag());
+        dataSource.setBindTestId(datasourceParam.getBindTestId());
         try {
             dataSourceMapper.insert(dataSource);
             putMsg(result, Status.SUCCESS);
@@ -204,6 +206,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setUpdateTime(now);
+        if(dataSource.getTestFlag()==1 && dataSourceParam.getTestFlag()==0){
+            clearBindTestId(id);
+        }
+        dataSource.setTestFlag(dataSourceParam.getTestFlag());
+        dataSource.setBindTestId(dataSourceParam.getBindTestId());
         try {
             dataSourceMapper.updateById(dataSource);
             putMsg(result, Status.SUCCESS);
@@ -240,7 +247,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
-
+        baseDataSourceParamDTO.setTestFlag(dataSource.getTestFlag());
+        baseDataSourceParamDTO.setBindTestId(dataSource.getBindTestId());
         result.put(Constants.DATA_LIST, baseDataSourceParamDTO);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -311,12 +319,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source list page
      */
     @Override
-    public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
+    public Map<String, Object> queryDataSourceList(User loginUser, Integer type, int testFlag) {
         Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList = null;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
+            datasourceList = dataSourceMapper.queryDataSourceByType(0, type,testFlag);
         } else {
             Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
             if (ids.isEmpty()) {
@@ -324,7 +332,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.SUCCESS);
                 return result;
             }
-            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
+            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).filter(dataSource -> dataSource.getTestFlag()==testFlag).collect(Collectors.toList());
+
         }
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
@@ -419,6 +428,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             dataSourceMapper.deleteById(datasourceId);
             datasourceUserMapper.deleteByDatasourceId(datasourceId);
+            clearBindTestId(datasourceId);
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
             logger.error("delete datasource error", e);
@@ -663,6 +673,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 logger.error("ResultSet close error", e);
             }
         }
+    }
+    private void clearBindTestId(Integer bindTestId){
+        dataSourceMapper.clearBindTestId(bindTestId);
     }
 
 }

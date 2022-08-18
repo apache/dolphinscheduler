@@ -81,7 +81,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
+     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2,"testFlag":0,"bindTestId":1}
      * @return create result code
      */
     @ApiOperation(value = "createDataSource", notes = "CREATE_DATA_SOURCE_NOTES")
@@ -102,7 +102,7 @@ public class DataSourceController extends BaseController {
      * @param loginUser login user
      * @param id        datasource id
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
+     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2,"testFlag":0,"bindTestId":1}
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
@@ -146,7 +146,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * query datasource by type
+     * query online/testDatasource by type
      *
      * @param loginUser login user
      * @param type data source type
@@ -154,15 +154,17 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType"),
+            @ApiImplicitParam(name = "testFlag", value = "DB_TEST_FLAG", required = true, dataType = "DbTestFlag")
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDataSourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("type") DbType type) {
-        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+                                      @RequestParam("type") DbType type,
+                                      @RequestParam("testFlag")int testFlag) {
+        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal(),testFlag);
         return returnDataList(result);
     }
 

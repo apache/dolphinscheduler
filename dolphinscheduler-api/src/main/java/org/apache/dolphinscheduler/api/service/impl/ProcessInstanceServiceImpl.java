@@ -310,7 +310,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processId);
             return result;
         }
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId);
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
         addDependResultForTaskList(taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -727,7 +727,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES);
+                taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES,processInstance.getTestFlag());
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());

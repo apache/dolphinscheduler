@@ -156,7 +156,7 @@ public class FailoverServiceTest {
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
-        given(processService.findValidTaskListByProcessId(Mockito.anyInt()))
+        given(processService.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
                 .willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
         given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(processInstance);
 

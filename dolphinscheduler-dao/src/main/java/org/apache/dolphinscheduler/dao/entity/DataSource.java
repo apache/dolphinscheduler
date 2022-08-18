@@ -17,14 +17,10 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("t_ds_datasource")
 public class DataSource {
@@ -74,6 +70,17 @@ public class DataSource {
      * update time
      */
     private Date updateTime;
+
+    /**
+     * test flag
+     */
+    protected int testFlag;
+
+    /**
+     * bind test data source id
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    protected Integer bindTestId;
 
     public DataSource() {
     }
@@ -150,19 +157,37 @@ public class DataSource {
         this.updateTime = updateTime;
     }
 
+    public int getTestFlag() {
+        return testFlag;
+    }
+
+    public void setTestFlag(int testFlag) {
+        this.testFlag = testFlag;
+    }
+
+    public Integer getBindTestId() {
+        return bindTestId;
+    }
+
+    public void setBindTestId(Integer bindTestId) {
+        this.bindTestId = bindTestId;
+    }
+
     @Override
     public String toString() {
-        return "DataSource{"
-                + "id=" + id
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", type=" + type
-                + ", connectionParams='" + connectionParams + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+        return "DataSource{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", name='" + name + '\'' +
+                ", note='" + note + '\'' +
+                ", type=" + type +
+                ", connectionParams='" + connectionParams + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", testFlag=" + testFlag +
+                ", bindTestId=" + bindTestId +
+                '}';
     }
 
     @Override

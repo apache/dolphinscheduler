@@ -65,13 +65,14 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
         taskExecutionContext.setVarPool(taskInstance.getVarPool());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());
+        taskExecutionContext.setTestFlag(taskInstance.getTestFlag());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUBMITTED_SUCCESS);
         taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
         taskExecutionContext.setMemoryMax(taskInstance.getMemoryMax());
         return this;
     }
 
-    public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition) {
+    public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition, TaskInstance taskInstance) {
         taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         if (taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN) {
             taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
@@ -81,7 +82,7 @@ public class TaskExecutionContextBuilder {
                         Math.min(taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT, Integer.MAX_VALUE));
             }
         }
-        taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
+        taskExecutionContext.setTaskParams(taskInstance.getTaskParams());
         return this;
     }
 

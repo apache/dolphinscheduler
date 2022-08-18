@@ -322,7 +322,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 curingParamsService.paramParsingPreparation(taskInstance, baseParam, processInstance);
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
+                .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine() , taskInstance)
                 .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
                 .buildResourceParametersInfo(resources)

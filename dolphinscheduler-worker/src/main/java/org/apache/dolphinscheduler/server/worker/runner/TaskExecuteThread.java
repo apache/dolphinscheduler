@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import com.amazonaws.services.sagemaker.model.ExecutionStatus;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Strings;
 import lombok.NonNull;
 import org.apache.commons.collections.MapUtils;
@@ -135,6 +137,25 @@ public class TaskExecuteThread implements Runnable, Delayed {
                         masterAddress,
                         CommandType.TASK_EXECUTE_RESULT);
                 logger.info("Task dry run success");
+                return;
+            }
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            Map<String, Object> Params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+            Integer dataSourceId = (Integer) Params.get("datasource");
+            if (null == dataSourceId) {
+                taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        masterAddress,
+                        CommandType.TASK_EXECUTE_RESULT);
+                logger.error("unbound test data source");
+                kill();
                 return;
             }
         } finally {

@@ -21,7 +21,9 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
-import { NEllipsis } from 'naive-ui'
+import { NEllipsis,
+         NTag
+} from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,
@@ -108,6 +110,33 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['state'],
         className: 'workflow-status',
         render: (_row: IWorkflowInstance) => renderStateCell(_row.state, t)
+      },
+      {
+        title: t('project.workflow.operating_environment'),
+        key: 'testFlag',
+        width: 160,
+        className: 'workflow-testFlag',
+        render: (_row: IWorkflowInstance) => {
+          if (_row.testFlag===0) {
+            return h(
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.workflow.on_line')
+                }
+            )
+          } else if(_row.testFlag===1){
+            return h(
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.workflow.test')
+                }
+            )
+          }else {
+            return '-'
+          }
+        }
       },
       {
         title: t('project.workflow.run_type'),

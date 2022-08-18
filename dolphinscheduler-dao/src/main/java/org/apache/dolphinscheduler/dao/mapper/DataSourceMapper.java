@@ -34,12 +34,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
-     * query datasource by type
+     * query online/testDatasource by type
      * @param userId userId
      * @param type type
      * @return datasource list
      */
-    List<DataSource> queryDataSourceByType(@Param("userId") int userId, @Param("type") Integer type);
+    List<DataSource> queryDataSourceByType(@Param("userId") int userId, @Param("type") Integer type,@Param("testFlag")int testFlag);
 
     /**
      * datasource page
@@ -109,4 +109,18 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @return
      */
     IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage, @Param("dataSourceIds")List<Integer> dataSourceIds, @Param("name")String name);
+
+    /**
+     * clearBindTestId
+     * @param bindTestId
+     * @return
+     */
+    void clearBindTestId(@Param("bindTestId")Integer bindTestId);
+
+    /**
+     * queryTestDataSourceId
+     * @param onlineDataSourceId
+     * @return Integer
+     */
+    Integer queryTestDataSourceId(@Param("dataSourceId")Integer onlineDataSourceId);
 }

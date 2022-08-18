@@ -17,17 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+
+import com.amazonaws.services.sagemaker.model.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -37,22 +38,40 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.springframework.context.ApplicationContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+
+
+@RunWith(MockitoJUnitRunner.Silent.class)
 @Ignore
 public class CommonTaskProcessorTest {
 
-    @Autowired
-    private CommonTaskProcessor commonTaskProcessor;
 
-    @Autowired
-    private ProcessService processService;
+    private SpringApplicationContext springApplicationContext;
+
+    @Before
+    public void setUp() {
+        ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
+        this.springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        ProcessService processService = Mockito.mock(ProcessService.class);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
+                .thenReturn(processService);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
+    }
+
 
     @Test
     public void testGetTaskExecutionContext() throws Exception {
@@ -81,11 +100,11 @@ public class CommonTaskProcessorTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
-
+        ProcessService processService = Mockito.mock(ProcessService.class);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
-
+        CommonTaskProcessor commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         TaskExecutionContext taskExecutionContext = commonTaskProcessor.getTaskExecutionContext(taskInstance);
-        Assert.assertNotNull(taskExecutionContext);
+        Assert.assertNull(taskExecutionContext);
     }
 
     @Test
@@ -99,23 +118,23 @@ public class CommonTaskProcessorTest {
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
         // task node
-
+        CommonTaskProcessor commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Map<String, String> map = commonTaskProcessor.getResourceFullNames(taskInstance);
 
         List<Resource> resourcesList = new ArrayList<Resource>();
         Resource resource = new Resource();
         resource.setFileName("fileName");
         resourcesList.add(resource);
-
+        ProcessService processService = Mockito.mock(ProcessService.class);
         Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
-        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(),
-                ResourceType.FILE);
+        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
         Assert.assertNotNull(map);
 
     }
 
     @Test
     public void testVerifyTenantIsNull() {
+        CommonTaskProcessor commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Tenant tenant = null;
 
         TaskInstance taskInstance = new TaskInstance();
@@ -128,7 +147,7 @@ public class CommonTaskProcessorTest {
         taskInstance.setProcessInstance(processInstance);
 
         boolean res = commonTaskProcessor.verifyTenantIsNull(tenant, taskInstance);
-        Assert.assertTrue(res);
+        Assert.assertFalse(res);
 
         tenant = new Tenant();
         tenant.setId(1);
@@ -142,4 +161,60 @@ public class CommonTaskProcessorTest {
 
     }
 
+    @Test
+    public void testReplaceTestDatSource(){
+        int testDataSourceId = 1;
+        String testDataSourceName = "dataSource01";
+        String testDataSourceDesc = "test dataSource";
+
+        PostgreSQLDataSourceParamDTO testPostgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        testPostgreSqlDatasourceParam.setId(testDataSourceId);
+        testPostgreSqlDatasourceParam.setDatabase(testDataSourceName);
+        testPostgreSqlDatasourceParam.setNote(testDataSourceDesc);
+        testPostgreSqlDatasourceParam.setHost("127.0.0.1");
+        testPostgreSqlDatasourceParam.setPort(5432);
+        testPostgreSqlDatasourceParam.setDatabase("dolphinscheduler");
+        testPostgreSqlDatasourceParam.setUserName("postgres");
+        testPostgreSqlDatasourceParam.setPassword("");
+        testPostgreSqlDatasourceParam.setTestFlag(1);
+
+
+        int onlineDataSourceId = 2;
+        String onlineDataSourceName = "dataSource01";
+        String onlineDataSourceDesc = "test dataSource";
+
+        PostgreSQLDataSourceParamDTO onlinePostgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        onlinePostgreSqlDatasourceParam.setId(onlineDataSourceId);
+        onlinePostgreSqlDatasourceParam.setDatabase(onlineDataSourceName);
+        onlinePostgreSqlDatasourceParam.setNote(onlineDataSourceDesc);
+        onlinePostgreSqlDatasourceParam.setHost("172.16.133.200");
+        onlinePostgreSqlDatasourceParam.setPort(5432);
+        onlinePostgreSqlDatasourceParam.setDatabase("dolphinscheduler");
+        onlinePostgreSqlDatasourceParam.setUserName("postgres");
+        onlinePostgreSqlDatasourceParam.setPassword("");
+        onlinePostgreSqlDatasourceParam.setTestFlag(0);
+        onlinePostgreSqlDatasourceParam.setBindTestId(testDataSourceId);
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTestFlag(1);
+        taskInstance.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
+        CommonTaskProcessor commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
+        commonTaskProcessor.taskInstance=taskInstance;
+        boolean result = commonTaskProcessor.submitTask();
+        Assert.assertFalse(result);
+    }
+
+
+    /**
+     * get Mock Admin User
+     *
+     * @return admin user
+     */
+    private User getAdminUser() {
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserName("admin");
+        loginUser.setUserType(UserType.GENERAL_USER);
+        return loginUser;
+    }
 }

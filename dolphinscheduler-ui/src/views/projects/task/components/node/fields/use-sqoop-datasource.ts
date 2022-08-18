@@ -30,10 +30,10 @@ export function useDatasource(
   const dataSourceList = ref([])
   const loading = ref(false)
 
-  const getDataSource = async (type: IDataBase) => {
+  const getDataSource = async (type: IDataBase,testFlag: IDataSource) => {
     if (loading.value) return
     loading.value = true
-    const result = await queryDataSourceList({ type })
+    const result = await queryDataSourceList({ type, testFlag })
     dataSourceList.value = result.map((item: { name: string; id: number }) => ({
       label: item.name,
       value: item.id

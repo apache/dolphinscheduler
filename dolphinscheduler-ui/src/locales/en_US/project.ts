@@ -39,6 +39,9 @@ export default {
     delete_confirm: 'Delete?'
   },
   workflow: {
+    on_line: 'Online',
+    test: 'Test',
+    operating_environment: 'Operating Environment',
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
@@ -102,6 +105,7 @@ export default {
     complement_data: 'Complement Data',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
+    whether_test: 'Whether Test',
     continue: 'Continue',
     end: 'End',
     none_send: 'None',
@@ -202,6 +206,9 @@ export default {
       'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    on_line: 'Online',
+    test: 'Test',
+    operating_environment: 'Operating Environment',
     cancel_full_screen: 'Cancel full screen',
     enter_full_screen: 'Enter full screen',
     current_task_settings: 'Current task settings',

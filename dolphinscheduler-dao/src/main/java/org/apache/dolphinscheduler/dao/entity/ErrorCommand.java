@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -121,6 +122,12 @@ public class ErrorCommand {
      */
     private int dryRun;
 
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
+
     public ErrorCommand() {}
 
     public ErrorCommand(Command command, String message) {
@@ -140,6 +147,7 @@ public class ErrorCommand {
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
         this.dryRun = command.getDryRun();
+        this.testFlag = command.getTestFlag();
     }
 
     public TaskDependType getTaskDependType() {
@@ -278,26 +286,35 @@ public class ErrorCommand {
         this.dryRun = dryRun;
     }
 
+    public int getTestFlag() {
+        return testFlag;
+    }
+
+    public void setTestFlag(int testFlag) {
+        this.testFlag = testFlag;
+    }
+
     @Override
     public String toString() {
-        return "ErrorCommand{"
-                + "id=" + id
-                + ", commandType=" + commandType
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", executorId=" + executorId
-                + ", commandParam='" + commandParam + '\''
-                + ", taskDependType=" + taskDependType
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", warningGroupId=" + warningGroupId
-                + ", scheduleTime=" + scheduleTime
-                + ", startTime=" + startTime
-                + ", processInstancePriority=" + processInstancePriority
-                + ", updateTime=" + updateTime
-                + ", message='" + message + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", dryRun='" + dryRun + '\''
-                + '}';
+        return "ErrorCommand{" +
+                "id=" + id +
+                ", commandType=" + commandType +
+                ", processDefinitionCode=" + processDefinitionCode +
+                ", executorId=" + executorId +
+                ", commandParam='" + commandParam + '\'' +
+                ", taskDependType=" + taskDependType +
+                ", failureStrategy=" + failureStrategy +
+                ", warningType=" + warningType +
+                ", warningGroupId=" + warningGroupId +
+                ", scheduleTime=" + scheduleTime +
+                ", startTime=" + startTime +
+                ", processInstancePriority=" + processInstancePriority +
+                ", updateTime=" + updateTime +
+                ", message='" + message + '\'' +
+                ", workerGroup='" + workerGroup + '\'' +
+                ", environmentCode=" + environmentCode +
+                ", dryRun=" + dryRun +
+                ", testFlag=" + testFlag +
+                '}';
     }
 }

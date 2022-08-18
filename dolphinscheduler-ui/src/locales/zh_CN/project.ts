@@ -39,6 +39,9 @@ export default {
     delete_confirm: '确定删除吗?'
   },
   workflow: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
     import_workflow: '导入工作流',
@@ -104,6 +107,7 @@ export default {
     complement_data: '补数',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
+    whether_test: '是否测试',
     continue: '继续',
     end: '结束',
     none_send: '都不发',
@@ -202,6 +206,9 @@ export default {
       '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     cancel_full_screen: '取消全屏',
     enter_full_screen: '全屏',
     current_task_settings: '当前任务设置',

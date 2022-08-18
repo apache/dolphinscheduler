@@ -81,6 +81,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
         processInstance.setProcessDefinitionCode(1L);
+        processInstance.setTestFlag(0);
         processInstanceMapper.insert(processInstance);
         return processInstanceMapper.queryByProcessDefineCode(1L, 1).get(0);
     }
@@ -185,12 +186,14 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         List<TaskInstance> taskInstances = taskInstanceMapper.findValidTaskListByProcessId(
                 task.getProcessInstanceId(),
-                Flag.YES);
+                Flag.YES,
+                processInstance.getTestFlag());
 
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
-            Flag.NO);
+            Flag.NO,
+            processInstance.getTestFlag());
 
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());

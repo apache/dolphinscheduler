@@ -337,6 +337,7 @@ CREATE TABLE t_ds_command
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id),
     KEY                        priority_id_index (process_instance_priority, id)
 );
@@ -359,6 +360,8 @@ CREATE TABLE t_ds_datasource
     connection_params text        NOT NULL,
     create_time       datetime    NOT NULL,
     update_time       datetime     DEFAULT NULL,
+    test_flag           int DEFAULT NULL,
+    bind_test_id        int DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_datasource_name_un (name, type)
 );
@@ -392,6 +395,7 @@ CREATE TABLE t_ds_error_command
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -619,6 +623,7 @@ CREATE TABLE t_ds_process_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -872,6 +877,7 @@ CREATE TABLE t_ds_task_instance
     dry_run                 int NULL DEFAULT 0,
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
+    test_flag               int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 

@@ -13,26 +13,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-import { ITaskState } from '@/common/types'
+*/
 
-export type { Router } from 'vue-router'
-export type { TaskInstancesRes } from '@/service/modules/task-instances/types'
+delimiter d//
 
-interface IRecord {
-  name: string
-  processInstanceName: string
-  executorName: string
-  taskType: string
-  state: ITaskState
-  submitTime: string
-  startTime: string
-  endTime: string
-  duration?: string
-  retryTimes: number
-  dryRun: number
-  host: string
-  testFlag: number
-}
+return 'Success!';
+exception when others then
+		---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
 
-export { ITaskState, IRecord }
+select dolphin_insert_dq_initial_data();
+
+d//

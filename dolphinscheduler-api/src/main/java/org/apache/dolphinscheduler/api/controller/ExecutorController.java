@@ -102,6 +102,7 @@ public class ExecutorController extends BaseController {
      * @param workerGroup worker group
      * @param timeout timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param testFlag testFlag
      * @return start process result code
      */
     @ApiOperation(value = "startProcessInstance", notes = "RUN_PROCESS_INSTANCE_NOTES")
@@ -121,6 +122,7 @@ public class ExecutorController extends BaseController {
             @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int" , example = "8"),
             @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "testFlag", value = "TEST_FLAG", dataType = "Int", example = "0"),
             @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataType = "complementDependentMode")
     })
     @PostMapping(value = "start-process-instance")
@@ -145,6 +147,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "startParams", required = false) String startParams,
                                        @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
+                                       @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                        @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
 
         if (timeout == null) {
@@ -162,7 +165,7 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, complementDependentMode);
+                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag, complementDependentMode);
         return returnDataList(result);
     }
 
@@ -186,6 +189,7 @@ public class ExecutorController extends BaseController {
      * @param workerGroup worker group
      * @param timeout timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param testFlag testFlag
      * @return start process result code
      */
     @ApiOperation(value = "batchStartProcessInstance", notes = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
@@ -205,6 +209,7 @@ public class ExecutorController extends BaseController {
             @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8"),
             @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "testFlag", value = "TEST_FLAG", dataType = "Int", example = "0"),
             @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataType = "complementDependentMode")
     })
     @PostMapping(value = "batch-start-process-instance")
@@ -229,6 +234,7 @@ public class ExecutorController extends BaseController {
                                             @RequestParam(value = "startParams", required = false) String startParams,
                                             @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                             @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
+                                            @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                             @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
 
         if (timeout == null) {
@@ -254,7 +260,7 @@ public class ExecutorController extends BaseController {
             long processDefinitionCode = Long.parseLong(strProcessDefinitionCode);
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                    workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                    workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
                     complementDependentMode);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {

@@ -63,6 +63,11 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     DependResult result;
 
+    /**
+     * test flag
+     */
+    private int testFlag;
+
     boolean allDependentItemFinished;
 
     @Override
@@ -136,6 +141,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         } else {
             this.dependentDate = new Date();
         }
+        this.testFlag = processInstance.getTestFlag();
     }
 
     @Override
@@ -169,7 +175,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                     logger.info("dependent item complete, task: {}, result: {}", entry.getKey(), entry.getValue());
                 }
             }
-            if (!dependentExecute.finish(dependentDate)) {
+            if (!dependentExecute.finish(dependentDate, testFlag)) {
                 finish = false;
             }
         }
@@ -184,7 +190,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     private DependResult getTaskDependResult() {
         List<DependResult> dependResultList = new ArrayList<>();
         for (DependentExecute dependentExecute : dependentTaskList) {
-            DependResult dependResult = dependentExecute.getModelDependResult(dependentDate);
+            DependResult dependResult = dependentExecute.getModelDependResult(dependentDate, testFlag);
             dependResultList.add(dependResult);
         }
         result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);

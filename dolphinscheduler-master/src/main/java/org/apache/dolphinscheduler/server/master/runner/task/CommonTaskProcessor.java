@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -34,6 +36,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.Map;
 
 import com.google.auto.service.AutoService;
 
@@ -49,6 +52,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
+        checkAndReplaceTestDataSource();
         this.taskInstance =
                 processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
@@ -167,5 +171,29 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         logger.info("master kill taskInstance name :{} taskInstance id:{}",
                 taskInstance.getName(), taskInstance.getId());
         return true;
+    }
+
+    /**
+     * Check whether the test data source needs to be replaced
+     */
+    private void checkAndReplaceTestDataSource() {
+        if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
+            try {
+                if (TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType()).getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
+                    Map<String, Object> instanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+                    Integer onlineDataSourceId = (Integer) instanceParams.get("datasource");
+                    Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
+                    if (null == testDataSourceId){
+                        logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+                    }else {
+                        logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+                    }
+                    instanceParams.put("datasource", testDataSourceId);
+                    taskInstance.setTaskParams(JSONUtils.toJsonString(instanceParams));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
