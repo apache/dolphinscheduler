@@ -831,6 +831,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Integer> allChildren = listAllChildren(resource, true);
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
 
+        if (needDeleteResourceIdArray.length >= 2){
+            logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
+            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
+            return result;
+        }
+
         //if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
             List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
