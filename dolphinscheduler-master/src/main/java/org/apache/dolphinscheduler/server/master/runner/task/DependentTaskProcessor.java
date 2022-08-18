@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-
+import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -35,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 /**
  * dependent task processor
@@ -74,6 +73,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
+        logger.info("Dependent task submit success");
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
@@ -84,6 +84,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         initDependParameters();
+        logger.info("Success initialize dependent task parameters, the dependent data is: {} parameter is {}", dependentDate, dependentParameters);
         return true;
     }
 
@@ -173,6 +174,10 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 finish = false;
             }
         }
+        if (!finish) {
+            // todo: add information, which dependent doesn't finished
+            logger.info("The dependent condition doesn't complete at date: {}", dependentDate);
+        }
         return finish;
     }
 
@@ -188,7 +193,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             dependResultList.add(dependResult);
         }
         result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
-        logger.info("dependent task completed, dependent result: {}", result);
+        logger.info("Dependent task completed, dependent result: {}", result);
         return result;
     }
 
