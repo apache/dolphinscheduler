@@ -74,7 +74,8 @@ public class WorkerGroupController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
         @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "WORKER_DESC", required = true, dataType = "String")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
