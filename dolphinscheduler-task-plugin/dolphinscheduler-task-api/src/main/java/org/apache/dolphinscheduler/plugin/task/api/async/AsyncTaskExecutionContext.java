@@ -36,7 +36,7 @@ public class AsyncTaskExecutionContext implements Delayed {
     private long currentStartTime;
     private int executeTimes;
     private final long executeInterval;
-    private final long timeout;
+    private long timeout;
 
 
     public AsyncTaskExecutionContext(@NonNull TaskExecutionContext taskExecutionContext,
@@ -62,9 +62,16 @@ public class AsyncTaskExecutionContext implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return unit.convert(
-                Math.min(currentStartTime + executeInterval, timeout) - System.currentTimeMillis(),
-                TimeUnit.MILLISECONDS);
+        long nextExecuteTime = currentStartTime + executeInterval;
+        long delayTime;
+        if (nextExecuteTime >= timeout) {
+            // has been timeout, clear the timeoutParams
+            delayTime = timeout - System.currentTimeMillis();
+            timeout = TimeUnit.SECONDS.toMillis(Integer.MAX_VALUE);
+        } else {
+            delayTime = nextExecuteTime - System.currentTimeMillis();
+        }
+        return unit.convert(delayTime, TimeUnit.MILLISECONDS);
     }
 
 

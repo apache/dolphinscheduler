@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
@@ -84,7 +85,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         initDependParameters();
-        logger.info("Success initialize dependent task parameters, the dependent data is: {} parameter is {}", dependentDate, dependentParameters);
+        logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
         return true;
     }
 
@@ -124,13 +125,17 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
      */
     protected void initDependParameters() {
         this.dependentParameters = taskInstance.getDependency();
-        for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
-            this.dependentTaskList.add(new DependentExecute(taskModel));
-        }
         if (processInstance.getScheduleTime() != null) {
             this.dependentDate = this.processInstance.getScheduleTime();
         } else {
             this.dependentDate = new Date();
+        }
+        for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
+            logger.info("Add sub dependent check tasks, dependent relation: {}", taskModel.getRelation());
+            for (DependentItem dependentItem : taskModel.getDependItemList()) {
+                logger.info("dependent task: {}", dependentItem.getKey());
+            }
+            this.dependentTaskList.add(new DependentExecute(taskModel));
         }
     }
 
@@ -162,16 +167,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
                     // save depend result to log
-                    logger.info("dependent item complete, task: {}, result: {}", entry.getKey(), entry.getValue());
+                    logger.info("dependent item complete, task: {}, result: {}, dependentDate: {}", entry.getKey(), entry.getValue(), dependentDate);
                 }
             }
             if (!dependentExecute.finish(dependentDate)) {
                 finish = false;
             }
-        }
-        if (!finish) {
-            // todo: add information, which dependent doesn't finished
-            logger.info("The dependent condition doesn't complete at date: {}", dependentDate);
         }
         return finish;
     }
