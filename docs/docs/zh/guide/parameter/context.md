@@ -81,18 +81,18 @@ Node_mysql 运行结果如下：
 
 ### HTTP
 
-第一步:拖一个http类型的任务，在自定义参数中KEY的位置填写body ,在IN/OUT的部分选择OUT,在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
+拖一个http类型的任务，在自定义参数中KEY的位置填写body，在IN/OUT的部分选择OUT，在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
 
 ![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
-第二步:在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了，
+在添加一个http任务类型的节点，接收上游传递来的参数。这一次只需要在【请求参数】部分进行添加就可以了。
 
 ![httpParam-2](../../../../img/httpParam/httpParam-2.png)
 
-参数名可以写任意，可以body也可以是别的，类型选择parameter,value的取值一定是你上一个节点设置输出的key,如:我上一个节点设置的输出key是body，那我下一个节点就要这样取值${body}
+参数名可以写任意，可以body也可以是别的，类型选择parameter，value的取值一定是你上一个节点设置输出的key，如:我上一个节点设置的输出key是body。那我下一个节点就要这样取值${body}
 
 配置好后的效果
 ![httpParam-3](../../../../img/httpParam/httpParam-3.png)
 
-第三步:你可以写一个测试接口,来测试咱们的参数是否传递成功。 
+你可以写一个测试接口,来测试咱们的参数是否传递成功。 
 ![httpParam-4](../../../../img/httpParam/httpParam-4.png)
