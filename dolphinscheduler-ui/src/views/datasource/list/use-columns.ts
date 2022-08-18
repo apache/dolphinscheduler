@@ -35,7 +35,6 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import type { TableColumns } from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
