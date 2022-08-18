@@ -21,12 +21,13 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 
 import java.util.List;
+import java.util.Map;
 
 public class DependentParameters extends AbstractParameters {
 
     private List<DependentTaskModel> dependTaskList;
     private DependentRelation relation;
-    private String otherParams;
+    private Map<String, Object> otherParams;
 
     @Override
     public boolean checkParameters() {
@@ -49,11 +50,11 @@ public class DependentParameters extends AbstractParameters {
         this.relation = relation;
     }
 
-    public String getOtherParams() {
+    public Map<String, Object> getOtherParams() {
         return otherParams;
     }
 
-    public void setOtherParams(String otherParams) {
+    public void setOtherParams(Map<String, Object> otherParams) {
         this.otherParams = otherParams;
     }
 }
