@@ -479,7 +479,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         switch (executeType) {
             case PAUSE:
             case STOP:
-                if (executionStatus.isRunning()) {
+                if (executionStatus.canStop()) {
                     checkResult = true;
                 }
                 break;
