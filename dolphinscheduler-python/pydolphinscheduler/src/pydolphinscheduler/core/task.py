@@ -240,13 +240,13 @@ class Task(Base):
         """
         if self.resource_plugin is None:
             if self.process_definition.resource_plugin is not None:
-                return self.process_definition.resource_plugin.resource
+                return self.process_definition.resource_plugin
             else:
                 raise PyResPluginException(
                     "The execution command of this task is a file, but the resource plugin is empty"
                 )
         else:
-            return self.resource_plugin.resource
+            return self.resource_plugin
 
     def get_content(self):
         """Get the file content according to the resource plugin."""
