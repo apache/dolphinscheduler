@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 /**
  * dependent task processor
@@ -68,12 +68,14 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
         this.setTaskExecutionLogger();
+        logger.info("Dependent task submit success");
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
@@ -84,6 +86,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         initDependParameters();
+        logger.info("Success initialize dependent task parameters, the dependent data is: {} parameter is {}", dependentDate, dependentParameters);
         return true;
     }
 
@@ -111,8 +114,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
-        logger.info("dependent task {} timeout, strategy {} ",
-                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+        logger.info("dependent taskInstanceId: {} timeout, taskName: {}, strategy: {} ",
+                taskInstance.getId(), taskInstance.getName(), taskTimeoutStrategy.getDescp());
         result = DependResult.FAILED;
         endTask();
         return true;
@@ -160,13 +163,17 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             for (Map.Entry<String, DependResult> entry : dependentExecute.getDependResultMap().entrySet()) {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
-                    //save depend result to log
-                    logger.info("dependent item complete {} {},{}", DEPENDENT_SPLIT, entry.getKey(), entry.getValue());
+                    // save depend result to log
+                    logger.info("dependent item complete, task: {}, result: {}", entry.getKey(), entry.getValue());
                 }
             }
             if (!dependentExecute.finish(dependentDate)) {
                 finish = false;
             }
+        }
+        if (!finish) {
+            // todo: add information, which dependent doesn't finished
+            logger.info("The dependent condition doesn't complete at date: {}", dependentDate);
         }
         return finish;
     }
@@ -183,7 +190,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             dependResultList.add(dependResult);
         }
         result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
-        logger.info("dependent task completed, dependent result:{}", result);
+        logger.info("Dependent task completed, dependent result: {}", result);
         return result;
     }
 
