@@ -319,7 +319,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
 
     /**
-     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
+     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -350,6 +350,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
             result = checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
