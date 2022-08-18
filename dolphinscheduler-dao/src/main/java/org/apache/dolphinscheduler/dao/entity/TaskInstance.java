@@ -314,8 +314,9 @@ public class TaskInstance implements Serializable {
             this.dependency =
                     JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
 
-            String otherParamsJson = JSONUtils.parseObject((String) taskParamsMap.get(Constants.OTHER_PARAMS)).toString();
-            this.dependency.setOtherParams(otherParamsJson);
+            Map<String, Object> otherParamsMap = JSONUtils.parseObject((String) taskParamsMap.get(Constants.OTHER_PARAMS), new TypeReference<Map<String, Object>>() {
+            });
+            this.dependency.setOtherParams(otherParamsMap);
 
         }
         return this.dependency;
