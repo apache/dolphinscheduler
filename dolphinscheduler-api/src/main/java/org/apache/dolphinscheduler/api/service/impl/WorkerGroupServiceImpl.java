@@ -123,7 +123,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         if (workerGroup.getId() != 0) {
-            handleWorkGroup(workerGroup);
+            handleDefaultWorkGroup(workerGroup);
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
@@ -133,7 +133,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return result;
     }
 
-    protected void handleWorkGroup(WorkerGroup workerGroup) {
+    protected void handleDefaultWorkGroup(WorkerGroup workerGroup) {
     }
 
     /**
