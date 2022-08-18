@@ -678,6 +678,12 @@
                             <replacement>project</replacement>
                         </replace>
                     </pom>
+                    <markdown>
+                        <includes>
+                            <include>**/*.md</include>
+                        </includes>
+                        <flexmark />
+                    </markdown>
                 </configuration>
                 <executions>
                     <execution>
