@@ -66,7 +66,7 @@ public class MysqlDataSourceE2ETest {
 
     private static final String jdbcParams = "{\"useSSL\": false}";
 
-    private static final int testFlag = 0;
+    private static final int testFlag = 1;
 
     private static final int bindTestId = 1;
     @BeforeAll

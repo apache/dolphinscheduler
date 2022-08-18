@@ -314,7 +314,7 @@ const DetailModal = defineComponent({
                   path='connectType'
                   show-require-mark
                 >
-                  <NRadioGroup v-model={[detailForm.connectType, 'value']} class='btn-test-connection'>
+                  <NRadioGroup v-model={[detailForm.connectType, 'value']}>
                     <NSpace>
                       <NRadio value='ORACLE_SERVICE_NAME'>
                         {t('datasource.oracle_service_name')}
@@ -350,13 +350,11 @@ const DetailModal = defineComponent({
                     show-require-mark
                 >
                   <NRadioGroup v-model={[detailForm.testFlag, 'value']} onUpdate:value={onChangeTestFlag}>
-                    <NSpace>
-                      <NRadio class='btn-test-data-source'
-                              value = {1}>
+                    <NSpace  class='btn-test-connection'>
+                      <NRadio value = {1}>
                         {t('datasource.test_datasource')}
                       </NRadio>
-                      <NRadio class='btn-online-data-source'
-                              value = {0}>
+                      <NRadio value = {0}>
                         {t('datasource.online_datasource')}
                       </NRadio>
                     </NSpace>

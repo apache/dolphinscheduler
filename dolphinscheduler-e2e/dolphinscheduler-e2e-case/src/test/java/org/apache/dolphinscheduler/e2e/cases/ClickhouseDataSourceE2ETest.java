@@ -65,7 +65,7 @@ public class ClickhouseDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
-    private static final int testFlag = 0;
+    private static final int testFlag = 1;
 
     private static final int bindTestId = 1;
 
