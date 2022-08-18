@@ -212,12 +212,13 @@ public class ServerNodeManager implements InitializingBean {
                         String[] addrs = wg.getAddrList().split(Constants.COMMA);
                         for (String addr : addrs) {
                             if (newWorkerNodeInfo.containsKey(addr)) {
-                                nodes.add(addr);
+                                handleAddr(workerGroup,nodes,addr);
                             }
                         }
                         if (!nodes.isEmpty()) {
                             syncWorkerGroupNodes(workerGroup, nodes);
                         }
+                        handleDefaultAddr(workerGroup,nodes);
                     }
                 }
                 notifyWorkerInfoChangeListeners();
@@ -225,6 +226,13 @@ public class ServerNodeManager implements InitializingBean {
                 logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
+    }
+
+    protected void handleDefaultAddr(String workerGroup, Set<String> nodes) {
+    }
+
+    protected void handleAddr(String workerGroup, Set<String> nodes, String addr) {
+        nodes.add(addr);
     }
 
     /**

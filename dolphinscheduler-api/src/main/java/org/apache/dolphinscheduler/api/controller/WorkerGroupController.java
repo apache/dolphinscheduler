@@ -83,9 +83,10 @@ public class WorkerGroupController extends BaseController {
     public Result saveWorkerGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
-                                  @RequestParam(value = "addrList") String addrList
+                                  @RequestParam(value = "addrList") String addrList,
+                                  @RequestParam(value = "description") String description
     ) {
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList);
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList,description);
         return returnDataList(result);
     }
 

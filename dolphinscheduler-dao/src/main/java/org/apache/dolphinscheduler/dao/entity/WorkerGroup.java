@@ -41,6 +41,8 @@ public class WorkerGroup {
 
     private Date updateTime;
 
+    private String description;
+
     @TableField(exist = false)
     private boolean systemDefault;
 
@@ -92,16 +94,24 @@ public class WorkerGroup {
         this.systemDefault = systemDefault;
     }
 
-    @Override
-    public String toString() {
-        return "WorkerGroup{"
-                + "id= " + id
-                + ", name= " + name
-                + ", addrList= " + addrList
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + ", systemDefault= " + systemDefault
-                + "}";
+    public String getDescription() {
+        return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "WorkerGroup{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", addrList='" + addrList + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", description='" + description + '\'' +
+                ", systemDefault=" + systemDefault +
+                '}';
+    }
 }

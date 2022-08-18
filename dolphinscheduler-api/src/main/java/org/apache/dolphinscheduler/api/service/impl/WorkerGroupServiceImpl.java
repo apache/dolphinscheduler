@@ -85,7 +85,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     @Transactional
-    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList) {
+    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -111,6 +111,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroup.setName(name);
         workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
+        workerGroup.setDescription(description);
 
         if (checkWorkerGroupNameExists(workerGroup)) {
             putMsg(result, Status.NAME_EXIST, workerGroup.getName());
@@ -122,6 +123,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         if (workerGroup.getId() != 0) {
+            handleWorkGroup(workerGroup);
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
@@ -129,6 +131,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    protected void handleWorkGroup(WorkerGroup workerGroup) {
     }
 
     /**
@@ -304,6 +309,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
+            handleChildrenNodes(childrenNodes);
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
             if (isPaging) {
@@ -313,10 +319,18 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 wg.setCreateTime(new Date(heartBeat.getStartupTime()));
                 wg.setUpdateTime(new Date(heartBeat.getReportTime()));
                 wg.setSystemDefault(true);
+                wg.setDescription(workerGroupMapper.queryDescription(workerGroup));
             }
+            handleDefault(wg);
             workerGroups.add(wg);
         }
         return workerGroups;
+    }
+
+    protected void handleDefault(WorkerGroup wg) {
+    }
+
+    protected void handleChildrenNodes(Collection<String> childrenNodes) {
     }
 
     /**

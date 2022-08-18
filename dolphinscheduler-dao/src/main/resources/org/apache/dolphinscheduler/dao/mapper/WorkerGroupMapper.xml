@@ -28,4 +28,9 @@
         from t_ds_worker_group
         where name = #{name}
     </select>
+    <select id="queryDescription" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        select description
+        from t_ds_worker_group
+        where name = #{name}
+    </select>
 </mapper>
