@@ -29,7 +29,7 @@ import {
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
 import ButtonLink from '@/components/button-link'
-import type {IDataSource, TableColumns} from './types'
+import {IDataSource, TableColumns} from './types'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,

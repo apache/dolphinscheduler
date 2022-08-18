@@ -65,6 +65,9 @@ public class SqlServerDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
+    private static final int testFlag = 0;
+
+    private static final int bindTestId = 1;
 
     @BeforeAll
     public static void setup() {
@@ -78,7 +81,7 @@ public class SqlServerDataSourceE2ETest {
     void testCreateSqlServerDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams, testFlag, bindTestId);
 
         new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));

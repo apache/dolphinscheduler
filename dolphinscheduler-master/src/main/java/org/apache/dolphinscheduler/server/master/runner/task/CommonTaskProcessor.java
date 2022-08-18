@@ -192,7 +192,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                     taskInstance.setTaskParams(JSONUtils.toJsonString(instanceParams));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
     }

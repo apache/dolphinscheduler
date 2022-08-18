@@ -90,6 +90,7 @@ public class TaskExecuteThreadTest {
      */
     @Test
     public void checkTestDataSource() {
+
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext,
                 "127.0.0.1:5678",
                 workerMessageSender,
@@ -102,7 +103,7 @@ public class TaskExecuteThreadTest {
         try {
             taskExecuteThread.run();
         } catch (Exception e) {
-
+            Assert.assertNotNull(e);
         }
     }
 }
