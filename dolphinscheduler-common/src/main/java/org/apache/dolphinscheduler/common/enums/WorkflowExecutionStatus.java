@@ -71,6 +71,10 @@ public enum WorkflowExecutionStatus {
         return this == RUNNING_EXECUTION;
     }
 
+    public boolean canStop() {
+        return this == RUNNING_EXECUTION || this == READY_PAUSE;
+    }
+
     public boolean isFinished() {
         // todo: do we need to remove pause/block in finished judge?
         return isSuccess() || isFailure() || isStop() || isPause() || isBlock();
