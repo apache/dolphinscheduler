@@ -195,6 +195,12 @@
             <artifactId>dolphinscheduler-task-sagemaker</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-pytorch</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

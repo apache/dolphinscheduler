@@ -43,6 +43,7 @@ export type TaskType =
   | 'SAGEMAKER'
   | 'CHUNJUN'
   | 'FLINK_STREAM'
+  | 'PYTORCH'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -146,6 +147,10 @@ export const TASK_TYPES_MAP = {
     alias: 'FLINK_STREAM',
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
+  },
+  PYTORCH: {
+    alias: 'Pytorch',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {

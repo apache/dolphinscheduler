@@ -386,6 +386,16 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SAGEMAKER') {
     taskParams.sagemakerRequestJson = data.sagemakerRequestJson
   }
+  if (data.taskType === 'PYTORCH') {
+    taskParams.script = data.script
+    taskParams.scriptParams = data.scriptParams
+    taskParams.pythonPath = data.pythonPath
+    taskParams.isCreateEnvironment = data.isCreateEnvironment
+    taskParams.pythonCommand = data.pythonCommand
+    taskParams.pythonEnvTool = data.pythonEnvTool
+    taskParams.requirements = data.requirements
+    taskParams.condaPythonVersion = data.condaPythonVersion
+  }
 
   if (data.taskType === 'DINKY') {
     taskParams.address = data.address
