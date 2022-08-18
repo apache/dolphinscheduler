@@ -160,7 +160,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                 @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
+                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectCode, id, schedule,
             warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);

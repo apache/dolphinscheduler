@@ -57,6 +57,14 @@ CREATE TABLE IF NOT EXISTS "t_ds_cluster" (
     CONSTRAINT cluster_code_unique UNIQUE (code)
 );
 
+--- set process_instance_priority and task_priority default value as 2
+alter table t_ds_process_instance alter column process_instance_priority set default 2;
+alter table t_ds_schedules alter column process_instance_priority set default 2;
+alter table t_ds_command alter column process_instance_priority set default 2;
+alter table t_ds_error_command alter column process_instance_priority set default 2;
+alter table t_ds_task_definition_log alter column task_priority set default 2;
+alter table t_ds_task_definition alter column task_priority set default 2;
+
 --- add column
 ALTER TABLE t_ds_task_definition ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT '0';
 ALTER TABLE t_ds_task_definition_log ADD COLUMN IF NOT EXISTS task_execute_type int DEFAULT '0';
