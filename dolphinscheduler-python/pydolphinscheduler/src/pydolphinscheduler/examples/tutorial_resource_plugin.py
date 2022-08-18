@@ -44,17 +44,14 @@ with ProcessDefinition(
     schedule="0 0 0 * * ? *",
     start_time="2021-01-01",
     tenant="tenant_exists",
-    resource_plugin=ResourcePlugin(
-        type=ResourcePluginType.LOCAL,
-        prefix="/tmp",
-    ),
+    resource_plugin=ResourcePlugin.Local(prefix="/tmp"),
 ) as process_definition:
     # [end workflow_declare]
     # [start task_declare]
     file = "resource.sh"
     path = Path("/tmp").joinpath(file)
     with open(str(path), "w") as f:
-        f.write("echo tutorial resource plugin")
+        f.write('echo "tutorial resource plugin"')
     task_parent = Shell(
         name="local-resource-example",
         command=file,

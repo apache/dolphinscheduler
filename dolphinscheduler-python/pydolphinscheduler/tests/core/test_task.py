@@ -299,16 +299,10 @@ def test_task_ext_attr(
             {
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
-                "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix="prefix",
-                ),
+                "resource_plugin": ResourcePlugin.Local("prefix"),
                 "process_definition": ProcessDefinition(
                     name="process_definition",
-                    resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.LOCAL,
-                        prefix="prefix",
-                    ),
+                    resource_plugin=ResourcePlugin.Local("prefix"),
                 ),
             },
             "Local",
@@ -317,10 +311,7 @@ def test_task_ext_attr(
             {
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
-                "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix="prefix",
-                ),
+                "resource_plugin": ResourcePlugin.Local("prefix"),
             },
             "Local",
         ),
@@ -330,10 +321,7 @@ def test_task_ext_attr(
                 "task_type": "TaskType",
                 "process_definition": ProcessDefinition(
                     name="process_definition",
-                    resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.LOCAL,
-                        prefix="prefix",
-                    ),
+                    resource_plugin=ResourcePlugin.Local("prefix"),
                 ),
             },
             "Local",
