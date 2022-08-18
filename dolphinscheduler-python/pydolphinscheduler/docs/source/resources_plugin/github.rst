@@ -15,15 +15,18 @@
    specific language governing permissions and limitations
    under the License.
 
-Resources_plugin
-================
+Github
+======
 
-In this section
+`Github` is a github resource plugin for pydolphinscheduler.
 
-.. toctree::
-   :maxdepth: 1
+When using a local resource plugin, you do not need to use this class explicitly, you only need to add the
+`resource_plugin` parameter in the task subclass or workflow definition.
+The data type of parameter `resource_plugin` is `ResourcePlugin`
 
-   develop
-   resource-plugin
-   local
-   github
+For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
+
+Dive Into
+---------
+
+.. automodule:: pydolphinscheduler.resources_plugin.github

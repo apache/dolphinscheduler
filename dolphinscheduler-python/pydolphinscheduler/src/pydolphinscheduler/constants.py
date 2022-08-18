@@ -108,6 +108,7 @@ class ResourcePluginType(str):
     """Constants for resources plugin type, it will also show you which kind we support up to now."""
 
     LOCAL = "local"
+    GITHUB = "github"
 
 
 # [end class_resource]

@@ -33,9 +33,11 @@ it will instantiate and run all the task it have.
 # [start tutorial]
 # [start package_import]
 # Import ProcessDefinition object to define your workflow attributes
+from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 
 # Import task Shell object cause we would create some shell tasks later
+from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.tasks.shell import Shell
 
 # [end package_import]
@@ -52,7 +54,13 @@ with ProcessDefinition(
     task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")
     task_child_one = Shell(name="task_child_one", command="echo 'child one'")
     task_child_two = Shell(name="task_child_two", command="echo 'child two'")
-    task_union = Shell(name="task_union", command="echo union")
+    task_union = Shell(
+        name="task_union",
+        command="union.sh",
+        resource_plugin=ResourcePlugin(
+            ResourcePluginType.GITHUB,
+            "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main")
+    )
     # [end task_declare]
 
     # [start task_relation_declare]
