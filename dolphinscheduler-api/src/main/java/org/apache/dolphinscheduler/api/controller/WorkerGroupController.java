@@ -87,7 +87,7 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "addrList") String addrList,
                                   @RequestParam(value = "description") String description
     ) {
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList,description);
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList, description);
         return returnDataList(result);
     }
 
