@@ -60,6 +60,7 @@
         <module>dolphinscheduler-task-sagemaker</module>
         <module>dolphinscheduler-task-chunjun</module>
         <module>dolphinscheduler-task-flink-stream</module>
+        <module>dolphinscheduler-task-pytorch</module>
     </modules>
 
     <dependencyManagement>
