@@ -390,3 +390,11 @@ d//
 delimiter ;
 CALL modify_t_ds_task_group_col_description;
 DROP PROCEDURE modify_t_ds_task_group_col_description;
+
+alter table t_ds_process_instance alter column process_instance_priority set default 2;
+alter table t_ds_schedules alter column process_instance_priority set default 2;
+alter table t_ds_command alter column process_instance_priority set default 2;
+alter table t_ds_error_command alter column process_instance_priority set default 2;
+
+alter table t_ds_task_definition_log alter column task_priority set default 2;
+alter table t_ds_task_definition alter column task_priority set default 2;
