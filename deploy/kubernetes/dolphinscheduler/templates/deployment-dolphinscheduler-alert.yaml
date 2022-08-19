@@ -104,6 +104,9 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: config-volume
+              mountPath: /opt/dolphinscheduler/conf/common.properties
+              subPath: common_properties
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.alert.persistentVolumeClaim.enabled }}
@@ -112,3 +115,6 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
