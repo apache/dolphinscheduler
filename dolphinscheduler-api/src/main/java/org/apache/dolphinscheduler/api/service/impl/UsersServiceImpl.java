@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -25,6 +27,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
@@ -969,6 +972,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
+        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN, USER_MANAGER)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
         List<User> userList = userMapper.queryEnabledUsers();
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
