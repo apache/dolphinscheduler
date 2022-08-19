@@ -51,7 +51,7 @@ public final class TaskProcessorFactory {
     static {
         for (ITaskProcessor iTaskProcessor : ServiceLoader.load(ITaskProcessor.class)) {
             try {
-              if (PROCESS_MAP.get(iTaskProcessor.getType()) != null )
+              if (PROCESS_MAP.get(iTaskProcessor.getType()) == null )
                   PROCESS_MAP.put(iTaskProcessor.getType(), (Constructor<ITaskProcessor>) iTaskProcessor.getClass().getConstructor());
             } catch (NoSuchMethodException e) {
                 throw new IllegalArgumentException("The task processor should has a no args constructor", e);
