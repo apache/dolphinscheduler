@@ -304,6 +304,7 @@ public class SqlTask extends AbstractTaskExecutor {
                         List<SqlBinds> preStatementsBinds) throws Exception {
         for (SqlBinds sqlBind : preStatementsBinds) {
             try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
+
                 //hive log listener
                 if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
                     logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
