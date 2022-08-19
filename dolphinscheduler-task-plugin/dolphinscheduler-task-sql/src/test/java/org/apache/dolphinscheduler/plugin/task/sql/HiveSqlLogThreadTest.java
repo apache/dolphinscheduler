@@ -81,7 +81,7 @@ public class HiveSqlLogThreadTest {
         ResultSet res = null;
         Connection con = null;
         Statement stmt = null;
-        try{
+        try {
             con = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
 
             stmt = con.createStatement();
