@@ -45,25 +45,25 @@ import org.springframework.stereotype.Component;
 public class LdapService {
     private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
 
-    @Value("${security.authentication.ldap.user.admin:null}")
+    @Value("${security.authentication.ldap.user.admin:#{null}}")
     private String adminUserId;
 
-    @Value("${security.authentication.ldap.urls:null}")
+    @Value("${security.authentication.ldap.urls:#{null}}")
     private String ldapUrls;
 
-    @Value("${security.authentication.ldap.base-dn:null}")
+    @Value("${security.authentication.ldap.base-dn:#{null}}")
     private String ldapBaseDn;
 
-    @Value("${security.authentication.ldap.username:null}")
+    @Value("${security.authentication.ldap.username:#{null}}")
     private String ldapSecurityPrincipal;
 
-    @Value("${security.authentication.ldap.password:null}")
+    @Value("${security.authentication.ldap.password:#{null}}")
     private String ldapPrincipalPassword;
 
-    @Value("${security.authentication.ldap.user.identity-attribute:null}")
+    @Value("${security.authentication.ldap.user.identity-attribute:#{null}}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${security.authentication.ldap.user.email-attribute:null}")
+    @Value("${security.authentication.ldap.user.email-attribute:#{null}}")
     private String ldapEmailAttribute;
 
     @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
