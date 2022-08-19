@@ -203,4 +203,8 @@ public enum ExecutionStatus {
     public static int[] getNeedFailoverWorkflowInstanceState() {
         return NEED_FAILOVER_STATES;
     }
+
+    public boolean canStop() {
+        return typeIsRunning() || this == READY_PAUSE;
+    }
 }

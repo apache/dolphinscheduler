@@ -455,8 +455,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         boolean checkResult = false;
         switch (executeType) {
             case PAUSE:
-            case STOP:
                 if (executionStatus.typeIsRunning()) {
+                    checkResult = true;
+                }
+                break;
+            case STOP:
+                if (executionStatus.canStop()) {
                     checkResult = true;
                 }
                 break;
