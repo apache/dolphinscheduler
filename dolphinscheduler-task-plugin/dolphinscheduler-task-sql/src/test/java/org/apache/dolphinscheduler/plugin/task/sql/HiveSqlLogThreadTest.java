@@ -17,24 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.hive.param.HiveConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -46,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class HiveSqlLogThreadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThreadTest.class);
     @Test
-    public void testHiveSql() throws IOException, ClassNotFoundException, ExecutionException {
+    public void testHiveSql() throws IOException {
         String taskJson="{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select count(*) from tmp.test_doris\",\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\",\"groupId\":null,\"localParams\":[],\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},\"switchResult\":{}}";
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskType("hive");
@@ -67,7 +64,7 @@ public class HiveSqlLogThreadTest {
         UserGroupInformation.setConfiguration(configuration);
         UserGroupInformation.loginUserFromKeytab("vulcan", krb5KeyTabPath);
 
-        // 创建hive连接
+        // create hive connection
         HiveConnectionParam connectionParam = new HiveConnectionParam();
         connectionParam.setUser("hive");
         connectionParam.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
@@ -88,13 +85,13 @@ public class HiveSqlLogThreadTest {
             con = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
 
             stmt = con.createStatement();
-            //日志进度打印
+            //print process log
             HiveSqlLogThread queryThread = new HiveSqlLogThread(stmt,LOGGER,taskExecutionContext);
             queryThread.setName("sql log print");
             queryThread.start();
             res = stmt.executeQuery(sql);
             while (res.next()) {
-                System.out.println("---------" + res.getInt(1) + "--------");
+                LOGGER.info("---------{}--------",res.getInt(1));
             }
 
         }catch (Exception e){
