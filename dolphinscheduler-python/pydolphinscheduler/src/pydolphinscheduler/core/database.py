@@ -22,7 +22,7 @@ from typing import Dict
 from py4j.protocol import Py4JJavaError
 
 from pydolphinscheduler.exceptions import PyDSParamException
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.java_gateway import JavaGate
 
 
 class Database(dict):
@@ -54,9 +54,8 @@ class Database(dict):
         if self._database:
             return self._database
         else:
-            gateway = launch_gateway()
             try:
-                self._database = gateway.entry_point.getDatasourceInfo(name)
+                self._database = JavaGate().get_datasource_info(name)
             # Handler database source do not exists error, for now we just terminate the process.
             except Py4JJavaError as ex:
                 raise PyDSParamException(str(ex.java_exception))

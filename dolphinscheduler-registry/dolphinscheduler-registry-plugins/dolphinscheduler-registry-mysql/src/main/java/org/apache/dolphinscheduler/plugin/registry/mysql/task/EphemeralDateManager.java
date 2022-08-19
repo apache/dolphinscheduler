@@ -46,6 +46,7 @@ public class EphemeralDateManager implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EphemeralDateManager.class);
 
+    private ConnectionState connectionState;
     private final MysqlOperator mysqlOperator;
     private final MysqlRegistryProperties registryProperties;
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
@@ -78,6 +79,10 @@ public class EphemeralDateManager implements AutoCloseable {
         return ephemeralId;
     }
 
+    public ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
     @Override
     public void close() throws SQLException {
         ephemeralDateIds.clear();
@@ -89,11 +94,11 @@ public class EphemeralDateManager implements AutoCloseable {
     }
 
     // Use this task to refresh ephemeral term and check the connect state.
-    static class EphemeralDateTermRefreshTask implements Runnable {
+    class EphemeralDateTermRefreshTask implements Runnable {
+
         private final List<ConnectionListener> connectionListeners;
         private final Set<Long> ephemeralDateIds;
         private final MysqlOperator mysqlOperator;
-        private ConnectionState connectionState;
 
         private EphemeralDateTermRefreshTask(MysqlOperator mysqlOperator,
                                              List<ConnectionListener> connectionListeners,

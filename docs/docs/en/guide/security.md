@@ -118,21 +118,28 @@ public  void doPOSTParam()throws Exception{
 
 ## Worker Grouping
 
-Each worker node will belong to its own worker group, and the default group is "default".
+Each worker node belongs to some worker groups, and the default group is `default`.
 
-When the task is executed, the task can be assigned to the specified worker group, and finally the worker node in the group will execute the task.
+When DolphinScheduler executes a task, it will assign the task to the configured worker group and the worker nodes in the group will execute the task.
 
-### Add or update worker group
+### Add or Update Worker Groups
 
-- Open the `conf/worker.properties` configuration file on the worker node where you want to configure the groups and modify the `worker.groups` parameter.
-- The `worker.groups` parameter is followed by the name of the group corresponding to the worker node, which is `default`.
-- If the worker node corresponds to multiple groups, separate them with commas. Example:
+- Open the `worker-server/conf/application.yaml` on the worker node where you want to configure the groups and modify the `groups` parameter in `worker` section.
+- The values of the `groups` parameter are the names of the groups where the worker node belong. The default value is `default`.
+- If the worker node belongs to multiple groups, list them with hyphens, e.g.
 
 ```conf
-worker.groups=default,test
+worker:
+......
+  groups:
+    - default
+    - group-1
+    - group-2
+......
 ```
 
-- You can also change the worker group for the worker during execution, and if the modification is successful, the worker will use the new group and ignore the configuration in `worker.properties`. The step to modify work group as below: `Security Center -> Worker Group Management -> click 'New Worker Group' -> click 'New Worker Group' ->  enter 'Group Name' -> Select Exists Worker -> Click Submit`. 
+- You can add new worker groups for the workers during runtime regardless of the configurations in `application.yaml` as below: 
+`Security Center` -> `Worker Group Manage` -> `Create Worker Group` -> fill in `Group Name` and `Worker Addresses` -> click `confirm`. 
 
 ## Environmental Management
 
@@ -151,6 +158,8 @@ The environment configuration is equivalent to the configuration in the `dolphin
 Create a task node in the workflow definition, select the worker group and the environment corresponding to the worker group. When executing the task, the Worker will execute the environment first before executing the task.
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
+
+> NOTE: Please make sure you have associated the `Environments` with your `worker groups` if you can not select the `Environment Name` in workflow definition page or when triggering workflows.
 
 ## Cluster Management
 

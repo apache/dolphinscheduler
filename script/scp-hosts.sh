@@ -35,8 +35,8 @@ hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-  if ! ssh -p $sshPort $host test -e $installPath; then
-    ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
+  if ! ssh -o StrictHostKeyChecking=no -p $sshPort $host test -e $installPath; then
+    ssh -o StrictHostKeyChecking=no -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
   fi
 
   echo "scp dirs to $host/$installPath starting"

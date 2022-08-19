@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -81,7 +81,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
         if (killCommand == null) {
             logger.error("task kill request command is null");
@@ -90,8 +90,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         logger.info("task kill command : {}", killCommand);
 
         int taskInstanceId = killCommand.getTaskInstanceId();
-        TaskExecutionContext taskExecutionContext
-            = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        TaskExecutionContext taskExecutionContext =
+                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
             logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
             return;
@@ -101,17 +101,19 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         if (processId == 0) {
             this.cancelApplication(taskInstanceId);
             workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.KILL);
+            taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
             sendTaskKillResponseCommand(channel, taskExecutionContext);
             logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
             return;
         }
 
+        // if processId > 0, it should call cancelApplication to cancel remote application too.
+        this.cancelApplication(taskInstanceId);
         Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
 
         taskExecutionContext.setCurrentExecutionStatus(
-            result.getLeft() ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE);
+                result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
         sendTaskKillResponseCommand(channel, taskExecutionContext);
 
@@ -129,6 +131,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         taskKillResponseCommand.setHost(taskExecutionContext.getHost());
         taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
         channel.writeAndFlush(taskKillResponseCommand.convert2Command()).addListener(new ChannelFutureListener() {
+
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {

@@ -1,6 +1,6 @@
 # Dolphin Scheduler UI
 
-> Brand new UI management system (Beta).
+> Brand new UI management system (V3.0.0-Release).
 > 
 > Compared with the old `UI`, it will be more standardized, and it will also have a more complete type checking mechanism. At the same time, its speed has made a qualitative leap.
 >

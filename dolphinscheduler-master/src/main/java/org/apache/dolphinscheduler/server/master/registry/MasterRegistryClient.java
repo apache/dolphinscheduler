@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_NODE;
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
-
-import org.apache.dolphinscheduler.common.Constants;
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -32,21 +29,18 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.service.FailoverService;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.time.Duration;
-import java.util.Collections;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Sets;
+import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_NODE;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 /**
  * <p>DolphinScheduler master register client, used to connect to registry and hand the registry events.
@@ -55,48 +49,36 @@ import com.google.common.collect.Sets;
 @Component
 public class MasterRegistryClient implements AutoCloseable {
 
-    /**
-     * logger
-     */
     private static final Logger logger = LoggerFactory.getLogger(MasterRegistryClient.class);
 
-    /**
-     * failover service
-     */
     @Autowired
     private FailoverService failoverService;
 
     @Autowired
     private RegistryClient registryClient;
 
-    /**
-     * master config
-     */
     @Autowired
     private MasterConfig masterConfig;
 
-    /**
-     * heartbeat executor
-     */
+    @Autowired
+    private MasterConnectStrategy masterConnectStrategy;
+
     private ScheduledExecutorService heartBeatExecutor;
 
     /**
      * master startup time, ms
      */
     private long startupTime;
-    private String masterAddress;
-
-    public void init() {
-        this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
-        this.startupTime = System.currentTimeMillis();
-        this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-    }
 
     public void start() {
         try {
+            this.startupTime = System.currentTimeMillis();
+            this.heartBeatExecutor =
+                    Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
             // master registry
             registry();
-            registryClient.addConnectionStateListener(new MasterConnectionStateListener(getCurrentNodePath(), registryClient));
+            registryClient.addConnectionStateListener(
+                    new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -137,11 +119,8 @@ public class MasterRegistryClient implements AutoCloseable {
         try {
             if (!registryClient.exists(path)) {
                 logger.info("path: {} not exists", path);
-                // handle dead server
-                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
             }
-
-            //failover server
+            // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
@@ -169,11 +148,9 @@ public class MasterRegistryClient implements AutoCloseable {
                 }
                 if (!registryClient.exists(path)) {
                     logger.info("path: {} not exists", path);
-                    // handle dead server
-                    registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
                 }
             }
-            //failover server
+            // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
@@ -186,16 +163,14 @@ public class MasterRegistryClient implements AutoCloseable {
      * Registry the current master server itself to registry.
      */
     void registry() {
-        logger.info("Master node : {} registering to registry center", masterAddress);
-        String localNodePath = getCurrentNodePath();
+        logger.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
+        String localNodePath = masterConfig.getMasterRegistryNodePath();
         Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                                                        masterConfig.getMaxCpuLoadAvg(),
-                                                        masterConfig.getReservedMemory(),
-                                                        Sets.newHashSet(localNodePath),
-                                                        Constants.MASTER_TYPE,
-                                                        registryClient,
-                                                        masterConfig.getHeartbeatErrorThreshold());
+                masterConfig.getMaxCpuLoadAvg(),
+                masterConfig.getReservedMemory(),
+                Sets.newHashSet(localNodePath),
+                registryClient);
 
         // remove before persist
         registryClient.remove(localNodePath);
@@ -209,41 +184,23 @@ public class MasterRegistryClient implements AutoCloseable {
         // sleep 1s, waiting master failover remove
         ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
-        // delete dead server
-        registryClient.handleDeadServer(Collections.singleton(localNodePath), NodeType.MASTER, Constants.DELETE_OP);
-
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, masterHeartbeatInterval.getSeconds(), TimeUnit.SECONDS);
-        logger.info("Master node : {} registered to registry center successfully with heartBeatInterval : {}s", masterAddress, masterHeartbeatInterval);
+        this.heartBeatExecutor.scheduleWithFixedDelay(heartBeatTask, 0L, masterHeartbeatInterval.getSeconds(),
+                TimeUnit.SECONDS);
+        logger.info("Master node : {} registered to registry center successfully with heartBeatInterval : {}s",
+                masterConfig.getMasterAddress(), masterHeartbeatInterval);
 
     }
 
     public void deregister() {
         try {
-            String address = getLocalAddress();
-            String localNodePath = getCurrentNodePath();
-            registryClient.remove(localNodePath);
-            logger.info("Master node : {} unRegistry to register center.", address);
+            registryClient.remove(masterConfig.getMasterRegistryNodePath());
+            logger.info("Master node : {} unRegistry to register center.", masterConfig.getMasterAddress());
             heartBeatExecutor.shutdown();
             logger.info("MasterServer heartbeat executor shutdown");
             registryClient.close();
         } catch (Exception e) {
             logger.error("MasterServer remove registry path exception ", e);
         }
-    }
-
-    /**
-     * get master path
-     */
-    private String getCurrentNodePath() {
-        String address = getLocalAddress();
-        return REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + address;
-    }
-
-    /**
-     * get local address
-     */
-    private String getLocalAddress() {
-        return NetUtils.getAddr(masterConfig.getListenPort());
     }
 
 }
