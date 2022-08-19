@@ -80,7 +80,6 @@ public class MasterRegistryClientTest {
         given(registryClient.getStoppable()).willReturn(cause -> {
 
         });
-        doNothing().when(registryClient).handleDeadServer(Mockito.anySet(), Mockito.any(NodeType.class), Mockito.anyString());
         ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
 
         ProcessInstance processInstance = new ProcessInstance();
@@ -89,13 +88,15 @@ public class MasterRegistryClientTest {
         processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
-        given(processService.queryNeedFailoverProcessInstances(Mockito.anyString())).willReturn(Arrays.asList(processInstance));
+        given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
+                .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setStartTime(new Date());
         taskInstance.setHost("127.0.0.1:8080");
-        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString())).willReturn(Arrays.asList(taskInstance));
+        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
+                .willReturn(Arrays.asList(taskInstance));
         given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(processInstance);
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
         Server server = new Server();
@@ -112,17 +113,10 @@ public class MasterRegistryClientTest {
     }
 
     @Test
-    public void handleConnectionStateTest() {
-        masterRegistryClient.handleConnectionState(ConnectionState.CONNECTED);
-        masterRegistryClient.handleConnectionState(ConnectionState.RECONNECTED);
-        masterRegistryClient.handleConnectionState(ConnectionState.SUSPENDED);
-    }
-
-    @Test
     public void removeNodePathTest() {
         masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, false);
         masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, true);
-        //Cannot mock static methods
+        // Cannot mock static methods
         masterRegistryClient.removeWorkerNodePath("/path", NodeType.WORKER, true);
     }
 }

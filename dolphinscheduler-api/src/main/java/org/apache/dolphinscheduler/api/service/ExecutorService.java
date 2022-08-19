@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public interface ExecutorService {
      * @param processDefinitionCode process definition code
      * @param cronTime cron time
      * @param commandType command type
-     * @param failureStrategy failuer strategy
+     * @param failureStrategy failure strategy
      * @param startNodeList start nodelist
      * @param taskDependType node dependency type
      * @param warningType warning type
@@ -73,9 +74,10 @@ public interface ExecutorService {
      * @param projectCode project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
+     * @param verison process definition version
      * @return check result code
      */
-    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode);
+    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode, Integer verison);
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
@@ -102,4 +104,37 @@ public interface ExecutorService {
      * @return check result
      */
     boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
+
+    /**
+     * force start Task Instance
+     * @param loginUser
+     * @param queueId
+     * @return
+     */
+    Map<String, Object> forceStartTaskInstance(User loginUser, int queueId);
+
+    /**
+     * query executing workflow data in Master memory
+     * @param processInstanceId
+     * @return
+     */
+    WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
+
+    /**
+     * execute stream task instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param warningGroupId notify group id
+     * @param workerGroup worker group name
+     * @param environmentCode environment code
+     * @param startParams the global param values which pass to new process instance
+     * @return execute process instance code
+     */
+    Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode,
+                                            long taskDefinitionCode, int taskDefinitionVersion,
+                                            int warningGroupId,
+                                            String workerGroup, Long environmentCode,
+                                            Map<String, String> startParams,
+                                            int dryRun);
 }

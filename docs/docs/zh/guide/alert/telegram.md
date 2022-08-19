@@ -1,14 +1,14 @@
 # Telegram
 
-如果您需要使用`Telegram`进行告警，请在告警实例管理模块创建告警实例，选择`Telegram`插件。
+如果您需要使用 `Telegram` 进行告警，请在告警实例管理模块创建告警实例，选择 `Telegram` 插件。
 
-`Telegram`的配置样例如下:
+`Telegram` 的配置样例如下:
 
-![telegram-plugin](/img/alert/telegram-plugin.png)
+![alert-telegram](../../../../img/new_ui/dev/alert/alert_telegram.png)
 
 参数配置:
 * WebHook:
-  > 使用 Telegram 的机器人，发送消息的WebHook。
+  > 使用 Telegram 的机器人，发送消息的 WebHook。
 * botToken
   > 创建 Telegram 的机器人，获取的访问令牌。
 * chatId
@@ -26,7 +26,7 @@
 * Password
   > 代理鉴权密码
 
-**注意**：用户配置的WebHook需要能够接收和使用与DolphinScheduler构造的HTTP POST请求BODY相同的结构，JSON结构如下：
+**注意**：用户配置的 WebHook 需要能够接收和使用与 DolphinScheduler 构造的 HTTP POST 请求 BODY 相同的结构，JSON 结构如下：
 
 ```json
 {

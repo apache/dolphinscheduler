@@ -17,16 +17,14 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
-
+import java.time.Duration;
 import java.util.regex.Pattern;
 
-/**
- * Constants
- */
 public final class Constants {
 
     private Constants() {
@@ -43,17 +41,13 @@ public final class Constants {
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
     public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
     public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
-    public static final String AWS_ACCESS_KEY_ID = "aws.access.key.id";
-    public static final String AWS_SECRET_ACCESS_KEY = "aws.secret.access.key";
-    public static final String AWS_REGION = "aws.region";
+    public static final String FORMAT_S_S_COLON = "%s:%s";
     public static final String FOLDER_SEPARATOR = "/";
 
     public static final String RESOURCE_TYPE_FILE = "resources";
@@ -64,13 +58,12 @@ public final class Constants {
 
     public static final String STORAGE_HDFS = "HDFS";
 
-    public static final String BUCKET_NAME = "dolphinscheduler-test";
+    public static final String EMPTY_STRING = "";
 
     /**
-     * fs.defaultFS
+     * resource.hdfs.fs.defaultFS
      */
-    public static final String FS_DEFAULT_FS = "fs.defaultFS";
-
+    public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
     /**
      * hadoop configuration
@@ -84,7 +77,6 @@ public final class Constants {
      */
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
 
-
     /**
      * yarn.application.status.address
      */
@@ -97,15 +89,15 @@ public final class Constants {
 
     /**
      * hdfs configuration
-     * hdfs.root.user
+     * resource.hdfs.root.user
      */
-    public static final String HDFS_ROOT_USER = "hdfs.root.user";
+    public static final String HDFS_ROOT_USER = "resource.hdfs.root.user";
 
     /**
      * hdfs/s3 configuration
-     * resource.upload.path
+     * resource.storage.upload.base.path
      */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
     /**
      * data basedir path
@@ -120,14 +112,15 @@ public final class Constants {
     /**
      * environment properties default path
      */
-    public static final String ENV_PATH = "env/dolphinscheduler_env.sh";
+    public static final String ENV_PATH = "dolphinscheduler_env.sh";
 
     /**
      * resource.view.suffixs
      */
     public static final String RESOURCE_VIEW_SUFFIXES = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
+    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE =
+            "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -149,7 +142,8 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
-    public static final String AWS_END_POINT = "aws.endpoint";
+    public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
+    public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
     /**
      * comma ,
      */
@@ -159,6 +153,11 @@ public final class Constants {
      * COLON :
      */
     public static final String COLON = ":";
+
+    /**
+     * period .
+     */
+    public static final String PERIOD = ".";
 
     /**
      * QUESTION ?
@@ -209,11 +208,14 @@ public final class Constants {
      * date format of yyyyMMddHHmmssSSS
      */
     public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+
+    public static final String IMPORT_SUFFIX = "_import_";
+
+    public static final String COPY_SUFFIX = "_copy_";
     /**
      * http connect time out
      */
     public static final int HTTP_CONNECT_TIMEOUT = 60 * 1000;
-
 
     /**
      * http connect request time out
@@ -260,12 +262,10 @@ public final class Constants {
      */
     public static final int READ_PERMISSION = 2;
 
-
     /**
      * write permission
      */
     public static final int WRITE_PERMISSION = 2 * 2;
-
 
     /**
      * execute permission
@@ -281,7 +281,6 @@ public final class Constants {
      * default hash map size
      */
     public static final int DEFAULT_HASH_MAP_SIZE = 16;
-
 
     /**
      * all permissions
@@ -363,6 +362,11 @@ public final class Constants {
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
 
     /**
+     * complement data Schedule date
+     */
+    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST = "complementScheduleDateList";
+
+    /**
      * complement date default cron string
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
@@ -370,27 +374,29 @@ public final class Constants {
     /**
      * sleep 1000ms
      */
-    public static final int SLEEP_TIME_MILLIS = 1000;
+    public static final long SLEEP_TIME_MILLIS = 1_000L;
 
     /**
      * short sleep 100ms
      */
-    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
+    public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
+
+    public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
 
     /**
      * one second mils
      */
-    public static final int SECOND_TIME_MILLIS = 1000;
+    public static final long SECOND_TIME_MILLIS = 1_000L;
 
     /**
      * master task instance cache-database refresh interval
      */
-    public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
+    public static final long CACHE_REFRESH_TIME_MILLIS = 20 * 1_000L;
 
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 13;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 14;
 
     /**
      * jar
@@ -421,6 +427,8 @@ public final class Constants {
      * process or task definition failure
      */
     public static final int DEFINITION_FAILURE = -1;
+
+    public static final int OPPOSITE_VALUE = -1;
 
     /**
      * process or task definition first version
@@ -494,26 +502,6 @@ public final class Constants {
      */
     public static final String UNDERLINE = "_";
     /**
-     * quartz job prifix
-     */
-    public static final String QUARTZ_JOB_PREFIX = "job";
-    /**
-     * quartz job group prifix
-     */
-    public static final String QUARTZ_JOB_GROUP_PREFIX = "jobgroup";
-    /**
-     * projectId
-     */
-    public static final String PROJECT_ID = "projectId";
-    /**
-     * processId
-     */
-    public static final String SCHEDULE_ID = "scheduleId";
-    /**
-     * schedule
-     */
-    public static final String SCHEDULE = "schedule";
-    /**
      * application regex
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
@@ -584,7 +572,6 @@ public final class Constants {
     public static final String DEPENDENT_SPLIT = ":||";
     public static final long DEPENDENT_ALL_TASK_CODE = 0;
 
-
     /**
      * preview schedule execute count
      */
@@ -618,7 +605,8 @@ public final class Constants {
     /**
      * hadoop.security.authentication
      */
-    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+            "hadoop.security.authentication.startup.state";
 
     /**
      * com.amazonaws.services.s3.enableV4
@@ -635,28 +623,29 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
+    public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
+
     /**
      * task log info format
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
     public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITING_THREAD.ordinal(),
-            ExecutionStatus.WAITING_DEPEND.ordinal()
+            WorkflowExecutionStatus.SUBMITTED_SUCCESS.getCode(),
+            TaskExecutionStatus.DISPATCH.getCode(),
+            WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
+            WorkflowExecutionStatus.DELAY_EXECUTION.getCode(),
+            WorkflowExecutionStatus.READY_PAUSE.getCode(),
+            WorkflowExecutionStatus.READY_STOP.getCode(),
+            TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),
     };
 
     public static final int[] RUNNING_PROCESS_STATE = new int[]{
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.DISPATCH.ordinal(),
-            ExecutionStatus.SERIAL_WAIT.ordinal()
+            TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
+            TaskExecutionStatus.SUBMITTED_SUCCESS.getCode(),
+            TaskExecutionStatus.DISPATCH.getCode(),
+            WorkflowExecutionStatus.SERIAL_WAIT.getCode()
     };
 
     /**
@@ -683,7 +672,6 @@ public final class Constants {
      * current page no
      */
     public static final String PAGE_NUMBER = "pageNo";
-
 
     /**
      *
@@ -739,7 +727,8 @@ public final class Constants {
     /**
      * dataSource sensitive param
      */
-    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
+    public static final String DATASOURCE_PASSWORD_REGEX =
+            "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
 
     /**
      * default worker group
@@ -777,12 +766,14 @@ public final class Constants {
     /**
      * network interface preferred
      */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED = "dolphin.scheduler.network.interface.preferred";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
+            "dolphin.scheduler.network.interface.preferred";
 
     /**
      * network IP gets priority, default inner outer
      */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
+            "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -794,7 +785,8 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
+            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag
@@ -813,8 +805,44 @@ public final class Constants {
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
-    public static final String K8S = "k8s";
+    public static final String CLUSTER = "cluster";
     public static final String LIMITS_CPU = "limitsCpu";
     public static final String LIMITS_MEMORY = "limitsMemory";
-    public static final String K8S_LOCAL_TEST_CLUSTER = "ds_null_k8s";
+    public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
+
+    /**
+     * schedule timezone
+     */
+    public static final String SCHEDULE_TIMEZONE = "schedule_timezone";
+    public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 128;
+
+    /**
+     * tenant
+     */
+    public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
+
+    /**
+     * schedule time  the amount of date data is too large, affecting the memory, so set 100
+     */
+    public static final int SCHEDULE_TIME_MAX_LENGTH = 100;
+
+    /**
+     * password max and min LENGTH
+     */
+    public static final int USER_PASSWORD_MAX_LENGTH = 20;
+
+    public static final int USER_PASSWORD_MIN_LENGTH = 2;
+
+    public static final String FUNCTION_START_WITH = "$";
+
+    public static final Integer DEFAULT_QUEUE_ID = 1;
+
+    /**
+     * Security authentication types (supported types: PASSWORD,LDAP)
+     */
+    public static final String SECURITY_CONFIG_TYPE = "securityConfigType";
+
+    public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
+
+    public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
 }

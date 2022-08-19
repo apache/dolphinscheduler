@@ -20,9 +20,9 @@
 from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.models.base import Base
 
 
 class SwitchBranch(Base):
@@ -129,7 +129,11 @@ class SwitchCondition(Base):
 
 
 class Switch(Task):
-    """Task switch object, declare behavior for switch task to dolphinscheduler."""
+    """Task switch object, declare behavior for switch task to dolphinscheduler.
+
+    Param of process definition or at least one local param of task must be set
+    if task `switch` in this workflow.
+    """
 
     def __init__(self, name: str, condition: SwitchCondition, *args, **kwargs):
         super().__init__(name, TaskType.SWITCH, *args, **kwargs)

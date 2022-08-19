@@ -17,20 +17,8 @@
 
 package org.apache.dolphinscheduler.service.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
-import static org.apache.dolphinscheduler.common.Constants.COLON;
-import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
-import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
-import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
-
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Strings;
+import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -41,7 +29,11 @@ import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -53,16 +45,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.dolphinscheduler.common.Constants.COLON;
+import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 @Component
 public class RegistryClient {
+
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
     private static final String EMPTY = "";
@@ -77,6 +69,10 @@ public class RegistryClient {
     @PostConstruct
     public void afterConstruct() {
         initNodes();
+    }
+
+    public void connectUntilTimeout(@NonNull Duration duration) throws RegistryException {
+        registry.connectUntilTimeout(duration);
     }
 
     public int getActiveMasterNum() {
@@ -143,33 +139,8 @@ public class RegistryClient {
 
     public boolean checkNodeExists(String host, NodeType nodeType) {
         return getServerMaps(nodeType, true).keySet()
-                                            .stream()
-                                            .anyMatch(it -> it.contains(host));
-    }
-
-    public void handleDeadServer(Collection<String> nodes, NodeType nodeType, String opType) {
-        nodes.forEach(node -> {
-            final String host = getHostByEventDataPath(node);
-            final String type = nodeType == NodeType.MASTER ? MASTER_TYPE : WORKER_TYPE;
-
-            if (opType.equals(DELETE_OP)) {
-                removeDeadServerByHost(host, type);
-            } else if (opType.equals(ADD_OP)) {
-                String deadServerPath = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + type + UNDERLINE + host;
-                // Add dead server info to zk dead server path : /dead-servers/
-                registry.put(deadServerPath, type + UNDERLINE + host, false);
-                logger.info("{} server dead , and {} added to zk dead server path success", nodeType, node);
-            }
-        });
-    }
-
-    public boolean checkIsDeadServer(String node, String serverType) {
-        // ip_sequence_no
-        String[] zNodesPath = node.split("/");
-        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
-        String deadServerPath = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
-
-        return !exists(node) || exists(deadServerPath);
+                .stream()
+                .anyMatch(it -> it.contains(host));
     }
 
     public Collection<String> getMasterNodesDirectly() {
@@ -272,7 +243,6 @@ public class RegistryClient {
     private void initNodes() {
         registry.put(REGISTRY_DOLPHINSCHEDULER_MASTERS, EMPTY, false);
         registry.put(REGISTRY_DOLPHINSCHEDULER_WORKERS, EMPTY, false);
-        registry.put(REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, EMPTY, false);
     }
 
     private String rootNodePath(NodeType type) {
@@ -281,8 +251,6 @@ public class RegistryClient {
                 return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
             case WORKER:
                 return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-            case DEAD_SERVER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
             default:
                 throw new IllegalStateException("Should not reach here");
         }
@@ -294,25 +262,9 @@ public class RegistryClient {
         if (nodeType != NodeType.WORKER) {
             return serverList;
         }
-        return serverList.stream().flatMap(group ->
-            getChildrenKeys(path + SINGLE_SLASH + group)
+        return serverList.stream().flatMap(group -> getChildrenKeys(path + SINGLE_SLASH + group)
                 .stream()
-                .map(it -> group + SINGLE_SLASH + it)
-        ).collect(Collectors.toList());
+                .map(it -> group + SINGLE_SLASH + it)).collect(Collectors.toList());
     }
 
-    private void removeDeadServerByHost(String host, String serverType) {
-        Collection<String> deadServers = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS);
-        for (String serverPath : deadServers) {
-            if (serverPath.startsWith(serverType + UNDERLINE + host)) {
-                String server = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + serverPath;
-                remove(server);
-                logger.info("{} server {} deleted from zk dead server path success", serverType, host);
-            }
-        }
-    }
-
-    public Duration getSessionTimeout() {
-        return registry.getSessionTimeout();
-    }
 }

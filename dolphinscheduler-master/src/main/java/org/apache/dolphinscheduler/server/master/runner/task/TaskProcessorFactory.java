@@ -18,38 +18,66 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_STREAM;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import lombok.experimental.UtilityClass;
+
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 /**
  * the factory to create task processor
  */
-public class TaskProcessorFactory {
+@UtilityClass
+public final class TaskProcessorFactory {
 
-    public static final Map<String, ITaskProcessor> PROCESS_MAP = new ConcurrentHashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(TaskProcessorFactory.class);
+
+    public static final Map<String, Constructor<ITaskProcessor>> PROCESS_MAP = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_PROCESSOR = COMMON_TASK_TYPE;
 
     static {
         for (ITaskProcessor iTaskProcessor : ServiceLoader.load(ITaskProcessor.class)) {
-            PROCESS_MAP.put(iTaskProcessor.getType(), iTaskProcessor);
+            try {
+                PROCESS_MAP.put(iTaskProcessor.getType(), (Constructor<ITaskProcessor>) iTaskProcessor.getClass().getConstructor());
+            } catch (NoSuchMethodException e) {
+                throw new IllegalArgumentException("The task processor should has a no args constructor", e);
+            }
         }
     }
 
-    public static ITaskProcessor getTaskProcessor(String type) throws InstantiationException, IllegalAccessException {
+    public static ITaskProcessor getTaskProcessor(String type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         if (StringUtils.isEmpty(type)) {
             type = DEFAULT_PROCESSOR;
         }
-        ITaskProcessor iTaskProcessor = PROCESS_MAP.get(type);
-        if (Objects.isNull(iTaskProcessor)) {
-            iTaskProcessor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
+        Constructor<ITaskProcessor> iTaskProcessorConstructor = PROCESS_MAP.get(type);
+        if (iTaskProcessorConstructor == null) {
+            iTaskProcessorConstructor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
         }
 
-        return iTaskProcessor.getClass().newInstance();
+        return iTaskProcessorConstructor.newInstance();
     }
+
+    /**
+     * if match master processor, then this task type is processed on the master
+     *
+     * @param type
+     * @return
+     */
+    public static boolean isMasterTask(String type) {
+        return PROCESS_MAP.containsKey(type);
+    }
+
 }

@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -82,8 +82,9 @@ public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * create function format
+     * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
      */
-    private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
+    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT = "create or replace temporary function {0} as ''{1}''";
 
     /**
      * default query sql limit
@@ -136,7 +137,11 @@ public class SqlTask extends AbstractTaskExecutor {
                     sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
-            SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
+            List<SqlBinds> mainStatementSqlBinds = SqlSplitter.split(sqlParameters.getSql(), sqlParameters.getSegmentSeparator())
+                    .stream()
+                    .map(this::getSqlAndSqlParamsMap)
+                    .collect(Collectors.toList());
+
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
                     .orElse(new ArrayList<>())
                     .stream()
@@ -151,13 +156,13 @@ public class SqlTask extends AbstractTaskExecutor {
             List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncParametersList(), logger);
 
             // execute sql task
-            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
 
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("sql task error: {}", e.toString());
+            logger.error("sql task error", e);
             throw e;
         }
     }
@@ -165,18 +170,16 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * execute function and sql
      *
-     * @param mainSqlBinds main sql binds
+     * @param mainStatementsBinds main statements binds
      * @param preStatementsBinds pre statements binds
      * @param postStatementsBinds post statements binds
      * @param createFuncs create functions
      */
-    public void executeFuncAndSql(SqlBinds mainSqlBinds,
+    public void executeFuncAndSql(List<SqlBinds> mainStatementsBinds,
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
-        PreparedStatement stmt = null;
-        ResultSet resultSet = null;
         try {
 
             // create connection
@@ -186,36 +189,30 @@ public class SqlTask extends AbstractTaskExecutor {
                 createTempFunction(connection, createFuncs);
             }
 
-            // pre sql
-            preSql(connection, preStatementsBinds);
-            stmt = prepareStatementAndBind(connection, mainSqlBinds);
+            // pre execute
+            executeUpdate(connection, preStatementsBinds, "pre");
 
+            // main execute
             String result = null;
-            //hive log listener
-            if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
-                logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
-                HiveSqlLogThread queryThread = new HiveSqlLogThread(stmt, logger,taskExecutionContext);
-                queryThread.start();
-            }
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
-                resultSet = stmt.executeQuery();
-                result = resultProcess(resultSet);
-
+                result = executeQuery(connection, mainStatementsBinds.get(0), "main");
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
-                String updateResult = String.valueOf(stmt.executeUpdate());
+                String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
             //deal out params
             sqlParameters.dealOutParam(result);
-            postSql(connection, postStatementsBinds);
+
+            // post execute
+            executeUpdate(connection, postStatementsBinds, "post");
         } catch (Exception e) {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
         } finally {
-            close(resultSet, stmt, connection);
+            close(connection);
         }
     }
 
@@ -294,52 +291,37 @@ public class SqlTask extends AbstractTaskExecutor {
         setTaskAlertInfo(taskAlertInfo);
     }
 
-    /**
-     * pre sql
-     *
-     * @param connection connection
-     * @param preStatementsBinds preStatementsBinds
-     */
-    private void preSql(Connection connection,
-                        List<SqlBinds> preStatementsBinds) throws Exception {
-        for (SqlBinds sqlBind : preStatementsBinds) {
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
+    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+        try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
+            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
+            //hive log listener
+            if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
 
-                //hive log listener
-                if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
-                    logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
-
-                    HiveSqlLogThread queryThread = new HiveSqlLogThread(pstmt, logger,taskExecutionContext);
-                    queryThread.start();
-                }
-                int result = pstmt.executeUpdate();
-                logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
-
+                HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
+                queryThread.start();
             }
+            ResultSet resultSet = statement.executeQuery();
+            return resultProcess(resultSet);
         }
     }
 
-    /**
-     * post sql
-     *
-     * @param connection connection
-     * @param postStatementsBinds postStatementsBinds
-     */
-    private void postSql(Connection connection,
-                         List<SqlBinds> postStatementsBinds) throws Exception {
-        for (SqlBinds sqlBind : postStatementsBinds) {
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
+    private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
+        int result = 0;
+        for (SqlBinds sqlBind : statementsBinds) {
+            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
                 //hive log listener
                 if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
                     logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
 
-                    HiveSqlLogThread queryThread = new HiveSqlLogThread(pstmt, logger,taskExecutionContext);
+                    HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
                     queryThread.start();
                 }
-                int result = pstmt.executeUpdate();
-                logger.info("post statement execute result: {},for sql: {}", result, sqlBind.getSql());
+                result = statement.executeUpdate();
+                logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sqlBind.getSql());
             }
         }
+        return String.valueOf(result);
     }
 
     /**
@@ -361,29 +343,9 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * close jdbc resource
      *
-     * @param resultSet resultSet
-     * @param pstmt pstmt
      * @param connection connection
      */
-    private void close(ResultSet resultSet,
-                       PreparedStatement pstmt,
-                       Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                logger.error("close result set error : {}", e.getMessage(), e);
-            }
-        }
-
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                logger.error("close prepared statement error : {}", e.getMessage(), e);
-            }
-        }
-
+    private void close(Connection connection) {
         if (connection != null) {
             try {
                 connection.close();
@@ -422,7 +384,6 @@ public class SqlTask extends AbstractTaskExecutor {
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
         }
-
     }
 
     /**
@@ -457,7 +418,7 @@ public class SqlTask extends AbstractTaskExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -482,9 +443,10 @@ public class SqlTask extends AbstractTaskExecutor {
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
         String formatSql = sql.replaceAll(rgex, "?");
+        // Convert the list parameter
+        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
         sqlBuilder.append(formatSql);
-
-        // print repalce sql
+        // print replace sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
@@ -532,7 +494,7 @@ public class SqlTask extends AbstractTaskExecutor {
      */
     private List<String> buildTempFuncSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> MessageFormat
-                .format(CREATE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
+                .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
     }
 
     /**
@@ -552,3 +514,4 @@ public class SqlTask extends AbstractTaskExecutor {
     }
 
 }
+

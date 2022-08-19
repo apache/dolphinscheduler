@@ -73,10 +73,10 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
     datasource.properties: database connection information 
     zookeeper.properties: information for connecting zk 
     common.properties: Configuration information about the resource store (if hadoop is set up, please check if the core-site.xml and hdfs-site.xml configuration files exist).
-    env/dolphinscheduler_env.sh: environment Variables
+    dolphinscheduler_env.sh: environment Variables
     ````
 
-- Modify the `dolphinscheduler_env.sh` environment variable in the `conf/env` directory according to the machine configuration (the following is the example that all the used software install under `/opt/soft`)
+- Modify the `dolphinscheduler_env.sh` environment variable in the `bin/env/dolphinscheduler_env.sh` directory according to the machine configuration (the following is the example that all the used software install under `/opt/soft`)
 
     ```shell
         export HADOOP_HOME=/opt/soft/hadoop
@@ -137,19 +137,19 @@ sudo chown -R dolphinscheduler:dolphinscheduler dolphinscheduler
 
 bin/stop-all.sh # stop all services
 
-sh bin/dolphinscheduler-daemon.sh stop master-server  # stop master service
-sh bin/dolphinscheduler-daemon.sh stop worker-server  # stop worker service
-sh bin/dolphinscheduler-daemon.sh stop api-server     # stop api    service
-sh bin/dolphinscheduler-daemon.sh stop alert-server   # stop alert  service
+bash bin/dolphinscheduler-daemon.sh stop master-server  # stop master service
+bash bin/dolphinscheduler-daemon.sh stop worker-server  # stop worker service
+bash bin/dolphinscheduler-daemon.sh stop api-server     # stop api    service
+bash bin/dolphinscheduler-daemon.sh stop alert-server   # stop alert  service
 
 
 # start command::
 bin/start-all.sh # start all services
 
-sh bin/dolphinscheduler-daemon.sh start master-server  # start master service
-sh bin/dolphinscheduler-daemon.sh start worker-server  # start worker service
-sh bin/dolphinscheduler-daemon.sh start api-server     # start api    service
-sh bin/dolphinscheduler-daemon.sh start alert-server   # start alert  service
+bash bin/dolphinscheduler-daemon.sh start master-server  # start master service
+bash bin/dolphinscheduler-daemon.sh start worker-server  # start worker service
+bash bin/dolphinscheduler-daemon.sh start api-server     # start api    service
+bash bin/dolphinscheduler-daemon.sh start alert-server   # start alert  service
 
 ```
 
@@ -194,19 +194,19 @@ There are two steps for shrinking. After performing the following two steps, the
 # stop command:
 bin/stop-all.sh # stop all services
 
-sh bin/dolphinscheduler-daemon.sh stop master-server  # stop master service
-sh bin/dolphinscheduler-daemon.sh stop worker-server  # stop worker service
-sh bin/dolphinscheduler-daemon.sh stop api-server     # stop api    service
-sh bin/dolphinscheduler-daemon.sh stop alert-server   # stop alert  service
+bash bin/dolphinscheduler-daemon.sh stop master-server  # stop master service
+bash bin/dolphinscheduler-daemon.sh stop worker-server  # stop worker service
+bash bin/dolphinscheduler-daemon.sh stop api-server     # stop api    service
+bash bin/dolphinscheduler-daemon.sh stop alert-server   # stop alert  service
 
 
 # start command:
 bin/start-all.sh # start all services
 
-sh bin/dolphinscheduler-daemon.sh start master-server # start master service
-sh bin/dolphinscheduler-daemon.sh start worker-server # start worker service
-sh bin/dolphinscheduler-daemon.sh start api-server    # start api    service
-sh bin/dolphinscheduler-daemon.sh start alert-server  # start alert  service
+bash bin/dolphinscheduler-daemon.sh start master-server # start master service
+bash bin/dolphinscheduler-daemon.sh start worker-server # start worker service
+bash bin/dolphinscheduler-daemon.sh start api-server    # start api    service
+bash bin/dolphinscheduler-daemon.sh start alert-server  # start alert  service
 
 ```
 

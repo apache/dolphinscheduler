@@ -71,7 +71,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
     datasource.properties 中的数据库连接信息. 
     zookeeper.properties 中的连接zk的信息.
     common.properties 中关于资源存储的配置信息(如果设置了hadoop,请检查是否存在core-site.xml和hdfs-site.xml配置文件).
-    env/dolphinscheduler_env.sh 中的环境变量
+    dolphinscheduler_env.sh 中的环境变量
     ````
 
 - 根据机器配置,修改 conf/env 目录下的 `dolphinscheduler_env.sh` 环境变量(以相关用到的软件都安装在/opt/soft下为例)
@@ -136,19 +136,19 @@ sudo chown -R dolphinscheduler:dolphinscheduler dolphinscheduler
 停止命令:
 bin/stop-all.sh 停止所有服务
 
-sh bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
-sh bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
-sh bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
-sh bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
+bash bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
+bash bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
+bash bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
+bash bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
 
 
 启动命令:
 bin/start-all.sh 启动所有服务
 
-sh bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
-sh bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
-sh bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
-sh bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
+bash bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
+bash bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
+bash bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
+bash bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 
 ```
 
@@ -191,19 +191,19 @@ sh bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 停止命令:
 bin/stop-all.sh 停止所有服务
 
-sh bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
-sh bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
-sh bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
-sh bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
+bash bin/dolphinscheduler-daemon.sh stop master-server  停止 master 服务
+bash bin/dolphinscheduler-daemon.sh stop worker-server  停止 worker 服务
+bash bin/dolphinscheduler-daemon.sh stop api-server     停止 api    服务
+bash bin/dolphinscheduler-daemon.sh stop alert-server   停止 alert  服务
 
 
 启动命令:
 bin/start-all.sh 启动所有服务
 
-sh bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
-sh bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
-sh bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
-sh bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
+bash bin/dolphinscheduler-daemon.sh start master-server  启动 master 服务
+bash bin/dolphinscheduler-daemon.sh start worker-server  启动 worker 服务
+bash bin/dolphinscheduler-daemon.sh start api-server     启动 api    服务
+bash bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 
 ```
 
