@@ -63,7 +63,7 @@
                 <file>${log.base}/${taskAppId}.log</file>
                 <encoder>
                     <pattern>
-                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %messsage%n
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %messsage%n
                     </pattern>
                     <charset>UTF-8</charset>
                 </encoder>
