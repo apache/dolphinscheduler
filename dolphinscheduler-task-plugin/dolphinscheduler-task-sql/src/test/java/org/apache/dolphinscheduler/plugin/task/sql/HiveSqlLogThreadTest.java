@@ -94,7 +94,7 @@ public class HiveSqlLogThreadTest {
                 LOGGER.info("---------{}--------",res.getInt(1));
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error(sql+" query failed" , e);
         }
 

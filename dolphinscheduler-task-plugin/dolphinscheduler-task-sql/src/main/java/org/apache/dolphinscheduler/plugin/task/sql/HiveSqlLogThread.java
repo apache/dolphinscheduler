@@ -62,7 +62,6 @@ public class HiveSqlLogThread extends Thread {
                     threadLogger.info(log);
 
                     List<String> appIds = LoggerUtils.getAppIds(log, threadLogger);
-
                     //get sql task yarn's application_id
                     if (!appIds.isEmpty()) {
                         taskExecutionContext.setAppIds(String.join(",", appIds));
