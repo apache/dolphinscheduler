@@ -39,15 +39,6 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../script/env</directory>
-            <outputDirectory>bin</outputDirectory>
-            <includes>
-                <include>dolphinscheduler_env.sh</include>
-            </includes>
-            <fileMode>0755</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
             <directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
             <includes>
                 <include>sql/**/*</include>

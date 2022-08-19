@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -41,10 +42,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * query task definition by name
      *
      * @param projectCode projectCode
+     * @param processCode processCode
      * @param name name
      * @return task definition
      */
     TaskDefinition queryByName(@Param("projectCode") long projectCode,
+                               @Param("processCode") long processCode,
                                @Param("name") String name);
 
     /**
@@ -111,13 +114,15 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
+     * @param taskExecuteType taskExecuteType
      * @return task main info IPage
      */
     IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
                                               @Param("projectCode") long projectCode,
                                               @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
-                                              @Param("taskType") String taskType);
+                                              @Param("taskType") String taskType,
+                                              @Param("taskExecuteType")TaskExecuteType taskExecuteType);
 
     /**
      * query task definition by code list

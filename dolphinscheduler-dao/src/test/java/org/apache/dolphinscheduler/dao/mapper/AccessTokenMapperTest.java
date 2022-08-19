@@ -30,9 +30,12 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -83,7 +86,6 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         int deleteCount = accessTokenMapper.deleteAccessTokenByUserId(userId);
         Assert.assertEquals(insertCount, deleteCount);
     }
-
 
     /**
      * test select by id
@@ -137,16 +139,26 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Integer size = 2;
 
         Map<Integer, AccessToken> accessTokenMap = createAccessTokens(count, userName);
+        Set<Integer> userIds = accessTokenMap.values().stream().map(AccessToken::getUserId).collect(Collectors.toSet());
+        Integer createTokenUserId = new ArrayList<>(userIds).get(0);
 
+        // general user and create token user
         Page page = new Page(offset, size);
-        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
-
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, createTokenUserId);
         assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()), size);
 
-        for (AccessToken accessToken : accessTokenPage.getRecords()) {
+        // admin user
+        IPage<AccessToken> adminAccessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
+        assertEquals(Integer.valueOf(adminAccessTokenPage.getRecords().size()), size);
+        for (AccessToken accessToken : adminAccessTokenPage.getRecords()) {
             AccessToken resultAccessToken = accessTokenMap.get(accessToken.getId());
             assertEquals(accessToken, resultAccessToken);
         }
+
+        // general user
+        Integer emptySize = 0;
+        IPage<AccessToken> generalAccessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 1);
+        assertEquals(Integer.valueOf(generalAccessTokenPage.getRecords().size()), emptySize);
     }
 
 

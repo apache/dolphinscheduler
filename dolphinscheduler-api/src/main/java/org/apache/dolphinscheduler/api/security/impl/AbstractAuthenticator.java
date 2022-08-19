@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.security.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.Authenticator;
+import org.apache.dolphinscheduler.api.security.SecurityConfig;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,7 +28,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,9 +41,13 @@ public abstract class AbstractAuthenticator implements Authenticator {
     private static final Logger logger = LoggerFactory.getLogger(AbstractAuthenticator.class);
 
     @Autowired
-    private UsersService userService;
+    protected UsersService userService;
+
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private SecurityConfig securityConfig;
 
     /**
      * user login and return user in db
@@ -78,8 +83,14 @@ public abstract class AbstractAuthenticator implements Authenticator {
             result.setMsg(Status.LOGIN_SESSION_FAILED.getMsg());
             return result;
         }
+
         logger.info("sessionId : {}", sessionId);
-        result.setData(Collections.singletonMap(Constants.SESSION_ID, sessionId));
+
+        Map<String, String> data = new HashMap<>();
+        data.put(Constants.SESSION_ID, sessionId);
+        data.put(Constants.SECURITY_CONFIG_TYPE, securityConfig.getType());
+
+        result.setData(data);
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.LOGIN_SUCCESS.getMsg());
         return result;

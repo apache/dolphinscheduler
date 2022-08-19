@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -169,54 +171,61 @@ public class DateUtilsTest {
     public void testFormat2Duration() {
 
         // days hours minutes seconds
-        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        Date d2 = DateUtils.stringToDate("2020-01-21 12:10:10");
-        String duration = DateUtils.format2Duration(d2, d1);
+        Date start = DateUtils.stringToDate("2020-01-20 11:00:00");
+        Date end = DateUtils.stringToDate("2020-01-21 12:10:10");
+        String duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1d 1h 10m 10s", duration);
 
         // hours minutes seconds
-        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        d2 = DateUtils.stringToDate("2020-01-20 12:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:00:00");
+        end = DateUtils.stringToDate("2020-01-20 12:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1h 10m 10s", duration);
 
         // minutes seconds
-        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:00:00");
+        end = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("10m 10s", duration);
 
         // minutes seconds
-        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
-        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("10s", duration);
 
-        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
-        d2 = DateUtils.stringToDate("2020-01-21 11:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-21 11:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1d 10s", duration);
 
-        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
-        d2 = DateUtils.stringToDate("2020-01-20 16:10:10");
-        duration = DateUtils.format2Duration(d2, d1);
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-20 16:10:10");
+        duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("5h 10s", duration);
 
-    }
+        // startTime = endTime, default 1s
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        end = DateUtils.stringToDate("2020-01-20 11:10:00");
+        duration = DateUtils.format2Duration(start, end);
+        Assert.assertEquals("1s", duration);
 
-    @Test
-    public void testNullDuration() {
-        // days hours minutes seconds
-        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
-        Date d2 = null;
-        Assert.assertNull(DateUtils.format2Duration(d1, d2));
+        // endTime is null, use current time
+        start = DateUtils.stringToDate("2020-01-20 11:10:00");
+        duration = DateUtils.format2Duration(start, null);
+        Assert.assertNotNull(duration);
     }
 
     @Test
     public void testTransformToTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
         Date date = new Date();
-        Date mst = DateUtils.getTimezoneDate(date, TimeZone.getDefault().getID());
-        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(mst));
+        Date defaultTimeZoneDate = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID());
+        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(defaultTimeZoneDate));
+
+        Date targetTimeZoneDate = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID(), "Asia/Shanghai");
+        Assert.assertEquals(DateUtils.dateToString(date, TimeZone.getDefault().getID()), DateUtils.dateToString(targetTimeZoneDate, "Asia/Shanghai"));
     }
 
     @Test
@@ -239,5 +248,16 @@ public class DateUtilsTest {
 
         Assert.assertEquals(Timer.ONE_HOUR * 8, utcDate.getTime() - shanghaiDate.getTime());
 
+    }
+
+    @Test
+    public void testDateToString() {
+        ZoneId asiaSh = ZoneId.of("Asia/Shanghai");
+        ZoneId utc = ZoneId.of("UTC");
+        ZonedDateTime asiaShNow = ZonedDateTime.now(asiaSh);
+        ZonedDateTime utcNow = asiaShNow.minusHours(8);
+        String asiaShNowStr = DateUtils.dateToString(utcNow, asiaSh);
+        String utcNowStr = DateUtils.dateToString(asiaShNow, utc);
+        Assert.assertEquals(asiaShNowStr, utcNowStr);
     }
 }

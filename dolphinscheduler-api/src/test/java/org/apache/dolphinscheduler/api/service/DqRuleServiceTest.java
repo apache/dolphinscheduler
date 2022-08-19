@@ -23,9 +23,11 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -42,6 +44,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 
@@ -55,7 +58,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -65,6 +71,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DqRuleServiceTest {
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
     private DqRuleServiceImpl dqRuleService;
@@ -80,6 +87,9 @@ public class DqRuleServiceTest {
 
     @Mock
     DataSourceMapper dataSourceMapper;
+
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Test
     public void testGetRuleFormCreateJsonById() {
@@ -118,13 +128,14 @@ public class DqRuleServiceTest {
 
         String searchVal = "";
         int ruleType = 0;
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
 
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, null, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0, baseServiceLogger)).thenReturn(true);
         Page<DqRule> page = new Page<>(1, 10);
         page.setTotal(1);
         page.setRecords(getRuleList());

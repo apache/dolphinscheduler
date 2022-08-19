@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +46,8 @@ import com.google.common.collect.Sets;
  */
 @Service
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
+
+    public static final Logger logger = LoggerFactory.getLogger(MonitorServiceImpl.class);
 
     @Autowired
     private MonitorDBDao monitorDBDao;
@@ -60,14 +64,10 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
         List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
-
         result.put(Constants.DATA_LIST, monitorRecordList);
         putMsg(result, Status.SUCCESS);
-
         return result;
-
     }
 
     /**
@@ -78,9 +78,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      */
     @Override
     public Map<String, Object> queryMaster(User loginUser) {
-
         Map<String, Object> result = new HashMap<>();
-
         List<Server> masterServers = getServerListFromRegistry(true);
         result.put(Constants.DATA_LIST, masterServers);
         putMsg(result, Status.SUCCESS);

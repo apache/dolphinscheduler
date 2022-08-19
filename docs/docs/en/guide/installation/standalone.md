@@ -2,13 +2,14 @@
 
 Standalone only for quick experience for DolphinScheduler.
 
-If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
+If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow Standalone deployment. If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
 
-> **_Note:_** Standalone only recommends the usage of fewer than 20 workflows, because it uses H2 Database, ZooKeeper Testing Server, too many tasks may cause instability.
+> **_Note:_** Standalone only recommends the usage of fewer than 20 workflows, because it uses in-memory H2 Database in default, ZooKeeper Testing Server, too many tasks may cause instability.
+> When Standalone stops or restarts, in-memory H2 database will clear up. To use Standalone with external databases like mysql or postgresql, please see [`Database Configuration`](#database-configuration).    
 
 ## Preparation
 
-* JDK：download [JDK][jdk] (1.8+), and configure `JAVA_HOME` to and `PATH` variable. You can skip this step if it already exists in your environment.
+* JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
 * Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/download.html).
 
 ## Start DolphinScheduler Standalone Server
@@ -21,12 +22,12 @@ There is a standalone startup script in the binary compressed package, which can
 # Extract and start Standalone Server
 tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
 cd apache-dolphinscheduler-*-bin
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```
 
 ### Login DolphinScheduler
 
-Access address `http://localhost:12345/dolphinscheduler` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
 
 ### Start or Stop Server
 
@@ -34,9 +35,9 @@ The script `./bin/dolphinscheduler-daemon.sh`can be used not only quickly start 
 
 ```shell
 # Start Standalone Server
-sh ./bin/dolphinscheduler-daemon.sh start standalone-server
+bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 # Stop Standalone Server
-sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
+bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 ```
 
 > Note: Python gateway service is started along with the api-server, and if you do not want to start Python gateway
@@ -44,3 +45,8 @@ sh ./bin/dolphinscheduler-daemon.sh stop standalone-server
 > path `api-server/conf/application.yaml`
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+## Database Configuration
+
+Standalone server use H2 database as its metadata store, it is easy and users do not need to start database before they set up server.
+But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database

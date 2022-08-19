@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -88,7 +88,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * @return session string
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public String createSession(User user, String ip) {
         Session session = null;
 

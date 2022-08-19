@@ -4,13 +4,10 @@
       "pattern": "^http://localhost"
     },
     {
-      "pattern": "^https://hive.apache.org"
-    },
-    {
-      "pattern": "^http://192"
-    },
-    {
       "pattern": "^https://img.shields.io/badge"
+    },
+    {
+      "pattern": "/community/community.html$"
     }
   ],
   "replacementPatterns": [
@@ -21,10 +18,6 @@
     {
       "pattern": "^/zh-cn/download/download.html$",
       "replacement": "https://dolphinscheduler.apache.org/zh-cn/download/download.html"
-    },
-    {
-      "pattern": "^/img",
-      "replacement": "{{BASEURL}}/docs/img"
     }
   ],
   "timeout": "10s",

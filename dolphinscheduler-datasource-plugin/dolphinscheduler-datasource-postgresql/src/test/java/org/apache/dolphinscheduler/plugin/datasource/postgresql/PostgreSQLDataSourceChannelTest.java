@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

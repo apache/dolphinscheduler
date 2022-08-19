@@ -18,31 +18,29 @@
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.HashMap;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * seatunnel task
@@ -62,7 +60,7 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     /**
      * taskExecutionContext
      */
-    private TaskExecutionContext taskExecutionContext;
+    protected final TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
@@ -80,12 +78,9 @@ public class SeatunnelTask extends AbstractTaskExecutor {
 
     @Override
     public void init() {
-        logger.info("seatunnel task params {}", taskExecutionContext.getTaskParams());
-
-        seatunnelParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SeatunnelParameters.class);
-
+        logger.info("SeaTunnel task params {}", taskExecutionContext.getTaskParams());
         if (!seatunnelParameters.checkParameters()) {
-            throw new RuntimeException("seatunnel task params is not valid");
+            throw new RuntimeException("SeaTunnel task params is not valid");
         }
     }
 
@@ -96,11 +91,11 @@ public class SeatunnelTask extends AbstractTaskExecutor {
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             seatunnelParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
-            logger.error("seatunnel task error", e);
+            logger.error("SeaTunnel task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         }
@@ -112,43 +107,61 @@ public class SeatunnelTask extends AbstractTaskExecutor {
         shellCommandExecutor.cancelApplication();
     }
 
-    /**
-     * create command
-     *
-     * @return file name
-     * @throws Exception exception
-     */
     private String buildCommand() throws Exception {
-        // generate scripts
-        String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
-        Path path = new File(fileName).toPath();
+        List<String> args = new ArrayList<>();
+        args.add(seatunnelParameters.getEngine().getCommand());
+        args.addAll(buildOptions());
 
-        if (Files.exists(path)) {
-            return fileName;
+        String command = String.join(" ", args);
+        logger.info("SeaTunnel task command: {}", command);
+
+        return command;
+    }
+
+    protected List<String> buildOptions() throws Exception {
+        List<String> args = new ArrayList<>();
+        if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
+            args.add(CONFIG_OPTIONS);
+            args.add(buildCustomConfigCommand());
+        } else {
+            seatunnelParameters.getResourceList().forEach(resourceInfo -> {
+                args.add(CONFIG_OPTIONS);
+                // TODO Currently resourceName is `/xxx.sh`, it has more `/` and needs to be optimized
+                args.add(resourceInfo.getResourceName().substring(1));
+            });
         }
+        return args;
+    }
 
+    protected String buildCustomConfigCommand() throws Exception {
+        String config = buildCustomConfigContent();
+        String filePath = buildConfigFilePath();
+        createConfigFileIfNotExists(config, filePath);
+
+        return filePath;
+    }
+
+    private String buildCustomConfigContent() {
+        logger.info("raw custom config content : {}", seatunnelParameters.getRawScript());
         String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", "\n");
         script = parseScript(script);
-        seatunnelParameters.setRawScript(script);
+        return script;
+    }
 
-        logger.info("raw script : {}", seatunnelParameters.getRawScript());
-        logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
+    private String buildConfigFilePath() {
+        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+    }
 
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
-        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+    private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
+        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
 
-        if (OSUtils.isWindows()) {
-            Files.createFile(path);
-        } else {
-            Files.createFile(path, attr);
+        if (!Files.exists(Paths.get(scriptFile))) {
+            logger.info("generate script file:{}", scriptFile);
+
+            // write data to file
+            FileUtils.writeStringToFile(new File(scriptFile), script, StandardCharsets.UTF_8);
         }
-
-        Files.write(path, seatunnelParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-
-        return fileName;
     }
 
     @Override
@@ -158,13 +171,11 @@ public class SeatunnelTask extends AbstractTaskExecutor {
 
     private String parseScript(String script) {
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
-        if (MapUtils.isEmpty(paramsMap)) {
-            paramsMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(taskExecutionContext.getParamsMap());
-        }
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+    }
+
+    public void setSeatunnelParameters(SeatunnelParameters seatunnelParameters) {
+        this.seatunnelParameters = seatunnelParameters;
     }
 }

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -53,10 +54,10 @@ public class UdfFuncMapperTest extends BaseDaoTest {
      *
      * @return UdfFunc
      */
-    private UdfFunc insertOne() {
+    private UdfFunc insertOne(String funcName) {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setUserId(1);
-        udfFunc.setFuncName("dolphin_udf_func");
+        udfFunc.setFuncName(funcName);
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
         udfFunc.setType(UdfType.HIVE);
         udfFunc.setResourceId(1);
@@ -75,7 +76,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     private UdfFunc insertOne(User user) {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setUserId(user.getId());
-        udfFunc.setFuncName("dolphin_udf_func");
+        udfFunc.setFuncName("dolphin_udf_func" + user.getUserName());
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
         udfFunc.setType(UdfType.HIVE);
         udfFunc.setResourceId(1);
@@ -163,7 +164,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     @Test
     public void testUpdate() {
         //insertOne
-        UdfFunc udfFunc = insertOne();
+        UdfFunc udfFunc = insertOne("func1");
         udfFunc.setResourceName("dolphin_resource_update");
         udfFunc.setResourceId(2);
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
@@ -180,7 +181,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     @Test
     public void testDelete() {
         //insertOne
-        UdfFunc udfFunc = insertOne();
+        UdfFunc udfFunc = insertOne("func2");
         //delete
         int delete = udfFuncMapper.deleteById(udfFunc.getId());
         Assert.assertEquals(delete, 1);
@@ -192,9 +193,9 @@ public class UdfFuncMapperTest extends BaseDaoTest {
     @Test
     public void testQueryUdfByIdStr() {
         //insertOne
-        UdfFunc udfFunc = insertOne();
+        UdfFunc udfFunc = insertOne("func3");
         //insertOne
-        UdfFunc udfFunc1 = insertOne();
+        UdfFunc udfFunc1 = insertOne("func4");
         Integer[] idArray = new Integer[]{udfFunc.getId(), udfFunc1.getId()};
         //queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");
@@ -212,7 +213,8 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc = insertOne(user);
         //queryUdfFuncPaging
         Page<UdfFunc> page = new Page(1, 3);
-        IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page, user.getId(), "");
+
+        IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page, Collections.singletonList(udfFunc.getId()), "");
         Assert.assertNotEquals(udfFuncIPage.getTotal(), 0);
 
     }
@@ -227,7 +229,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         //insertOne
         UdfFunc udfFunc = insertOne(user);
         //getUdfFuncByType
-        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(user.getId(), udfFunc.getType().ordinal());
+        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(Collections.singletonList(udfFunc.getId()), udfFunc.getType().ordinal());
         Assert.assertNotEquals(udfFuncList.size(), 0);
 
     }

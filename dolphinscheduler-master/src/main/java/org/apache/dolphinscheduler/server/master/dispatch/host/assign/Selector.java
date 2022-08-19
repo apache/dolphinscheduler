@@ -27,7 +27,7 @@ public interface Selector<T> {
 
     /**
      * select
-     * @param source source
+     * @param source source, the given source should not be empty.
      * @return T
      */
     T select(Collection<T> source);

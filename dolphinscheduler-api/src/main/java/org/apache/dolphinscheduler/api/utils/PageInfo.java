@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class PageInfo<T> {
     /**
      * totalList
      */
-    private List<T> totalList;
+    private List<T> totalList = Collections.emptyList();
     /**
      * total
      */

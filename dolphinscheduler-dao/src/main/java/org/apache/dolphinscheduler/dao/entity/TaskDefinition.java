@@ -20,12 +20,12 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +41,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Strings;
 
 /**
  * task definition
@@ -103,7 +104,7 @@ public class TaskDefinition {
     private List<Property> taskParamList;
 
     /**
-     * user define parameter map
+     * user defined parameter map
      */
     @TableField(exist = false)
     private Map<String, String> taskParamMap;
@@ -200,6 +201,21 @@ public class TaskDefinition {
      * task group id
      */
     private int taskGroupPriority;
+
+    /**
+     * cpu quota
+     */
+    private Integer cpuQuota;
+
+    /**
+     * max memory
+     */
+    private Integer memoryMax;
+
+    /**
+     * task execute type
+     */
+    private TaskExecuteType taskExecuteType;
 
     public TaskDefinition() {
     }
@@ -307,7 +323,7 @@ public class TaskDefinition {
     }
 
     public Map<String, String> getTaskParamMap() {
-        if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
+        if (taskParamMap == null && !Strings.isNullOrEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
 
             //If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
@@ -457,6 +473,30 @@ public class TaskDefinition {
         this.environmentCode = environmentCode;
     }
 
+    public Integer getCpuQuota() {
+        return cpuQuota == null ? -1 : cpuQuota;
+    }
+
+    public void setCpuQuota(Integer cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax == null ? -1 : memoryMax;
+    }
+
+    public void setMemoryMax(Integer memoryMax) {
+        this.memoryMax = memoryMax;
+    }
+
+    public TaskExecuteType getTaskExecuteType() {
+        return taskExecuteType;
+    }
+
+    public void setTaskExecuteType(TaskExecuteType taskExecuteType) {
+        this.taskExecuteType = taskExecuteType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -477,11 +517,14 @@ public class TaskDefinition {
             && timeoutFlag == that.timeoutFlag
             && timeoutNotifyStrategy == that.timeoutNotifyStrategy
             && (Objects.equals(resourceIds, that.resourceIds)
-            || (StringUtils.EMPTY.equals(resourceIds) && that.resourceIds == null)
-            || (StringUtils.EMPTY.equals(that.resourceIds) && resourceIds == null))
+            || ("".equals(resourceIds) && that.resourceIds == null)
+            || ("".equals(that.resourceIds) && resourceIds == null))
             && environmentCode == that.environmentCode
             && taskGroupId == that.taskGroupId
-            && taskGroupPriority == that.taskGroupPriority;
+            && taskGroupPriority == that.taskGroupPriority
+            && Objects.equals(cpuQuota, that.cpuQuota)
+            && Objects.equals(memoryMax, that.memoryMax)
+            && Objects.equals(taskExecuteType, that.taskExecuteType);
     }
 
     @Override
@@ -513,6 +556,9 @@ public class TaskDefinition {
                 + ", timeout=" + timeout
                 + ", delayTime=" + delayTime
                 + ", resourceIds='" + resourceIds + '\''
+                + ", cpuQuota=" + cpuQuota
+                + ", memoryMax=" + memoryMax
+                + ", taskExecuteType=" + taskExecuteType
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

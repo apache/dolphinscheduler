@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -29,8 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +44,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProjectControllerTest {
 
+    protected User user;
+
     @InjectMocks
     private ProjectController projectController;
 
@@ -55,8 +54,6 @@ public class ProjectControllerTest {
 
     @Mock
     private ProjectMapper projectMapper;
-
-    protected User user;
 
     @Before
     public void before() {
@@ -69,9 +66,8 @@ public class ProjectControllerTest {
 
     @Test
     public void testUpdateProject() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        result.put("projectId", 1);
 
         long projectCode = 1L;
         String projectName = "test";
@@ -84,7 +80,7 @@ public class ProjectControllerTest {
 
     @Test
     public void testQueryProjectByCode() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject());
@@ -109,7 +105,7 @@ public class ProjectControllerTest {
 
     @Test
     public void testQueryUnauthorizedProject() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryUnauthorizedProject(user, 2)).thenReturn(result);
         Result response = projectController.queryUnauthorizedProject(user, 2);
@@ -118,7 +114,7 @@ public class ProjectControllerTest {
 
     @Test
     public void testQueryAuthorizedProject() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryAuthorizedProject(user, 2)).thenReturn(result);
         Result response = projectController.queryAuthorizedProject(user, 2);
@@ -127,7 +123,7 @@ public class ProjectControllerTest {
 
     @Test
     public void testQueryAuthorizedUser() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         this.putMsg(result, Status.SUCCESS);
 
         Mockito.when(this.projectService.queryAuthorizedUser(this.user, 3682329499136L)).thenReturn(result);
@@ -139,7 +135,7 @@ public class ProjectControllerTest {
     public void testQueryAllProjectList() {
         User user = new User();
         user.setId(0);
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryAllProjectList(user)).thenReturn(result);
         Result response = projectController.queryAllProjectList(user);
@@ -155,12 +151,12 @@ public class ProjectControllerTest {
         return project;
     }
 
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
+    private void putMsg(Result result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
         if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
         } else {
-            result.put(Constants.MSG, status.getMsg());
+            result.setMsg(status.getMsg());
         }
     }
 }

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -133,8 +133,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param destState   destState
      * @return update result
      */
-    int updateProcessInstanceByState(@Param("originState") ExecutionStatus originState,
-                                     @Param("destState") ExecutionStatus destState);
+    int updateProcessInstanceByState(@Param("originState") WorkflowExecutionStatus originState,
+                                     @Param("destState") WorkflowExecutionStatus destState);
 
     /**
      * update process instance by tenantId
@@ -167,9 +167,9 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @return ExecuteStatusCount list
      */
     List<ExecuteStatusCount> countInstanceStateByProjectCodes(
-        @Param("startTime") Date startTime,
-        @Param("endTime") Date endTime,
-        @Param("projectCodes") Long[] projectCodes);
+                                                              @Param("startTime") Date startTime,
+                                                              @Param("endTime") Date endTime,
+                                                              @Param("projectCodes") Long[] projectCodes);
 
     /**
      * query process instance by processDefinitionCode
@@ -233,7 +233,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     List<ProcessInstance> queryTopNProcessInstance(@Param("size") int size,
                                                    @Param("startTime") Date startTime,
                                                    @Param("endTime") Date endTime,
-                                                   @Param("status") ExecutionStatus status,
+                                                   @Param("status") WorkflowExecutionStatus status,
                                                    @Param("projectCode") long projectCode);
 
     /**
@@ -247,13 +247,17 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     List<ProcessInstance> queryByProcessDefineCodeAndStatus(@Param("processDefinitionCode") Long processDefinitionCode,
                                                             @Param("states") int[] states);
 
-    List<ProcessInstance> queryByProcessDefineCodeAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
-                                                                     @Param("states") int[] states, @Param("id") int id);
+    List<ProcessInstance> queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
+                                                                                                @Param("processDefinitionVersion") int processDefinitionVersion,
+                                                                                                @Param("states") int[] states,
+                                                                                                @Param("id") int id);
 
     int updateGlobalParamsById(@Param("globalParams") String globalParams,
                                @Param("id") int id);
 
-    boolean updateNextProcessIdById(@Param("thisInstanceId") int thisInstanceId, @Param("runningInstanceId") int runningInstanceId);
+    boolean updateNextProcessIdById(@Param("thisInstanceId") int thisInstanceId,
+                                    @Param("runningInstanceId") int runningInstanceId);
 
-    ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode, @Param("state") int state);
+    ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode,
+                                           @Param("state") int state, @Param("id") int id);
 }

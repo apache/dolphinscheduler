@@ -6,6 +6,7 @@
 .DS_Store
 .target
 .idea/
+.run/
 target/
 dist/
 all-dependencies.txt
@@ -45,10 +46,11 @@ dolphinscheduler-alert/src/main/resources/logback.xml
 dolphinscheduler-server/src/main/resources/logback.xml
 dolphinscheduler-ui/dist
 dolphinscheduler-ui/node
-dolphinscheduler-ui-next/node
 dolphinscheduler-common/sql
 dolphinscheduler-common/test
 dolphinscheduler-worker/logs
+dolphinscheduler-master/logs
+dolphinscheduler-api/logs
 
 # ------------------
 # pydolphinscheduler

@@ -9,12 +9,7 @@ scheduling system
 form of a directed acyclic graph, and topological traversal is performed from nodes with zero degrees of entry until
 there are no subsequent nodes. Examples are as follows:
 
-<p align="center">
-  <img src="/img/dag_examples_cn.jpg" alt="dag example"  width="60%" />
-  <p align="center">
-        <em>dag example</em>
-  </p>
-</p>
+![about-glossary](../../../img/new_ui/dev/about/glossary.png)
 
 **Process definition**: Visualization formed by dragging task nodes and establishing task node associations**DAG**
 
@@ -50,7 +45,7 @@ provided. **Continue** refers to regardless of the status of the task running in
 failure. **End** means that once a failed task is found, Kill will also run the parallel task at the same time, and the
 process fails and ends
 
-**Complement**: Supplement historical data，Supports **interval parallel and serial** two complement methods
+**Complement**: Supplement historical data，supports **interval parallel and serial** two complement methods, and two types of date selection which include **date range** and **date enumeration**.
 
 ### 2.Module introduction
 

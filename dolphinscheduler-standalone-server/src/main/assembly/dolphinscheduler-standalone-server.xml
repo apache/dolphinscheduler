@@ -41,10 +41,6 @@
             <directory>${basedir}/../dolphinscheduler-worker/target/worker-server/libs</directory>
             <outputDirectory>libs/worker-server</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-log-server/target/logger-server/libs</directory>
-            <outputDirectory>libs/logger-server</outputDirectory>
-        </fileSet>
 
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
@@ -69,23 +65,13 @@
         </fileSet>
         <fileSet>
             <directory>${basedir}/../script/env</directory>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>dolphinscheduler_env.sh</include>
             </includes>
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
-        <fileSet>
-            <directory>${basedir}/../script/env</directory>
-            <outputDirectory>dist-bin</outputDirectory>
-            <includes>
-                <include>dolphinscheduler_env.sh</include>
-            </includes>
-            <fileMode>0755</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
             <includes>
@@ -94,7 +80,14 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui-next/dist</directory>
+            <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
+            <includes>
+                <include>common.properties</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
     </fileSets>

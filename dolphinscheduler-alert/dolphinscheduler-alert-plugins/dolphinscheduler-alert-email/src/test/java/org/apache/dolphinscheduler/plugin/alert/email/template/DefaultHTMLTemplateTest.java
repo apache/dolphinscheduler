@@ -46,6 +46,14 @@ public class DefaultHTMLTemplateTest {
         String textTypeMessage = template.getMessageFromTemplate(list2String(), ShowType.TEXT, true);
 
         assertEquals(textTypeMessage, generateMockTextTypeResultByHand());
+
+        String mapjson = "{\"taskInstanceId\":94,\"taskName\":\"000\",\"taskType\":\"DATA_QUALITY\","
+                + "\"processDefinitionId\":0,\"processInstanceId\":58,\"state\":\"RUNNING_EXECUTION\","
+                + "\"startTime\":\"2022-07-17 16:00:32\",\"host\":\"192.168.18.182:1234\","
+                + "\"logPath\":\"/Users/mac/学习/dolphinscheduler/dolphinscheduler/logs/20220717/6222644042400_1-58-94.log\"}";
+        textTypeMessage = template.getMessageFromTemplate(mapjson, ShowType.TEXT, true);
+        String result = textTypeMessage;
+        assertEquals(textTypeMessage, result);
     }
 
     private String list2String() {
@@ -76,7 +84,7 @@ public class DefaultHTMLTemplateTest {
         return EmailConstants.HTML_HEADER_PREFIX
             + "<thead>"
             + "<tr><th>mysql service name</th><th>mysql address</th><th>database client connections</th><th>port</th><th>no index of number</th></tr>"
-            + "</thead>\n"
+            + "</thead>"+System.getProperty("line.separator")
             + "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>190</td><td>3306</td><td>80</td></tr>"
             + "<tr><td>mysql210</td><td>192.168.xx.xx</td><td>90</td><td>3306</td><td>10</td></tr>"
             + EmailConstants.TABLE_BODY_HTML_TAIL;

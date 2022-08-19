@@ -36,18 +36,20 @@ import org.slf4j.LoggerFactory;
  * configuration test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
+@PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class})
 public class CommonUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
+
     @Test
     public void getSystemEnvPath() {
-        logger.info(CommonUtils.getSystemEnvPath());
-        Assert.assertTrue(true);
+        String envPath;
+        envPath = CommonUtils.getSystemEnvPath();
+        Assert.assertEquals("/etc/profile", envPath);
     }
 
     @Test
     public void isDevelopMode() {
-        logger.info("develop mode: {}",CommonUtils.isDevelopMode());
+        logger.info("develop mode: {}", CommonUtils.isDevelopMode());
         Assert.assertTrue(true);
     }
 

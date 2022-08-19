@@ -19,27 +19,16 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
-import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
-import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
+import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
-import javax.annotation.PostConstruct;
-
-import org.quartz.Scheduler;
+import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,47 +39,30 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.annotation.PostConstruct;
+
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
 public class MasterServer implements IStoppable {
+
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     @Autowired
-    private MasterConfig masterConfig;
-
-    @Autowired
     private SpringApplicationContext springApplicationContext;
-
-    private NettyRemotingServer nettyRemotingServer;
 
     @Autowired
     private MasterRegistryClient masterRegistryClient;
 
     @Autowired
-    private MasterSchedulerService masterSchedulerService;
+    private TaskPluginManager taskPluginManager;
 
     @Autowired
-    private Scheduler scheduler;
+    private MasterSchedulerBootstrap masterSchedulerBootstrap;
 
     @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
-
-    @Autowired
-    private TaskEventProcessor taskEventProcessor;
-
-    @Autowired
-    private StateEventProcessor stateEventProcessor;
-
-    @Autowired
-    private CacheProcessor cacheProcessor;
-
-    @Autowired
-    private TaskKillResponseProcessor taskKillResponseProcessor;
+    private SchedulerApi schedulerApi;
 
     @Autowired
     private EventExecuteService eventExecuteService;
@@ -99,7 +71,7 @@ public class MasterServer implements IStoppable {
     private FailoverExecuteThread failoverExecuteThread;
 
     @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
+    private MasterRPCServer masterRPCServer;
 
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
@@ -111,42 +83,27 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run() throws SchedulerException {
-        // init remoting server
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(masterConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, taskEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, taskEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);
+        // init rpc server
+        this.masterRPCServer.start();
 
-        // logger server
-        this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
-
-        this.nettyRemotingServer.start();
+        // install task plugin
+        this.taskPluginManager.loadPlugin();
 
         // self tolerant
-        this.masterRegistryClient.init();
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.masterSchedulerService.init();
-        this.masterSchedulerService.start();
+        this.masterSchedulerBootstrap.init();
+        this.masterSchedulerBootstrap.start();
 
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
 
-        this.scheduler.start();
+        this.schedulerApi.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (Stopper.isRunning()) {
-                close("shutdownHook");
+            if (!ServerLifeCycleManager.isStopped()) {
+                close("MasterServer shutdownHook");
             }
         }));
     }
@@ -157,33 +114,29 @@ public class MasterServer implements IStoppable {
      * @param cause close cause
      */
     public void close(String cause) {
-
-        try {
-            // execute only once
-            if (Stopper.isStopped()) {
-                return;
-            }
-
-            logger.info("master server is stopping ..., cause : {}", cause);
-
-            // set stop signal is true
-            Stopper.stop();
-
-            try {
-                // thread sleep 3 seconds for thread quietly stop
-                Thread.sleep(3000L);
-            } catch (Exception e) {
-                logger.warn("thread sleep exception ", e);
-            }
-            // close
-            this.masterSchedulerService.close();
-            this.nettyRemotingServer.close();
-            this.masterRegistryClient.closeRegistry();
-            // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
-            springApplicationContext.close();
-        } catch (Exception e) {
-            logger.error("master server stop exception ", e);
+        // set stop signal is true
+        // execute only once
+        if (!ServerLifeCycleManager.toStopped()) {
+            logger.warn("MasterServer is already stopped, current cause: {}", cause);
+            return;
         }
+        // thread sleep 3 seconds for thread quietly stop
+        ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
+        try (
+                SchedulerApi closedSchedulerApi = schedulerApi;
+                MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
+                MasterRPCServer closedRpcServer = masterRPCServer;
+                MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
+                // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
+                // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
+                SpringApplicationContext closedSpringContext = springApplicationContext) {
+
+            logger.info("Master server is stopping, current cause : {}", cause);
+        } catch (Exception e) {
+            logger.error("MasterServer stop failed, current cause: {}", cause, e);
+            return;
+        }
+        logger.info("MasterServer stopped, current cause: {}", cause);
     }
 
     @Override

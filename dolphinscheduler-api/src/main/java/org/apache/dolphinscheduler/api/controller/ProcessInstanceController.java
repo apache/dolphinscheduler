@@ -17,55 +17,33 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_INSTANCE_ERROR;
-
+import io.swagger.annotations.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * process instance controller
@@ -78,7 +56,7 @@ public class ProcessInstanceController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
     @Autowired
-    ProcessInstanceService processInstanceService;
+    private ProcessInstanceService processInstanceService;
 
     /**
      * query process instance list paging
@@ -93,19 +71,20 @@ public class ProcessInstanceController extends BaseController {
      * @param host host
      * @param startTime start time
      * @param endTime end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
     @ApiOperation(value = "queryProcessInstanceListPaging", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefiniteCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
-        @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
-        @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
+            @ApiImplicitParam(name = "processDefineCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
+            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
+            @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -116,10 +95,11 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
                                            @RequestParam(value = "searchVal", required = false) String searchVal,
                                            @RequestParam(value = "executorName", required = false) String executorName,
-                                           @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
+                                           @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
                                            @RequestParam(value = "host", required = false) String host,
                                            @RequestParam(value = "startDate", required = false) String startTime,
                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
 
@@ -128,8 +108,9 @@ public class ProcessInstanceController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
-                searchVal, executorName, stateType, host, pageNo, pageSize);
+        result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime,
+                endTime,
+                searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
         return result;
     }
 
@@ -143,7 +124,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryTaskListByProcessId", notes = "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -172,15 +153,15 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "updateProcessInstance", notes = "UPDATE_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskRelationJson", value = "TASK_RELATION_JSON", type = "String"),
-        @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", type = "String"),
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
-        @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, type = "Boolean", example = "false"),
-        @ApiImplicitParam(name = "globalParams", value = "PROCESS_GLOBAL_PARAMS", type = "String", example = "[]"),
-        @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
-        @ApiImplicitParam(name = "timeout", value = "PROCESS_TIMEOUT", type = "Int", example = "0"),
-        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "String", example = "default")
+            @ApiImplicitParam(name = "taskRelationJson", value = "TASK_RELATION_JSON", type = "String"),
+            @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", type = "String"),
+            @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
+            @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, type = "Boolean", example = "false"),
+            @ApiImplicitParam(name = "globalParams", value = "PROCESS_GLOBAL_PARAMS", type = "String", example = "[]"),
+            @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
+            @ApiImplicitParam(name = "timeout", value = "PROCESS_TIMEOUT", type = "Int", example = "0"),
+            @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "String", example = "default")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -198,7 +179,8 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                         @RequestParam(value = "tenantCode", required = true) String tenantCode) {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
-            taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout, tenantCode);
+                taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout,
+                tenantCode);
         return returnDataList(result);
     }
 
@@ -212,7 +194,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryProcessInstanceById", notes = "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -237,9 +219,9 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "size", value = "PROCESS_INSTANCE_SIZE", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "startTime", value = "PROCESS_INSTANCE_START_TIME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "endTime", value = "PROCESS_INSTANCE_END_TIME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "PROCESS_INSTANCE_SIZE", required = true, dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "startTime", value = "PROCESS_INSTANCE_START_TIME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "PROCESS_INSTANCE_END_TIME", required = true, dataType = "String"),
     })
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
@@ -250,7 +232,8 @@ public class ProcessInstanceController extends BaseController {
                                                                           @RequestParam("size") Integer size,
                                                                           @RequestParam(value = "startTime", required = true) String startTime,
                                                                           @RequestParam(value = "endTime", required = true) String endTime) {
-        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, startTime, endTime);
+        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,
+                projectCode, size, startTime, endTime);
         return returnDataList(result);
     }
 
@@ -265,7 +248,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "deleteProcessInstanceById", notes = "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -288,7 +271,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "querySubProcessInstanceByTaskCode", notes = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, dataType = "Long", example = "100")
     })
     @GetMapping(value = "/query-sub-by-parent")
     @ResponseStatus(HttpStatus.OK)
@@ -297,7 +280,8 @@ public class ProcessInstanceController extends BaseController {
     public Result querySubProcessInstanceByTaskId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                   @RequestParam("taskId") Integer taskId) {
-        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, taskId);
+        Map<String, Object> result =
+                processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, taskId);
         return returnDataList(result);
     }
 
@@ -311,7 +295,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryParentInstanceBySubId", notes = "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "subId", value = "SUB_PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "subId", value = "SUB_PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/query-parent-by-sub")
     @ResponseStatus(HttpStatus.OK)
@@ -333,7 +317,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "viewVariables", notes = "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/{id}/view-variables")
     @ResponseStatus(HttpStatus.OK)
@@ -356,7 +340,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "vieGanttTree", notes = "VIEW_GANTT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/{id}/view-gantt")
     @ResponseStatus(HttpStatus.OK)
@@ -380,8 +364,8 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "batchDeleteProcessInstanceByIds", notes = "BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
@@ -394,18 +378,20 @@ public class ProcessInstanceController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (!StringUtils.isEmpty(processInstanceIds)) {
-            String[] processInstanceIdArray = processInstanceIds.split(",");
+            String[] processInstanceIdArray = processInstanceIds.split(Constants.COMMA);
 
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
+                    Map<String, Object> deleteResult =
+                            processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                         deleteFailedIdList.add((String) deleteResult.get(Constants.MSG));
                         logger.error((String) deleteResult.get(Constants.MSG));
                     }
                 } catch (Exception e) {
-                    deleteFailedIdList.add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                    deleteFailedIdList
+                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
             }
         }
