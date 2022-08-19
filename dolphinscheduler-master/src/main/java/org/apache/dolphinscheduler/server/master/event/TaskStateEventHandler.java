@@ -82,7 +82,7 @@ public class TaskStateEventHandler implements StateEventHandler {
             }
             return true;
         }
-        throw new StateEventHandleException(
+        throw new StateEventHandleError(
                 "Task state event handle error, due to the task is not in activeTaskProcessorMaps");
     }
 
@@ -102,7 +102,7 @@ public class TaskStateEventHandler implements StateEventHandler {
         }
         switch (taskStateEvent.getStatus()) {
             case KILL:
-                TaskMetrics.incTaskInstanceByState("kill");
+                TaskMetrics.incTaskInstanceByState("stop");
                 break;
             case SUCCESS:
                 TaskMetrics.incTaskInstanceByState("success");

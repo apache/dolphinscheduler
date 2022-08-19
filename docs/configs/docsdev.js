@@ -189,6 +189,10 @@ export default {
                                 title: 'ChunJun',
                                 link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
                             },
+                            {
+                                title: 'Pytorch',
+                                link: '/en-us/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
                         ],
                     },
                     {
@@ -386,6 +390,15 @@ export default {
                         title: 'Kubernetes Deployment',
                         link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
+                    {
+                        title: 'integration',
+                        children: [
+                            {
+                                title: 'Rainbond Deployment',
+                                link: '/en-us/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
                 ],
             },
             {
@@ -426,7 +439,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/dev/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -557,6 +570,10 @@ export default {
                             {
                                 title: 'API Automation Test',
                                 link: '/en-us/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                            {
+                                title: 'Log Specification',
+                                link: '/en-us/docs/dev/user_doc/contribute/log-specification.html',
                             },
                         ],
                     },
@@ -792,6 +809,10 @@ export default {
                                 title: 'ChunJun',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
                             },
+                            {
+                                title: 'Pytorch',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
                         ],
                     },
                     {
@@ -965,6 +986,15 @@ export default {
                         title: 'Kubernetes部署(Kubernetes)',
                         link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
+                    {
+                        title: '集成',
+                        children: [
+                            {
+                                title: '基于Rainbond部署(Cluster)',
+                                link: '/zh-cn/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
                 ],
             },
             {
@@ -1005,7 +1035,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/dev/index.html',
                     },
                     {
                         title: '健康检查',
@@ -1136,6 +1166,10 @@ export default {
                             {
                                 title: 'API 自动化测试',
                                 link: '/zh-cn/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                            {
+                                title: '日志规范',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/log-specification.html',
                             },
                         ],
                     },

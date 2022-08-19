@@ -17,7 +17,10 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type { TaskType } from '@/views/projects/task/constants/task-type'
+import type {
+  TaskExecuteType,
+  TaskType
+} from '@/views/projects/task/constants/task-type'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
   IFormItem,
@@ -361,6 +364,14 @@ interface ITaskParams {
   taskId?: string
   online?: boolean
   sagemakerRequestJson?: string
+  script?: string
+  scriptParams?: string
+  pythonPath?: string
+  isCreateEnvironment?: string
+  pythonCommand?: string
+  pythonEnvTool?: string
+  requirements?: string
+  condaPythonVersion?: string
 }
 
 interface INodeData
@@ -415,6 +426,7 @@ interface INodeData
   udfs?: string[]
   customConfig?: boolean
   mapping_columns?: object[]
+  taskExecuteType?: TaskExecuteType
 }
 
 interface ITaskData

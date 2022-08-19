@@ -243,6 +243,11 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.password|password|LDAP password|
 |security.authentication.ldap.user.identity.attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email.attribute|mail|LDAP user email attribute|
+|traffic.control.global.switch|false|traffic control global switch|
+|traffic.control.max-global-qps-rate|300|global max request number per second|
+|traffic.control.tenant-switch|false|traffic control tenant switch|
+|traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
+|traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
 
 ### Master Server related configuration
 Location: `master-server/conf/application.yaml`
@@ -263,6 +268,8 @@ Location: `master-server/conf/application.yaml`
 |master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G|
 |master.failover-interval|10|failover interval, the unit is minute|
 |master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
+|master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
+|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
 
 
 ### Worker Server related configuration
@@ -280,6 +287,8 @@ Location: `worker-server/conf/application.yaml`
 |worker.groups|default|worker groups separated by comma, e.g., 'worker.groups=default,test' <br> worker will join corresponding group according to this config when startup|
 |worker.alert-listen-host|localhost|the alert listen host of worker|
 |worker.alert-listen-port|50052|the alert listen port of worker|
+|worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
+|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
 
 ### Alert Server related configuration
 Location: `alert-server/conf/application.yaml`

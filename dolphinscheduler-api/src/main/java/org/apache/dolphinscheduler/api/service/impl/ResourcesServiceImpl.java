@@ -159,6 +159,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
+
+        if(checkDescriptionLength(description)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
+
         String fullName = getFullName(currentDir, name);
         result = verifyResource(loginUser, type, fullName, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -238,6 +244,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         result = verifyPid(loginUser, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -367,6 +377,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -814,7 +828,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource, true);
+
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
+
+
+        if (needDeleteResourceIdArray.length >= 2){
+            logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
+            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
+            return result;
+        }
 
         //if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
@@ -825,6 +847,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
         }
+
+
 
         if (resourceIdSet.contains(resource.getPid())) {
             logger.error("can't be deleted,because it is used of process definition");
@@ -1070,6 +1094,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         if (FileUtils.directoryTraversal(fileName)) {
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            return result;
+        }
+        if(checkDescriptionLength(desc)){
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 

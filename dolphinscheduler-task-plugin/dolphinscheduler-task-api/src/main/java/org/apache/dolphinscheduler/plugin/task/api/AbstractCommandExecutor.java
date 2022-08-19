@@ -59,10 +59,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * abstract command executor
  */
 public abstract class AbstractCommandExecutor {
-    /**
-     * rules for extracting application ID
-     */
-    protected static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.APPLICATION_REGEX);
     
     /**
      * rules for extracting Var Pool
@@ -234,16 +230,12 @@ public abstract class AbstractCommandExecutor {
 
         // if SHELL task exit
         if (status) {
-            // set appIds
-            List<String> appIds = getAppIds(taskRequest.getLogPath());
-            result.setAppIds(String.join(TaskConstants.COMMA, appIds));
 
             // SHELL task state
             result.setExitStatusCode(process.exitValue());
 
         } else {
-            logger.error("process has failure , exitStatusCode:{}, processExitValue:{}, ready to kill ...",
-                    result.getExitStatusCode(), process.exitValue());
+            logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...", taskRequest.getTaskTimeout());
             ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
@@ -409,38 +401,6 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     * get app links
-     *
-     * @param logPath log path
-     * @return app id list
-     */
-    private List<String> getAppIds(String logPath) {
-        List<String> appIds = new ArrayList<>();
-
-        File file = new File(logPath);
-        if (!file.exists()) {
-            return appIds;
-        }
-
-        /*
-         * analysis log?get submited yarn application id
-         */
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(logPath), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
-                    logger.info("find app id: {}", appId);
-                    appIds.add(appId);
-                }
-            }
-        } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ", logPath), e);
-        }
-        return appIds;
-    }
-
-    /**
      * find var pool
      * @param line
      * @return
@@ -449,20 +409,6 @@ public abstract class AbstractCommandExecutor {
         Matcher matcher = SETVALUE_REGEX.matcher(line);
         if (matcher.find()) {
             return matcher.group(1);
-        }
-        return null;
-    }
-
-    /**
-     * find app id
-     *
-     * @param line line
-     * @return appid
-     */
-    private String findAppId(String line) {
-        Matcher matcher = APPLICATION_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group();
         }
         return null;
     }

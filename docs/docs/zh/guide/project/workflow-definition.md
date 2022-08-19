@@ -24,6 +24,10 @@
 
   ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-dependent.png)
 
+- **实时任务的依赖关系：** 若DAG中包含了实时任务的组件，则实时任务的关联关系显示为虚线，在执行工作流实例的时候会跳过实时任务的执行
+
+  ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-definition-with-stream-task.png)
+
 - **删除依赖关系：** 点击右上角"箭头"图标<img src="../../../../img/arrow.png" width="35"/>，选中连接线，点击右上角"删除"图标<img src="../../../../img/delete.png" width="35"/>，删除任务间的依赖关系。
 
   ![workflow-delete](../../../../img/new_ui/dev/project/workflow-delete.png)

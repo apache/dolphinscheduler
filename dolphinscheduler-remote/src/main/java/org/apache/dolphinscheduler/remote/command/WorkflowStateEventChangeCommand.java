@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -27,6 +28,7 @@ import java.io.Serializable;
  * db task final result response command
  */
 @Data
+@NoArgsConstructor
 public class WorkflowStateEventChangeCommand implements Serializable {
 
     private String key;

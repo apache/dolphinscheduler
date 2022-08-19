@@ -17,24 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
-
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.NonNull;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -80,8 +65,8 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,12 +78,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.zaxxer.hikari.HikariDataSource;
-
-import lombok.NonNull;
+import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
+import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
+import static org.apache.dolphinscheduler.common.Constants.OTHER;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -185,27 +181,39 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
             Thread.currentThread().setName(threadLoggerInfoName);
         }
-        switch (taskAction) {
-            case STOP:
-                return stop();
-            case PAUSE:
-                return pause();
-            case TIMEOUT:
-                return timeout();
-            case SUBMIT:
-                return submit();
-            case RUN:
-                return run();
-            case DISPATCH:
-                return dispatch();
-            case RESUBMIT:
-                return resubmit();
-            default:
-                logger.error("unknown task action: {}", taskAction);
+        boolean result = false;
+        try {
+            switch (taskAction) {
+                case STOP:
+                    result = stop();
+                    break;
+                case PAUSE:
+                    result = pause();
+                    break;
+                case TIMEOUT:
+                    result = timeout();
+                    break;
+                case SUBMIT:
+                    result = submit();
+                    break;
+                case RUN:
+                    result = run();
+                    break;
+                case DISPATCH:
+                    result = dispatch();
+                    break;
+                case RESUBMIT:
+                    result = resubmit();
+                    break;
+                default:
+                    logger.error("unknown task action: {}", taskAction);
+            }
+            return result;
+        } finally {
+            // reset thread name
+            Thread.currentThread().setName(threadName);
+
         }
-        // reset thread name
-        Thread.currentThread().setName(threadName);
-        return false;
     }
 
     protected boolean resubmit() {
@@ -325,7 +333,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .create();
     }
 
-    private void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
+    public void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
         if (Objects.isNull(resourceParametersHelper)) {
             return;
         }
@@ -592,7 +600,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * get resource map key is full name and value is tenantCode
      */
-    protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
+    public Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
         Map<String, String> resourcesMap = new HashMap<>();
         AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
                 .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());

@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
@@ -323,7 +324,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
+     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
+
+
      *
      * @param loginUser         login user
      * @param projectCode       project code
@@ -357,6 +360,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
             result =
                     checkProcessDefinitionValid(projectCode, processDefinition,
@@ -474,8 +478,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         boolean checkResult = false;
         switch (executeType) {
             case PAUSE:
-            case STOP:
                 if (executionStatus.isRunning()) {
+                    checkResult = true;
+                }
+                break;
+            case STOP:
+                if (executionStatus.canStop()) {
                     checkResult = true;
                 }
                 break;
@@ -1012,5 +1020,46 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         WorkflowExecutingDataResponseCommand responseCommand =
                 JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponseCommand.class);
         return responseCommand.getWorkflowExecuteDto();
+    }
+
+    @Override
+    public Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion,
+                                                int warningGroupId, String workerGroup, Long environmentCode, Map<String, String> startParams, int dryRun) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result =
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
+        // check master exists
+        if (!checkMasterExists(result)) {
+            return result;
+        }
+
+        // todo dispatch improvement
+        List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
+        Host host = new Host(masterServerList.get(0).getHost(), masterServerList.get(0).getPort());
+
+        TaskExecuteStartCommand taskExecuteStartCommand = new TaskExecuteStartCommand();
+        taskExecuteStartCommand.setExecutorId(loginUser.getId());
+        taskExecuteStartCommand.setExecutorName(loginUser.getUserName());
+        taskExecuteStartCommand.setProjectCode(projectCode);
+        taskExecuteStartCommand.setTaskDefinitionCode(taskDefinitionCode);
+        taskExecuteStartCommand.setTaskDefinitionVersion(taskDefinitionVersion);
+        taskExecuteStartCommand.setWorkerGroup(workerGroup);
+        taskExecuteStartCommand.setWarningGroupId(warningGroupId);
+        taskExecuteStartCommand.setEnvironmentCode(environmentCode);
+        taskExecuteStartCommand.setStartParams(startParams);
+        taskExecuteStartCommand.setDryRun(dryRun);
+
+        org.apache.dolphinscheduler.remote.command.Command response = stateEventCallbackService.sendSync(host, taskExecuteStartCommand.convert2Command());
+        if (response != null) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.START_TASK_INSTANCE_ERROR);
+        }
+        return result;
     }
 }

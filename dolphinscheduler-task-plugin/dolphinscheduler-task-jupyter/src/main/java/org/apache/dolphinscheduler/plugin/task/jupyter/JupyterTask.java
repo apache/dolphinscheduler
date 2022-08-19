@@ -83,7 +83,7 @@ public class JupyterTask extends AbstractTaskExecutor {
             // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
-            setAppIds(response.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
         } catch (Exception e) {
             logger.error("jupyter task execution failure", e);
