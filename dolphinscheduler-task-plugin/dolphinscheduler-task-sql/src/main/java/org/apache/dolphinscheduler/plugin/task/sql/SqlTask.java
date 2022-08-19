@@ -294,6 +294,13 @@ public class SqlTask extends AbstractTaskExecutor {
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
             logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
+            //hive log listener
+            if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+
+                HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
+                queryThread.start();
+            }
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
@@ -303,6 +310,13 @@ public class SqlTask extends AbstractTaskExecutor {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
             try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
+                //hive log listener
+                if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                    logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+
+                    HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
+                    queryThread.start();
+                }
                 result = statement.executeUpdate();
                 logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sqlBind.getSql());
             }
