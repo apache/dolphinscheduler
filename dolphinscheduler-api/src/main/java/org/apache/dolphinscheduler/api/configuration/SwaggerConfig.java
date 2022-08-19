@@ -24,12 +24,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -52,7 +58,8 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
                 .paths(PathSelectors.any())
                 .paths(PathSelectors.regex("^(?!/v2).*"))
-                .build();
+                .build()
+                .globalOperationParameters(setHeaderToken());
     }
 
     private ApiInfo apiV1Info() {
@@ -71,7 +78,8 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
                 .paths(PathSelectors.ant("/v2/**"))
-                .build();
+                .build()
+                .globalOperationParameters(setHeaderToken());
     }
 
     private ApiInfo apiV2Info() {
@@ -80,5 +88,22 @@ public class SwaggerConfig implements WebMvcConfigurer {
                 .description("Dolphin Scheduler Api Docs")
                 .version("V2")
                 .build();
+    }
+
+    private List<Parameter> setHeaderToken() {
+        List<Parameter> pars = new ArrayList<>();
+        // token请求头
+        String testTokenValue = "";
+        ParameterBuilder tokenPar = new ParameterBuilder();
+        Parameter tokenParameter = tokenPar
+                .name("token")
+                .description("JWT Token Request Header")
+                .modelRef(new ModelRef("string"))
+                .parameterType("header")
+                .required(false)
+                .defaultValue(testTokenValue)
+                .build();
+        pars.add(tokenParameter);
+        return pars;
     }
 }
