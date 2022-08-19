@@ -126,6 +126,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -285,9 +286,18 @@ public class ProcessServiceImpl implements ProcessService {
      * @return process instance
      */
     @Override
+    public ProcessInstance handleCommand(String host, Command command) throws CodeGenerateException, CronParseException {
+        ProcessInstance processInstance = processService.handleCommandInDB(host, command);
+        if (processInstance == null) {
+            return null;
+        }
+        sendRpcCommand(processInstance);
+        return processInstance;
+    }
+
+    @Override
     @Transactional
-    public ProcessInstance handleCommand(String host,
-                                         Command command) throws CronParseException, CodeGenerateException {
+    public ProcessInstance handleCommandInDB(String host, Command command) throws CodeGenerateException, CronParseException {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
@@ -313,6 +323,25 @@ public class ProcessServiceImpl implements ProcessService {
         setSubProcessParam(processInstance);
         deleteCommandWithCheck(command.getId());
         return processInstance;
+    }
+
+    @Override
+    public void sendRpcCommand(ProcessInstance processInstance) {
+        ProcessDefinition processDefinition = processInstance.getProcessDefinition();
+        if (processDefinition.getExecutionType().typeIsSerialPriority()){
+            List<ProcessInstance> runningProcessInstances =
+                    processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
+                            processInstance.getProcessDefinitionCode(),
+                            processInstance.getProcessDefinitionVersion(), new int[]{WorkflowExecutionStatus.READY_STOP.getCode()},
+                            processInstance.getId());
+            for (ProcessInstance runningProcessInstance : runningProcessInstances) {
+                WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
+                        new WorkflowStateEventChangeCommand(
+                                runningProcessInstance.getId(), 0, runningProcessInstance.getState(), runningProcessInstance.getId(), 0);
+                Host host = new Host(runningProcessInstance.getHost());
+                stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+            }
+        }
     }
 
     protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
@@ -354,7 +383,6 @@ public class ProcessServiceImpl implements ProcessService {
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(WorkflowExecutionStatus.READY_STOP);
                 processService.updateProcessInstance(info);
-                // TODO rpc after command handle complete, but this is not better
             }
             processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
             saveProcessInstance(processInstance);

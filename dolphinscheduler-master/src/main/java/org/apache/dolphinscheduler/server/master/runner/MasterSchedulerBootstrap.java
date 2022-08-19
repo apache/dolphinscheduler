@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -27,12 +26,9 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -226,7 +222,6 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         processInstances.add(processInstance);
                         logger.info("Master handle command {} end, create process instance {}", command.getId(),
                                 processInstance.getId());
-                        sendRpcCommand(processInstance);
                     }
                 } catch (Exception e) {
                     logger.error("Master handle command {} error ", command.getId(), e);
@@ -245,24 +240,6 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         ProcessInstanceMetrics
                 .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
-    }
-
-    private void sendRpcCommand(ProcessInstance processInstance) {
-        ProcessDefinition processDefinition = processInstance.getProcessDefinition();
-        if (processDefinition.getExecutionType().typeIsSerialPriority()){
-            List<ProcessInstance> runningProcessInstances =
-                    processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
-                            processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(), new int[]{WorkflowExecutionStatus.READY_STOP.getCode()},
-                            processInstance.getId());
-            for (ProcessInstance runningProcessInstance : runningProcessInstances) {
-                WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
-                        new WorkflowStateEventChangeCommand(
-                                runningProcessInstance.getId(), 0, runningProcessInstance.getState(), runningProcessInstance.getId(), 0);
-                Host host = new Host(runningProcessInstance.getHost());
-                stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
-            }
-        }
     }
 
     private List<Command> findCommands() throws MasterException {
