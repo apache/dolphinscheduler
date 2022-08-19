@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -87,12 +88,13 @@ public class DataxTask extends AbstractTaskExecutor {
     /**
      * python process(datax only supports version 2.7 by default)
      */
-    private static final String DATAX_PYTHON = "python2.7";
+    private static final String DATAX_PYTHON = "python";
     private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
     /**
      * datax path
      */
     private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
+    private static final String DATAX_PATH_WIN = "%DATAX_HOME%/bin/datax.py";
     /**
      * datax channel count
      */
@@ -391,10 +393,17 @@ public class DataxTask extends AbstractTaskExecutor {
         StringBuilder sbr = new StringBuilder();
         sbr.append(getPythonCommand());
         sbr.append(" ");
-        sbr.append(DATAX_PATH);
+        if(SystemUtils.IS_OS_WINDOWS) {
+            sbr.append(DATAX_PATH_WIN);
+        }
+        else {
+            sbr.append(DATAX_PATH);
+        }
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
-        sbr.append(addCustomParameters(paramsMap));
+        if (paramsMap != null) {
+            sbr.append(addCustomParameters(paramsMap));
+        }
         sbr.append(" ");
         sbr.append(jobConfigFilePath);
 
