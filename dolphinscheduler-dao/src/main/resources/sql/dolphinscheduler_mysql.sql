@@ -955,6 +955,7 @@ CREATE TABLE `t_ds_worker_group` (
   `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
   `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
+  `other_params_json` text NULL DEFAULT NULL COMMENT 'other params json',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

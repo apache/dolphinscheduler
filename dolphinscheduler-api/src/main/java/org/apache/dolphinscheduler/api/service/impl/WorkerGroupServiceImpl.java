@@ -85,7 +85,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     @Transactional
-    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description) {
+    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String otherParamsJson) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -122,8 +122,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
+        handleDefaultWorkGroup(workerGroup, otherParamsJson);
         if (workerGroup.getId() != 0) {
-            handleDefaultWorkGroup(workerGroup);
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
@@ -133,7 +133,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return result;
     }
 
-    protected void handleDefaultWorkGroup(WorkerGroup workerGroup) {
+    protected void handleDefaultWorkGroup(WorkerGroup workerGroup, String otherParamsJson) {
     }
 
     /**
@@ -310,6 +310,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
+            WorkerGroup aDefault = workerGroups.stream().filter(a -> a.getAddrList().equals("default")).collect(Collectors.toList()).get(0);
             handleChildrenNodes(workerGroup,childrenNodes);
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
@@ -320,14 +321,14 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 wg.setCreateTime(new Date(heartBeat.getStartupTime()));
                 wg.setUpdateTime(new Date(heartBeat.getReportTime()));
                 wg.setSystemDefault(true);
-                wg.setDescription(workerGroupMapper.queryDescription(workerGroup));
+                wg.setDescription(aDefault.getDescription());
             }
-            handleDefault(workerGroups, workerGroup, wg);
+            handleDefault(workerGroups, workerGroup, wg, aDefault);
         }
         return workerGroups;
     }
 
-    protected void handleDefault(List<WorkerGroup> workerGroups, String workerGroup, WorkerGroup wg) {
+    protected void handleDefault(List<WorkerGroup> workerGroups, String workerGroup, WorkerGroup wg, WorkerGroup aDefault) {
         workerGroups.add(wg);
     }
 

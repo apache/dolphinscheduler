@@ -28,9 +28,5 @@
         from t_ds_worker_group
         where name = #{name}
     </select>
-    <select id="queryDescription" resultType="java.lang.String">
-        select description
-        from t_ds_worker_group
-        where name = #{name}
-    </select>
+
 </mapper>

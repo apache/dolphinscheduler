@@ -75,7 +75,8 @@ public class WorkerGroupController extends BaseController {
         @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
         @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "WORKER_DESC", required = true, dataType = "String")
+        @ApiImplicitParam(name = "description", value = "WORKER_DESC", required = false, dataType = "String"),
+        @ApiImplicitParam(name = "otherParamsJson", value = "WORKER_PARMS_JSON", required = false, dataType = "String"),
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -85,9 +86,10 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
                                   @RequestParam(value = "addrList") String addrList,
-                                  @RequestParam(value = "description") String description
+                                  @RequestParam(value = "description") String description,
+                                  @RequestParam(value = "otherParamsJson") String otherParamsJson
     ) {
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList, description);
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList, description, otherParamsJson);
         return returnDataList(result);
     }
 
