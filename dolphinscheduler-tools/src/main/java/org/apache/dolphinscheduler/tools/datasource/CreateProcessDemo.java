@@ -31,25 +31,19 @@ public class CreateProcessDemo {
     }
 
     @Component
-    static class CreateRunner implements CommandLineRunner {
-        private static final Logger logger = LoggerFactory.getLogger(CreateRunner.class);
+    static class DemoRunner implements CommandLineRunner {
+        private static final Logger logger = LoggerFactory.getLogger(DemoRunner.class);
 
-        private final DolphinSchedulerManager dolphinSchedulerManager;
+        private final ProcessDefinitionDemo processDefinitionDemo;
 
-        CreateRunner(DolphinSchedulerManager dolphinSchedulerManager) {
-            this.dolphinSchedulerManager = dolphinSchedulerManager;
+        DemoRunner(ProcessDefinitionDemo processDefinitionDemo) {
+            this.processDefinitionDemo = processDefinitionDemo;
         }
 
         @Override
         public void run(String... args) throws Exception {
-            if (dolphinSchedulerManager.schemaIsInitialized()) {
-                dolphinSchedulerManager.upgradeDolphinScheduler();
-                logger.info("upgrade DolphinScheduler finished");
-            } else {
-                dolphinSchedulerManager.initDolphinScheduler();
-                logger.info("init DolphinScheduler finished");
-            }
-            logger.info("create DolphinScheduler success");
+            processDefinitionDemo.createProcessDefinitionDemo();
+            logger.info("create process definition demo success");
         }
     }
 }
