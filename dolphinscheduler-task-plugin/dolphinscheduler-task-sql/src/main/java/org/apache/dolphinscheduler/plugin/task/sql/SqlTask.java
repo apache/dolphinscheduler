@@ -191,6 +191,12 @@ public class SqlTask extends AbstractTaskExecutor {
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
 
             String result = null;
+            //hive log listener
+            if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+                HiveSqlLogThread queryThread = new HiveSqlLogThread(stmt, logger,taskExecutionContext);
+                queryThread.start();
+            }
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
@@ -298,6 +304,13 @@ public class SqlTask extends AbstractTaskExecutor {
                         List<SqlBinds> preStatementsBinds) throws Exception {
         for (SqlBinds sqlBind : preStatementsBinds) {
             try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
+                //hive log listener
+                if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                    logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+
+                    HiveSqlLogThread queryThread = new HiveSqlLogThread(pstmt, logger,taskExecutionContext);
+                    queryThread.start();
+                }
                 int result = pstmt.executeUpdate();
                 logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
 
@@ -315,6 +328,13 @@ public class SqlTask extends AbstractTaskExecutor {
                          List<SqlBinds> postStatementsBinds) throws Exception {
         for (SqlBinds sqlBind : postStatementsBinds) {
             try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
+                //hive log listener
+                if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+                    logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+
+                    HiveSqlLogThread queryThread = new HiveSqlLogThread(pstmt, logger,taskExecutionContext);
+                    queryThread.start();
+                }
                 int result = pstmt.executeUpdate();
                 logger.info("post statement execute result: {},for sql: {}", result, sqlBind.getSql());
             }
