@@ -298,8 +298,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
             return workerGroups;
         }
-        
-        WorkerGroup aDefault = workerGroups.stream().filter(a -> a.getAddrList().equals("default")).collect(Collectors.toList()).get(0);
+        Map<String, WorkerGroup> collect = null;
+        if (workerGroups.size() != 0) { 
+            collect = workerGroups.stream().collect(Collectors.toMap(WorkerGroup::getName, a -> a, (k1, k2) -> k1));
+        }
         for (String workerGroup : workerGroupList) {
             String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
             Collection<String> childrenNodes = null;
@@ -321,17 +323,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 wg.setCreateTime(new Date(heartBeat.getStartupTime()));
                 wg.setUpdateTime(new Date(heartBeat.getReportTime()));
                 wg.setSystemDefault(true);
-                wg.setDescription(aDefault.getDescription());
+                if (collect != null && collect.get(workerGroup) != null) {
+                    wg.setDescription(collect.get(workerGroup).getDescription());
+                    workerGroups.remove(collect.get(workerGroup));
+                }
             }
-            handleDefault(workerGroups, workerGroup, wg, aDefault);
+            workerGroups.add(wg);
         }
         return workerGroups;
     }
-
-    protected void handleDefault(List<WorkerGroup> workerGroups, String workerGroup, WorkerGroup wg, WorkerGroup aDefault) {
-        workerGroups.add(wg);
-    }
-
+    
     protected void handleChildrenNodes(String workerGroup, Collection<String> childrenNodes) {
     }
 
