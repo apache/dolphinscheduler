@@ -25,15 +25,13 @@ it will instantiate and run all the task it have.
 import os
 from pathlib import Path
 
-from pydolphinscheduler.constants import ResourcePluginType
-
 # [start tutorial_resource_plugin]
 # [start package_import]
 # Import ProcessDefinition object to define your workflow attributes
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 # Import task Shell object cause we would create some shell tasks later
+from pydolphinscheduler.resources_plugin.local import Local
 from pydolphinscheduler.tasks.shell import Shell
 
 # [end package_import]
@@ -44,10 +42,7 @@ with ProcessDefinition(
     schedule="0 0 0 * * ? *",
     start_time="2021-01-01",
     tenant="tenant_exists",
-    resource_plugin=ResourcePlugin(
-        type=ResourcePluginType.LOCAL,
-        prefix="/tmp",
-    ),
+    resource_plugin=Local("/tmp"),
 ) as process_definition:
     # [end workflow_declare]
     # [start task_declare]

@@ -20,10 +20,11 @@
 import os
 from pathlib import Path
 
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyResPluginException
 
 
-class Local:
+class Local(ResourcePlugin):
     """Local object, declare local resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of Local.
@@ -31,15 +32,10 @@ class Local:
     """
 
     # [start init_method]
-    def __init__(self, prefix: str):
-        self._prefix = prefix
+    def __init__(self, prefix: str, *args, **kwargs):
+        super().__init__(prefix, *args, **kwargs)
 
     # [end init_method]
-
-    @property
-    def prefix(self):
-        """Get the _prefix attribute."""
-        return self._prefix
 
     # [start read_file_method]
     def read_file(self, suf: str):

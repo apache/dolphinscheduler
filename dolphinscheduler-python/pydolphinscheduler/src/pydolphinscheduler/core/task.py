@@ -33,10 +33,10 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyDSParamException, PyResPluginException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 logger = getLogger(__name__)
 
@@ -240,13 +240,13 @@ class Task(Base):
         """
         if self.resource_plugin is None:
             if self.process_definition.resource_plugin is not None:
-                return self.process_definition.resource_plugin.resource
+                return self.process_definition.resource_plugin
             else:
                 raise PyResPluginException(
                     "The execution command of this task is a file, but the resource plugin is empty"
                 )
         else:
-            return self.resource_plugin.resource
+            return self.resource_plugin
 
     def get_content(self):
         """Get the file content according to the resource plugin."""

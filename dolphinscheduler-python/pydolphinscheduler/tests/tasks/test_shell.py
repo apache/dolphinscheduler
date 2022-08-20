@@ -22,8 +22,7 @@ from unittest.mock import patch
 
 import pytest
 
-from pydolphinscheduler.constants import ResourcePluginType
-from pydolphinscheduler.resources_plugin import ResourcePlugin
+from pydolphinscheduler.resources_plugin import Local
 from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.utils import file
 from tests.testing.file import delete_file
@@ -113,9 +112,7 @@ def test_shell_get_define():
             {
                 "name": "test-local-res-command-content",
                 "command": file_name,
-                "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL, prefix=res_plugin_prefix
-                ),
+                "resource_plugin": Local(str(res_plugin_prefix)),
             },
             file_content,
         )

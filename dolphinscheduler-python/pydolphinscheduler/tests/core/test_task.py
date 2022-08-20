@@ -22,11 +22,10 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
 from pydolphinscheduler.exceptions import PyResPluginException
-from pydolphinscheduler.resources_plugin import ResourcePlugin
+from pydolphinscheduler.resources_plugin import Local
 from tests.testing.task import Task as testTask
 from tests.testing.task import TaskWithCode
 
@@ -299,16 +298,10 @@ def test_task_ext_attr(
             {
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
-                "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix="prefix",
-                ),
+                "resource_plugin": Local("prefix"),
                 "process_definition": ProcessDefinition(
                     name="process_definition",
-                    resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.LOCAL,
-                        prefix="prefix",
-                    ),
+                    resource_plugin=Local("prefix"),
                 ),
             },
             "Local",
@@ -317,10 +310,7 @@ def test_task_ext_attr(
             {
                 "name": "test_task_abtain_res_plugin",
                 "task_type": "TaskType",
-                "resource_plugin": ResourcePlugin(
-                    type=ResourcePluginType.LOCAL,
-                    prefix="prefix",
-                ),
+                "resource_plugin": Local("prefix"),
             },
             "Local",
         ),
@@ -330,10 +320,7 @@ def test_task_ext_attr(
                 "task_type": "TaskType",
                 "process_definition": ProcessDefinition(
                     name="process_definition",
-                    resource_plugin=ResourcePlugin(
-                        type=ResourcePluginType.LOCAL,
-                        prefix="prefix",
-                    ),
+                    resource_plugin=Local("prefix"),
                 ),
             },
             "Local",
