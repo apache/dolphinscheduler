@@ -145,8 +145,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
-            Map<String, Object> Params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {});
-            Integer dataSourceId = (Integer) Params.get("datasource");
+            Map<String, Object> params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+            Integer dataSourceId = (Integer) params.get("datasource");
             if (null == dataSourceId) {
                 taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
