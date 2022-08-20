@@ -298,7 +298,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
             return workerGroups;
         }
-
+        
+        WorkerGroup aDefault = workerGroups.stream().filter(a -> a.getAddrList().equals("default")).collect(Collectors.toList()).get(0);
         for (String workerGroup : workerGroupList) {
             String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
             Collection<String> childrenNodes = null;
@@ -310,7 +311,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
-            WorkerGroup aDefault = workerGroups.stream().filter(a -> a.getAddrList().equals("default")).collect(Collectors.toList()).get(0);
             handleChildrenNodes(workerGroup,childrenNodes);
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
