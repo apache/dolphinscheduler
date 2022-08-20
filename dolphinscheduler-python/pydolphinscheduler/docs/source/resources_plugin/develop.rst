@@ -18,12 +18,14 @@
 How to develop
 ==============
 
-When you want to create a new resource plugin, you need to add a new class in the module `mod`:`resources_plugin`. All you have to do is named your plugin, implement `__init__` and `read_file` method.
+When you want to create a new resource plugin, you need to add a new class in the module `resources_plugin`.
 
-Your plugin class needs two indispensable methods, one is the __init__ method, the parameter is the prefix of type str, the other is
-the read_file function, the parameter is the file suffix of type str, the return value is the file content, if it is exists and is readable.
+The resource plug-in class needs to inherit the abstract class `ResourcePlugin` and implement its abstract method `read_file` function.
 
-In addition you need to add a constant with your plugin name to ResourcePluginType in dolphinscheduler-python/pydolphinscheduler/src/pydolphinscheduler/constants.py, eg LOCAL = "local".
+The parameter of the `__init__` function of `ResourcePlugin` is the prefix of STR type. You can override it when necessary.
+
+The `read_file` function parameter of `ResourcePlugin` is the file suffix of STR type, and its return value is the file content, if it exists and is readable.
+
 
 Example
 -------
@@ -42,10 +44,3 @@ The prefix plus suffix is the absolute path of the file in this resource.
 .. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/local.py
     :start-after: [start read_file_method]
     :end-before: [end read_file_method]
-
-Last but not least, you should also add new resource plugin in constants.py
-
-.. literalinclude:: ../../../src/pydolphinscheduler/constants.py
-    :start-after: [start class_resource]
-    :end-before: [end class_resource]
-

@@ -18,12 +18,12 @@
 ResourcePlugin
 ==============
 
-ResourcePlugin is the data type of the resources plugin parameter in task subclasses and workflow definitions.
-
+`ResourcePlugin` is an abstract class of resource plug-in parameters of task subclass and workflow.
+All resource plugins need to inherit and override its abstract methods.
 
 Code
 ----
-.. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/__init__.py
+.. literalinclude:: ../../../src/pydolphinscheduler/core/resource_plugin.py
    :start-after: [start resource_plugin_definition]
    :end-before: [end resource_plugin_definition]
 
@@ -31,57 +31,36 @@ Dive Into
 ---------
 It has the following key functions.
 
-- Method `__init__`: The `__init__` function requires parameters. The first is the `type` of str type, which means the plugin type of the resource,
+- Method `__init__`: The `__init__` function has STR type parameter `prefix`, which means the plugin type of the resource.
 
-and the second is the `prefix` of the str type, which means the prefix of the resource.
+You can rewrite it if necessary.
 
-.. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/__init__.py
+.. literalinclude:: ../../../src/pydolphinscheduler/core/resource_plugin.py
     :start-after: [start init_method]
     :end-before: [end init_method]
 
-- Method `get_all_modules`: The `get_all_modules` function will return the absolute path of all resource plugins defined in the resource_plugin file.
+- Method `read_file`: Get content from the given URI, The function parameter is the suffix of the file path.
 
-.. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/__init__.py
-    :start-after: [start get_all_modules]
-    :end-before: [end get_all_modules]
+The file prefix has been initialized in init of the resource plug-in.
 
-- Method `import_module`: The `import_module` function has two parameters, `script_name` and `script_path`.
+The prefix plus suffix is the absolute path of the file in this resource.
 
-`script_name` is the name of the resource file without the suffix, such as the local resource plugin class local.py,
+It is an abstract function. You must rewrite it
 
-its `script_name` is local, and `script_path` is the absolute path of the resource plugin file
+.. literalinclude:: ../../../src/pydolphinscheduler/core/resource_plugin.py
+    :start-after: [start abstractmethod read_file]
+    :end-before: [end abstractmethod read_file]
 
-.. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/__init__.py
-    :start-after: [start import_module]
-    :end-before: [end import_module]
-
-- Method `resource`: The `resource` function will dynamically return the resource plugin object according to the type parameter of the `__init__` function,
-
-for example, the type is `ResourcePluginType.LOCAL`, then the local plugin object is returned
-
-.. literalinclude:: ../../../src/pydolphinscheduler/resources_plugin/__init__.py
-    :start-after: [start resource]
-    :end-before: [end resource]
-
-.. automodule:: pydolphinscheduler.resources_plugin.__init__
+.. automodule:: pydolphinscheduler.core.resource_plugin
 
 How to use
 ----------
 Resource plug-ins can be used in task subclasses and workflows. You can use the resource plug-ins by adding the `resource_plugin` parameter when they are initialized.
+For example, local resource plug-ins, add `resource_plugin = Local("/tmp")`.
 
-Using resource plug-ins in workflows
+The resource plug-ins we currently support is `local`.
 
-.. literalinclude:: ../../../src/pydolphinscheduler/examples/tutorial_resource_plugin.py
-   :start-after: [start workflow_declare]
-   :end-before: [end workflow_declare]
-
-Using resource plug-ins in sehll tasks
-
-.. literalinclude:: ../../../src/pydolphinscheduler/examples/tutorial_resource_plugin.py
-   :start-after: [start task_declare]
-   :end-before: [end task_declare]
-
-Use resource plug-ins in both tasks and workflows
+Here is an example.
 
 .. literalinclude:: ../../../src/pydolphinscheduler/examples/tutorial_resource_plugin.py
    :start-after: [start workflow_declare]

@@ -21,10 +21,8 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from pydolphinscheduler.constants import ResourcePluginType
 from pydolphinscheduler.core import Task
 from pydolphinscheduler.exceptions import PyResPluginException
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.local import Local
 from pydolphinscheduler.utils import file
 from tests.testing.file import delete_file
@@ -77,11 +75,8 @@ def test_task_obtain_res_plugin(
     m_raw_script.return_value = val
     task = Task(
         name="test_task_ext_attr",
-        task_type=ResourcePluginType.LOCAL,
-        resource_plugin=ResourcePlugin(
-            type=ResourcePluginType.LOCAL,
-            prefix=str(res_plugin_prefix),
-        ),
+        task_type="type",
+        resource_plugin=Local(str(res_plugin_prefix)),
     )
     assert expected == getattr(task, "raw_script")
 

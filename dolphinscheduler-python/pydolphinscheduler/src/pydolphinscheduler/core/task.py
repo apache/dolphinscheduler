@@ -33,10 +33,10 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyDSParamException, PyResPluginException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 
 logger = getLogger(__name__)
 

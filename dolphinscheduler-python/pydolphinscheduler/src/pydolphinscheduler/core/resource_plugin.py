@@ -15,43 +15,35 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""DolphinScheduler local resource plugin."""
-
-import os
-from pathlib import Path
-
-from pydolphinscheduler.core.resource_plugin import ResourcePlugin
-from pydolphinscheduler.exceptions import PyResPluginException
+"""DolphinScheduler ResourcePlugin object."""
 
 
-class Local(ResourcePlugin):
-    """Local object, declare local resource plugin for task and workflow to dolphinscheduler.
+from abc import ABCMeta, abstractmethod
 
-    :param prefix: A string representing the prefix of Local.
+
+# [start resource_plugin_definition]
+class ResourcePlugin(object, metaclass=ABCMeta):
+    """ResourcePlugin object, declare resource plugin for task and workflow to dolphinscheduler.
+
+    :param prefix: A string representing the prefix of ResourcePlugin.
 
     """
 
     # [start init_method]
     def __init__(self, prefix: str, *args, **kwargs):
-        super().__init__(prefix, *args, **kwargs)
+        self.prefix = prefix
 
     # [end init_method]
 
-    # [start read_file_method]
+    # [start abstractmethod read_file]
+    @abstractmethod
     def read_file(self, suf: str):
         """Get the content of the file.
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
-        path = Path(self.prefix).joinpath(suf)
-        if not path.exists():
-            raise PyResPluginException("{} is not found".format(str(path)))
-        if not os.access(str(path), os.R_OK):
-            raise PyResPluginException(
-                "You don't have permission to access {}".format(self.prefix + suf)
-            )
-        with open(path, "r") as f:
-            content = f.read()
-        return content
 
-    # [end read_file_method]
+    # [end abstractmethod read_file]
+
+
+# [end resource_plugin_definition]

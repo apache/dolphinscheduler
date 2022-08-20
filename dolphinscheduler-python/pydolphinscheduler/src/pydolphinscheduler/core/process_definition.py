@@ -24,10 +24,10 @@ from typing import Any, Dict, List, Optional, Set
 from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base, Project, Tenant, User
-from pydolphinscheduler.resources_plugin import ResourcePlugin
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
 
