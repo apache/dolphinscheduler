@@ -15,6 +15,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +31,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-@RestController
-@RequestMapping("projects/process-definition")
-public class ProcessDefinitionDemo extends BaseController {
+@Component
+public class ProcessDefinitionDemo implements CommandLineRunner {
 
+    private static final boolean DEMO_MODE = Objects.equals(System.getProperty("demo"), "true");
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDemo.class);
 
     @Autowired
@@ -44,8 +48,13 @@ public class ProcessDefinitionDemo extends BaseController {
     @Autowired
     private UserMapper userMapper;
 
-    @PostMapping(value = "/demo")
-    public Result createProcessDefinitionDemo(){
+    @Override
+    public void run(String... args) throws Exception {
+        if( DEMO_MODE ){
+            createProcessDefinitionDemo();
+        }
+    }
+    public void createProcessDefinitionDemo(){
         //get user
         User loginUser = userMapper.selectById("1");
         Map<String, Object> result = new HashMap<>();
@@ -99,7 +108,7 @@ public class ProcessDefinitionDemo extends BaseController {
         Map<String, Object> conditionResult = conditionDemo (loginUser, projectCode, tenantCode);
         logger.info("create condition demo " + conditionResult.get("msg"));
 
-        return returnDataList(conditionResult);
+//        return returnDataList(conditionResult);
 
     }
 
@@ -179,11 +188,11 @@ public class ProcessDefinitionDemo extends BaseController {
             DemoContants.SHELL_NAME,
             DemoContants.DESCRIPTION,
             DemoContants.SHELL_GLOBAL_PARAMS,
-            DemoContants.SHELL_locations[0]+taskCodeFirst+DemoContants.SHELL_locations[1]+taskCodeSecond+DemoContants.SHELL_locations[2]+taskCodeThird+DemoContants.SHELL_locations[3],
+            DemoContants.SHELL_locations[0] + taskCodeFirst + DemoContants.SHELL_locations[1] + taskCodeSecond + DemoContants.SHELL_locations[2] + taskCodeThird + DemoContants.SHELL_locations[3],
             DemoContants.TIMEOUT,
             tenantCode,
-            DemoContants.SHELL_taskRelationJson[0]+taskCodeFirst+DemoContants.SHELL_taskRelationJson[1]+taskCodeFirst+DemoContants.SHELL_taskRelationJson[2]+taskCodeSecond+DemoContants.SHELL_taskRelationJson[3]+taskCodeSecond+DemoContants.SHELL_taskRelationJson[4]+taskCodeThird+DemoContants.SHELL_taskRelationJson[5],
-            DemoContants.SHELL_taskDefinitionJson[0]+taskCodeFirst+DemoContants.SHELL_taskDefinitionJson[1]+taskCodeSecond+DemoContants.SHELL_taskDefinitionJson[2]+taskCodeThird+DemoContants.SHELL_taskDefinitionJson[3],
+            DemoContants.SHELL_taskRelationJson[0] + taskCodeFirst + DemoContants.SHELL_taskRelationJson[1] + taskCodeFirst + DemoContants.SHELL_taskRelationJson[2] + taskCodeSecond + DemoContants.SHELL_taskRelationJson[3] + taskCodeSecond + DemoContants.SHELL_taskRelationJson[4] + taskCodeThird + DemoContants.SHELL_taskRelationJson[5],
+            DemoContants.SHELL_taskDefinitionJson[0] + taskCodeFirst + DemoContants.SHELL_taskDefinitionJson[1] + taskCodeSecond + DemoContants.SHELL_taskDefinitionJson[2] + taskCodeThird + DemoContants.SHELL_taskDefinitionJson[3],
             PARALLEL);
         return result;
     }
@@ -213,6 +222,7 @@ public class ProcessDefinitionDemo extends BaseController {
             PARALLEL);
         return result;
     }
+
 
 
 }
