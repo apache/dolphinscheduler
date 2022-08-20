@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -106,8 +107,8 @@ public class SchemaUtils {
     public static String getSoftVersion() throws IOException {
         final ClassPathResource softVersionFile = new ClassPathResource("sql/soft_version");
         String softVersion;
-        try {
-            softVersion = FileUtils.readFile2Str(softVersionFile.getInputStream());
+        try (InputStream inputStream = softVersionFile.getInputStream()) {
+            softVersion = FileUtils.readFile2Str(inputStream);
             softVersion = Strings.nullToEmpty(softVersion).replaceAll("\\s+|\r|\n", "");
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);
