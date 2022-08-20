@@ -283,6 +283,10 @@ public class ProcessAlertManager {
             // no need to close alert
             return;
         }
+        if (processInstance.getWarningGroupId() == null || processInstance.getWarningGroupId() == 0) {
+            // no need to close alert if not close alert
+            return;
+        }
 
         Alert alert = new Alert();
         alert.setAlertGroupId(processInstance.getWarningGroupId());
