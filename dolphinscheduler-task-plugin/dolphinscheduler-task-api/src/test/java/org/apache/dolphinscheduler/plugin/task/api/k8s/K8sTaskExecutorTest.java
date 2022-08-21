@@ -16,8 +16,6 @@
  */
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
-import io.fabric8.kubernetes.api.model.batch.Job;
-import io.fabric8.kubernetes.api.model.batch.JobStatus;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
@@ -36,7 +34,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
+
 public class K8sTaskExecutorTest {
+
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;
     private final String image = "ds-dev";
@@ -51,10 +53,10 @@ public class K8sTaskExecutorTest {
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
-        Map<String,String> namespace = JSONUtils.toMap(this.namespace);
+        Map<String, String> namespace = JSONUtils.toMap(this.namespace);
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);
-        k8sTaskExecutor = new K8sTaskExecutor(null,taskRequest);
+        k8sTaskExecutor = new K8sTaskExecutor(null, taskRequest);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
         k8sTaskMainParameters.setNamespaceName(namespaceName);
@@ -68,7 +70,7 @@ public class K8sTaskExecutorTest {
         JobStatus jobStatus = new JobStatus();
         jobStatus.setSucceeded(1);
         job.setStatus(jobStatus);
-        Assert.assertEquals(0, Integer.compare(0,k8sTaskExecutor.getK8sJobStatus(job)));
+        Assert.assertEquals(0, Integer.compare(0, k8sTaskExecutor.getK8sJobStatus(job)));
     }
     @Test
     public void testSetTaskStatusNormal() {
@@ -76,15 +78,15 @@ public class K8sTaskExecutorTest {
         TaskResponse taskResponse = new TaskResponse();
         K8sTaskMainParameters k8STaskMainParameters = new K8sTaskMainParameters();
         k8sTaskExecutor.setJob(job);
-        k8sTaskExecutor.setTaskStatus(jobStatus,String.valueOf(taskInstanceId),taskResponse,k8STaskMainParameters);
-        Assert.assertEquals(0, Integer.compare(EXIT_CODE_KILL,taskResponse.getExitStatusCode()));
+        k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse, k8STaskMainParameters);
+        Assert.assertEquals(0, Integer.compare(EXIT_CODE_KILL, taskResponse.getExitStatusCode()));
     }
     @Test
     public void testWaitTimeoutNormal() {
         try {
             k8sTaskExecutor.waitTimeout(true);
         } catch (TaskException e) {
-            Assert.assertThat(e.getMessage(),is("K8sTask is timeout"));
+            Assert.assertThat(e.getMessage(), is("K8sTask is timeout"));
         }
     }
 }
