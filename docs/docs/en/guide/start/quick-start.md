@@ -56,6 +56,6 @@ Click on the user name in the upper right corner to "exit" and re-use the normal
 * `Click Workflow Definition -> Create Workflow Definition-> Online Workflow Definition`
 
 ![workflow-definition](../../../../img/new_ui/dev/quick-start/workflow-definition.png)
-* `Running Process Definition -> Click Workflow Instance -> Click Workflow Instance Name -> Double-click Task Node -> View Task Execution Log`
+* `Running Workflow Definition -> Click Workflow Instance -> Click Workflow Instance Name -> Double-click Task Node -> View Task Execution Log`
 
 ![log](../../../../img/new_ui/dev/quick-start/log.png)
