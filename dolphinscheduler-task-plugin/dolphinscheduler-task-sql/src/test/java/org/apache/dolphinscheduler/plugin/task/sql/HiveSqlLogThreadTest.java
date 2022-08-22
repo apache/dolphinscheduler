@@ -16,25 +16,12 @@
  */
 
 package org.apache.dolphinscheduler.plugin.task.sql;
-
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 
 import org.apache.hive.jdbc.HiveStatement;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +40,7 @@ public class HiveSqlLogThreadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThreadTest.class);
 
     @Test
-    public void testHiveSql() throws SQLException, InterruptedException {
+    public void testHiveSql() throws SQLException {
         TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         PowerMockito.when(taskExecutionContext.getTaskType()).thenReturn("hive");
 
@@ -73,7 +60,7 @@ public class HiveSqlLogThreadTest {
             Assert.assertEquals(taskExecutionContext.getTaskType(), "hive");
 
         } catch (Exception e) {
-            LOGGER.error(sql + " query failed" , e);
+            LOGGER.error("query failed,sql is [{}]" ,sql);
         }
 
     }
