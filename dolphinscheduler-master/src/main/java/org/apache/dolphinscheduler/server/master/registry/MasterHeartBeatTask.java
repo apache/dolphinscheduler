@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -35,23 +36,17 @@ public class MasterHeartBeatTask implements Runnable {
 
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
-    private final String serverType;
     private final HeartBeat heartBeat;
-    private final int heartBeatErrorThreshold;
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
     public MasterHeartBeatTask(long startupTime,
                                double maxCpuloadAvg,
                                double reservedMemory,
                                Set<String> heartBeatPaths,
-                               String serverType,
-                               RegistryClient registryClient,
-                               int heartBeatErrorThreshold) {
+                               RegistryClient registryClient) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
-        this.serverType = serverType;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
-        this.heartBeatErrorThreshold = heartBeatErrorThreshold;
     }
 
     public String getHeartBeatInfo() {
@@ -61,23 +56,15 @@ public class MasterHeartBeatTask implements Runnable {
     @Override
     public void run() {
         try {
-            // check dead or not in zookeeper
-            for (String heartBeatPath : heartBeatPaths) {
-                if (registryClient.checkIsDeadServer(heartBeatPath, serverType)) {
-                    registryClient.getStoppable().stop("i was judged to death, release resources and stop myself");
-                    return;
-                }
+            if (!ServerLifeCycleManager.isRunning()) {
+                return;
             }
             for (String heartBeatPath : heartBeatPaths) {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
             heartBeatErrorTimes.set(0);
         } catch (Throwable ex) {
-            logger.error("HeartBeat task execute failed", ex);
-            if (heartBeatErrorTimes.incrementAndGet() >= heartBeatErrorThreshold) {
-                registryClient.getStoppable()
-                              .stop("HeartBeat task connect to zk failed too much times: " + heartBeatErrorTimes);
-            }
+            logger.error("HeartBeat task execute failed, errorTimes: {}", heartBeatErrorTimes.get(), ex);
         }
     }
 }

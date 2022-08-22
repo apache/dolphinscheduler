@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.registry;
+package org.apache.dolphinscheduler.server.worker.registry;
 
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
@@ -29,9 +29,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Heart beat task
  */
-public class HeartBeatTask implements Runnable {
+public class WorkerHeartBeatTask implements Runnable {
 
-    private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
+    private final Logger logger = LoggerFactory.getLogger(WorkerHeartBeatTask.class);
 
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
@@ -40,17 +40,7 @@ public class HeartBeatTask implements Runnable {
 
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         Set<String> heartBeatPaths,
-                         RegistryClient registryClient) {
-        this.heartBeatPaths = heartBeatPaths;
-        this.registryClient = registryClient;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
-    }
-
-    public HeartBeatTask(long startupTime,
+    public WorkerHeartBeatTask(long startupTime,
                          double maxCpuloadAvg,
                          double reservedMemory,
                          int hostWeight,
