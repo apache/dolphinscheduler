@@ -207,10 +207,9 @@ public class ServerNodeManager implements InitializingBean {
                 if (CollectionUtils.isNotEmpty(workerGroupList)) {
                     for (WorkerGroup wg : workerGroupList) {
                         String workerGroupName = wg.getName();
-                        Set<String> nodes = new HashSet<>();
-                        handleAddr(registryWorkerNodeMap, wg, nodes);
-                        if (!nodes.isEmpty()) {
-                            syncWorkerGroupNodes(workerGroupName, nodes);
+                        Set<String> workerAddress = getWorkerAddressByWorkerGroup(registryWorkerNodeMap, wg);
+                        if (!workerAddress.isEmpty()) {
+                            syncWorkerGroupNodes(workerGroupName, workerAddress);
                         }
                     }
                 }
@@ -222,13 +221,15 @@ public class ServerNodeManager implements InitializingBean {
     }
 
 
-    protected void handleAddr(Map<String, String> newWorkerNodeInfo, WorkerGroup wg, Set<String> nodes) {
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroup wg) {
+        Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {
             if (newWorkerNodeInfo.containsKey(addr)) {
                 nodes.add(addr);
             }
         }
+        return nodes;
     }
 
     /**
