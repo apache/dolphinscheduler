@@ -27,9 +27,9 @@ from pydolphinscheduler.exceptions import PyResPluginException
 
 
 class GitHub(ResourcePlugin):
-    """Github object, declare github resource plugin for task and workflow to dolphinscheduler.
+    """Github object, declare GitHub resource plugin for task and workflow to dolphinscheduler.
 
-    :param prefix: A string representing the prefix of Github.
+    :param prefix: A string representing the prefix of GitHub.
 
     :param access_token: A string used for identity authentication of GitHub private warehouse.
 
