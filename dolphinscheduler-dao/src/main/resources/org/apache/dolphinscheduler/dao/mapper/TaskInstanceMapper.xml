@@ -134,7 +134,7 @@
         and flag = 1
         limit 1
     </select>
-    <select id="queryByInstanceIdsAndCodes" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+    <select id="queryByProcessInstanceIdsAndTaskCodes" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>
         from t_ds_task_instance

@@ -1722,7 +1722,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (processInstanceIds.isEmpty() || nodeCodes.isEmpty()) {
                 taskInstances = Collections.emptyList();
             } else {
-                taskInstances = taskInstanceMapper.queryByInstanceIdsAndCodes(processInstanceIds, nodeCodes);
+                taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(processInstanceIds, nodeCodes);
             }
             for (Map.Entry<String, List<TreeViewDto>> en : entries) {
                 String nodeCode = en.getKey();

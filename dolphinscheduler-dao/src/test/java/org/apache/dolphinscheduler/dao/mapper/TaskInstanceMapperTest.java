@@ -280,10 +280,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     }
 
     /**
-     * test query by task instance ids and codes
+     * test query by process instance ids and task codes
      */
     @Test
-    public void testQueryByInstanceIdsAndCodes() {
+    public void testQueryByProcessInstanceIdsAndTaskCodes() {
         // insert ProcessInstance
         ProcessInstance processInstance = insertProcessInstance();
 
@@ -292,7 +292,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         task.setHost("111.111.11.11");
         taskInstanceMapper.updateById(task);
 
-        List<TaskInstance> taskInstances = taskInstanceMapper.queryByInstanceIdsAndCodes(
+        List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
                 Collections.singletonList(task.getProcessInstanceId()),
                 Collections.singletonList(task.getTaskCode()));
         taskInstanceMapper.deleteById(task.getId());
