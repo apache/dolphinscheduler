@@ -122,18 +122,18 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
-        handleDefaultWorkGroup(workerGroup, otherParamsJson);
+        handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    protected void handleDefaultWorkGroup(WorkerGroupMapper workerGroupMapper, WorkerGroup workerGroup, User loginUser, String otherParamsJson) {
         if (workerGroup.getId() != 0) {
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
             permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()),logger);
         }
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    protected void handleDefaultWorkGroup(WorkerGroup workerGroup, String otherParamsJson) {
     }
 
     /**
@@ -313,11 +313,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
-            handleChildrenNodes(workerGroup,childrenNodes);
             WorkerGroup wg = new WorkerGroup();
+            handleAddrList(wg, workerGroup, childrenNodes);
             wg.setName(workerGroup);
             if (isPaging) {
-                wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
                 HeartBeat heartBeat = HeartBeat.decodeHeartBeat(registeredValue);
                 wg.setCreateTime(new Date(heartBeat.getStartupTime()));
@@ -333,7 +332,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return workerGroups;
     }
     
-    protected void handleChildrenNodes(String workerGroup, Collection<String> childrenNodes) {
+    protected void handleAddrList(WorkerGroup wg, String workerGroup, Collection<String> childrenNodes) {
+        wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
     }
 
     /**

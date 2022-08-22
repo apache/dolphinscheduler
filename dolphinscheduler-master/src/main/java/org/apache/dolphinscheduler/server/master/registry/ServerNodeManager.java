@@ -210,11 +210,7 @@ public class ServerNodeManager implements InitializingBean {
                         String workerGroup = wg.getName();
                         Set<String> nodes = new HashSet<>();
                         String[] addrs = wg.getAddrList().split(Constants.COMMA);
-                        for (String addr : addrs) {
-                            if (newWorkerNodeInfo.containsKey(addr)) {
-                                handleAddr(workerGroupMapper, workerGroup, nodes, addr);
-                            }
-                        }
+                        handleAddr(newWorkerNodeInfo, workerGroup, nodes, addrs);
                         if (!nodes.isEmpty()) {
                             syncWorkerGroupNodes(workerGroup, nodes);
                         }
@@ -228,8 +224,12 @@ public class ServerNodeManager implements InitializingBean {
     }
 
 
-    protected void handleAddr(WorkerGroupMapper workerGroupMapper, String workerGroup, Set<String> nodes, String addr) {
-        nodes.add(addr);
+    protected void handleAddr(Map<String, String> newWorkerNodeInfo, String workerGroup, Set<String> nodes, String[] addrs) {
+        for (String addr : addrs) {
+            if (newWorkerNodeInfo.containsKey(addr)) {
+                nodes.add(addr);
+            }
+        }
     }
 
     /**
