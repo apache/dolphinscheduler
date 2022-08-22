@@ -274,10 +274,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
-        }  else if (!checkSubProcessDefinitionValid(processDefinition)) {
-            // check sub process definition online
-            putMsg(result, Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
-        } else {
+        }  else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
         return result;
