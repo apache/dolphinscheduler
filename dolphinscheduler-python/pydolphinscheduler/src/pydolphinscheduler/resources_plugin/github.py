@@ -33,6 +33,10 @@ class GitHub(ResourcePlugin):
 
     :param access_token: A string used for identity authentication of GitHub private warehouse.
 
+    :param username: A string representing the user of the warehouse.
+
+    :param password: A string representing the user password.
+
 
     """
 
