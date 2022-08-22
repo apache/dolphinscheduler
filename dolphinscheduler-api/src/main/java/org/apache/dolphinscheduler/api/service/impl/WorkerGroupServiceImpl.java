@@ -300,7 +300,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         Map<String, WorkerGroup> workerGroupsMap = null;
         if (workerGroups.size() != 0) {
-            workerGroupsMap = workerGroups.stream().collect(Collectors.toMap(WorkerGroup::getName, item -> item, (key, value) -> key));
+            workerGroupsMap = workerGroups.stream().collect(Collectors.toMap(WorkerGroup::getName, workerGroupItem -> workerGroupItem, (oldWorkerGroup, newWorkerGroup) -> oldWorkerGroup));
         }
         for (String workerGroup : workerGroupList) {
             String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
@@ -322,7 +322,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 wg.setCreateTime(new Date(heartBeat.getStartupTime()));
                 wg.setUpdateTime(new Date(heartBeat.getReportTime()));
                 wg.setSystemDefault(true);
-                if (workerGroupsMap != null && workerGroupsMap.get(workerGroup) != null) {
+                if (workerGroupsMap != null && workerGroupsMap.containsKey(workerGroup)) {
                     wg.setDescription(workerGroupsMap.get(workerGroup).getDescription());
                     workerGroups.remove(workerGroupsMap.get(workerGroup));
                 }

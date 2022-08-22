@@ -200,19 +200,17 @@ public class ServerNodeManager implements InitializingBean {
         public void run() {
             try {
                 // sync worker node info
-                Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
-                syncAllWorkerNodeInfo(newWorkerNodeInfo);
-
+                Map<String, String> registryWorkerNodeMap = registryClient.getServerMaps(NodeType.WORKER, true);
+                syncAllWorkerNodeInfo(registryWorkerNodeMap);
                 // sync worker group nodes from database
                 List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
                 if (CollectionUtils.isNotEmpty(workerGroupList)) {
                     for (WorkerGroup wg : workerGroupList) {
-                        String workerGroup = wg.getName();
+                        String workerGroupName = wg.getName();
                         Set<String> nodes = new HashSet<>();
-                        String[] addrs = wg.getAddrList().split(Constants.COMMA);
-                        handleAddr(newWorkerNodeInfo, workerGroup, nodes, addrs);
+                        handleAddr(registryWorkerNodeMap, wg, nodes);
                         if (!nodes.isEmpty()) {
-                            syncWorkerGroupNodes(workerGroup, nodes);
+                            syncWorkerGroupNodes(workerGroupName, nodes);
                         }
                     }
                 }
@@ -224,7 +222,8 @@ public class ServerNodeManager implements InitializingBean {
     }
 
 
-    protected void handleAddr(Map<String, String> newWorkerNodeInfo, String workerGroup, Set<String> nodes, String[] addrs) {
+    protected void handleAddr(Map<String, String> newWorkerNodeInfo, WorkerGroup wg, Set<String> nodes) {
+        String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {
             if (newWorkerNodeInfo.containsKey(addr)) {
                 nodes.add(addr);
