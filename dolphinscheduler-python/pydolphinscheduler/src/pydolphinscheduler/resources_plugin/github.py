@@ -65,7 +65,7 @@ class Github(ResourcePlugin):
         if prefix[-1] != "/":
             prefix = prefix + "/"
         if suf[0] == "/":
-            suf = suf[0:]
+            suf = suf[1:]
         return urljoin(prefix + "/", suf)
 
     def get_index(self, s: str, x, n):
@@ -108,6 +108,8 @@ class Github(ResourcePlugin):
         path = self.url_join(self.prefix, suf)
         return self.req(path)
 
+    # [end read_file_method]
+
     def req(self, path: str):
         """Send HTTP request, parse response data, and get file content."""
         headers = {
@@ -119,12 +121,10 @@ class Github(ResourcePlugin):
         file_info = self.get_file_info(path)
         url = self.get_req_url(file_info)
         params = {"ref": file_info["branch"]}
-        proxies = {"http": "http://127.0.0.1:8889", "https": "http://127.0.0.1:8889"}
         response = requests.get(
             headers=headers,
             url=url,
             params=params,
-            proxies=proxies,
         )
         if response.status_code == requests.codes.ok:
             json_response = response.json()
@@ -136,5 +136,3 @@ class Github(ResourcePlugin):
             if response.status_code == requests.codes.unauthorized:
                 raise PyResPluginException("unauthorized.")
             raise PyResPluginException("Unknown exception.")
-
-    # [end read_file_method]
