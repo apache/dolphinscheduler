@@ -71,6 +71,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 registry:
   type: zookeeper

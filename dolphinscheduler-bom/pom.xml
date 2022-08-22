@@ -29,7 +29,7 @@
 
     <properties>
         <netty.version>4.1.53.Final</netty.version>
-        <spring-boot.version>2.5.6</spring-boot.version>
+        <spring-boot.version>2.7.3</spring-boot.version>
         <spring.version>5.3.19</spring.version>
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
@@ -57,8 +57,7 @@
         <h2.version>1.4.200</h2.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
-        <slf4j-api.version>1.7.5</slf4j-api.version>
-        <slf4j-log4j12.version>1.7.5</slf4j-log4j12.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <activation.version>1.1</activation.version>
@@ -72,9 +71,7 @@
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <swagger.version>1.9.3</swagger.version>
-        <springfox.version>2.9.2</springfox.version>
-        <swagger-models.version>1.5.24</swagger-models.version>
+        <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
         <reflections.version>0.9.12</reflections.version>
         <py4j.version>0.10.9</py4j.version>
@@ -87,7 +84,7 @@
         <joda-time.version>2.10.13</joda-time.version>
         <okhttp.version>3.14.9</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
-        <spring-cloud-dependencies.version>2020.0.6</spring-cloud-dependencies.version>
+        <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
     </properties>
 
     <dependencyManagement>
@@ -355,12 +352,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j-log4j12.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <!-- logback -->
             <dependency>
@@ -507,26 +504,8 @@
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
+                <artifactId>springfox-boot-starter</artifactId>
                 <version>${springfox.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger-models.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>swagger-bootstrap-ui</artifactId>
-                <version>${swagger.version}</version>
             </dependency>
 
             <dependency>
@@ -603,7 +582,12 @@
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>mockwebserver</artifactId>
+                <version>${okhttp.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
@@ -616,6 +600,14 @@
                 <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.12.4</version>
+                <!-- TODO: remove this dependency management after removing powermock -->
+                <scope>test</scope>
             </dependency>
         </dependencies>
 

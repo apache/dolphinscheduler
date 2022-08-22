@@ -38,6 +38,10 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,14 +57,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.apache.commons.lang3.StringUtils;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * task definition controller
@@ -83,8 +84,8 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "save", notes = "CREATE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", required = true, type = "String")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", required = true, dataTypeClass = String.class)
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -93,7 +94,8 @@ public class TaskDefinitionController extends BaseController {
     public Result createTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson) {
-        Map<String, Object> result = taskDefinitionService.createTaskDefinition(loginUser, projectCode, taskDefinitionJson);
+        Map<String, Object> result =
+                taskDefinitionService.createTaskDefinition(loginUser, projectCode, taskDefinitionJson);
         return returnDataList(result);
     }
 
@@ -109,10 +111,10 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "saveSingle", notes = "CREATE_SINGLE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "processDefinitionCode"),
-        @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, type = "String"),
-        @ApiImplicitParam(name = "upstreamCodes", value = "UPSTREAM_CODES", required = false, type = "String")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "upstreamCodes", value = "UPSTREAM_CODES", required = false, dataTypeClass = String.class)
     })
     @PostMapping("/save-single")
     @ResponseStatus(HttpStatus.CREATED)
@@ -123,7 +125,8 @@ public class TaskDefinitionController extends BaseController {
                                           @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
                                           @RequestParam(value = "taskDefinitionJsonObj", required = true) String taskDefinitionJsonObj,
                                           @RequestParam(value = "upstreamCodes", required = false) String upstreamCodes) {
-        Map<String, Object> result = taskDefinitionService.createTaskBindsWorkFlow(loginUser, projectCode, processDefinitionCode, taskDefinitionJsonObj, StringUtils.defaultString(upstreamCodes));
+        Map<String, Object> result = taskDefinitionService.createTaskBindsWorkFlow(loginUser, projectCode,
+                processDefinitionCode, taskDefinitionJsonObj, StringUtils.defaultString(upstreamCodes));
         return returnDataList(result);
     }
 
@@ -138,9 +141,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "update", notes = "UPDATE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
-        @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, type = "String")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1"),
+            @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, dataTypeClass = String.class)
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -150,7 +153,8 @@ public class TaskDefinitionController extends BaseController {
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @PathVariable(value = "code") long code,
                                        @RequestParam(value = "taskDefinitionJsonObj", required = true) String taskDefinitionJsonObj) {
-        Map<String, Object> result = taskDefinitionService.updateTaskDefinition(loginUser, projectCode, code, taskDefinitionJsonObj);
+        Map<String, Object> result =
+                taskDefinitionService.updateTaskDefinition(loginUser, projectCode, code, taskDefinitionJsonObj);
         return returnDataList(result);
     }
 
@@ -166,10 +170,10 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "updateWithUpstream", notes = "UPDATE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
-        @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, type = "String"),
-        @ApiImplicitParam(name = "upstreamCodes", value = "UPSTREAM_CODES", required = false, type = "String")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1"),
+            @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "upstreamCodes", value = "UPSTREAM_CODES", required = false, dataTypeClass = String.class)
     })
     @PutMapping(value = "/{code}/with-upstream")
     @ResponseStatus(HttpStatus.OK)
@@ -180,7 +184,8 @@ public class TaskDefinitionController extends BaseController {
                                          @PathVariable(value = "code") long code,
                                          @RequestParam(value = "taskDefinitionJsonObj", required = true) String taskDefinitionJsonObj,
                                          @RequestParam(value = "upstreamCodes", required = false) String upstreamCodes) {
-        Map<String, Object> result = taskDefinitionService.updateTaskWithUpstream(loginUser, projectCode, code, taskDefinitionJsonObj, upstreamCodes);
+        Map<String, Object> result = taskDefinitionService.updateTaskWithUpstream(loginUser, projectCode, code,
+                taskDefinitionJsonObj, upstreamCodes);
         return returnDataList(result);
     }
 
@@ -197,9 +202,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "queryVersions", notes = "QUERY_TASK_DEFINITION_VERSIONS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "10")
     })
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
@@ -228,8 +233,8 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "switchVersion", notes = "SWITCH_TASK_DEFINITION_VERSION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
-        @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1"),
+            @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
@@ -254,8 +259,8 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "deleteVersion", notes = "DELETE_TASK_DEFINITION_VERSION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
-        @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1"),
+            @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataTypeClass = int.class, example = "100")
     })
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
@@ -265,7 +270,8 @@ public class TaskDefinitionController extends BaseController {
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable(value = "code") long code,
                                               @PathVariable(value = "version") int version) {
-        Map<String, Object> result = taskDefinitionService.deleteByCodeAndVersion(loginUser, projectCode, code, version);
+        Map<String, Object> result =
+                taskDefinitionService.deleteByCodeAndVersion(loginUser, projectCode, code, version);
         return returnDataList(result);
     }
 
@@ -279,7 +285,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "deleteTaskDefinition", notes = "DELETE_TASK_DEFINITION_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1")
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -302,7 +308,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "queryTaskDefinitionByCode", notes = "QUERY_TASK_DEFINITION_DETAIL_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "1")
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -330,13 +336,13 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "queryTaskDefinitionListPaging", notes = "QUERY_TASK_DEFINITION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = false, type = "Long"),
-        @ApiImplicitParam(name = "searchWorkflowName", value = "SEARCH_WORKFLOW_NAME", required = false, type = "String"),
-        @ApiImplicitParam(name = "searchTaskName", value = "SEARCH_TASK_NAME", required = false, type = "String"),
-        @ApiImplicitParam(name = "taskType", value = "TASK_TYPE", required = false, dataType = "TaskType", example = "SHELL"),
-        @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataType = "TaskExecuteType", example = "STREAM"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = false, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "searchWorkflowName", value = "SEARCH_WORKFLOW_NAME", required = false, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "searchTaskName", value = "SEARCH_TASK_NAME", required = false, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "taskType", value = "TASK_TYPE", required = false, dataTypeClass = String.class, example = "SHELL"),
+            @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataTypeClass = TaskExecuteType.class, example = "STREAM"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "10")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -356,7 +362,8 @@ public class TaskDefinitionController extends BaseController {
         }
         searchWorkflowName = ParameterUtils.handleEscapes(searchWorkflowName);
         searchTaskName = ParameterUtils.handleEscapes(searchTaskName);
-        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchWorkflowName, searchTaskName, taskType, taskExecuteType, pageNo, pageSize);
+        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchWorkflowName,
+                searchTaskName, taskType, taskExecuteType, pageNo, pageSize);
     }
 
     /**
@@ -368,7 +375,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "genTaskCodeList", notes = "GEN_TASK_CODE_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "genNum", value = "GEN_NUM", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "genNum", value = "GEN_NUM", required = true, dataTypeClass = int.class, example = "1")
     })
     @GetMapping(value = "/gen-task-codes")
     @ResponseStatus(HttpStatus.OK)
@@ -391,9 +398,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "releaseTaskDefinition", notes = "RELEASE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, type = "Long"),
-        @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
-        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, dataType = "ReleaseState")
+            @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "123456789"),
+            @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, dataTypeClass = ReleaseState.class)
     })
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
@@ -403,7 +410,8 @@ public class TaskDefinitionController extends BaseController {
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "code", required = true) long code,
                                         @RequestParam(value = "releaseState", required = true, defaultValue = "OFFLINE") ReleaseState releaseState) {
-        Map<String, Object> result = taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, code, releaseState);
+        Map<String, Object> result =
+                taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, code, releaseState);
         return returnDataList(result);
     }
 }
