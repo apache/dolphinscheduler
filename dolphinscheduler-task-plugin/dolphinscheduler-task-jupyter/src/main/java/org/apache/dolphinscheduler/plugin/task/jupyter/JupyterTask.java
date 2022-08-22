@@ -84,6 +84,11 @@ public class JupyterTask extends AbstractTaskExecutor {
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Jupyter task has been interrupted", e);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            throw new TaskException("The current Jupyter task has been interrupted", e);
         } catch (Exception e) {
             logger.error("jupyter task execution failure", e);
             exitStatusCode = -1;

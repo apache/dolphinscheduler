@@ -57,6 +57,11 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
             // set appIds
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            logger.info("The current yarn task has been interrupted", ex);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            throw new TaskException("The current yarn task has been interrupted", ex);
         } catch (Exception e) {
             logger.error("yarn process failure", e);
             exitStatusCode = -1;

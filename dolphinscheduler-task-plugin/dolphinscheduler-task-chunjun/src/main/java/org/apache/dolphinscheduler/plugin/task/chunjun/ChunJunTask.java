@@ -115,6 +115,11 @@ public class ChunJunTask extends AbstractTaskExecutor {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current ChunJun Task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current ChunJun Task has been interrupted", e);
         } catch (Exception e) {
             logger.error("chunjun task failed.", e);
             setExitStatusCode(EXIT_CODE_FAILURE);

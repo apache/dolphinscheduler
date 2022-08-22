@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.mlflow;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -36,6 +34,8 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
 /**
  * shell task
@@ -96,6 +96,11 @@ public class MlflowTask extends AbstractTaskExecutor {
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Mlflow task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current Mlflow task has been interrupted", e);
         } catch (Exception e) {
             logger.error("Mlflow task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);

@@ -56,12 +56,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, WorkerTaskExecuteRunnable.class));
 
-    protected final @NonNull TaskExecutionContext taskExecutionContext;
-    protected final @NonNull WorkerConfig workerConfig;
-    protected final @NonNull String masterAddress;
-    protected final @NonNull WorkerMessageSender workerMessageSender;
-    protected final @NonNull AlertClientService alertClientService;
-    protected final @NonNull TaskPluginManager taskPluginManager;
+    protected final TaskExecutionContext taskExecutionContext;
+    protected final WorkerConfig workerConfig;
+    protected final String masterAddress;
+    protected final WorkerMessageSender workerMessageSender;
+    protected final AlertClientService alertClientService;
+    protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
 
     protected @Nullable AbstractTask task;

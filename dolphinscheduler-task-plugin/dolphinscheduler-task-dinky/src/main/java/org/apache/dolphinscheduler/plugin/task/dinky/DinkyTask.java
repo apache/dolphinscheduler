@@ -123,6 +123,7 @@ public class DinkyTask extends AbstractTaskExecutor {
                 }
             }
         } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
             logger.error("Execute dinkyTask failed", ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute dinkyTask failed", ex);
