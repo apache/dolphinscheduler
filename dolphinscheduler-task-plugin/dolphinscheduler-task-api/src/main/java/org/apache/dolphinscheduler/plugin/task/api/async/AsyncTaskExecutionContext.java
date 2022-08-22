@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api.async;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,13 @@ public class AsyncTaskExecutionContext implements Delayed {
         this.asyncTaskCallbackFunction = asyncTaskCallbackFunction;
         this.currentStartTime = 0;
         this.executeTimes = 0;
-        this.timeout = taskExecutionContext.getStartTime().getTime() + TimeUnit.SECONDS.toMillis(taskExecutionContext.getTaskTimeout());
+        if (TaskTimeoutStrategy.FAILED.equals(taskExecutionContext.getTaskTimeoutStrategy())
+                || TaskTimeoutStrategy.WARNFAILED.equals(taskExecutionContext.getTaskTimeoutStrategy())) {
+            // will timeout
+            this.timeout = taskExecutionContext.getStartTime().getTime() + TimeUnit.SECONDS.toMillis(taskExecutionContext.getTaskTimeout());
+        } else {
+            this.timeout = TimeUnit.SECONDS.toMillis(taskExecutionContext.getTaskTimeout());
+        }
         this.executeInterval = Math.max(asyncTaskExecuteFunction.getTaskExecuteInterval().toMillis(), 1000L);
     }
 
@@ -62,16 +69,8 @@ public class AsyncTaskExecutionContext implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        long nextExecuteTime = currentStartTime + executeInterval;
-        long delayTime;
-        if (nextExecuteTime >= timeout) {
-            // has been timeout, clear the timeoutParams
-            delayTime = timeout - System.currentTimeMillis();
-            timeout = TimeUnit.SECONDS.toMillis(Integer.MAX_VALUE);
-        } else {
-            delayTime = nextExecuteTime - System.currentTimeMillis();
-        }
-        return unit.convert(delayTime, TimeUnit.MILLISECONDS);
+        long nextExecuteTimeDelay = Math.min(currentStartTime + executeInterval, timeout) - System.currentTimeMillis();
+        return unit.convert(nextExecuteTimeDelay, TimeUnit.MILLISECONDS);
     }
 
 
