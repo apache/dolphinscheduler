@@ -251,6 +251,7 @@ spring-core-5.3.19.jar
 spring-expression-5.3.22.jar
 spring-jcl-5.3.22.jar
 spring-jdbc-5.3.19.jar
+spring-ldap-1.1.2.jar
 spring-plugin-core-2.0.0.RELEASE.jar
 spring-plugin-metadata-2.0.0.RELEASE.jar
 spring-tx-5.3.19.jar
