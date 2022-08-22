@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, watch, h, VNode } from 'vue'
+import { ref, onMounted, watch, h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NIcon, NTooltip, SelectOption } from 'naive-ui'
+import { NEllipsis, NIcon } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryAllProjectList } from '@/service/modules/projects'
@@ -179,7 +179,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryAllProjectList()
     projectList.value = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: item.name
+      label: () => h(NEllipsis, null, item.name)
     }))
     return projectList
   }
@@ -190,7 +190,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryProcessDefinitionList(code)
     const processList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: item.name
+      label: () => h(NEllipsis, null, item.name)
     }))
     processCache[code] = processList
 
@@ -204,7 +204,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await getTasksByDefinitionList(code, processCode)
     const taskList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: item.name
+      label: () => h(NEllipsis, null, item.name)
     }))
     taskList.unshift({
       value: 0,
@@ -308,18 +308,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                   processCode
                 )
                 item.depTaskCode = 0
-              },
-              renderOption: ({
-                node,
-                option
-              }: {
-                node: VNode
-                option: SelectOption
-              }) =>
-                h(NTooltip, null, {
-                  trigger: () => node,
-                  default: () => option.label
-                })
+              }
             },
             options:
               model.dependTaskList[i]?.dependItemList[j]
@@ -341,18 +330,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 24,
             name: t('project.node.task_name'),
             props: {
-              filterable: true,
-              renderOption: ({
-                node,
-                option
-              }: {
-                node: VNode
-                option: SelectOption
-              }) =>
-                h(NTooltip, null, {
-                  trigger: () => node,
-                  default: () => option.label
-                })
+              filterable: true
             },
             options:
               model.dependTaskList[i]?.dependItemList[j]?.depTaskCodeOptions ||
