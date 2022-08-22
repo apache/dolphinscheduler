@@ -64,9 +64,6 @@ public class HiveDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
-    private static final int testFlag = 1;
-
-    private static final int bindTestId = 1;
 
     @BeforeAll
     public static void setup() {
@@ -80,7 +77,7 @@ public class HiveDataSourceE2ETest {
     void testCreateHiveDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, hivePassword, database, jdbcParams, testFlag, bindTestId);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, hivePassword, database, jdbcParams);
 
         new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));

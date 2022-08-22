@@ -66,9 +66,6 @@ public class MysqlDataSourceE2ETest {
 
     private static final String jdbcParams = "{\"useSSL\": false}";
 
-    private static final int testFlag = 1;
-
-    private static final int bindTestId = 1;
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
@@ -81,7 +78,7 @@ public class MysqlDataSourceE2ETest {
     void testCreateMysqlDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams, testFlag, bindTestId);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams);
 
         new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));
