@@ -23,6 +23,7 @@
 /dolphinscheduler-registry/ @kezhenxu94 @caishunfeng @ruanwenjun
 /dolphinscheduler-api/ @caishunfeng @SbloodyS
 /dolphinscheduler-dao/ @caishunfeng @SbloodyS
+/dolphinscheduler-dao/src/main/resources/sql/ @zhongjiajie
 /dolphinscheduler-common/ @caishunfeng
 /dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-log-server/ @caishunfeng

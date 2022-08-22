@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +43,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "AUDIT_LOG_TAG")
 @RestController
@@ -66,13 +67,13 @@ public class AuditLogController extends BaseController {
      */
     @ApiOperation(value = "queryAuditLogListPaging", notes = "QUERY_AUDIT_LOG")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-        @ApiImplicitParam(name = "resourceType", value = "RESOURCE_TYPE", type = "AuditResourceType"),
-        @ApiImplicitParam(name = "operationType", value = "OPERATION_TYPE", type = "AuditOperationType"),
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "resourceType", value = "RESOURCE_TYPE", dataTypeClass = AuditResourceType.class),
+            @ApiImplicitParam(name = "operationType", value = "OPERATION_TYPE", dataTypeClass = AuditOperationType.class),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
     })
     @GetMapping(value = "/audit-log-list")
     @ResponseStatus(HttpStatus.OK)
@@ -90,7 +91,8 @@ public class AuditLogController extends BaseController {
         if (!result.checkResult()) {
             return result;
         }
-        result = auditService.queryLogListPaging(loginUser, resourceType, operationType, startDate, endDate, userName, pageNo, pageSize);
+        result = auditService.queryLogListPaging(loginUser, resourceType, operationType, startDate, endDate, userName,
+                pageNo, pageSize);
         return result;
     }
 }

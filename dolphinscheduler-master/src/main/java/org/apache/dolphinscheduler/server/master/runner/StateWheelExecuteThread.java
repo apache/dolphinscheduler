@@ -21,9 +21,9 @@ import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -79,6 +80,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     @Autowired
     private MasterConfig masterConfig;
 
+    @Lazy
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
@@ -97,7 +99,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     @Override
     public void run() {
         final long checkInterval = masterConfig.getStateWheelInterval().toMillis();
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
                 checkTask4Timeout();
                 checkTask4Retry();
@@ -233,6 +235,13 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         TaskInstanceKey taskInstanceKey = TaskInstanceKey.getTaskInstanceKey(processInstance, taskInstance);
         taskInstanceStateCheckList.remove(taskInstanceKey);
         logger.info("Removed task instance from state check list");
+    }
+
+    public void clearAllTasks() {
+        processInstanceTimeoutCheckList.clear();
+        taskInstanceTimeoutCheckList.clear();
+        taskInstanceRetryCheckList.clear();
+        taskInstanceStateCheckList.clear();
     }
 
     private void checkTask4Timeout() {

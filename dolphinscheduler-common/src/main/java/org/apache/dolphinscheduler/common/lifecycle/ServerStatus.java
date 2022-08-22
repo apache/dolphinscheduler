@@ -13,14 +13,33 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-alter table t_ds_process_definition drop primary key, ADD PRIMARY KEY (`id`,`code`);
-ALTER TABLE t_ds_process_definition drop KEY `process_definition_unique`;
-ALTER TABLE t_ds_process_definition drop KEY `process_definition_index`;
-alter table t_ds_process_definition drop process_definition_json;
-alter table t_ds_process_definition drop connects;
-alter table t_ds_process_definition drop receivers;
-alter table t_ds_process_definition drop receivers_cc;
-alter table t_ds_process_definition drop modify_by;
-alter table t_ds_process_definition drop resource_ids;
+package org.apache.dolphinscheduler.common.lifecycle;
+
+/**
+ * This enum is used to represent the server status, include master/worker.
+ */
+public enum ServerStatus {
+
+    RUNNING(0, "The current server is running"),
+    WAITING(1, "The current server is waiting, this means it cannot work"),
+    STOPPED(2, "The current server is stopped"),
+    ;
+
+    private final int code;
+    private final String desc;
+
+    ServerStatus(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+}

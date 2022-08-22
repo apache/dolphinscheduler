@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +48,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * queue controller
@@ -58,7 +59,6 @@ public class QueueController extends BaseController {
 
     @Autowired
     private QueueService queueService;
-
 
     /**
      * query queue list
@@ -86,9 +86,9 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -118,8 +118,8 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "createQueue", notes = "CREATE_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataTypeClass = String.class)
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -142,9 +142,9 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "updateQueue", notes = "UPDATE_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataTypeClass = String.class)
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -167,8 +167,8 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "verifyQueue", notes = "VERIFY_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataTypeClass = String.class)
     })
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)

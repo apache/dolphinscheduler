@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * data analysis controller
@@ -69,9 +70,9 @@ public class DataAnalysisController extends BaseController {
      */
     @ApiOperation(value = "countTaskState", notes = "COUNT_TASK_STATE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
     })
     @GetMapping(value = "/task-state-count")
     @ResponseStatus(HttpStatus.OK)
@@ -82,7 +83,8 @@ public class DataAnalysisController extends BaseController {
                                  @RequestParam(value = "endDate", required = false) String endDate,
                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, projectCode, startDate, endDate);
+        Map<String, Object> result =
+                dataAnalysisService.countTaskStateByProject(loginUser, projectCode, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -97,9 +99,9 @@ public class DataAnalysisController extends BaseController {
      */
     @ApiOperation(value = "countProcessInstanceState", notes = "COUNT_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
     })
     @GetMapping(value = "/process-state-count")
     @ResponseStatus(HttpStatus.OK)
@@ -110,7 +112,8 @@ public class DataAnalysisController extends BaseController {
                                             @RequestParam(value = "endDate", required = false) String endDate,
                                             @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectCode, startDate, endDate);
+        Map<String, Object> result =
+                dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectCode, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -123,7 +126,7 @@ public class DataAnalysisController extends BaseController {
      */
     @ApiOperation(value = "countDefinitionByUser", notes = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
     })
     @GetMapping(value = "/define-user-count")
     @ResponseStatus(HttpStatus.OK)

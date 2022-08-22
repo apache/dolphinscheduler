@@ -828,7 +828,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource, true);
+
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
+
+
+        if (needDeleteResourceIdArray.length >= 2){
+            logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
+            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
+            return result;
+        }
 
         //if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
@@ -839,6 +847,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
         }
+
+
 
         if (resourceIdSet.contains(resource.getPid())) {
             logger.error("can't be deleted,because it is used of process definition");
