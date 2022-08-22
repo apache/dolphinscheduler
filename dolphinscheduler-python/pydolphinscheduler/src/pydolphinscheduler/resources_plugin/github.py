@@ -38,10 +38,18 @@ class GitHub(ResourcePlugin):
 
     # [start init_method]
     def __init__(
-        self, prefix: str, access_token: Optional[str] = None, *args, **kwargs
+        self,
+        prefix: str,
+        access_token: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        *args,
+        **kwargs
     ):
         super().__init__(prefix, *args, **kwargs)
         self.access_token = access_token
+        self.username = username
+        self.password = password
 
     # [end init_method]
 
@@ -115,9 +123,18 @@ class GitHub(ResourcePlugin):
         headers = {
             "user-agent": "Mozilla/5.0 (X11; Linux x86_64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+            "Content-Type": "application/json; charset=utf-8",
         }
         if self.access_token is not None:
-            headers.setdefault("Authorization", "Bearer " + self.access_token)
+            headers.setdefault("Authorization", "Bearer %s" % self.access_token)
+        if self.username is not None and self.password is not None:
+            base64string = base64.b64encode(
+                bytes("%s:%s" % (self.username, self.password), encoding="utf-8")
+            )
+            headers.setdefault(
+                "Authorization", "Basic %s" % base64string.decode("utf-8")
+            )
+
         file_info = self.get_file_info(path)
         url = self.get_req_url(file_info)
         params = {"ref": file_info["branch"]}
@@ -126,6 +143,7 @@ class GitHub(ResourcePlugin):
             url=url,
             params=params,
         )
+        print(response.json())
         if response.status_code == requests.codes.ok:
             json_response = response.json()
             content = base64.b64decode(json_response["content"])
