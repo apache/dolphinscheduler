@@ -143,7 +143,7 @@ public class WorkerManagerThread implements Runnable {
                 workerTaskExecuteRunnable.cancelTask();
                 logger.info("Cancel the taskInstance in worker  {}", taskInstanceId);
             } catch (Exception ex) {
-                logger.error("Cancel the taskInstance error");
+                logger.error("Cancel the taskInstance error {}", taskInstanceId, ex);
             } finally {
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
             }
