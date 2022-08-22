@@ -280,6 +280,13 @@
             <groupId>net.sf.py4j</groupId>
             <artifactId>py4j</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-ldap</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -228,6 +228,7 @@ springfox-spring-web-2.9.2.jar
 springfox-swagger-common-2.9.2.jar
 springfox-swagger-ui-2.9.2.jar
 springfox-swagger2-2.9.2.jar
+spring-ldap-1.1.2.jar
 swagger-annotations-1.5.20.jar
 swagger-bootstrap-ui-1.9.3.jar
 swagger-models-1.5.24.jar
