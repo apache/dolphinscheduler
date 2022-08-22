@@ -106,8 +106,9 @@ public abstract class UpgradeDao {
         try (Connection conn = dataSource.getConnection()) {
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
-            Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream());
-            initScriptRunner.runScript(initSqlReader);
+            try (Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream())) {
+                initScriptRunner.runScript(initSqlReader);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
@@ -298,22 +299,23 @@ public abstract class UpgradeDao {
             conn.setAutoCommit(false);
             // Execute the upgraded dolphinscheduler dml
             ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
-            Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream());
-            scriptRunner.runScript(sqlReader);
-            if (isExistsTable(T_VERSION_NAME)) {
-                // Change version in the version table to the new version
-                String upgradeSQL = String.format("update %s set version = ?", T_VERSION_NAME);
-                pstmt = conn.prepareStatement(upgradeSQL);
-                pstmt.setString(1, schemaVersion);
-                pstmt.executeUpdate();
-            } else if (isExistsTable(T_NEW_VERSION_NAME)) {
-                // Change version in the version table to the new version
-                String upgradeSQL = String.format("update %s set version = ?", T_NEW_VERSION_NAME);
-                pstmt = conn.prepareStatement(upgradeSQL);
-                pstmt.setString(1, schemaVersion);
-                pstmt.executeUpdate();
+            try (Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream())) {
+                scriptRunner.runScript(sqlReader);
+                if (isExistsTable(T_VERSION_NAME)) {
+                    // Change version in the version table to the new version
+                    String upgradeSQL = String.format("update %s set version = ?", T_VERSION_NAME);
+                    pstmt = conn.prepareStatement(upgradeSQL);
+                    pstmt.setString(1, schemaVersion);
+                    pstmt.executeUpdate();
+                } else if (isExistsTable(T_NEW_VERSION_NAME)) {
+                    // Change version in the version table to the new version
+                    String upgradeSQL = String.format("update %s set version = ?", T_NEW_VERSION_NAME);
+                    pstmt = conn.prepareStatement(upgradeSQL);
+                    pstmt.setString(1, schemaVersion);
+                    pstmt.executeUpdate();
+                }
+                conn.commit();
             }
-            conn.commit();
         } catch (FileNotFoundException e) {
             try {
                 conn.rollback();
@@ -362,9 +364,9 @@ public abstract class UpgradeDao {
             conn.setAutoCommit(true);
             // Execute the dolphinscheduler ddl.sql for the upgrade
             ScriptRunner scriptRunner = new ScriptRunner(conn, true, true);
-            Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream());
-            scriptRunner.runScript(sqlReader);
-
+            try (Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream())) {
+                scriptRunner.runScript(sqlReader);
+            }
         } catch (FileNotFoundException e) {
 
             logger.error(e.getMessage(), e);
