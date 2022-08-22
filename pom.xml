@@ -62,7 +62,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>2.5.6</spring.boot.version>
+        <spring.boot.version>2.6.1</spring.boot.version>
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
         <spotbugs.version>3.1.12</spotbugs.version>
@@ -76,7 +76,7 @@
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
         <spotless.version>2.23.0</spotless.version>
-        <jacoco.version>0.8.7</jacoco.version>
+        <jacoco.version>0.8.8</jacoco.version>
         <maven.deploy.skip>false</maven.deploy.skip>
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
         <auto-service.version>1.0.1</auto-service.version>
@@ -678,6 +678,12 @@
                             <replacement>project</replacement>
                         </replace>
                     </pom>
+                    <markdown>
+                        <includes>
+                            <include>**/*.md</include>
+                        </includes>
+                        <flexmark />
+                    </markdown>
                 </configuration>
                 <executions>
                     <execution>

@@ -13,32 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
-
-    button,
-    input {
-      margin-left: 10px;
-    }
-  }
-}
-
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-}
+*/

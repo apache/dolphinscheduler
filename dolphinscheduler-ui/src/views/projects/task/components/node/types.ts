@@ -364,6 +364,14 @@ interface ITaskParams {
   taskId?: string
   online?: boolean
   sagemakerRequestJson?: string
+  script?: string
+  scriptParams?: string
+  pythonPath?: string
+  isCreateEnvironment?: string
+  pythonCommand?: string
+  pythonEnvTool?: string
+  requirements?: string
+  condaPythonVersion?: string
 }
 
 interface INodeData

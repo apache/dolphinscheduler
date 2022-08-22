@@ -46,6 +46,7 @@ export default {
     create_workflow: '创建工作流',
     import_workflow: '导入工作流',
     workflow_name: '工作流名称',
+    workflow_instance_name: '工作流实例名称',
     current_selection: '当前选择',
     online: '已上线',
     offline: '已下线',
@@ -744,6 +745,17 @@ export default {
     dinky_address_tips: '请输入 Dinky 地址',
     dinky_task_id: 'dinky 作业ID',
     dinky_task_id_tips: '请输入作业 ID',
-    dinky_online: '是否上线作业'
+    dinky_online: '是否上线作业',
+    pytorch_script: 'python脚本',
+    pytorch_script_params: '脚本启动参数',
+    pytorch_other_params: '展开更多配置',
+    pytorch_python_path: 'python项目地址',
+    pytorch_is_create_environment: '是否创建新环境',
+    pytorch_python_command: 'python命令路径',
+    pytorch_python_command_tips: '若为空，则使用$PYTHON_HOME',
+    pytorch_python_env_tool: 'python环境管理工具',
+    pytorch_requirements: '依赖文件',
+    pytorch_conda_python_version: 'python版本',
+    pytorch_conda_python_version_tips: '请输入版本号，如 3.6, 3.7, 3.x等'
   }
 }

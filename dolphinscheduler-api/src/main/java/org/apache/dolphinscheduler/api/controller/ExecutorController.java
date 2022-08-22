@@ -41,6 +41,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
@@ -69,7 +71,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * executor controller
@@ -258,7 +259,8 @@ public class ExecutorController extends BaseController {
 
         for (String strProcessDefinitionCode : processDefinitionCodeArray) {
             long processDefinitionCode = Long.parseLong(strProcessDefinitionCode);
-            result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
+            result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime,
+                    execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                     workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
                     complementDependentMode);
@@ -269,7 +271,8 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
+            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR,
+                    String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
         return returnDataList(result);
@@ -286,8 +289,8 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "execute", notes = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataTypeClass = ExecuteType.class)
     })
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
@@ -296,8 +299,7 @@ public class ExecutorController extends BaseController {
     public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
-                          @RequestParam("executeType") ExecuteType executeType
-    ) {
+                          @RequestParam("executeType") ExecuteType executeType) {
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -313,9 +315,9 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "batchExecute", notes = "BATCH_EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
-        @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = int.class),
+            @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataTypeClass = ExecuteType.class)
     })
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
@@ -324,8 +326,7 @@ public class ExecutorController extends BaseController {
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
-                               @RequestParam("executeType") ExecuteType executeType
-    ) {
+                               @RequestParam("executeType") ExecuteType executeType) {
         Map<String, Object> result = new HashMap<>();
         List<String> executeFailedIdList = new ArrayList<>();
         if (!StringUtils.isEmpty(processInstanceIds)) {
@@ -334,13 +335,15 @@ public class ExecutorController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> singleResult = execService.execute(loginUser, projectCode, processInstanceId, executeType);
+                    Map<String, Object> singleResult =
+                            execService.execute(loginUser, projectCode, processInstanceId, executeType);
                     if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
                         logger.error((String) singleResult.get(Constants.MSG));
                     }
                 } catch (Exception e) {
-                    executeFailedIdList.add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                    executeFailedIdList
+                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
             }
         }
@@ -360,7 +363,7 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "startCheckProcessDefinition", notes = "START_CHECK_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "100")
     })
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
@@ -376,14 +379,15 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "queryExecutingWorkflow", notes = "QUERY_WORKFLOW_EXECUTE_DATA")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/query-executing-workflow")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
     @AccessLogAnnotation
     public Result queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
-        WorkflowExecuteDto workflowExecuteDto = execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
+        WorkflowExecuteDto workflowExecuteDto =
+                execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
         return Result.success(workflowExecuteDto);
     }
 
@@ -400,29 +404,29 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "startTaskInstance", notes = "RUN_TASK_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "version", value = "VERSION", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
-        @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
-        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
-        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
-        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
-        @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "version", value = "VERSION", dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataTypeClass = FailureStrategy.class),
+            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataTypeClass = CommandType.class),
+            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataTypeClass = WarningType.class),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataTypeClass = String.class, example = "default"),
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataTypeClass = long.class, example = "-1"),
+            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataTypeClass = int.class, example = "0"),
     })
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startStreamTaskInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                       @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
-                                       @RequestParam(value = "version", required = true) int version,
-                                       @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
-                                       @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                       @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                       @RequestParam(value = "startParams", required = false) String startParams,
-                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
+                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @ApiParam(name = "code", value = "TASK_CODE", required = true) @PathVariable long code,
+                                          @RequestParam(value = "version", required = true) int version,
+                                          @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
+                                          @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                          @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                          @RequestParam(value = "startParams", required = false) String startParams,
+                                          @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
 
         Map<String, String> startParamMap = null;
         if (startParams != null) {
@@ -430,7 +434,7 @@ public class ExecutorController extends BaseController {
         }
 
         Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
-            warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
+                warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
 }

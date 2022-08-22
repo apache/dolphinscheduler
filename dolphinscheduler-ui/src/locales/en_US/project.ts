@@ -46,6 +46,7 @@ export default {
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
     workflow_name: 'Workflow Name',
+    workflow_instance_name: 'Workflow Instance Name',
     current_selection: 'Current Selection',
     online: 'Online',
     offline: 'Offline',
@@ -759,6 +760,17 @@ export default {
     dinky_address_tips: 'Please enter the url of your dinky',
     dinky_task_id: 'Dinky task id',
     dinky_task_id_tips: 'Please enter the task id of your dinky',
-    dinky_online: 'Online task'
+    dinky_online: 'Online task',
+    pytorch_script: 'Python Script',
+    pytorch_script_params: 'Script Input Parameters',
+    pytorch_other_params: 'Show More Configurations',
+    pytorch_python_path: 'Project Path',
+    pytorch_is_create_environment: 'Create An Environment Or Not',
+    pytorch_python_command: 'Python Command Path',
+    pytorch_python_command_tips: 'If empty，will be set $PYTHON_HOME',
+    pytorch_python_env_tool: 'Python Environment Manager Tool',
+    pytorch_requirements: 'Requirement File',
+    pytorch_conda_python_version: 'Python Version',
+    pytorch_conda_python_version_tips: 'Please enter the version number, such as 3.6, 3.7, 3.x'
   }
 }
