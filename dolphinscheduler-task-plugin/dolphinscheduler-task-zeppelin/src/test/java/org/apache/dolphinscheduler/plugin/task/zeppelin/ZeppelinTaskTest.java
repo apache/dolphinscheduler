@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.zeppelin;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -35,22 +34,21 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-
-import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.NoteResult;
+import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ZeppelinTaskTest {
@@ -131,6 +129,7 @@ public class ZeppelinTaskTest {
                 thenThrow(new TaskException("Something wrong happens from zeppelin side"));
 //        when(this.paragraphResult.getStatus()).thenReturn(Status.ERROR);
         this.zeppelinTask.handle(taskCallBack);
+
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
                 MOCK_PARAGRAPH_ID,
                 (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
@@ -139,11 +138,10 @@ public class ZeppelinTaskTest {
         Assert.assertEquals(EXIT_CODE_FAILURE, this.zeppelinTask.getExitStatusCode());
     }
 
-
     @Test
     public void testHandleWithNoteExecutionSuccess() throws Exception {
         String zeppelinParametersWithNoParagraphId = buildZeppelinTaskParametersWithNoParagraphId();
-        TaskExecutionContext taskExecutionContext= mock(TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
