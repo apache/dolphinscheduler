@@ -18,7 +18,7 @@
 """Test github resource plugin."""
 import pytest
 
-from pydolphinscheduler.resources_plugin import Github
+from pydolphinscheduler.resources_plugin import GitHub
 
 
 @pytest.mark.parametrize(
@@ -37,7 +37,7 @@ from pydolphinscheduler.resources_plugin import Github
 )
 def test_github_build_req_api(attr, expected):
     """Test the build_req_api function of the github resource plug-in."""
-    github = Github(prefix="prefix")
+    github = GitHub(prefix="prefix")
     assert expected == github.build_req_api(**attr)
 
 
@@ -69,7 +69,7 @@ def test_github_build_req_api(attr, expected):
 )
 def test_github_url_join(attr, expected):
     """Test the url_join function of the github resource plug-in."""
-    github = Github(prefix="prefix")
+    github = GitHub(prefix="prefix")
     assert expected == github.url_join(**attr)
 
 
@@ -112,7 +112,7 @@ def test_github_url_join(attr, expected):
 )
 def test_github_get_index(attr, expected):
     """Test the get_index function of the github resource plug-in."""
-    github = Github(prefix="prefix")
+    github = GitHub(prefix="prefix")
     assert expected == github.get_index(**attr)
 
 
@@ -150,7 +150,7 @@ def test_github_get_index(attr, expected):
 )
 def test_github_get_file_info(attr, expected):
     """Test the get_file_info function of the github resource plug-in."""
-    github = Github(prefix="prefix")
+    github = GitHub(prefix="prefix")
     assert expected == github.get_file_info(attr)
 
 
@@ -191,7 +191,7 @@ def test_github_get_file_info(attr, expected):
 )
 def test_github_get_req_url(attr, expected):
     """Test the get_req_url function of the github resource plug-in."""
-    github = Github(prefix="prefix")
+    github = GitHub(prefix="prefix")
     assert expected == github.get_req_url(attr)
 
 
@@ -223,7 +223,7 @@ def test_github_get_req_url(attr, expected):
 )
 def test_github_read_file(attr, expected):
     """Test the read_file function of the github resource plug-in."""
-    github = Github(
+    github = GitHub(
         prefix="https://github.com/apache/dolphinscheduler/blob/dev",
     )
     assert expected == github.read_file(attr)
@@ -257,7 +257,7 @@ def test_github_read_file(attr, expected):
 )
 def test_github_req(attr, expected):
     """Test the req function of the github resource plug-in."""
-    github = Github(
+    github = GitHub(
         prefix="prefix",
     )
     assert expected == github.req(attr)

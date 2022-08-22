@@ -16,10 +16,10 @@
 # under the License.
 
 """Init resources_plugin package."""
-from pydolphinscheduler.resources_plugin.github import Github
+from pydolphinscheduler.resources_plugin.github import GitHub
 from pydolphinscheduler.resources_plugin.local import Local
 
 __all__ = [
     "Local",
-    "Github",
+    "GitHub",
 ]

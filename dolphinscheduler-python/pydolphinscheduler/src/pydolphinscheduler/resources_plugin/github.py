@@ -26,7 +26,7 @@ from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyResPluginException
 
 
-class Github(ResourcePlugin):
+class GitHub(ResourcePlugin):
     """Github object, declare github resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of Github.
