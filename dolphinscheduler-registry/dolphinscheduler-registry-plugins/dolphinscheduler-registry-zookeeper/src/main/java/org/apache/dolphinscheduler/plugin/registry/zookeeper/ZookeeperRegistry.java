@@ -175,7 +175,7 @@ public final class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public void put(String key, String value, boolean deleteOnDisconnect) {
+    public void put(@NonNull String key, String value, boolean deleteOnDisconnect) {
         final CreateMode mode = deleteOnDisconnect ? CreateMode.EPHEMERAL : CreateMode.PERSISTENT;
 
         try {

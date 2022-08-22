@@ -190,7 +190,7 @@ public class RegistryClient {
         registry.close();
     }
 
-    public void persistEphemeral(String key, String value) {
+    public void persistEphemeral(@NonNull String key, String value) {
         registry.put(key, value, true);
     }
 

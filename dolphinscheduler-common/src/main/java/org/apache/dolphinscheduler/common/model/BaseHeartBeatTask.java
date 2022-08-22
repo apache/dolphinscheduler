@@ -2,6 +2,7 @@ package org.apache.dolphinscheduler.common.model;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 
 @Slf4j
@@ -30,8 +31,12 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
     public void run() {
         while (runningFlag) {
             try {
-                T heartBeat = getHeartBeat();
-                writeHeartBeat(heartBeat);
+                if (ServerLifeCycleManager.isRunning()) {
+                    T heartBeat = getHeartBeat();
+                    writeHeartBeat(heartBeat);
+                } else {
+                    log.info("The current server status is {}, will not write heart beat", ServerLifeCycleManager.getServerStatus());
+                }
                 Thread.sleep(heartBeatInterval);
             } catch (InterruptedException ex) {
                 handleInterruptException(ex);
