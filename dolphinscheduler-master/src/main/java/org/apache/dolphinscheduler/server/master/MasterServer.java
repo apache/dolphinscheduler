@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
@@ -29,9 +29,6 @@ import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import javax.annotation.PostConstruct;
-
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +39,14 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.annotation.PostConstruct;
+
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
 public class MasterServer implements IStoppable {
+
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     @Autowired
@@ -90,7 +90,6 @@ public class MasterServer implements IStoppable {
         this.taskPluginManager.loadPlugin();
 
         // self tolerant
-        this.masterRegistryClient.init();
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
@@ -103,7 +102,7 @@ public class MasterServer implements IStoppable {
         this.schedulerApi.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (Stopper.isRunning()) {
+            if (!ServerLifeCycleManager.isStopped()) {
                 close("MasterServer shutdownHook");
             }
         }));
@@ -117,19 +116,20 @@ public class MasterServer implements IStoppable {
     public void close(String cause) {
         // set stop signal is true
         // execute only once
-        if (!Stopper.stop()) {
+        if (!ServerLifeCycleManager.toStopped()) {
             logger.warn("MasterServer is already stopped, current cause: {}", cause);
             return;
         }
         // thread sleep 3 seconds for thread quietly stop
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
-        try (SchedulerApi closedSchedulerApi = schedulerApi;
-             MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
-             MasterRPCServer closedRpcServer = masterRPCServer;
-             MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
-             // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
-             // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
-             SpringApplicationContext closedSpringContext = springApplicationContext) {
+        try (
+                SchedulerApi closedSchedulerApi = schedulerApi;
+                MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
+                MasterRPCServer closedRpcServer = masterRPCServer;
+                MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
+                // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
+                // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
+                SpringApplicationContext closedSpringContext = springApplicationContext) {
 
             logger.info("Master server is stopping, current cause : {}", cause);
         } catch (Exception e) {

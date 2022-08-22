@@ -16,6 +16,7 @@
  */
 
 import { useFlink } from './use-flink'
+import { useFlinkStream } from './use-flink-stream'
 import { useShell } from './use-shell'
 import { useSubProcess } from './use-sub-process'
 import { usePigeon } from './use-pigeon'
@@ -42,6 +43,7 @@ import { useDvc } from './use-dvc'
 import { useDinky } from './use-dinky'
 import { userSagemaker } from './use-sagemaker'
 import { useChunjun } from './use-chunjun'
+import { usePytorch } from './use-pytorch'
 
 export default {
   SHELL: useShell,
@@ -70,5 +72,7 @@ export default {
   DVC: useDvc,
   DINKY: useDinky,
   SAGEMAKER: userSagemaker,
-  CHUNJUN: useChunjun
+  CHUNJUN: useChunjun,
+  FLINK_STREAM: useFlinkStream,
+  PYTORCH: usePytorch
 }
