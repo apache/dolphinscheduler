@@ -32,7 +32,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAME_LAB
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESTART_POLICY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_INSTANCE_ID;
 
-import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -59,11 +58,12 @@ import org.slf4j.Logger;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
-import io.fabric8.kubernetes.api.model.batch.Job;
-import io.fabric8.kubernetes.api.model.batch.JobBuilder;
-import io.fabric8.kubernetes.api.model.batch.JobStatus;
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
+import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.WatcherException;
 
 /**
  * K8sTaskExecutor used to submit k8s task to K8S
@@ -148,7 +148,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             }
 
             @Override
-            public void onClose(KubernetesClientException e) {
+            public void onClose(WatcherException e) {
                 logStringBuffer.append(String.format("[K8sJobExecutor-%s] fail in k8s: %s", job.getMetadata().getName(),
                         e.getMessage()));
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
