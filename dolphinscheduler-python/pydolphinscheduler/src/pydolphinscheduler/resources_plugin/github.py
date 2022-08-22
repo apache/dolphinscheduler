@@ -17,66 +17,87 @@
 
 """DolphinScheduler github resource plugin."""
 import base64
-import os
+from typing import Optional
 from urllib.parse import urljoin
-
-from pydolphinscheduler.exceptions import PyResPluginException
-
-
-def constructURL(user: str = "404", repo_name: str = "404", path_to_file: str = "404", url: str = "404"):
-    url = url.replace("{user}", user)
-    url = url.replace("{repo_name}", repo_name)
-    url = url.replace("{path_to_file}", path_to_file)
-    return url
-
 
 import requests
 
-user = 'xdu-chenrj'
-repo_name = 'test-ds-res-plugin'
-path_to_file = 'union.sh'
-json_url = 'https://api.github.com/repos/{user}/{repo_name}/contents/{path_to_file}?re'
-proxies = {'http': 'http://127.0.0.1:8889', 'https': 'http://127.0.0.1:8889'}
-
-json_url = constructURL(user, repo_name, path_to_file, json_url)
-print(json_url)
-# json_url = "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main/union.sh"
-response = requests.get(json_url, proxies=proxies)
-# print(response)
-jsonResponse = response.text
-print(jsonResponse)
-#
-if response.status_code == requests.codes.ok:
-    jsonResponse = response.json()
-    content = base64.b64decode(jsonResponse['content'])
-    jsonString = content.decode('utf-8')
-    print(jsonString)
-else:
-    raise PyResPluginException('Content was not found.')
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
+from pydolphinscheduler.exceptions import PyResPluginException
 
 
-class Github:
-    """Github object, declare local resource plugin for task and workflow to dolphinscheduler.
+class Github(ResourcePlugin):
+    """Github object, declare github resource plugin for task and workflow to dolphinscheduler.
 
-    :param prefix: A string representing the prefix of Local.
+    :param prefix: A string representing the prefix of Github.
+
+    :param access_token: A string used for identity authentication of GitHub private warehouse.
+
 
     """
 
     # [start init_method]
-    def __init__(self, prefix: str):
-        self._prefix = prefix
+    def __init__(
+        self, prefix: str, access_token: Optional[str] = None, *args, **kwargs
+    ):
+        super().__init__(prefix, *args, **kwargs)
+        self.access_token = access_token
 
     # [end init_method]
 
-    @property
-    def prefix(self):
-        """Get the _prefix attribute."""
-        return self._prefix
+    req_api = "https://api.github.com/repos/{user}/{repo_name}/contents/{file_path}"
 
-    # [start auth_method]
-    def auth(self):
-        """GitHub private warehouse certification"""
-        pass
+    def build_req_api(
+        self,
+        user: str,
+        repo_name: str,
+        file_path: str,
+        api: str,
+    ):
+        """Build request file content API."""
+        api = api.replace("{user}", user)
+        api = api.replace("{repo_name}", repo_name)
+        api = api.replace("{file_path}", file_path)
+        return api
+
+    def url_join(self, prefix: str, suf: str):
+        """File url splicing."""
+        if prefix[-1] != "/":
+            prefix = prefix + "/"
+        if suf[0] == "/":
+            suf = suf[0:]
+        return urljoin(prefix + "/", suf)
+
+    def get_index(self, s: str, x, n):
+        """Find the subscript of the nth occurrence of the X character in the string s."""
+        if n <= s.count(x):
+            all_index = [key for key, value in enumerate(s) if value == x]
+            return all_index[n - 1]
+        else:
+            return None
+
+    def get_file_info(self, path: str):
+        """Get file information from the file url, like repository name, user, branch, and file path."""
+        elements = path.split("/")
+        index = self.get_index(path, "/", 7)
+        if index is None:
+            raise PyResPluginException("Incomplete path.")
+        index = index + 1
+        file_info = {
+            "user": elements[3],
+            "repo_name": elements[4],
+            "branch": elements[6],
+            "file_path": path[index:],
+        }
+        return file_info
+
+    def get_req_url(self, file_info: dict):
+        """Build request URLs according to file information."""
+        user = file_info["user"]
+        repo_name = file_info["repo_name"]
+        file_path = file_info["file_path"]
+        url = self.build_req_api(user, repo_name, file_path, self.req_api)
+        return url
 
     # [start read_file_method]
     def read_file(self, suf: str):
@@ -84,16 +105,36 @@ class Github:
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
-        path = urljoin(self.prefix, suf)
+        path = self.url_join(self.prefix, suf)
+        return self.req(path)
 
-        if not path.exists():
-            raise PyResPluginException("{} is not found".format(str(path)))
-        if not os.access(str(path), os.R_OK):
-            raise PyResPluginException(
-                "You don't have permission to access {}".format(self.prefix + suf)
-            )
-        with open(path, "r") as f:
-            content = f.read()
-        return content
+    def req(self, path: str):
+        """Send HTTP request, parse response data, and get file content."""
+        headers = {
+            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+        }
+        if self.access_token is not None:
+            headers.setdefault("Authorization", "Bearer " + self.access_token)
+        file_info = self.get_file_info(path)
+        url = self.get_req_url(file_info)
+        params = {"ref": file_info["branch"]}
+        proxies = {"http": "http://127.0.0.1:8889", "https": "http://127.0.0.1:8889"}
+        response = requests.get(
+            headers=headers,
+            url=url,
+            params=params,
+            proxies=proxies,
+        )
+        if response.status_code == requests.codes.ok:
+            json_response = response.json()
+            content = base64.b64decode(json_response["content"])
+            return content.decode("utf-8")
+        else:
+            if response.status_code == requests.codes.not_found:
+                raise PyResPluginException("{} is not found.".format(path))
+            if response.status_code == requests.codes.unauthorized:
+                raise PyResPluginException("unauthorized.")
+            raise PyResPluginException("Unknown exception.")
 
     # [end read_file_method]

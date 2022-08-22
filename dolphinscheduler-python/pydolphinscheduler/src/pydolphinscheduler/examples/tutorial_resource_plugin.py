@@ -22,8 +22,6 @@ Resource plug-ins can be defined in workflows and tasks
 
 it will instantiate and run all the task it have.
 """
-import os
-from pathlib import Path
 
 # [start tutorial_resource_plugin]
 # [start package_import]
@@ -31,7 +29,7 @@ from pathlib import Path
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 
 # Import task Shell object cause we would create some shell tasks later
-from pydolphinscheduler.resources_plugin.local import Local
+from pydolphinscheduler.resources_plugin.github import Github
 from pydolphinscheduler.tasks.shell import Shell
 
 # [end package_import]
@@ -42,20 +40,22 @@ with ProcessDefinition(
     schedule="0 0 0 * * ? *",
     start_time="2021-01-01",
     tenant="tenant_exists",
-    resource_plugin=Local("/tmp"),
+    resource_plugin=Github(
+        prefix="https://github.com/xdu-chenrj/codeforces/blob/main/1715",
+        # access_token="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",
+    ),
 ) as process_definition:
     # [end workflow_declare]
     # [start task_declare]
-    file = "resource.sh"
-    path = Path("/tmp").joinpath(file)
-    with open(str(path), "w") as f:
-        f.write("echo tutorial resource plugin")
+    # file = "resource.sh"
+    # path = Path("/tmp").joinpath(file)
+    # with open(str(path), "w") as f:
+    #     f.write("echo tutorial resource plugin")
     task_parent = Shell(
         name="local-resource-example",
-        command=file,
+        command="union.sh",
     )
     print(task_parent.task_params)
-    os.remove(path)
     # [end task_declare]
 
     # [start submit_or_run]

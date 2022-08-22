@@ -20,9 +20,12 @@ Github
 
 `Github` is a github resource plugin for pydolphinscheduler.
 
-When using a local resource plugin, you do not need to use this class explicitly, you only need to add the
-`resource_plugin` parameter in the task subclass or workflow definition.
-The data type of parameter `resource_plugin` is `ResourcePlugin`
+When using a github resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
+such as `resource_plugin=Github(prefix="https://github.com/xxx", access_token="ghpxx")`.
+The token parameter is optional. You need to add it when your warehouse is a private warehouse.
+
+You can view this `document <https://docs.github.com/cn/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token>`_
+when creating a token
 
 For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
 
