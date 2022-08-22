@@ -78,6 +78,9 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 management:
   endpoints:
