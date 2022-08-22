@@ -76,11 +76,9 @@ public class ZeppelinTaskTest {
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParameters);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
-        // mock zClient and paragraph result
         this.zClient = mock(ZeppelinClient.class);
         this.paragraphResult = mock(ParagraphResult.class);
 
-        // use mocked zClient in zeppelinTask
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
         when(this.zClient.executeParagraph(any(), any(), any(Map.class))).thenReturn(this.paragraphResult);
         when(paragraphResult.getResultInText()).thenReturn("mock-zeppelin-paragraph-execution-result");
@@ -127,7 +125,6 @@ public class ZeppelinTaskTest {
     public void testHandleWithParagraphExecutionException() throws Exception {
         when(this.zClient.executeParagraph(any(), any(), any(Map.class))).
                 thenThrow(new TaskException("Something wrong happens from zeppelin side"));
-//        when(this.paragraphResult.getStatus()).thenReturn(Status.ERROR);
         this.zeppelinTask.handle(taskCallBack);
 
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
@@ -145,11 +142,9 @@ public class ZeppelinTaskTest {
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
-        // mock zClient and note result
         this.zClient = mock(ZeppelinClient.class);
         this.noteResult = mock(NoteResult.class);
 
-        // use mocked zClient in zeppelinTask
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
         when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
         this.zeppelinTask.init();
@@ -170,11 +165,9 @@ public class ZeppelinTaskTest {
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
-        // mock zClient and note result
         this.zClient = mock(ZeppelinClient.class);
         this.noteResult = mock(NoteResult.class);
 
-        // use mocked zClient in zeppelinTask
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
         when(this.zClient.cloneNote(any(String.class), any(String.class))).thenReturn(MOCK_CLONE_NOTE_ID);
         when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
