@@ -15,30 +15,11 @@
  * limitations under the License.
  */
 
-.search-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+package org.apache.dolphinscheduler.registry.api;
 
-  .box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 300px;
+public enum StrategyType {
 
-    button,
-    input {
-      margin-left: 10px;
-    }
-  }
-}
-
-.table-card {
-  margin-top: 8px;
-
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+    STOP,
+    WAITING,
+    ;
 }

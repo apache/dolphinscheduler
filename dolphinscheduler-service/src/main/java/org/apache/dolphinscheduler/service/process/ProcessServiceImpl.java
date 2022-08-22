@@ -266,9 +266,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private CuringParamsService curingGlobalParamsService;
 
-    @Autowired
-    private ProcessService processService;
-
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -341,16 +338,7 @@ public class ProcessServiceImpl implements ProcessService {
                             processInstance.getProcessDefinitionCode(),
                             processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
-            if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
-                saveProcessInstance(processInstance);
-                return;
-            }
             for (ProcessInstance info : runningProcessInstances) {
-                if (Objects.nonNull(info.getState()) && (WorkflowExecutionStatus.READY_STOP.equals(info.getState())
-                        || info.getState().isFinished())) {
-                    continue;
-                }
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(WorkflowExecutionStatus.READY_STOP);
@@ -368,6 +356,8 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                 }
             }
+            processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
+            saveProcessInstance(processInstance);
         }
     }
 
@@ -1268,7 +1258,7 @@ public class ProcessServiceImpl implements ProcessService {
             try {
                 // submit task to db
                 // Only want to use transaction here
-                task = processService.submitTask(processInstance, taskInstance);
+                task = submitTask(processInstance, taskInstance);
                 if (task != null && task.getId() != 0) {
                     break;
                 }
