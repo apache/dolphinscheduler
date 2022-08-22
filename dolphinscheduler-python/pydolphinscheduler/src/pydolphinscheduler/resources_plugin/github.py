@@ -138,15 +138,10 @@ class GitHub(ResourcePlugin):
         file_info = self.get_file_info(path)
         url = self.get_req_url(file_info)
         params = {"ref": file_info["branch"]}
-        proxies = {
-            "http": "http://127.0.0.1:8889",
-            "https": "http://127.0.0.1:8889",
-        }
         response = requests.get(
             headers=headers,
             url=url,
             params=params,
-            proxies=proxies,
         )
         print(response.json())
         if response.status_code == requests.codes.ok:

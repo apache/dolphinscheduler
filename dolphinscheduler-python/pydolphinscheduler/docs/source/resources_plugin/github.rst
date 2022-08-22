@@ -28,7 +28,7 @@ Basic auth is also supported, using such as `resource_plugin=GitHub(prefix="http
 However, in basic auth, `password` is equal to personal access token.
 
 You can view this `document <https://docs.github.com/cn/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token>`_
-when creating a token
+when creating a token.
 
 For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
 
