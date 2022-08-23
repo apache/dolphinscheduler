@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,6 +260,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     @Override
     public String getType() {
         throw new UnsupportedOperationException("This abstract class doesn's has type");
+    }
+
+    @Override
+    public SPIIdentify getIdentify() {
+        return SPIIdentify.create(getType());
     }
 
     @Override
