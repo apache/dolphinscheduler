@@ -42,14 +42,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JupyterTask extends AbstractRemoteTask {
 
-    /**
-     * jupyter parameters
-     */
     private JupyterParameters jupyterParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private TaskExecutionContext taskExecutionContext;
 
     private ShellCommandExecutor shellCommandExecutor;
@@ -95,7 +89,6 @@ public class JupyterTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
@@ -123,14 +116,10 @@ public class JupyterTask extends AbstractRemoteTask {
     }
 
     /**
-     * create command
-     *
-     * @return command
+     * command will be like: papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
      */
     protected String buildCommand() throws IOException {
-        /**
-         * papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
-         */
+
         List<String> args = new ArrayList<>();
         final String condaPath = jupyterPropertyReader.readProperty(TaskConstants.CONDA_PATH);
         final String timestamp = DateUtils.getTimestampString();
@@ -156,11 +145,7 @@ public class JupyterTask extends AbstractRemoteTask {
         args.add(JupyterConstants.PAPERMILL);
         args.add(jupyterParameters.getInputNotePath());
         args.add(jupyterParameters.getOutputNotePath());
-
-        // populate jupyter parameterization
         args.addAll(populateJupyterParameterization());
-
-        // populate jupyter options
         args.addAll(populateJupyterOptions());
 
         // remove tmp conda env, if created from requirements.txt
@@ -171,7 +156,6 @@ public class JupyterTask extends AbstractRemoteTask {
 
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
@@ -180,11 +164,6 @@ public class JupyterTask extends AbstractRemoteTask {
         return command;
     }
 
-    /**
-     * build jupyter parameterization
-     *
-     * @return argument list
-     */
     protected List<String> populateJupyterParameterization() throws IOException {
         List<String> args = new ArrayList<>();
         String parameters = jupyterParameters.getParameters();
@@ -207,11 +186,6 @@ public class JupyterTask extends AbstractRemoteTask {
         return args;
     }
 
-    /**
-     * build jupyter options
-     *
-     * @return argument list
-     */
     protected List<String> populateJupyterOptions() {
         List<String> args = new ArrayList<>();
         String kernel = jupyterParameters.getKernel();

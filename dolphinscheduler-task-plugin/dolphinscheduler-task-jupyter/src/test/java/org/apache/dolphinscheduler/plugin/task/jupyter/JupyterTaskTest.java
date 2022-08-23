@@ -25,10 +25,8 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -37,96 +35,97 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JupyterTaskTest {
 
+    private static final String EXPECTED_JUPYTER_TASK_COMMAND_USE_LOCAL_CONDA_ENV =
+            "source /opt/anaconda3/etc/profile.d/conda.sh && " +
+                    "conda activate jupyter-lab && " +
+                    "papermill " +
+                    "/test/input_note.ipynb " +
+                    "/test/output_note.ipynb " +
+                    "--parameters city Shanghai " +
+                    "--parameters factor 0.01 " +
+                    "--kernel python3 " +
+                    "--engine default_engine " +
+                    "--execution-timeout 10 " +
+                    "--start-timeout 3 " +
+                    "--version " +
+                    "--inject-paths " +
+                    "--progress-bar";
+
+    private static final String EXPECTED_JUPYTER_TASK_COMMAND_USE_PACKED_CONDA_ENV =
+            "source /opt/anaconda3/etc/profile.d/conda.sh && " +
+                    "mkdir jupyter_env && " +
+                    "tar -xzf jupyter.tar.gz -C jupyter_env && " +
+                    "source jupyter_env/bin/activate && " +
+                    "papermill " +
+                    "/test/input_note.ipynb " +
+                    "/test/output_note.ipynb " +
+                    "--parameters city Shanghai " +
+                    "--parameters factor 0.01 " +
+                    "--kernel python3 " +
+                    "--engine default_engine " +
+                    "--execution-timeout 10 " +
+                    "--start-timeout 3 " +
+                    "--version " +
+                    "--inject-paths " +
+                    "--progress-bar";
+
+    private static final String EXPECTED_JUPYTER_TASK_COMMAND_USE_PIP_REQUIREMENTS =
+            "set +e \n " +
+                    "source /opt/anaconda3/etc/profile.d/conda.sh && " +
+                    "conda create -n jupyter-tmp-env-123456789 -y && " +
+                    "conda activate jupyter-tmp-env-123456789 && " +
+                    "pip install -r requirements.txt && " +
+                    "papermill " +
+                    "/test/input_note.ipynb " +
+                    "/test/output_note.ipynb " +
+                    "--parameters city Shanghai " +
+                    "--parameters factor 0.01 " +
+                    "--kernel python3 " +
+                    "--engine default_engine " +
+                    "--execution-timeout 10 " +
+                    "--start-timeout 3 " +
+                    "--version " +
+                    "--inject-paths " +
+                    "--progress-bar \n " +
+                    "conda deactivate && conda remove --name jupyter-tmp-env-123456789 --all -y";
+
     @Test
-    public void testBuildJupyterCommandWithLocalEnv() throws Exception {
-        String parameters = buildJupyterCommandWithLocalEnv();
+    public void jupyterTaskUseLocalCondaEnv() throws Exception {
+        String jupyterTaskParameters = buildJupyterTaskUseLocalCondaEnvCommand();
+        JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
+        jupyterTask.init();
+        Assert.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_LOCAL_CONDA_ENV);
+    }
+
+    @Test
+    public void jupyterTaskUsePackedCondaEnv() throws Exception {
+        String jupyterTaskParameters = buildJupyterTaskUsePackedCondaEnvCommand();
+        JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
+        jupyterTask.init();
+        Assert.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PACKED_CONDA_ENV);
+    }
+
+    @Test
+    public void jupyterTaskUsePipRequirements() throws Exception {
+        String jupyterTaskParameters = buildJupyterTaskUsePipRequirementsCommand();
+        JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
+        Mockito.mockStatic(DateUtils.class);
+        when(DateUtils.getTimestampString()).thenReturn("123456789");
+        jupyterTask.init();
+        Assert.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PIP_REQUIREMENTS);
+    }
+
+    private JupyterTask prepareJupyterTaskForTest(final String jupyterTaskParameters) {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        when(taskExecutionContext.getTaskParams()).thenReturn(jupyterTaskParameters);
         JupyterPropertyReader mockedJupyterPropertyReader = Mockito.mock(JupyterPropertyReader.class);
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
         doReturn(mockedJupyterPropertyReader).when(jupyterTask).proxyJupyterPropertyReaderCreator();
         doReturn("/opt/anaconda3/etc/profile.d/conda.sh").when(mockedJupyterPropertyReader).readProperty(any());
-        jupyterTask.init();
-        Assert.assertEquals(jupyterTask.buildCommand(),
-                "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                        "conda activate jupyter-lab && " +
-                        "papermill " +
-                        "/test/input_note.ipynb " +
-                        "/test/output_note.ipynb " +
-                        "--parameters city Shanghai " +
-                        "--parameters factor 0.01 " +
-                        "--kernel python3 " +
-                        "--engine default_engine " +
-                        "--execution-timeout 10 " +
-                        "--start-timeout 3 " +
-                        "--version " +
-                        "--inject-paths " +
-                        "--progress-bar");
+        return jupyterTask;
     }
 
-    @Ignore
-    @Test
-    public void testBuildJupyterCommandWithPackedEnv() throws Exception {
-        String parameters = buildJupyterCommandWithPackedEnv();
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        Mockito.mockStatic(PropertyUtils.class);
-        when(PropertyUtils.getString(any())).thenReturn("/opt/anaconda3/etc/profile.d/conda.sh");
-        JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
-        jupyterTask.init();
-        Assert.assertEquals(jupyterTask.buildCommand(),
-                "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                        "mkdir jupyter_env && " +
-                        "tar -xzf jupyter.tar.gz -C jupyter_env && " +
-                        "source jupyter_env/bin/activate && " +
-                        "papermill " +
-                        "/test/input_note.ipynb " +
-                        "/test/output_note.ipynb " +
-                        "--parameters city Shanghai " +
-                        "--parameters factor 0.01 " +
-                        "--kernel python3 " +
-                        "--engine default_engine " +
-                        "--execution-timeout 10 " +
-                        "--start-timeout 3 " +
-                        "--version " +
-                        "--inject-paths " +
-                        "--progress-bar");
-    }
-
-    @Ignore
-    @Test
-    public void testBuildJupyterCommandWithRequirements() throws Exception {
-        String parameters = buildJupyterCommandWithRequirements();
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        Mockito.mockStatic(PropertyUtils.class);
-        when(PropertyUtils.getString(any())).thenReturn("/opt/anaconda3/etc/profile.d/conda.sh");
-        Mockito.mockStatic(DateUtils.class);
-        when(DateUtils.getTimestampString()).thenReturn("123456789");
-        JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
-        jupyterTask.init();
-        Assert.assertEquals(jupyterTask.buildCommand(),
-                "set +e \n " +
-                        "source /opt/anaconda3/etc/profile.d/conda.sh && " +
-                        "conda create -n jupyter-tmp-env-123456789 -y && " +
-                        "conda activate jupyter-tmp-env-123456789 && " +
-                        "pip install -r requirements.txt && " +
-                        "papermill " +
-                        "/test/input_note.ipynb " +
-                        "/test/output_note.ipynb " +
-                        "--parameters city Shanghai " +
-                        "--parameters factor 0.01 " +
-                        "--kernel python3 " +
-                        "--engine default_engine " +
-                        "--execution-timeout 10 " +
-                        "--start-timeout 3 " +
-                        "--version " +
-                        "--inject-paths " +
-                        "--progress-bar \n " +
-                        "conda deactivate && conda remove --name jupyter-tmp-env-123456789 --all -y");
-    }
-
-    private String buildJupyterCommandWithLocalEnv() {
+    private String buildJupyterTaskUseLocalCondaEnvCommand() {
         JupyterParameters jupyterParameters = new JupyterParameters();
         jupyterParameters.setCondaEnvName("jupyter-lab");
         jupyterParameters.setInputNotePath("/test/input_note.ipynb");
@@ -140,7 +139,7 @@ public class JupyterTaskTest {
         return JSONUtils.toJsonString(jupyterParameters);
     }
 
-    private String buildJupyterCommandWithPackedEnv() {
+    private String buildJupyterTaskUsePackedCondaEnvCommand() {
         JupyterParameters jupyterParameters = new JupyterParameters();
         jupyterParameters.setCondaEnvName("jupyter.tar.gz");
         jupyterParameters.setInputNotePath("/test/input_note.ipynb");
@@ -154,7 +153,7 @@ public class JupyterTaskTest {
         return JSONUtils.toJsonString(jupyterParameters);
     }
 
-    private String buildJupyterCommandWithRequirements() {
+    private String buildJupyterTaskUsePipRequirementsCommand() {
         JupyterParameters jupyterParameters = new JupyterParameters();
         jupyterParameters.setCondaEnvName("requirements.txt");
         jupyterParameters.setInputNotePath("/test/input_note.ipynb");
