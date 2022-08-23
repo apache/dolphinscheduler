@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_MANAGE;
 
 /**
  * worker group service impl
@@ -311,7 +310,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 continue;
             }
             WorkerGroup wg = new WorkerGroup();
-            handleAddrList(wg, workerGroup, childrenNodes);
+            handleAddrList(wg, workerGroup, workerGroupsMap, childrenNodes);
             wg.setName(workerGroup);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
@@ -329,7 +328,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return workerGroups;
     }
     
-    protected void handleAddrList(WorkerGroup wg, String workerGroup, Collection<String> childrenNodes) {
+    protected void handleAddrList(WorkerGroup wg, String workerGroup, Map<String, WorkerGroup> workerGroupsMap, Collection<String> childrenNodes) {
         wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
     }
 
