@@ -100,6 +100,18 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("startTime") Date startTime,
                                                     @Param("endTime") Date endTime);
 
+    IPage<TaskInstance> queryStreamTaskInstanceListPaging(IPage<TaskInstance> page,
+                                                          @Param("projectCode") Long projectCode,
+                                                          @Param("processDefinitionName") String processDefinitionName,
+                                                          @Param("searchVal") String searchVal,
+                                                          @Param("taskName") String taskName,
+                                                          @Param("executorId") int executorId,
+                                                          @Param("states") int[] statusArray,
+                                                          @Param("host") String host,
+                                                          @Param("taskExecuteType") TaskExecuteType taskExecuteType,
+                                                          @Param("startTime") Date startTime,
+                                                          @Param("endTime") Date endTime);
+
     List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId, @Param("status") int status);
 
     /**
