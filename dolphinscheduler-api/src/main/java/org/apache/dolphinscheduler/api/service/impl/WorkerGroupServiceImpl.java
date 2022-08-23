@@ -139,6 +139,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private boolean checkWorkerGroupNameExists(WorkerGroup workerGroup) {
+        // Skip default group name check
+        if (workerGroup.getName().equals("default")) {
+            return false;
+        }
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(workerGroupList)) {
             // new group has same name
