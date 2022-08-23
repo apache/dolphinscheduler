@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
@@ -55,12 +54,18 @@ public class JupyterTask extends AbstractRemoteTask {
 
     private ShellCommandExecutor shellCommandExecutor;
 
+    private JupyterPropertyReader jupyterPropertyReader;
+
     public JupyterTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
                 logger);
+    }
+
+    protected JupyterPropertyReader proxyJupyterPropertyReaderCreator() {
+        return new JupyterPropertyReader();
     }
 
     @Override
@@ -70,6 +75,8 @@ public class JupyterTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
+        this.jupyterPropertyReader = proxyJupyterPropertyReaderCreator();
+
         logger.info("jupyter task params {}", taskExecutionContext.getTaskParams());
 
         jupyterParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), JupyterParameters.class);
@@ -125,7 +132,7 @@ public class JupyterTask extends AbstractRemoteTask {
          * papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
          */
         List<String> args = new ArrayList<>();
-        final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
+        final String condaPath = jupyterPropertyReader.readProperty(TaskConstants.CONDA_PATH);
         final String timestamp = DateUtils.getTimestampString();
         String condaEnvName = jupyterParameters.getCondaEnvName();
         if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
@@ -178,7 +185,7 @@ public class JupyterTask extends AbstractRemoteTask {
      *
      * @return argument list
      */
-    private List<String> populateJupyterParameterization() throws IOException {
+    protected List<String> populateJupyterParameterization() throws IOException {
         List<String> args = new ArrayList<>();
         String parameters = jupyterParameters.getParameters();
         if (StringUtils.isNotEmpty(parameters)) {
@@ -205,7 +212,7 @@ public class JupyterTask extends AbstractRemoteTask {
      *
      * @return argument list
      */
-    private List<String> populateJupyterOptions() {
+    protected List<String> populateJupyterOptions() {
         List<String> args = new ArrayList<>();
         String kernel = jupyterParameters.getKernel();
         if (StringUtils.isNotEmpty(kernel)) {
