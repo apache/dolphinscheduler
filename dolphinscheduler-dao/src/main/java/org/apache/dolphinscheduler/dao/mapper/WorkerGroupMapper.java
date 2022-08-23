@@ -61,4 +61,5 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
      * @return worker group list
      */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
+
 }
