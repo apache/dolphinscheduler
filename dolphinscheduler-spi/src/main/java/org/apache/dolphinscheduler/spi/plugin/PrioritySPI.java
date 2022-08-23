@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.spi.plugin;
 
-import org.apache.dolphinscheduler.spi.common.UiChannelFactory;
-import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
-import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
+public interface PrioritySPI extends Comparable<Integer> {
 
-public interface TaskChannelFactory extends UiChannelFactory, PrioritySPI {
+    /**
+     * The SPI identify, if the two plugin has the same name, will load the high priority.
+     * If the priority and name is all same, will throw <code>IllegalArgumentException</code>
+     * @return
+     */
+    SPIIdentify getIdentify();
 
-    TaskChannel create();
-
-    default SPIIdentify getIdentify() {
-        return SPIIdentify.create(getName());
+    @Override
+    default int compareTo(Integer o) {
+        return Integer.compare(getIdentify().getPriority(), o);
     }
 
 }

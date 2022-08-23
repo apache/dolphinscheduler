@@ -27,11 +27,13 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ import static java.lang.String.format;
 public class TaskPluginManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskPluginManager.class);
 
+    private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();
     private final Map<String, TaskChannel> taskChannelMap = new ConcurrentHashMap<>();
 
     private final PluginDao pluginDao;
@@ -86,26 +89,23 @@ public class TaskPluginManager {
     }
 
     public void installPlugin() {
-        final Set<String> names = new HashSet<>();
+        PrioritySPIFactory<TaskChannelFactory> prioritySPIFactory = new PrioritySPIFactory<>(TaskChannelFactory.class);
+        for (Map.Entry<String, TaskChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
+            String factoryName = entry.getKey();
+            TaskChannelFactory factory = entry.getValue();
 
-        ServiceLoader.load(TaskChannelFactory.class).forEach(factory -> {
-            final String name = factory.getName();
+            logger.info("Registry task plugin: {} - {}", factoryName, factory.getClass());
 
-            logger.info("Registering task plugin: {}", name);
+            taskChannelFactoryMap.put(factoryName, factory);
+            taskChannelMap.put(factoryName, factory.create());
 
-            if (!names.add(name)) {
-                throw new TaskPluginException(format("Duplicate task plugins named '%s'", name));
-            }
-
-            loadTaskChannel(factory);
-
-            logger.info("Registered task plugin: {}", name);
+            logger.info("Registered task plugin: {} - {}", factoryName, factory.getClass());
 
             List<PluginParams> params = factory.getParams();
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
-            PluginDefine pluginDefine = new PluginDefine(name, PluginType.TASK.getDesc(), paramsJson);
+            PluginDefine pluginDefine = new PluginDefine(factoryName, PluginType.TASK.getDesc(), paramsJson);
             pluginDao.addOrUpdatePluginDefine(pluginDefine);
-        });
+        }
     }
 }
