@@ -114,7 +114,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -722,9 +721,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper
                     .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
             if (taskRelationList.size() == processTaskRelationLogList.size()) {
-                Set<ProcessTaskRelationLog> taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
-                Set<ProcessTaskRelationLog> processTaskRelationLogSet =
-                        processTaskRelationLogList.stream().collect(Collectors.toSet());
+                Set<ProcessTaskRelationLog> taskRelationSet = new HashSet<>(taskRelationList);
+                Set<ProcessTaskRelationLog> processTaskRelationLogSet = new HashSet<>(processTaskRelationLogList);
                 if (taskRelationSet.size() == processTaskRelationLogSet.size()) {
                     taskRelationSet.removeAll(processTaskRelationLogSet);
                     if (!taskRelationSet.isEmpty()) {
@@ -1047,7 +1045,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     @Transactional
     public Map<String, Object> importProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result;
         String dagDataScheduleJson = FileUtils.file2String(file);
         List<DagDataSchedule> dagDataScheduleList = JSONUtils.toList(dagDataScheduleJson, DagDataSchedule.class);
         Project project = projectMapper.queryByCode(projectCode);
@@ -1658,7 +1656,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     public Map<String, Object> viewTree(User loginUser, long projectCode, long code, Integer limit) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result;
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_TREE_VIEW);
@@ -1716,9 +1714,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         while (!ServerLifeCycleManager.isStopped()) {
             Set<String> postNodeList;
-            Iterator<Map.Entry<String, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<String, List<TreeViewDto>> en = iter.next();
+            Set<Map.Entry<String, List<TreeViewDto>>> entries = runningNodeMap.entrySet();
+            List<Integer> processInstanceIds = processInstanceList.stream()
+                    .limit(limit).map(ProcessInstance::getId).collect(Collectors.toList());
+            List<Long> nodeCodes = entries.stream().map(e -> Long.parseLong(e.getKey())).collect(Collectors.toList());
+            List<TaskInstance> taskInstances;
+            if (processInstanceIds.isEmpty() || nodeCodes.isEmpty()) {
+                taskInstances = Collections.emptyList();
+            } else {
+                taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(processInstanceIds, nodeCodes);
+            }
+            for (Map.Entry<String, List<TreeViewDto>> en : entries) {
                 String nodeCode = en.getKey();
                 parentTreeViewDtoList = en.getValue();
 
@@ -1730,8 +1736,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 // set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
-                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(processInstance.getId(),
-                            Long.parseLong(nodeCode));
+                    TaskInstance taskInstance = null;
+                    for (TaskInstance instance : taskInstances) {
+                        if (instance.getTaskCode() == Long.parseLong(nodeCode)
+                                && instance.getProcessInstanceId() == processInstance.getId()) {
+                            taskInstance = instance;
+                            break;
+                        }
+                    }
                     if (taskInstance == null) {
                         treeViewDto.getInstances().add(new Instance(-1, "not running", 0, "null"));
                     } else {
