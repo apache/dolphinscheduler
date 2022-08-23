@@ -32,33 +32,33 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * hive sql listener test
- */
+
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"javax.*"})
 public class HiveSqlLogThreadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThreadTest.class);
 
+    private static volatile TaskExecutionContext taskExecutionContext;
+
     @Test
     public void testHiveSql() throws SQLException {
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        PowerMockito.when(taskExecutionContext.getTaskType()).thenReturn("hive");
+        taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskType("hive");
 
         String sql = "select count(*) from test.table";
 
         List<String> mockLog = new ArrayList<>();
-        mockLog.add("start hive sql log\napplication_1231_2323");
+        mockLog.add("1start hive sql log\napplication_1231_2323");
         HiveStatement statement = PowerMockito.mock(HiveStatement.class);
         PowerMockito.when(statement.isClosed()).thenReturn(false);
         PowerMockito.when(statement.hasMoreLogs()).thenReturn(true);
-        PowerMockito.when(statement.getQueryLog(true,500)).thenReturn(mockLog);
+        PowerMockito.when(statement.getQueryLog(true, 500)).thenReturn(mockLog);
         try {
-            //print process log
-            HiveSqlLogThread queryThread = PowerMockito.spy(new HiveSqlLogThread(statement,LOGGER,taskExecutionContext));
+            HiveSqlLogThread queryThread = PowerMockito.spy(new HiveSqlLogThread(statement, LOGGER, taskExecutionContext));
             queryThread.start();
 
-            Assert.assertEquals(taskExecutionContext.getTaskType(), "hive");
+            Thread.sleep(5000);
+            Assert.assertEquals(taskExecutionContext.getAppIds(), "application_1231_2323");
 
         } catch (Exception e) {
             LOGGER.error("query failed,sql is [{}]" ,sql);
