@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -279,6 +280,26 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 task.getTaskCode());
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstance, null);
+    }
+
+    /**
+     * test query by process instance ids and task codes
+     */
+    @Test
+    public void testQueryByProcessInstanceIdsAndTaskCodes() {
+        // insert ProcessInstance
+        ProcessInstance processInstance = insertProcessInstance();
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(processInstance.getId());
+        task.setHost("111.111.11.11");
+        taskInstanceMapper.updateById(task);
+
+        List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
+                Collections.singletonList(task.getProcessInstanceId()),
+                Collections.singletonList(task.getTaskCode()));
+        taskInstanceMapper.deleteById(task.getId());
+        Assert.assertEquals(taskInstances.size(), 1);
     }
 
     /**
