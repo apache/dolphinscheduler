@@ -64,6 +64,7 @@ public class WorkerHeartBeatTask implements Runnable {
             if (!ServerLifeCycleManager.isRunning()) {
                 return;
             }
+            heartBeat.setStartupTime(ServerLifeCycleManager.getServerStartupTime());
             // update waiting task count
             heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
 
