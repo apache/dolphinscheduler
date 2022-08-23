@@ -72,6 +72,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","cxc_work_group");
         paramsMap.add("addrList","192.168.0.1,192.168.0.2");
+        paramsMap.add("description","");
+        paramsMap.add("otherParamsJson","");
         MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
