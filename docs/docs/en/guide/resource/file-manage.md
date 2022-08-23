@@ -65,6 +65,8 @@ In the workflow definition module of project Manage, create a new workflow using
 
 - Script: 'sh hello.sh'
 - Resource: Select 'hello.sh'
+> Notice: When invoking a resource file in the script, the file name needs to be the same as the full path of the selected resource:
+> For example: if the resource path is `/resource/hello.sh`, you need to use the full path of `/resource/hello.sh` to call in the script.
 
 ![use-shell](../../../../img/new_ui/dev/resource/demo/file-demo02.png)
 
