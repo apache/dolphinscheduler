@@ -165,29 +165,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         return true;
     }
 
-    /**
-     * Check whether the test data source needs to be replaced
-     */
-    private void checkAndReplaceTestDataSource() {
-        if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
-            try {
-                if (TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType()).getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
-                    Map<String, Object> instanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {});
-                    Integer onlineDataSourceId = (Integer) instanceParams.get("datasource");
-                    Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
-                    if (null == testDataSourceId){
-                        logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
-                    }else {
-                        logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
-                    }
-                    instanceParams.put("datasource", testDataSourceId);
-                    taskInstance.setTaskParams(JSONUtils.toJsonString(instanceParams));
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        }
-
     private void killRemoteTask() throws ExecuteException {
         TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
         killCommand.setTaskInstanceId(taskInstance.getId());
@@ -199,6 +176,30 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         executionContext.setHost(host);
 
         nettyExecutorManager.executeDirectly(executionContext);
+    }
 
+    /**
+     * Check whether the test data source needs to be replaced
+     */
+    private void checkAndReplaceTestDataSource(){
+        if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
+            try {
+                if (TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType()).getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
+                    Map<String, Object> instanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+                    Integer onlineDataSourceId = (Integer) instanceParams.get("datasource");
+                    Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
+                    if (null == testDataSourceId) {
+                        logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+                    } else {
+                        logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+                    }
+                    instanceParams.put("datasource", testDataSourceId);
+                    taskInstance.setTaskParams(JSONUtils.toJsonString(instanceParams));
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+        }
     }
 }
