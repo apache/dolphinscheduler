@@ -147,7 +147,6 @@ class GitHub(ResourcePlugin):
             url=url,
             params=params,
         )
-        print(response.json())
         if response.status_code == requests.codes.ok:
             json_response = response.json()
             content = base64.b64decode(json_response["content"])
