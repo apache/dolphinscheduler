@@ -197,23 +197,16 @@ public class ServerNodeManager implements InitializingBean {
         public void run() {
             try {
                 // sync worker node info
-                Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
-                syncAllWorkerNodeInfo(newWorkerNodeInfo);
-
+                Map<String, String> registryWorkerNodeMap = registryClient.getServerMaps(NodeType.WORKER, true);
+                syncAllWorkerNodeInfo(registryWorkerNodeMap);
                 // sync worker group nodes from database
                 List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
                 if (CollectionUtils.isNotEmpty(workerGroupList)) {
                     for (WorkerGroup wg : workerGroupList) {
-                        String workerGroup = wg.getName();
-                        Set<String> nodes = new HashSet<>();
-                        String[] addrs = wg.getAddrList().split(Constants.COMMA);
-                        for (String addr : addrs) {
-                            if (newWorkerNodeInfo.containsKey(addr)) {
-                                nodes.add(addr);
-                            }
-                        }
-                        if (!nodes.isEmpty()) {
-                            syncWorkerGroupNodes(workerGroup, nodes);
+                        String workerGroupName = wg.getName();
+                        Set<String> workerAddress = getWorkerAddressByWorkerGroup(registryWorkerNodeMap, wg);
+                        if (!workerAddress.isEmpty()) {
+                            syncWorkerGroupNodes(workerGroupName, workerAddress);
                         }
                     }
                 }
@@ -221,6 +214,18 @@ public class ServerNodeManager implements InitializingBean {
                 logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
+    }
+
+
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroup wg) {
+        Set<String> nodes = new HashSet<>();
+        String[] addrs = wg.getAddrList().split(Constants.COMMA);
+        for (String addr : addrs) {
+            if (newWorkerNodeInfo.containsKey(addr)) {
+                nodes.add(addr);
+            }
+        }
+        return nodes;
     }
 
     /**

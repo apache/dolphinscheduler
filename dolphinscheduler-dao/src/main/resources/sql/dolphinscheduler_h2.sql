@@ -954,6 +954,8 @@ CREATE TABLE t_ds_worker_group
     addr_list   text NULL DEFAULT NULL,
     create_time datetime NULL DEFAULT NULL,
     update_time datetime NULL DEFAULT NULL,
+    description text NULL DEFAULT NULL,
+    other_params_json text NULL DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY name_unique (name)
 );
