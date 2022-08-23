@@ -135,6 +135,24 @@
         and flag = 1
         limit 1
     </select>
+    <select id="queryByProcessInstanceIdsAndTaskCodes" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where flag = 1
+        <if test="processInstanceIds != null and processInstanceIds.size() != 0">
+            and process_instance_id in
+            <foreach collection="processInstanceIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="taskCodes != null and taskCodes.size() != 0">
+            and task_code in
+            <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
     <select id="countTask" resultType="java.lang.Integer">
         select count(1) as count
         from t_ds_task_instance task,t_ds_task_definition_log define

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -38,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.auto.service.AutoService;
 
 /**
@@ -152,23 +152,15 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskInstance.setState(TaskExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
             processService.updateTaskInstance(taskInstance);
-
-            TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
-            killCommand.setTaskInstanceId(taskInstance.getId());
-
-            ExecutionContext executionContext =
-                    new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
-
-            Host host = Host.of(taskInstance.getHost());
-            executionContext.setHost(host);
-
-            nettyExecutorManager.executeDirectly(executionContext);
-        } catch (ExecuteException e) {
-            logger.error("kill task error:", e);
+            if (StringUtils.isNotEmpty(taskInstance.getHost())) {
+                killRemoteTask();
+            }
+        } catch (Exception e) {
+            logger.error("master kill task error, taskInstance id: {}", taskInstance.getId(), e);
             return false;
         }
 
-        logger.info("master kill taskInstance name :{} taskInstance id:{}",
+        logger.info("master success kill taskInstance name: {} taskInstance id: {}",
                 taskInstance.getName(), taskInstance.getId());
         return true;
     }
@@ -195,5 +187,18 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 logger.error(e.getMessage());
             }
         }
+
+    private void killRemoteTask() throws ExecuteException {
+        TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
+        killCommand.setTaskInstanceId(taskInstance.getId());
+
+        ExecutionContext executionContext =
+                new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
+
+        Host host = Host.of(taskInstance.getHost());
+        executionContext.setHost(host);
+
+        nettyExecutorManager.executeDirectly(executionContext);
+
     }
 }
