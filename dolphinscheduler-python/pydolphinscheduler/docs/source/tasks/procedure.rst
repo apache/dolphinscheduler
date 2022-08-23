@@ -19,3 +19,11 @@ Procedure
 =========
 
 .. automodule:: pydolphinscheduler.tasks.procedure
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Procedure.yaml
+   :start-after: # under the License.
+   :language: yaml
