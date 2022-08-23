@@ -28,4 +28,5 @@
         from t_ds_worker_group
         where name = #{name}
     </select>
+
 </mapper>
