@@ -29,16 +29,14 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * dependent item execute
@@ -53,23 +51,23 @@ public class DependentExecute {
     /**
      * depend item list
      */
-    private List<DependentItem> dependItemList;
+    protected List<DependentItem> dependItemList;
 
     /**
      * dependent relation
      */
-    private DependentRelation relation;
+    protected DependentRelation relation;
 
 
     /**
      * depend result
      */
-    private DependResult modelDependResult = DependResult.WAITING;
+    protected DependResult modelDependResult = DependResult.WAITING;
 
     /**
      * depend result map
      */
-    private Map<String, DependResult> dependResultMap = new HashMap<>();
+    protected Map<String, DependResult> dependResultMap = new HashMap<>();
 
     /**
      * logger
