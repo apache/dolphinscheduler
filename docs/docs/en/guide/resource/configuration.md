@@ -9,7 +9,8 @@
 
 ### Configure `common.properties`
 
-Configure `api-server/conf/common.properties` and `worker-server/conf/common.properties` as follows:
+If you deploy DolphinScheduler in `Cluster` or `Pseudo-Cluster` mode, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
+If you deploy DolphinScheduler in `Standalone` mode, you only need to configure `standalone-server/conf/common.properties` as follows:
 
 - Change `resource.storage.upload.base.path` to your local directory path. Please make sure the `tenant resource.hdfs.root.user` has read and write permissions for `resource.storage.upload.base.path`, e,g. `/tmp/dolphinscheduler`. `DolphinScheduler` will create the directory you configure if it does not exist.
 - Modify `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///`.
@@ -133,6 +134,7 @@ task.resource.limit.state=false
 
 > **Note:**
 >
-> *  If only the `api-server/conf/common.properties` file is configured, then resource uploading is enabled, but you can not use resources in task. If you want to use or execute the files in the workflow you need to configure `worker-server/conf/common.properties` too.
+> * If only the `api-server/conf/common.properties` file is configured, then resource uploading is enabled, but you can not use resources in task. If you want to use or execute the files in the workflow you need to configure `worker-server/conf/common.properties` too.
 > * If you want to use the resource upload function, the deployment user in [installation and deployment](../installation/standalone.md) must have relevant operation authority.
 > * If you using a Hadoop cluster with HA, you need to enable HDFS resource upload, and you need to copy the `core-site.xml` and `hdfs-site.xml` under the Hadoop cluster to `worker-server/conf` and `api-server/conf`, otherwise skip this copy step.
+
