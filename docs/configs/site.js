@@ -138,7 +138,7 @@ export default {
           name: 'Email List',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
-          link: '/en-us/docs/dev/user_doc/contribute/join/subscribe.html',
+          link: '/en-us/docs/latest/user_doc/contribute/join/subscribe.html',
         },
         {
           name: 'Twitter',
@@ -263,7 +263,7 @@ export default {
           name: '邮件列表',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
-          link: '/zh-cn/docs/dev/user_doc/contribute/join/subscribe.html',
+          link: '/zh-cn/docs/latest/user_doc/contribute/join/subscribe.html',
         },
         {
           name: 'Twitter',
