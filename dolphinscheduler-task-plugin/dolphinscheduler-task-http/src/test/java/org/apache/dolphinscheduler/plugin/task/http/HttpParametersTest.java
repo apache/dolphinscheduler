@@ -94,12 +94,23 @@ public class HttpParametersTest  {
         property.setProp("body");
         property.setDirect(Direct.OUT);
         property.setType(DataType.VARCHAR);
-        property.setValue("");
+        property.setValue("1");
         localParams.add(property);
         httpParameters.setLocalParams(localParams);
         String result = httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
         List<Property> varPool = new ArrayList<>();
         httpParameters.setVarPool(varPool.toString());
         httpParameters.dealOutParam(result);
+        Map<String, Property> varPoolMap = httpParameters.getVarPoolMap();
+
+        Assert.assertTrue(httpParameters.checkParameters());
+        Assert.assertEquals(10000,httpParameters.getConnectTimeout());
+        Assert.assertEquals(10000,httpParameters.getSocketTimeout());
+        Assert.assertEquals("https://www.baidu.com/",httpParameters.getUrl());
+        Assert.assertEquals(HttpMethod.GET,httpParameters.getHttpMethod());
+        Assert.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT,httpParameters.getHttpCheckCondition());
+        Assert.assertEquals("",httpParameters.getCondition());
+        Assert.assertEquals(1,httpParameters.getLocalParametersMap().size());
+        Assert.assertEquals(0,httpParameters.getResourceFilesList().size());
     }
 }
