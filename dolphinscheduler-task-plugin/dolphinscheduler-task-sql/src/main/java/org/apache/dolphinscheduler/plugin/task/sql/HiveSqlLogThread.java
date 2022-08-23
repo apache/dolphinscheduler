@@ -28,48 +28,43 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-/**
- * hive log listener thread
- */
+
 public class HiveSqlLogThread extends Thread {
-    /**
-     * hive statement
-     */
+
     private final HiveStatement statement;
-    /**
-     * logger
-     */
-    private final Logger threadLogger;
+
+    private final Logger hiveMapReduceLogger;
 
     private final TaskExecutionContext taskExecutionContext;
 
     public HiveSqlLogThread(Statement statement, Logger logger, TaskExecutionContext taskExecutionContext) {
         this.statement = (HiveStatement) statement;
-        this.threadLogger = logger;
+        this.hiveMapReduceLogger = logger;
         this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void run() {
         if (statement == null) {
-            threadLogger.info("hive statement is null,end this log query!");
+            hiveMapReduceLogger.info("hive statement is null, end this log query!");
             return;
         }
         try {
             while (!statement.isClosed() && statement.hasMoreLogs()) {
                 for (String log : statement.getQueryLog(true, 500)) {
-                    //hive mapreduce log
-                    threadLogger.info(log);
 
-                    List<String> appIds = LoggerUtils.getAppIds(log, threadLogger);
+                    hiveMapReduceLogger.info(log);
+
+                    List<String> appIds = LoggerUtils.getAppIds(log, hiveMapReduceLogger);
                     //get sql task yarn's application_id
                     if (!appIds.isEmpty()) {
+                        hiveMapReduceLogger.info("yarn application_id is {}",appIds);
                         taskExecutionContext.setAppIds(String.join(",", appIds));
                     }
                 }
             }
         } catch (SQLException e) {
-            threadLogger.error("Failed to view hive log,exception:[{}]", e.getMessage());
+            hiveMapReduceLogger.error("Failed to view hive log,exception:[{}]", e.getMessage());
         }
 
     }
