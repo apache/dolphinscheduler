@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.service.FailoverService;
-import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +49,7 @@ import com.google.common.collect.Sets;
 
 /**
  * <p>DolphinScheduler master register client, used to connect to registry and hand the registry events.
- * <p>When the Master node startup, it will register in registry center. And schedule a {@link HeartBeatTask} to update its metadata in registry.
+ * <p>When the Master node startup, it will register in registry center. And schedule a {@link MasterHeartBeatTask} to update its metadata in registry.
  */
 @Component
 public class MasterRegistryClient implements AutoCloseable {
@@ -97,7 +96,7 @@ public class MasterRegistryClient implements AutoCloseable {
             // master registry
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(getCurrentNodePath(),
-                                                                                        registryClient));
+                registryClient));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -190,13 +189,11 @@ public class MasterRegistryClient implements AutoCloseable {
         logger.info("Master node : {} registering to registry center", masterAddress);
         String localNodePath = getCurrentNodePath();
         Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                                                        masterConfig.getMaxCpuLoadAvg(),
-                                                        masterConfig.getReservedMemory(),
-                                                        Sets.newHashSet(localNodePath),
-                                                        Constants.MASTER_TYPE,
-                                                        registryClient,
-                                                        masterConfig.getHeartbeatErrorThreshold());
+        MasterHeartBeatTask heartBeatTask = new MasterHeartBeatTask(startupTime,
+            masterConfig.getMaxCpuLoadAvg(),
+            masterConfig.getReservedMemory(),
+            Sets.newHashSet(localNodePath),
+            registryClient);
 
         // remove before persist
         registryClient.remove(localNodePath);

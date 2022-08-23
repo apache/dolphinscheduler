@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
@@ -101,16 +100,14 @@ public class WorkerRegistryClient implements AutoCloseable {
         Set<String> workerZkPaths = getWorkerZkPaths();
         long workerHeartbeatInterval = workerConfig.getHeartbeatInterval().getSeconds();
 
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                                                        workerConfig.getMaxCpuLoadAvg(),
-                                                        workerConfig.getReservedMemory(),
-                                                        workerConfig.getHostWeight(),
-                                                        workerZkPaths,
-                                                        Constants.WORKER_TYPE,
-                                                        registryClient,
-                                                        workerConfig.getExecThreads(),
-                                                        workerManagerThread.getThreadPoolQueueSize(),
-                                                        workerConfig.getHeartbeatErrorThreshold());
+        WorkerHeartBeatTask heartBeatTask = new WorkerHeartBeatTask(startupTime,
+            workerConfig.getMaxCpuLoadAvg(),
+            workerConfig.getReservedMemory(),
+            workerConfig.getHostWeight(),
+            workerZkPaths,
+            registryClient,
+            workerConfig.getExecThreads(),
+            workerManagerThread.getThreadPoolQueueSize());
 
         for (String workerZKPath : workerZkPaths) {
             // remove before persist
