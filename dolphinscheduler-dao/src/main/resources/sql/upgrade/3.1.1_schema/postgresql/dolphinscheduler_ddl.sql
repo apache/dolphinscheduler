@@ -13,41 +13,42 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.dao.entity;
+delimiter d//
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
-import java.util.Date;
 
-/**
- * worker group
- */
-@TableName("t_ds_worker_group")
-@Data
-public class WorkerGroup {
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+    )
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private int id;
 
-    private String name;
 
-    private String addrList;
+--- add column
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json int DEFAULT NULL  ';
 
-    private Date createTime;
 
-    private Date updateTime;
 
-    private String description;
+return 'Success!';
+exception when others then
+        ---Raise EXCEPTION '(%)',SQLERRM;
 
-    @TableField(exist = false)
-    private boolean systemDefault;
+        return SQLERRM;
+END;
+$BODY$;
 
-    private String otherParamsJson;
+select dolphin_update_metadata();
 
-}
+
+d//
+
