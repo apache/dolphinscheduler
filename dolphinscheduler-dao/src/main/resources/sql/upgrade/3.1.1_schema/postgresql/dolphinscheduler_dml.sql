@@ -13,41 +13,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.dao.entity;
+delimiter d//
 
-import java.util.Date;
+return 'Success!';
+exception when others then
+		---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+select dolphin_insert_dq_initial_data();
 
-/**
- * worker group
- */
-@TableName("t_ds_worker_group")
-@Data
-public class WorkerGroup {
+d//
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private int id;
-
-    private String name;
-
-    private String addrList;
-
-    private Date createTime;
-
-    private Date updateTime;
-
-    private String description;
-
-    @TableField(exist = false)
-    private boolean systemDefault;
-
-    private String otherParamsJson;
-
-}
