@@ -118,12 +118,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
-        handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
+        handleWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    protected void handleDefaultWorkGroup(WorkerGroupMapper workerGroupMapper, WorkerGroup workerGroup, User loginUser, String otherParamsJson) {
+    protected void handleWorkGroup(WorkerGroupMapper workerGroupMapper, WorkerGroup workerGroup, User loginUser, String otherParamsJson) {
         if (workerGroup.getId() != 0) {
             workerGroupMapper.updateById(workerGroup);
         } else {
