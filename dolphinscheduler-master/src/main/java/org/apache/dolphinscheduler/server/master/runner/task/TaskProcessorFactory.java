@@ -17,24 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_STREAM;
-
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.experimental.UtilityClass;
-
-import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
 
 /**
  * the factory to create task processor
@@ -44,16 +38,19 @@ public final class TaskProcessorFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessorFactory.class);
 
-    public static final Map<String, Constructor<ITaskProcessor>> PROCESS_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Constructor<ITaskProcessor>> PROCESS_MAP = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_PROCESSOR = COMMON_TASK_TYPE;
 
     static {
-        for (ITaskProcessor iTaskProcessor : ServiceLoader.load(ITaskProcessor.class)) {
+        PrioritySPIFactory<ITaskProcessor> prioritySPIFactory = new PrioritySPIFactory<>(ITaskProcessor.class);
+        for (Map.Entry<String, ITaskProcessor> entry : prioritySPIFactory.getSPIMap().entrySet()) {
             try {
-                PROCESS_MAP.put(iTaskProcessor.getType(), (Constructor<ITaskProcessor>) iTaskProcessor.getClass().getConstructor());
+                logger.info("Registering task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
+                PROCESS_MAP.put(entry.getKey(), (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
+                logger.info("Registered task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
             } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException("The task processor should has a no args constructor", e);
+                throw new IllegalArgumentException(String.format("The task processor: %s should has a no args constructor", entry.getKey()));
             }
         }
     }
