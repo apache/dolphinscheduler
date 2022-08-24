@@ -18,6 +18,7 @@ name: Docs
 
 on:
   pull_request:
+  push:
     paths:
       - '.github/workflows/docs.yml'
       - '**/*.md'
@@ -39,7 +40,7 @@ jobs:
       run:
         working-directory: docs
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
@@ -54,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo npm install -g markdown-link-check@3.10.0
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
@@ -62,3 +63,17 @@ jobs:
           for file in $(find . -name "*.md"); do
             markdown-link-check -c .dlc.json -q "$file"
           done
+  markdown-lint:
+    name: Lint Markdown
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v3
+      - uses: github/super-linter@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BRANCH: dev
+          FILTER_REGEX_INCLUDE: .*docs/.*md$
+          VALIDATE_MARKDOWN: true
+          # VALIDATE_ALL_CODEBASE: false
