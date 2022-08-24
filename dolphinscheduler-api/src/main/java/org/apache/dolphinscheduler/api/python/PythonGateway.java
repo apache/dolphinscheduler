@@ -266,7 +266,7 @@ public class PythonGateway {
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
+        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName, 0);
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         ProcessDefinition processDefinition = null;
