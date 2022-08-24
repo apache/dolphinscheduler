@@ -28,10 +28,11 @@ export function useEdit(state: any) {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const getResourceView = (id: number) => {
+  const getResourceView = (fullName: string,id: number) => {
     const params = {
       skipLineNum: 0,
-      limit: 3000
+      limit: 3000,
+      fullName: fullName,
     }
     return useAsyncState(viewResource(params, id), {
       alias: '',
@@ -39,14 +40,16 @@ export function useEdit(state: any) {
     })
   }
 
-  const handleUpdateContent = (id: number) => {
+  const handleUpdateContent = (id: string, fullName: string, tenantCode: string) => {
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
         await updateResourceContent(
           {
-            ...state.fileForm
+            ...state.fileForm,
+            tenantCode: tenantCode,
+            fullName: fullName,
           },
-          id
+          0
         )
 
         window.$message.success(t('resource.file.success'))

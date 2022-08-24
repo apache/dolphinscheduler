@@ -43,6 +43,7 @@ export function useTable() {
     tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
+    // here is id not prefix because udf function is still stored in db
     id: ref(Number(router.currentRoute.value.params.id) || -1),
     page: ref(1),
     pageSize: ref(10),

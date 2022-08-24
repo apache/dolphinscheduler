@@ -42,7 +42,9 @@ export default defineComponent({
 
     const requestData = () => {
       getTableData({
-        id: variables.id,
+        id: -1,
+        fullName: variables.fileId,
+        tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal

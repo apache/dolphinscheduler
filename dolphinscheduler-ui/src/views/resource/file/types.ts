@@ -16,7 +16,7 @@
  */
 
 export interface ResourceFileTableData {
-  id: number
+  id: string
   name: string
   user_name: string
   directory: string

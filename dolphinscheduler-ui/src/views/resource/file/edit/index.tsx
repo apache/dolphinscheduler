@@ -32,21 +32,22 @@ export default defineComponent({
     const router = useRouter()
 
     const componentName = route.name
-    const fileId = Number(route.params.id)
+    const fileId = router.currentRoute.value.query.prefix || ""
+    const tenantCode = router.currentRoute.value.query.tenantCode || ""
 
     const { state } = useForm()
     const { getResourceView, handleUpdateContent } = useEdit(state)
 
     const handleFileContent = () => {
       state.fileForm.content = resourceViewRef.state.value.content
-      handleUpdateContent(fileId)
+      handleUpdateContent(-1, fileId, tenantCode)
     }
 
     const handleReturn = () => {
       router.go(-1)
     }
 
-    const resourceViewRef = getResourceView(fileId)
+    const resourceViewRef = getResourceView(fileId, 0)
     watch(
       () => resourceViewRef.state.value.content,
       () => (state.fileForm.content = resourceViewRef.state.value.content)

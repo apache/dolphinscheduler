@@ -32,7 +32,7 @@ public abstract class ResourceComponent {
     public ResourceComponent() {
     }
 
-    public ResourceComponent(int id, int pid, String name, String fullName, String description, boolean isDirctory) {
+    public ResourceComponent(int id, String pid, String name, String fullName, String description, boolean isDirctory) {
         this.id = id;
         this.pid = pid;
         this.name = name;
@@ -51,7 +51,7 @@ public abstract class ResourceComponent {
     /**
      * parent id
      */
-    protected int pid;
+    protected String pid;
     /**
      * name
      */
@@ -109,11 +109,11 @@ public abstract class ResourceComponent {
         this.id = id;
     }
 
-    public int getPid() {
+    public String getPid() {
         return pid;
     }
 
-    public void setPid(int pid) {
+    public void setPid(String pid) {
         this.pid = pid;
     }
 

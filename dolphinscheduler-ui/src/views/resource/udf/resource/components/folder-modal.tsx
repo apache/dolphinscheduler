@@ -52,7 +52,7 @@ export default defineComponent({
     }
 
     const handleRename = () => {
-      handleRenameResource(props.row.id)
+      handleRenameResource(props.row.id, props.row.fullName)
     }
 
     watch(
@@ -76,9 +76,9 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('resource.udf.create_folder')}
+        title={this.row.fullName ? t('resource.udf.rename') : t('resource.udf.create_folder')}
         onCancel={this.hideModal}
-        onConfirm={this.row.id ? this.handleRename : this.handleCreate}
+        onConfirm={this.row.fullName ? this.handleRename : this.handleCreate}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}

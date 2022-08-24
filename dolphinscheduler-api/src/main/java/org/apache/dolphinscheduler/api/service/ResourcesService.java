@@ -82,6 +82,8 @@ public interface ResourcesService {
      */
     Result<Object> updateResource(User loginUser,
                                   int resourceId,
+                                  String fullName,
+                                  String tenantCode,
                                   String name,
                                   String desc,
                                   ResourceType type,
@@ -97,7 +99,7 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query resource list
@@ -106,7 +108,7 @@ public interface ResourcesService {
      * @param type resource type
      * @return resource list
      */
-    Map<String, Object> queryResourceList(User loginUser, ResourceType type);
+    Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName);
 
     /**
      * query resource list by program type
@@ -125,7 +127,7 @@ public interface ResourcesService {
      * @return delete result code
      * @throws IOException exception
      */
-    Result<Object> delete(User loginUser, int resourceId) throws IOException;
+    Result<Object> delete(User loginUser, int resourceId, String fullName, String tenantCode) throws IOException;
 
     /**
      * verify resource by name and type
@@ -143,7 +145,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    Result<Object> queryResource(User loginUser,String fullName,Integer id,ResourceType type);
+    Result<Object> queryResource(User loginUser,String fullName,Integer id,ResourceType type, String resTenantCode);
 
     /**
      * view resource file online
@@ -151,9 +153,10 @@ public interface ResourcesService {
      * @param resourceId resource id
      * @param skipLineNum skip line number
      * @param limit limit
+     * @param fullName fullName
      * @return resource content
      */
-    Result<Object> readResource(User loginUser,int resourceId, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser,String resourceId, String fullName, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -175,7 +178,7 @@ public interface ResourcesService {
      * @param content content
      * @return update result cod
      */
-    Result<Object> updateResourceContent(User loginUser,int resourceId, String content);
+    Result<Object> updateResourceContent(User loginUser,int resourceId, String fullName, String tenantCode, String content);
 
     /**
      * download file
@@ -184,7 +187,7 @@ public interface ResourcesService {
      * @return resource content
      * @throws IOException exception
      */
-    org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId) throws IOException;
+    org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId, String fullName) throws IOException;
 
     /**
      * list all file
@@ -236,6 +239,6 @@ public interface ResourcesService {
      * @param resourceId resource id
      * @return resource
      */
-    Result<Object> queryResourceById(User loginUser, Integer resourceId);
+    Result<Object> queryResourceById(User loginUser, Integer resourceId, String fullName, String tenantCode,ResourceType type) throws IOException;
 
 }

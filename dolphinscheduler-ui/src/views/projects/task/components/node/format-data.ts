@@ -402,7 +402,7 @@ export function formatParams(data: INodeData): {
         initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
-          ? data.resourceList.map((id: number) => ({ id }))
+          ? data.resourceList.map((fullName: string) => ({ resourceName: `${fullName}` }))
           : [],
         ...taskParams
       },
@@ -424,7 +424,6 @@ export function formatParams(data: INodeData): {
     params.taskDefinitionJsonObj.timeout = 0
     params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
   }
-
   return params
 }
 
@@ -450,7 +449,7 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
-      (item: { id: number }) => item.id
+      (item: { resourceName: string }) => (`${item.resourceName}`)
     )
   }
   if (data.taskParams?.mainJar) {

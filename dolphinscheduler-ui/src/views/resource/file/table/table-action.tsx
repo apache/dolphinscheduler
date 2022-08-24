@@ -27,10 +27,10 @@ import {
 } from '@vicons/antd'
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
-import { ResourceFileTableData } from '../types'
+import { ResourceFileTableData, IRenameFile, IRtDisb } from '../types'
+import { FullNameReq } from '@/service/modules/resources/types.ts'
 import { fileTypeArr } from '@/common/common'
 import { downloadResource, deleteResource } from '@/service/modules/resources'
-import { IRenameFile, IRtDisb } from '../types'
 import type { Router } from 'vue-router'
 
 const props = {
@@ -63,16 +63,16 @@ export default defineComponent({
       return !(flag && size < 1000000)
     }
 
-    const handleEditFile = (item: { id: number }) => {
-      router.push({ name: 'resource-file-edit', params: { id: item.id } })
+    const handleEditFile = (item: { id: number, fullName: string, user_name: string }) => {
+      router.push({ name: 'resource-file-edit', params: { id: item.id }, query: {prefix: item.fullName, tenantCode: item.user_name} })
     }
 
-    const handleDeleteFile = (id: number) => {
-      deleteResource(id).then(() => emit('updateList'))
+    const handleDeleteFile = (id: number, fullNameObj: FullNameReq & TenantCodeReq) => {
+      deleteResource(id, fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleRenameFile: IRenameFile = (id, name, description) => {
-      emit('renameResource', id, name, description)
+    const handleRenameFile: IRenameFile = (id, name, description, fullName) => {
+      emit('renameResource', id, name, description, fullName)
     }
 
     return {
@@ -118,12 +118,15 @@ export default defineComponent({
               <NButton
                 size='tiny'
                 type='info'
-                onClick={() =>
+                onClick={() => {
                   this.handleRenameFile(
                     this.row.id,
                     this.row.name,
-                    this.row.description
+                    this.row.description,
+                    this.row.fullName
                   )
+                }
+
                 }
                 style={{ marginRight: '-5px' }}
                 circle
@@ -147,7 +150,7 @@ export default defineComponent({
                 tag='div'
                 circle
                 style={{ marginRight: '-5px' }}
-                onClick={() => downloadResource(this.row.id)}
+                onClick={() => downloadResource(this.row.id, {fullName: this.row.fullName})}
                 class='btn-download'
               >
                 <NIcon>
@@ -166,7 +169,7 @@ export default defineComponent({
                   positive-text={t('resource.file.confirm')}
                   negative-text={t('resource.file.cancel')}
                   onPositiveClick={() => {
-                    this.handleDeleteFile(this.row.id)
+                    this.handleDeleteFile(this.row.id, {fullName: this.row.fullName, tenantCode: this.row.user_name})
                   }}
                 >
                   {{

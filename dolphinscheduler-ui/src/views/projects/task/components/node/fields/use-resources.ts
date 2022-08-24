@@ -21,6 +21,7 @@ import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
+import { TreeSelectOption } from 'naive-ui'
 
 export function useResources(): IJsonItem {
   const { t } = useI18n()
@@ -29,7 +30,6 @@ export function useResources(): IJsonItem {
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
-
   const getResources = async () => {
     if (taskStore.resources.length) {
       resourcesOptions.value = taskStore.resources
@@ -37,11 +37,12 @@ export function useResources(): IJsonItem {
     }
     if (resourcesLoading.value) return
     resourcesLoading.value = true
-    const res = await queryResourceList({ type: 'FILE' })
+    const res = await queryResourceList({ type: 'FILE', fullName:"" })
     utils.removeUselessChildren(res)
     resourcesOptions.value = res || []
     resourcesLoading.value = false
     taskStore.updateResource(res)
+//     console.log("use-resources taskStore.resource", taskStore.resources)
   }
 
   onMounted(() => {
@@ -60,9 +61,12 @@ export function useResources(): IJsonItem {
       showPath: true,
       checkStrategy: 'child',
       placeholder: t('project.node.resources_tips'),
-      keyField: 'id',
+      keyField: 'fullName',
       labelField: 'name',
-      loading: resourcesLoading
+      loading: resourcesLoading,
+//       onLoad: async function(option: TreeSelectOption) {
+//         option.children = await queryResourceList({ type: 'FILE', fullName:option.fullName })
+//       }
     }
   }
 }

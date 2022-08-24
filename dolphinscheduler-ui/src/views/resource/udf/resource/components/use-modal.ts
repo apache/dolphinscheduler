@@ -36,8 +36,8 @@ export function useModal(
 
   const handleCreateResource = async () => {
     const pid = router.currentRoute.value.params.id || -1
-    const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
-
+    const currentFullName = router.currentRoute.value.query.prefix || ""
+    const currentDir = currentFullName == "" ? '/' : fileStore.getCurrentDir || '/'
     submitRequest(
       async () =>
         await createDirectory({
@@ -47,10 +47,11 @@ export function useModal(
     )
   }
 
-  const handleRenameResource = async (id: number) => {
+  const handleRenameResource = async (id: number, fullName: string) => {
     submitRequest(async () => {
       await updateResource(
         {
+          fullName: fullName,
           ...state.folderForm,
           ...{ id }
         },
@@ -61,7 +62,6 @@ export function useModal(
 
   const submitRequest = async (serviceHandle: any) => {
     await state.folderFormRef.validate()
-
     if (state.saving) return
     state.saving = true
 
@@ -90,7 +90,9 @@ export function useModal(
 
     try {
       const pid = router.currentRoute.value.params.id || -1
-      const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
+//       const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
+      const currentFullName = router.currentRoute.value.query.prefix || ""
+      const currentDir = currentFullName == "" ? '/' : fileStore.getCurrentDir || '/'
 
       const formData = new FormData()
       formData.append('file', state.uploadForm.file)

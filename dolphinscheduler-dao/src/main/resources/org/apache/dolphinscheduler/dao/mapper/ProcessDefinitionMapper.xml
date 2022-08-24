@@ -151,7 +151,7 @@
     </select>
 
     <select id="listResources" resultType="java.util.HashMap">
-        SELECT distinct pd.code,td.resource_ids
+        SELECT distinct pd.code,td.resource_ids_new
         FROM t_ds_process_task_relation ptr
         join t_ds_process_definition pd
             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
@@ -159,7 +159,7 @@
         join t_ds_task_definition td
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
                 or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
-        WHERE  td.resource_ids is not null and td.resource_ids != ''
+        WHERE  td.resource_ids_new is not null and td.resource_ids_new != ''
     </select>
 
     <select id="listResourcesByUser" resultType="java.util.HashMap">
@@ -172,6 +172,22 @@
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
                 or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
         WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
+    </select>
+
+    <select id="queryResourcesInUseWithinResourceList" resultType="java.util.HashMap">
+        SELECT distinct pd.code,td.resource_ids
+        FROM t_ds_process_task_relation ptr
+        join t_ds_process_definition pd
+        on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
+        and ptr.project_code=pd.project_code and  pd.release_state = 1
+        join t_ds_task_definition td
+        on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+        or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
+        WHERE 1 = 1
+        and
+        <foreach item="item" index="index" collection="resourcesArray" separator=" OR " >
+            td.resource_ids LIKE '%${item}%' and td.resource_ids != ''
+        </foreach>
     </select>
 
     <select id="listProjectIds" resultType="java.lang.Integer">

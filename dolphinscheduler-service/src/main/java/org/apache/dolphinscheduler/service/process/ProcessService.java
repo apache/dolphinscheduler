@@ -58,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface ProcessService {
     @Transactional
@@ -224,6 +225,8 @@ public interface ProcessService {
 
     String getResourceIds(TaskDefinition taskDefinition);
 
+    Set<String> getResourceFullNames(TaskDefinition taskDefinition);
+
     int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine);
 
     int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean syncDefine, Boolean isFromProcessDefine);
@@ -297,5 +300,7 @@ public interface ProcessService {
 
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
 
-    public String findConfigYamlByName(String clusterName) ;
+    public String findConfigYamlByName(String clusterName);
+
+    Integer createRelationTaskResourcesIfNotExist(String resourceFullName);
 }

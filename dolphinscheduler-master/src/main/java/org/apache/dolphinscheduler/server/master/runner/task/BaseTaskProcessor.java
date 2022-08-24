@@ -582,21 +582,24 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
-                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
-                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
-                }
+                // TODO: what is this doing?
+//                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
+//                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
+//                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
+//                }
 
                 // get the resource id in order to get the resource names in batch
-                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
-                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
+//                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
+//                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
+//
+//                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
+//                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
+//
+//                    List<Resource> resources = processService.listResourceByIds(resourceIds);
+//                    resources.forEach(t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
+//                }
 
-                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
-                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
-
-                    List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
-                }
+                projectResourceFiles.forEach(file -> resourcesMap.put(file.getResourceName(),processService.queryTenantCodeByResName(file.getResourceName(), ResourceType.FILE)));
             }
         }
 

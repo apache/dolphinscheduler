@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.dao.entity.User;
 
 /**
  * Visitor
@@ -27,5 +28,5 @@ public interface Visitor {
      * visit
      * @return resource component
      */
-    ResourceComponent visit();
+    ResourceComponent visit(String rootPath);
 }

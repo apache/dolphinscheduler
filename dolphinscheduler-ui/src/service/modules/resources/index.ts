@@ -22,6 +22,7 @@ import {
   NameReq,
   FileNameReq,
   FullNameReq,
+  TenantCodeReq,
   IdReq,
   ContentReq,
   DescriptionReq,
@@ -36,7 +37,7 @@ import {
 } from './types'
 
 export function queryResourceListPaging(
-  params: ListReq & IdReq & ResourceTypeReq
+  params: ListReq & IdReq & ResourceTypeReq & FullNameReq & TenantCodeReq
 ): any {
   return axios({
     url: '/resources',
@@ -46,7 +47,7 @@ export function queryResourceListPaging(
 }
 
 export function queryResourceById(
-  params: ResourceTypeReq & FullNameReq & IdReq,
+  params: ResourceTypeReq & FileNameReq & IdReq & TenantCodeReq,
   id: number
 ): any {
   return axios({
@@ -56,10 +57,14 @@ export function queryResourceById(
   })
 }
 
-export function queryCurrentResourceById(id: number): any {
+export function queryCurrentResourceById(
+  params: ResourceTypeReq & FullNameReq & IdReq & TenantCodeReq,
+  id: number
+): any {
   return axios({
     url: `/resources/${id}/query`,
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
@@ -100,6 +105,7 @@ export function authUDFFunc(params: UserIdReq): any {
 export function createDirectory(
   data: CreateReq & NameReq & ResourceTypeReq
 ): any {
+  console.log(data)
   return axios({
     url: '/resources/directory',
     method: 'post',
@@ -107,7 +113,7 @@ export function createDirectory(
   })
 }
 
-export function queryResourceList(params: ResourceTypeReq): any {
+export function queryResourceList(params: ResourceTypeReq & fullName): any {
   return axios({
     url: '/resources/list',
     method: 'get',
@@ -159,10 +165,11 @@ export function verifyUdfFuncName(params: NameReq): any {
   })
 }
 
-export function deleteUdfFunc(id: number): any {
+export function deleteUdfFunc(id: number, params: FullNameReq): any {
   return axios({
     url: `/resources/udf-func/${id}`,
-    method: 'delete'
+    method: 'delete',
+    params
   })
 }
 
@@ -194,7 +201,7 @@ export function queryResource(
 }
 
 export function updateResource(
-  data: NameReq & ResourceTypeReq & IdReq & DescriptionReq,
+  data: NameReq & ResourceTypeReq & IdReq & DescriptionReq & FullNameReq & TenantCodeReq,
   id: number
 ): any {
   return axios({
@@ -204,15 +211,17 @@ export function updateResource(
   })
 }
 
-export function deleteResource(id: number): any {
+export function deleteResource(id: number, params): any {
+  console.log(params)
   return axios({
     url: `/resources/${id}`,
-    method: 'delete'
+    method: 'delete',
+    params
   })
 }
 
-export function downloadResource(id: number): void {
-  utils.downloadFile(`resources/${id}/download`)
+export function downloadResource(id: number, params: FullNameReq): void {
+  utils.downloadFile(`resources/${id}/download`, params)
 }
 
 export function viewUIUdfFunction(id: IdReq): any {
@@ -222,7 +231,7 @@ export function viewUIUdfFunction(id: IdReq): any {
   })
 }
 
-export function updateResourceContent(data: ContentReq, id: number): any {
+export function updateResourceContent(data: ContentReq & TenantCodeReq & FullNameReq, id: number): any {
   return axios({
     url: `/resources/${id}/update-content`,
     method: 'put',
@@ -230,7 +239,7 @@ export function updateResourceContent(data: ContentReq, id: number): any {
   })
 }
 
-export function viewResource(params: ViewResourceReq, id: number): any {
+export function viewResource(params: ViewResourceReq & FullNameReq, id: number): any {
   return axios({
     url: `/resources/${id}/view`,
     method: 'get',

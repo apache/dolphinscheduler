@@ -39,6 +39,7 @@ export default defineComponent({
     const requestData = () => {
       getTableData({
         id: variables.id,
+        fullName: variables.fileId,
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal

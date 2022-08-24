@@ -35,12 +35,12 @@ import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
   fileStore.setFileInfo(`${item.alias}|${item.size}`)
-
+  console.log(item)
   if (item.directory) {
     fileStore.setCurrentDir(`${item.fullName}`)
-    router.push({ name: 'resource-file-subdirectory', params: { id: item.id } })
+    router.push({ name: 'resource-file-subdirectory', params: { id: item.id }, query: { prefix: item.fullName, tenantCode: item.user_name}})
   } else {
-    router.push({ name: 'resource-file-list', params: { id: item.id } })
+    router.push({ name: 'resource-file-list', params: { id: item.id }, query: {prefix: item.fullName, tenantCode: item.user_name} })
   }
 }
 
@@ -72,7 +72,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
         )
     },
     {
-      title: t('resource.file.user_name'),
+      title: t('resource.file.tenant_name'),
       ...COLUMN_WIDTH_CONFIG['userName'],
       key: 'user_name'
     },
@@ -86,13 +86,13 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
     {
       title: t('resource.file.file_name'),
       ...COLUMN_WIDTH_CONFIG['name'],
-      key: 'file_name'
+      key: 'fullName'
     },
-    {
-      title: t('resource.file.description'),
-      ...COLUMN_WIDTH_CONFIG['note'],
-      key: 'description'
-    },
+//     {
+//       title: t('resource.file.description'),
+//       ...COLUMN_WIDTH_CONFIG['note'],
+//       key: 'description'
+//     },
     {
       title: t('resource.file.size'),
       key: 'size',
@@ -110,8 +110,8 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       render: (row) =>
         h(TableAction, {
           row,
-          onRenameResource: (id, name, description) =>
-            renameResource(id, name, description),
+          onRenameResource: (id, name, description, fullName) =>
+            renameResource(id, name, description, fullName),
           onUpdateList: () => updateList()
         }),
       ...COLUMN_WIDTH_CONFIG['operation'](4)

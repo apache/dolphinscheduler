@@ -96,6 +96,7 @@ export default defineComponent({
         state.functionForm.funcName = props.row.funcName
         state.functionForm.className = props.row.className
         state.functionForm.resourceId = props.row.resourceId || -1
+        state.functionForm.fullName = props.row.resourceName || ""
         state.functionForm.description = props.row.description
       }
     )
@@ -113,7 +114,6 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-
     return (
       <Modal
         show={this.$props.show}
@@ -160,18 +160,19 @@ export default defineComponent({
           </NFormItem>
           <NFormItem
             label={t('resource.function.udf_resources')}
-            path='resourceId'
+            path='fullName'
           >
             <NInputGroup>
               <NTreeSelect
                 options={this.udfResourceList}
-                label-field='fullName'
-                key-field='id'
-                v-model={[this.functionForm.resourceId, 'value']}
+                label-field='name'
+                key-field='fullName'
+                check-strategy='child'
+                v-model={[this.functionForm.fullName, 'value']}
                 placeholder={t(
                   'resource.function.enter_select_udf_resources_tips'
                 )}
-                defaultValue={this.functionForm.resourceId}
+                defaultValue={this.functionForm.fullName}
                 disabled={this.uploadShow}
                 showPath={false}
                 class='btn-udf-resource-dropdown'

@@ -16,7 +16,7 @@
  */
 
 import { h, unref } from 'vue'
-import { NTreeSelect } from 'naive-ui'
+import { NTreeSelect, TreeSelectOption } from 'naive-ui'
 import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 
@@ -28,7 +28,7 @@ export function renderTreeSelect(
   return h(NTreeSelect, {
     ...props,
     value: fields[field],
-    onUpdateValue: (value: []) => void (fields[field] = value),
+    onUpdateValue: (value: []) => void (fields[field] = value, console.log('Hihi', value)),
     options: unref(options)
   })
 }

@@ -50,7 +50,7 @@ export default defineComponent({
 
     const handleReturn = () => {
       const { id } = router.currentRoute.value.params
-      const name = id ? 'resource-file-subdirectory' : 'file'
+      const name = id ? 'resource-file-subdirectory' : 'file-manage'
       router.push({ name, params: { id } })
     }
 

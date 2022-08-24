@@ -50,67 +50,8 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateEx
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DagData;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
-import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.K8s;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -214,6 +155,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ResourceUserMapper resourceUserMapper;
+
+    @Autowired
+    private ResourceTaskMapper resourceTaskMapper;
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -1733,6 +1677,7 @@ public class ProcessServiceImpl implements ProcessService {
             new TypeReference<Map<String, Object>>() {
             });
         if (taskParameters != null) {
+            // TODO: relates to HIVE
             // if contains mainJar field, query resource from database
             // Flink, Spark, MR
             if (taskParameters.containsKey("mainJar")) {
@@ -1771,17 +1716,26 @@ public class ProcessServiceImpl implements ProcessService {
         ResourceInfo resourceInfo = null;
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {
-            int resourceId = res.getId();
-            if (resourceId <= 0) {
-                logger.error("invalid resourceId, {}", resourceId);
+            String resourceFullName = res.getResourceName();
+//            if (resourceId <= 0) {
+            if ("".equals(resourceFullName)) {
+                logger.error("invalid resourceFullName, {}", resourceFullName);
                 return null;
             }
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
-            Resource resource = getResourceById(resourceId);
-            resourceInfo.setId(resourceId);
-            resourceInfo.setRes(resource.getFileName());
-            resourceInfo.setResourceName(resource.getFullName());
+//            Resource resource = getResourceById(resourceId);
+            Map<String, Object> columnMap = new HashMap<>();
+            columnMap.put("full_name", resourceFullName);
+            List<ResourcesTask> resultList =  resourceTaskMapper.selectByMap(columnMap);
+            if (resultList.size() > 0) {
+                ResourcesTask resource = resultList.get(0);
+                resourceInfo.setId(resource.getId());
+                resourceInfo.setRes(res.getRes());
+                resourceInfo.setResourceName(resource.getFullName());
+            }
+//            resourceInfo.setRes(resource.getFileName());
+//            resourceInfo.setResourceName(resource.getFullName());
             if (logger.isInfoEnabled()) {
                 logger.info("updated resource info {}",
                     JSONUtils.toJsonString(resourceInfo));
@@ -2463,6 +2417,25 @@ public class ProcessServiceImpl implements ProcessService {
         return Joiner.on(",").join(resourceIds);
     }
 
+    public Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
+        Set<String> resourceFullNames = null;
+        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
+
+        if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+            resourceFullNames = params.getResourceFilesList().
+                    stream()
+                    .filter(t -> t.getResourceName() != "")
+                    .map(ResourceInfo::getResourceName)
+                    .collect(toSet());
+        }
+
+        if (CollectionUtils.isEmpty(resourceFullNames)) {
+            return new HashSet<String>();
+        }
+
+        return resourceFullNames;
+    }
+
     @Override
     public int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine) {
         Date now = new Date();
@@ -2512,6 +2485,13 @@ public class ProcessServiceImpl implements ProcessService {
             if (task == null) {
                 newTaskDefinitionLogs.add(taskDefinitionToUpdate);
             } else {
+                Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionToUpdate);
+                List<Integer> resourceIdsNewSet = new ArrayList<>();
+                for (String resourceFullName: resourceFullNameSet) {
+                    resourceIdsNewSet.add(createRelationTaskResourcesIfNotExist(resourceFullName));
+                }
+                taskDefinitionToUpdate.setResourceIdsNew(Joiner.on(",").join(resourceIdsNewSet));
+
                 insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
                 if (Boolean.TRUE.equals(syncDefine)) {
                     taskDefinitionToUpdate.setId(task.getId());
@@ -2522,6 +2502,15 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         if (!newTaskDefinitionLogs.isEmpty()) {
+            for (TaskDefinitionLog newTaskDefinitionLog: newTaskDefinitionLogs) {
+                Set<String> resourceFullNameSet = getResourceFullNames(newTaskDefinitionLog);
+                List<Integer> resourceIdsNewSet = new ArrayList<>();
+                for (String resourceFullName : resourceFullNameSet) {
+                    resourceIdsNewSet.add(createRelationTaskResourcesIfNotExist(resourceFullName));
+                }
+                newTaskDefinitionLog.setResourceIdsNew(Joiner.on(",").join(resourceIdsNewSet));
+            }
+
             insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
             if (Boolean.TRUE.equals(syncDefine)) {
                 updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
@@ -3073,5 +3062,19 @@ public class ProcessServiceImpl implements ProcessService {
         nodeWrapper.eq("k8s_name", clusterName);
         K8s k8s = k8sMapper.selectOne(nodeWrapper);
         return k8s.getK8sConfig();
+    }
+
+    @Override
+    public Integer createRelationTaskResourcesIfNotExist(String resourceFullName) {
+
+        Integer resourceId = resourceTaskMapper.existResourceByFullName(resourceFullName, ResourceType.FILE);
+        if ( null == resourceId) {
+            // create the relation if not exist
+            ResourcesTask resourcesTask = new ResourcesTask(resourceFullName, ResourceType.FILE);
+            resourceTaskMapper.insert(resourcesTask);
+            return resourcesTask.getId();
+        }
+
+        return resourceId;
     }
 }

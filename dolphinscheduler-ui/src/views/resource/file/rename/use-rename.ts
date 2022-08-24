@@ -28,10 +28,8 @@ export function useRename(state: any) {
     resetForm: () => void
   ) => {
     await state.renameFormRef.validate()
-
     if (state.saving) return
     state.saving = true
-
     try {
       await updateResource(
         {

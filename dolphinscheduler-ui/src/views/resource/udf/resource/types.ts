@@ -16,6 +16,7 @@
  */
 
 export interface IUdfResourceParam {
+  fullName: string
   id: number
   pageSize: number
   pageNo: number

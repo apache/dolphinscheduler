@@ -34,6 +34,7 @@ export function useModal(
   const { t } = useI18n()
 
   const handleCreateFunc = async () => {
+    console.log("use-model", state.functionForm)
     submitRequest(
       async () =>
         await createUdfFunc(
@@ -84,9 +85,9 @@ export function useModal(
   const filterEmptyDirectory = (list: any) => {
     for (const item of list) {
       if (item.children) {
-        if (!/\.jar$/.test(item.name)) {
-          item.disabled = true
-        }
+//         if (!/\.jar$/.test(item.name)) {
+//           item.disabled = true
+//         }
         filterEmptyDirectory(item.children)
       }
     }
@@ -122,7 +123,7 @@ export function useModal(
 
   const getUdfList = () => {
     const { state } = useAsyncState(
-      queryResourceList({ type: 'UDF' }).then((res: any) => {
+      queryResourceList({ type: 'UDF', fullName: "" }).then((res: any) => {
         let item = res
         let item1 = _.cloneDeep(res)
 

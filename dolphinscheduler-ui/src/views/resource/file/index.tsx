@@ -16,7 +16,7 @@
  */
 
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, reactive, Ref } from 'vue'
+import { defineComponent, onMounted, ref, reactive, Ref, toRaw, watch } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -50,8 +50,8 @@ export default defineComponent({
   name: 'File',
   setup() {
     const router: Router = useRouter()
-    const fileId = ref(Number(router.currentRoute.value.params.id) || -1)
-
+    const fileId = ref(router.currentRoute.value.query.prefix || "")
+    const tenantCode = ref(router.currentRoute.value.query.tenantCode || "")
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -61,7 +61,8 @@ export default defineComponent({
     const renameInfo = reactive({
       id: -1,
       name: '',
-      description: ''
+      description: '',
+      fullName: ''
     })
 
     const paginationReactive = reactive({
@@ -74,7 +75,9 @@ export default defineComponent({
     const handleUpdatePage = (page: number) => {
       paginationReactive.page = page
       resourceListRef.value = getResourceListState(
+        -1,
         fileId.value,
+        tenantCode.value,
         searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
@@ -85,7 +88,9 @@ export default defineComponent({
       paginationReactive.page = 1
       paginationReactive.pageSize = pageSize
       resourceListRef.value = getResourceListState(
+        -1,
         fileId.value,
+        tenantCode.value,
         searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
@@ -104,7 +109,9 @@ export default defineComponent({
 
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
+        -1,
         fileId.value,
+        tenantCode.value,
         searchRef.value
       )
     }
@@ -127,7 +134,8 @@ export default defineComponent({
       handleShowModal(uploadShowRef)
     }
 
-    const handleRenameFile: IRenameFile = (id, name, description) => {
+    const handleRenameFile: IRenameFile = (id, name, description, fullName) => {
+      renameInfo.fullName = fullName
       renameInfo.id = id
       renameInfo.name = name
       renameInfo.description = description
@@ -142,14 +150,16 @@ export default defineComponent({
 
     const updateList = () => {
       resourceListRef.value = getResourceListState(
+        -1,
         fileId.value,
+        tenantCode.value,
         searchRef.value
       )
     }
     const fileStore = useFileStore()
 
     onMounted(() => {
-      resourceListRef.value = getResourceListState(fileId.value)
+      resourceListRef.value = getResourceListState(-1, fileId.value, tenantCode.value,searchRef.value)
     })
 
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
@@ -168,15 +178,11 @@ export default defineComponent({
     ])
 
     onMounted(() => {
-      const currFileId = Number(router.currentRoute.value.params.id) || -1
-      if (currFileId === -1) {
+      const currFileId = router.currentRoute.value.query.prefix || ""
+      if (currFileId === "") {
         fileStore.setCurrentDir('/')
       } else {
-        queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
-          if (res.fullName) {
-            fileStore.setCurrentDir(res.fullName)
-          }
-        })
+        fileStore.setCurrentDir(currFileId)
       }
     })
 
@@ -184,31 +190,39 @@ export default defineComponent({
       let index = 0
       for (const dir of dirs) {
         const newDir = dirs.slice(0, index + 1).join('/')
-        if (newDir) {
-          const id = 0
-          const resource = await queryResourceById(
-            {
-              id,
-              type: 'FILE',
-              fullName: newDir
-            },
-            id
-          )
-          breadcrumbItemsRef.value?.push({ id: resource.id, fullName: dir })
-        } else {
-          breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root' })
-        }
+        const id = 0
+        const resource = await queryResourceById(
+          {
+            id,
+            type: 'FILE',
+            fileName: newDir+"/",
+            tenantCode: tenantCode.value
+          },
+          id
+        )
+        breadcrumbItemsRef.value?.push({ id: resource.fullName, fullName: resource.alias, userName: resource.userName })
         index = index + 1
       }
     }
 
     onMounted(() => {
       breadcrumbItemsRef.value = []
-      if (fileId.value != -1) {
-        queryCurrentResourceById(fileId.value).then((res: ResourceFile) => {
-          if (res.fullName) {
-            const dirs = res.fullName.split('/')
+      if (fileId.value != "") {
+        breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root' })
+        const id = 0
+        queryCurrentResourceById(
+          {
+            id,
+            type: 'FILE',
+            fullName: fileId.value,
+            tenantCode: tenantCode.value,
+          },
+          id
+        ).then((res: ResourceFile) => {
+          if (res.fileName) {
+            const dirs = res.fileName.split('/')
             if (dirs && dirs.length > 1) {
+              dirs.pop(-1)
               initBreadcrumb(dirs)
             }
           }
@@ -306,7 +320,7 @@ export default defineComponent({
                     )
                   } else {
                     return (
-                      <NBreadcrumbItem href={item.id.toString()}>
+                      <NBreadcrumbItem href={"0?prefix=" + item.id.toString() + "&tenantCode=" + item.userName}>
                         {item.fullName}
                       </NBreadcrumbItem>
                     )
@@ -354,6 +368,7 @@ export default defineComponent({
           v-model:show={this.renameShowRef}
           id={this.renameInfo.id}
           name={this.renameInfo.name}
+          fullName={this.renameInfo.fullName}
           description={this.renameInfo.description}
           onUpdateList={this.updateList}
         />

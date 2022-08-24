@@ -177,6 +177,11 @@ public class TaskDefinition {
     private String resourceIds;
 
     /**
+     * new resource ids, fullName of the resource
+     */
+    private String resourceIdsNew;
+
+    /**
      * create time
      */
     private Date createTime;
@@ -439,6 +444,14 @@ public class TaskDefinition {
         this.resourceIds = resourceIds;
     }
 
+    public String getResourceIdsNew() {
+        return resourceIdsNew;
+    }
+
+    public void setResourceIdsNew(String resourceIdsNew) {
+        this.resourceIdsNew = resourceIdsNew;
+    }
+
     public int getDelayTime() {
         return delayTime;
     }
@@ -505,6 +518,9 @@ public class TaskDefinition {
             && (Objects.equals(resourceIds, that.resourceIds)
             || ("".equals(resourceIds) && that.resourceIds == null)
             || ("".equals(that.resourceIds) && resourceIds == null))
+            && (Objects.equals(resourceIdsNew, that.resourceIdsNew)
+            || ("".equals(resourceIdsNew) && that.resourceIdsNew == null)
+            || ("".equals(that.resourceIdsNew) && resourceIdsNew == null))
             && environmentCode == that.environmentCode
             && taskGroupId == that.taskGroupId
             && taskGroupPriority == that.taskGroupPriority
@@ -541,6 +557,7 @@ public class TaskDefinition {
                 + ", timeout=" + timeout
                 + ", delayTime=" + delayTime
                 + ", resourceIds='" + resourceIds + '\''
+                + ", resourceIdsNew='" + resourceIdsNew + '\''
                 + ", cpuQuota=" + cpuQuota
                 + ", memoryMax=" + memoryMax
                 + ", createTime=" + createTime

@@ -182,4 +182,11 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return project ids list
      */
     List<Integer> listProjectIds();
+
+    /**
+     * list all resources in use within the resourceList
+     *
+     * @return resource ids list
+     */
+    List<Map<String, Object>> queryResourcesInUseWithinResourceArray(@Param("resourcesArray") Integer[] resourcesArray);
 }

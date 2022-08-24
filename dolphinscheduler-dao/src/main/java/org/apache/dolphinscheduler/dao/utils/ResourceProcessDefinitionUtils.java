@@ -44,7 +44,7 @@ public class ResourceProcessDefinitionUtils {
         if (CollectionUtils.isNotEmpty(resourceList)) {
             for (Map<String, Object> resourceMap : resourceList) {
                 Long code = (Long) resourceMap.get("code");
-                String[] resourceIds = ((String) resourceMap.get("resource_ids"))
+                String[] resourceIds = ((String) resourceMap.get("resource_ids_new"))
                         .split(",");
 
                 Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());

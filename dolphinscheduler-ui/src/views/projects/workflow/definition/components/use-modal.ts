@@ -125,7 +125,7 @@ export function useModal(
       params.startParams = !_.isEmpty(startParams)
         ? JSON.stringify(startParams)
         : ''
-
+      console.log("use-modal startProcessInstance", params)
       await startProcessInstance(params, variables.projectCode)
       window.$message.success(t('project.workflow.success'))
       state.saving = false

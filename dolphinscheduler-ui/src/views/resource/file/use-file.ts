@@ -28,14 +28,18 @@ export function useFileState(
 ) {
   const getResourceListState: IResourceListState = (
     id = -1,
+    fullName = '',
+    tenantCode = '',
     searchVal = '',
     pageNo = 1,
     pageSize = 10
   ) => {
     const { state } = useAsyncState(
       queryResourceListPaging({
-        id,
+        fullName,
+        tenantCode,
         type: 'FILE',
+        id,
         searchVal,
         pageNo,
         pageSize
@@ -66,7 +70,7 @@ export function useFileState(
     return state
   }
 
-  const getResourceView = (id: number) => {
+  const getResourceView = (id: string) => {
     const params = {
       skipLineNum: 0,
       limit: 3000

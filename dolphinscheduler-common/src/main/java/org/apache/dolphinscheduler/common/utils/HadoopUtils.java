@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
+import org.apache.dolphinscheduler.common.storage.StorageEntity;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -48,6 +49,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -384,6 +386,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
         return fs.delete(new Path(hdfsFilePath), recursive);
     }
 
+    @Override
+    public boolean delete(String tenantCode, String[] filePathArray, boolean recursive) throws IOException {
+        return false;
+    }
+
     /**
      * check if exists
      *
@@ -392,7 +399,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean exists(String tenantCode, String hdfsFilePath) throws IOException {
+    public boolean exists(String hdfsFilePath) throws IOException {
         return fs.exists(new Path(hdfsFilePath));
     }
 
@@ -403,13 +410,29 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @return {@link FileStatus} file status
      * @throws IOException errors
      */
-    public FileStatus[] listFileStatus(String filePath) throws IOException {
+    @Override
+    public List<StorageEntity> listFilesStatus(String filePath, String prefix, String tenantCode, ResourceType type) throws IOException {
         try {
-            return fs.listStatus(new Path(filePath));
+            //TODO: transform into StorageList Class
+            FileStatus[] fileStatuses = fs.listStatus(new Path(filePath));
+//            return fs.listStatus(new Path(filePath));
         } catch (IOException e) {
             logger.error("Get file list exception", e);
             throw new IOException("Get file list exception", e);
         }
+        // transform ...
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+        return storageEntityList;
+    }
+
+    @Override
+    public StorageEntity getFileStatus(String path, String prefix, String resTenantCode, ResourceType type) throws IOException {
+        return null;
+    }
+
+    @Override
+    public List<String> listAllChildrenPaths(String path) {
+        return null;
     }
 
     /**
@@ -713,7 +736,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
     public void deleteTenant(String tenantCode) throws Exception {
         String tenantPath = getHdfsDataBasePath() + FOLDER_SEPARATOR + tenantCode;
 
-        if (exists(tenantCode, tenantPath)) {
+        if (exists(tenantPath)) {
             delete(tenantCode, tenantPath, true);
 
         }
@@ -722,5 +745,10 @@ public class HadoopUtils implements Closeable, StorageOperate {
     @Override
     public ResUploadType returnStorageType() {
         return ResUploadType.HDFS;
+    }
+
+    @Override
+    public List<StorageEntity> listFilesStatusRecursively(String defaultPath, String prefix, String tenantCode, ResourceType type) {
+        return null;
     }
 }
