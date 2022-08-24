@@ -76,6 +76,10 @@ class JavaGate:
     ):
         self.java_gateway = launch_gateway(address, port, auto_convert)
 
+    def get_gateway_version(self):
+        """Get the java gateway version, expected to be equal with pydolphinscheduler."""
+        return self.java_gateway.entry_point.getGatewayVersion()
+
     def get_datasource_info(self, name: str):
         """Get datasource info through java gateway."""
         return self.java_gateway.entry_point.getDatasourceInfo(name)
