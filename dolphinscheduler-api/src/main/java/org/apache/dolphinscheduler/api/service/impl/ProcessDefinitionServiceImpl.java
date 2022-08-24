@@ -724,7 +724,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return true if process definition name not exists, otherwise false
      */
     @Override
-    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name, long processDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_CREATE);
@@ -734,9 +734,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
+            return result;
         }
+        if (processDefinitionCode != 0 && processDefinitionCode == processDefinition.getCode()) {
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
         return result;
     }
 
@@ -1212,10 +1216,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // generate import processDefinitionName
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
+<<<<<<< HEAD
         String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
 
         //unique check
         Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
+=======
+        String importProcessDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+        // unique check
+        Map<String, Object> checkResult =
+                verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
+>>>>>>> cf3b4424d... [Fix-11616] Workflow Definition Name Change Validation Optimization. (#11617)
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {
