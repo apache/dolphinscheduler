@@ -108,7 +108,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
                     sb.append(taskRequest.getEnvironmentConfig()).append("\n");
                 } else {
                     if (taskRequest.getEnvFile() != null) {
-                        sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
+                        sb.append(". ").append(taskRequest.getEnvFile()).append("\n");
                     }
                 }
             }
