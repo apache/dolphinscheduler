@@ -264,7 +264,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public SPIIdentify getIdentify() {
-        return SPIIdentify.create(getType());
+        return SPIIdentify.builder().name(getType()).build();
     }
 
     @Override

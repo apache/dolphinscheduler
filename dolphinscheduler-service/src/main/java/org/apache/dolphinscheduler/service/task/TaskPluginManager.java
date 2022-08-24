@@ -54,7 +54,7 @@ public class TaskPluginManager {
             String factoryName = entry.getKey();
             TaskChannelFactory factory = entry.getValue();
 
-            logger.info("Registry task plugin: {} - {}", factoryName, factory.getClass());
+            logger.info("Registering task plugin: {} - {}", factoryName, factory.getClass());
 
             taskChannelFactoryMap.put(factoryName, factory);
             taskChannelMap.put(factoryName, factory.create());

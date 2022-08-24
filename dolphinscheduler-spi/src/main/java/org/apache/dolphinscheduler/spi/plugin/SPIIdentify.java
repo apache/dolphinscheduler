@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.spi.plugin;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class SPIIdentify {
 
@@ -28,14 +30,7 @@ public class SPIIdentify {
 
     private String name;
 
+    @Builder.Default
     private int priority = DEFAULT_PRIORITY;
-
-    public static SPIIdentify create(String name, int priority) {
-        return new SPIIdentify(name, priority);
-    }
-
-    public static SPIIdentify create(String name) {
-        return create(name, DEFAULT_PRIORITY);
-    }
 
 }

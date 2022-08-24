@@ -49,7 +49,7 @@ public class PrioritySPIFactoryTest {
 
         @Override
         public SPIIdentify getIdentify() {
-            return SPIIdentify.create("A", 0);
+            return SPIIdentify.builder().name("A").priority(0).build();
         }
     }
 
@@ -58,7 +58,7 @@ public class PrioritySPIFactoryTest {
 
         @Override
         public SPIIdentify getIdentify() {
-            return SPIIdentify.create("A", 1);
+            return SPIIdentify.builder().name("A").priority(1).build();
         }
     }
 
@@ -71,7 +71,7 @@ public class PrioritySPIFactoryTest {
 
         @Override
         public SPIIdentify getIdentify() {
-            return SPIIdentify.create("B", 0);
+            return SPIIdentify.builder().name("B").priority(0).build();
         }
     }
 
@@ -80,7 +80,7 @@ public class PrioritySPIFactoryTest {
 
         @Override
         public SPIIdentify getIdentify() {
-            return SPIIdentify.create("B", 0);
+            return SPIIdentify.builder().name("B").priority(0).build();
         }
     }
 

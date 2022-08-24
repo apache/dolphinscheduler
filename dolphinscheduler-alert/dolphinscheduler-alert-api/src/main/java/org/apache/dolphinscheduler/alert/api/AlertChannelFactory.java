@@ -49,6 +49,6 @@ public interface AlertChannelFactory extends PrioritySPI {
     List<PluginParams> params();
 
     default SPIIdentify getIdentify() {
-        return SPIIdentify.create(name());
+        return SPIIdentify.builder().name(name()).build();
     }
 }

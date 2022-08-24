@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.spi.plugin;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+@Slf4j
 public class PrioritySPIFactory<T extends PrioritySPI> {
-
-    private final Logger logger = LoggerFactory.getLogger(PrioritySPIFactory.class);
 
     private final Map<String, T> map = new HashMap<>();
 
@@ -41,7 +40,7 @@ public class PrioritySPIFactory<T extends PrioritySPI> {
     }
 
     public Map<String, T> getSPIMap() {
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     private void resolveConflict(T newSPI) {
@@ -52,7 +51,7 @@ public class PrioritySPIFactory<T extends PrioritySPI> {
             throw new IllegalArgumentException(String.format("These two spi plugins has conflict identify name with the same priority: %s, %s",
                     oldSPI.getIdentify(), newSPI.getIdentify()));
         } else if (newSPI.compareTo(oldSPI.getIdentify().getPriority()) > 0) {
-            logger.info("The {} plugin has high priority, will override {}", newSPI.getIdentify(), oldSPI);
+            log.info("The {} plugin has high priority, will override {}", newSPI.getIdentify(), oldSPI);
             map.put(identify.getName(), newSPI);
         }
     }

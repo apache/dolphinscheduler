@@ -33,6 +33,6 @@ public interface DataSourceChannelFactory extends PrioritySPI {
 
     @Override
     default SPIIdentify getIdentify() {
-        return SPIIdentify.create(getName());
+        return SPIIdentify.builder().name(getName()).build();
     }
 }
