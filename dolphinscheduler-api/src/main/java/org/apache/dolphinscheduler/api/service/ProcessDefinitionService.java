@@ -194,13 +194,13 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param name name
-     * @param code code
+     * @param processDefinitionCode processDefinitionCode
      * @return true if process definition name not exists, otherwise false
      */
     Map<String, Object> verifyProcessDefinitionName(User loginUser,
                                                     long projectCode,
                                                     String name,
-                                                    Long processDefinitionCode);
+                                                    long processDefinitionCode);
 
     /**
      * delete process definition by code

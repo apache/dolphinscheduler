@@ -773,7 +773,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return true if process definition name not exists, otherwise false
      */
     @Override
-    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name, long code) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name, long processDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -787,7 +787,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        if (code != 0 && code == processDefinition.getCode()) {
+        if (processDefinitionCode != 0 && processDefinitionCode == processDefinition.getCode()) {
             putMsg(result, Status.SUCCESS);
             return result;
         }

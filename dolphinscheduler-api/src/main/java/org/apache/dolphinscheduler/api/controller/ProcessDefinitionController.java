@@ -212,8 +212,8 @@ public class ProcessDefinitionController extends BaseController {
     public Result verifyProcessDefinitionName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @RequestParam(value = "name", required = true) String name,
-                                              @RequestParam(value = "code", required = false, defaultValue = "0") long code) {
-        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name, code);
+                                              @RequestParam(value = "code", required = false, defaultValue = "0") long processDefinitionCode) {
+        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name, processDefinitionCode);
         return returnDataList(result);
     }
 
