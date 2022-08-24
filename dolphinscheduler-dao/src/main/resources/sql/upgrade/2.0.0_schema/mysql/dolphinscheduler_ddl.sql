@@ -407,6 +407,7 @@ alter table t_ds_process_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dr
 alter table t_ds_process_instance add next_process_instance_id int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId' AFTER dry_run;
 alter table t_ds_process_instance drop KEY `process_instance_index`;
 alter table t_ds_process_instance add KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE;
+alter table t_ds_process_instance add KEY `process_instance_code_state_index` (`process_definition_code`,`state`) USING BTREE;
 alter table t_ds_process_instance drop process_instance_json;
 alter table t_ds_process_instance drop locations;
 alter table t_ds_process_instance drop connects;
