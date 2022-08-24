@@ -139,10 +139,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private boolean checkWorkerGroupNameExists(WorkerGroup workerGroup) {
-        // Skip default group name check
-        if (workerGroup.getName().equals("default")) {
-            return false;
-        }
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(workerGroupList)) {
             // new group has same name
@@ -155,6 +151,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     return true;
                 }
             }
+        }
+        // Skip default group name check
+        if (workerGroup.getName().equals("default")) {
+            return false;
         }
         // check zookeeper
         String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
