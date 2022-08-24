@@ -131,4 +131,10 @@
         from t_ds_user u, t_ds_relation_project_user rel
         where u.id = rel.user_id and rel.project_id = #{projectId}
     </select>
+    <select id="queryEnabledUsers" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        select
+        <include refid="baseSql"/>
+        from t_ds_user
+        where state = 1
+    </select>
 </mapper>
