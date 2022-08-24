@@ -80,7 +80,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -977,13 +976,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.ge("id", 0);
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
-            queryWrapper.eq("id", loginUser.getId());
-        }
-        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userMapper.queryEnabledUsers();
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
