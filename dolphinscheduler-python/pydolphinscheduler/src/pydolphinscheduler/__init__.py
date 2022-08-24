@@ -27,8 +27,10 @@ __version__ = get_distribution("apache-dolphinscheduler").version
 
 # validate the versions of python api and java gateway are equal
 if gateway_version := JavaGate().get_gateway_version():
-    if __version__ != gateway_version != 'dev-SNAPSHOT':
-        logging.getLogger(__name__).critical(f'Using unmatched version of pydolphinscheduler (version {__version__}) '
-                                             f'and Java gateway (version {gateway_version}) may cause errors. '
-                                             'We strongly recommend you to find the matched version (find another '
-                                             'version at: https://pypi.org/project/apache-dolphinscheduler)')
+    if __version__ != gateway_version != "dev-SNAPSHOT":
+        logging.getLogger(__name__).critical(
+            f"Using unmatched version of pydolphinscheduler (version {__version__}) "
+            f"and Java gateway (version {gateway_version}) may cause errors. "
+            "We strongly recommend you to find the matched version (find another "
+            "version at: https://pypi.org/project/apache-dolphinscheduler)"
+        )
