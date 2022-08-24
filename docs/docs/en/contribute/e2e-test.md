@@ -74,7 +74,7 @@ During the test process, we only test the elements we need to focus on, not all 
 
 In addition, during the testing process, the elements are not manipulated directly. The general choice is to package the corresponding methods to achieve the effect of reuse. For example, if you want to log in, you input your username and password through the `public TenantPage login()` method to manipulate the elements you pass in to achieve the effect of logging in. That is, when the user finishes logging in, he or she jumps to the Security Centre (which goes to the Tenant Management page by default).
 
-The goToTab method is provided in SecurityPage to test the corresponding sidebar jumps, which include TenantPage, UserPage and WorkerGroupPge and QueuePage. These pages are implemented in the same way, to test that the form's input, add and delete buttons return the corresponding pages.
+The goToTab method is provided in SecurityPage to test the corresponding sidebar jumps, which include TenantPage, UserPage and WorkerGroupPage and QueuePage. These pages are implemented in the same way, to test that the form's input, add and delete buttons return the corresponding pages.
 
 ```java
  public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
