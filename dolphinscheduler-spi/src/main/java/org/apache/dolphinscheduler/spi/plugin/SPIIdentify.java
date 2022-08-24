@@ -15,18 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.spi.plugin;
 
-import org.apache.dolphinscheduler.spi.common.UiChannelFactory;
-import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
-import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-public interface TaskChannelFactory extends UiChannelFactory, PrioritySPI {
+@Data
+@Builder
+@AllArgsConstructor
+public class SPIIdentify {
 
-    TaskChannel create();
+    private static final int DEFAULT_PRIORITY = 0;
 
-    default SPIIdentify getIdentify() {
-        return SPIIdentify.builder().name(getName()).build();
-    }
+    private String name;
+
+    @Builder.Default
+    private int priority = DEFAULT_PRIORITY;
 
 }
