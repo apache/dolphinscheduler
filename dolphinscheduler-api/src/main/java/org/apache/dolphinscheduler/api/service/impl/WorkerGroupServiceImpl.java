@@ -152,7 +152,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 }
             }
         }
-        // Skip default group name check
+        // skip default group name check
         if (Constants.DEFAULT.equals(workerGroup.getName())) {
             return false;
         }
