@@ -141,12 +141,4 @@
     <update id="clearBindTestId">
         update t_ds_datasource d set bind_test_id=null where bind_test_id=#{bindTestId}
     </update>
-    <select id="queryTestDataSourceId" resultType="java.lang.Integer">
-        select d.bind_test_id
-        from t_ds_datasource d
-        where d.id = #{dataSourceId}
-    </select>
-    <update id="clearBindTestId">
-        update t_ds_datasource d set bind_test_id=null where bind_test_id=#{bindTestId}
-    </update>
 </mapper>
