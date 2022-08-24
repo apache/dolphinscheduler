@@ -279,7 +279,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public ProcessInstance handleCommand(String host, Command command) throws CodeGenerateException, CronParseException {
-        ProcessInstance processInstance = processService.handleCommandInDB(host, command);
+        ProcessInstance processInstance = this.handleCommandInDB(host, command);
         if (processInstance == null) {
             return null;
         }
@@ -374,7 +374,7 @@ public class ProcessServiceImpl implements ProcessService {
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setState(WorkflowExecutionStatus.READY_STOP);
-                processService.updateProcessInstance(info);
+                this.updateProcessInstance(info);
             }
             processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
             saveProcessInstance(processInstance);
