@@ -17,14 +17,17 @@
 
 """Module java gateway, contain gateway behavior."""
 
+from logging import getLogger
 from typing import Any, Optional
 
 from py4j.java_collections import JavaMap
 from py4j.java_gateway import GatewayParameters, JavaGateway
 
-from pydolphinscheduler import configuration
+from pydolphinscheduler import __version__, configuration
 from pydolphinscheduler.constants import JavaGatewayDefault
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException
+
+logger = getLogger(__name__)
 
 
 def launch_gateway(
@@ -75,10 +78,21 @@ class JavaGate:
         auto_convert: Optional[bool] = True,
     ):
         self.java_gateway = launch_gateway(address, port, auto_convert)
+        gateway_version = self.get_gateway_version()
+        if gateway_version is not None and gateway_version != __version__:
+            logger.critical(
+                f"Using unmatched version of pydolphinscheduler (version {__version__}) "
+                f"and Java gateway (version {gateway_version}) may cause errors. "
+                "We strongly recommend you to find the matched version "
+                "(check: https://pypi.org/project/apache-dolphinscheduler)"
+            )
 
     def get_gateway_version(self):
         """Get the java gateway version, expected to be equal with pydolphinscheduler."""
-        return self.java_gateway.entry_point.getGatewayVersion()
+        try:
+            return self.java_gateway.entry_point.getGatewayVersion()
+        except Exception:
+            return None
 
     def get_datasource_info(self, name: str):
         """Get datasource info through java gateway."""
