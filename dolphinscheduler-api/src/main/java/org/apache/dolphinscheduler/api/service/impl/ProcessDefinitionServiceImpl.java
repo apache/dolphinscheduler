@@ -1216,17 +1216,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // generate import processDefinitionName
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
-<<<<<<< HEAD
         String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
 
         //unique check
-        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
-=======
-        String importProcessDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
-        // unique check
-        Map<String, Object> checkResult =
-                verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
->>>>>>> cf3b4424d... [Fix-11616] Workflow Definition Name Change Validation Optimization. (#11617)
+        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {

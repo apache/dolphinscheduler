@@ -195,12 +195,9 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "verify-name", notes = "VERIFY_PROCESS_DEFINITION_NAME_NOTES")
     @ApiImplicitParams({
-<<<<<<< HEAD
-        @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String")
-=======
-            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = false, dataTypeClass = Long.class),
->>>>>>> cf3b4424d... [Fix-11616] Workflow Definition Name Change Validation Optimization. (#11617)
+        @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
+        @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = String.class),
+        @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = false, dataTypeClass = Long.class)
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
