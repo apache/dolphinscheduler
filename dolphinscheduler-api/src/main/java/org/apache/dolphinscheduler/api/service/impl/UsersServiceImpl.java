@@ -79,7 +79,19 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+=======
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+>>>>>>> 961e67f52... [Improvement][User] Query all users filter un enabled. (#11504)
 
 /**
  * users service impl
@@ -1032,16 +1044,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.ge("id", 0);
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
-            queryWrapper.eq("id", loginUser.getId());
-        }
-        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userMapper.queryEnabledUsers();
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
