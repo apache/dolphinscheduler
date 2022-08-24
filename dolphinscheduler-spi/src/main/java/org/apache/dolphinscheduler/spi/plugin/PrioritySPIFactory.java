@@ -53,6 +53,8 @@ public class PrioritySPIFactory<T extends PrioritySPI> {
         } else if (newSPI.compareTo(oldSPI.getIdentify().getPriority()) > 0) {
             log.info("The {} plugin has high priority, will override {}", newSPI.getIdentify(), oldSPI);
             map.put(identify.getName(), newSPI);
+        } else {
+            log.info("The low plugin {} will be skipped", newSPI);
         }
     }
 }
