@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
-import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -48,21 +51,13 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    /**
-     * process service
-     */
     @Autowired
-    private ProcessService processService;
-
-    /**
-     * data quality result operator
-     */
-    @Autowired
-    private DataQualityResultOperator dataQualityResultOperator;
-
+    private List<TaskEventHandler> taskEventHandlerList;
 
     @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
+
+    private Map<TaskEventType, TaskEventHandler> taskEventHandlerMap = new HashMap<>();
 
     /**
      * task event thread map
@@ -75,25 +70,23 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
         this.setThreadNamePrefix("Task-Execute-Thread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
         this.setCorePoolSize(masterConfig.getExecThreads());
+        taskEventHandlerList.forEach(
+            taskEventHandler -> taskEventHandlerMap.put(taskEventHandler.getHandleEventType(), taskEventHandler));
     }
 
     public void submitTaskEvent(TaskEvent taskEvent) {
+        // stream task event handle
+        if (taskEvent.getProcessInstanceId() == 0 && streamTaskInstanceExecCacheManager.contains(taskEvent.getTaskInstanceId())) {
+            streamTaskInstanceExecCacheManager.getByTaskInstanceId(taskEvent.getTaskInstanceId()).addTaskEvent(taskEvent);
+            return;
+        }
         if (!processInstanceExecCacheManager.contains(taskEvent.getProcessInstanceId())) {
             logger.warn("Cannot find workflowExecuteThread from cacheManager, event: {}", taskEvent);
             return;
         }
-        if (!taskExecuteThreadMap.containsKey(taskEvent.getProcessInstanceId())) {
-            TaskExecuteRunnable taskExecuteThread = new TaskExecuteRunnable(
-                    taskEvent.getProcessInstanceId(),
-                    processService, workflowExecuteThreadPool,
-                    processInstanceExecCacheManager,
-                    dataQualityResultOperator);
-            taskExecuteThreadMap.put(taskEvent.getProcessInstanceId(), taskExecuteThread);
-        }
-        TaskExecuteRunnable taskExecuteRunnable= taskExecuteThreadMap.get(taskEvent.getProcessInstanceId());
-        if (taskExecuteRunnable != null) {
-            taskExecuteRunnable.addEvent(taskEvent);
-        }
+        TaskExecuteRunnable taskExecuteRunnable = taskExecuteThreadMap.computeIfAbsent(taskEvent.getProcessInstanceId(),
+            (processInstanceId) -> new TaskExecuteRunnable(processInstanceId, taskEventHandlerMap));
+        taskExecuteRunnable.addEvent(taskEvent);
     }
 
     public void eventHandler() {
@@ -103,7 +96,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     public void executeEvent(TaskExecuteRunnable taskExecuteThread) {
-        if (taskExecuteThread.eventSize() == 0) {
+        if (taskExecuteThread.isEmpty()) {
             return;
         }
         if (multiThreadFilterMap.containsKey(taskExecuteThread.getKey())) {
@@ -115,11 +108,11 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onFailure(Throwable ex) {
                 Integer processInstanceId = taskExecuteThread.getProcessInstanceId();
-                logger.error("persist event failed processInstanceId: {}", processInstanceId, ex);
+                logger.error("[WorkflowInstance-{}] persist event failed", processInstanceId, ex);
                 if (!processInstanceExecCacheManager.contains(processInstanceId)) {
                     taskExecuteThreadMap.remove(processInstanceId);
-                    logger.info("Cannot find processInstance from cacheManager, remove process instance from threadMap: {}",
-                            processInstanceId);
+                    logger.info("[WorkflowInstance-{}] Cannot find processInstance from cacheManager, remove process instance from threadMap",
+                        processInstanceId);
                 }
                 multiThreadFilterMap.remove(taskExecuteThread.getKey());
             }
@@ -127,11 +120,11 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onSuccess(Object result) {
                 Integer processInstanceId = taskExecuteThread.getProcessInstanceId();
-                logger.info("persist events succeeded, processInstanceId: {}", processInstanceId);
+                logger.info("[WorkflowInstance-{}] persist events succeeded", processInstanceId);
                 if (!processInstanceExecCacheManager.contains(processInstanceId)) {
                     taskExecuteThreadMap.remove(processInstanceId);
-                    logger.info("Cannot find processInstance from cacheManager, remove process instance from threadMap: {}",
-                            processInstanceId);
+                    logger.info("[WorkflowInstance-{}] Cannot find processInstance from cacheManager, remove process instance from threadMap",
+                        processInstanceId);
                 }
                 multiThreadFilterMap.remove(taskExecuteThread.getKey());
             }

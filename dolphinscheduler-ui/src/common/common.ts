@@ -46,8 +46,7 @@ export const bytesToSize = (bytes: number) => {
   const k = 1024 // or 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-  return parseInt((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
+  return parseFloat((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
 }
 
 export const fileTypeArr = [
@@ -138,6 +137,34 @@ export const stateType = (t: any) => [
     value: key,
     label: item.desc
   }))
+]
+
+/**
+ * Stream task state
+ */
+const streamTaskState = [
+  'SUBMITTED_SUCCESS',
+  'RUNNING_EXECUTION',
+  'FAILURE',
+  'STOP',
+  'KILL',
+  'SUCCESS'
+]
+
+/**
+ * Stream task State code table
+ */
+export const streamStateType = (t: any) => [
+  {
+    value: '',
+    label: `${t('project.workflow.all_status')}`
+  },
+  ...Object.entries(tasksState(t))
+    .filter(([key]) => streamTaskState.includes(key))
+    .map(([key, item]) => ({
+      value: key,
+      label: item.desc
+    }))
 ]
 
 /**

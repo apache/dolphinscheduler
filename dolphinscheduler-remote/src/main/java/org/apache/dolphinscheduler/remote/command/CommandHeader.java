@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
 import java.io.Serializable;
 
+import lombok.Data;
+
 /**
  *  command header
  */
+@Data
 public class CommandHeader implements Serializable {
 
     /**
@@ -34,12 +38,12 @@ public class CommandHeader implements Serializable {
     private long opaque;
 
     /**
-     *  context length
+     * context length
      */
     private int contextLength;
 
     /**
-     *  context
+     * context
      */
     private byte[] context;
 
@@ -48,43 +52,4 @@ public class CommandHeader implements Serializable {
      */
     private int bodyLength;
 
-    public int getBodyLength() {
-        return bodyLength;
-    }
-
-    public void setBodyLength(int bodyLength) {
-        this.bodyLength = bodyLength;
-    }
-
-    public byte getType() {
-        return type;
-    }
-
-    public void setType(byte type) {
-        this.type = type;
-    }
-
-    public long getOpaque() {
-        return opaque;
-    }
-
-    public void setOpaque(long opaque) {
-        this.opaque = opaque;
-    }
-
-    public int getContextLength() {
-        return contextLength;
-    }
-
-    public void setContextLength(int contextLength) {
-        this.contextLength = contextLength;
-    }
-
-    public byte[] getContext() {
-        return context;
-    }
-
-    public void setContext(byte[] context) {
-        this.context = context;
-    }
 }

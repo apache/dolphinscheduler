@@ -15,21 +15,25 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
-import { TreeSelectOption } from 'naive-ui'
 
-export function useResources(): IJsonItem {
+export function useResources(
+  span: number | Ref<number> = 24,
+  required = false,
+  limit: number | Ref<number> = -1
+): IJsonItem {
   const { t } = useI18n()
 
   const resourcesOptions = ref([] as IResource[])
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
+
   const getResources = async () => {
     if (taskStore.resources.length) {
       resourcesOptions.value = taskStore.resources
@@ -42,7 +46,6 @@ export function useResources(): IJsonItem {
     resourcesOptions.value = res || []
     resourcesLoading.value = false
     taskStore.updateResource(res)
-//     console.log("use-resources taskStore.resource", taskStore.resources)
   }
 
   onMounted(() => {
@@ -53,6 +56,7 @@ export function useResources(): IJsonItem {
     type: 'tree-select',
     field: 'resourceList',
     name: t('project.node.resources'),
+    span: span,
     options: resourcesOptions,
     props: {
       multiple: true,
@@ -63,10 +67,22 @@ export function useResources(): IJsonItem {
       placeholder: t('project.node.resources_tips'),
       keyField: 'fullName',
       labelField: 'name',
-      loading: resourcesLoading,
-//       onLoad: async function(option: TreeSelectOption) {
-//         option.children = await queryResourceList({ type: 'FILE', fullName:option.fullName })
-//       }
+      loading: resourcesLoading
+    },
+    validate: {
+      trigger: ['input', 'blur'],
+      required: required,
+      validator(validate: any, value: IResource[]) {
+        if (required) {
+          if (!value) {
+            return new Error(t('project.node.resources_tips'))
+          }
+
+          if (limit > 0 && value.length > limit) {
+            return new Error(t('project.node.resources_limit_tips') + limit)
+          }
+        }
+      }
     }
   }
 }

@@ -17,7 +17,10 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type { TaskType } from '@/views/projects/task/constants/task-type'
+import type {
+  TaskExecuteType,
+  TaskType
+} from '@/views/projects/task/constants/task-type'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
   IFormItem,
@@ -265,6 +268,7 @@ interface ITaskParams {
   hadoopCustomParams?: ILocalParam[]
   sqoopAdvancedParams?: ILocalParam[]
   concurrency?: number
+  splitBy?: string
   modelType?: ModelType
   sourceType?: SourceType
   targetType?: SourceType
@@ -272,6 +276,7 @@ interface ITaskParams {
   sourceParams?: string
   queue?: string
   master?: string
+  masterUrl?: string
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
@@ -294,8 +299,13 @@ interface ITaskParams {
   ruleId?: number
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
+  stepsDefineJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
+  zeppelinRestEndpoint?: string
+  restEndpoint?: string
+  zeppelinProductionNoteDirectory?: string
+  productionNoteDirectory?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
@@ -341,6 +351,27 @@ interface ITaskParams {
   zk?: string
   zkPath?: string
   executeMode?: string
+  useCustom?: boolean
+  runMode?: string
+  dvcTaskType?: string
+  dvcRepository?: string
+  dvcVersion?: string
+  dvcDataLocation?: string
+  dvcMessage?: string
+  dvcLoadSaveDataPath?: string
+  dvcStoreUrl?: string
+  address?: string
+  taskId?: string
+  online?: boolean
+  sagemakerRequestJson?: string
+  script?: string
+  scriptParams?: string
+  pythonPath?: string
+  isCreateEnvironment?: string
+  pythonCommand?: string
+  pythonEnvTool?: string
+  requirements?: string
+  condaPythonVersion?: string
 }
 
 interface INodeData
@@ -387,7 +418,6 @@ interface INodeData
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
-  masterUrl?: string
   resourceFiles?: { id: number; fullName: string }[] | null
   relation?: RelationType
   definition?: object
@@ -396,6 +426,7 @@ interface INodeData
   udfs?: string[]
   customConfig?: boolean
   mapping_columns?: object[]
+  taskExecuteType?: TaskExecuteType
 }
 
 interface ITaskData

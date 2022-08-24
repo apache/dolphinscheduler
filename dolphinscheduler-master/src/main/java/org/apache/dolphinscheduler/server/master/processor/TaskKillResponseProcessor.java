@@ -51,7 +51,8 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
 
         TaskKillResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
-        logger.info("received task kill response command : {}", responseCommand);
+        logger.info("[TaskInstance-{}] Received task kill response command : {}",
+            responseCommand.getTaskInstanceId(), responseCommand);
     }
 
 }

@@ -25,8 +25,6 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.model.*;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageEntity;
@@ -45,7 +43,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.nio.file.Files;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,6 +59,12 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -171,21 +177,26 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
-        try (S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
-             S3ObjectInputStream s3is = o.getObjectContent();
-             FileOutputStream fos = new FileOutputStream(dstFile)){
-                byte[] readBuf = new byte[1024];
-                int readLen = 0;
-                while ((readLen = s3is.read(readBuf)) > 0) {
-                    fos.write(readBuf, 0, readLen);
-                }
+    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource, boolean overwrite) throws IOException {
+        File dstFile = new File(dstFilePath);
+        if (dstFile.isDirectory()) {
+            Files.delete(dstFile.toPath());
+        } else {
+            Files.createDirectories(dstFile.getParentFile().toPath());
+        }
+        S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
+        try (S3ObjectInputStream s3is = o.getObjectContent();
+             FileOutputStream fos = new FileOutputStream(dstFilePath)) {
+            byte[] readBuf = new byte[1024];
+            int readLen;
+            while ((readLen = s3is.read(readBuf)) > 0) {
+                fos.write(readBuf, 0, readLen);
+            }
         } catch (AmazonServiceException e) {
-            logger.error("the resource can`t be downloaded,the bucket is {},and the src is {}", tenantCode, srcFilePath);
             throw new IOException(e.getMessage());
         } catch (FileNotFoundException e) {
-            logger.error("the file isn`t exists");
-            throw new IOException("the file isn`t exists");
+            logger.error("the destination file {} not found", dstFilePath);
+            throw e;
         }
     }
 
@@ -368,8 +379,6 @@ public class S3Utils implements Closeable, StorageOperate {
 
     /**
      * only delete the object of directory ,it`s better to delete the files in it -r
-     *
-     *
      */
     private void deleteDirectory(String directoryName) {
         if (s3Client.doesObjectExist(BUCKET_NAME, directoryName)) {

@@ -18,21 +18,17 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
-import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,58 +74,6 @@ public class ParameterUtils {
     }
 
     /**
-     * curing user define parameters
-     *
-     * @param globalParamMap  global param map
-     * @param globalParamList global param list
-     * @param commandType     command type
-     * @param scheduleTime    schedule time
-     * @return curing user define parameters
-     */
-    public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
-                                            CommandType commandType, Date scheduleTime, String timezone) {
-
-        if (globalParamList == null || globalParamList.isEmpty()) {
-            return null;
-        }
-
-        Map<String, String> globalMap = new HashMap<>();
-        if (globalParamMap != null) {
-            globalMap.putAll(globalParamMap);
-        }
-        Map<String, String> allParamMap = new HashMap<>();
-        //If it is a complement, a complement time needs to be passed in, according to the task type
-        Map<String, String> timeParams = BusinessTimeUtils.
-            getBusinessTime(commandType, scheduleTime, timezone);
-
-        if (timeParams != null) {
-            allParamMap.putAll(timeParams);
-        }
-
-        allParamMap.putAll(globalMap);
-
-        Set<Map.Entry<String, String>> entries = allParamMap.entrySet();
-
-        Map<String, String> resolveMap = new HashMap<>();
-        for (Map.Entry<String, String> entry : entries) {
-            String val = entry.getValue();
-            if (val.startsWith("$")) {
-                String str = ParameterUtils.convertParameterPlaceholders(val, allParamMap);
-                resolveMap.put(entry.getKey(), str);
-            }
-        }
-        globalMap.putAll(resolveMap);
-
-        for (Property property : globalParamList) {
-            String val = globalMap.get(property.getProp());
-            if (val != null) {
-                property.setValue(val);
-            }
-        }
-        return JSONUtils.toJsonString(globalParamList);
-    }
-
-    /**
      * handle escapes
      *
      * @param inputString input string
@@ -164,7 +108,6 @@ public class ParameterUtils {
         if (templateStr == null) {
             return null;
         }
-
 
         StringBuffer newValue = new StringBuffer(templateStr.length());
 

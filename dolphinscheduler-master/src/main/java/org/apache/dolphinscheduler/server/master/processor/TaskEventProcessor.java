@@ -17,23 +17,21 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.common.enums.StateEvent;
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
-
-import io.netty.channel.Channel;
 
 /**
  * handle state event received from master/api
@@ -49,17 +47,25 @@ public class TaskEventProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_FORCE_STATE_EVENT_REQUEST == command.getType()
-                        || CommandType.TASK_WAKEUP_EVENT_REQUEST == command.getType()
-                , String.format("invalid command type: %s", command.getType()));
+                || CommandType.TASK_WAKEUP_EVENT_REQUEST == command.getType(),
+                String.format("invalid command type: %s", command.getType()));
 
-        TaskEventChangeCommand taskEventChangeCommand = JSONUtils.parseObject(command.getBody(), TaskEventChangeCommand.class);
-        StateEvent stateEvent = new StateEvent();
-        stateEvent.setKey(taskEventChangeCommand.getKey());
-        stateEvent.setProcessInstanceId(taskEventChangeCommand.getProcessInstanceId());
-        stateEvent.setTaskInstanceId(taskEventChangeCommand.getTaskInstanceId());
-        stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
-        logger.info("received command : {}", stateEvent);
-        stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
+        TaskEventChangeCommand taskEventChangeCommand =
+                JSONUtils.parseObject(command.getBody(), TaskEventChangeCommand.class);
+        TaskStateEvent stateEvent = TaskStateEvent.builder()
+                .processInstanceId(taskEventChangeCommand.getProcessInstanceId())
+                .taskInstanceId(taskEventChangeCommand.getTaskInstanceId())
+                .key(taskEventChangeCommand.getKey())
+                .type(StateEventType.WAIT_TASK_GROUP)
+                .build();
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                    stateEvent.getTaskInstanceId());
+            logger.info("Received task event change command, event: {}", stateEvent);
+            stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
     }
 
 }

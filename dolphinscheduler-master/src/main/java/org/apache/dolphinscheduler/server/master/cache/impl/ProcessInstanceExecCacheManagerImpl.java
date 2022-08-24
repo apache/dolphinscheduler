@@ -30,13 +30,16 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 /**
  * cache of process instance id and WorkflowExecuteThread
  */
 @Component
 public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecCacheManager {
 
-    private final ConcurrentHashMap<Integer, WorkflowExecuteRunnable> processInstanceExecMaps = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkflowExecuteRunnable> processInstanceExecMaps =
+            new ConcurrentHashMap<>();
 
     @PostConstruct
     public void registerMetrics() {
@@ -59,15 +62,17 @@ public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecC
     }
 
     @Override
-    public void cache(int processInstanceId, WorkflowExecuteRunnable workflowExecuteThread) {
-        if (workflowExecuteThread == null) {
-            return;
-        }
+    public void cache(int processInstanceId, @NonNull WorkflowExecuteRunnable workflowExecuteThread) {
         processInstanceExecMaps.put(processInstanceId, workflowExecuteThread);
     }
 
     @Override
     public Collection<WorkflowExecuteRunnable> getAll() {
         return ImmutableList.copyOf(processInstanceExecMaps.values());
+    }
+
+    @Override
+    public void clearCache() {
+        processInstanceExecMaps.clear();
     }
 }

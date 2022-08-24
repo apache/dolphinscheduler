@@ -17,12 +17,11 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { format } from 'date-fns'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import { queryAccessTokenList, deleteToken } from '@/service/modules/token'
-import { parseTime } from '@/common/common'
+import { renderTableTime } from '@/common/common'
 import type { TokenRes } from '@/service/modules/token/types'
 
 export function useTable() {
@@ -53,15 +52,18 @@ export function useTable() {
       },
       {
         title: t('security.token.expiration_time'),
-        key: 'expireTime'
+        key: 'expireTime',
+        render: (row: any) => renderTableTime(row.expireTime)
       },
       {
         title: t('security.token.create_time'),
-        key: 'createTime'
+        key: 'createTime',
+        render: (row: any) => renderTableTime(row.createTime)
       },
       {
         title: t('security.token.update_time'),
-        key: 'updateTime'
+        key: 'updateTime',
+        render: (row: any) => renderTableTime(row.updateTime)
       },
       {
         title: t('security.token.operation'),
@@ -166,23 +168,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryAccessTokenList({ ...params }).then((res: TokenRes) => {
-        variables.tableData = res.totalList.map((item, unused) => {
-          item.expireTime = format(
-            parseTime(item.expireTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          item.createTime = format(
-            parseTime(item.createTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          item.updateTime = format(
-            parseTime(item.updateTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          return {
-            ...item
-          }
-        }) as any
+        variables.tableData = res.totalList as any
         variables.totalPage = res.totalPage
         variables.loadingRef = false
       }),

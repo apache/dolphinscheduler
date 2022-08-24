@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.api.python;
 
+import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,6 +57,9 @@ public class PythonGatewayTest {
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
+    @Mock
+    private ResourcesService resourcesService;
+
     @Test
     public void testGetCodeAndVersion() throws CodeGenerateUtils.CodeGenerateException {
         Project project = getTestProject();
@@ -81,6 +88,51 @@ public class PythonGatewayTest {
 
         Map<String, Object> result = pythonGateway.getDependentInfo(project.getName(), processDefinition.getName(), taskDefinition.getName());
         Assert.assertEquals((long) result.get("taskDefinitionCode"), taskDefinition.getCode());
+    }
+
+    @Test
+    public void testCreateResource() {
+        User user = getTestUser();
+        String resourceDir = "/dir1/dir2/";
+        String resourceName = "test";
+        String resourceSuffix = "py";
+        String desc = "desc";
+        String content = "content";
+        String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
+
+        int resourceId = 3;
+
+        Mockito.when(resourcesService.createOrUpdateResource(user.getUserName(), resourceFullName, desc, content))
+                .thenReturn(resourceId);
+
+        int id = pythonGateway.createOrUpdateResource(
+                user.getUserName(), resourceFullName, desc, content);
+        Assert.assertEquals(id, resourceId);
+    }
+
+
+    @Test
+    public void testQueryResourcesFileInfo() {
+        User user = getTestUser();
+        Resource resource = getTestResource();
+        Mockito.when(resourcesService.queryResourcesFileInfo(user.getUserName(), resource.getFullName())).thenReturn(resource);
+        Resource result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
+        Assert.assertEquals(result.getId(), resource.getId());
+    }
+
+    private Resource getTestResource() {
+        Resource resource = new Resource();
+        resource.setId(1);
+        resource.setType(ResourceType.FILE);
+        resource.setFullName("/dev/test.py");
+        return resource;
+    }
+
+    private User getTestUser() {
+        User user = new User();
+        user.setId(1);
+        user.setUserName("ut-user");
+        return user;
     }
 
     private Project getTestProject() {

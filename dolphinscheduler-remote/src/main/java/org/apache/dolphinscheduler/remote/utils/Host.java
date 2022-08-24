@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
+import lombok.NonNull;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
 
 import java.io.Serializable;
@@ -95,7 +96,7 @@ public class Host implements Serializable {
      * @param address address
      * @return host
      */
-    public static Host of(String address) {
+    public static Host of(@NonNull String address) {
         String[] parts = splitAddress(address);
         return new Host(parts[0], Integer.parseInt(parts[1]));
     }

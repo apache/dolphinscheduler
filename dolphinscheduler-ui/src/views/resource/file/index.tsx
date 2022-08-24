@@ -16,7 +16,7 @@
  */
 
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, reactive, Ref, toRaw, watch } from 'vue'
+import { defineComponent, onMounted, ref, reactive, Ref, getCurrentInstance } from 'vue'
 import {
   NIcon,
   NSpace,
@@ -30,21 +30,21 @@ import {
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
-import Card from '@/components/card'
 import { useTable } from './table/use-table'
 import { useFileState } from './use-file'
-import ResourceFolderModal from './folder'
-import ResourceUploadModal from './upload'
-import ResourceRenameModal from './rename'
 import { BreadcrumbItem, IRenameFile } from './types'
-import type { Router } from 'vue-router'
-import styles from './index.module.scss'
 import { useFileStore } from '@/store/file/file'
 import {
   queryCurrentResourceById,
   queryResourceById
 } from '@/service/modules/resources'
-import { ResourceFile } from '@/service/modules/resources/types'
+import Card from '@/components/card'
+import ResourceFolderModal from './folder'
+import ResourceUploadModal from './upload'
+import ResourceRenameModal from './rename'
+import styles from './index.module.scss'
+import type { ResourceFile } from '@/service/modules/resources/types'
+import type { Router } from 'vue-router'
 
 export default defineComponent({
   name: 'File',
@@ -177,6 +177,8 @@ export default defineComponent({
       }
     ])
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       const currFileId = router.currentRoute.value.query.prefix || ""
       if (currFileId === "") {
@@ -249,7 +251,8 @@ export default defineComponent({
       handleGoRoot,
       pagination: paginationReactive,
       renameInfo,
-      breadcrumbItemsRef
+      breadcrumbItemsRef,
+      trim
     }
   },
   render() {
@@ -266,48 +269,39 @@ export default defineComponent({
     } = this
 
     return (
-      <div>
-        <Card style={{ marginBottom: '8px' }}>
-          <div class={styles['conditions-model']}>
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButtonGroup size='small'>
+              <NButton
+                onClick={handleCreateFolder}
+                class='btn-create-directory'
+              >
+                {t('resource.file.create_folder')}
+              </NButton>
+              <NButton onClick={handleCreateFile} class='btn-create-file'>
+                {t('resource.file.create_file')}
+              </NButton>
+              <NButton onClick={handleUploadFile} class='btn-upload-file'>
+                {t('resource.file.upload_files')}
+              </NButton>
+            </NButtonGroup>
             <NSpace>
-              <NButtonGroup>
-                <NButton
-                  onClick={handleCreateFolder}
-                  class='btn-create-directory'
-                >
-                  {t('resource.file.create_folder')}
-                </NButton>
-                <NButton onClick={handleCreateFile} class='btn-create-file'>
-                  {t('resource.file.create_file')}
-                </NButton>
-                <NButton onClick={handleUploadFile} class='btn-upload-file'>
-                  {t('resource.file.upload_files')}
-                </NButton>
-              </NButtonGroup>
+              <NInput
+                size='small'
+                allowInput={this.trim}
+                placeholder={t('resource.file.enter_keyword_tips')}
+                v-model={[this.searchRef, 'value']}
+              />
+              <NButton size='small' type='primary' onClick={handleConditions}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
             </NSpace>
-            <div class={styles.right}>
-              <div class={styles['form-box']}>
-                <div class={styles.list}>
-                  <NButton onClick={handleConditions}>
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  </NButton>
-                </div>
-                <div class={styles.list}>
-                  <NInput
-                    placeholder={t('resource.file.enter_keyword_tips')}
-                    v-model={[this.searchRef, 'value']}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          </NSpace>
         </Card>
-        <Card
-          title={t('resource.file.file_manage')}
-          class={styles['table-card']}
-        >
+        <Card title={t('resource.file.file_manage')}>
           {{
             'header-extra': () => (
               <NBreadcrumb separator='>' class={styles['breadcrumb']}>
@@ -329,7 +323,7 @@ export default defineComponent({
               </NBreadcrumb>
             ),
             default: () => (
-              <div>
+              <NSpace vertical>
                 <NDataTable
                   remote
                   columns={columnsRef}
@@ -340,7 +334,7 @@ export default defineComponent({
                   row-class-name='items'
                   scrollX={tableWidth}
                 />
-                <div class={styles.pagination}>
+                <NSpace justify='center'>
                   <NPagination
                     v-model:page={this.pagination.page}
                     v-model:pageSize={this.pagination.pageSize}
@@ -351,8 +345,8 @@ export default defineComponent({
                     show-quick-jumper
                     show-size-picker
                   />
-                </div>
-              </div>
+                </NSpace>
+              </NSpace>
             )
           }}
         </Card>
@@ -372,7 +366,7 @@ export default defineComponent({
           description={this.renameInfo.description}
           onUpdateList={this.updateList}
         />
-      </div>
+      </NSpace>
     )
   }
 })

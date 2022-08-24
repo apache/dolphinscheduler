@@ -34,9 +34,11 @@ public interface WorkerGroupService {
      * @param id worker group id
      * @param name worker group name
      * @param addrList addr list
+     * @param description   description
+     * @param otherParamsJson  otherParamsJson
      * @return create or update result code
      */
-    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList);
+    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String otherParamsJson);
 
     /**
      * query worker group paging
@@ -52,9 +54,10 @@ public interface WorkerGroupService {
     /**
      * query all worker group
      *
+     * @param loginUser
      * @return all worker group list
      */
-    Map<String, Object> queryAllGroup();
+    Map<String, Object> queryAllGroup(User loginUser);
 
     /**
      * delete worker group by id

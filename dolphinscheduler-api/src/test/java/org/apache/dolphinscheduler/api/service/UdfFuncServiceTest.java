@@ -95,7 +95,7 @@ public class UdfFuncServiceTest {
     @Test
     public  void testCreateUdfFunction() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_CREATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_CREATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, null, 0, serviceLogger)).thenReturn(true);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         //hdfs not start
@@ -120,7 +120,7 @@ public class UdfFuncServiceTest {
     @Test
     public  void testQueryUdfFuncDetail() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{2}, 0, serviceLogger)).thenReturn(true);
         PowerMockito.when(udfFuncMapper.selectById(1)).thenReturn(getUdfFunc());
         //resource not exist
@@ -128,7 +128,7 @@ public class UdfFuncServiceTest {
         logger.info(result.toString());
         Assert.assertTrue(Status.RESOURCE_NOT_EXIST.getCode() == result.getCode());
         // success
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{1}, 0, serviceLogger)).thenReturn(true);
         result = udfFuncService.queryUdfFuncDetail(getLoginUser(), 1);
         logger.info(result.toString());
@@ -143,7 +143,7 @@ public class UdfFuncServiceTest {
         PowerMockito.when(resourceMapper.selectById(1)).thenReturn(getResource());
 
         //UDF_FUNCTION_NOT_EXIST
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{12}, 0, serviceLogger)).thenReturn(true);
         Result<Object> result = udfFuncService.updateUdfFunc(getLoginUser(), 12, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
@@ -158,7 +158,7 @@ public class UdfFuncServiceTest {
         Assert.assertTrue(Status.HDFS_NOT_STARTUP.getCode() == result.getCode());
 
         //RESOURCE_NOT_EXIST
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{11}, 0, serviceLogger)).thenReturn(true);
         PowerMockito.when(udfFuncMapper.selectUdfById(11)).thenReturn(getUdfFunc());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
@@ -168,7 +168,7 @@ public class UdfFuncServiceTest {
         Assert.assertTrue(Status.RESOURCE_NOT_EXIST.getCode() == result.getCode());
 
         //success
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{1}, 0, serviceLogger)).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
@@ -180,7 +180,7 @@ public class UdfFuncServiceTest {
     @Test
     public  void testQueryUdfFuncListPaging() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, null, 0, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, 1, udfLogger)).thenReturn(getSetIds());
         IPage<UdfFunc> page = new Page<>(1,10);
@@ -195,7 +195,7 @@ public class UdfFuncServiceTest {
 
     @Test
     public  void testQueryUdfFuncList() {
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, null, 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF, 1, udfLogger)).thenReturn(getSetIds());
 
@@ -212,7 +212,7 @@ public class UdfFuncServiceTest {
 
     @Test
     public  void testDelete() {
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_DELETE, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_DELETE, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{122}, 0, serviceLogger)).thenReturn(true);
 
         Mockito.when(udfFuncMapper.deleteById(Mockito.anyInt())).thenReturn(1);
@@ -225,7 +225,7 @@ public class UdfFuncServiceTest {
     @Test
     public  void testVerifyUdfFuncByName() {
 
-        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
+        PowerMockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1, ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, null, 0, serviceLogger)).thenReturn(true);
         //success
         Mockito.when(udfFuncMapper.queryUdfByIdStr(null, "UdfFuncServiceTest")).thenReturn(getList());
