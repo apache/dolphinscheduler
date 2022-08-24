@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref, computed, onMounted, watch, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  ref,
+  computed,
+  onMounted,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import {
@@ -136,8 +144,9 @@ export default defineComponent({
       formRef.value.validate(async (valid: any) => {
         if (!valid) {
           const params = {
-            name: formValue.value.name
-          }
+            name: formValue.value.name,
+            code: props.definition?.processDefinition.code
+          } as { name: string; code?: number }
           if (
             props.definition?.processDefinition.name !== formValue.value.name
           ) {
@@ -192,11 +201,14 @@ export default defineComponent({
         <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
             <NInput
-                  allowInput={trim} v-model:value={formValue.value.name} class='input-name' />
+              allowInput={trim}
+              v-model:value={formValue.value.name}
+              class='input-name'
+            />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
-                  allowInput={trim}
+              allowInput={trim}
               type='textarea'
               v-model:value={formValue.value.description}
               class='input-description'
