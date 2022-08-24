@@ -118,12 +118,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
-        handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
+        saveWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    protected void handleDefaultWorkGroup(WorkerGroupMapper workerGroupMapper, WorkerGroup workerGroup, User loginUser, String otherParamsJson) {
+    protected void saveWorkGroup(WorkerGroupMapper workerGroupMapper, WorkerGroup workerGroup, User loginUser, String otherParamsJson) {
         if (workerGroup.getId() != 0) {
             workerGroupMapper.updateById(workerGroup);
         } else {
@@ -151,6 +151,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     return true;
                 }
             }
+        }
+        // skip default group name check
+        if (Constants.DEFAULT.equals(workerGroup.getName())) {
+            return false;
         }
         // check zookeeper
         String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
