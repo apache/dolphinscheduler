@@ -126,9 +126,9 @@ public class ProcessDefinitionControllerTest {
         long projectCode = 1L;
         String name = "dag_test";
 
-        Mockito.when(processDefinitionService.verifyProcessDefinitionName(user, projectCode, name)).thenReturn(result);
+        Mockito.when(processDefinitionService.verifyProcessDefinitionName(user, projectCode, name, 0)).thenReturn(result);
 
-        Result response = processDefinitionController.verifyProcessDefinitionName(user, projectCode, name);
+        Result response = processDefinitionController.verifyProcessDefinitionName(user, projectCode, name, 0);
         Assert.assertTrue(response.isStatus(Status.PROCESS_DEFINITION_NAME_EXIST));
     }
 
