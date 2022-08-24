@@ -70,7 +70,6 @@ public class PluginDao {
                 if (currPluginDefine == null) {
                     throw new TaskPluginException(String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s", pluginDefine.getPluginName(), pluginDefine.getPluginType()));
                 }
-                throw new IllegalStateException("Failed to insert plugin definition");
             }
         }
         if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
