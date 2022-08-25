@@ -91,7 +91,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
         createDataSourceForm().inputDataBase().sendKeys(database);
-        createDataSourceForm().radioIsTestDatasource().sendKeys(testFlag);
+        createDataSourceForm().radioTestDatasource().click();
 
 
         if (!"".equals(jdbcParams)) {
@@ -181,8 +181,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         })
         private WebElement inputJdbcParams;
 
-        @FindBy(className = "radio-istest-datasource")
-        private WebElement radioIsTestDatasource;
+        @FindBy(className = "radio-test-datasource")
+        private WebElement radioTestDatasource;
+
+        @FindBy(className = "radio-online-datasource")
+        private WebElement radioOnlineDatasource;
 
         @FindBy(className = "select-bind-test-data-source-type-drop-down")
         private WebElement selectBindTestDataSourceId;

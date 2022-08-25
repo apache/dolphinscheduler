@@ -351,10 +351,10 @@ const DetailModal = defineComponent({
                 >
                   <NRadioGroup v-model={[detailForm.testFlag, 'value']} onUpdate:value={onChangeTestFlag}>
                     <NSpace>
-                      <NRadio value = {1} class='radio-istest-datasource'>
+                      <NRadio value = {1} class='radio-test-datasource'>
                         {t('datasource.test_datasource')}
                       </NRadio>
-                      <NRadio value = {0} class='radio-istest-datasource'>
+                      <NRadio value = {0} class='radio-online-datasource'>
                         {t('datasource.online_datasource')}
                       </NRadio>
                     </NSpace>
