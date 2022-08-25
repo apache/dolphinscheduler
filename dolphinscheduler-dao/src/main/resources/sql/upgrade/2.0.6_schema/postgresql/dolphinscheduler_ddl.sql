@@ -15,12 +15,30 @@
  * limitations under the License.
 */
 
-alter table t_ds_process_definition drop primary key, ADD PRIMARY KEY (`id`,`code`);
-ALTER TABLE t_ds_process_definition drop KEY `process_definition_unique`;
-ALTER TABLE t_ds_process_definition drop KEY `process_definition_index`;
-alter table t_ds_process_definition drop process_definition_json;
-alter table t_ds_process_definition drop connects;
-alter table t_ds_process_definition drop receivers;
-alter table t_ds_process_definition drop receivers_cc;
-alter table t_ds_process_definition drop modify_by;
-alter table t_ds_process_definition drop resource_ids;
+delimiter d//
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+    )
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
+
+    --- alter column
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_resources ALTER COLUMN full_name Type varchar(128)';
+
+    return 'Success!';
+    exception when others then
+        ---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+
+select dolphin_update_metadata();
+
+d//

@@ -13,14 +13,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-ALTER TABLE "t_ds_process_definition" DROP CONSTRAINT "t_ds_process_definition_pkey";
-ALTER TABLE "t_ds_process_definition" DROP CONSTRAINT "process_definition_unique";
-DROP INDEX "process_definition_index";
-ALTER TABLE "t_ds_process_definition" DROP "process_definition_json";
-ALTER TABLE "t_ds_process_definition" DROP "connects";
-ALTER TABLE "t_ds_process_definition" DROP "receivers";
-ALTER TABLE "t_ds_process_definition" DROP "receivers_cc";
-ALTER TABLE "t_ds_process_definition" DROP "modify_by";
-ALTER TABLE "t_ds_process_definition" DROP "resource_ids";
+package org.apache.dolphinscheduler.spi.plugin;
+
+public interface PrioritySPI extends Comparable<Integer> {
+
+    /**
+     * The SPI identify, if the two plugin has the same name, will load the high priority.
+     * If the priority and name is all same, will throw <code>IllegalArgumentException</code>
+     * @return
+     */
+    SPIIdentify getIdentify();
+
+    @Override
+    default int compareTo(Integer o) {
+        return Integer.compare(getIdentify().getPriority(), o);
+    }
+
+}

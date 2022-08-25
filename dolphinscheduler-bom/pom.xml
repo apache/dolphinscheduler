@@ -26,10 +26,10 @@
     <artifactId>dolphinscheduler-bom</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
-    
+
     <properties>
         <netty.version>4.1.53.Final</netty.version>
-        <spring-boot.version>2.5.6</spring-boot.version>
+        <spring-boot.version>2.7.3</spring-boot.version>
         <spring.version>5.3.19</spring.version>
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
@@ -48,7 +48,7 @@
         <commons-collections4.version>4.1</commons-collections4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
-        <jackson.version>2.10.5</jackson.version>
+        <jackson.version>2.13.0</jackson.version>
         <protostuff.version>1.7.2</protostuff.version>
         <byte-buddy.version>1.9.16</byte-buddy.version>
         <logback.version>1.2.11</logback.version>
@@ -57,8 +57,7 @@
         <h2.version>1.4.200</h2.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
-        <slf4j-api.version>1.7.5</slf4j-api.version>
-        <slf4j-log4j12.version>1.7.5</slf4j-log4j12.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <activation.version>1.1</activation.version>
@@ -72,9 +71,7 @@
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <swagger.version>1.9.3</swagger.version>
-        <springfox.version>2.9.2</springfox.version>
-        <swagger-models.version>1.5.24</swagger-models.version>
+        <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
         <reflections.version>0.9.12</reflections.version>
         <py4j.version>0.10.9</py4j.version>
@@ -82,15 +79,14 @@
         <commons-compress.version>1.21</commons-compress.version>
         <commons-math3.version>3.1.1</commons-math3.version>
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
-        <kubernetes.version>5.8.0</kubernetes.version>
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
         <aws-sdk.version>1.12.160</aws-sdk.version>
         <joda-time.version>2.10.13</joda-time.version>
         <okhttp.version>3.14.9</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
-        
+        <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
             <!-- netty -->
@@ -106,7 +102,7 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
-            
+
             <!-- spring -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -146,7 +142,7 @@
                 <version>${spring.version}</version>
                 <scope>test</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.java-websocket</groupId>
                 <artifactId>Java-WebSocket</artifactId>
@@ -168,7 +164,7 @@
                 <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
-            
+
             <!-- quartz-->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
@@ -180,13 +176,13 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
                 <version>${druid.version}</version>
             </dependency>
-            
+
             <!-- Zookeeper -->
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
@@ -245,7 +241,7 @@
                 <artifactId>curator-test</artifactId>
                 <version>${curator-test.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -281,7 +277,7 @@
                 <artifactId>commons-email</artifactId>
                 <version>${commons-email.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -308,7 +304,7 @@
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-            
+
             <!--protostuff-->
             <dependency>
                 <groupId>io.protostuff</groupId>
@@ -320,33 +316,33 @@
                 <artifactId>protostuff-runtime</artifactId>
                 <version>${protostuff.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>${byte-buddy.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${reflections.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector.version}</version>
                 <scope>test</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.oracle.database.jdbc</groupId>
                 <artifactId>ojdbc8</artifactId>
                 <version>${oracle-jdbc.version}</version>
                 <scope>test</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
@@ -356,12 +352,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j-log4j12.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <!-- logback -->
             <dependency>
@@ -374,7 +370,7 @@
                 <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
             </dependency>
-            
+
             <!--excel poi-->
             <dependency>
                 <groupId>org.apache.poi</groupId>
@@ -386,7 +382,7 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-            
+
             <!-- hadoop -->
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -426,37 +422,37 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons-collections4.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.hive</groupId>
                 <artifactId>hive-jdbc</artifactId>
                 <version>${hive-jdbc.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
@@ -476,31 +472,31 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            
+
             <dependency>
                 <groupId>ru.yandex.clickhouse</groupId>
                 <artifactId>clickhouse-jdbc</artifactId>
                 <version>${clickhouse-jdbc.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>mssql-jdbc</artifactId>
                 <version>${mssql-jdbc.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.facebook.presto</groupId>
                 <artifactId>presto-jdbc</artifactId>
                 <version>${presto-jdbc.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
@@ -508,52 +504,34 @@
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
+                <artifactId>springfox-boot-starter</artifactId>
                 <version>${springfox.version}</version>
             </dependency>
-            
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger-models.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>swagger-bootstrap-ui</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            
+
             <dependency>
                 <groupId>com.github.rholder</groupId>
                 <artifactId>guava-retrying</artifactId>
                 <version>${guava-retry.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>${activation.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.sun.mail</groupId>
                 <artifactId>javax.mail</artifactId>
                 <version>${javax-mail}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>net.sf.py4j</groupId>
                 <artifactId>py4j</artifactId>
                 <version>${py4j.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
@@ -574,19 +552,14 @@
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${error_prone_annotations.version}</version>
             </dependency>
-            
-            <dependency>
-                <groupId>io.fabric8</groupId>
-                <artifactId>kubernetes-client</artifactId>
-                <version>${kubernetes.version}</version>
-            </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
             <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate-validator.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-emr</artifactId>
@@ -597,26 +570,52 @@
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-sdk.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
-            
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>mockwebserver</artifactId>
+                <version>${okhttp.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
             </dependency>
-            
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.12.4</version>
+                <!-- TODO: remove this dependency management after removing powermock -->
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-ldap</artifactId>
+                <version>1.1.2</version>
+            </dependency>
         </dependencies>
-        
+
     </dependencyManagement>
 </project>
