@@ -81,4 +81,9 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
     public int size() throws TaskPriorityQueueException {
         return queue.size();
     }
+
+    @Override
+    public void clear() {
+        queue.clear();
+    }
 }

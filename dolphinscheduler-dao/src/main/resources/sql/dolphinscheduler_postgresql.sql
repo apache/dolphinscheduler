@@ -428,7 +428,7 @@ CREATE TABLE t_ds_task_definition_log (
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   task_type varchar(50) DEFAULT NULL ,
-  task_execute_type int(11) DEFAULT '0',
+  task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
   task_priority int DEFAULT '2' ,
@@ -505,7 +505,7 @@ CREATE TABLE t_ds_process_task_relation_log (
   PRIMARY KEY (id)
 ) ;
 
-create index process_task_relation_log_idx_project_code_process_definition_code on t_ds_process_task_relation_log (project_code,process_definition_code);
+create index idx_process_code_version on t_ds_process_task_relation_log (process_definition_code, process_definition_version);
 
 --
 -- Table structure for table t_ds_process_instance

@@ -17,6 +17,17 @@
 
 delimiter d//
 
+--- Drop column
+ALTER TABLE t_ds_task_definition_log DROP CONSTRAINT IF EXISTS task_execute_type;
+
+--- Add column
+ALTER TABLE t_ds_task_definition_log ADD COLUMN IF NOT EXISTS "task_execute_type" int DEFAULT 0;
+
+--- Drop INDEX
+DROP INDEX IF EXISTS "process_task_relation_log_idx_project_code_process_definition_code";
+
+--- Add INDEX
+CREATE INDEX IF NOT EXISTS idx_process_code_version ON t_ds_process_task_relation_log USING Btree("process_definition_code", "process_definition_version");
 
 
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(

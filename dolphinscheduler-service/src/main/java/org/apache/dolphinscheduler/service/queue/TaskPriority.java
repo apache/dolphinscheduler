@@ -71,6 +71,8 @@ public class TaskPriority implements Comparable<TaskPriority> {
 
     private int taskGroupPriority;
 
+    private int dispatchFailedRetryTimes;
+
     public TaskPriority() {
         this.checkpoint = System.currentTimeMillis();
     }
@@ -161,6 +163,14 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.taskGroupPriority = taskGroupPriority;
     }
 
+    public int getDispatchFailedRetryTimes() {
+        return dispatchFailedRetryTimes;
+    }
+
+    public void setDispatchFailedRetryTimes(int dispatchFailedRetryTimes) {
+        this.dispatchFailedRetryTimes = dispatchFailedRetryTimes;
+    }
+
     @Override
     public int compareTo(TaskPriority other) {
         if (this.getProcessInstancePriority() > other.getProcessInstancePriority()) {
@@ -191,6 +201,9 @@ public class TaskPriority implements Comparable<TaskPriority> {
             return 1;
         }
         if (this.getTaskId() < other.getTaskId()) {
+            return -1;
+        }
+        if (this.getDispatchFailedRetryTimes() > other.getDispatchFailedRetryTimes()) {
             return -1;
         }
         String thisGroupName = StringUtils.isNotBlank(this.getGroupName()) ? this.getGroupName() : Constants.EMPTY_STRING;

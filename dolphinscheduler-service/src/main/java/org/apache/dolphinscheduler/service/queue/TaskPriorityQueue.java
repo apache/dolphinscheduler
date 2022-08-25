@@ -61,4 +61,9 @@ public interface TaskPriorityQueue<T> {
      * @throws TaskPriorityQueueException
      */
     int size() throws TaskPriorityQueueException;
+
+    /**
+     * clear
+     */
+    void clear();
 }

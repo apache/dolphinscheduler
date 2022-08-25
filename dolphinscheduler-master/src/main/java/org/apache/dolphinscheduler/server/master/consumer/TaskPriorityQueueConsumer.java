@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
@@ -38,14 +37,12 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventServic
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskFailedRetryPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +51,13 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * TaskUpdateQueue consumer
@@ -71,6 +75,12 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      */
     @Autowired
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+
+    /**
+     * task dispatch failed retry queue
+     */
+    @Autowired
+    private TaskPriorityQueue<TaskFailedRetryPriority> taskDispatchFailedQueueImpl;
 
     /**
      * processService
@@ -130,11 +140,8 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
-                        taskPriorityQueue.put(dispatchFailedTask);
-                    }
-                    // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
-                    if (fetchTaskNum == failedDispatchTasks.size()) {
-                        TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                        // put into failure queue after failure
+                        taskDispatchFailedQueueImpl.put(new TaskFailedRetryPriority(dispatchFailedTask));
                     }
                 }
             } catch (Exception e) {

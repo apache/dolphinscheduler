@@ -28,6 +28,9 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
+import org.apache.dolphinscheduler.service.queue.TaskFailedRetryPriority;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,10 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
+    @Autowired
+    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+    @Autowired
+    private TaskPriorityQueue<TaskFailedRetryPriority> taskDispatchFailedQueue;
 
     @Override
     public void disconnect() {
@@ -123,7 +130,10 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
         logger.warn("Master clear process instance cache due to lost registry connection");
         stateWheelExecuteThread.clearAllTasks();
         logger.warn("Master clear all state wheel task due to lost registry connection");
-
+        taskPriorityQueue.clear();
+        logger.warn("Master clear all task priority queue due to lost registry connection");
+        taskDispatchFailedQueue.clear();
+        logger.warn("Master clear all task dispatch failed queue due to lost registry connection");
     }
 
     private void reStartMasterResource() {
