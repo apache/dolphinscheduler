@@ -651,6 +651,10 @@ export default {
     zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
     zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
     zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
+    hive_cli_task_type: 'Hive Cli Task Type',
+    hive_cli_task_type_tips: 'Please choose the type of your hive cli task',
+    hive_sql_script: 'Hive SQL Script',
+    hive_sql_script_tips: 'Please enter your hive sql script',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',

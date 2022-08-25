@@ -77,3 +77,5 @@ export { useSagemaker } from './use-sagemaker'
 export { useChunjun } from './use-chunjun'
 export { useChunjunDeployMode } from './use-chunjun-deploy-mode'
 export { usePytorch } from './use-pytorch'
+export { useHiveCli } from './use-hive-cli'
+
