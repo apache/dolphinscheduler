@@ -91,13 +91,13 @@ const DetailModal = defineComponent({
     watch(
       () => props.show,
       async () => {
-        props.show && props.id && setFieldsValue(await queryById(props.id))
         props.show &&
           state.detailForm.type &&
-          changeType(
+          await changeType(
             state.detailForm.type,
             datasourceType[state.detailForm.type]
           )
+        props.show && props.id && setFieldsValue(await queryById(props.id))
       }
     )
 
