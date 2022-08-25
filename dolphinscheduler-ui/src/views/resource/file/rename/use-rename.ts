@@ -33,7 +33,8 @@ export function useRename(state: any) {
     try {
       await updateResource(
         {
-          ...state.renameForm
+          ...state.renameForm,
+          tenantCode: state.renameForm.user_name,
         },
         state.renameForm.id
       )

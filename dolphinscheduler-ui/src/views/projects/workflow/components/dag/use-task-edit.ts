@@ -161,7 +161,6 @@ export function useTaskEdit(options: Options) {
    * @param from
    */
   function taskConfirm({ data }: any) {
-    console.log("use-task-edit data", data)
     const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
     // override target config
     processDefinition.value.taskDefinitionList =

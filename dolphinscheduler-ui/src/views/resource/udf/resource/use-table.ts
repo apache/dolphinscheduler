@@ -322,7 +322,6 @@ export function useTable() {
       id
     ).then((res: any) => {
       fileStore.setCurrentDir(res.fullName)
-      console.log("use-table", res)
       router.push({ name: 'resource-sub-manage', params: { id: -1 }, query: {prefix: res.fullName, tenantCode: res.userName} })
     })
   }

@@ -54,7 +54,6 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     /**
      * resource page
      * @param page page
-     * @param userId userId
      * @param id id
      * @param type type
      * @param searchVal searchVal
@@ -97,14 +96,14 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @param <T> T
      * @return resource list
      */
-    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
+    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId, @Param("resIds") T[] resIds);
 
     /**
      * delete resource by id array
      * @param resIds resource id array
      * @return delete num
      */
-    int deleteIds(@Param("resIds")Integer[] resIds);
+    int deleteIds(@Param("resIds") Integer[] resIds);
 
     /**
      * list children
@@ -119,14 +118,14 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @param type      resource type
      * @return resource
      */
-    List<Resource> queryResource(@Param("fullName") String fullName,@Param("type") int type);
+    List<Resource> queryResource(@Param("fullName") String fullName, @Param("type") int type);
 
     /**
      * list resource by id array
      * @param resIds resource id array
      * @return resource list
      */
-    List<Resource> listResourceByIds(@Param("resIds")Integer[] resIds);
+    List<Resource> listResourceByIds(@Param("resIds") Integer[] resIds);
 
     /**
      * update resource
@@ -143,8 +142,8 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return true if exist else return null
      */
     Boolean existResourceByUser(@Param("fullName") String fullName,
-                              @Param("userId") int userId,
-                              @Param("type") int type);
+                                @Param("userId") int userId,
+                                @Param("type") int type);
 
     /**
      * check resource exist

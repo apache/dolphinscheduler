@@ -17,14 +17,21 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import io.micrometer.core.annotation.Counted;
-import org.apache.commons.collections.CollectionUtils;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -44,7 +51,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -67,6 +73,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -95,6 +102,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -130,11 +138,8 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,20 +154,19 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -1807,25 +1811,25 @@ public class ProcessServiceImpl implements ProcessService {
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {
             String resourceFullName = res.getResourceName();
-//            if (resourceId <= 0) {
+            // if (resourceId <= 0) {
             if ("".equals(resourceFullName)) {
                 logger.error("invalid resourceFullName, {}", resourceFullName);
                 return null;
             }
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
-//            Resource resource = getResourceById(resourceId);
+            // Resource resource = getResourceById(resourceId);
             Map<String, Object> columnMap = new HashMap<>();
             columnMap.put("full_name", resourceFullName);
-            List<ResourcesTask> resultList =  resourceTaskMapper.selectByMap(columnMap);
+            List<ResourcesTask> resultList = resourceTaskMapper.selectByMap(columnMap);
             if (resultList.size() > 0) {
                 ResourcesTask resource = resultList.get(0);
                 resourceInfo.setId(resource.getId());
                 resourceInfo.setRes(res.getRes());
                 resourceInfo.setResourceName(resource.getFullName());
             }
-//            resourceInfo.setRes(resource.getFileName());
-//            resourceInfo.setResourceName(resource.getFullName());
+            // resourceInfo.setRes(resource.getFileName());
+            // resourceInfo.setResourceName(resource.getFullName());
             if (logger.isInfoEnabled()) {
                 logger.info("updated resource info {}",
                         JSONUtils.toJsonString(resourceInfo));
@@ -2523,11 +2527,11 @@ public class ProcessServiceImpl implements ProcessService {
 
     public Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
         Set<String> resourceFullNames = null;
-        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
+        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceFullNames = params.getResourceFilesList().
-                    stream()
+            resourceFullNames = params.getResourceFilesList().stream()
                     .filter(t -> t.getResourceName() != "")
                     .map(ResourceInfo::getResourceName)
                     .collect(toSet());
@@ -2586,7 +2590,8 @@ public class ProcessServiceImpl implements ProcessService {
         int insertResult = 0;
         int updateResult = 0;
         if (!updateTaskDefinitionLogs.isEmpty()) {
-            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs.stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
+            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs
+                    .stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
             for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
                 TaskDefinition task = null;
                 for (TaskDefinition taskDefinition : taskDefinitions) {
@@ -2611,6 +2616,7 @@ public class ProcessServiceImpl implements ProcessService {
                         updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
                     } else {
                         updateResult++;
+                    }
                 }
             }
         }
@@ -3050,13 +3056,15 @@ public class ProcessServiceImpl implements ProcessService {
                 taskGroupQueue.getId(),
                 TaskGroupQueueStatus.WAIT_QUEUE.getCode());
         if (affectedCount > 0) {
-            logger.info("Success rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(), taskGroupQueue.getId());
+            logger.info("Success rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(),
+                    taskGroupQueue.getId());
             taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
             this.taskGroupQueueMapper.updateById(taskGroupQueue);
             this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
             return true;
         }
-        logger.info("Failed to rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(), taskGroupQueue.getId());
+        logger.info("Failed to rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(),
+                taskGroupQueue.getId());
         return false;
     }
 
@@ -3094,9 +3102,9 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             } while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode()
                     && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
-                    taskGroup.getUseSize(),
-                    thisTaskGroupQueue.getId(),
-                    TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
+                            taskGroup.getUseSize(),
+                            thisTaskGroupQueue.getId(),
+                            TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
         } catch (Exception e) {
             logger.error("release the task group error", e);
             return null;
@@ -3216,7 +3224,7 @@ public class ProcessServiceImpl implements ProcessService {
     public Integer createRelationTaskResourcesIfNotExist(String resourceFullName) {
 
         Integer resourceId = resourceTaskMapper.existResourceByFullName(resourceFullName, ResourceType.FILE);
-        if ( null == resourceId) {
+        if (null == resourceId) {
             // create the relation if not exist
             ResourcesTask resourcesTask = new ResourcesTask(resourceFullName, ResourceType.FILE);
             resourceTaskMapper.insert(resourcesTask);

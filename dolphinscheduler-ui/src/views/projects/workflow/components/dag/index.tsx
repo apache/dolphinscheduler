@@ -220,7 +220,6 @@ export default defineComponent({
         processDefinition.value.taskDefinitionList as any
       )
       const locations = getLocations(nodes)
-      console.log(processDefinition.value.taskDefinitionList)
       context.emit('save', {
         taskDefinitions: processDefinition.value.taskDefinitionList,
         saveForm,

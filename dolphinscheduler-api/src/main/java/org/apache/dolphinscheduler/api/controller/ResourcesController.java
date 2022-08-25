@@ -327,10 +327,10 @@ public class ResourcesController extends BaseController {
     }
 
     /**
-     * query resource by full name and type
+     * query resource by file name and type
      *
      * @param loginUser login user
-     * @param fullName resource full name
+     * @param fileName resource file name, it is not full name
      * @param tenantCode tenantcode of the owner of the resource
      * @param type resource type
      * @param id resource id
@@ -348,12 +348,12 @@ public class ResourcesController extends BaseController {
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam(value = "fullName", required = false) String fullName,
+                                        @RequestParam(value = "fileName", required = false) String fileName,
                                         @RequestParam(value = "tenantCode", required = false) String tenantCode,
                                         @PathVariable(value = "id", required = false) Integer id,
                                         @RequestParam(value = "type") ResourceType type) {
 
-        return resourceService.queryResource(loginUser, fullName, id, type, tenantCode);
+        return resourceService.queryResource(loginUser, fileName, id, type, tenantCode);
     }
 
     /**

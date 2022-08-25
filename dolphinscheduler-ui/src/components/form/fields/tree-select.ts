@@ -28,7 +28,7 @@ export function renderTreeSelect(
   return h(NTreeSelect, {
     ...props,
     value: fields[field],
-    onUpdateValue: (value: []) => void (fields[field] = value, console.log('Hihi', value)),
+    onUpdateValue: (value: []) => void (fields[field] = value),
     options: unref(options)
   })
 }

@@ -100,7 +100,8 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode,
+                                   ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query resource list
@@ -137,7 +138,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    Result<Object> verifyResourceName(String fullName, ResourceType type,User loginUser);
+    Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser);
 
     /**
      * verify resource by full name or pid and type
@@ -146,7 +147,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    Result<Object> queryResource(User loginUser,String fullName,Integer id,ResourceType type, String resTenantCode);
+    Result<Object> queryResource(User loginUser, String fullName, Integer id, ResourceType type, String resTenantCode);
 
     /**
      * view resource file online
@@ -157,7 +158,7 @@ public interface ResourcesService {
      * @param fullName fullName
      * @return resource content
      */
-    Result<Object> readResource(User loginUser,String resourceId, String fullName, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser, String resourceId, String fullName, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -170,31 +171,33 @@ public interface ResourcesService {
      * @param content content
      * @return create result code
      */
-    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory);
+    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
+                                        String desc, String content, int pid, String currentDirectory);
 
-//    /**
-//     * create or update resource.
-//     * If the folder is not already created, it will be
-//     *
-//     * @param loginUser user who create or update resource
-//     * @param fileFullName The full name of resource.Includes path and suffix.
-//     * @param desc description of resource
-//     * @param content content of resource
-//     * @return create result code
-//     */
-//    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content);
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param loginUser user who create or update resource
+     * @param fileFullName The full name of resource.Includes path and suffix.
+     * @param desc description of resource
+     * @param content content of resource
+     * @return create result code
+     */
+    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
+                                                       String content);
 
-//    /**
-//     * create or update resource.
-//     * If the folder is not already created, it will be
-//     *
-//     * @param userName user who create or update resource
-//     * @param fullName The fullname of resource.Includes path and suffix.
-//     * @param description description of resource
-//     * @param resourceContent content of resource
-//     * @return id of resource
-//     */
-//    Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
 
     /**
      * updateProcessInstance resource
@@ -203,7 +206,8 @@ public interface ResourcesService {
      * @param content content
      * @return update result cod
      */
-    Result<Object> updateResourceContent(User loginUser,int resourceId, String fullName, String tenantCode, String content);
+    Result<Object> updateResourceContent(User loginUser, int resourceId, String fullName, String tenantCode,
+                                         String content);
 
     /**
      * download file
@@ -212,7 +216,8 @@ public interface ResourcesService {
      * @return resource content
      * @throws IOException exception
      */
-    org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId, String fullName) throws IOException;
+    org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId,
+                                                          String fullName) throws IOException;
 
     /**
      * list all file
@@ -223,14 +228,14 @@ public interface ResourcesService {
      */
     Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
 
-//    /**
-//     * Get resource by given resource type and full name.
-//     * Useful in Python API create task which need processDefinition information.
-//     *
-//     * @param userName user who query resource
-//     * @param fullName full name of the resource
-//     */
-//    Resource queryResourcesFileInfo(String userName, String fullName);
+    /**
+     * Get resource by given resource type and full name.
+     * Useful in Python API create task which need processDefinition information.
+     *
+     * @param userName user who query resource
+     * @param fullName full name of the resource
+     */
+    Resource queryResourcesFileInfo(String userName, String fullName);
 
     /**
      * unauthorized file
@@ -273,6 +278,7 @@ public interface ResourcesService {
      * @param resourceId resource id
      * @return resource
      */
-    Result<Object> queryResourceById(User loginUser, Integer resourceId, String fullName, String tenantCode,ResourceType type) throws IOException;
+    Result<Object> queryResourceById(User loginUser, Integer resourceId, String fullName, String tenantCode,
+                                     ResourceType type) throws IOException;
 
 }

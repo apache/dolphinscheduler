@@ -19,24 +19,24 @@ import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
 
-const defaultValue = (fullName = '',name = '', description = '') => ({
+const defaultValue = (fullName = '',name = '', description = '', user_name = '') => ({
   id: -1,
   fullName,
   name,
   type: 'FILE',
-  description
+  description,
+  user_name
 })
 
-export function useForm(fullName: string, name: string, description: string) {
+export function useForm(fullName: string, name: string, description: string, user_name: string) {
   const { t } = useI18n()
-  console.log(fullName, name)
   const resetForm = () => {
     state.renameForm = Object.assign(unref(state.renameForm), defaultValue())
   }
 
   const state = reactive({
     renameFormRef: ref(),
-    renameForm: defaultValue(fullName, name, description),
+    renameForm: defaultValue(fullName, name, description, user_name),
     saving: false,
     rules: {
       name: {

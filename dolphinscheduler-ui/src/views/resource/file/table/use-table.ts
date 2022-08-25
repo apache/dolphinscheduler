@@ -35,7 +35,6 @@ import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
   fileStore.setFileInfo(`${item.alias}|${item.size}`)
-  console.log(item)
   if (item.directory) {
     fileStore.setCurrentDir(`${item.fullName}`)
     router.push({ name: 'resource-file-subdirectory', params: { id: item.id }, query: { prefix: item.fullName, tenantCode: item.user_name}})
@@ -110,8 +109,9 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       render: (row) =>
         h(TableAction, {
           row,
-          onRenameResource: (id, name, description, fullName) =>
-            renameResource(id, name, description, fullName),
+          onRenameResource: (id, name, description, fullName, user_name ) => {
+            renameResource(id, name, description, fullName, user_name)
+          },
           onUpdateList: () => updateList()
         }),
       ...COLUMN_WIDTH_CONFIG['operation'](4)

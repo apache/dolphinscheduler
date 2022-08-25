@@ -43,7 +43,8 @@ const props = {
     default: {
       id: -1,
       name: '',
-      description: ''
+      description: '',
+      user_name: '',
     }
   }
 }
@@ -71,8 +72,8 @@ export default defineComponent({
       deleteResource(id, fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleRenameFile: IRenameFile = (id, name, description, fullName) => {
-      emit('renameResource', id, name, description, fullName)
+    const handleRenameFile: IRenameFile = (id, name, description, fullName, user_name) => {
+      emit('renameResource', id, name, description, fullName, user_name)
     }
 
     return {
@@ -123,7 +124,8 @@ export default defineComponent({
                     this.row.id,
                     this.row.name,
                     this.row.description,
-                    this.row.fullName
+                    this.row.fullName,
+                    this.row.user_name
                   )
                 }
 

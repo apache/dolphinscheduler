@@ -102,7 +102,6 @@ const NodeDetailModal = defineComponent({
 
     const onConfirm = async () => {
       await detailRef.value.value.validate()
-      console.log("detail-modal detailRef", detailRef.value.value.getValues())
       emit('submit', { data: detailRef.value.value.getValues() })
     }
     const onCancel = () => {

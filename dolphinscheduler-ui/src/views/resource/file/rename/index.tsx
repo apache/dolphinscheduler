@@ -41,7 +41,11 @@ const props = {
   fullName: {
     type: String as PropType<string>,
     default: ''
-  }
+  },
+  userName: {
+    type: String as PropType<string>,
+    default: ''
+  },
 }
 
 export default defineComponent({
@@ -49,9 +53,8 @@ export default defineComponent({
   props,
   emits: ['updateList', 'update:show'],
   setup(props, ctx) {
-    const { state, resetForm } = useForm(props.fullName, props.name, props.description)
+    const { state, resetForm } = useForm(props.fullName, props.name, props.description, props.userName)
     const { handleRenameFile } = useRename(state)
-
     const hideModal = () => {
       ctx.emit('update:show', false)
     }
@@ -69,6 +72,7 @@ export default defineComponent({
         state.renameForm.id = props.id
         state.renameForm.name = props.name
         state.renameForm.description = props.description
+        state.renameForm.user_name = props.userName
       }
     )
 

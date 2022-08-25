@@ -62,7 +62,7 @@ export function useTask({
       getElements()
     }
   }
-  console.log('dd')
+
   const { model, json } = nodes[data.taskType || 'SHELL'](params)
   jsonRef.value = json
   model.preTasks = taskStore.getPreTasks

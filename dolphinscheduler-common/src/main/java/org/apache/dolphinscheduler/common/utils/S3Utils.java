@@ -212,7 +212,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException {
+    public boolean delete(String filePath, boolean recursive) throws IOException {
         try {
             s3Client.deleteObject(BUCKET_NAME, filePath);
             return true;
@@ -223,7 +223,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean delete(String tenantCode, String[] filePathArray, boolean recursive) throws IOException {
+    public boolean delete(String[] filePathArray, boolean recursive) throws IOException {
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(BUCKET_NAME)
                 .withKeys(filePathArray);
         try {

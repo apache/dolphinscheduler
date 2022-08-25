@@ -89,15 +89,14 @@ public interface StorageOperate {
     /**
      * delete the resource of  filePath
      * todo if the filePath is the type of directory ,the files in the filePath need to be deleted at all
-     * @param tenantCode
      * @param filePath
      * @param recursive
      * @return
      * @throws IOException
      */
-    boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException;
+    boolean delete(String filePath, boolean recursive) throws IOException;
 
-    boolean delete(String tenantCode, String[] filePathArray, boolean recursive) throws IOException;
+    boolean delete(String[] filePathArray, boolean recursive) throws IOException;
 
     /**
      * copy the file from srcPath to dstPath

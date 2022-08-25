@@ -34,7 +34,6 @@ export function useModal(
   const { t } = useI18n()
 
   const handleCreateFunc = async () => {
-    console.log("use-model", state.functionForm)
     submitRequest(
       async () =>
         await createUdfFunc(

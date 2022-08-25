@@ -105,7 +105,6 @@ export function authUDFFunc(params: UserIdReq): any {
 export function createDirectory(
   data: CreateReq & NameReq & ResourceTypeReq
 ): any {
-  console.log(data)
   return axios({
     url: '/resources/directory',
     method: 'post',
@@ -212,7 +211,6 @@ export function updateResource(
 }
 
 export function deleteResource(id: number, params): any {
-  console.log(params)
   return axios({
     url: `/resources/${id}`,
     method: 'delete',

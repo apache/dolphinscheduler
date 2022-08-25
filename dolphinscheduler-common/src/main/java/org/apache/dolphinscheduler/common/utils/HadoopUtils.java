@@ -396,12 +396,12 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public boolean delete(String tenantCode, String hdfsFilePath, boolean recursive) throws IOException {
+    public boolean delete(String hdfsFilePath, boolean recursive) throws IOException {
         return fs.delete(new Path(hdfsFilePath), recursive);
     }
 
     @Override
-    public boolean delete(String tenantCode, String[] filePathArray, boolean recursive) throws IOException {
+    public boolean delete(String[] filePathArray, boolean recursive) throws IOException {
         return false;
     }
 
@@ -758,7 +758,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
         String tenantPath = getHdfsDataBasePath() + FOLDER_SEPARATOR + tenantCode;
 
         if (exists(tenantPath)) {
-            delete(tenantCode, tenantPath, true);
+            delete(tenantPath, true);
 
         }
     }

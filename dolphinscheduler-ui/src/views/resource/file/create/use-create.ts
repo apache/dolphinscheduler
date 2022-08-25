@@ -27,7 +27,7 @@ export function useCreate(state: any) {
   const fileStore = useFileStore()
 
   const handleCreateFile = () => {
-    const pid = router.currentRoute.value.params.id || -1
+    const pid = -1
     const currentDir = fileStore.getCurrentDir || '/'
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
