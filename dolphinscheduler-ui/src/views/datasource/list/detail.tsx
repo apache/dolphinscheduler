@@ -349,12 +349,12 @@ const DetailModal = defineComponent({
                     path='testFlag'
                     show-require-mark
                 >
-                  <NRadioGroup v-model={[detailForm.testFlag, 'value']} onUpdate:value={onChangeTestFlag} class='radio-istest-datasource' default-value={-1}>
+                  <NRadioGroup v-model={[detailForm.testFlag, 'value']} onUpdate:value={onChangeTestFlag}>
                     <NSpace>
-                      <NRadio value = {1}>
+                      <NRadio value = {1} class='radio-istest-datasource'>
                         {t('datasource.test_datasource')}
                       </NRadio>
-                      <NRadio value = {0}>
+                      <NRadio value = {0} class='radio-istest-datasource'>
                         {t('datasource.online_datasource')}
                       </NRadio>
                     </NSpace>
@@ -367,7 +367,7 @@ const DetailModal = defineComponent({
                     show-require-mark
                 >
                   <NSelect
-                      class='btn-bind-test-data-source-type-drop-down'
+                      class='select-bind-test-data-source-type-drop-down'
                       v-model={[detailForm.bindTestId, 'value']}
                       options={this.bindTestDataSourceExample}
                   />

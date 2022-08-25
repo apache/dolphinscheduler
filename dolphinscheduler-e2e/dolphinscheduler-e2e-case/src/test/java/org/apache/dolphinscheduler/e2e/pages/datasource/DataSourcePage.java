@@ -65,7 +65,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     }
 
     public DataSourcePage createDataSource(String dataSourceType, String dataSourceName, String dataSourceDescription, String ip, String port, String userName, String password, String database,
-                                           String jdbcParams) {
+                                           String jdbcParams, int testFlag) {
         buttonCreateDataSource().click();
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
@@ -91,6 +91,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
         createDataSourceForm().inputDataBase().sendKeys(database);
+        createDataSourceForm().radioIsTestDatasource().sendKeys(testFlag);
 
 
         if (!"".equals(jdbcParams)) {
@@ -179,6 +180,12 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                 @FindBy(tagName = "textarea"),
         })
         private WebElement inputJdbcParams;
+
+        @FindBy(className = "radio-istest-datasource")
+        private WebElement radioIsTestDatasource;
+
+        @FindBy(className = "select-bind-test-data-source-type-drop-down")
+        private WebElement selectBindTestDataSourceId;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
