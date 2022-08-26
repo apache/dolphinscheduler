@@ -95,11 +95,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
         int processId = taskExecutionContext.getProcessId();
 
+        // if processId > 0, it should call cancelApplication to cancel remote application too.
 
         this.cancelApplication(taskInstanceId);
 
         Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
-        // if processId = 0 and application_id list is empty,the task has not been executed,we will cancel it
+
         if (processId == 0 && result.getRight().isEmpty()) {
             workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
             taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
