@@ -186,7 +186,7 @@ public class MasterRegistryClient {
     void registry() {
         logger.info("Master node : {} registering to registry center", masterAddress);
         String localNodePath = getCurrentNodePath();
-        long masterHeartbeatInterval = masterConfig.getHeartbeatInterval().toMillis();
+        long masterHeartbeatInterval = masterConfig.getHeartbeatInterval().getSeconds();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 masterConfig.getMaxCpuLoadAvg(),
                 masterConfig.getReservedMemory(),
