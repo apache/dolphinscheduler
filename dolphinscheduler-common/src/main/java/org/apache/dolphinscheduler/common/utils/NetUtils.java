@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
 import java.net.Inet6Address;
@@ -118,9 +119,12 @@ public class NetUtils {
         if (null != LOCAL_ADDRESS) {
             return LOCAL_ADDRESS;
         }
-
+        String specifyNetworkIP = PropertyUtils.getString(Constants.DOLPHIN_SCHEDULER_NETWORK_IP);
         InetAddress localAddress = null;
         try {
+            if(StringUtils.isNotBlank(specifyNetworkIP)){
+               return InetAddress.getByName(specifyNetworkIP);
+            }
             NetworkInterface networkInterface = findNetworkInterface();
             if (networkInterface != null) {
                 Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();

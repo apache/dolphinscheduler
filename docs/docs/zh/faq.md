@@ -561,6 +561,12 @@ master 服务、worker 服务在 zookeeper 注册时，会以 ip:port 的形式�
 dolphin.scheduler.network.interface.preferred=eth1
 ```
 
+另外，如果希望指定 ip 地址，配置方式是在 `common.properties` 中设置配置项 `dolphin.scheduler.network.ip`。例如，如果希望指定 `192.168.1.1` 作为 ip 地址，配置方式是：
+
+```shell
+dolphin.scheduler.network.ip=192.168.1.1
+```
+
 以上配置修改后重启服务生效
 
 如果 ip 地址获取依然错误，请下载 [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) 到相应机器，执行以下命令以进一步排障，并反馈给社区开发人员：

@@ -211,6 +211,7 @@ The default configuration is as follows:
 |development.state | false | specify whether in development state|
 |dolphin.scheduler.network.interface.preferred | NONE | display name of the network card|
 |dolphin.scheduler.network.priority.strategy | default | IP acquisition strategy, give priority to finding the internal network or the external network|
+|dolphin.scheduler.network.ip | NONE | specify IP address|
 |resource.manager.httpaddress.port | 8088 | the port of resource manager|
 |yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | job history status url of yarn|
 |datasource.encryption.enable | false | whether to enable datasource encryption|

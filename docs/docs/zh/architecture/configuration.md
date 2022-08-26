@@ -201,6 +201,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |development.state | false | 是否处于开发模式|
 |dolphin.scheduler.network.interface.preferred | NONE | 网卡名称|
 |dolphin.scheduler.network.priority.strategy | default | ip获取策略 default优先获取内网|
+|dolphin.scheduler.network.ip | NONE | 指定IP地址|
 |resource.manager.httpaddress.port | 8088 | resource manager的端口|
 |yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | yarn的作业历史状态URL|
 |datasource.encryption.enable | false | 是否启用datasource 加密|

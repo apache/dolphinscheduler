@@ -613,6 +613,12 @@ In addition, if you would like to obtain the ip address from the specified netwo
 dolphin.scheduler.network.interface.preferred=eth1
 ```
 
+In addition, if you want to specify an ip address, the configuration method is to set the configuration item `dolphin.scheduler.network.ip` in `common.properties`. For example, if you want to specify `192.168.1.1` as the ip address, the configuration is:
+
+```shell
+dolphin.scheduler.network.ip=192.168.1.1
+```
+
 After configuration is modified, restart the service to activation
 
 If the ip address is still wrong, please download [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) to the machine, execute the following commands and feedback the output to the community developers:

@@ -776,6 +776,12 @@ public final class Constants {
             "dolphin.scheduler.network.priority.strategy";
 
     /**
+     * specify network IP
+     */
+    public static final String DOLPHIN_SCHEDULER_NETWORK_IP =
+            "dolphin.scheduler.network.ip";
+
+    /**
      * exec shell scripts
      */
     public static final String SH = "sh";
