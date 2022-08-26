@@ -23,7 +23,6 @@ import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.server.worker.taskType.TestableTaskModel;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -150,7 +149,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 return;
             }
 
-            if (taskExecutionContext.getTestFlag() == Constants.TEST_FLAG_YES && TestableTaskModel.testableTaskTypeList.contains(taskExecutionContext.getTaskType())) {
+            if (taskExecutionContext.getTestFlag() == Constants.TEST_FLAG_YES) {
                 Map<String, Object> params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {
                 });
                 Integer dataSourceId = (Integer) params.get("datasource");
