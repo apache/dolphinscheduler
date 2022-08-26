@@ -64,6 +64,8 @@
 
 - 脚本：`sh hello.sh`
 - 资源：选择 `hello.sh`
+> 注意：脚本中选择资源文件时文件名称需要保持和所选择资源全路径一致：
+> 例如：资源路径为`/resource/hello.sh` 则脚本中调用需要使用`/resource/hello.sh`全路径
 
 ![use-shell](../../../../img/new_ui/dev/resource/demo/file-demo02.png)
 
