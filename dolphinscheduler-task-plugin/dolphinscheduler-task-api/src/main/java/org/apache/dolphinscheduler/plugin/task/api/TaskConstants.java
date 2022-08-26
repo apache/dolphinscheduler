@@ -55,6 +55,11 @@ public class TaskConstants {
     public static final String COMMA = ",";
 
     /**
+     * hyphen
+     */
+    public static final String HYPHEN = "-";
+
+    /**
      * slash /
      */
     public static final String SLASH = "/";
@@ -230,6 +235,40 @@ public class TaskConstants {
      * week_end
      */
     public static final String WEEK_END = "week_end";
+    /**
+     * this_day
+     */
+    public static final String THIS_DAY = "this_day";
+    /**
+     * last_day
+     */
+    public static final String LAST_DAY = "last_day";
+
+    /**
+     * month_first_day
+     */
+    public static final String MONTH_FIRST_DAY = "month_first_day";
+
+    /**
+     * month_last_day
+     */
+    public static final String MONTH_LAST_DAY = "month_last_day";
+
+    /**
+     * week_first_day
+     */
+    public static final String WEEK_FIRST_DAY = "week_first_day";
+
+    /**
+     * week_last_day
+     */
+    public static final String WEEK_LAST_DAY = "week_last_day";
+
+    /**
+     * year_week
+     *
+     */
+    public static final String YEAR_WEEK = "year_week";
     /**
      * timestamp
      */
