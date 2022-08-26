@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.emr;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-
-import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
-
 import com.amazonaws.SdkBaseException;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsRequest;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
@@ -36,6 +30,12 @@ import com.amazonaws.services.elasticmapreduce.model.StepState;
 import com.amazonaws.services.elasticmapreduce.model.StepStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Sets;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+
+import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * AddJobFlowSteps task executor
@@ -62,7 +62,7 @@ public class EmrAddStepsTask extends AbstractEmrTask {
     }
 
     @Override
-    public void handle() throws InterruptedException {
+    public void handle() throws TaskException {
         StepStatus stepStatus = null;
         try {
             AddJobFlowStepsRequest addJobFlowStepsRequest = createAddJobFlowStepsRequest();
@@ -84,6 +84,9 @@ public class EmrAddStepsTask extends AbstractEmrTask {
 
         } catch (EmrTaskException | SdkBaseException e) {
             logger.error("emr task submit failed with error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TaskException("Execute emr task failed", e);
         } finally {
             final int exitStatusCode = calculateExitStatusCode(stepStatus);
             setExitStatusCode(exitStatusCode);

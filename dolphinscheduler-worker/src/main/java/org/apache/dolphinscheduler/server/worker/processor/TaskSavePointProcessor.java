@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -27,19 +31,12 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 
 /**
  * task save point processor
@@ -98,12 +95,12 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
     }
 
     protected void doSavePoint(int taskInstanceId) {
-        TaskExecuteThread taskExecuteThread = workerManager.getTaskExecuteThread(taskInstanceId);
-        if (taskExecuteThread == null) {
+        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
+        if (workerTaskExecuteRunnable == null) {
             logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
-        AbstractTask task = taskExecuteThread.getTask();
+        AbstractTask task = workerTaskExecuteRunnable.getTask();
         if (task == null) {
             logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
             return;

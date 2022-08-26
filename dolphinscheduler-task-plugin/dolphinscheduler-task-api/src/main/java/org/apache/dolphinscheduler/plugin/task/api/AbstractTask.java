@@ -28,9 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,12 +101,8 @@ public abstract class AbstractTask {
         return null;
     }
 
-    /**
-     * task handle
-     *
-     * @throws Exception exception
-     */
-    public abstract void handle() throws Exception;
+    public abstract void handle() throws TaskException;
+
 
     /**
      * cancel application

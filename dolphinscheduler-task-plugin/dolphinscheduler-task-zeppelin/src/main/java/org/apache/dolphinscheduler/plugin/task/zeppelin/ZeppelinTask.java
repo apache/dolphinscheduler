@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kong.unirest.Unirest;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
@@ -33,10 +35,6 @@ import org.apache.zeppelin.client.ZeppelinClient;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import kong.unirest.Unirest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ZeppelinTask extends AbstractTaskExecutor {
 
@@ -77,7 +75,7 @@ public class ZeppelinTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
@@ -142,6 +140,7 @@ public class ZeppelinTask extends AbstractTaskExecutor {
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             logger.error("zeppelin task submit failed with error", e);
+            throw new TaskException("Execute ZeppelinTask exception");
         }
 
     }

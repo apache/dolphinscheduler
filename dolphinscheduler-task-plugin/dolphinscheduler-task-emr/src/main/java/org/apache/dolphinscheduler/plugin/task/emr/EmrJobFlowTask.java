@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.emr;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.util.HashSet;
@@ -55,7 +56,7 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     }
 
     @Override
-    public void handle() throws InterruptedException {
+    public void handle() throws TaskException {
         ClusterStatus clusterStatus = null;
         try {
             RunJobFlowRequest runJobFlowRequest = createRunJobFlowRequest();
@@ -76,6 +77,9 @@ public class EmrJobFlowTask extends AbstractEmrTask {
 
         } catch (EmrTaskException | SdkBaseException e) {
             logger.error("emr task submit failed with error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TaskException("Execute emr task failed", e);
         } finally {
             final int exitStatusCode = calculateExitStatusCode(clusterStatus);
             setExitStatusCode(exitStatusCode);
