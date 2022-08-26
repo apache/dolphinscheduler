@@ -24,7 +24,7 @@ Drag from the toolbar <img src="../../../../img/tasks/icons/shell.png" width="15
 2. Check `Normal` for `Run Flag`. If `Prohibit Execution` is checked, the task will not execute when the workflow runs.
 3. Select `Task Priority`: when the number of worker threads is insufficient, high priority tasks will execute first in the execution queue, and tasks with the same priority will execute in the order of first in, first out.
 4. Timeout alarm (optional): check the timeout alarm, timeout failure, and fill in the "timeout period". When the task execution time exceeds **timeout period**, an alert email will send and the task timeout fails.
-5. Resources (optional). Resources are files create or upload in the `Resource Center -> File Management` page. For example, the file name is `test.sh`, and the command to call the resource in the script is `sh test.sh`.
+5. Resources (optional). Resources are files created or uploaded in the `Resource Center -> File Management` page. For example, the file name is `test.sh`, and the command to use the resource in the script is `sh test.sh`. Please note that you need to use the full path to the resource files.
 6. Customize parameters (optional).
 7. Click the `Confirm Add` button to save the task settings.
 
