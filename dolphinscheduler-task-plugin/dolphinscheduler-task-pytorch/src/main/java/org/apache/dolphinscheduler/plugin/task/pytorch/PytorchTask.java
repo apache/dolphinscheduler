@@ -65,7 +65,7 @@ public class PytorchTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             String command = buildPythonExecuteCommand();
             TaskResponse taskResponse = shellCommandExecutor.run(command);
@@ -73,9 +73,14 @@ public class PytorchTask extends AbstractTaskExecutor {
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Pytorch task has been interrupted", e);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            throw new TaskException("The current Pytorch task has been interrupted", e);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Pytorch task execute failed", e);
         }
     }
 
