@@ -199,6 +199,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |yarn.resourcemanager.ha.rm.ids | 192.168.xx.xx,192.168.xx.xx | yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可|
 |yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | 如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname|
 |development.state | false | 是否处于开发模式|
+|dolphin.scheduler.network.interface.preferred | NONE | 网卡名称|
+|dolphin.scheduler.network.priority.strategy | default | ip获取策略 default优先获取内网|
 |resource.manager.httpaddress.port | 8088 | resource manager的端口|
 |yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | yarn的作业历史状态URL|
 |datasource.encryption.enable | false | 是否启用datasource 加密|
@@ -231,6 +233,11 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |security.authentication.ldap.password|password|LDAP密码|
 |security.authentication.ldap.user.identity.attribute|uid|LDAP用户身份标识字段名|
 |security.authentication.ldap.user.email.attribute|mail|LDAP邮箱字段名|
+|traffic.control.global.switch|false|流量控制全局开关|
+|traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
+|traffic.control.tenant-switch|false|流量控制租户开关|
+|traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制|
+|traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
 
 ## Master Server相关配置
 位置：`master-server/conf/application.yaml`
@@ -250,6 +257,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G|
 |master.failover-interval|10|failover间隔，单位为分钟|
 |master.kill-yarn-job-when-task-failover|true|当任务实例failover时，是否kill掉yarn job|
+|master.registry-disconnect-strategy.strategy|stop|当Master与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
+|master.registry-disconnect-strategy.max-waiting-time|100s|当Master与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Master与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Master会丢弃目前正在执行的工作流，值为0表示会无限期等待 |
 
 ## Worker Server相关配置
 位置：`worker-server/conf/application.yaml`
@@ -265,6 +274,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |worker.groups|default|worker分组配置,逗号分隔,例如'worker.groups=default,test' <br> worker启动时会根据该配置自动加入对应的分组|
 |worker.alert-listen-host|localhost|alert监听host|
 |worker.alert-listen-port|50052|alert监听端口|
+|worker.registry-disconnect-strategy.strategy|stop|当Worker与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
+|worker.registry-disconnect-strategy.max-waiting-time|100s|当Worker与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Worker与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Worker会丢弃kill正在执行的任务。值为0表示会无限期等待 |
 
 
 ## Alert Server相关配置

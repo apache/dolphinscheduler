@@ -18,6 +18,8 @@ org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient
 
 We provide APIs for external access of all data sources in the dolphin scheduler data source API module
 
+In additional, the `DataSourceChannelFactory` extends from `PrioritySPI`, this means you can set the plugin priority, when you have two plugin has the same name, you can customize the priority by override the `getIdentify` method. The high priority plugin will be load, but if you have two plugin with the same name and same priority, the server will throw `IllegalArgumentException` when load the plugin.
+
 #### **Future plan**
 
 Support data sources such as kafka, http, files, sparkSQL, FlinkSQL, etc.

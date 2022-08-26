@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.chunjun;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -30,9 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +44,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 /**
  * chunjun task
@@ -100,10 +101,10 @@ public class ChunJunTask extends AbstractTaskExecutor {
     /**
      * run chunjun process
      *
-     * @throws Exception exception
+     * @throws TaskException exception
      */
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
@@ -112,12 +113,17 @@ public class ChunJunTask extends AbstractTaskExecutor {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current ChunJun Task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current ChunJun Task has been interrupted", e);
         } catch (Exception e) {
             logger.error("chunjun task failed.", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Execute chunjun task failed", e);
         }
     }
 

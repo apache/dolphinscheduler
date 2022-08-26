@@ -30,7 +30,6 @@ import {
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import { renderTableTime, runningType } from '@/common/common'
-import styles from './index.module.scss'
 import { renderStateCell } from '../../task/instance/use-table'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -78,7 +77,7 @@ export function useTable() {
         render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
-        title: t('project.workflow.workflow_name'),
+        title: t('project.workflow.workflow_instance_name'),
         key: 'name',
         ...COLUMN_WIDTH_CONFIG['linkName'],
         className: 'workflow-name',
