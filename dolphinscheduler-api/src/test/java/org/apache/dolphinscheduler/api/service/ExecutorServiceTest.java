@@ -253,7 +253,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.START_TIME_CAN_NOT_AFTER_END_TIME, result.get(Constants.STATUS));
         verify(processService, times(0)).createCommand(any(Command.class));
     }
 

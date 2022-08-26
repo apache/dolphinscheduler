@@ -29,6 +29,7 @@ import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_TIME_MAX_LENGTH;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import org.apache.dolphinscheduler.api.dto.CheckComplementDto;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -189,15 +190,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        if (!checkScheduleTimeNum(commandType, cronTime)) {
-            putMsg(result, Status.SCHEDULE_TIME_NUMBER);
-            return result;
-        }
-
         // check master exists
         if (!checkMasterExists(result)) {
             return result;
         }
+
+        // check complement data
+        CheckComplementDto complementDto = checkComplementDataWithSchedule(result, processDefinition, commandType, cronTime);
+        if (!complementDto.isCheckResult()) {
+            return result;
+        }
+
         /**
          * create command
          */
@@ -206,7 +209,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup,
-                        environmentCode, startParams, expectedParallelismNumber, dryRun, complementDependentMode);
+                        environmentCode, startParams, expectedParallelismNumber, dryRun, complementDependentMode,
+                        complementDto);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -216,6 +220,37 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
         }
         return result;
+    }
+
+    protected CheckComplementDto checkComplementDataWithSchedule(Map<String, Object> result, ProcessDefinition processDefinition, CommandType commandType, String cronTime) {
+        CheckComplementDto checkComplementDto = new CheckComplementDto(cronTime, processDefinition, false);
+        // no complete
+        if (!CommandType.COMPLEMENT_DATA.equals(commandType)) {
+            checkComplementDto.setCheckResult(true);
+            return checkComplementDto;
+        }
+        // cron param empty check
+        if (checkComplementDto.checkCronTimeParamEmpty()) {
+            putMsg(result, Status.COMPLEMENT_COMMAND_SCHEDULE_TIME_EMPTY);
+            return checkComplementDto;
+        }
+        // num check
+        if (checkComplementDto.checkWritingNumOfTimes()) {
+            putMsg(result, Status.SCHEDULE_TIME_NUMBER);
+            return checkComplementDto;
+        }
+        // time order check
+        if (checkComplementDto.checkStartEndOrder()) {
+            putMsg(result, Status.START_TIME_CAN_NOT_AFTER_END_TIME);
+            return checkComplementDto;
+        }
+        // schedule config filter or other filter
+        if (checkComplementDto.checkFilter()) {
+            putMsg(result, Status.CONFIG_FILTER_EMPTY);
+            return checkComplementDto;
+        }
+        checkComplementDto.setCheckResult(true);
+        return checkComplementDto;
     }
 
     /**
@@ -232,28 +267,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
             return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param complementData
-     * @param cronTime
-     * @return CommandType is COMPLEMENT_DATA and cronTime's number is not greater than 100 return true , otherwise return false
-     */
-    private boolean checkScheduleTimeNum(CommandType complementData, String cronTime) {
-        if (!CommandType.COMPLEMENT_DATA.equals(complementData)) {
-            return true;
-        }
-        if (cronTime == null) {
-            return true;
-        }
-        Map<String, String> cronMap = JSONUtils.toMap(cronTime);
-        if (cronMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            String[] stringDates = cronMap.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
-            if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
-                return false;
-            }
         }
         return true;
     }
@@ -668,6 +681,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param processInstancePriority processInstancePriority
      * @param workerGroup             workerGroup
      * @param environmentCode         environmentCode
+     * @param complementDto           complementDto
      * @return command id
      */
     private int createCommand(CommandType commandType, long processDefineCode, TaskDependType nodeDep,
@@ -675,7 +689,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               WarningType warningType, int executorId, int warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
-                              ComplementDependentMode complementDependentMode) {
+                              ComplementDependentMode complementDependentMode, CheckComplementDto complementDto) {
 
         /**
          * instantiate command schedule instance
@@ -720,15 +734,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // determine whether to complement
         if (commandType == CommandType.COMPLEMENT_DATA) {
-            if (schedule == null || StringUtils.isEmpty(schedule)) {
-                return 0;
-            }
-            if (!isValidateScheduleTime(schedule)) {
-                return 0;
-            }
             try {
                 return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber,
-                        complementDependentMode);
+                        complementDependentMode, complementDto);
             } catch (CronParseException cronParseException) {
                 // We catch the exception here just to make compiler happy, since we have already validated the schedule
                 // cron expression before
@@ -746,38 +754,26 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      *
      * @param scheduleTimeParam
      * @param runMode
+     * @param complementDto
      * @return
      */
     protected int createComplementCommandList(String scheduleTimeParam, RunMode runMode, Command command,
                                               Integer expectedParallelismNumber,
-                                              ComplementDependentMode complementDependentMode) throws CronParseException {
+                                              ComplementDependentMode complementDependentMode,
+                                              CheckComplementDto complementDto) throws CronParseException {
         int createCount = 0;
-        String startDate = null;
-        String endDate = null;
-        String dateList = null;
         int dependentProcessDefinitionCreateCount = 0;
         runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
-        Map<String, String> scheduleParam = JSONUtils.toMap(scheduleTimeParam);
-        if (scheduleParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            dateList = scheduleParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-            dateList = removeDuplicates(dateList);
-        }
-        if (scheduleParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE) && scheduleParam.containsKey(
-                CMDPARAM_COMPLEMENT_DATA_END_DATE)) {
-            startDate = scheduleParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
-            endDate = scheduleParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
-        }
         switch (runMode) {
             case RUN_MODE_SERIAL: {
-                if (StringUtils.isNotEmpty(dateList)) {
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateList);
+                if (complementDto.isManual()) {
+                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, complementDto.getWritingTimes());
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     createCount = processService.createCommand(command);
-                }
-                if (startDate != null && endDate != null) {
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startDate);
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endDate);
+                } else {
+                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, complementDto.getSelectStartDate());
+                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, complementDto.getSelectEndDate());
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     createCount = processService.createCommand(command);
 
@@ -795,12 +791,26 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
             }
             case RUN_MODE_PARALLEL: {
-                if (startDate != null && endDate != null) {
+                if (complementDto.isManual()) {
+                    List<String> listDate = complementDto.getWritingTimeList();
+                    createCount = listDate.size();
+                    if (!CollectionUtils.isEmpty(listDate)) {
+                        if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
+                            createCount = Math.min(createCount, expectedParallelismNumber);
+                        }
+                        logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+                        for (List<String> stringDate : Lists.partition(listDate, createCount)) {
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(COMMA, stringDate));
+                            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                            processService.createCommand(command);
+                        }
+                    }
+                } else {
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
                             command.getProcessDefinitionCode());
                     List<ZonedDateTime> listDate = new ArrayList<>(
-                            CronUtils.getSelfFireDateList(DateUtils.stringToZoneDateTime(startDate),
-                                    DateUtils.stringToZoneDateTime(endDate), schedules));
+                            CronUtils.getSelfFireDateList(DateUtils.stringToZoneDateTime(complementDto.getSelectStartDate()),
+                                    DateUtils.stringToZoneDateTime(complementDto.getSelectEndDate()), schedules));
                     int listDateSize = listDate.size();
                     createCount = listDate.size();
                     if (!CollectionUtils.isEmpty(listDate)) {
@@ -843,21 +853,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                 dependentProcessDefinitionCreateCount +=
                                         createComplementDependentCommand(schedules, command);
                             }
-                        }
-                    }
-                }
-                if (StringUtils.isNotEmpty(dateList)) {
-                    List<String> listDate = Arrays.asList(dateList.split(COMMA));
-                    createCount = listDate.size();
-                    if (!CollectionUtils.isEmpty(listDate)) {
-                        if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                            createCount = Math.min(createCount, expectedParallelismNumber);
-                        }
-                        logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
-                        for (List<String> stringDate : Lists.partition(listDate, createCount)) {
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(COMMA, stringDate));
-                            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                            processService.createCommand(command);
                         }
                     }
                 }
