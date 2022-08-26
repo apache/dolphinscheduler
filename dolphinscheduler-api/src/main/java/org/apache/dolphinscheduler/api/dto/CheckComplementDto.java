@@ -108,7 +108,7 @@ public class CheckComplementDto {
         boolean manual = scheduleTimeParamMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
         boolean selected = scheduleTimeParamMap.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE);
         boolean withoutAny = !manual && !selected;
-        if (CollectionUtils.isEmpty(cronMap) || withoutAny) {
+        if (CollectionUtils.isEmpty(scheduleTimeParamMap) || withoutAny) {
             return true;
         }
         this.setHandleTypes(manual);
