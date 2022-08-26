@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.common.taskType.TestableTaskModel;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -145,18 +146,20 @@ public class TaskExecuteThread implements Runnable, Delayed {
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
-            Map<String, Object> params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {});
-            Integer dataSourceId = (Integer) params.get("datasource");
-            if (null == dataSourceId) {
-                taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
-                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                        masterAddress,
-                        CommandType.TASK_EXECUTE_RESULT);
-                logger.error("unbound test data source");
-                kill();
-                return;
+            if (taskExecutionContext.getTestFlag() == Constants.TEST_FLAG_YES && TestableTaskModel.testableTaskTypeList.contains(taskExecutionContext.getTaskType())) {
+                Map<String, Object> params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+                Integer dataSourceId = (Integer) params.get("datasource");
+                if (null == dataSourceId) {
+                    taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
+                    taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
+                    TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                    workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                            masterAddress,
+                            CommandType.TASK_EXECUTE_RESULT);
+                    logger.error("unbound test data source");
+                    kill();
+                    return;
+                }
             }
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
