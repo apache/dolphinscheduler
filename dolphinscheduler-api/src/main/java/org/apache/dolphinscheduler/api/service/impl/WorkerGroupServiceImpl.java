@@ -311,7 +311,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 continue;
             }
             WorkerGroup workerGroup = new WorkerGroup();
-            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
             workerGroup.setName(workerGroupName);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
@@ -320,6 +319,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 workerGroup.setUpdateTime(new Date(Long.parseLong(rv[7])));
                 workerGroup.setSystemDefault(true);
             }
+            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
             workerGroups.add(workerGroup);
         }
         return workerGroups;
