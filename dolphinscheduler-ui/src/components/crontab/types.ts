@@ -27,4 +27,11 @@ interface ICrontabI18n {
   time: string
 }
 
-export { ICrontabI18n }
+interface ISpecialSelect {
+  [key: number | string]: {
+    label: string
+    value: string
+  }[]
+}
+
+export { ICrontabI18n, ISpecialSelect }

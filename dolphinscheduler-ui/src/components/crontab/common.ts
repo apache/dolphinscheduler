@@ -16,6 +16,7 @@
  */
 
 import _ from 'lodash'
+import type { ISpecialSelect } from './types'
 
 const timeI18n = {
   second: {
@@ -190,4 +191,40 @@ const isWeek = (str: string) => {
   return flag
 }
 
-export { isStr, isWeek, timeI18n, week, specificWeek, lastWeeks }
+const range = (start: number, stop: number, step = 1) =>
+  Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)
+
+const specificList: ISpecialSelect = {
+  60: _.map(range(0, 59), (v) => {
+    return {
+      value: v + '',
+      label: v + ''
+    }
+  }),
+  24: _.map(range(0, 23), (v) => {
+    return {
+      value: v + '',
+      label: v + ''
+    }
+  }),
+  12: _.map(range(1, 12), (v) => {
+    return {
+      value: v + '',
+      label: v + ''
+    }
+  }),
+  year: _.map(range(2018, 2030), (v) => {
+    return {
+      value: v + '',
+      label: v + ''
+    }
+  }),
+  day: _.map(range(1, 31), (v) => {
+    return {
+      value: v + '',
+      label: v + ''
+    }
+  })
+}
+
+export { isStr, isWeek, timeI18n, week, specificWeek, lastWeeks, specificList }
