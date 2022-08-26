@@ -140,7 +140,7 @@ const environmentManage = defineComponent({
               data={this.tableData}
               scrollX={this.tableWidth}
             />
-            <NSpace>
+            <NSpace justify='center'>
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}
