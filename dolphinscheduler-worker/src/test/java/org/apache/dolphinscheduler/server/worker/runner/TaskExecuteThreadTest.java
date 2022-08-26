@@ -99,6 +99,8 @@ public class TaskExecuteThreadTest {
                 storageOperate);
         taskExecutionContext.setProcessId(1);
         taskExecutionContext.setTaskInstanceId(2);
+        taskExecutionContext.setTestFlag(1);
+        taskExecutionContext.setTaskType("SQL");
         taskExecutionContext.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":2,\"sql\":\"select * from order\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
         try {
             taskExecuteThread.run();
