@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.common.taskType;
+package org.apache.dolphinscheduler.server.worker.taskType;
 
 import java.util.Arrays;
 import java.util.List;
