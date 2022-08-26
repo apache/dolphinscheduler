@@ -54,7 +54,7 @@ from pydolphinscheduler.tasks.sql import Sql, SqlType
         ("delete from table_name where id < 10", None, SqlType.NOT_SELECT),
         ("alter table table_name add column col1 int", None, SqlType.NOT_SELECT),
         ("create table table_name2 (col1 int)", None, SqlType.NOT_SELECT),
-        ("truncate table  table_name", None, SqlType.NOT_SELECT),
+        ("truncate table table_name", None, SqlType.NOT_SELECT),
         ("create table table_name2 (col1 int)", SqlType.SELECT, SqlType.SELECT),
         ("select 1", SqlType.NOT_SELECT, SqlType.NOT_SELECT),
         ("create table table_name2 (col1 int)", SqlType.NOT_SELECT, SqlType.NOT_SELECT),
