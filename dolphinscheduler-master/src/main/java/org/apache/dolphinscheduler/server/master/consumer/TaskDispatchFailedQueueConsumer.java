@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
+import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.queue.TaskFailedRetryPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
@@ -75,9 +76,15 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 dispatchFailedBackToTaskPriorityQueue(masterConfig.getDispatchTaskNumber());
+            } catch (InterruptedException exception) {
+                log.error("dispatch failed queue poll error", exception);
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
                 TaskMetrics.incTaskDispatchError();
                 log.error("failed task retry error", e);
+            } finally {
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         }
     }
@@ -85,26 +92,17 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
     /**
      * put the failed dispatch task into the dispatch queue again
      */
-    private void dispatchFailedBackToTaskPriorityQueue(int fetchTaskNum) {
+    private void dispatchFailedBackToTaskPriorityQueue(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
         for (int i = 0; i < fetchTaskNum; i++) {
-            try {
-                TaskFailedRetryPriority delayTaskPriority = taskDispatchFailedQueueImpl.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
-                if (Objects.isNull(delayTaskPriority)) {
-                    continue;
-                }
-                retryConsumerThreadPoolExecutor.submit(() -> {
-                    TaskPriority retryTaskPriority = delayTaskPriority.getTaskPriority();
-                    retryTaskPriority.setDispatchFailedRetryTimes(retryTaskPriority.getDispatchFailedRetryTimes() + 1);
-                    taskPriorityQueueImpl.put(retryTaskPriority);
-                });
-            } catch (InterruptedException exception) {
-                log.error("dispatch failed queue poll error", exception);
-                Thread.currentThread().interrupt();
-            } catch (Exception e) {
-                log.error("dispatch failed back to task priority queue error", e);
-            } finally {
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            TaskFailedRetryPriority delayTaskPriority = taskDispatchFailedQueueImpl.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+            if (Objects.isNull(delayTaskPriority)) {
+                continue;
             }
+            retryConsumerThreadPoolExecutor.submit(() -> {
+                TaskPriority retryTaskPriority = delayTaskPriority.getTaskPriority();
+                retryTaskPriority.setDispatchFailedRetryTimes(retryTaskPriority.getDispatchFailedRetryTimes() + 1);
+                taskPriorityQueueImpl.put(retryTaskPriority);
+            });
         }
     }
 }
