@@ -13,7 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class WorkerGroupHandleDto {
     private WorkerGroup workerGroup;
-    private   String workerGroupName;
+    private String workerGroupName;
     private Map<String, WorkerGroup> workerGroupsMap;
     private Collection<String> childrenNodes;
     private List<WorkerGroup> workerGroups;
