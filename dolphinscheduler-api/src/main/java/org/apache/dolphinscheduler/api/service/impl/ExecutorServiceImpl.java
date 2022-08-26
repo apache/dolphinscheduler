@@ -776,21 +776,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, complementDto.getSelectEndDate());
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     createCount = processService.createCommand(command);
-
-                    // dependent process definition
-                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
-                            command.getProcessDefinitionCode());
-
-                    if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
-                        logger.info("process code: {} complement dependent in off mode or schedule's size is 0, skip "
-                                + "dependent complement data", command.getProcessDefinitionCode());
-                    } else {
-                        dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command);
-                    }
+                }
+                // dependent process definition
+                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                        command.getProcessDefinitionCode());
+                if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
+                    logger.info("process code: {} complement dependent in off mode or schedule's size is 0, skip "
+                            + "dependent complement data", command.getProcessDefinitionCode());
+                } else {
+                    dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command);
                 }
                 break;
             }
             case RUN_MODE_PARALLEL: {
+                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                        command.getProcessDefinitionCode());
+
                 if (complementDto.isManual()) {
                     List<String> listDate = complementDto.getWritingTimeList();
                     createCount = listDate.size();
@@ -803,11 +804,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(COMMA, stringDate));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
+
+                            if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
+                                logger.info("process code: {} complement dependent in off mode or schedule's size is 0, skip "
+                                        + "dependent complement data", command.getProcessDefinitionCode());
+                            } else {
+                                dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command);
+                            }
                         }
                     }
                 } else {
-                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
-                            command.getProcessDefinitionCode());
                     List<ZonedDateTime> listDate = new ArrayList<>(
                             CronUtils.getSelfFireDateList(DateUtils.stringToZoneDateTime(complementDto.getSelectStartDate()),
                                     DateUtils.stringToZoneDateTime(complementDto.getSelectEndDate()), schedules));
