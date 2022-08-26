@@ -435,6 +435,9 @@ public enum Status {
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
+    COMPLEMENT_COMMAND_SCHEDULE_TIME_EMPTY(1400005, "complement command schedule time can not be empty", "补数数据日期不可为空"),
+    START_TIME_CAN_NOT_AFTER_END_TIME(1400006, "start time can not after end time", "开始时间不可晚于结束时间"),
+    CONFIG_FILTER_EMPTY(1400007, "complement time is empty after filtering according to the configuration", "当前补数时间根据配置过滤后为空"),
     ;
 
     private final int code;
