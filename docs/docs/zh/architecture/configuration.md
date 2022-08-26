@@ -199,6 +199,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |yarn.resourcemanager.ha.rm.ids | 192.168.xx.xx,192.168.xx.xx | yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可|
 |yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | 如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname|
 |development.state | false | 是否处于开发模式|
+|dolphin.scheduler.network.interface.preferred | NONE | 网卡名称|
+|dolphin.scheduler.network.priority.strategy | default | ip获取策略 default优先获取内网|
 |resource.manager.httpaddress.port | 8088 | resource manager的端口|
 |yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | yarn的作业历史状态URL|
 |datasource.encryption.enable | false | 是否启用datasource 加密|
