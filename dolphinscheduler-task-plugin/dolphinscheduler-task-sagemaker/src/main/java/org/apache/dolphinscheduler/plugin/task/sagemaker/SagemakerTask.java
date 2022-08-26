@@ -24,6 +24,7 @@ import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_G
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
@@ -80,13 +81,13 @@ public class SagemakerTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws SagemakerTaskException {
+    public void handle() throws TaskException {
         try {
             int exitStatusCode = handleStartPipeline();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new SagemakerTaskException("SageMaker task error", e);
+            throw new TaskException("SageMaker task error", e);
         }
     }
 
