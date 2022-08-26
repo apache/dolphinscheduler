@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.facebook.presto.jdbc.internal.guava.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.dto.WorkerGroupHandleDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.facebook.presto.jdbc.internal.guava.base.Strings;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
@@ -256,11 +258,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
-        int index = availableWorkerGroupList.indexOf(Constants.DEFAULT_WORKER_GROUP);
-        if (index > -1) {
-            availableWorkerGroupList.remove(index);
-            availableWorkerGroupList.add(0, Constants.DEFAULT_WORKER_GROUP);
-        }
         result.put(Constants.DATA_LIST, availableWorkerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -302,8 +299,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (workerGroups.size() != 0) {
             workerGroupsMap = workerGroups.stream().collect(Collectors.toMap(WorkerGroup::getName, workerGroupItem -> workerGroupItem, (oldWorkerGroup, newWorkerGroup) -> oldWorkerGroup));
         }
-        for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
+        for (String workerGroupName : workerGroupList) {
+            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroupName;
             Collection<String> childrenNodes = null;
             try {
                 childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
@@ -313,27 +310,22 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
-            WorkerGroup wg = new WorkerGroup();
-            handleAddrList(wg, workerGroup, workerGroupsMap, childrenNodes);
-            wg.setName(workerGroup);
+            WorkerGroup workerGroup = new WorkerGroup();
+            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
+            workerGroup.setName(workerGroupName);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
                 String[] rv = registeredValue.split(Constants.COMMA);
-                wg.setCreateTime(new Date(Long.parseLong(rv[6])));
-                wg.setUpdateTime(new Date(Long.parseLong(rv[7])));
-                wg.setSystemDefault(true);
-                if (workerGroupsMap != null && workerGroupsMap.containsKey(workerGroup)) {
-                    wg.setDescription(workerGroupsMap.get(workerGroup).getDescription());
-                    workerGroups.remove(workerGroupsMap.get(workerGroup));
-                }
+                workerGroup.setCreateTime(new Date(Long.parseLong(rv[6])));
+                workerGroup.setUpdateTime(new Date(Long.parseLong(rv[7])));
+                workerGroup.setSystemDefault(true);
             }
-            workerGroups.add(wg);
+            workerGroups.add(workerGroup);
         }
         return workerGroups;
     }
-    
-    protected void handleAddrList(WorkerGroup wg, String workerGroup, Map<String, WorkerGroup> workerGroupsMap, Collection<String> childrenNodes) {
-        wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
+    protected void handleAddrList(WorkerGroupHandleDto obj) {
+        obj.getWorkerGroup().setAddrList(String.join(Constants.COMMA, obj.getChildrenNodes()));
     }
 
     /**
