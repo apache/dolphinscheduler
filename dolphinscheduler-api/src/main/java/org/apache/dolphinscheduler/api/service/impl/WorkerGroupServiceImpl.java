@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.api.dto.WorkerGroupHandelDTO;
+import org.apache.dolphinscheduler.api.dto.WorkerGroupHandleDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -311,7 +311,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 continue;
             }
             WorkerGroup workerGroup = new WorkerGroup();
-            handleAddrList(new WorkerGroupHandelDTO(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
+            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
             workerGroup.setName(workerGroupName);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
@@ -324,7 +324,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         return workerGroups;
     }
-    protected void handleAddrList(WorkerGroupHandelDTO obj) {
+    protected void handleAddrList(WorkerGroupHandleDto obj) {
         obj.getWorkerGroup().setAddrList(String.join(Constants.COMMA, obj.getChildrenNodes()));
     }
 
