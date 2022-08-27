@@ -575,10 +575,6 @@ public class PythonGateway {
         return resourceService.queryResourcesFileInfo(userName, fullName);
     }
 
-    /**
-     * Get the version of java gateway.
-     * For validating the python api version to prevent errors (<a href="https://github.com/apache/dolphinscheduler/issues/10949">#10949</a>)
-     */
     public String getGatewayVersion() {
         return PythonGateway.class.getPackage().getImplementationVersion();
     }
