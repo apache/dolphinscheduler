@@ -107,8 +107,7 @@ class SwitchCondition(Base):
             # Default number branch checker
             if num_branch_default >= 1 and isinstance(condition, Default):
                 raise PyDSParamException(
-                    "Task Switch's parameter only support SwitchBranch but got %s.",
-                    type(condition),
+                    "Task Switch's parameter only support exactly one default branch."
                 )
             if isinstance(condition, Default):
                 self._DEFINE_ATTR.add("next_node")
