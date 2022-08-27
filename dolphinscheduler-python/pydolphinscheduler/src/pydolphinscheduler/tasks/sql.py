@@ -98,7 +98,7 @@ class Sql(Task):
             return self.param_sql_type
         pattern_select_str = (
             "^(?!(.* |)insert |(.* |)delete |(.* |)drop "
-            "|(.* |)update |(.* |)alter |(.* |)create ).*"
+            "|(.* |)update |(.* |)truncate |(.* |)alter |(.* |)create ).*"
         )
         pattern_select = re.compile(pattern_select_str, re.IGNORECASE)
         if pattern_select.match(self.sql) is None:
