@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -694,6 +695,43 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser,
+                                                                   long projectCode,
+                                                                   String codes){
+        Map<String, Object> result = new HashMap<>();
+        Set<String> deleteFailedCodeSet = new HashSet<>();
+        if (!StringUtils.isEmpty(codes)) {
+            String[] processDefinitionCodeArray = codes.split(",");
+            for (String strProcessDefinitionCode : processDefinitionCodeArray) {
+                long code = Long.parseLong(strProcessDefinitionCode);
+                ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
+                // check workflow exists, avoid null exception
+                if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+                    deleteFailedCodeSet.add(MessageFormat.format(Status.PROCESS_DEFINE_NOT_EXIST.getMsg(), String.valueOf(code)));
+                    continue;
+                }
+                try {
+                    Map<String, Object> deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, code);
+                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
+                        String errorMsg = MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), processDefinition.getName(), deleteResult.get(Constants.MSG));
+                        deleteFailedCodeSet.add(errorMsg);
+                        logger.error(errorMsg);
+                    }
+                } catch (Exception e) {
+                    deleteFailedCodeSet.add(MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), processDefinition.getName(), e.getMessage()));
+                }
+            }
+        }
+
+        if (!deleteFailedCodeSet.isEmpty()) {
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, "\n " + String.join("\n ", deleteFailedCodeSet));
+        } else {
+            putMsg(result, Status.SUCCESS);
         }
         return result;
     }
