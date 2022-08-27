@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_NODE;
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
@@ -148,16 +150,16 @@ public class MasterRegistryClient implements AutoCloseable {
      * Registry the current master server itself to registry.
      */
     void registry() {
+        logger.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
         String masterAddress = masterConfig.getMasterAddress();
-        logger.info("Master node : {} registering to registry center: {}", masterAddress, masterRegistryPath);
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
         registryClient.persistEphemeral(masterRegistryPath, masterHeartBeatTask.getHeartBeatJsonString());
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
-            logger.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
+            logger.warn("The current master server node:{} cannot find in registry", masterAddress);
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 

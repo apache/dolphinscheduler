@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.lifecycle.ServerStatus;
 
-import java.time.Duration;
-
 @Data
 @Builder
 @NoArgsConstructor

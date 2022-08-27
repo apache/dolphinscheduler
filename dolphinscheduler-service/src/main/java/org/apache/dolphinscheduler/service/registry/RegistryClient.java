@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.service.registry;
 
 import com.google.common.base.Strings;
-import io.micrometer.core.lang.NonNull;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
