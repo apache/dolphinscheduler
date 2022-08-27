@@ -50,7 +50,9 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
@@ -149,7 +151,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 return;
             }
 
-            if (taskExecutionContext.getTestFlag() == Constants.TEST_FLAG_YES) {
+            if (checkTaskHaveDataSourceInstance(taskExecutionContext.getTaskType()) && taskExecutionContext.getTestFlag() == Constants.TEST_FLAG_YES) {
                 Map<String, Object> params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {
                 });
                 Integer dataSourceId = (Integer) params.get("datasource");
@@ -290,6 +292,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     public @Nullable AbstractTask getTask() {
         return task;
+    }
+
+    public boolean checkTaskHaveDataSourceInstance(String taskType) {
+        List<String> testableTaskTypeList = Arrays.asList("PROCEDURE", "SQL", "DATAX", "SQOOP", "DATA_QUALITY");
+        return testableTaskTypeList.contains(taskType);
     }
 
 }
