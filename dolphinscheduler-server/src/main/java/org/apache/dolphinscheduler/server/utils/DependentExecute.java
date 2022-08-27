@@ -149,7 +149,7 @@ public class DependentExecute {
                         .filter(log -> log.getFlag().equals(Flag.YES))
                         .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinitionLog::getName));
                 if (!definiteTask.isEmpty()) {
-                    List<TaskInstance> taskInstanceList = processService.findLastTaskInstanceListInterval(definiteTask.keySet(), dateInterval);
+                    List<TaskInstance> taskInstanceList = processService.findLastTaskInstanceListInterval(definiteTask.keySet(), processInstance.getId());
                     if (taskInstanceList.isEmpty()) {
                         logger.warn("Cannot find the task instance: {}", JSONUtils.toJsonString(definiteTask));
                         return DependResult.FAILED;
@@ -195,7 +195,7 @@ public class DependentExecute {
      * get depend task result
      */
     private DependResult getDependTaskResult(ProcessInstance processInstance, long taskCode, DateInterval dateInterval) {
-        TaskInstance taskInstance = processService.findLastTaskInstanceInterval(taskCode, dateInterval);
+        TaskInstance taskInstance = processService.findLastTaskInstanceInterval(taskCode, processInstance.getId());
         if (taskInstance == null) {
             TaskDefinition taskDefinition = processService.findTaskDefinitionByCode(taskCode);
             if (taskDefinition == null) {

@@ -176,9 +176,7 @@
         <include refid="baseSql"/>
         from t_ds_task_instance
         where task_code=#{taskCode}
-        <if test="startTime!=null and endTime != null">
-            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
-        </if>
+        and process_instance_id=#{processInstanceId}
         order by end_time desc limit 1
     </select>
     <select id="queryLastTaskInstanceList" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
@@ -192,8 +190,6 @@
                 #{i}
             </foreach>
         </if>
-        <if test="startTime!=null and endTime != null">
-            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
-        </if>
+        and process_instance_id=#{processInstanceId}
     </select>
 </mapper>

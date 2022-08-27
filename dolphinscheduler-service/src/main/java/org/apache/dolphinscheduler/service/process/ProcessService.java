@@ -1967,8 +1967,8 @@ public class ProcessService {
      * @param dateInterval dateInterval
      * @return task instance
      */
-    public TaskInstance findLastTaskInstanceInterval(long taskCode, DateInterval dateInterval) {
-        return taskInstanceMapper.queryLastTaskInstance(taskCode, dateInterval.getStartTime(), dateInterval.getEndTime());
+    public TaskInstance findLastTaskInstanceInterval(long taskCode, long processInstanceId) {
+        return taskInstanceMapper.queryLastTaskInstance(taskCode, processInstanceId);
     }
 
     /**
@@ -1978,8 +1978,8 @@ public class ProcessService {
      * @param dateInterval dateInterval
      * @return task instance
      */
-    public List<TaskInstance> findLastTaskInstanceListInterval(Set<Long> taskCodes, DateInterval dateInterval) {
-        return taskInstanceMapper.queryLastTaskInstanceList(taskCodes, dateInterval.getStartTime(), dateInterval.getEndTime());
+    public List<TaskInstance> findLastTaskInstanceListInterval(Set<Long> taskCodes, long processInstanceId) {
+        return taskInstanceMapper.queryLastTaskInstanceList(taskCodes, processInstanceId);
     }
 
     /**
