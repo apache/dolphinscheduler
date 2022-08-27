@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,7 +56,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * work flow lineage controller
@@ -63,6 +64,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("projects/{projectCode}/lineages")
 public class WorkFlowLineageController extends BaseController {
+
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageController.class);
 
     @Autowired
@@ -90,8 +92,8 @@ public class WorkFlowLineageController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                 @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
+                                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                  @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
         try {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
             return returnDataList(result);
@@ -106,7 +108,7 @@ public class WorkFlowLineageController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Map<String, Object>> queryWorkFlowLineage(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+                                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
             return returnDataList(result);
@@ -127,9 +129,9 @@ public class WorkFlowLineageController extends BaseController {
      */
     @ApiOperation(value = "verifyTaskCanDelete", notes = "VERIFY_TASK_CAN_DELETE")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "processDefinitionCode"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
+            @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "taskCode", value = "TASK_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "123456789"),
     })
     @PostMapping(value = "/tasks/verify-delete")
     @ResponseStatus(HttpStatus.OK)
@@ -140,7 +142,8 @@ public class WorkFlowLineageController extends BaseController {
                                       @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
                                       @RequestParam(value = "taskCode", required = true) long taskCode) {
         Result result = new Result();
-        Optional<String> taskDepMsg = workFlowLineageService.taskDepOnTaskMsg(projectCode, processDefinitionCode, taskCode);
+        Optional<String> taskDepMsg =
+                workFlowLineageService.taskDepOnTaskMsg(projectCode, processDefinitionCode, taskCode);
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }
