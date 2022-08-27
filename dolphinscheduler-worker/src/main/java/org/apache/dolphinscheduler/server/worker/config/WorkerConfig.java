@@ -17,20 +17,21 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
+import com.google.common.collect.Sets;
+import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-
-import java.time.Duration;
-import java.util.Set;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import com.google.common.collect.Sets;
+import java.time.Duration;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import lombok.Data;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 @Data
 @Validated
@@ -52,6 +53,7 @@ public class WorkerConfig implements Validator {
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
      */
     private String workerAddress;
+    private Set<String> workerGroupRegistryPaths;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -71,5 +73,17 @@ public class WorkerConfig implements Validator {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
         workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+
+        workerConfig.setGroups(workerConfig.getGroups().stream().map(String::trim).collect(Collectors.toSet()));
+        if (CollectionUtils.isEmpty(workerConfig.getGroups())) {
+            errors.rejectValue("groups", null, "should not be empty");
+        }
+
+        Set<String> workerRegistryPaths = workerConfig.getGroups()
+                .stream()
+                .map(workerGroup -> REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup + "/" + workerConfig.getWorkerAddress())
+                .collect(Collectors.toSet());
+
+        workerConfig.setWorkerGroupRegistryPaths(workerRegistryPaths);
     }
 }

@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
@@ -100,6 +101,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    @Autowired
+    private WorkerConfig workerConfig;
+
     /**
      * worker server startup, not use web service
      *
@@ -118,8 +122,7 @@ public class WorkerServer implements IStoppable {
 
         this.workerRegistryClient.registry();
         this.workerRegistryClient.setRegistryStoppable(this);
-        Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
-        this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
+        this.workerRegistryClient.handleDeadServer(workerConfig.getWorkerRegistryPaths(), NodeType.WORKER, Constants.DELETE_OP);
 
         this.workerManagerThread.start();
 

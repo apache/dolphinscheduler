@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
-
-import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import lombok.Data;
+import java.time.Duration;
+
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 
 @Data
 @Validated
@@ -86,6 +86,8 @@ public class MasterConfig implements Validator {
      */
     private String masterAddress;
 
+    private String masterRegistryPath;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return MasterConfig.class.isAssignableFrom(clazz);
@@ -128,5 +130,6 @@ public class MasterConfig implements Validator {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
+        masterConfig.setMasterRegistryPath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
     }
 }

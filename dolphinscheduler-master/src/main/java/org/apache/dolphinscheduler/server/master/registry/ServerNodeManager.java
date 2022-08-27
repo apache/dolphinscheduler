@@ -22,7 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
@@ -53,6 +54,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
@@ -65,23 +67,19 @@ public class ServerNodeManager implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(ServerNodeManager.class);
 
-    /**
-     * master lock
-     */
     private final Lock masterLock = new ReentrantLock();
 
-    /**
-     * worker group lock
-     */
-    private final Lock workerGroupLock = new ReentrantLock();
+    private final ReentrantReadWriteLock workerGroupLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock workerGroupReadLock = workerGroupLock.readLock();
+    private final ReentrantReadWriteLock.WriteLock workerGroupWriteLock = workerGroupLock.writeLock();
+
+
+    private final ReentrantReadWriteLock workerNodeInfoLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock workerNodeInfoReadLock = workerNodeInfoLock.readLock();
+    private final ReentrantReadWriteLock.WriteLock workerNodeInfoWriteLock = workerNodeInfoLock.writeLock();
 
     /**
-     * worker node info lock
-     */
-    private final Lock workerNodeInfoLock = new ReentrantLock();
-
-    /**
-     * worker group nodes
+     * worker group nodes, workerGroup -> ips
      */
     private final ConcurrentHashMap<String, Set<String>> workerGroupNodes = new ConcurrentHashMap<>();
 
@@ -90,10 +88,7 @@ public class ServerNodeManager implements InitializingBean {
      */
     private final Set<String> masterNodes = new HashSet<>();
 
-    /**
-     * worker node info
-     */
-    private final Map<String, String> workerNodeInfo = new HashMap<>();
+    private final Map<String, WorkerHeartBeat> workerNodeInfo = new HashMap<>();
 
     /**
      * executor service
@@ -104,7 +99,7 @@ public class ServerNodeManager implements InitializingBean {
     private RegistryClient registryClient;
 
     /**
-     * eg : /node/worker/group/127.0.0.1:xxx
+     * eg : /dolphinscheduler/node/worker/group/127.0.0.1:xxx
      */
     private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
 
@@ -238,26 +233,29 @@ public class ServerNodeManager implements InitializingBean {
             final String data = event.data();
             if (registryClient.isWorkerPath(path)) {
                 try {
+                    String[] parts = path.split("/");
+                    if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
+                        throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
+                    }
+                    final String workerGroupName = parts[parts.length - 2];
+                    final String workerAddress = parts[parts.length - 1];
+
                     if (type == Type.ADD) {
                         logger.info("worker group node : {} added.", path);
-                        String group = parseGroup(path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
                         logger.info("currentNodes : {}", currentNodes);
-                        syncWorkerGroupNodes(group, currentNodes);
+                        syncWorkerGroupNodes(workerGroupName, currentNodes);
                     } else if (type == Type.REMOVE) {
                         logger.info("worker group node : {} down.", path);
-                        String group = parseGroup(path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
-                        syncWorkerGroupNodes(group, currentNodes);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
+                        syncWorkerGroupNodes(workerGroupName, currentNodes);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
-                        String group = parseGroup(path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
-                        syncWorkerGroupNodes(group, currentNodes);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
+                        syncWorkerGroupNodes(workerGroupName, currentNodes);
 
-                        String node = parseNode(path);
-                        syncSingleWorkerNodeInfo(node, data);
+                        syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
                 } catch (IllegalArgumentException ex) {
                     logger.warn(ex.getMessage());
@@ -266,22 +264,6 @@ public class ServerNodeManager implements InitializingBean {
                 }
 
             }
-        }
-
-        private String parseGroup(String path) {
-            String[] parts = path.split("/");
-            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
-            }
-            return parts[parts.length - 2];
-        }
-
-        private String parseNode(String path) {
-            String[] parts = path.split("/");
-            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
-            }
-            return parts[parts.length - 1];
         }
     }
 
@@ -327,20 +309,6 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     /**
-     * get master nodes
-     *
-     * @return master nodes
-     */
-    public Set<String> getMasterNodes() {
-        masterLock.lock();
-        try {
-            return Collections.unmodifiableSet(masterNodes);
-        } finally {
-            masterLock.unlock();
-        }
-    }
-
-    /**
      * sync master nodes
      *
      * @param nodes master nodes
@@ -348,18 +316,17 @@ public class ServerNodeManager implements InitializingBean {
     private void syncMasterNodes(Collection<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
-            String addr = NetUtils.getAddr(NetUtils.getHost(), masterConfig.getListenPort());
             this.masterNodes.addAll(nodes);
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
-            int index = masterPriorityQueue.getIndex(addr);
+            int index = masterPriorityQueue.getIndex(masterConfig.getMasterAddress());
             if (index >= 0) {
                 MASTER_SIZE = nodes.size();
                 MASTER_SLOT = index;
             } else {
-                logger.warn("current addr:{} is not in active master list", addr);
+                logger.warn("current addr:{} is not in active master list", masterConfig.getMasterAddress());
             }
-            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, addr);
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, masterConfig.getMasterAddress());
         } finally {
             masterLock.unlock();
         }
@@ -372,19 +339,24 @@ public class ServerNodeManager implements InitializingBean {
      * @param nodes worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
-        workerGroupLock.lock();
+        workerGroupWriteLock.lock();
         try {
             Set<String> workerNodes = workerGroupNodes.getOrDefault(workerGroup, new HashSet<>());
             workerNodes.clear();
             workerNodes.addAll(nodes);
             workerGroupNodes.put(workerGroup, workerNodes);
         } finally {
-            workerGroupLock.unlock();
+            workerGroupWriteLock.unlock();
         }
     }
 
     public Map<String, Set<String>> getWorkerGroupNodes() {
-        return Collections.unmodifiableMap(workerGroupNodes);
+        workerGroupLock.readLock();
+        try {
+            return Collections.unmodifiableMap(workerGroupNodes);
+        } finally {
+            workerGroupLock.writeLock();
+        }
     }
 
     /**
@@ -394,7 +366,7 @@ public class ServerNodeManager implements InitializingBean {
      * @return worker nodes
      */
     public Set<String> getWorkerGroupNodes(String workerGroup) {
-        workerGroupLock.lock();
+        workerGroupReadLock.lock();
         try {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
@@ -405,16 +377,11 @@ public class ServerNodeManager implements InitializingBean {
             }
             return nodes;
         } finally {
-            workerGroupLock.unlock();
+            workerGroupReadLock.unlock();
         }
     }
 
-    /**
-     * get worker node info
-     *
-     * @return worker node info
-     */
-    public Map<String, String> getWorkerNodeInfo() {
+    public Map<String, WorkerHeartBeat> getWorkerNodeInfo() {
         return Collections.unmodifiableMap(workerNodeInfo);
     }
 
@@ -424,12 +391,12 @@ public class ServerNodeManager implements InitializingBean {
      * @param workerNode worker node
      * @return worker node info
      */
-    public String getWorkerNodeInfo(String workerNode) {
-        workerNodeInfoLock.lock();
+    public WorkerHeartBeat getWorkerNodeInfo(String workerNode) {
+        workerNodeInfoReadLock.lock();
         try {
             return workerNodeInfo.getOrDefault(workerNode, null);
         } finally {
-            workerNodeInfoLock.unlock();
+            workerNodeInfoReadLock.unlock();
         }
     }
 
@@ -439,24 +406,26 @@ public class ServerNodeManager implements InitializingBean {
      * @param newWorkerNodeInfo new worker node info
      */
     private void syncAllWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
-        workerNodeInfoLock.lock();
+        workerNodeInfoWriteLock.lock();
         try {
             workerNodeInfo.clear();
-            workerNodeInfo.putAll(newWorkerNodeInfo);
+            for (Map.Entry<String, String> entry : newWorkerNodeInfo.entrySet()) {
+                workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
+            }
         } finally {
-            workerNodeInfoLock.unlock();
+            workerNodeInfoWriteLock.unlock();
         }
     }
 
     /**
      * sync single worker node info
      */
-    private void syncSingleWorkerNodeInfo(String node, String info) {
-        workerNodeInfoLock.lock();
+    private void syncSingleWorkerNodeInfo(String node, WorkerHeartBeat info) {
+        workerNodeInfoWriteLock.lock();
         try {
             workerNodeInfo.put(node, info);
         } finally {
-            workerNodeInfoLock.unlock();
+            workerNodeInfoWriteLock.unlock();
         }
     }
 

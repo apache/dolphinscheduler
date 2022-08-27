@@ -17,18 +17,20 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,12 +43,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * lower weight host manager
@@ -140,11 +136,9 @@ public class LowerWeightHostManager extends CommonHostManager {
                     Set<String> nodes = entry.getValue();
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for (String node : nodes) {
-                        String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
-                        Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
-                        if (hostWeightOpt.isPresent()) {
-                            hostWeights.add(hostWeightOpt.get());
-                        }
+                        WorkerHeartBeat workerHeartBeat = serverNodeManager.getWorkerNodeInfo(node);
+                        Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, workerHeartBeat);
+                        hostWeightOpt.ifPresent(hostWeights::add);
                     }
                     if (!hostWeights.isEmpty()) {
                         workerHostWeights.put(workerGroup, hostWeights);
@@ -156,13 +150,9 @@ public class LowerWeightHostManager extends CommonHostManager {
             }
         }
 
-        public Optional<HostWeight> getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
-            if (StringUtils.isEmpty(heartBeatInfo)) {
-                logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
-                return Optional.empty();
-            }
-            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+        public Optional<HostWeight> getHostWeight(String addr, String workerGroup, WorkerHeartBeat heartBeat) {
             if (heartBeat == null) {
+                logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
                 return Optional.empty();
             }
             if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {

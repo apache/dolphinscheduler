@@ -17,6 +17,35 @@
 
 package org.apache.dolphinscheduler.service.registry;
 
+import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectionListener;
+import org.apache.dolphinscheduler.registry.api.Registry;
+import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
@@ -29,36 +58,6 @@ import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHED
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.registry.api.ConnectionListener;
-import org.apache.dolphinscheduler.registry.api.Registry;
-import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.apache.dolphinscheduler.registry.api.SubscribeListener;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
 
 @Component
 public class RegistryClient {
@@ -97,21 +96,33 @@ public class RegistryClient {
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
-            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(entry.getValue());
-            if (heartBeat == null) {
+            String serverPath = entry.getKey();
+            String heartBeatJson = entry.getValue();
+            if (StringUtils.isEmpty(heartBeatJson)) {
+                logger.error("The heartBeatJson is empty, serverPath: {}", serverPath);
                 continue;
             }
-
             Server server = new Server();
-            server.setResInfo(JSONUtils.toJsonString(heartBeat));
-            server.setCreateTime(new Date(heartBeat.getStartupTime()));
-            server.setLastHeartbeatTime(new Date(heartBeat.getReportTime()));
-            server.setId(heartBeat.getProcessId());
+            switch (nodeType) {
+                case MASTER:
+                    MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(heartBeatJson, MasterHeartBeat.class);
+                    server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
+                    server.setId(masterHeartBeat.getProcessId());
+                    break;
+                case WORKER:
+                    WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
+                    server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
+                    server.setId(workerHeartBeat.getProcessId());
+                    break;
+            }
 
-            String key = entry.getKey();
-            server.setZkDirectory(parentPath + "/" + key);
+            server.setResInfo(heartBeatJson);
+            // todo: add host, port in heartBeat Info, so that we don't need to parse this again
+            server.setZkDirectory(parentPath + "/" + serverPath);
             // set host and port
-            String[] hostAndPort = key.split(COLON);
+            String[] hostAndPort = serverPath.split(COLON);
             String[] hosts = hostAndPort[0].split(DIVISION_STRING);
             // fetch the last one
             server.setHost(hosts[hosts.length - 1]);
