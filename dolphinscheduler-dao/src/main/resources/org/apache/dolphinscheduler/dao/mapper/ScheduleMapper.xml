@@ -75,10 +75,12 @@
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        where process_definition_code in
-        <foreach collection="processDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
-            #{code}
-        </foreach>
+        <if test="processDefinitionCodeList != null and processDefinitionCodeList.size() != 0">
+            where process_definition_code in
+            <foreach collection="processDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
+                #{code}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryReleaseSchedulerListByProcessDefinitionCode"

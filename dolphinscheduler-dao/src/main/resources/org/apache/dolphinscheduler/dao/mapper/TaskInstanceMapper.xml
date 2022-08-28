@@ -34,10 +34,12 @@
         update t_ds_task_instance
         set state = #{destStatus}
         where host = #{host}
-        and state in
-        <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
     </update>
     <select id="queryTaskByProcessIdAndState" resultType="java.lang.Integer">
         select id
