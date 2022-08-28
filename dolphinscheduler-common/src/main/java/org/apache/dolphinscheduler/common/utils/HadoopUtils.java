@@ -44,6 +44,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -441,7 +442,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
     @Override
     public StorageEntity getFileStatus(String path, String prefix, String resTenantCode, ResourceType type) throws IOException {
-        return null;
+        throw new FileNotFoundException("Object is not found in HDFS");
     }
 
     @Override

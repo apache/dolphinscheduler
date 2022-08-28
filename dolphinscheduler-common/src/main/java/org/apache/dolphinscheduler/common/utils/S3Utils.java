@@ -427,7 +427,6 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public List<StorageEntity> listFilesStatusRecursively (String path, String defaultPath, String tenantCode, ResourceType type) {
-        // TODO: consider truncate
         List<StorageEntity> storageEntityList = new ArrayList<>();
 
         LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
@@ -535,8 +534,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws AmazonServiceException{
-        // TODO: udf type
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws AmazonServiceException, FileNotFoundException{
         ListObjectsV2Request request = new ListObjectsV2Request();
         request.setBucketName(BUCKET_NAME);
         request.setPrefix(path);
@@ -561,7 +559,6 @@ public class S3Utils implements Closeable, StorageOperate {
                     .fullName(path)
                     .isDirectory(true)
                     .description("")
-//                    .userId(2)
                     .userName(tenantCode)
                     .type(type)
                     .size(0)
@@ -579,7 +576,6 @@ public class S3Utils implements Closeable, StorageOperate {
                         .fullName(summary.getKey())
                         .isDirectory(false)
                         .description("")
-//                        .userId(2)
                         .userName(tenantCode)
                         .type(type)
                         .size(summary.getSize())
@@ -589,7 +585,7 @@ public class S3Utils implements Closeable, StorageOperate {
             }
         }
 
-        return null;
+        throw new FileNotFoundException("Object is not found in S3 Bucket: " + BUCKET_NAME);
     }
 
     /**

@@ -393,25 +393,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
 
-        // TODO: I comment out this part because this permission check uses Resource ID, which should not be available after refactoring
-        // String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE :
-        // ApiFuncIdentificationConstant.UDF_UPDATE;
-        // boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-        // checkResourceType(type), funcPermissionKey);
-        // if (!canOperatorPermissions){
-        // putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-        // return result;
-        // }
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
         // new permission check
-        if (!isAdmin(loginUser)) {
-            resTenantCode = resTenantCode == null ? "" : resTenantCode;
-            if (!resTenantCode.equals(tenantCode)){
-                // if request tenant does not equal to the login user, then he/she does not have read/write permission
-                putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-                return result;
-            }
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
 
         result = checkResourceUploadStartupState();
@@ -425,10 +412,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resource = storageOperate.getFileStatus(resourceFullName, defaultPath, resTenantCode, type);
         } catch (Exception e) {
-            logger.error("load resources failed");
-            // MAYBE a new code
+            logger.error(e.getMessage() + " Resource path: {}", resourceFullName, e);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
-            throw new ServiceException(String.format("load resources failed"));
+            throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", resourceFullName));
         }
 
         if (!PropertyUtils.getResUploadStartupState()) {
@@ -470,38 +456,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         result = verifyFile(name, type, file);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
-        }
-
-        if (!resource.isDirectory()) {
-            // get the origin file suffix
-            String originSuffix = Files.getFileExtension(originFullName);
-            String suffix = Files.getFileExtension(fullName);
-            boolean suffixIsChanged = false;
-            if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
-                suffixIsChanged = true;
-            }
-            if (StringUtils.isNotBlank(suffix) && !suffix.equals(originSuffix)) {
-                suffixIsChanged = true;
-            }
-
-            // TODO: same as permission check?
-            // verify whether suffix is changed
-            // if (suffixIsChanged) {
-            // //need verify whether this resource is authorized to other users
-            // Map<String, Object> columnMap = new HashMap<>();
-            // columnMap.put("resources_id", resourceId);
-            //
-            // List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
-            // if (CollectionUtils.isNotEmpty(resourcesUsers)) {
-            // List<Integer> userIds =
-            // resourcesUsers.stream().map(ResourcesUser::getUserId).collect(Collectors.toList());
-            // List<User> users = userMapper.selectBatchIds(userIds);
-            // String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
-            // logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
-            // putMsg(result, Status.RESOURCE_IS_AUTHORIZED, userNames);
-            // return result;
-            // }
-            // }
         }
 
         // updateResource data
@@ -617,13 +571,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             updatedResource.setId(oldResourceId);
             resourceTaskMapper.updateById(updatedResource);
         }
-        // else {
-        // logger.error("update resource in DB: {} file: {} failed.", name,
-        // RegexUtils.escapeNRT(file.getOriginalFilename()));
-        // putMsg(result, Status.S3_CANNOT_RENAME);
-        // throw new ServiceException(String.format("update resource in DB: %s file: %s failed.", name,
-        // file.getOriginalFilename()));
-        // }
 
         return result;
     }
@@ -694,15 +641,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode,
                                           ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
-                : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions =
-                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-        // Page<Resource> page = new Page<>(pageNo, pageSize);
 
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
         Set<Integer> resourcesIds = resourcePermissionCheckService
@@ -718,114 +656,52 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (tenant == null) {
             logger.error("tenant not exists");
             putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return null;
+            return result;
         }
 
         // check user type
         String tenantCode = tenantMapper.queryById(tenantId).getTenantCode();
 
-        if (!isAdmin(loginUser)) {
-            resTenantCode = resTenantCode == null ? "" : resTenantCode;
-            if (!"".equals(fullName) && !resTenantCode.equals(tenantCode)){
-                // if request tenant does not equal to the login user && fullName is not specified (not root page), then he/she does not have read/write permission
-                putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-                return result;
-            }
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
 
-        // TODO: admin have all tenantcode path
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
 
-        if ("".equals(fullName)) {
-            // if request fullname is the root path
-            if (isAdmin(loginUser)) {
-                // list all tenants' resources to admin users
-                List<Tenant> tenantList = tenantMapper.selectList(null);
-                for (Tenant tenantEntity : tenantList) {
-                    // entity is tenant because we can later decide if we want to use 'id' or 'tenantCode' in
-                    // storageEntity
-                    defaultPath = storageOperate.getResDir(tenantEntity.getTenantCode());
-                    if (type.equals(ResourceType.UDF)) {
-                        defaultPath = storageOperate.getUdfDir(tenantEntity.getTenantCode());
-                    }
-                    try {
-                        resourcesList.addAll(storageOperate.listFilesStatus(defaultPath, defaultPath,
-                                tenantEntity.getTenantCode(), type));
-                    } catch (Exception e) {
-                        logger.error("load resources failed");
-                        // MAYBE a new code
-                        putMsg(result, Status.RESOURCE_NOT_EXIST);
-                        throw new ServiceException(String.format("load resources failed"));
-                    }
-                }
-            } else {
-                if (!"".equals(resTenantCode) && !resTenantCode.equals(tenantCode)) {
-                    // User is trying to access another tenant's resource without admin perm.
-                    putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-                    return result;
-                }
-
-                defaultPath = storageOperate.getResDir(tenantCode);
+        if (isAdmin(loginUser) && "".equals(fullName)) {
+            // list all tenants' resources to admin users in the root directory
+            List<Tenant> tenantList = tenantMapper.selectList(null);
+            for (Tenant tenantEntity : tenantList) {
+                defaultPath = storageOperate.getResDir(tenantEntity.getTenantCode());
                 if (type.equals(ResourceType.UDF)) {
-                    defaultPath = storageOperate.getUdfDir(tenantCode);
+                    defaultPath = storageOperate.getUdfDir(tenantEntity.getTenantCode());
                 }
-
                 try {
-                    resourcesList = storageOperate.listFilesStatus(defaultPath, defaultPath, tenantCode, type);
+                    resourcesList.addAll(storageOperate.listFilesStatus(defaultPath, defaultPath,
+                            tenantEntity.getTenantCode(), type));
                 } catch (Exception e) {
-                    logger.error("load resources failed");
-                    // MAYBE a new code
+                    logger.error(e.getMessage() + " Resource path: {}", defaultPath, e);
                     putMsg(result, Status.RESOURCE_NOT_EXIST);
-                    throw new ServiceException(String.format("load resources failed"));
+                    throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", defaultPath));
                 }
             }
         } else {
-            // if request fullname is NOT the root path
-            if (isAdmin(loginUser)) {
-                // list resources for a specific path
-                defaultPath = storageOperate.getResDir(resTenantCode);
-                if (type.equals(ResourceType.UDF)) {
-                    defaultPath = storageOperate.getUdfDir(resTenantCode);
-                }
+            defaultPath = storageOperate.getResDir(tenantCode);
+            if (type.equals(ResourceType.UDF)) {
+                defaultPath = storageOperate.getUdfDir(tenantCode);
+            }
 
-                try {
-                    resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, resTenantCode, type);
-                } catch (Exception e) {
-                    logger.error("load resources failed");
-                    // MAYBE a new code
-                    putMsg(result, Status.RESOURCE_NOT_EXIST);
-                    throw new ServiceException(String.format("load resources failed"));
-                }
-            } else {
-                if (!resTenantCode.equals(tenantCode)) {
-                    // User is trying to access another tenant's resource without admin perm.
-                    putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-                    return result;
-                }
-                defaultPath = storageOperate.getResDir(tenantCode);
-                if (type.equals(ResourceType.UDF)) {
-                    defaultPath = storageOperate.getUdfDir(tenantCode);
-                }
-
-                try {
-                    resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
-                } catch (Exception e) {
-                    logger.error("load resources failed");
-                    // MAYBE a new code
-                    putMsg(result, Status.RESOURCE_NOT_EXIST);
-                    throw new ServiceException(String.format("load resources failed"));
-                }
+            try {
+                resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
+            } catch (Exception e) {
+                logger.error(e.getMessage() + " Resource path: {}", fullName, e);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
             }
         }
 
-        // OLD
-        // IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(),
-        // searchVal, new ArrayList<>(resourcesIds));
-        // pageInfo.setTotal((int) resourceIPage.getTotal());
-        // pageInfo.setTotalList(resourceIPage.getRecords());
-
-        // NEW
         // remove leading and trailing spaces in searchVal
         String trimmedSearchVal = searchVal != null ? searchVal.trim() : "";
         // filter based on trimmed searchVal
@@ -1007,10 +883,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
         List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
-        // TODO: revise late
-        // Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
-        // result.setData(resourceTreeVisitor.visit().getChildren());
-        // putMsg(result, Status.SUCCESS);
+        // TODO: Transform resources into storageEntity using stream
+//         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
+//         result.setData(resourceTreeVisitor.visit().getChildren());
+         putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1040,10 +916,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resource = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, ResourceType.FILE);
         } catch (Exception e) {
-            logger.error("load resources failed");
-            // MAYBE a new code
+            logger.error(e.getMessage() + " Resource path: {}", fullName, e);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
-            throw new ServiceException(String.format("load resources failed"));
+            throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
         }
 
         if (resource == null) {
@@ -1051,35 +926,18 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return resultCheck;
         }
 
-        // String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ?
-        // ApiFuncIdentificationConstant.FILE_DELETE : ApiFuncIdentificationConstant.UDF_DELETE;
-        // boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-        // checkResourceType(resource.getType()), funcPermissionKey);
-        // if (!canOperatorPermissions){
-        // putMsg(resultCheck, Status.NO_CURRENT_OPERATING_PERMISSION);
-        // return resultCheck;
-        // }
-
-        if (!isAdmin(loginUser)) {
-            resTenantCode = resTenantCode == null ? "" : resTenantCode;
-            if (!resTenantCode.equals(tenantCode)){
-                // if request tenant does not equal to the login user, then he/she does not have read/write permission
-                putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-                return result;
-            }
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
 
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        if (!isAdmin(loginUser)) {
-            resTenantCode = resTenantCode == null ? "" : resTenantCode;
-            if (!resTenantCode.equals(tenantCode)){
-                // if request tenant does not equal to the login user, then he/she does not have read/write permission
-                putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-                return result;
-            }
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
         }
 
         // get all resource id_news of process definitions those is released
@@ -1204,51 +1062,33 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
-        StorageEntity file;
-        // TODO: use private method getDefaultPath Here
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+
+        String tenantCode = getTenantCode(loginUser.getTenantId(), result);
+
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
 
         String defaultPath = storageOperate.getResDir(resTenantCode);
         if (type.equals(ResourceType.UDF)) {
             defaultPath = storageOperate.getUdfDir(resTenantCode);
         }
 
-        if (StringUtils.isNotBlank(fileName)) {
-            try {
-                file = storageOperate.getFileStatus(defaultPath + fileName, defaultPath, resTenantCode, type);
-                Integer resourceId = resourceTaskMapper.existResourceByFullName(defaultPath + fileName, type);
-                if (resourceId != null) {
-                    file.setId(resourceId);
-                }
-            } catch (Exception e) {
-                logger.error("load resources failed");
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-        } else {
-            try {
-                file = storageOperate.getFileStatus(defaultPath + fileName, defaultPath, resTenantCode, type);
-
-            } catch (Exception e) {
-                logger.error("load resources failed");
-                // MAYBE a new code
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                throw new ServiceException(String.format("load resources failed"));
-            }
+        StorageEntity file;
+        try {
+            file = storageOperate.getFileStatus(defaultPath + fileName, defaultPath, resTenantCode, type);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", defaultPath + fileName, e);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
         }
 
         Integer resourceId = resourceTaskMapper.existResourceByFullName(defaultPath + fileName, type);
         if (resourceId != null) {
             file.setId(resourceId);
         }
-        // String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW :
-        // ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        // boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resource.getId()},
-        // checkResourceType(type), funcPermissionKey);
-        // if (!canOperatorPermissions){
-        // putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-        // return result;
-        // }
+
         putMsg(result, Status.SUCCESS);
         result.setData(file);
         return result;
@@ -1295,10 +1135,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 file.setId(resourceId);
             }
         } catch (Exception e) {
-            logger.error("load resources failed");
-            // MAYBE a new code
+            logger.error(e.getMessage() + " Resource path: {}", fullName, e);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
-            throw new ServiceException(String.format("load resources failed"));
+            throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
         }
 
         putMsg(result, Status.SUCCESS);
@@ -1333,12 +1172,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        // get resource by id
-        // Resource resource = resourcesMapper.selectById(resourceId);
-        // if (resource == null) {
-        // putMsg(result, Status.RESOURCE_NOT_EXIST);
-        // return result;
-        // }
+
+        // TODO: add permission check here
         // String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ?
         // ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
         // boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
@@ -1347,6 +1182,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
         // return result;
         // }
+
+        // new permission check
+//        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+//            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+//            return result;
+//        }
+
+
         // check preview or not by file suffix
         String nameSuffix = Files.getFileExtension(fullName);
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
@@ -1361,9 +1204,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String tenantCode = getTenantCode(loginUser.getId(), result);
 
-        // source path
-        // String resourceFileName = storageOperate.getResourceFileName(tenantCode, fullName);
-        // logger.info("resource path is {}", resourceFileName);
         List<String> content = new ArrayList<>();
         try {
             if (storageOperate.exists(fullName)) {
@@ -1642,7 +1482,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resource = storageOperate.getFileStatus(fullName, "", resTenantCode, ResourceType.FILE);
         } catch (Exception e) {
-            logger.error("read file not exist,  resource id {}", resourceId);
+            logger.error("error occurred when fetching resource information ,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -1829,9 +1669,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         List<ResourceComponent> list;
         if (CollectionUtils.isNotEmpty(resourceList)) {
-            // TODO: revise later
-            // Visitor visitor = new ResourceTreeVisitor(resourceList);
-            // list = visitor.visit().getChildren();
+            // TODO: revise later, Transform into StorageEntity
+//             Visitor visitor = new ResourceTreeVisitor(resourceList);
+//             list = visitor.visit().getChildren();
             list = new ArrayList<>(0);
         } else {
             list = new ArrayList<>(0);
@@ -1882,10 +1722,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } else {
             list = new ArrayList<>(0);
         }
-        // TODO: revise later
-        // Visitor visitor = new ResourceTreeVisitor(list);
-        // result.put(Constants.DATA_LIST, visitor.visit().getChildren());
-        // putMsg(result, Status.SUCCESS);
+        // TODO: revise later, transform into Storage Entity in a private method
+//         Visitor visitor = new ResourceTreeVisitor(list);
+//         result.put(Constants.DATA_LIST, visitor.visit().getChildren());
+         putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -2078,5 +1918,30 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private AuthorizationType checkResourceType(ResourceType type) {
         return type.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+    }
+
+    /**
+     * check permission by comparing login user's tenantCode with tenantCode in the request
+     *
+     * @param loginUser user who currently logs in
+     * @param tenantCode  loginUser's tenantCode
+     * @param resTenantCode tenantCode in the request field "resTenantCode", can be different from the login user in the case of admin users.
+     * @return isValid
+     */
+    private boolean userIsValid(User loginUser, String tenantCode, String resTenantCode) {
+        if (!isAdmin(loginUser)) {
+            resTenantCode = resTenantCode == null ? "" : resTenantCode;
+            if (!resTenantCode.equals(tenantCode)){
+                // if request tenant does not equal to the login user, then he/she does not have read/write permission
+                return false;
+            }
+
+            if (!"".equals(resTenantCode) && !resTenantCode.equals(tenantCode)) {
+                // if an ordinary user directly send a query API with a different tenantCode and fullName "", still he/she does not have read permission.
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -394,6 +394,8 @@ public class ResourcesServiceTest {
     public void testQueryResourceListPaging() {
         User loginUser = new User();
         loginUser.setId(1);
+        loginUser.setTenantId(1);
+        loginUser.setTenantCode("tenant1");
         loginUser.setUserType(UserType.ADMIN_USER);
         IPage<Resource> resourcePage = new Page<>(1, 10);
         resourcePage.setTotal(1);
@@ -415,8 +417,10 @@ public class ResourcesServiceTest {
         Mockito.when(
                 resourcesMapper.queryResourcePaging(Mockito.any(Page.class), eq(-1), eq(0), eq("test"), Mockito.any()))
                 .thenReturn(resourcePage);
+//        Result result =
+//                resourcesService.queryResourceListPaging(loginUser, -1, "", "", ResourceType.FILE, "test", 1, 10);
         Result result =
-                resourcesService.queryResourceListPaging(loginUser, -1, "", "", ResourceType.FILE, "test", 1, 10);
+                resourcesService.queryResource(loginUser, "/dd", 1,  ResourceType.FILE, "");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         PageInfo pageInfo = (PageInfo) result.getData();
