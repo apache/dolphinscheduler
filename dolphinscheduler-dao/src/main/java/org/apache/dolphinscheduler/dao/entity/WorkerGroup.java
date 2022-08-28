@@ -23,11 +23,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 /**
  * worker group
  */
 @TableName("t_ds_worker_group")
+@Data
 public class WorkerGroup {
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -41,67 +43,11 @@ public class WorkerGroup {
 
     private Date updateTime;
 
+    private String description;
+
     @TableField(exist = false)
     private boolean systemDefault;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAddrList() {
-        return addrList;
-    }
-
-    public void setAddrList(String addrList) {
-        this.addrList = addrList;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public boolean getSystemDefault() {
-        return systemDefault;
-    }
-
-    public void setSystemDefault(boolean systemDefault) {
-        this.systemDefault = systemDefault;
-    }
-
-    @Override
-    public String toString() {
-        return "WorkerGroup{"
-                + "id= " + id
-                + ", name= " + name
-                + ", addrList= " + addrList
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + ", systemDefault= " + systemDefault
-                + "}";
-    }
+    private String otherParamsJson;
 
 }

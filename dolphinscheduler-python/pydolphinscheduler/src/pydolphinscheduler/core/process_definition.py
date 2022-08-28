@@ -277,19 +277,6 @@ class ProcessDefinition(Base):
                 "timezoneId": self.timezone,
             }
 
-    # TODO inti DAG's tasks are in the same location with default {x: 0, y: 0}
-    @property
-    def task_location(self) -> List[Dict]:
-        """Return all tasks location for all process definition.
-
-        For now, we only set all location with same x and y valued equal to 0. Because we do not
-        find a good way to set task locations. This is requests from java gateway interface.
-        """
-        if not self.tasks:
-            return [self.tasks]
-        else:
-            return [{"taskCode": task_code, "x": 0, "y": 0} for task_code in self.tasks]
-
     @property
     def task_list(self) -> List["Task"]:  # noqa: F821
         """Return list of tasks objects."""
@@ -403,7 +390,6 @@ class ProcessDefinition(Base):
             json.dumps(self.param_json),
             self.warning_type,
             self.warning_group_id,
-            json.dumps(self.task_location),
             self.timeout,
             self.worker_group,
             self._tenant,
