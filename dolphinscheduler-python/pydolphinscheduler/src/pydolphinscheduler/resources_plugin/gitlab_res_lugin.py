@@ -21,21 +21,20 @@ import sys
 from typing import Optional
 from urllib.parse import urljoin
 
-import bs4 as bs4
 import gitlab
 import requests
 
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyResPluginException
 
-URL = 'http://124.221.129.34:8088/'
-SIGN_IN_URL = 'http://124.221.129.34:8088//users/sign_in'
-LOGIN_URL = 'http://124.221.129.34:8088/users/sign_in'
+URL = "http://124.221.129.34:8088/"
+SIGN_IN_URL = "http://124.221.129.34:8088//users/sign_in"
+LOGIN_URL = "http://124.221.129.34:8088/users/sign_in"
 
 session = requests.Session()
 
 sign_in_page = session.get(SIGN_IN_URL).content
-for l in sign_in_page.decode().split('\n'):
+for l in sign_in_page.decode().split("\n"):
     m = re.search('name="authenticity_token" value="([^"]+)"', l)
     if m:
         break
@@ -45,14 +44,18 @@ if m:
     token = m.group(1)
 
 if not token:
-    print('Unable to find the authenticity token')
+    print("Unable to find the authenticity token")
     sys.exit(1)
 
 # data = {'username': 'xdu.chenrj@gmail.com',
 #         'password': '429579723+wan',
 #         'authenticity_token': token}
 
-data = {'grant_type': 'password', 'username': "xdu.chenrj@gmail.com", 'password': "429579723+wan"}
+data = {
+    "grant_type": "password",
+    "username": "xdu.chenrj@gmail.com",
+    "password": "429579723+wan",
+}
 resp = requests.get("http://124.221.129.34:8088/oauth/token", data=data)
 # resp_data = resp.json()
 print(resp_data)
@@ -62,7 +65,6 @@ print(resp_data)
 #                                             oauth_token=gitlab_oauth_token)
 #
 # gitlab_instance.auth()
-
 
 
 class GitLab(ResourcePlugin):

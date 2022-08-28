@@ -19,5 +19,3 @@
 import pytest
 
 from pydolphinscheduler.resources_plugin import GitHub
-
-
