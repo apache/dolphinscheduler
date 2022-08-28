@@ -33,6 +33,7 @@ import {
   Location
 } from '../../components/dag/types'
 import Styles from './index.module.scss'
+import { useGraphAutoLayout } from '../../components/dag/use-graph-auto-layout'
 
 interface SaveData {
   saveForm: SaveForm
@@ -55,6 +56,7 @@ export default defineComponent({
     const definition = ref<WorkflowDefinition>()
     const readonly = ref(false)
     const isLoading = ref(true)
+    const dagRef = ref()
 
     const refresh = () => {
       isLoading.value = true
@@ -62,6 +64,13 @@ export default defineComponent({
         readonly.value = res.processDefinition.releaseState === 'ONLINE'
         definition.value = res
         isLoading.value = false
+        if (!res.processDefinition.locations) {
+          setTimeout(() => {
+            const graph = dagRef.value
+            const { submit } = useGraphAutoLayout({ graph })
+            submit()
+          }, 1000)
+        }
       })
     }
 
@@ -115,6 +124,7 @@ export default defineComponent({
       >
         {!isLoading.value && (
           <Dag
+            ref={dagRef}
             definition={definition.value}
             onRefresh={refresh}
             projectCode={projectCode}

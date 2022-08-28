@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -34,25 +39,17 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * task kill processor
@@ -161,12 +158,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @param taskInstanceId
      */
     protected void cancelApplication(int taskInstanceId) {
-        TaskExecuteThread taskExecuteThread = workerManager.getTaskExecuteThread(taskInstanceId);
-        if (taskExecuteThread == null) {
+        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
+        if (workerTaskExecuteRunnable == null) {
             logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
-        AbstractTask task = taskExecuteThread.getTask();
+        AbstractTask task = workerTaskExecuteRunnable.getTask();
         if (task == null) {
             logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
             return;
