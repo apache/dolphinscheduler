@@ -36,11 +36,13 @@
         select
         <include refid="baseSql"/>
         from t_ds_alert_plugin_instance
-        where id in
-        <foreach item="item" index="index" collection="ids"
-                 open="(" separator="," close=")">
-            #{item}
-        </foreach>
+        <if test="ids != null and ids.size() != 0">
+            where id in
+            <foreach item="item" index="index" collection="ids"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryByInstanceNamePage" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
