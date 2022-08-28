@@ -129,10 +129,13 @@
     </select>
 
     <delete id="deleteIds" parameterType="java.lang.Integer">
-        delete from t_ds_resources where id in
-        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        delete from t_ds_resources
+        <if test="resIds != null and resIds.length != 0">
+            where id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
     </delete>
 
     <select id="listChildren" resultType="java.lang.Integer">
@@ -170,10 +173,12 @@
             <property name="alias" value="r"/>
         </include>
         from t_ds_resources r
-        where r.id in
-        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="resIds != null and resIds.length != 0">
+            where r.id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
     </select>
 
     <select id="existResourceByUser" resultType="java.lang.Boolean">
