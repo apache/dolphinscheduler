@@ -15,53 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.registry;
+package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Heart beat task
- */
-public class HeartBeatTask implements Runnable {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
+/**
+ * Master heart beat task
+ */
+public class MasterHeartBeatTask implements Runnable {
+
+    private final Logger logger = LoggerFactory.getLogger(MasterHeartBeatTask.class);
 
     private final Set<String> heartBeatPaths;
     private final RegistryClient registryClient;
-    private int workerWaitingTaskCount;
     private final HeartBeat heartBeat;
-
     private final AtomicInteger heartBeatErrorTimes = new AtomicInteger();
 
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         Set<String> heartBeatPaths,
-                         RegistryClient registryClient) {
+    public MasterHeartBeatTask(long startupTime,
+                               double maxCpuloadAvg,
+                               double reservedMemory,
+                               Set<String> heartBeatPaths,
+                               RegistryClient registryClient) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
         this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory);
-    }
-
-    public HeartBeatTask(long startupTime,
-                         double maxCpuloadAvg,
-                         double reservedMemory,
-                         int hostWeight,
-                         Set<String> heartBeatPaths,
-                         RegistryClient registryClient,
-                         int workerThreadCount,
-                         int workerWaitingTaskCount) {
-        this.heartBeatPaths = heartBeatPaths;
-        this.registryClient = registryClient;
-        this.workerWaitingTaskCount = workerWaitingTaskCount;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
     }
 
     public String getHeartBeatInfo() {
@@ -74,9 +59,6 @@ public class HeartBeatTask implements Runnable {
             if (!ServerLifeCycleManager.isRunning()) {
                 return;
             }
-            // update waiting task count
-            heartBeat.setWorkerWaitingTaskCount(workerWaitingTaskCount);
-
             for (String heartBeatPath : heartBeatPaths) {
                 registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
