@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_ALL_TASK_CODE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 /**
@@ -55,7 +56,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 @AutoService(ITaskProcessor.class)
 public class DependentTaskProcessor extends BaseTaskProcessor {
 
-    private DependentParameters dependentParameters;
+    protected DependentParameters dependentParameters;
 
     private final ProcessDefinitionMapper processDefinitionMapper = SpringApplicationContext.getBean(ProcessDefinitionMapper.class);
 
@@ -66,7 +67,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      * dependent task list
      */
-    private List<DependentExecute> dependentTaskList = new ArrayList<>();
+    protected List<DependentExecute> dependentTaskList = new ArrayList<>();
 
     /**
      * depend item result map
@@ -81,7 +82,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      * dependent date
      */
-    private Date dependentDate;
+    protected Date dependentDate;
 
     DependResult result;
 
@@ -155,7 +156,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      * init dependent parameters
      */
-    private void initDependParameters() {
+    protected void initDependParameters() {
         this.dependentParameters = taskInstance.getDependency();
         if (processInstance.getScheduleTime() != null) {
             this.dependentDate = this.processInstance.getScheduleTime();
@@ -174,9 +175,9 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 taskDefinitionCodes.add(dependentItem.getDepTaskCode());
             });
         });
-        projectCodeMap = projectMapper.queryByCodes(projectCodes).stream().collect(Collectors.toMap(Project::getCode, Function.identity()));
-        processDefinitionMap = processDefinitionMapper.queryByCodes(processDefinitionCodes).stream().collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
-        taskDefinitionMap = taskDefinitionMapper.queryByCodeList(taskDefinitionCodes).stream().collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
+        Map<Long, Project> projectCodeMap = projectMapper.queryByCodes(projectCodes).stream().collect(Collectors.toMap(Project::getCode, Function.identity()));
+        Map<Long, ProcessDefinition> processDefinitionMap = processDefinitionMapper.queryByCodes(processDefinitionCodes).stream().collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
+        Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionMapper.queryByCodeList(taskDefinitionCodes).stream().collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
 
         for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
             logger.info("Add sub dependent check tasks, dependent relation: {}", taskModel.getRelation());
@@ -191,13 +192,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                     logger.error("The dependent task's workflow is not exist, dependentItem: {}", dependentItem);
                     throw new RuntimeException("The dependent task's workflow is not exist, dependentItem: " + dependentItem);
                 }
-                if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                if (dependentItem.getDepTaskCode() == DEPENDENT_ALL_TASK_CODE) {
                     logger.info("Add dependent task: projectName: {}, workflowName: {}, taskName: ALL, dependentKey: {}",
                             project.getName(), processDefinition.getName(), dependentItem.getKey());
-
                 } else {
                     TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
-                    if (taskDefinition == null) {
+                    if (dependentItem.getDepTaskCode() != DEPENDENT_ALL_TASK_CODE && taskDefinition == null) {
                         logger.error("The dependent task's taskDefinition is not exist, dependentItem: {}", dependentItem);
                         throw new RuntimeException("The dependent task's taskDefinition is not exist, dependentItem: " + dependentItem);
                     }
@@ -205,7 +205,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                             project.getName(), processDefinition.getName(), taskDefinition.getName(), dependentItem.getKey());
                 }
             }
-            this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation()));
+            this.dependentTaskList.add(new DependentExecute(taskModel));
         }
     }
 

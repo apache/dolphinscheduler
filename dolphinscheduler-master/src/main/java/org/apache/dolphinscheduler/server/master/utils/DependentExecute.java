@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -79,9 +80,9 @@ public class DependentExecute {
      * @param itemList item list
      * @param relation relation
      */
-    public DependentExecute(List<DependentItem> itemList, DependentRelation relation) {
-        this.dependItemList = itemList;
-        this.relation = relation;
+    public DependentExecute(DependentTaskModel taskModel) {
+        this.dependItemList = taskModel.getDependItemList();
+        this.relation = taskModel.getRelation();
     }
 
     /**
@@ -104,7 +105,7 @@ public class DependentExecute {
      * @param dateIntervals date intervals
      * @return dateIntervals
      */
-    private DependResult calculateResultForTasks(DependentItem dependentItem,
+    public DependResult calculateResultForTasks(DependentItem dependentItem,
                                                  List<DateInterval> dateIntervals) {
 
         DependResult result = DependResult.FAILED;
@@ -132,7 +133,7 @@ public class DependentExecute {
      *
      * @return
      */
-    private DependResult dependResultByProcessInstance(ProcessInstance processInstance) {
+    protected DependResult dependResultByProcessInstance(ProcessInstance processInstance) {
         if (!processInstance.getState().isFinished()) {
             return DependResult.WAITING;
         }
@@ -149,7 +150,7 @@ public class DependentExecute {
      * @param processInstance
      * @return
      */
-    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance) {
+    protected DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance) {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -185,7 +186,7 @@ public class DependentExecute {
      * @param dateInterval   date interval
      * @return ProcessInstance
      */
-    private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
+    protected ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
 
         ProcessInstance lastSchedulerProcess =
                 processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
