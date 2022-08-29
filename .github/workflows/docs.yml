@@ -18,7 +18,6 @@ name: Docs
 
 on:
   pull_request:
-  push:
     paths:
       - '.github/workflows/docs.yml'
       - '**/*.md'
@@ -65,7 +64,7 @@ jobs:
           done
   markdown-lint:
     name: Lint Markdown
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -76,4 +75,4 @@ jobs:
           DEFAULT_BRANCH: dev
           FILTER_REGEX_INCLUDE: .*docs/.*md$
           VALIDATE_MARKDOWN: true
-          # VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: false
