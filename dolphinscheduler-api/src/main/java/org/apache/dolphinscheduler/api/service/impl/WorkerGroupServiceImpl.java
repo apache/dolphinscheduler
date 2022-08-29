@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
 
+import org.apache.dolphinscheduler.api.dto.WorkerGroupHandleDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -302,8 +303,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (workerGroups.size() != 0) {
             workerGroupsMap = workerGroups.stream().collect(Collectors.toMap(WorkerGroup::getName, workerGroupItem -> workerGroupItem, (oldWorkerGroup, newWorkerGroup) -> oldWorkerGroup));
         }
-        for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
+        for (String workerGroupName : workerGroupList) {
+            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroupName;
             Collection<String> childrenNodes = null;
             try {
                 childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
@@ -313,27 +314,22 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
-            WorkerGroup wg = new WorkerGroup();
-            handleAddrList(wg, workerGroup, childrenNodes);
-            wg.setName(workerGroup);
+            WorkerGroup workerGroup = new WorkerGroup();
+            workerGroup.setName(workerGroupName);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                HeartBeat heartBeat = HeartBeat.decodeHeartBeat(registeredValue);
-                wg.setCreateTime(new Date(heartBeat.getStartupTime()));
-                wg.setUpdateTime(new Date(heartBeat.getReportTime()));
-                wg.setSystemDefault(true);
-                if (workerGroupsMap != null && workerGroupsMap.containsKey(workerGroup)) {
-                    wg.setDescription(workerGroupsMap.get(workerGroup).getDescription());
-                    workerGroups.remove(workerGroupsMap.get(workerGroup));
-                }
+                String[] rv = registeredValue.split(Constants.COMMA);
+                workerGroup.setCreateTime(new Date(Long.parseLong(rv[6])));
+                workerGroup.setUpdateTime(new Date(Long.parseLong(rv[7])));
+                workerGroup.setSystemDefault(true);
             }
-            workerGroups.add(wg);
+            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
+            workerGroups.add(workerGroup);
         }
         return workerGroups;
     }
-    
-    protected void handleAddrList(WorkerGroup wg, String workerGroup, Collection<String> childrenNodes) {
-        wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
+    protected void handleAddrList(WorkerGroupHandleDto obj) {
+        obj.getWorkerGroup().setAddrList(String.join(Constants.COMMA, obj.getChildrenNodes()));
     }
 
     /**
