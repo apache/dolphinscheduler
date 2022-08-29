@@ -116,7 +116,7 @@ sudo.enable=true
 # network IP gets priority, default: inner outer
 #dolphin.scheduler.network.priority.strategy=default
 
-# specify network IP . example:127.0.0.1, default:empty
+# specify network IP. example: 127.0.0.1, default: empty
 #dolphin.scheduler.network.ip=
 
 # system env path
