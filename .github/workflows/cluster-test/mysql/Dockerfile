@@ -20,7 +20,6 @@ FROM openjdk:8-jre-slim-buster
 RUN apt update ; \
     apt install -y curl wget default-mysql-client sudo openssh-server netcat-traditional ;
 
-#COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
 COPY ./apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
 RUN tar -zxvf /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz -C ~
 
