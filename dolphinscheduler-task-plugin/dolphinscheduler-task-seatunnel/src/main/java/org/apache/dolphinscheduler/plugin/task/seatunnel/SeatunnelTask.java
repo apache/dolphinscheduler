@@ -17,21 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +38,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
 /**
  * seatunnel task
@@ -85,7 +85,7 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             // construct process
             String command = buildCommand();
@@ -94,10 +94,15 @@ public class SeatunnelTask extends AbstractTaskExecutor {
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             seatunnelParameters.dealOutParam(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current SeaTunnel task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current SeaTunnel task has been interrupted", e);
         } catch (Exception e) {
             logger.error("SeaTunnel task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Execute Seatunnel task failed", e);
         }
     }
 

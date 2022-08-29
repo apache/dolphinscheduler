@@ -50,17 +50,17 @@ public class WorkerExecService {
     /**
      * running task
      */
-    private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap;
+    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap;
 
     public WorkerExecService(ExecutorService execService,
-                             ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap) {
+                             ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap) {
         this.execService = execService;
         this.listeningExecutorService = MoreExecutors.listeningDecorator(this.execService);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
         WorkerServerMetrics.registerWorkerRunningTaskGauge(taskExecuteThreadMap::size);
     }
 
-    public void submit(TaskExecuteThread taskExecuteThread) {
+    public void submit(final WorkerTaskExecuteRunnable taskExecuteThread) {
         taskExecuteThreadMap.put(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(), taskExecuteThread);
         ListenableFuture future = this.listeningExecutorService.submit(taskExecuteThread);
         FutureCallback futureCallback = new FutureCallback() {
@@ -91,7 +91,7 @@ public class WorkerExecService {
         return ((ThreadPoolExecutor) this.execService).getQueue().size();
     }
 
-    public Map<Integer, TaskExecuteThread> getTaskExecuteThreadMap() {
+    public Map<Integer, WorkerTaskExecuteRunnable> getTaskExecuteThreadMap() {
         return taskExecuteThreadMap;
     }
 
