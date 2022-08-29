@@ -75,4 +75,3 @@ jobs:
           DEFAULT_BRANCH: dev
           FILTER_REGEX_INCLUDE: .*md$
           VALIDATE_MARKDOWN: true
-          VALIDATE_ALL_CODEBASE: false
