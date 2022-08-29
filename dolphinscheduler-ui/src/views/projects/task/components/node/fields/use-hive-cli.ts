@@ -24,18 +24,25 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
     return [
         {
             type: 'select',
-            field: 'type',
+            field: 'hiveCliTaskExecutionType',
             span: 12,
-            name: t('project.node.hive_cli_task_type'),
-            options: HIVE_CLI_TASK_TYPES,
+            name: t('project.node.hive_cli_task_execution_type'),
+            options: HIVE_CLI_TASK_EXECUTION_TYPES,
         },
         {
             type: 'editor',
-            field: 'rawScript',
+            field: 'hiveSqlScript',
             name: t('project.node.hive_sql_script'),
             props: {
-                language: 'sql',
-                placeholder: t('project.node.hive_sql_script_tips')
+                language: 'sql'
+            }
+        },
+        {
+            type: 'input',
+            field: 'hiveCliOptions',
+            name: t('project.node.hive_cli_options'),
+            props: {
+                placeholder: t('project.node.hive_cli_options')
             }
         },
         useResources(),
@@ -43,7 +50,7 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
     ]
 }
 
-export const HIVE_CLI_TASK_TYPES = [
+export const HIVE_CLI_TASK_EXECUTION_TYPES = [
     {
         label: 'FROM_SCRIPT',
         value: 'SCRIPT'

@@ -37,16 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * hivecli task
- */
 public class HiveCliTask extends AbstractTaskExecutor {
 
     private HiveCliParameters hiveCliParameters;
 
-    private ShellCommandExecutor shellCommandExecutor;
+    private final ShellCommandExecutor shellCommandExecutor;
 
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     public HiveCliTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -71,7 +68,7 @@ public class HiveCliTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         try {
-            TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
+            final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
@@ -85,9 +82,9 @@ public class HiveCliTask extends AbstractTaskExecutor {
 
     protected String buildCommand() throws IOException {
 
-        List<String> args = new ArrayList<>();
+        final List<String> args = new ArrayList<>();
 
-        final String type = hiveCliParameters.getType();
+        final String type = hiveCliParameters.getHiveCliTaskExecutionType();
 
         // TODO: make sure type is not unknown
         if (HiveCliConstants.TYPE_FILE.equals(type)) {
@@ -99,13 +96,17 @@ public class HiveCliTask extends AbstractTaskExecutor {
 
             args.add(StringUtils.stripStart(resourceInfos.get(0).getResourceName(), "/"));
         } else {
-            final String script = hiveCliParameters.getRawScript();
+            final String script = hiveCliParameters.getHiveSqlScript();
             args.add(String.format(HiveCliConstants.HIVE_CLI_EXECUTE_SCRIPT, script));
         }
 
-        // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        String command =
+        final String hiveCliOptions = hiveCliParameters.getHiveCliOptions();
+        if (StringUtils.isNotEmpty(hiveCliOptions)) {
+            args.add(hiveCliOptions);
+        }
+
+        final Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        final String command =
                 ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
         logger.info("hiveCli task command: {}", command);

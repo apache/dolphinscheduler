@@ -42,9 +42,12 @@ public class HiveCliTaskTest {
     public static final String EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_FILE_COMMAND =
             "hive -f sql_tasks/hive_task.sql";
 
+    public static final String EXPECTED_HIVE_CLI_TASK_EXECUTE_WITH_OPTIONS =
+            "hive -e \"SHOW DATABASES;\" --verbose";
+
     @Test
     public void hiveCliTaskExecuteSqlFromScript() throws Exception {
-        String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromSqlParameters();
+        String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromScriptParameters();
         HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
         hiveCliTask.init();
         Assert.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_SCRIPT_COMMAND);
@@ -58,6 +61,14 @@ public class HiveCliTaskTest {
         Assert.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_FILE_COMMAND);
     }
 
+    @Test
+    public void hiveCliTaskExecuteWithOptions() throws Exception {
+        String hiveCliTaskParameters = buildHiveCliTaskExecuteWithOptionsParameters();
+        HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
+        hiveCliTask.init();
+        Assert.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_WITH_OPTIONS);
+    }
+
     private HiveCliTask prepareHiveCliTaskForTest(final String hiveCliTaskParameters) {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(hiveCliTaskParameters);
@@ -65,21 +76,29 @@ public class HiveCliTaskTest {
         return hiveCliTask;
     }
 
-    private String buildHiveCliTaskExecuteSqlFromSqlParameters() {
+    private String buildHiveCliTaskExecuteSqlFromScriptParameters() {
         final HiveCliParameters hiveCliParameters = new HiveCliParameters();
-        hiveCliParameters.setType("SCRIPT");
-        hiveCliParameters.setRawScript("SHOW DATABASES;");
+        hiveCliParameters.setHiveCliTaskExecutionType("SCRIPT");
+        hiveCliParameters.setHiveSqlScript("SHOW DATABASES;");
         return JSONUtils.toJsonString(hiveCliParameters);
     }
 
     private String buildHiveCliTaskExecuteSqlFromFileParameters() {
         final HiveCliParameters hiveCliParameters = new HiveCliParameters();
-        hiveCliParameters.setType("FILE");
+        hiveCliParameters.setHiveCliTaskExecutionType("FILE");
         List<ResourceInfo> resources = new ArrayList<>();
         ResourceInfo sqlResource = new ResourceInfo();
         sqlResource.setResourceName("/sql_tasks/hive_task.sql");
         resources.add(sqlResource);
         hiveCliParameters.setResourceList(resources);
+        return JSONUtils.toJsonString(hiveCliParameters);
+    }
+
+    private String buildHiveCliTaskExecuteWithOptionsParameters() {
+        final HiveCliParameters hiveCliParameters = new HiveCliParameters();
+        hiveCliParameters.setHiveCliTaskExecutionType("SCRIPT");
+        hiveCliParameters.setHiveSqlScript("SHOW DATABASES;");
+        hiveCliParameters.setHiveCliOptions("--verbose");
         return JSONUtils.toJsonString(hiveCliParameters);
     }
 

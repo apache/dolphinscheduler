@@ -28,22 +28,23 @@ import lombok.Data;
 @Data
 public class HiveCliParameters extends AbstractParameters {
 
-    private String rawScript;
+    private String hiveSqlScript;
 
-    private String type;
+    private String hiveCliTaskExecutionType;
 
-    private String parameters;
+    private String hiveCliOptions;
+
     private List<ResourceInfo> resourceList;
 
     @Override
     public boolean checkParameters() {
-        if (!StringUtils.isNotEmpty(type)) {
+        if (!StringUtils.isNotEmpty(hiveCliTaskExecutionType)) {
             return false;
         }
 
-        if (HiveCliConstants.TYPE_SCRIPT.equals(type)) {
-            return StringUtils.isNotEmpty(rawScript);
-        } else if (HiveCliConstants.TYPE_FILE.equals(type)) {
+        if (HiveCliConstants.TYPE_SCRIPT.equals(hiveCliTaskExecutionType)) {
+            return StringUtils.isNotEmpty(hiveSqlScript);
+        } else if (HiveCliConstants.TYPE_FILE.equals(hiveCliTaskExecutionType)) {
             return (resourceList != null) && (resourceList.size() > 0);
         } else {
             return false;

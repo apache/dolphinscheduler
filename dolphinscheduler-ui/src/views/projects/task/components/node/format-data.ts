@@ -422,8 +422,9 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'HIVECLI') {
-    taskParams.type = data.type
-    taskParams.rawScript = data.rawScript
+    taskParams.hiveCliTaskExecutionType = data.hiveCliTaskExecutionType
+    taskParams.hiveSqlScript = data.hiveSqlScript
+    taskParams.hiveCliOptions = data.hiveCliOptions
   }
 
   let timeoutNotifyStrategy = ''
