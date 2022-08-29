@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,7 @@ public class HiveCliTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(taskResponse.getExitStatusCode());
@@ -80,7 +79,7 @@ public class HiveCliTask extends AbstractTaskExecutor {
         }
     }
 
-    protected String buildCommand() throws IOException {
+    protected String buildCommand() {
 
         final List<String> args = new ArrayList<>();
 
