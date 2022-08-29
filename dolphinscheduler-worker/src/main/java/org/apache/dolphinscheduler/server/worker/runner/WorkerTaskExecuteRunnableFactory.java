@@ -15,23 +15,9 @@
  * limitations under the License.
  */
 
-interface ICrontabI18n {
-  everyTime: string
-  every: string
-  timeCarriedOut: string
-  timeStart: string
-  cycleFrom: string
-  specificTime: string
-  specificTimeTip: string
-  to: string
-  time: string
-}
+package org.apache.dolphinscheduler.server.worker.runner;
 
-interface ISpecialSelect {
-  [key: number | string]: {
-    label: string
-    value: string
-  }[]
-}
+public interface WorkerTaskExecuteRunnableFactory<T> {
 
-export { ICrontabI18n, ISpecialSelect }
+    T createWorkerTaskExecuteRunnable();
+}
