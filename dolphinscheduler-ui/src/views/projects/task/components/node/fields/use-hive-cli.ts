@@ -15,48 +15,48 @@
  * limitations under the License.
  */
 import { useI18n } from 'vue-i18n'
-import {useCustomParams, useResources} from '.'
+import { useCustomParams, useResources } from '.'
 import type { IJsonItem } from '../types'
 
 export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
-    const { t } = useI18n()
+  const { t } = useI18n()
 
-    return [
-        {
-            type: 'select',
-            field: 'hiveCliTaskExecutionType',
-            span: 12,
-            name: t('project.node.hive_cli_task_execution_type'),
-            options: HIVE_CLI_TASK_EXECUTION_TYPES,
-        },
-        {
-            type: 'editor',
-            field: 'hiveSqlScript',
-            name: t('project.node.hive_sql_script'),
-            props: {
-                language: 'sql'
-            }
-        },
-        {
-            type: 'input',
-            field: 'hiveCliOptions',
-            name: t('project.node.hive_cli_options'),
-            props: {
-                placeholder: t('project.node.hive_cli_options')
-            }
-        },
-        useResources(),
-        ...useCustomParams({ model, field: 'localParams', isSimple: false })
-    ]
+  return [
+    {
+      type: 'select',
+      field: 'hiveCliTaskExecutionType',
+      span: 12,
+      name: t('project.node.hive_cli_task_execution_type'),
+      options: HIVE_CLI_TASK_EXECUTION_TYPES
+    },
+    {
+      type: 'editor',
+      field: 'hiveSqlScript',
+      name: t('project.node.hive_sql_script'),
+      props: {
+        language: 'sql'
+      }
+    },
+    {
+      type: 'input',
+      field: 'hiveCliOptions',
+      name: t('project.node.hive_cli_options'),
+      props: {
+        placeholder: t('project.node.hive_cli_options_tips')
+      }
+    },
+    useResources(),
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+  ]
 }
 
 export const HIVE_CLI_TASK_EXECUTION_TYPES = [
-    {
-        label: 'FROM_SCRIPT',
-        value: 'SCRIPT'
-    },
-    {
-        label: 'FROM_FILE',
-        value: 'FILE'
-    }
+  {
+    label: 'FROM_SCRIPT',
+    value: 'SCRIPT'
+  },
+  {
+    label: 'FROM_FILE',
+    value: 'FILE'
+  }
 ]

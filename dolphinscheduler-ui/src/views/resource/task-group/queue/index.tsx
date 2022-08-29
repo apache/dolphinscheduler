@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted, getCurrentInstance } from 'vue'
+import {
+  ref,
+  defineComponent,
+  toRefs,
+  reactive,
+  onMounted,
+  getCurrentInstance
+} from 'vue'
 import {
   NButton,
   NIcon,
