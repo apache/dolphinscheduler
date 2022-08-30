@@ -17,24 +17,29 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import lombok.experimental.UtilityClass;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import lombok.experimental.UtilityClass;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * logger utils
@@ -88,6 +93,33 @@ public class LoggerUtils {
             }
         }
         return appIds;
+    }
+
+    public static List<String> getAppIds(String logPath) {
+        File logFile = new File(logPath);
+        if (!logFile.exists() || !logFile.isFile()) {
+            return Collections.emptyList();
+        }
+        Set<String> appIds = new HashSet<>();
+        try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
+            stream.filter(line -> {
+                        Matcher matcher = APPLICATION_REGEX.matcher(line);
+                        return matcher.find();
+                    }
+            ).forEach(line -> {
+                Matcher matcher = APPLICATION_REGEX.matcher(line);
+                if (matcher.find()) {
+                    String appId = matcher.group();
+                    if (appIds.add(appId)) {
+                        logger.info("Find appId: {} from {}", appId, logPath);
+                    }
+                }
+            });
+            return new ArrayList<>(appIds);
+        } catch (IOException e) {
+            logger.error("Get appId from log file erro, logPath: {}", logPath, e);
+            return Collections.emptyList();
+        }
     }
 
     /**

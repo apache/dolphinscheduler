@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
@@ -28,14 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -44,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
@@ -53,11 +48,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
  * abstract command executor
  */
 public abstract class AbstractCommandExecutor {
-    /**
-     * rules for extracting application ID
-     */
-    protected static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.APPLICATION_REGEX);
-    
+
     /**
      * rules for extracting Var Pool
      */
@@ -364,30 +355,7 @@ public abstract class AbstractCommandExecutor {
      * @return app id list
      */
     protected List<String> getAppIds(String logPath) {
-        File logFile = new File(logPath);
-        if (!logFile.exists() || !logFile.isFile()) {
-            return Collections.emptyList();
-        }
-        Set<String> appIds = new HashSet<>();
-        try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
-            stream.filter(line -> {
-                        Matcher matcher = APPLICATION_REGEX.matcher(line);
-                        return matcher.find();
-                    }
-            ).forEach(line -> {
-                Matcher matcher = APPLICATION_REGEX.matcher(line);
-                if (matcher.find()) {
-                    String appId = matcher.group();
-                    if (appIds.add(appId)) {
-                        logger.info("Find appId: {} from {}", appId, logPath);
-                    }
-                }
-            });
-            return new ArrayList<>(appIds);
-        } catch (IOException e) {
-            logger.error("Get appId from log file erro, logPath: {}", logPath, e);
-            return Collections.emptyList();
-        }
+        return LogUtils.getAppIdsFromLogFile(logPath, logger);
     }
 
     /**
