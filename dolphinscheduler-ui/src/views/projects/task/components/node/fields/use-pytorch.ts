@@ -46,7 +46,8 @@ export function usePytorch(model: { [field: string]: any }): IJsonItem[] {
     isCreateEnvironmentSpan.value = model.otherParams ? 12 : 0
     pythonPathSpan.value = model.otherParams ? 24 : 0
     pythonEnvToolSpan.value = model.showCreateEnvironment ? 12 : 0
-    pythonCommandSpan.value = ~model.showCreateEnvironment & model.otherParams ? 12 : 0
+    pythonCommandSpan.value =
+      ~model.showCreateEnvironment & model.otherParams ? 12 : 0
     requirementsSpan.value = model.showCreateEnvironment ? 24 : 0
     condaPythonVersionSpan.value = model.showCreateConda ? 24 : 0
   }

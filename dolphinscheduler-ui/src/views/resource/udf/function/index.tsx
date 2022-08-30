@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef, watch, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  Ref,
+  toRefs,
+  onMounted,
+  toRef,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import {
   NIcon,
   NSpace,
@@ -114,7 +122,7 @@ export default defineComponent({
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>
-                  <SearchOutlined/>
+                  <SearchOutlined />
                 </NIcon>
               </NButton>
             </NSpace>

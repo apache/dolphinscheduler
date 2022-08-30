@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  onMounted,
+  getCurrentInstance
+} from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
@@ -83,7 +89,9 @@ const FormModal = defineComponent({
             path='priority'
           >
             <NInput
-                  allowInput={this.trim} v-model:value={this.formData.priority} />
+              allowInput={this.trim}
+              v-model:value={this.formData.priority}
+            />
           </NFormItem>
         </NForm>
       </Modal>

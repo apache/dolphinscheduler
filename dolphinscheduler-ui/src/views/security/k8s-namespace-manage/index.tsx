@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
   NDataTable,
@@ -112,7 +118,7 @@ const k8sNamespaceManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
-                  allowInput={this.trim}
+                allowInput={this.trim}
                 size='small'
                 clearable
                 v-model={[this.searchVal, 'value']}

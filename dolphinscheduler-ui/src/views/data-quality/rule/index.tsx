@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, ref, toRefs } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs
+} from 'vue'
 import {
   NSpace,
   NInput,

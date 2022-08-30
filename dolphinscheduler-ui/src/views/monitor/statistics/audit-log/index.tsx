@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NSpace,
   NInput,
@@ -85,7 +91,7 @@ const AuditLog = defineComponent({
         <Card>
           <NSpace justify='end'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.userName, 'value']}
               size='small'
               placeholder={t('monitor.audit_log.user_name')}

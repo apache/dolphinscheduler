@@ -51,7 +51,14 @@ const login = defineComponent({
 
     cookies.set('language', localesStore.getLocales, { path: '/' })
 
-    return { t, handleChange, handleLogin, ...toRefs(state), localesStore, trim }
+    return {
+      t,
+      handleChange,
+      handleLogin,
+      ...toRefs(state),
+      localesStore,
+      trim
+    }
   },
   render() {
     return (

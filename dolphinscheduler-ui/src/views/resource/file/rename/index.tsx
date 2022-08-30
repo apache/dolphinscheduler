@@ -14,7 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineComponent, toRefs, PropType, watch, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  PropType,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -84,7 +90,7 @@ export default defineComponent({
         <NForm rules={this.rules} ref='renameFormRef'>
           <NFormItem label={t('resource.file.name')} path='name'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.renameForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-name'
@@ -92,7 +98,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.renameForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}

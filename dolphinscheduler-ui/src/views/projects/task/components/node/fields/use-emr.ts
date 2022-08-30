@@ -17,14 +17,18 @@
 import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
-import {computed} from "vue";
+import { computed } from 'vue'
 
 export function useEmr(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
-  const jobFlowDefineJsonSpan = computed(() => (model.programType === 'RUN_JOB_FLOW' ? 24 : 0))
+  const jobFlowDefineJsonSpan = computed(() =>
+    model.programType === 'RUN_JOB_FLOW' ? 24 : 0
+  )
 
-  const stepsDefineJsonSpan = computed(() => (model.programType === 'ADD_JOB_FLOW_STEPS' ? 24 : 0))
+  const stepsDefineJsonSpan = computed(() =>
+    model.programType === 'ADD_JOB_FLOW_STEPS' ? 24 : 0
+  )
 
   return [
     {

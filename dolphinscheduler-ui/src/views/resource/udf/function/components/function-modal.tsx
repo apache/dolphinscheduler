@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, watch, onMounted, ref, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  PropType,
+  watch,
+  onMounted,
+  ref,
+  getCurrentInstance
+} from 'vue'
 import {
   NUpload,
   NIcon,
@@ -146,7 +154,7 @@ export default defineComponent({
             path='funcName'
           >
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.functionForm.funcName, 'value']}
               placeholder={t('resource.function.enter_udf_unction_name_tips')}
               class='input-function-name'
@@ -157,7 +165,7 @@ export default defineComponent({
             path='className'
           >
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.functionForm.className, 'value']}
               placeholder={t('resource.function.enter_package_name_tips')}
               class='input-class-name'
@@ -217,7 +225,7 @@ export default defineComponent({
               >
                 <NInputGroup>
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[this.uploadForm.name, 'value']}
                     placeholder={t('resource.function.enter_name_tips')}
                   />
@@ -263,7 +271,7 @@ export default defineComponent({
             path='description'
           >
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}

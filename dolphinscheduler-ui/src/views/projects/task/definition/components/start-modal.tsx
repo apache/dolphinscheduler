@@ -160,9 +160,7 @@ export default defineComponent({
       >
         <NForm ref='startFormRef' model={this.startForm}>
           <NFormItem label={t('project.task.task_name')} path='task_name'>
-            <div title={this.row.taskName}>
-              {this.row.taskName}
-            </div>
+            <div title={this.row.taskName}>{this.row.taskName}</div>
           </NFormItem>
           <NFormItem
             label={t('project.task.notification_strategy')}

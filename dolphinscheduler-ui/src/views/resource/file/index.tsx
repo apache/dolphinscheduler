@@ -16,7 +16,14 @@
  */
 
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, reactive, Ref, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  ref,
+  reactive,
+  Ref,
+  getCurrentInstance
+} from 'vue'
 import {
   NIcon,
   NSpace,

@@ -87,7 +87,7 @@ export default defineComponent({
             ref='uploadFormNameRef'
           >
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-file-name'
@@ -95,7 +95,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}

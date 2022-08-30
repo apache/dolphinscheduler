@@ -18,19 +18,18 @@ import type { IJsonItem } from '../types'
 import { useCustomParams } from '.'
 
 export function useSagemaker(model: { [field: string]: any }): IJsonItem[] {
-
   return [
     {
       type: 'editor',
       field: 'sagemakerRequestJson',
-      name: "SagemakerRequestJson",
+      name: 'SagemakerRequestJson',
       props: {
         language: 'json'
       },
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
-        message: 'requestJson' 
+        message: 'requestJson'
       }
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: false })

@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, watch, onMounted, ref, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  watch,
+  onMounted,
+  ref,
+  getCurrentInstance
+} from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -168,7 +175,7 @@ const DetailModal = defineComponent({
                     label: t('security.alarm_instance.alarm_instance_name'),
                     widget: (
                       <NInput
-                  allowInput={this.trim}
+                        allowInput={this.trim}
                         v-model={[detailForm.instanceName, 'value']}
                         placeholder={t(
                           'security.alarm_instance.alarm_instance_name_tips'

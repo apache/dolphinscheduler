@@ -159,6 +159,9 @@ $bgLight: #ffffff;
     &.icon-zeppelin {
       background-image: url('/images/task-icons/zeppelin.png');
     }
+    &.icon-hivecli {
+      background-image: url('/images/task-icons/hivecli.png');
+    }
     &.icon-k8s {
       background-image: url('/images/task-icons/k8s.png');
     }
@@ -247,6 +250,9 @@ $bgLight: #ffffff;
       }
       &.icon-zeppelin {
         background-image: url('/images/task-icons/zeppelin_hover.png');
+      }
+      &.icon-hivecli {
+        background-image: url('/images/task-icons/hivecli_hover.png');
       }
       &.icon-k8s {
         background-image: url('/images/task-icons/k8s_hover.png');

@@ -47,8 +47,8 @@ export function useMlflowModels(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => [model.deployType],
     () => {
-     cpuLimitSpan.value = model.deployType === "DOCKER COMPOSE" ? 12 : 0 
-     memoryLimitSpan.value = model.deployType === "DOCKER COMPOSE" ? 12 : 0 
+      cpuLimitSpan.value = model.deployType === 'DOCKER COMPOSE' ? 12 : 0
+      memoryLimitSpan.value = model.deployType === 'DOCKER COMPOSE' ? 12 : 0
     }
   )
 
