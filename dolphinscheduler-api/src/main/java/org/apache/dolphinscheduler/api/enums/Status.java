@@ -438,7 +438,7 @@ public enum Status {
     COMPLEMENT_COMMAND_SCHEDULE_TIME_EMPTY(1400005, "complement command schedule time can not be empty", "补数数据日期不可为空"),
     START_TIME_CAN_NOT_AFTER_END_TIME(1400006, "start time can not after end time", "开始时间不可晚于结束时间"),
     CONFIG_FILTER_EMPTY(1400007, "complement time is empty after filtering according to the configuration", "当前补数时间根据配置过滤后为空"),
-    PROJECTNAME_TOO_LONG_ERROR(1400008, "project name is too long error", "项目名称过长"),
+    PROJECT_NAME_TOO_LONG_ERROR(1400008, "project name is too long error", "项目名称过长"),
     ;
 
     private final int code;

@@ -97,7 +97,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         if(checkLengthIllegal(name, 100)) {
             result.put(Constants.STATUS,Status.FAILED);
-            result.put(Constants.MSG, Status.PROJECTNAME_TOO_LONG_ERROR);
+            result.put(Constants.MSG, Status.PROJECT_NAME_TOO_LONG_ERROR);
             return result;
         }
 
@@ -343,7 +343,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         if(checkLengthIllegal(projectName, 100)) {
             result.put(Constants.STATUS,Status.FAILED);
-            result.put(Constants.MSG, Status.PROJECTNAME_TOO_LONG_ERROR);
+            result.put(Constants.MSG, Status.PROJECT_NAME_TOO_LONG_ERROR);
             return result;
         }
 
