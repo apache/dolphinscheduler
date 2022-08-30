@@ -87,7 +87,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        if(checkDescriptionLengthIllegal(description)){
+        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -137,7 +137,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        if(checkDescriptionLengthIllegal(description)){
+        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

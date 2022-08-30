@@ -95,7 +95,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
         Map<String, Object> result = new HashMap<>();
 
-        if(checkDescriptionLengthIllegal(desc)) {
+        if(checkLengthIllegal(name, Constants.NAME_LENGTH_GO_ONLINE)) {
+            result.put(Constants.STATUS,Status.FAILED);
+            result.put(Constants.MSG, Status.PROJECT_NAME_TOO_LONG_ERROR);
+            return result;
+        }
+
+        if(checkLengthIllegal(desc, Constants.DESC_LENGTH_GO_ONLINE)) {
             result.put(Constants.STATUS,Status.FAILED);
             result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
@@ -334,7 +340,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> update(User loginUser, Long projectCode, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
-        if(checkDescriptionLengthIllegal(desc)) {
+
+        if(checkLengthIllegal(projectName, Constants.NAME_LENGTH_GO_ONLINE)) {
+            result.put(Constants.STATUS,Status.FAILED);
+            result.put(Constants.MSG, Status.PROJECT_NAME_TOO_LONG_ERROR);
+            return result;
+        }
+
+        if(checkLengthIllegal(desc, Constants.DESC_LENGTH_GO_ONLINE)) {
             result.put(Constants.STATUS,Status.FAILED);
             result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;

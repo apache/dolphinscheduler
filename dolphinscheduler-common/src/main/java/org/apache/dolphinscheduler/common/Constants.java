@@ -850,4 +850,8 @@ public final class Constants {
     public static final String TASK_PRIORITY_QUEUE = "TASK_PRIORITY_QUEUE";
 
     public static final String TASK_DISPATCH_FAILED_QUEUE = "TASK_DISPATCH_FAILED_QUEUE";
+
+    public static final int DESC_LENGTH_GO_ONLINE = 255;
+
+    public static final int NAME_LENGTH_GO_ONLINE = 100;
 }
