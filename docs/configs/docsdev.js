@@ -162,6 +162,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/en-us/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -780,6 +784,10 @@ export default {
                             {
                                 title: 'Jupyter',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
+                            },
+                            {
+                                title: 'Hive CLI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/hive-cli.html',
                             },
                             {
                                 title: 'Kubernetes',

@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
   NInput,
@@ -113,10 +120,7 @@ const list = defineComponent({
             >
               {t('datasource.create_datasource')}
             </NButton>
-            <NSpace
-              justify='end'
-              wrap={false}
-            >
+            <NSpace justify='end' wrap={false}>
               <NInput
                 allowInput={this.trim}
                 v-model={[this.searchVal, 'value']}
