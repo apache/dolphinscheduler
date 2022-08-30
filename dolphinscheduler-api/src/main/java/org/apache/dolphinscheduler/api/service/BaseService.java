@@ -119,6 +119,7 @@ public interface BaseService {
      * check checkInputLength
      *
      * @param input input String
+     * @param length length
      * @return ture if illegal
      */
     boolean checkLengthIllegal(String input, int length);
