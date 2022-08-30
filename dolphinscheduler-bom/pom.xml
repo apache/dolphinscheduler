@@ -68,6 +68,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.1.52</clickhouse-jdbc.version>
+        <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
