@@ -113,7 +113,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
-        if(checkDescriptionLengthIllegal(datasourceParam.getNote())){
+        if(checkLengthIllegal(datasourceParam.getNote(), 255)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -177,7 +177,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
-        if(checkDescriptionLengthIllegal(dataSourceParam.getNote())){
+        if(checkLengthIllegal(dataSourceParam.getNote(), 255)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

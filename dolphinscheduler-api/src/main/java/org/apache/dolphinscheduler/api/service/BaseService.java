@@ -116,12 +116,12 @@ public interface BaseService {
     Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
 
     /**
-     * check checkDescriptionLength
+     * check checkInputLength
      *
-     * @param description input String
+     * @param input input String
      * @return ture if illegal
      */
-    boolean checkDescriptionLengthIllegal(String description);
+    boolean checkLengthIllegal(String input, int length);
 
 }
 

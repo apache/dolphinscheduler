@@ -214,7 +214,7 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public boolean checkDescriptionLengthIllegal(String description) {
-        return description!=null && description.codePointCount(0, description.length()) > 255;
+    public boolean checkLengthIllegal(String input, int length) {
+        return input!=null && input.codePointCount(0, input.length()) > length;
     }
 }

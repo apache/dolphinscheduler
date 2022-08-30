@@ -99,7 +99,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if(checkDescriptionLengthIllegal(desc)){
+        if(checkLengthIllegal(desc, 255)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -357,7 +357,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkResult;
         }
-        if(checkDescriptionLengthIllegal(desc)){
+        if(checkLengthIllegal(desc, 255)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
