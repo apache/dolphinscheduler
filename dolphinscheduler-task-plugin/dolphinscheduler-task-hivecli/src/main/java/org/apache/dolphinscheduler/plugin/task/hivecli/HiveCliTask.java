@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.hivecli;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -72,9 +73,14 @@ public class HiveCliTask extends AbstractTaskExecutor {
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current HiveCLI Task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current HiveCLI Task has been interrupted", e);
         } catch (Exception e) {
             logger.error("hiveCli task failure", e);
-            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("run hiveCli task error", e);
         }
     }
