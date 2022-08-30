@@ -86,7 +86,7 @@ export default defineComponent({
         <NForm rules={this.rules} ref='uploadFormRef'>
           <NFormItem label={t('resource.udf.file_name')} path='name'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
               class='input-file-name'
@@ -94,7 +94,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}

@@ -646,11 +646,20 @@ export default {
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
     zeppelin_parameters: 'parameters',
-    zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
+    zeppelin_parameters_tips:
+      'Please enter the parameters for zeppelin dynamic form',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
-    zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
-    zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
-    zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
+    zeppelin_rest_endpoint_tips:
+      'Please enter the rest endpoint of your Zeppelin server',
+    zeppelin_production_note_directory:
+      'Directory for cloned zeppelin note in production mode',
+    zeppelin_production_note_directory_tips:
+      'Please enter the production note directory to enable production mode',
+    hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
+    hive_sql_script: 'Hive SQL Script',
+    hive_cli_options: 'Hive Cli Options',
+    hive_cli_options_tips:
+      'Please enter the options for hive cli, e.g. --verbose',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',
@@ -764,6 +773,7 @@ export default {
     pytorch_python_env_tool: 'Python Environment Manager Tool',
     pytorch_requirements: 'Requirement File',
     pytorch_conda_python_version: 'Python Version',
-    pytorch_conda_python_version_tips: 'Please enter the version number, such as 3.6, 3.7, 3.x'
+    pytorch_conda_python_version_tips:
+      'Please enter the version number, such as 3.6, 3.7, 3.x'
   }
 }
