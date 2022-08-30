@@ -684,6 +684,16 @@
                         </includes>
                         <flexmark />
                     </markdown>
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>**/*.yaml</include>
+                            </includes>
+                            <prettier>
+                                <prettierVersion>2.0.5</prettierVersion>
+                            </prettier>
+                        </format>
+                    </formats>
                 </configuration>
                 <executions>
                     <execution>
