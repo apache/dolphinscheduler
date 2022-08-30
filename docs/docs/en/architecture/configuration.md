@@ -173,7 +173,7 @@ The default configuration is as follows:
 |registry.zookeeper.session-timeout|30s|session timeout|
 |registry.zookeeper.connection-timeout|30s|connection timeout|
 |registry.zookeeper.block-until-connected|600ms|waiting time to block until the connection succeeds|
-|registry.zookeeper.digest|{username}:{password}|digest of zookeeper to access znode, works only when acl is enabled, for more details plz check [https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper doc) |
+|registry.zookeeper.digest|{username}:{password}|digest of zookeeper to access znode, works only when acl is enabled, for more details please check [https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper doc) |
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
 
