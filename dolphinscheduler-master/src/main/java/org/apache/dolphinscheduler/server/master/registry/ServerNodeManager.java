@@ -206,6 +206,7 @@ public class ServerNodeManager implements InitializingBean {
                         String workerGroupName = wg.getName();
                         Set<String> workerAddress = getWorkerAddressByWorkerGroup(registryWorkerNodeMap, wg);
                         if (!workerAddress.isEmpty()) {
+                            logger.info("WorkerGroup:{} sync after filter addrList: {}", workerGroupName, workerAddress.toString());
                             syncWorkerGroupNodes(workerGroupName, workerAddress);
                         }
                     }
