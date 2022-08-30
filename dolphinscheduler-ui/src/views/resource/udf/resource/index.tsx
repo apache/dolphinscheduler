@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef, watch, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  Ref,
+  toRefs,
+  onMounted,
+  toRef,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import {
   NIcon,
   NSpace,

@@ -421,6 +421,12 @@ export function formatParams(data: INodeData): {
     taskParams.targetJobName = data.targetJobName
   }
 
+  if (data.taskType === 'HIVECLI') {
+    taskParams.hiveCliTaskExecutionType = data.hiveCliTaskExecutionType
+    taskParams.hiveSqlScript = data.hiveSqlScript
+    taskParams.hiveCliOptions = data.hiveCliOptions
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
@@ -658,5 +664,6 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
+
   return params
 }
