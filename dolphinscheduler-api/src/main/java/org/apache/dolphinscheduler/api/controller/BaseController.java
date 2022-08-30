@@ -100,7 +100,7 @@ public class BaseController {
             return success(msg, datalist);
         } else {
             Integer code = status.getCode();
-            String msg = ((Status) result.get(Constants.MSG)).getMsg();
+            String msg = (String)result.get("msg");
             return error(code, msg);
         }
     }

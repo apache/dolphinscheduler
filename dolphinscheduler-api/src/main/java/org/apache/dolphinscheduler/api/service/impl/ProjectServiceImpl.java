@@ -342,14 +342,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Map<String, Object> result = new HashMap<>();
 
         if(checkLengthIllegal(projectName, Constants.NAME_LENGTH_GO_ONLINE)) {
-            result.put(Constants.STATUS,Status.FAILED);
-            result.put(Constants.MSG, Status.PROJECT_NAME_TOO_LONG_ERROR);
+            putMsg(result,Status.PROJECT_NAME_TOO_LONG_ERROR);
             return result;
         }
 
         if(checkLengthIllegal(desc, Constants.DESC_LENGTH_GO_ONLINE)) {
-            result.put(Constants.STATUS,Status.FAILED);
-            result.put(Constants.MSG, Status.DESCRIPTION_TOO_LONG_ERROR);
+            putMsg(result,Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
