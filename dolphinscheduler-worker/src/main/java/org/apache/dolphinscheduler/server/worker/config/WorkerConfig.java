@@ -64,7 +64,7 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getExecThreads() <= 0) {
             errors.rejectValue("exec-threads", null, "should be a positive value");
         }
-        if (workerConfig.getHeartbeatInterval().toMillis() <= 0) {
+        if (workerConfig.getHeartbeatInterval().getSeconds() <= 0) {
             errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
         }
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {

@@ -17,10 +17,15 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import io.netty.channel.Channel;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.log.GetAppIdRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
@@ -31,8 +36,9 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
-
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,15 +54,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import io.netty.channel.Channel;
-
-/**
- * logger request process logic
- */
 @Component
 public class LoggerRequestProcessor implements NettyRequestProcessor {
 
@@ -135,6 +132,15 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
                 RemoveTaskLogResponseCommand removeTaskLogResponse = new RemoveTaskLogResponseCommand(status);
                 channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
+                break;
+            case GET_APP_ID_REQUEST:
+                GetAppIdRequestCommand getAppIdRequestCommand = JSONUtils.parseObject(command.getBody(), GetAppIdRequestCommand.class);
+                String logPath = getAppIdRequestCommand.getLogPath();
+                if (!checkPathSecurity(logPath)) {
+                    throw new IllegalArgumentException("Illegal path");
+                }
+                List<String> appIds = LogUtils.getAppIdsFromLogFile(logPath);
+                channel.writeAndFlush(new GetAppIdResponseCommand(appIds).convert2Command(command.getOpaque()));
                 break;
             default:
                 throw new IllegalArgumentException("unknown commandType");
