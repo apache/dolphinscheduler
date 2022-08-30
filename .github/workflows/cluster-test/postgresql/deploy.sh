@@ -19,7 +19,6 @@ set -euox pipefail
 
 
 USER=root
-DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-*-SNAPSHOT-bin
 
 #Sudo
 sed -i '$a'$USER'  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
