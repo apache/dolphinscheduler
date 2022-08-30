@@ -123,7 +123,7 @@ public class JavaTask extends AbstractTaskExecutor {
      * @throws Exception
      */
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             // Step 1: judge if is java or jar run type.
             // Step 2 case1: the jar run type builds the command directly, adding resource to the java -jar class when building the command
@@ -323,7 +323,6 @@ public class JavaTask extends AbstractTaskExecutor {
     /**
      * Constructs a shell command compiled from a Java source file
      *
-     * @param fileName
      * @param sourceCode
      * @return String
      * @throws IOException
