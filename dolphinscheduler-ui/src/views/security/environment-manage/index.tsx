@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
   NDataTable,
@@ -117,7 +123,7 @@ const environmentManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
-                  allowInput={this.trim}
+                allowInput={this.trim}
                 size='small'
                 clearable
                 v-model={[this.searchVal, 'value']}
@@ -140,7 +146,7 @@ const environmentManage = defineComponent({
               data={this.tableData}
               scrollX={this.tableWidth}
             />
-            <NSpace>
+            <NSpace justify='center'>
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}

@@ -26,8 +26,8 @@ import { queryAllClusterList } from '@/service/modules/cluster'
 import { useAsyncState } from '@vueuse/core'
 
 export function useModal(
-    props: any,
-    ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
+  props: any,
+  ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
 ) {
   const { t } = useI18n()
 
@@ -73,8 +73,8 @@ export function useModal(
 
     try {
       statusRef === 0
-          ? await submitK8SNamespaceModal()
-          : await updateK8SNamespaceModal()
+        ? await submitK8SNamespaceModal()
+        : await updateK8SNamespaceModal()
       variables.saving = false
     } catch (err) {
       variables.saving = false
@@ -83,23 +83,23 @@ export function useModal(
 
   const getListData = () => {
     const { state } = useAsyncState(
-        queryAllClusterList().then((res: any) => {
-          variables.model.clusterOptions = res
-              .filter((item: any) => {
-                if (item.config) {
-                  const k8s = JSON.parse(item.config).k8s
-                  return !!k8s
-                }
-                return false
-              })
-              .map((item: any) => {
-                return {
-                  label: item.name,
-                  value: item.code
-                }
-              })
-        }),
-        {}
+      queryAllClusterList().then((res: any) => {
+        variables.model.clusterOptions = res
+          .filter((item: any) => {
+            if (item.config) {
+              const k8s = JSON.parse(item.config).k8s
+              return !!k8s
+            }
+            return false
+          })
+          .map((item: any) => {
+            return {
+              label: item.name,
+              value: item.code
+            }
+          })
+      }),
+      {}
     )
 
     return state
@@ -120,9 +120,9 @@ export function useModal(
 
   const updateK8SNamespaceModal = () => {
     updateK8sNamespace(variables.model, variables.model.id).then(
-        (ignored: any) => {
-          ctx.emit('confirmModal', props.showModalRef)
-        }
+      (ignored: any) => {
+        ctx.emit('confirmModal', props.showModalRef)
+      }
     )
   }
 

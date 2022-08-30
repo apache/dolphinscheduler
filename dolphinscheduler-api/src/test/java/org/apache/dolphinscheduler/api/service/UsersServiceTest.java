@@ -252,7 +252,6 @@ public class UsersServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
 
-        //no operate
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,null, 1, USER_MANAGER, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(false);
         Map<String, Object> result = usersService.queryUserList(user);
@@ -263,7 +262,7 @@ public class UsersServiceTest {
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN,null, 1, USER_MANAGER, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, serviceLogger)).thenReturn(true);
         user.setUserType(UserType.ADMIN_USER);
-        when(userMapper.selectList(null)).thenReturn(getUserList());
+        when(userMapper.queryEnabledUsers()).thenReturn(getUserList());
         result = usersService.queryUserList(user);
         List<User> userList = (List<User>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(userList.size() > 0);

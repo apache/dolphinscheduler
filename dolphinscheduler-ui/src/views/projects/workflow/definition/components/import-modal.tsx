@@ -90,7 +90,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('project.workflow.file_name')} path='name'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.importForm.name, 'value']}
               placeholder={''}
               disabled
