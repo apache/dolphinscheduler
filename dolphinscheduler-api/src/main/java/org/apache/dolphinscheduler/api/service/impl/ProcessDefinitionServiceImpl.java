@@ -248,7 +248,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if(checkLengthIllegal(description, 255)){
+        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -579,7 +579,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if(checkLengthIllegal(description, 255)){
+        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -2050,7 +2050,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if(checkLengthIllegal(description, 255)){
+        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -2182,7 +2182,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if(checkLengthIllegal(description, 255)){
+        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
