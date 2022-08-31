@@ -60,6 +60,8 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
+
 public interface ProcessService {
     @Transactional
     ProcessInstance handleCommand(String host, Command command)
@@ -105,7 +107,7 @@ public interface ProcessService {
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval);
+    @Nullable TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval);
 
     @Transactional
     TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
