@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.config;
 
 import com.google.common.collect.Sets;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.slf4j.Logger;
@@ -31,6 +32,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 @Data
 @Validated
@@ -57,6 +61,7 @@ public class WorkerConfig implements Validator {
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
      */
     private String workerAddress;
+    private Set<String> workerGroupRegistryPaths;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -76,6 +81,18 @@ public class WorkerConfig implements Validator {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
         workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+
+        workerConfig.setGroups(workerConfig.getGroups().stream().map(String::trim).collect(Collectors.toSet()));
+        if (CollectionUtils.isEmpty(workerConfig.getGroups())) {
+            errors.rejectValue("groups", null, "should not be empty");
+        }
+
+        Set<String> workerRegistryPaths = workerConfig.getGroups()
+                .stream()
+                .map(workerGroup -> REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup + "/" + workerConfig.getWorkerAddress())
+                .collect(Collectors.toSet());
+
+        workerConfig.setWorkerGroupRegistryPaths(workerRegistryPaths);
         printConfig();
     }
 
@@ -93,5 +110,6 @@ public class WorkerConfig implements Validator {
         logger.info("Worker config: alertListenPort -> {}", alertListenPort);
         logger.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
         logger.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
+        logger.info("Worker config: workerGroupRegistryPaths: {}", workerGroupRegistryPaths);
     }
 }

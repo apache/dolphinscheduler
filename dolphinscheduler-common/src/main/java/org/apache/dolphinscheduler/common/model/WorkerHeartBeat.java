@@ -17,28 +17,31 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.NoArgsConstructor;
 
 @Data
-public class Server {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkerHeartBeat implements HeartBeat {
 
-    private int id;
+    private long startupTime;
+    private long reportTime;
+    private double cpuUsage;
+    private double memoryUsage;
+    private double loadAverage;
+    private double availablePhysicalMemorySize;
+    private double maxCpuloadAvg;
+    private double reservedMemory;
+    private int serverStatus;
+    private int processId;
 
-    private String host;
+    private int workerHostWeight; // worker host weight
+    private int workerWaitingTaskCount; // worker waiting task count
+    private int workerExecThreadCount; // worker thread pool thread count
 
-    private int port;
-
-    private String zkDirectory;
-
-    /**
-     * resource info: CPU and memory
-     */
-    private String resInfo;
-
-    private Date createTime;
-
-    private Date lastHeartbeatTime;
 
 }
