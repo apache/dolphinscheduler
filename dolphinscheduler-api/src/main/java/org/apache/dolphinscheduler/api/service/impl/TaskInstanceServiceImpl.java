@@ -92,17 +92,17 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param searchVal search value
-     * @param taskName task name
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param searchVal         search value
+     * @param taskName          task name
+     * @param stateType         state type
+     * @param host              host
+     * @param startDate         start time
+     * @param endDate           end time
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @return task list page
      */
     @Override
@@ -150,11 +150,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without process instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
-                page, project.getCode(), processDefinitionName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
+                    page, project.getCode(), processDefinitionName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
             );
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
+                    page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
             );
         }
         Set<String> exclusionSet = new HashSet<>();
@@ -182,19 +182,19 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     /**
      * change one task instance's state from failure to forced success
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser      login user
+     * @param projectCode    project code
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
     @Transactional
     @Override
-    public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
+    public Result forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
+        Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        projectService.checkProjectAndAuth(result, loginUser, project, projectCode, FORCED_SUCCESS);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
             return result;
         }
 
@@ -235,10 +235,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            putMsg(result,status);
+            putMsg(result, status);
             return result;
         }
 
@@ -263,10 +263,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            putMsg(result,status);
+            putMsg(result, status);
             return result;
         }
 

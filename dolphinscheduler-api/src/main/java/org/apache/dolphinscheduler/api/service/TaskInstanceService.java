@@ -70,7 +70,7 @@ public interface TaskInstanceService {
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    Map<String, Object> forceTaskSuccess(User loginUser,
+    Result forceTaskSuccess(User loginUser,
                                          long projectCode,
                                          Integer taskInstanceId);
 

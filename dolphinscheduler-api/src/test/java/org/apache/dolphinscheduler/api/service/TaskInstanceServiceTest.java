@@ -283,8 +283,8 @@ public class TaskInstanceServiceTest {
         Map<String, Object> mockFailure = new HashMap<>(5);
         putMsg(mockFailure, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockFailure);
-        Map<String, Object> authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertNotSame(Status.SUCCESS, authFailRes.get(Constants.STATUS));
+        Result authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assert.assertNotSame(Status.SUCCESS.getCode(), authFailRes.getCode());
 
         // test task not found
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockSuccess);
@@ -292,8 +292,8 @@ public class TaskInstanceServiceTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
-        Map<String, Object> taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
+        Result taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), taskNotFoundRes.getCode().intValue());
 
         // test task instance state error
         task.setState(TaskExecutionStatus.SUCCESS);
@@ -302,8 +302,8 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Map<String, Object> taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
+        Result taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR.getCode(), taskStateErrorRes.getCode().intValue());
 
         // test error
         task.setState(TaskExecutionStatus.FAILURE);
@@ -311,8 +311,8 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Map<String, Object> errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR, errorRes.get(Constants.STATUS));
+        Result errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assert.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR.getCode(), errorRes.getCode().intValue());
 
         // test success
         task.setState(TaskExecutionStatus.FAILURE);
@@ -320,7 +320,7 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Map<String, Object> successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assert.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
     }
 }
