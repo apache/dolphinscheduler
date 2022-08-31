@@ -21,7 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
-import { NEllipsis, NTag } from 'naive-ui'
+import { NEllipsis} from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,

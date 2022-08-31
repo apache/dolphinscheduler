@@ -29,8 +29,7 @@ import {
   NSpace,
   NTooltip,
   NSpin,
-  NEllipsis,
-  NTag
+  NEllipsis
 } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
