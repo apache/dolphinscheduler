@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -129,22 +130,14 @@ public class AlertGroup {
 
         AlertGroup that = (AlertGroup) o;
 
-        if (id != that.id) {
-            return false;
-        }
-        if (createUserId != that.createUserId) {
-            return false;
-        }
-        if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
-            return false;
-        }
-        if (alertInstanceIds != null ? !alertInstanceIds.equals(that.alertInstanceIds) : that.alertInstanceIds != null) {
-            return false;
-        }
-        if (description != null ? !description.equals(that.description) : that.description != null) {
-            return false;
-        }
-        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) && !(updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null);
+        return Objects.equals(id,that.id)
+                && Objects.equals(createUserId,that.createUserId)
+                && Objects.equals(groupName, that.groupName)
+                && Objects.equals(alertInstanceIds, that.alertInstanceIds)
+                && Objects.equals(description, that.description)
+                && Objects.equals(createTime, that.createTime)
+                && Objects.equals(updateTime, that.updateTime)
+                ;
 
     }
 

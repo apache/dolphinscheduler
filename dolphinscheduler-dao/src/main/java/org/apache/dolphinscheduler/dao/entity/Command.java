@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -336,57 +337,25 @@ public class Command {
 
         Command command = (Command) o;
 
-        if (id != command.id) {
-            return false;
-        }
-        if (processDefinitionCode != command.processDefinitionCode) {
-            return false;
-        }
-        if (executorId != command.executorId) {
-            return false;
-        }
-        if (workerGroup != null ? workerGroup.equals(command.workerGroup) : command.workerGroup == null) {
-            return false;
-        }
+        return Objects.equals(id, command.id)
+                && Objects.equals(processDefinitionCode, command.processDefinitionCode)
+                && Objects.equals(executorId, command.executorId)
+                && Objects.equals(workerGroup, command.workerGroup)
+                && Objects.equals(environmentCode, command.environmentCode)
+                && Objects.equals(commandType, command.commandType)
+                && Objects.equals(commandParam, command.commandParam)
+                && Objects.equals(taskDependType, command.taskDependType)
+                && Objects.equals(failureStrategy, command.failureStrategy)
+                && Objects.equals(warningType, command.warningType)
+                && Objects.equals(warningGroupId, command.warningGroupId)
+                && Objects.equals(scheduleTime, command.scheduleTime)
+                && Objects.equals(startTime, command.startTime)
+                && Objects.equals(processInstancePriority, command.processInstancePriority)
+                && Objects.equals(processInstanceId, command.processInstanceId)
+                && Objects.equals(processDefinitionVersion, command.getProcessDefinitionVersion())
+                && Objects.equals(updateTime, command.updateTime)
+                ;
 
-        if (environmentCode != null ? environmentCode.equals(command.environmentCode) : command.environmentCode == null) {
-            return false;
-        }
-
-        if (commandType != command.commandType) {
-            return false;
-        }
-        if (commandParam != null ? !commandParam.equals(command.commandParam) : command.commandParam != null) {
-            return false;
-        }
-        if (taskDependType != command.taskDependType) {
-            return false;
-        }
-        if (failureStrategy != command.failureStrategy) {
-            return false;
-        }
-        if (warningType != command.warningType) {
-            return false;
-        }
-        if (warningGroupId != null ? !warningGroupId.equals(command.warningGroupId) : command.warningGroupId != null) {
-            return false;
-        }
-        if (scheduleTime != null ? !scheduleTime.equals(command.scheduleTime) : command.scheduleTime != null) {
-            return false;
-        }
-        if (startTime != null ? !startTime.equals(command.startTime) : command.startTime != null) {
-            return false;
-        }
-        if (processInstancePriority != command.processInstancePriority) {
-            return false;
-        }
-        if (processInstanceId != command.processInstanceId) {
-            return false;
-        }
-        if (processDefinitionVersion != command.getProcessDefinitionVersion()) {
-            return false;
-        }
-        return !(updateTime != null ? !updateTime.equals(command.updateTime) : command.updateTime != null);
     }
 
     @Override
