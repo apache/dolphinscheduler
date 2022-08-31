@@ -866,7 +866,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.warn("The process definition has not relation, it will be delete successfully");
         }
         deleteOtherRelation(project, result, processDefinition);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, Status.DELETE_PROCESS_DEFINITION_SUCCESS, processDefinition.getName());
         return result;
     }
 
