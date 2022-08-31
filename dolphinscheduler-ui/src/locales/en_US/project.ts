@@ -662,6 +662,11 @@ export default {
       'Directory for cloned zeppelin note in production mode',
     zeppelin_production_note_directory_tips:
       'Please enter the production note directory to enable production mode',
+    hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
+    hive_sql_script: 'Hive SQL Script',
+    hive_cli_options: 'Hive Cli Options',
+    hive_cli_options_tips:
+      'Please enter the options for hive cli, e.g. --verbose',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',

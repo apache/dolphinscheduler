@@ -40,19 +40,23 @@
         <if test="host != null and host != ''">
             and host=#{host}
         </if>
-        and state in
-        <foreach collection="states" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
         order by id asc
     </select>
     <select id="queryNeedFailoverProcessInstanceHost" resultType="String">
         select distinct host
         from t_ds_process_instance
-        where state in
-        <foreach collection="states" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            where state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryTopNProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
@@ -77,10 +81,12 @@
         <if test="tenantId != -1">
             and tenant_id =#{tenantId}
         </if>
-        and state in
-        <foreach collection="states" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
         order by id asc
     </select>
 
@@ -92,10 +98,12 @@
         <if test="workerGroupName != ''">
             and worker_group =#{workerGroupName}
         </if>
-        and state in
-        <foreach collection="states" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
         order by id asc
     </select>
 
@@ -114,8 +122,8 @@
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
         </if>
-        <if test="startTime != null ">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+        <if test="startTime != null and endTime != null ">
+            and instance.start_time <![CDATA[ >= ]]> #{startTime} and instance.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="states != null and states.length > 0">
             and instance.state in
@@ -134,10 +142,13 @@
     <update id="setFailoverByHostAndStateArray">
         update t_ds_process_instance
         set host=null
-        where host =#{host} and state in
-        <foreach collection="states" index="index" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        where host =#{host}
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" index="index" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
     </update>
     <update id="updateProcessInstanceByState">
         update t_ds_process_instance
@@ -225,10 +236,12 @@
         <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_code=#{processDefinitionCode}
-        and state in
-        <foreach collection="states" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
         order by id asc
     </select>
     <select id="queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
@@ -237,10 +250,12 @@
         from t_ds_process_instance
         where process_definition_code=#{processDefinitionCode}
           and process_definition_version = #{processDefinitionVersion}
-        and state in
-        <foreach collection="states" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
         and next_process_instance_id=0
         and id <![CDATA[ < ]]> #{id}
         order by id desc
