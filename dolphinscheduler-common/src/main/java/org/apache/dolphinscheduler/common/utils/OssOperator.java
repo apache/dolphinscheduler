@@ -324,6 +324,6 @@ public class OssOperator implements Closeable, StorageOperate {
 
     @Override
     public ResUploadType returnStorageType() {
-        return ResUploadType.S3;
+        return ResUploadType.OSS;
     }
 }
