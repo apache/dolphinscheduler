@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +33,6 @@ public interface WorkerInfoChangeListener {
      * @param workerGroups   worker groups map, key is worker group name, value is worker address.
      * @param workerNodeInfo worker node info map, key is worker address, value is worker info.
      */
-    void notify(Map<String, Set<String>> workerGroups, Map<String, String> workerNodeInfo);
+    void notify(Map<String, Set<String>> workerGroups, Map<String, WorkerHeartBeat> workerNodeInfo);
 
 }

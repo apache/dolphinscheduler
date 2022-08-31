@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutionContextTestUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -55,6 +56,7 @@ public class RoundRobinHostManagerTest {
     @Test
     public void testSelectWithResult() {
         Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22"));
+        Mockito.when(serverNodeManager.getWorkerNodeInfo("192.168.1.1:22")).thenReturn(new WorkerHeartBeat());
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(!Strings.isNullOrEmpty(host.getAddress()));

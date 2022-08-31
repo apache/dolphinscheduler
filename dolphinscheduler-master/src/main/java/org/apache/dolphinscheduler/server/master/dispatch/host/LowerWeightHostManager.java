@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.server.master.registry.WorkerInfoChangeListener;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,11 +39,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * lower weight host manager
@@ -97,7 +93,7 @@ public class LowerWeightHostManager extends CommonHostManager {
 
     private class WorkerWeightListener implements WorkerInfoChangeListener {
         @Override
-        public void notify(Map<String, Set<String>> workerGroups, Map<String, String> workerNodeInfo) {
+        public void notify(Map<String, Set<String>> workerGroups, Map<String, WorkerHeartBeat> workerNodeInfo) {
             syncWorkerResources(workerGroups, workerNodeInfo);
         }
     }
@@ -109,7 +105,7 @@ public class LowerWeightHostManager extends CommonHostManager {
      * @param workerNodeInfoMap worker node info map, key is worker node, value is worker info.
      */
     private void syncWorkerResources(final Map<String, Set<String>> workerGroupNodes,
-                                     final Map<String, String> workerNodeInfoMap) {
+                                     final Map<String, WorkerHeartBeat> workerNodeInfoMap) {
         try {
             Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
             for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
@@ -117,7 +113,7 @@ public class LowerWeightHostManager extends CommonHostManager {
                 Set<String> nodes = entry.getValue();
                 Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                 for (String node : nodes) {
-                    String heartbeat = workerNodeInfoMap.getOrDefault(node, null);
+                    WorkerHeartBeat heartbeat = workerNodeInfoMap.getOrDefault(node, null);
                     Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
                     hostWeightOpt.ifPresent(hostWeights::add);
                 }
@@ -131,13 +127,9 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    private Optional<HostWeight> getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
-        if (StringUtils.isEmpty(heartBeatInfo)) {
-            logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
-            return Optional.empty();
-        }
-        HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+    public Optional<HostWeight> getHostWeight(String addr, String workerGroup, WorkerHeartBeat heartBeat) {
         if (heartBeat == null) {
+            logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
             return Optional.empty();
         }
         if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
@@ -151,11 +143,14 @@ public class LowerWeightHostManager extends CommonHostManager {
             return Optional.empty();
         }
         return Optional.of(
-                new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
-                        heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
-                        heartBeat.getWorkerWaitingTaskCount(), heartBeat.getStartupTime()));
+                new HostWeight(
+                        HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
+                        heartBeat.getCpuUsage(),
+                        heartBeat.getMemoryUsage(),
+                        heartBeat.getLoadAverage(),
+                        heartBeat.getWorkerWaitingTaskCount(),
+                        heartBeat.getStartupTime()));
     }
-
 
     private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
         lock.lock();

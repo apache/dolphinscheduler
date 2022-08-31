@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -70,6 +71,12 @@ public class MasterRegistryClientTest {
     private ProcessService processService;
 
     @Mock
+    private MasterConnectStrategy masterConnectStrategy;
+
+    @Mock
+    private MasterHeartBeatTask masterHeartBeatTask;
+
+    @Mock
     private ProcessInstanceExecCacheManagerImpl processInstanceExecCacheManager;
 
     @Before
@@ -81,6 +88,7 @@ public class MasterRegistryClientTest {
 
         });
         ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
+        ReflectionTestUtils.setField(masterRegistryClient, "masterHeartBeatTask", masterHeartBeatTask);
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
