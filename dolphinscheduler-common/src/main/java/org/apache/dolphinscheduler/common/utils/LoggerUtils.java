@@ -17,24 +17,29 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import lombok.experimental.UtilityClass;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import lombok.experimental.UtilityClass;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * logger utils
@@ -43,11 +48,6 @@ import lombok.experimental.UtilityClass;
 public class LoggerUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
-
-    /**
-     * rules for extracting application ID
-     */
-    private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
      * build job id
@@ -63,31 +63,6 @@ public class LoggerUtils {
         String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null);
         return String.format("%s=%s-%s-%s_%s-%s-%s",
                 TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
-    }
-
-    /**
-     * processing log
-     * get yarn application id list
-     *
-     * @param log log content
-     * @param logger logger
-     * @return app id list
-     */
-    public static List<String> getAppIds(String log, Logger logger) {
-
-        List<String> appIds = new ArrayList<>();
-
-        Matcher matcher = APPLICATION_REGEX.matcher(log);
-
-        // analyse logs to get all submit yarn application id
-        while (matcher.find()) {
-            String appId = matcher.group();
-            if (!appIds.contains(appId)) {
-                logger.info("find app id: {}", appId);
-                appIds.add(appId);
-            }
-        }
-        return appIds;
     }
 
     /**
