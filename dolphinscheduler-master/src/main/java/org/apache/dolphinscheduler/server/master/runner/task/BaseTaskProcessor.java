@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -115,6 +116,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessService processService;
 
+    protected ProcessInstanceDao processInstanceDao;
+
     protected MasterConfig masterConfig;
 
     protected TaskPluginManager taskPluginManager;
@@ -128,6 +131,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     @Override
     public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
         processService = SpringApplicationContext.getBean(ProcessService.class);
+        processInstanceDao = SpringApplicationContext.getBean(ProcessInstanceDao.class);
         masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);

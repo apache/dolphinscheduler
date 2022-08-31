@@ -18,3 +18,5 @@
 
 ALTER TABLE `t_ds_worker_group` ADD COLUMN `worker_group_extra_param` text DEFAULT NULL COMMENT 'extra params, e.g. default address filter list..';
 
+ALTER TABLE `t_ds_process_instance` ADD COLUMN `state_history` text DEFAULT NULL COMMENT 'state history desc' AFTER `state`;
+

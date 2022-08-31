@@ -586,6 +586,7 @@ CREATE TABLE `t_ds_process_instance` (
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `process_definition_version` int(11) DEFAULT '0' COMMENT 'process definition version',
   `state` tinyint(4) DEFAULT NULL COMMENT 'process instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
+  `state_history` text DEFAULT NULL COMMENT 'state history desc',
   `recovery` tinyint(4) DEFAULT NULL COMMENT 'process instance failover flag：0:normal,1:failover instance',
   `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
   `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',

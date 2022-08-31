@@ -62,6 +62,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
@@ -122,6 +123,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private ProcessInstanceDao processInstanceDao;
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
@@ -507,8 +511,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         processInstance.setCommandType(commandType);
         processInstance.addHistoryCmd(commandType);
-        processInstance.setState(executionStatus);
-        int update = processService.updateProcessInstance(processInstance);
+        processInstance.setStateWithDesc(executionStatus, commandType.getDescp() + "by ui");
+        int update = processInstanceDao.updateProcessInstance(processInstance);
 
         // determine whether the process is normal
         if (update > 0) {

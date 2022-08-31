@@ -13,43 +13,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-delimiter d//
+package org.apache.dolphinscheduler.dao.repository;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 
+public interface ProcessInstanceDao {
 
-CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
-    )
-    RETURNS character varying
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
-DECLARE
-v_schema varchar;
-BEGIN
-    ---get schema name
-    v_schema =current_schema();
+    public int insertProcessInstance(ProcessInstance processInstance);
 
+    public int updateProcessInstance(ProcessInstance processInstance);
 
-
---- add column
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS worker_group_extra_param int DEFAULT NULL  ';
-
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_isntance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL  ';
-
-
-return 'Success!';
-exception when others then
-        ---Raise EXCEPTION '(%)',SQLERRM;
-
-        return SQLERRM;
-END;
-$BODY$;
-
-select dolphin_update_metadata();
-
-
-d//
-
+    /**
+     * insert or update work process instance to database
+     *
+     * @param processInstance processInstance
+     */
+    public int upsertProcessInstance(ProcessInstance processInstance);
+}

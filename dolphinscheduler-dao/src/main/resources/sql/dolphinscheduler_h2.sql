@@ -584,6 +584,7 @@ CREATE TABLE t_ds_process_instance
     process_definition_version int(11) DEFAULT NULL,
     process_definition_code    bigint(20) not NULL,
     state                      tinyint(4) DEFAULT NULL,
+    state_history              text,
     recovery                   tinyint(4) DEFAULT NULL,
     start_time                 datetime     DEFAULT NULL,
     end_time                   datetime     DEFAULT NULL,
