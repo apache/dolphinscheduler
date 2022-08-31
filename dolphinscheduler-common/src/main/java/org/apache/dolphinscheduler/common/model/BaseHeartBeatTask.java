@@ -71,8 +71,7 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
     }
 
     private void handleInterruptException(InterruptedException ex) {
-        shutdown();
-        log.warn("{} has been interrupted, will stop this thread", threadName, ex);
+        log.warn("{} has been interrupted", threadName, ex);
         Thread.currentThread().interrupt();
     }
 

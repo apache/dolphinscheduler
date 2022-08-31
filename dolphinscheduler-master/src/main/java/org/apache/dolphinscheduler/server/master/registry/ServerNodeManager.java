@@ -355,11 +355,11 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     public Map<String, Set<String>> getWorkerGroupNodes() {
-        workerGroupLock.readLock();
+        workerGroupReadLock.lock();
         try {
             return Collections.unmodifiableMap(workerGroupNodes);
         } finally {
-            workerGroupLock.writeLock();
+            workerGroupReadLock.unlock();
         }
     }
 
