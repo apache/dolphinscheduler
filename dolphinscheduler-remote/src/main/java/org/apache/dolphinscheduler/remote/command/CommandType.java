@@ -19,44 +19,23 @@ package org.apache.dolphinscheduler.remote.command;
 
 public enum CommandType {
 
-    /**
-     * remove task log request,
-     */
+    GET_APP_ID_REQUEST,
+    GET_APP_ID_RESPONSE,
+
     REMOVE_TAK_LOG_REQUEST,
 
-    /**
-     * remove task log response
-     */
     REMOVE_TAK_LOG_RESPONSE,
 
-    /**
-     * roll view log request
-     */
     ROLL_VIEW_LOG_REQUEST,
 
-    /**
-     * roll view log response
-     */
     ROLL_VIEW_LOG_RESPONSE,
 
-    /**
-     * view whole log request
-     */
     VIEW_WHOLE_LOG_REQUEST,
 
-    /**
-     * view whole log response
-     */
     VIEW_WHOLE_LOG_RESPONSE,
 
-    /**
-     * get log bytes request
-     */
     GET_LOG_BYTES_REQUEST,
 
-    /**
-     * get log bytes response
-     */
     GET_LOG_BYTES_RESPONSE,
 
 
