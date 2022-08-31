@@ -21,9 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
-import { NEllipsis,
-         NTag
-} from 'naive-ui'
+import { NEllipsis, NTag } from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,
@@ -31,7 +29,11 @@ import {
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
-import { renderTableTime, runningType } from '@/common/common'
+import {
+  renderEnvironmentalDistinctionCell,
+  renderTableTime,
+  runningType
+} from '@/common/common'
 import { renderStateCell } from '../../task/instance/use-table'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -116,27 +118,8 @@ export function useTable() {
         key: 'testFlag',
         width: 160,
         className: 'workflow-testFlag',
-        render: (_row: IWorkflowInstance) => {
-          if (_row.testFlag===0) {
-            return h(
-                NTag,
-                { type: 'success', size: 'small' },
-                {
-                  default: () => t('project.workflow.on_line')
-                }
-            )
-          } else if(_row.testFlag===1){
-            return h(
-                NTag,
-                { type: 'warning', size: 'small' },
-                {
-                  default: () => t('project.workflow.test')
-                }
-            )
-          }else {
-            return '-'
-          }
-        }
+        render: (_row: IWorkflowInstance) =>
+          renderEnvironmentalDistinctionCell(_row.testFlag, t)
       },
       {
         title: t('project.workflow.run_type'),

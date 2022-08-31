@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -111,7 +117,7 @@ const YarnQueueModal = defineComponent({
                   path='queueName'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-queue-name'
                     placeholder={t('security.yarn_queue.queue_name_tips')}
                     v-model={[this.model.queueName, 'value']}
@@ -122,7 +128,7 @@ const YarnQueueModal = defineComponent({
                   path='queue'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-queue-value'
                     placeholder={t('security.yarn_queue.queue_value_tips')}
                     v-model={[this.model.queue, 'value']}

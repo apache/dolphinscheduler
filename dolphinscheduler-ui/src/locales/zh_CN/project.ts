@@ -645,7 +645,8 @@ export default {
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
     zeppelin_production_note_directory: '生产模式下存放克隆note的目录',
-    zeppelin_production_note_directory_tips: '请输入生产环境note目录以启用生产模式',
+    zeppelin_production_note_directory_tips:
+      '请输入生产环境note目录以启用生产模式',
     zeppelin_paragraph_id_tips: '请输入zeppelin paragraph id',
     zeppelin_parameters: 'parameters',
     zeppelin_parameters_tips: '请输入zeppelin dynamic form参数',

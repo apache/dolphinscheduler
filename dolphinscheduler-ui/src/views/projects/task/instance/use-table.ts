@@ -23,7 +23,15 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis , NTag } from 'naive-ui'
+import {
+  NButton,
+  NIcon,
+  NSpace,
+  NTooltip,
+  NSpin,
+  NEllipsis,
+  NTag
+} from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -32,7 +40,12 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import { parseTime, renderTableTime, tasksState } from '@/common/common'
+import {
+  parseTime,
+  renderEnvironmentalDistinctionCell,
+  renderTableTime,
+  tasksState
+} from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -120,27 +133,8 @@ export function useTable() {
         title: t('project.task.operating_environment'),
         key: 'testFlag',
         width: 160,
-        render: (row: IRecord) => {
-          if (row.testFlag===0) {
-            return h(
-                NTag,
-                { type: 'success', size: 'small' },
-                {
-                  default: () => t('project.task.on_line')
-                }
-            )
-          } else if(row.testFlag===1){
-            return h(
-                NTag,
-                { type: 'warning', size: 'small' },
-                {
-                  default: () => t('project.task.test')
-                }
-            )
-          }else {
-            return '-'
-          }
-        }
+        render: (_row: IRecord) =>
+          renderEnvironmentalDistinctionCell(_row.testFlag, t)
       },
       {
         title: t('project.task.node_type'),

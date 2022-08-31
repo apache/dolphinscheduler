@@ -105,7 +105,10 @@ export function useDatasource(
   }
 
   const refreshOptions = async () => {
-    const parameters = { type: model[params.typeField || 'type'], testFlag: 0 } as TypeReq
+    const parameters = {
+      type: model[params.typeField || 'type'],
+      testFlag: 0
+    } as TypeReq
     const res = await queryDataSourceList(parameters)
     datasourceOptions.value = res.map((item: any) => ({
       label: item.name,

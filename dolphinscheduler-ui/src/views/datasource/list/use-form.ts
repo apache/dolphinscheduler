@@ -30,7 +30,7 @@ import type {
   IDataSource
 } from './types'
 import utils from '@/utils'
-import {TypeReq} from "@/service/modules/data-source/types";
+import { TypeReq } from '@/service/modules/data-source/types'
 export function useForm(id?: number) {
   const { t } = useI18n()
 
@@ -125,22 +125,22 @@ export function useForm(id?: number) {
           }
         }
       },
-    testFlag: {
-      trigger: ['input'],
-      validator() {
-        if (state.detailForm.testFlag ===undefined) {
-          return new Error(t('datasource.datasource_test_flag_tips'))
+      testFlag: {
+        trigger: ['input'],
+        validator() {
+          if (undefined === state.detailForm.testFlag) {
+            return new Error(t('datasource.datasource_test_flag_tips'))
+          }
+        }
+      },
+      bindTestId: {
+        trigger: ['input'],
+        validator() {
+          if (!state.detailForm.bindTestId && !state.detailForm.testFlag) {
+            return new Error(t('datasource.datasource_bind_test_id_tips'))
+          }
         }
       }
-    },
-    bindTestId: {
-      trigger: ['input'],
-      validator() {
-        if (!state.detailForm.bindTestId && !state.detailForm.testFlag) {
-          return new Error(t('datasource.datasource_bind_test_id_tips'))
-        }
-      }
-    }
     } as FormRules
   })
 
@@ -159,7 +159,9 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
-    if (!state.detailForm.id) await getSameTypeTestDataSource()
+    if (state.detailForm.id === undefined) {
+      await getSameTypeTestDataSource()
+    }
   }
 
   const changePort = async () => {
@@ -171,22 +173,24 @@ export function useForm(id?: number) {
     if (testFlag) {
       state.detailForm.bindTestId = undefined
     }
-    if (state.detailForm.id) await getSameTypeTestDataSource()
+    if (state.detailForm.id !== undefined && testFlag === 0) {
+      await getSameTypeTestDataSource()
+    }
   }
 
-
   const getSameTypeTestDataSource = async () => {
-    const params = { type: state.detailForm.type,testFlag: 1 } as TypeReq
+    const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
     const result = await queryDataSourceList(params)
-    state.bindTestDataSourceExample = result.map(
-        (TestDataSourceExample: { name: string; id: number }) => ({
-          label: TestDataSourceExample.name,
-          value: TestDataSourceExample.id
-        })
-    ).filter((value: { label: string; value: number }) => {
-      if (state.detailForm.id && state.detailForm.id === value.value) return false
-      return true
-    } )
+    state.bindTestDataSourceExample = result
+      .map((TestDataSourceExample: { name: string; id: number }) => ({
+        label: TestDataSourceExample.name,
+        value: TestDataSourceExample.id
+      }))
+      .filter((value: { label: string; value: number }) => {
+        if (state.detailForm.id && state.detailForm.id === value.value)
+          return false
+        return true
+      })
   }
 
   const resetFieldsValue = () => {
