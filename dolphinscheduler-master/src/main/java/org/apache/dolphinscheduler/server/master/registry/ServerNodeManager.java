@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -178,7 +178,7 @@ public class ServerNodeManager implements InitializingBean {
                 syncAllWorkerNodeInfo(registryWorkerNodeMap);
                 // sync worker group nodes from database
                 List<WorkerGroupDto> workerGroupList = workerGroupDao.queryAllWorkerGroup();
-                if (CollectionUtils.isNotEmpty(workerGroupList)) {
+                if (CollectionUtils.isEmpty(workerGroupList)) {
                     return;
                 }
                 for (WorkerGroupDto wg : workerGroupList) {

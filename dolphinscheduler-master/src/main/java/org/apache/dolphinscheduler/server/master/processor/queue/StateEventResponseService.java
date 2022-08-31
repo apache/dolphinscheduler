@@ -117,6 +117,10 @@ public class StateEventResponseService {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
+                    if (!ServerLifeCycleManager.isRunning()) {
+                        continue;
+                    }
+
                     LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
                             stateEvent.getTaskInstanceId());
                     persist(stateEvent);
