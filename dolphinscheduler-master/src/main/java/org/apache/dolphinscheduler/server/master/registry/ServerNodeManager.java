@@ -221,7 +221,8 @@ public class ServerNodeManager implements InitializingBean {
                 try {
                     String[] parts = path.split("/");
                     if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                        throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
+                        logger.error("Worker group path is not valida, will ignore this event: {}", event);
+                        return;
                     }
                     final String workerGroupName = parts[parts.length - 2];
                     final String workerAddress = parts[parts.length - 1];

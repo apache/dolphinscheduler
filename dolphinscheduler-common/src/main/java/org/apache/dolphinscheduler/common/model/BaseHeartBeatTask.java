@@ -3,10 +3,10 @@ package org.apache.dolphinscheduler.common.model;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 @Slf4j
-public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
+public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonThread {
 
     private final String threadName;
     private final long heartBeatInterval;

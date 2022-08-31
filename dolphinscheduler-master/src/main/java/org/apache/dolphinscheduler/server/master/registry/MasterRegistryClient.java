@@ -147,9 +147,9 @@ public class MasterRegistryClient implements AutoCloseable {
      * Registry the current master server itself to registry.
      */
     void registry() {
-        logger.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
         String masterAddress = masterConfig.getMasterAddress();
+        logger.info("Master node : {} registering to registry center: {}", masterAddress, masterRegistryPath);
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
