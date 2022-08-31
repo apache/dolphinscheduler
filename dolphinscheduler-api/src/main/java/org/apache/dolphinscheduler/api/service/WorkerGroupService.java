@@ -35,10 +35,10 @@ public interface WorkerGroupService {
      * @param name worker group name
      * @param addrList addr list
      * @param description   description
-     * @param otherParamsJson  otherParamsJson
+     * @param workerGroupExtraParam  workerGroupExtraParam
      * @return create or update result code
      */
-    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String otherParamsJson);
+    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String workerGroupExtraParam);
 
     /**
      * query worker group paging

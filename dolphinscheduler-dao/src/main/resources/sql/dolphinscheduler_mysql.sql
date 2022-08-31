@@ -946,7 +946,7 @@ CREATE TABLE `t_ds_worker_group` (
   `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
   `description` text NULL DEFAULT NULL COMMENT 'description',
-  `other_params_json` text NULL DEFAULT NULL COMMENT 'other params json',
+  `worker_group_extra_param` text NULL DEFAULT NULL COMMENT 'extra params, e.g. default address filter list..',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

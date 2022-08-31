@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -34,10 +33,13 @@ import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
+import javax.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,13 +54,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.annotation.PreDestroy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 /**
  * server node manager
@@ -115,7 +112,7 @@ public class ServerNodeManager implements InitializingBean {
      * worker group mapper
      */
     @Autowired
-    private WorkerGroupMapper workerGroupMapper;
+    private WorkerGroupDao workerGroupDao;
 
     private final MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
@@ -200,9 +197,9 @@ public class ServerNodeManager implements InitializingBean {
                 Map<String, String> registryWorkerNodeMap = registryClient.getServerMaps(NodeType.WORKER, true);
                 syncAllWorkerNodeInfo(registryWorkerNodeMap);
                 // sync worker group nodes from database
-                List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
+                List<WorkerGroupDto> workerGroupList = workerGroupDao.queryAllWorkerGroup();
                 if (CollectionUtils.isNotEmpty(workerGroupList)) {
-                    for (WorkerGroup wg : workerGroupList) {
+                    for (WorkerGroupDto wg : workerGroupList) {
                         String workerGroupName = wg.getName();
                         Set<String> workerAddress = getWorkerAddressByWorkerGroup(registryWorkerNodeMap, wg);
                         if (!workerAddress.isEmpty()) {
@@ -218,7 +215,7 @@ public class ServerNodeManager implements InitializingBean {
     }
 
 
-    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroup wg) {
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroupDto wg) {
         Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {

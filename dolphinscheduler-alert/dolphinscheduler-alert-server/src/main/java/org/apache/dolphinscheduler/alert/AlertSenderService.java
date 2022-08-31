@@ -69,6 +69,7 @@ public final class AlertSenderService extends Thread {
     @Override
     public synchronized void start() {
         super.setName("AlertSenderService");
+        super.setDaemon(true);
         super.start();
     }
 

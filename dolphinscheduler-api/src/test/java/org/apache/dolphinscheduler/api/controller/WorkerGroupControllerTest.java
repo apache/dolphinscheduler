@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,6 +39,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -52,8 +53,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class WorkerGroupControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
-    @MockBean(name = "workerGroupMapper")
-    private WorkerGroupMapper workerGroupMapper;
+    @MockBean(name = "workerGroupDao")
+    private WorkerGroupDao workerGroupDao;
 
     @MockBean(name = "processInstanceMapper")
     private ProcessInstanceMapper processInstanceMapper;
@@ -129,12 +130,12 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDeleteById() throws Exception {
-        WorkerGroup workerGroup = new WorkerGroup();
+        WorkerGroupDto workerGroup = new WorkerGroupDto();
         workerGroup.setId(12);
         workerGroup.setName("测试");
-        Mockito.when(workerGroupMapper.selectById(12)).thenReturn(workerGroup);
+        Mockito.when(workerGroupDao.queryById(12)).thenReturn(Optional.of(workerGroup));
         Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES)).thenReturn(null);
-        Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
+        Mockito.when(workerGroupDao.deleteById(12)).thenReturn(1);
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")

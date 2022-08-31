@@ -35,7 +35,7 @@ BEGIN
 
 
 --- add column
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json int DEFAULT NULL  ';
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS worker_group_extra_param int DEFAULT NULL  ';
 
 
 

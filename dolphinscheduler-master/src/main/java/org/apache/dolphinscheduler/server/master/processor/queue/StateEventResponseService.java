@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -68,7 +69,6 @@ public class StateEventResponseService {
     @PostConstruct
     public void start() {
         this.responseWorker = new StateEventResponseWorker();
-        this.responseWorker.setName("StateEventResponseWorker");
         this.responseWorker.start();
     }
 
@@ -106,7 +106,11 @@ public class StateEventResponseService {
     /**
      * task worker thread
      */
-    class StateEventResponseWorker extends Thread {
+    class StateEventResponseWorker extends BaseDaemonThread {
+
+        protected StateEventResponseWorker() {
+            super("StateEventResponseWorker");
+        }
 
         @Override
         public void run() {

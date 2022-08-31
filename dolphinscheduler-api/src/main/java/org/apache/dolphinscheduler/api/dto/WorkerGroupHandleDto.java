@@ -1,5 +1,6 @@
 package org.apache.dolphinscheduler.api.dto;
 
+import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import lombok.AllArgsConstructor;
@@ -12,9 +13,9 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class WorkerGroupHandleDto {
-    private WorkerGroup workerGroup;
+    private WorkerGroupDto workerGroup;
     private String workerGroupName;
-    private Map<String, WorkerGroup> workerGroupsMap;
+    private Map<String, WorkerGroupDto> workerGroupsMap;
     private Collection<String> childrenNodes;
-    private List<WorkerGroup> workerGroups;
+    private List<WorkerGroupDto> workerGroups;
 }

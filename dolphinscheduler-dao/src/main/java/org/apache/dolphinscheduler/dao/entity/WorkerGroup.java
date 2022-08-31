@@ -18,10 +18,12 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -30,6 +32,9 @@ import java.util.Date;
  */
 @TableName("t_ds_worker_group")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkerGroup {
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -45,9 +50,6 @@ public class WorkerGroup {
 
     private String description;
 
-    @TableField(exist = false)
-    private boolean systemDefault;
-
-    private String otherParamsJson;
+    private String workerGroupExtraParam;
 
 }

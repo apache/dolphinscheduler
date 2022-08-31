@@ -88,7 +88,7 @@ public class TaskEventService {
                 taskExecuteThreadPool.eventHandler();
             }
         } catch (Exception e) {
-            logger.error("stop error:", e);
+            logger.error("TaskEventService stop error:", e);
         }
     }
 
@@ -105,6 +105,7 @@ public class TaskEventService {
      * Dispatch event to target task runnable.
      */
     class TaskEventDispatchThread extends BaseDaemonThread {
+
         protected TaskEventDispatchThread() {
             super("TaskEventLoopThread");
         }
@@ -130,7 +131,11 @@ public class TaskEventService {
     /**
      * event handler thread
      */
-    class TaskEventHandlerThread extends Thread {
+    class TaskEventHandlerThread extends BaseDaemonThread {
+
+        protected TaskEventHandlerThread() {
+            super("TaskEventHandlerThread");
+        }
 
         @Override
         public void run() {

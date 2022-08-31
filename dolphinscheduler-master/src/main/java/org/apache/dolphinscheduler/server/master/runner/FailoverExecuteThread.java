@@ -18,19 +18,18 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.service.FailoverService;
 import org.apache.dolphinscheduler.server.master.service.MasterFailoverService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FailoverExecuteThread extends Thread {
+public class FailoverExecuteThread extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(FailoverExecuteThread.class);
 
@@ -43,6 +42,10 @@ public class FailoverExecuteThread extends Thread {
     @Autowired
     private MasterFailoverService masterFailoverService;
 
+    protected FailoverExecuteThread() {
+        super("FailoverExecuteThread");
+    }
+
     @Override
     public synchronized void start() {
         logger.info("Master failover thread staring");
@@ -53,7 +56,7 @@ public class FailoverExecuteThread extends Thread {
     @Override
     public void run() {
         // when startup, wait 10s for ready
-        ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * 10);
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 10);
 
         while (Stopper.isRunning()) {
             try {

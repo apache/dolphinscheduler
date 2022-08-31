@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -30,18 +31,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EventExecuteService extends Thread {
+public class EventExecuteService extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(EventExecuteService.class);
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    /**
-     * workflow exec service
-     */
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+
+    protected EventExecuteService() {
+        super("EventExecuteService");
+    }
 
     @Override
     public synchronized void start() {
