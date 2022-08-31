@@ -304,9 +304,5 @@ perfmark-api-0.23.0.jar
 proto-google-common-protos-2.0.1.jar
 protobuf-java-3.17.2.jar
 protobuf-java-util-3.17.2.jar
-json-path-2.7.0.jar
-accessors-smart-2.4.7.jar
-asm-9.1.jar
-json-smart-2.4.7.jar
 zjsonpatch-0.3.0.jar
 zookeeper-3.4.14.jar
