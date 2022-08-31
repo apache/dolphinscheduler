@@ -22,11 +22,15 @@ public enum SparkVersion {
     /**
      * 0 SPARK1
      * 1 SPARK2
-     * 2 SPARKSQL
+     * 2 SPARK1SQL
+     * 3 SPARK2SQL
      */
-    SPARK1(0, "SPARK1", "${SPARK_HOME1}/bin/spark-submit"),
-    SPARK2(1, "SPARK2", "${SPARK_HOME2}/bin/spark-submit"),
-    SPARKSQL(2, "SPARKSQL", "${SPARK_HOME2}/bin/spark-sql");
+    SPARK1(0, "SPARK1", "${SPARK_HOME1}/bin/spark-submit", "SPARK1"),
+    SPARK2(1, "SPARK2", "${SPARK_HOME2}/bin/spark-submit", "SPARK2"),
+
+    SPARK1SQL(2, "SPARK1SQL", "${SPARK_HOME1}/bin/spark-sql", "SPARK1"),
+
+    SPARK2SQL(3, "SPARK2SQL", "${SPARK_HOME2}/bin/spark-sql", "SPARK2");
 
     private final int code;
     private final String descp;
@@ -34,11 +38,13 @@ public enum SparkVersion {
      * usage: spark-submit [options] <app jar | python file> [app arguments]
      */
     private final String command;
+    private final String sparkVersion;
 
-    SparkVersion(int code, String descp, String command) {
+    SparkVersion(int code, String descp, String command, String sparkVersion) {
         this.code = code;
         this.descp = descp;
         this.command = command;
+        this.sparkVersion = sparkVersion;
     }
 
     public int getCode() {
@@ -51,5 +57,9 @@ public enum SparkVersion {
 
     public String getCommand() {
         return command;
+    }
+
+    public String getSparkVersion() {
+        return sparkVersion;
     }
 }

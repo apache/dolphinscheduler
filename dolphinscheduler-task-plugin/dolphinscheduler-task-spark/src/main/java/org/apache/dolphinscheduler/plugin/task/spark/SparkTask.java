@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -42,7 +41,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,13 +101,16 @@ public class SparkTask extends AbstractYarnTask {
         String sparkCommand = SparkVersion.SPARK2.getCommand();
 
         // If the programType is non-SQL, execute bin/spark-submit
-        if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
+        if (SparkVersion.SPARK1.getSparkVersion().equals(sparkParameters.getSparkVersion())) {
             sparkCommand = SparkVersion.SPARK1.getCommand();
         }
 
         // If the programType is SQL, execute bin/spark-sql
         if (sparkParameters.getProgramType() == ProgramType.SQL) {
-            sparkCommand = SparkVersion.SPARKSQL.getCommand();
+            sparkCommand = SparkVersion.SPARK2SQL.getCommand();
+            if (SparkVersion.SPARK1SQL.getSparkVersion().equals(sparkParameters.getSparkVersion())) {
+                sparkCommand = SparkVersion.SPARK1SQL.getCommand();
+            }
         }
 
         args.add(sparkCommand);
