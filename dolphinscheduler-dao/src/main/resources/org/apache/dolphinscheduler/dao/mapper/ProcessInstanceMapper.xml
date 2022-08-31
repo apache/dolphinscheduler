@@ -122,8 +122,8 @@
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
         </if>
-        <if test="startTime != null ">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+        <if test="startTime != null and endTime != null ">
+            and instance.start_time <![CDATA[ >= ]]> #{startTime} and instance.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="states != null and states.length > 0">
             and instance.state in
