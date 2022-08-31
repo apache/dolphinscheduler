@@ -75,4 +75,9 @@ public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecC
     public void clearCache() {
         processInstanceExecMaps.clear();
     }
+
+    @Override
+    public int getSize() {
+        return processInstanceExecMaps.size();
+    }
 }

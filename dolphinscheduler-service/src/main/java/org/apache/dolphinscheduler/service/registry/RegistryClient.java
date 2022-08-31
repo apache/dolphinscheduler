@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -133,6 +132,11 @@ public class RegistryClient {
         return serverList;
     }
 
+    /**
+     * @param nodeType
+     * @param hostOnly
+     * @return address -> data
+     */
     public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         Map<String, String> serverMap = new HashMap<>();
         try {

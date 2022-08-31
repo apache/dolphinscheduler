@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import lombok.NonNull;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
 import java.util.Map;
@@ -42,25 +43,19 @@ public class WorkerExecService {
 
     private final ListeningExecutorService listeningExecutorService;
 
-    /**
-     * thread executor service
-     */
-    private final ExecutorService execService;
+    private final ThreadPoolExecutor taskExecuteThreadPool;
 
-    /**
-     * running task
-     */
     private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap;
 
-    public WorkerExecService(ExecutorService execService,
+    public WorkerExecService(ExecutorService taskExecuteThreadPool,
                              ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap) {
-        this.execService = execService;
-        this.listeningExecutorService = MoreExecutors.listeningDecorator(this.execService);
+        this.taskExecuteThreadPool = (ThreadPoolExecutor) taskExecuteThreadPool;
+        this.listeningExecutorService = MoreExecutors.listeningDecorator(this.taskExecuteThreadPool);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
         WorkerServerMetrics.registerWorkerRunningTaskGauge(taskExecuteThreadMap::size);
     }
 
-    public void submit(final WorkerTaskExecuteRunnable taskExecuteThread) {
+    public void submit(@NonNull final WorkerTaskExecuteRunnable taskExecuteThread) {
         taskExecuteThreadMap.put(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(), taskExecuteThread);
         ListenableFuture future = this.listeningExecutorService.submit(taskExecuteThread);
         FutureCallback futureCallback = new FutureCallback() {
@@ -87,8 +82,13 @@ public class WorkerExecService {
      *
      * @return queue size
      */
-    public int getThreadPoolQueueSize() {
-        return ((ThreadPoolExecutor) this.execService).getQueue().size();
+    public int getThreadPoolWaitingTaskNum() {
+        return taskExecuteThreadPool.getQueue().size();
+    }
+
+    public int getThreadPoolRunningTaskNum() {
+        // we don't calculate from execService, since we don't want to lock tge executeService
+        return taskExecuteThreadMap.size();
     }
 
     public Map<Integer, WorkerTaskExecuteRunnable> getTaskExecuteThreadMap() {

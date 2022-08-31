@@ -134,6 +134,10 @@ public class MessageRetryRunner extends BaseDaemonThread {
         }
     }
 
+    public int getRetryMessageSize() {
+        return needToRetryMessages.size();
+    }
+
     public void clearMessage() {
         needToRetryMessages.clear();
     }

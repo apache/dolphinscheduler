@@ -57,14 +57,13 @@ public class MasterRegistryClient implements AutoCloseable {
     @Autowired
     private MasterConnectStrategy masterConnectStrategy;
 
+    @Autowired
     private MasterHeartBeatTask masterHeartBeatTask;
 
     public void start() {
         try {
-            masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, registryClient);
             registry();
-            registryClient.addConnectionStateListener(
-                    new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
+            registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -149,12 +148,13 @@ public class MasterRegistryClient implements AutoCloseable {
      * Registry the current master server itself to registry.
      */
     void registry() {
-        logger.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
+        String masterAddress = masterConfig.getMasterAddress();
+        logger.info("Master node : {} registering to registry center: {}", masterAddress, masterRegistryPath);
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
-        registryClient.persistEphemeral(masterRegistryPath, JSONUtils.toJsonString(masterHeartBeatTask.getHeartBeat()));
+        registryClient.persistEphemeral(masterRegistryPath, masterHeartBeatTask.getHeartBeatJsonString());
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
             logger.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
@@ -165,7 +165,7 @@ public class MasterRegistryClient implements AutoCloseable {
         ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
         masterHeartBeatTask.start();
-        logger.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
+        logger.info("Master node : {} registered to registry center: {} successfully", masterAddress, masterRegistryPath);
 
     }
 

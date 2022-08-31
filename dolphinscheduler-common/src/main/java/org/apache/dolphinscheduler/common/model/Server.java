@@ -33,7 +33,7 @@ public class Server {
     private String zkDirectory;
 
     /**
-     * resource info: CPU and memory
+     * server heartbeatJson, see {@link  HeartBeat}
      */
     private String resInfo;
 

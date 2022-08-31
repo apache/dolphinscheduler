@@ -41,15 +41,12 @@ public class WorkerManagerThread implements Runnable {
 
     private final WorkerExecService workerExecService;
 
-    private final int workerExecThreads;
-
     /**
      * running task
      */
     private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
-        workerExecThreads = workerConfig.getExecThreads();
         this.waitSubmitQueue = new DelayQueue<>();
         workerExecService = new WorkerExecService(
                 ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
@@ -60,22 +57,16 @@ public class WorkerManagerThread implements Runnable {
         return taskExecuteThreadMap.get(taskInstanceId);
     }
 
-    /**
-     * get wait submit queue size
-     *
-     * @return queue size
-     */
     public int getWaitSubmitQueueSize() {
         return waitSubmitQueue.size();
     }
 
-    /**
-     * get thread pool queue size
-     *
-     * @return queue size
-     */
-    public int getThreadPoolQueueSize() {
-        return workerExecService.getThreadPoolQueueSize();
+    public int getThreadPoolWaitingTaskNum() {
+        return workerExecService.getThreadPoolWaitingTaskNum();
+    }
+
+    public int getThreadPoolRunningTaskNum() {
+        return workerExecService.getThreadPoolRunningTaskNum();
     }
 
     /**
@@ -110,10 +101,22 @@ public class WorkerManagerThread implements Runnable {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
+
                 workerExecService.submit(workerDelayTaskExecuteRunnable);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                logger.warn("Worker execute manager thread has been interrupted, will stop", ex);
+                break;
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "
                         + "the exception will be ignored and this thread will continue to run", e);
+                try {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    logger.warn("Worker execute manager thread has been interrupted, will stop", ex);
+                    break;
+                }
             }
         }
     }

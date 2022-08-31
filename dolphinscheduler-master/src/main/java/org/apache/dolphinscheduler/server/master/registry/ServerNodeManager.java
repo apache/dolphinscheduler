@@ -59,9 +59,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
-/**
- * server node manager
- */
 @Service
 public class ServerNodeManager implements InitializingBean {
 
@@ -81,7 +78,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * worker group nodes, workerGroup -> ips
      */
-    private final ConcurrentHashMap<String, Set<String>> workerGroupNodes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Set<String>> workerGroupToAddressMap = new ConcurrentHashMap<>();
 
     /**
      * master nodes
@@ -90,9 +87,6 @@ public class ServerNodeManager implements InitializingBean {
 
     private final Map<String, WorkerHeartBeat> workerNodeInfo = new HashMap<>();
 
-    /**
-     * executor service
-     */
     private ScheduledExecutorService executorService;
 
     @Autowired
@@ -103,23 +97,14 @@ public class ServerNodeManager implements InitializingBean {
      */
     private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
 
-    /**
-     * worker group mapper
-     */
     @Autowired
     private WorkerGroupDao workerGroupDao;
 
     private final MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
-    /**
-     * alert dao
-     */
     @Autowired
     private AlertDao alertDao;
 
-    /**
-     * master config
-     */
     @Autowired
     private MasterConfig masterConfig;
 
@@ -176,7 +161,7 @@ public class ServerNodeManager implements InitializingBean {
          */
         Collection<String> workerGroups = registryClient.getWorkerGroupDirectly();
         for (String workerGroup : workerGroups) {
-            syncWorkerGroupNodes(workerGroup, registryClient.getWorkerGroupNodesDirectly(workerGroup));
+            syncWorkerGroupNodes(workerGroup, new HashSet<>(registryClient.getWorkerGroupNodesDirectly(workerGroup)));
         }
     }
 
@@ -194,13 +179,14 @@ public class ServerNodeManager implements InitializingBean {
                 // sync worker group nodes from database
                 List<WorkerGroupDto> workerGroupList = workerGroupDao.queryAllWorkerGroup();
                 if (CollectionUtils.isNotEmpty(workerGroupList)) {
-                    for (WorkerGroupDto wg : workerGroupList) {
-                        String workerGroupName = wg.getName();
-                        Set<String> workerAddress = getWorkerAddressByWorkerGroup(registryWorkerNodeMap, wg);
-                        if (!workerAddress.isEmpty()) {
-                            logger.info("WorkerGroup:{} sync after filter addrList: {}", workerGroupName, workerAddress.toString());
-                            syncWorkerGroupNodes(workerGroupName, workerAddress);
-                        }
+                    return;
+                }
+                for (WorkerGroupDto wg : workerGroupList) {
+                    String workerGroupName = wg.getName();
+                    Set<String> workerAddress = getWorkerAddressByWorkerGroup(workerNodeInfo, wg);
+                    if (!workerAddress.isEmpty()) {
+                        logger.info("WorkerGroup:{} sync after filter addrList: {}", workerGroupName, workerAddress);
+                        syncWorkerGroupNodes(workerGroupName, workerAddress);
                     }
                 }
             } catch (Exception e) {
@@ -210,7 +196,7 @@ public class ServerNodeManager implements InitializingBean {
     }
 
 
-    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroupDto wg) {
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, WorkerHeartBeat> newWorkerNodeInfo, WorkerGroupDto wg) {
         Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {
@@ -235,7 +221,8 @@ public class ServerNodeManager implements InitializingBean {
                 try {
                     String[] parts = path.split("/");
                     if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                        throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
+                        logger.error("Worker group path is not valida, will ignore this event: {}", event);
+                        return;
                     }
                     final String workerGroupName = parts[parts.length - 2];
                     final String workerAddress = parts[parts.length - 1];
@@ -244,21 +231,19 @@ public class ServerNodeManager implements InitializingBean {
                         logger.info("worker group node : {} added.", path);
                         Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
                         logger.info("currentNodes : {}", currentNodes);
-                        syncWorkerGroupNodes(workerGroupName, currentNodes);
+                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
                     } else if (type == Type.REMOVE) {
                         logger.info("worker group node : {} down.", path);
                         Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
-                        syncWorkerGroupNodes(workerGroupName, currentNodes);
+                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
                         Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
-                        syncWorkerGroupNodes(workerGroupName, currentNodes);
+                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
 
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
-                } catch (IllegalArgumentException ex) {
-                    logger.warn(ex.getMessage());
                 } catch (Exception ex) {
                     logger.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
@@ -335,27 +320,27 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * sync worker group nodes
      *
-     * @param workerGroup worker group
-     * @param nodes worker nodes
+     * @param workerGroup     worker group
+     * @param workerAddresses worker nodes
      */
-    private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
+    private void syncWorkerGroupNodes(String workerGroup, Set<String> workerAddresses) {
         workerGroupWriteLock.lock();
         try {
-            Set<String> workerNodes = workerGroupNodes.getOrDefault(workerGroup, new HashSet<>());
-            workerNodes.clear();
-            workerNodes.addAll(nodes);
-            workerGroupNodes.put(workerGroup, workerNodes);
+            workerGroupToAddressMap.put(workerGroup, workerAddresses);
         } finally {
             workerGroupWriteLock.unlock();
         }
     }
 
+    /**
+     * @return workerGroup -> workerAddresses
+     */
     public Map<String, Set<String>> getWorkerGroupNodes() {
-        workerGroupLock.readLock();
+        workerGroupReadLock.lock();
         try {
-            return Collections.unmodifiableMap(workerGroupNodes);
+            return Collections.unmodifiableMap(workerGroupToAddressMap);
         } finally {
-            workerGroupLock.writeLock();
+            workerGroupReadLock.unlock();
         }
     }
 
@@ -371,18 +356,11 @@ public class ServerNodeManager implements InitializingBean {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
-            Set<String> nodes = workerGroupNodes.get(workerGroup);
-            if (CollectionUtils.isNotEmpty(nodes)) {
-                return Collections.unmodifiableSet(nodes);
-            }
-            return nodes;
+            Set<String> workerAddress = workerGroupToAddressMap.get(workerGroup);
+            return Collections.unmodifiableSet(workerAddress);
         } finally {
             workerGroupReadLock.unlock();
         }
-    }
-
-    public Map<String, WorkerHeartBeat> getWorkerNodeInfo() {
-        return Collections.unmodifiableMap(workerNodeInfo);
     }
 
     /**
@@ -429,9 +407,6 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
-    /**
-     * destroy
-     */
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();

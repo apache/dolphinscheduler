@@ -45,6 +45,10 @@ public class WorkflowEventQueue {
         return workflowEventQueue.take();
     }
 
+    public int getWaitingEventNum() {
+        return workflowEventQueue.size();
+    }
+
     public void clearWorkflowEventQueue() {
         workflowEventQueue.clear();
     }

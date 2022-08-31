@@ -1,12 +1,12 @@
 package org.apache.dolphinscheduler.common.model;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 @Slf4j
-public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
+public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonThread {
 
     private final String threadName;
     private final long heartBeatInterval;
@@ -37,15 +37,13 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
                 } else {
                     log.info("The current server status is {}, will not write heart beat", ServerLifeCycleManager.getServerStatus());
                 }
-                Thread.sleep(heartBeatInterval);
-            } catch (InterruptedException ex) {
-                handleInterruptException(ex);
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 log.error("{} task execute failed", threadName, ex);
+            } finally {
                 try {
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                } catch (InterruptedException e) {
-                    handleInterruptException(e);
+                    Thread.sleep(heartBeatInterval);
+                } catch (InterruptedException ex) {
+                    handleInterruptException(ex);
                 }
             }
         }
@@ -60,6 +58,11 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
         shutdown();
         log.warn("{} has been interrupted, will stop this thread", threadName, ex);
         Thread.currentThread().interrupt();
+    }
+
+    public String getHeartBeatJsonString() {
+        T heartBeat = getHeartBeat();
+        return JSONUtils.toJsonString(heartBeat);
     }
 
     public abstract T getHeartBeat();

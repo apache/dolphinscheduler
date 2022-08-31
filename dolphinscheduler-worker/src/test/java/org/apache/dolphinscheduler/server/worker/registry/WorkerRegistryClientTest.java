@@ -90,7 +90,7 @@ public class WorkerRegistryClientTest {
 
     @Test
     public void testStart() {
-        workerRegistryClient.initWorkRegistry();
+        workerRegistryClient.start();
 
         given(workerManagerThread.getThreadPoolQueueSize()).willReturn(1);
 
