@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -28,14 +25,24 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.base.Strings;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * process instance
@@ -65,6 +72,18 @@ public class ProcessInstance {
      * process state
      */
     private WorkflowExecutionStatus state;
+
+    /**
+     * state history
+     */
+    private String stateHistory;
+
+    /**
+     * state desc list from state history
+     */
+    @TableField(exist = false)
+    private List<StateDesc> stateDescList;
+
     /**
      * recovery flag for failover
      */
@@ -310,4 +329,130 @@ public class ProcessInstance {
         return commandType;
     }
 
+    /**
+     * set state with desc
+     * @param state
+     * @param stateDesc
+     */
+    public void setStateWithDesc(WorkflowExecutionStatus state, String stateDesc) {
+        this.setState(state);
+        if (StringUtils.isEmpty(this.getStateHistory())) {
+            stateDescList = new ArrayList<>();
+        } else if (stateDescList == null) {
+            stateDescList = JSONUtils.toList(this.getStateHistory(), StateDesc.class);
+        }
+        stateDescList.add(new StateDesc(new Date(), state, stateDesc));
+        this.setStateHistory(JSONUtils.toJsonString(stateDescList));
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessInstance{"
+            + "id=" + id
+            + ", state=" + state
+            + ", recovery=" + recovery
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", runTimes=" + runTimes
+            + ", name='" + name + '\''
+            + ", host='" + host + '\''
+            + ", processDefinition="
+            + processDefinition
+            + ", commandType="
+            + commandType
+            + ", commandParam='"
+            + commandParam
+            + '\''
+            + ", taskDependType="
+            + taskDependType
+            + ", maxTryTimes="
+            + maxTryTimes
+            + ", failureStrategy="
+            + failureStrategy
+            + ", warningType="
+            + warningType
+            + ", warningGroupId="
+            + warningGroupId
+            + ", scheduleTime="
+            + scheduleTime
+            + ", commandStartTime="
+            + commandStartTime
+            + ", globalParams='"
+            + globalParams
+            + '\''
+            + ", executorId="
+            + executorId
+            + ", tenantCode='"
+            + tenantCode
+            + '\''
+            + ", queue='"
+            + queue
+            + '\''
+            + ", isSubProcess="
+            + isSubProcess
+            + ", locations='"
+            + locations
+            + '\''
+            + ", historyCmd='"
+            + historyCmd
+            + '\''
+            + ", dependenceScheduleTimes='"
+            + dependenceScheduleTimes
+            + '\''
+            + ", duration="
+            + duration
+            + ", processInstancePriority="
+            + processInstancePriority
+            + ", workerGroup='"
+            + workerGroup
+            + '\''
+            + ", timeout="
+            + timeout
+            + ", tenantId="
+            + tenantId
+            + ", processDefinitionCode='"
+            + processDefinitionCode
+            + '\''
+            + ", processDefinitionVersion='"
+            + processDefinitionVersion
+            + '\''
+            + ", dryRun='"
+            + dryRun
+            + '\''
+            + '}'
+            + ", restartTime='"
+            + restartTime
+            + '\''
+            + ", isBlocked="
+            + isBlocked
+            + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ProcessInstance that = (ProcessInstance) o;
+
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StateDesc {
+        Date time;
+        WorkflowExecutionStatus state;
+        String desc;
+    }
 }
