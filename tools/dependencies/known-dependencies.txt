@@ -345,3 +345,12 @@ protobuf-java-util-3.17.2.jar
 zjsonpatch-0.3.0.jar
 zookeeper-3.8.0.jar
 zookeeper-jute-3.8.0.jar
+aliyun-java-sdk-core-3.4.0.jar
+aliyun-java-sdk-ecs-4.2.0.jar
+aliyun-java-sdk-kms-2.7.0.jar
+aliyun-java-sdk-ram-3.0.0.jar
+aliyun-java-sdk-sts-3.0.0.jar
+aliyun-sdk-oss-3.10.2.jar
+jdom2-2.0.6.1.jar
+jettison-1.1.jar
+stax-api-1.0.1.jar

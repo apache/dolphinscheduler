@@ -78,9 +78,11 @@ public class OssOperator implements Closeable, StorageOperate {
         if (PropertyUtils.getString(RESOURCE_STORAGE_TYPE).equals(STORAGE_OSS)) {
 
             if (!StringUtils.isEmpty(PropertyUtils.getString(ALIBABA_CLOUD_OSS_END_POINT))) {
-                ossClient = new OSSClientBuilder().build(ALIBABA_CLOUD_OSS_END_POINT, ACCESS_KEY_ID, ACCESS_KEY_SECRET);
+                ossClient = new OSSClientBuilder().build(PropertyUtils.getString(ALIBABA_CLOUD_OSS_END_POINT),
+                        ACCESS_KEY_ID, ACCESS_KEY_SECRET);
             } else {
-                ossClient = new OSSClientBuilder().build(ALIBABA_CLOUD_OSS_END_POINT, ACCESS_KEY_ID, ACCESS_KEY_SECRET);
+                ossClient = new OSSClientBuilder().build(PropertyUtils.getString(ALIBABA_CLOUD_OSS_END_POINT),
+                        ACCESS_KEY_ID, ACCESS_KEY_SECRET);
             }
             checkBucketNameExists(BUCKET_NAME);
         }
