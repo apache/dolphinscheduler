@@ -113,6 +113,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -760,7 +761,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         // check process instances is already running
         List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processDefinition.getName(), processInstances.size());
         }
 
         // check process used by other task, including subprocess and dependent task type
@@ -769,7 +770,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             String taskDepDetail = taskDepOnProcess.stream()
                     .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(), task.getTaskName()))
                     .collect(Collectors.joining(Constants.COMMA));
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, taskDepDetail);
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, processDefinition.getName(), taskDepDetail);
         }
     }
 
@@ -810,26 +811,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
                 int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
-                    putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
-                    throw new ServiceException(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+                    throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_SCHEDULE_CRON_ERROR, processDefinition.getName());
                 }
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
-                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, scheduleObj.getId());
+                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, processDefinition.getName());
                 return result;
             }
         }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR.getCode(), Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR.getMsg() + " : " + processDefinition.getName());
         }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (deleteRelation == 0) {
             logger.warn("The process definition has not relation, it will be delete successfully");
         }
         deleteOtherRelation(project, result, processDefinition);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, Status.DELETE_PROCESS_DEFINITION_SUCCESS, processDefinition.getName());
         return result;
     }
 
