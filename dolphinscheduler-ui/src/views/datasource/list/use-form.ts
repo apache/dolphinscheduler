@@ -173,6 +173,7 @@ export function useForm(id?: number) {
     if (testFlag) {
       state.detailForm.bindTestId = undefined
     }
+    // @ts-ignore
     if (state.detailForm.id !== undefined && testFlag === 0) {
       await getSameTypeTestDataSource()
     }
