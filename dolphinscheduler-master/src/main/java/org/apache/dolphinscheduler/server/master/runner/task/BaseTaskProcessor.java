@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.NonNull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -71,6 +73,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,8 +94,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATASOURCE_ID;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
-
-import lombok.NonNull;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -120,6 +121,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected CuringParamsService curingParamsService;
 
+    protected TaskInstanceDao taskInstanceDao;
+
     protected String threadLoggerInfoName;
 
     @Override
@@ -128,6 +131,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
+        taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -605,5 +609,22 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         }
 
         return resourcesMap;
+    }
+
+    /**
+     * This method will not throw exception, it's safe
+     */
+    protected Optional<TaskInstance> submitTaskInstanceToDb(ProcessInstance processInstance,
+                                                            TaskInstance taskInstance,
+                                                            int commitRetryTimes,
+                                                            long commitInterval) {
+        try {
+            // todo: refactor this submit method
+            TaskInstance submitInstance = processService.submitTaskWithRetry(processInstance, taskInstance, commitRetryTimes, commitInterval);
+            return Optional.ofNullable(submitInstance);
+        } catch (Exception ex) {
+            logger.error("Submit taskInstance to DB error, taskInstance: {}", taskInstance, ex);
+            return Optional.empty();
+        }
     }
 }
