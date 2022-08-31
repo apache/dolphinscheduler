@@ -93,7 +93,7 @@ public class NettyClient {
     /**
      * channels
      */
-    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap(128);
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
     /**
      * get channel
