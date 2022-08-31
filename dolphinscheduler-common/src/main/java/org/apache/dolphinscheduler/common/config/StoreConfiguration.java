@@ -17,18 +17,20 @@
 
 package org.apache.dolphinscheduler.common.config;
 
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
+import static org.apache.dolphinscheduler.common.Constants.STORAGE_OSS;
+import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
+
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.OssOperator;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.S3Utils;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
-
 
 /**
  * choose the impl of storage by RESOURCE_STORAGE_TYPE
@@ -41,6 +43,8 @@ public class StoreConfiguration {
     @Bean
     public StorageOperate storageOperate() {
         switch (PropertyUtils.getString(RESOURCE_STORAGE_TYPE)) {
+            case STORAGE_OSS:
+                return OssOperator.getInstance();
             case STORAGE_S3:
                 return S3Utils.getInstance();
             case STORAGE_HDFS:
@@ -49,6 +53,5 @@ public class StoreConfiguration {
                 return null;
         }
     }
-
 
 }
