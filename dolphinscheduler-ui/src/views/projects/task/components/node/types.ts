@@ -306,6 +306,9 @@ interface ITaskParams {
   restEndpoint?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
+  hiveCliOptions?: string
+  hiveSqlScript?: string
+  hiveCliTaskExecutionType?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string

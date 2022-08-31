@@ -431,7 +431,7 @@ CREATE TABLE t_ds_task_definition_log (
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   task_type varchar(50) DEFAULT NULL ,
-  task_execute_type int(11) DEFAULT '0',
+  task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
   task_priority int DEFAULT '2' ,
