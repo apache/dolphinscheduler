@@ -98,18 +98,18 @@ public class SparkTask extends AbstractYarnTask {
         List<String> args = new ArrayList<>();
 
         // spark version
-        String sparkCommand = SparkVersion.SPARK2.getCommand();
+        String sparkCommand = SparkCommand.SPARK2SUBMIT.getCommand();
 
         // If the programType is non-SQL, execute bin/spark-submit
-        if (SparkVersion.SPARK1.getSparkVersion().equals(sparkParameters.getSparkVersion())) {
-            sparkCommand = SparkVersion.SPARK1.getCommand();
+        if (SparkCommand.SPARK1SUBMIT.getSparkVersion().name().equals(sparkParameters.getSparkVersion())) {
+            sparkCommand = SparkCommand.SPARK1SUBMIT.getCommand();
         }
 
         // If the programType is SQL, execute bin/spark-sql
         if (sparkParameters.getProgramType() == ProgramType.SQL) {
-            sparkCommand = SparkVersion.SPARK2SQL.getCommand();
-            if (SparkVersion.SPARK1SQL.getSparkVersion().equals(sparkParameters.getSparkVersion())) {
-                sparkCommand = SparkVersion.SPARK1SQL.getCommand();
+            sparkCommand = SparkCommand.SPARK2SQL.getCommand();
+            if (SparkCommand.SPARK1SQL.getSparkVersion().name().equals(sparkParameters.getSparkVersion())) {
+                sparkCommand = SparkCommand.SPARK1SQL.getCommand();
             }
         }
 
