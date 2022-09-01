@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.dq.utils.spark;
+package org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark;
 
 public class SparkConstants {
 
