@@ -62,6 +62,7 @@ const DetailModal = defineComponent({
       changePort,
       changeTestFlag,
       resetFieldsValue,
+      getSameTypeTestDataSource,
       setFieldsValue,
       getFieldsValue
     } = useForm(props.id)
@@ -92,6 +93,7 @@ const DetailModal = defineComponent({
     const onChangePort = changePort
     const onChangeTestFlag = changeTestFlag
 
+    const onGetSameTypeTestDataSource = getSameTypeTestDataSource
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(
@@ -104,6 +106,7 @@ const DetailModal = defineComponent({
             datasourceType[state.detailForm.type]
           ))
         props.show && props.id && setFieldsValue(await queryById(props.id))
+        props.show && state.detailForm.testFlag == 0 && await getSameTypeTestDataSource()
       }
     )
 
@@ -113,6 +116,7 @@ const DetailModal = defineComponent({
       ...toRefs(status),
       onChangeType,
       onChangeTestFlag,
+      getSameTypeTestDataSource,
       onChangePort,
       onSubmit,
       onTest,

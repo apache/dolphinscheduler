@@ -204,7 +204,6 @@ export function useForm(id?: number) {
       ...values,
       other: values.other ? JSON.stringify(values.other) : values.other
     }
-    await getSameTypeTestDataSource()
   }
 
   const getFieldsValue = () => state.detailForm
@@ -215,6 +214,7 @@ export function useForm(id?: number) {
     changePort,
     changeTestFlag,
     resetFieldsValue,
+    getSameTypeTestDataSource,
     setFieldsValue,
     getFieldsValue
   }
