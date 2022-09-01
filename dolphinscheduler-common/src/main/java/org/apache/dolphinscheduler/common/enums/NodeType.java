@@ -18,5 +18,27 @@
 package org.apache.dolphinscheduler.common.enums;
 
 public enum NodeType {
-    MASTER, WORKER, DEAD_SERVER
+    MASTER("master", "/nodes/master"),
+    WORKER("worker", "/nodes/worker"),
+    API_SERVER("apiServer", "/nodes/apiServer"),
+    ALERT_SERVER("alertServer", "/nodes/alertServer"),
+    ;
+
+    private final String name;
+    private final String registryPath;
+
+    NodeType(String name, String registryPath) {
+        this.name = name;
+        this.registryPath = registryPath;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getRegistryPath() {
+        return registryPath;
+    }
+
+
 }

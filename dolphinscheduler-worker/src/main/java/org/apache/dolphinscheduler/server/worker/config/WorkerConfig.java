@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.config;
 import com.google.common.collect.Sets;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.slf4j.Logger;
@@ -33,8 +34,6 @@ import org.springframework.validation.annotation.Validated;
 import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 @Data
 @Validated
@@ -75,7 +74,7 @@ public class WorkerConfig implements Validator {
             errors.rejectValue("exec-threads", null, "should be a positive value");
         }
         if (workerConfig.getHeartbeatInterval().getSeconds() <= 0) {
-            errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
+            errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
         }
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
@@ -89,7 +88,7 @@ public class WorkerConfig implements Validator {
 
         Set<String> workerRegistryPaths = workerConfig.getGroups()
                 .stream()
-                .map(workerGroup -> REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup + "/" + workerConfig.getWorkerAddress())
+                .map(workerGroup -> NodeType.WORKER.getRegistryPath() + "/" + workerGroup + "/" + workerConfig.getWorkerAddress())
                 .collect(Collectors.toSet());
 
         workerConfig.setWorkerGroupRegistryPaths(workerRegistryPaths);

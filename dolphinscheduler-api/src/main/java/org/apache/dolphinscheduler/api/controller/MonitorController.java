@@ -63,7 +63,7 @@ public class MonitorController extends BaseController {
     @ApiException(LIST_MASTERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listMaster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = monitorService.queryMaster(loginUser);
+        Map<String, Object> result = monitorService.queryMaster();
         return returnDataList(result);
     }
 
@@ -79,7 +79,7 @@ public class MonitorController extends BaseController {
     @ApiException(LIST_WORKERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listWorker(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = monitorService.queryWorker(loginUser);
+        Map<String, Object> result = monitorService.queryWorker();
         return returnDataList(result);
     }
 
@@ -95,7 +95,7 @@ public class MonitorController extends BaseController {
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
+        Map<String, Object> result = monitorService.queryDatabaseState();
         return returnDataList(result);
     }
 

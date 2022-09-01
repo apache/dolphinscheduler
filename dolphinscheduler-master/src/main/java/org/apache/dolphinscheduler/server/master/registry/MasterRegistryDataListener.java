@@ -17,19 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
+import com.google.common.base.Strings;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
 
 public class MasterRegistryDataListener implements SubscribeListener {
 
@@ -47,11 +42,11 @@ public class MasterRegistryDataListener implements SubscribeListener {
         if (Strings.isNullOrEmpty(path)) {
             return;
         }
-        //monitor master
-        if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS + Constants.SINGLE_SLASH)) {
+        if (path.startsWith(NodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH)) {
+            // monitor master
             handleMasterEvent(event);
-        } else if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH)) {
-            //monitor worker
+        } else if (path.startsWith(NodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH)) {
+            // monitor worker
             handleWorkerEvent(event);
         }
     }

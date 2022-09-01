@@ -50,12 +50,12 @@ public class WorkerRegistryClient implements AutoCloseable {
     @Autowired
     private WorkerHeartBeatTask workerHeartBeatTask;
 
-    public void start() {
+    public synchronized void start() {
         try {
             registry();
             registryClient.addConnectionStateListener(new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
         } catch (Exception ex) {
-            throw new RegistryException("Worker registry client start up error", ex);
+            throw new RegistryException("WorkerRegistryClient start up error", ex);
         }
     }
 

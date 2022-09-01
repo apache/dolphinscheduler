@@ -59,7 +59,7 @@ public class MasterRegistryClient implements AutoCloseable {
     @Autowired
     private MasterHeartBeatTask masterHeartBeatTask;
 
-    public void start() {
+    public synchronized void start() {
         try {
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));

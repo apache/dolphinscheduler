@@ -84,14 +84,14 @@ public class MonitorServiceTest {
     public  void testQueryDatabaseState() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, true);
         Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
-        Map<String,Object> result = monitorService.queryDatabaseState(user);
+        Map<String,Object> result = monitorService.queryDatabaseState();
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         List<MonitorRecord> monitorRecordList = (List<MonitorRecord>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, false);
-        Map<String,Object> noPermission = monitorService.queryDatabaseState(user);
+        Map<String,Object> noPermission = monitorService.queryDatabaseState();
         Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
@@ -99,11 +99,11 @@ public class MonitorServiceTest {
     public  void testQueryMaster() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
         Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(getServerList());
-        Map<String, Object> result = monitorService.queryMaster(user);
+        Map<String, Object> result = monitorService.queryMaster();
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, false);
-        Map<String,Object> noPermission = monitorService.queryMaster(user);
+        Map<String,Object> noPermission = monitorService.queryMaster();
         Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 
@@ -111,11 +111,11 @@ public class MonitorServiceTest {
     public  void testQueryWorker() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, true);
         Mockito.when(registryClient.getServerList(NodeType.WORKER)).thenReturn(getServerList());
-        Map<String, Object> result = monitorService.queryWorker(user);
+        Map<String, Object> result = monitorService.queryWorker();
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, false);
-        Map<String,Object> noPermission = monitorService.queryWorker(user);
+        Map<String,Object> noPermission = monitorService.queryWorker();
         Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
     }
 

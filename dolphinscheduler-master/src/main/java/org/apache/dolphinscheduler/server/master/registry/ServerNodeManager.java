@@ -56,9 +56,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
 @Service
 public class ServerNodeManager implements InitializingBean {
 
@@ -140,11 +137,11 @@ public class ServerNodeManager implements InitializingBean {
         /*
          * init MasterNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
+        registryClient.subscribe(NodeType.MASTER.getRegistryPath(), new MasterDataListener());
         /*
          * init WorkerNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
+        registryClient.subscribe(NodeType.WORKER.getRegistryPath(), new WorkerDataListener());
     }
 
     /**

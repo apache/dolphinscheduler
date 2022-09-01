@@ -20,9 +20,10 @@ package org.apache.dolphinscheduler.service.registry;
 import com.google.common.base.Strings;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ApiServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
@@ -50,8 +51,6 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 @Component
@@ -77,22 +76,9 @@ public class RegistryClient {
         registry.connectUntilTimeout(duration);
     }
 
-    public int getActiveMasterNum() {
-        Collection<String> childrenList = new ArrayList<>();
-        try {
-            // read master node parent path from conf
-            if (exists(rootNodePath(NodeType.MASTER))) {
-                childrenList = getChildrenKeys(rootNodePath(NodeType.MASTER));
-            }
-        } catch (Exception e) {
-            logger.error("getActiveMasterNum error", e);
-        }
-        return childrenList.size();
-    }
-
     public List<Server> getServerList(NodeType nodeType) {
         Map<String, String> serverMaps = getServerMaps(nodeType, false);
-        String parentPath = rootNodePath(nodeType);
+        String parentPath = nodeType.getRegistryPath();
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
@@ -116,6 +102,20 @@ public class RegistryClient {
                     server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
                     server.setId(workerHeartBeat.getProcessId());
                     break;
+                case ALERT_SERVER:
+                    AlertServerHeartBeat alertServerHeartBeat = JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
+                    server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
+                    server.setId(alertServerHeartBeat.getProcessId());
+                    break;
+                case API_SERVER:
+                    ApiServerHeartBeat apiServerHeartBeat = JSONUtils.parseObject(heartBeatJson, ApiServerHeartBeat.class);
+                    server.setCreateTime(new Date(apiServerHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(apiServerHeartBeat.getReportTime()));
+                    server.setId(apiServerHeartBeat.getProcessId());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown nodeType: " + nodeType);
             }
 
             server.setResInfo(heartBeatJson);
@@ -140,7 +140,7 @@ public class RegistryClient {
     public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         Map<String, String> serverMap = new HashMap<>();
         try {
-            String path = rootNodePath(nodeType);
+            String path = nodeType.getRegistryPath();
             Collection<String> serverList = getServerNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
@@ -163,15 +163,15 @@ public class RegistryClient {
     }
 
     public Collection<String> getMasterNodesDirectly() {
-        return getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_MASTERS);
+        return getChildrenKeys(NodeType.MASTER.getRegistryPath());
     }
 
     public Collection<String> getWorkerGroupDirectly() {
-        return getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS);
+        return getChildrenKeys(NodeType.WORKER.getRegistryPath());
     }
 
     public Collection<String> getWorkerGroupNodesDirectly(String workerGroup) {
-        return getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup);
+        return getChildrenKeys(NodeType.WORKER.getRegistryPath() + "/" + workerGroup);
     }
 
     /**
@@ -235,11 +235,11 @@ public class RegistryClient {
     }
 
     public boolean isMasterPath(String path) {
-        return path != null && path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS);
+        return path != null && path.startsWith(NodeType.MASTER.getRegistryPath());
     }
 
     public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(REGISTRY_DOLPHINSCHEDULER_WORKERS);
+        return path != null && path.startsWith(NodeType.WORKER.getRegistryPath());
     }
 
     public Collection<String> getChildrenKeys(final String key) {
@@ -260,30 +260,22 @@ public class RegistryClient {
     }
 
     private void initNodes() {
-        registry.put(REGISTRY_DOLPHINSCHEDULER_MASTERS, EMPTY, false);
-        registry.put(REGISTRY_DOLPHINSCHEDULER_WORKERS, EMPTY, false);
-    }
-
-    private String rootNodePath(NodeType type) {
-        switch (type) {
-            case MASTER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-            case WORKER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-            default:
-                throw new IllegalStateException("Should not reach here");
+        for (NodeType nodeType : NodeType.values()) {
+            registry.put(nodeType.getRegistryPath(), EMPTY, false);
         }
     }
 
     private Collection<String> getServerNodes(NodeType nodeType) {
-        final String path = rootNodePath(nodeType);
+        final String path = nodeType.getRegistryPath();
         final Collection<String> serverList = getChildrenKeys(path);
         if (nodeType != NodeType.WORKER) {
             return serverList;
         }
-        return serverList.stream().flatMap(group -> getChildrenKeys(path + SINGLE_SLASH + group)
+        return serverList
                 .stream()
-                .map(it -> group + SINGLE_SLASH + it)).collect(Collectors.toList());
+                .flatMap(group ->
+                        getChildrenKeys(path + SINGLE_SLASH + group).stream().map(it -> group + SINGLE_SLASH + it))
+                .collect(Collectors.toList());
     }
 
 }

@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +52,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Autowired
     private RegistryClient registryClient;
 
-    /**
-     * query database state
-     *
-     * @param loginUser login user
-     * @return data base state
-     */
     @Override
-    public Map<String, Object> queryDatabaseState(User loginUser) {
+    public Map<String, Object> queryDatabaseState() {
         Map<String, Object> result = new HashMap<>();
         List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
         result.put(Constants.DATA_LIST, monitorRecordList);
@@ -68,59 +61,47 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
         return result;
     }
 
-    /**
-     * query master list
-     *
-     * @param loginUser login user
-     * @return master information list
-     */
     @Override
-    public Map<String, Object> queryMaster(User loginUser) {
+    public Map<String, Object> queryMaster() {
         Map<String, Object> result = new HashMap<>();
-        List<Server> masterServers = getServerListFromRegistry(true);
+        List<Server> masterServers = getServerListFromRegistry(NodeType.MASTER);
         result.put(Constants.DATA_LIST, masterServers);
         putMsg(result, Status.SUCCESS);
 
         return result;
     }
 
-    /**
-     * query worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
     @Override
-    public Map<String, Object> queryWorker(User loginUser) {
+    public Map<String, Object> queryWorker() {
 
         Map<String, Object> result = new HashMap<>();
-        List<WorkerServerModel> workerServers = getServerListFromRegistry(false)
-            .stream()
-            .map((Server server) -> {
-                WorkerServerModel model = new WorkerServerModel();
-                model.setId(server.getId());
-                model.setHost(server.getHost());
-                model.setPort(server.getPort());
-                model.setZkDirectories(Sets.newHashSet(server.getZkDirectory()));
-                model.setResInfo(server.getResInfo());
-                model.setCreateTime(server.getCreateTime());
-                model.setLastHeartbeatTime(server.getLastHeartbeatTime());
-                return model;
-            })
-            .collect(Collectors.toList());
+        List<WorkerServerModel> workerServers = getServerListFromRegistry(NodeType.MASTER)
+                .stream()
+                .map((Server server) -> {
+                    WorkerServerModel model = new WorkerServerModel();
+                    model.setId(server.getId());
+                    model.setHost(server.getHost());
+                    model.setPort(server.getPort());
+                    model.setZkDirectories(Sets.newHashSet(server.getZkDirectory()));
+                    model.setResInfo(server.getResInfo());
+                    model.setCreateTime(server.getCreateTime());
+                    model.setLastHeartbeatTime(server.getLastHeartbeatTime());
+                    return model;
+                })
+                .collect(Collectors.toList());
 
         Map<String, WorkerServerModel> workerHostPortServerMapping = workerServers
-            .stream()
-            .collect(Collectors.toMap(
-                (WorkerServerModel worker) -> {
-                    String[] s = worker.getZkDirectories().iterator().next().split("/");
-                    return s[s.length - 1];
-                }
-                , Function.identity()
-                , (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
-                    oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
-                    return oldOne;
-                }));
+                .stream()
+                .collect(Collectors.toMap(
+                        (WorkerServerModel worker) -> {
+                            String[] s = worker.getZkDirectories().iterator().next().split("/");
+                            return s[s.length - 1];
+                        }
+                        , Function.identity()
+                        , (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
+                            oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
+                            return oldOne;
+                        }));
 
         result.put(Constants.DATA_LIST, workerHostPortServerMapping.values());
         putMsg(result, Status.SUCCESS);
@@ -129,10 +110,26 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     }
 
     @Override
-    public List<Server> getServerListFromRegistry(boolean isMaster) {
-        return isMaster
-            ? registryClient.getServerList(NodeType.MASTER)
-            : registryClient.getServerList(NodeType.WORKER);
+    public Map<String, Object> queryAlertServer() {
+        Map<String, Object> result = new HashMap<>();
+        List<Server> alertServer = getServerListFromRegistry(NodeType.ALERT_SERVER);
+        result.put(Constants.DATA_LIST, alertServer);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> queryApiServer() {
+        Map<String, Object> result = new HashMap<>();
+        List<Server> alertServer = getServerListFromRegistry(NodeType.API_SERVER);
+        result.put(Constants.DATA_LIST, alertServer);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public List<Server> getServerListFromRegistry(NodeType nodeType) {
+        return registryClient.getServerList(nodeType);
     }
 
 }

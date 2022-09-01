@@ -30,12 +30,14 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,7 +160,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return false;
         }
         // check zookeeper
-        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
+        String workerGroupPath = NodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH + workerGroup.getName();
         return registryClient.exists(workerGroupPath);
     }
 
@@ -279,7 +281,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         // worker groups from zookeeper
-        String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+        String workerPath = NodeType.WORKER.getRegistryPath();
         Collection<String> workerGroupList = null;
         try {
             workerGroupList = registryClient.getChildrenKeys(workerPath);
@@ -315,9 +317,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroup.setName(workerGroupName);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                String[] rv = registeredValue.split(Constants.COMMA);
-                workerGroup.setCreateTime(new Date(Long.parseLong(rv[6])));
-                workerGroup.setUpdateTime(new Date(Long.parseLong(rv[7])));
+                WorkerHeartBeat workerHeartBeat = JsonUtils.fromJson(registeredValue, WorkerHeartBeat.class);
+                workerGroup.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
+                workerGroup.setUpdateTime(new Date(workerHeartBeat.getReportTime()));
                 workerGroup.setSystemDefault(true);
             }
             handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
