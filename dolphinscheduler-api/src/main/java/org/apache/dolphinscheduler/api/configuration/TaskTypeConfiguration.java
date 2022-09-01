@@ -46,6 +46,8 @@ public class TaskTypeConfiguration {
     private List<String> dataQuality;
     private List<String> other;
 
+    private List<String> machineLearning;
+
     public Set<FavDto> getDefaultTaskTypes() {
         Set<FavDto> defaultTaskTypes = new HashSet<>();
         if (defaultTaskTypes.size() <= 0) {
@@ -54,7 +56,9 @@ public class TaskTypeConfiguration {
             logic.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_LOGIC)));
             dataIntegration.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
             dataQuality.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_DATA_QUALITY)));
+            machineLearning.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
             other.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_OTHER)));
+
         }
 
         return defaultTaskTypes;

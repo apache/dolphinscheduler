@@ -848,11 +848,11 @@ public final class Constants {
     /**
      * Task Types
      */
-    public static final String TYPE_UNIVERSAL = "universal";
-    public static final String TYPE_DATA_INTEGRATION = "dataIntegration";
-    public static final String TYPE_CLOUD = "cloud";
-    public static final String TYPE_LOGIC = "logic";
-    public static final String TYPE_DATA_QUALITY = "dataQuality";
-    public static final String TYPE_OTHER = "other";
-
+    public static final String TYPE_UNIVERSAL = "Universal";
+    public static final String TYPE_DATA_INTEGRATION = "DataIntegration";
+    public static final String TYPE_CLOUD = "Cloud";
+    public static final String TYPE_LOGIC = "Logic";
+    public static final String TYPE_DATA_QUALITY = "DataQuality";
+    public static final String TYPE_OTHER = "Other";
+    public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
 }

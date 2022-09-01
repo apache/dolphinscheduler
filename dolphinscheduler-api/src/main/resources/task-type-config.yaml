@@ -8,8 +8,12 @@ task:
     - 'FLINK'
     - 'HTTP'
     - 'MR'
+    - 'DINKY'
+    - 'FLINK_STREAM'
+    - 'HIVECLI'
   cloud:
     - 'EMR'
+    - 'K8S'
   logic:
     - 'SUB_PROCESS'
     - 'DEPENDENT'
@@ -23,4 +27,14 @@ task:
     - 'SQOOP'
   dataQuality:
     - 'DATA_QUALITY'
+  machineLearning:
+    - 'JUPYTER'
+    - 'MLFLOW'
+    - 'OPENMLDB'
+    - 'DVC'
+    - 'SAGEMAKER'
+    - 'PYTORCH'
   other:
+    - 'PIGEON'
+    - 'ZEPPELIN'
+    - 'CHUNJUN'
