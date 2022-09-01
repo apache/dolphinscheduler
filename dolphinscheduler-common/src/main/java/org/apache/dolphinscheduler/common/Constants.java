@@ -845,4 +845,14 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+    /**
+     * Task Types
+     */
+    public static final String TYPE_UNIVERSAL = "universal";
+    public static final String TYPE_DI = "di";
+    public static final String TYPE_CLOUD = "cloud";
+    public static final String TYPE_LOGIC = "logic";
+    public static final String TYPE_DQ = "dq";
+    public static final String TYPE_OTHER = "other";
+
 }

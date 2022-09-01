@@ -1,0 +1,28 @@
+task:
+  universal:
+    - 'SHELL'
+    - 'PYTHON'
+    - 'PROCEDURE'
+    - 'SQL'
+    - 'SPARK'
+    - 'FLINK'
+    - 'HTTP'
+    - 'MR'
+  cloud:
+    - 'EMR'
+  logic:
+    - 'SUB_PROCESS'
+    - 'DEPENDENT'
+    - 'CONDITIONS'
+    - 'SWITCH'
+    - 'NEXT_LOOP'
+    - 'SURVEIL'
+  di:
+    - 'SEATUNNEL'
+    - 'DATAX'
+    - 'SQOOP'
+  dq:
+    - 'DATA_QUALITY'
+  other:
+    - 'PIGEON'
+    - 'INFA'
