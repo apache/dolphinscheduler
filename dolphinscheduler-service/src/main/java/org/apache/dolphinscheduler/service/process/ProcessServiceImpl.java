@@ -2518,20 +2518,24 @@ public class ProcessServiceImpl implements ProcessService {
 
             TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
                     .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+            // no this 'TaskDefinitionLog' and no 'TaskDefinition' is a new task definition
             if (definitionCodeAndVersion == null) {
-                taskDefinitionLog.setUserId(operator.getId());
-                taskDefinitionLog.setCreateTime(now);
-                newTaskDefinitionLogs.add(taskDefinitionLog);
-                continue;
+                TaskDefinition task = taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode());
+                if (task == null) {
+                    taskDefinitionLog.setUserId(operator.getId());
+                    taskDefinitionLog.setCreateTime(now);
+                    newTaskDefinitionLogs.add(taskDefinitionLog);
+                    continue;
+                }
             }
             if (taskDefinitionLog.equals(definitionCodeAndVersion)) {
                 // do nothing if equals
                 continue;
             }
-            taskDefinitionLog.setUserId(definitionCodeAndVersion.getUserId());
             Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionLog.getCode());
             taskDefinitionLog.setVersion(version + 1);
-            taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
+            taskDefinitionLog.setUserId(operator.getId());
+            taskDefinitionLog.setCreateTime(new Date());
             updateTaskDefinitionLogs.add(taskDefinitionLog);
         }
         int insertResult = 0;
