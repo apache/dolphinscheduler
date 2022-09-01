@@ -15,18 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.api.dto;
 
-import org.apache.dolphinscheduler.api.dto.FavTaskDto;
-import org.apache.dolphinscheduler.dao.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
+@NoArgsConstructor
+@Getter
+@Setter
+@AllArgsConstructor
+public class FavTaskDto {
 
-public interface FavTaskService {
+    private String taskName;
+    private boolean isCollection;
+    private String taskType;
 
-    List<FavTaskDto> getFavTaskList(User loginUser);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof FavTaskDto) {
+            FavTaskDto favDto = (FavTaskDto) obj;
+            return this.taskName.equals(favDto.getTaskName());
 
-    boolean deleteFavTask(User loginUser, String taskName);
-
-    int addFavTask(User loginUser, String taskName);
+        }
+        return super.equals(obj);
+    }
 }

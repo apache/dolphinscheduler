@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.dolphinscheduler.api.dto.FavDto;
+import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -48,16 +48,16 @@ public class TaskTypeConfiguration {
 
     private List<String> machineLearning;
 
-    public Set<FavDto> getDefaultTaskTypes() {
-        Set<FavDto> defaultTaskTypes = new HashSet<>();
+    public Set<FavTaskDto> getDefaultTaskTypes() {
+        Set<FavTaskDto> defaultTaskTypes = new HashSet<>();
         if (defaultTaskTypes.size() <= 0) {
-            universal.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_UNIVERSAL)));
-            cloud.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_CLOUD)));
-            logic.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_LOGIC)));
-            dataIntegration.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
-            dataQuality.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_DATA_QUALITY)));
-            machineLearning.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
-            other.forEach(task -> defaultTaskTypes.add(new FavDto(task, false, Constants.TYPE_OTHER)));
+            universal.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_UNIVERSAL)));
+            cloud.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_CLOUD)));
+            logic.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_LOGIC)));
+            dataIntegration.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
+            dataQuality.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_QUALITY)));
+            machineLearning.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
+            other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
 
         }
 

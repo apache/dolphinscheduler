@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.configuration.TaskTypeConfiguration;
-import org.apache.dolphinscheduler.api.dto.FavDto;
+import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.dao.entity.FavTask;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -39,11 +39,11 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
     private FavTaskMapper favMapper;
 
     @Override
-    public List<FavDto> getFavTaskList(User loginUser) {
-        List<FavDto> result = new ArrayList<>();
+    public List<FavTaskDto> getFavTaskList(User loginUser) {
+        List<FavTaskDto> result = new ArrayList<>();
         Set<String> userFavTaskTypes = favMapper.getUserFavTaskTypes(loginUser.getId());
 
-        Set<FavDto> defaultTaskTypes = taskTypeConfiguration.getDefaultTaskTypes();
+        Set<FavTaskDto> defaultTaskTypes = taskTypeConfiguration.getDefaultTaskTypes();
         defaultTaskTypes.forEach(e -> {
             if (userFavTaskTypes.contains(e.getTaskName())) {
                 e.setCollection(true);

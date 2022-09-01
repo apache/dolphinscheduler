@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.dto.FavDto;
+import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.FavTaskService;
@@ -68,7 +68,7 @@ public class FavTaskController extends BaseController {
     @ApiException(LIST_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listTaskType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<FavDto> favTaskList = favTaskService.getFavTaskList(loginUser);
+        List<FavTaskDto> favTaskList = favTaskService.getFavTaskList(loginUser);
         return success(Status.SUCCESS.getMsg(), favTaskList);
     }
 
