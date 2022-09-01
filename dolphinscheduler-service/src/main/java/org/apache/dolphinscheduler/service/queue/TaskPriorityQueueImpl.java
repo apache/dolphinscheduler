@@ -19,11 +19,14 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
+import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 /**
  * A singleton of a task queue implemented using PriorityBlockingQueue
@@ -81,6 +84,11 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
     @Override
     public int size() throws TaskPriorityQueueException {
         return queue.size();
+    }
+
+    public List<TaskPriority> getAll() {
+        TaskPriority[] taskPriorities = queue.toArray(new TaskPriority[0]);
+        return Arrays.stream(taskPriorities).collect(Collectors.toList());
     }
 
     @Override

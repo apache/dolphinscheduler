@@ -119,6 +119,8 @@ master:
 
 server:
   port: 5679
+  servlet:
+    context-path: /dolphinscheduler/master/
 
 management:
   endpoints:

@@ -17,19 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@UtilityClass
 public class TaskExecutionContextCacheManager {
 
-    private TaskExecutionContextCacheManager() {
-        throw new IllegalStateException("Utility class");
-    }
-
-    /**
-     * taskInstance cache
-     */
     private static Map<Integer, TaskExecutionContext> taskRequestContextCache = new ConcurrentHashMap<>();
 
     /**
@@ -66,7 +63,11 @@ public class TaskExecutionContextCacheManager {
         return taskRequestContextCache.containsKey(request.getTaskInstanceId());
     }
 
+    public static void clearAllTaskExecutionContext() {
+        taskRequestContextCache.clear();
+    }
+
     public static Collection<TaskExecutionContext> getAllTaskRequestList() {
-        return taskRequestContextCache.values();
+        return Collections.unmodifiableCollection(taskRequestContextCache.values());
     }
 }

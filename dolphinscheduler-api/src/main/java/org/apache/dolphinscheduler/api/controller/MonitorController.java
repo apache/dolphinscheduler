@@ -36,6 +36,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_ALERT_SERVERS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_API_SERVERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
@@ -51,12 +53,6 @@ public class MonitorController extends BaseController {
     @Autowired
     private MonitorService monitorService;
 
-    /**
-     * master list
-     *
-     * @param loginUser login user
-     * @return master list
-     */
     @ApiOperation(value = "listMaster", notes = "MASTER_LIST_NOTES")
     @GetMapping(value = "/masters")
     @ResponseStatus(HttpStatus.OK)
@@ -67,12 +63,6 @@ public class MonitorController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
     @ApiOperation(value = "listWorker", notes = "WORKER_LIST_NOTES")
     @GetMapping(value = "/workers")
     @ResponseStatus(HttpStatus.OK)
@@ -83,12 +73,26 @@ public class MonitorController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * query database state
-     *
-     * @param loginUser login user
-     * @return data base state
-     */
+    @ApiOperation(value = "listAlertServers", notes = "ALERT_SERVER_LIST_NOTES")
+    @GetMapping(value = "/alertServers")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LIST_ALERT_SERVERS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result listAlertServers(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        Map<String, Object> result = monitorService.queryAlertServer();
+        return returnDataList(result);
+    }
+
+    @ApiOperation(value = "listApiServers", notes = "ALERT_SERVER_LIST_NOTES")
+    @GetMapping(value = "/alertApiServers")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LIST_API_SERVERS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result listApiServers(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        Map<String, Object> result = monitorService.queryApiServer();
+        return returnDataList(result);
+    }
+
     @ApiOperation(value = "queryDatabaseState", notes = "QUERY_DATABASE_STATE_NOTES")
     @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)

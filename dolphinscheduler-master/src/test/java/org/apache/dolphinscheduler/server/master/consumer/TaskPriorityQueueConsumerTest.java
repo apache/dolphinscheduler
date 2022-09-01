@@ -305,7 +305,7 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority();
-        taskPriority.setTaskId(1);
+        taskPriority.setTaskInstanceId(1);
         boolean res = taskPriorityQueueConsumer.dispatchTask(taskPriority);
 
         Assert.assertFalse(res);

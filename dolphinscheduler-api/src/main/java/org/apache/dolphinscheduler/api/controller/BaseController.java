@@ -32,10 +32,7 @@ import static org.apache.dolphinscheduler.common.Constants.HTTP_HEADER_UNKNOWN;
 import static org.apache.dolphinscheduler.common.Constants.HTTP_X_FORWARDED_FOR;
 import static org.apache.dolphinscheduler.common.Constants.HTTP_X_REAL_IP;
 
-/**
- * base controller
- */
-public class BaseController {
+public abstract class BaseController {
 
     /**
      * check params

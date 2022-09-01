@@ -203,7 +203,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 return true;
             }
             Optional<TaskInstance> taskInstanceOptional =
-                    workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
+                    workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskInstanceId());
             if (!taskInstanceOptional.isPresent()) {
                 logger.error("Cannot find the task instance from related processInstance, taskPriority: {}",
                         taskPriority);
@@ -217,7 +217,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                             taskInstance);
 
             if (isTaskNeedToCheck(taskPriority)) {
-                if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
+                if (taskInstanceIsFinalState(taskPriority.getTaskInstanceId())) {
                     // when task finish, ignore this task, there is no need to dispatch anymore
                     return true;
                 }
@@ -227,12 +227,12 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
             if (result) {
                 logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
-                        taskPriority.getTaskId(),
+                        taskPriority.getTaskInstanceId(),
                         executionContext.getHost());
                 addDispatchEvent(context, executionContext);
             } else {
                 logger.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
-                        taskPriority.getTaskId(),
+                        taskPriority.getTaskInstanceId(),
                         executionContext.getHost());
             }
         } catch (RuntimeException | ExecuteException e) {

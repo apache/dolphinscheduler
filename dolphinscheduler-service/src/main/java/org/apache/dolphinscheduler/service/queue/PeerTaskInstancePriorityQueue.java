@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
+import com.google.common.base.Preconditions;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import com.google.common.base.Preconditions;
+import java.util.stream.Collectors;
 
 /**
  * Task instances priority queue implementation
@@ -108,6 +110,12 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     @Override
     public int size() {
         return queue.size();
+    }
+
+    @Override
+    public List<TaskInstance> getAll() {
+        TaskInstance[] taskInstances = queue.toArray(new TaskInstance[0]);
+        return Arrays.stream(taskInstances).collect(Collectors.toList());
     }
 
     /**

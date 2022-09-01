@@ -17,29 +17,31 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import lombok.NonNull;
-import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import lombok.NonNull;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class WorkerExecService {
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
+
+public class TaskExecuteThreadPool {
 
     /**
      * logger of WorkerExecService
      */
-    private static final Logger logger = LoggerFactory.getLogger(WorkerExecService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecuteThreadPool.class);
 
     private final ListeningExecutorService listeningExecutorService;
 
@@ -47,31 +49,31 @@ public class WorkerExecService {
 
     private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap;
 
-    public WorkerExecService(ExecutorService taskExecuteThreadPool,
-                             ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap) {
+    public TaskExecuteThreadPool(ExecutorService taskExecuteThreadPool,
+                                 ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap) {
         this.taskExecuteThreadPool = (ThreadPoolExecutor) taskExecuteThreadPool;
         this.listeningExecutorService = MoreExecutors.listeningDecorator(this.taskExecuteThreadPool);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
         WorkerServerMetrics.registerWorkerRunningTaskGauge(taskExecuteThreadMap::size);
     }
 
-    public void submit(@NonNull final WorkerTaskExecuteRunnable taskExecuteThread) {
-        taskExecuteThreadMap.put(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(), taskExecuteThread);
-        ListenableFuture future = this.listeningExecutorService.submit(taskExecuteThread);
+    public void submit(@NonNull final WorkerTaskExecuteRunnable workerTaskExecuteRunnable) {
+        taskExecuteThreadMap.put(workerTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId(), workerTaskExecuteRunnable);
+        ListenableFuture future = this.listeningExecutorService.submit(workerTaskExecuteRunnable);
         FutureCallback futureCallback = new FutureCallback() {
 
             @Override
             public void onSuccess(Object o) {
-                taskExecuteThreadMap.remove(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId());
+                taskExecuteThreadMap.remove(workerTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId());
             }
 
             @Override
             public void onFailure(Throwable throwable) {
                 logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}",
-                        taskExecuteThread.getTaskExecutionContext().getProcessInstanceId(),
-                        taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(),
+                        workerTaskExecuteRunnable.getTaskExecutionContext().getProcessInstanceId(),
+                        workerTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId(),
                         throwable);
-                taskExecuteThreadMap.remove(taskExecuteThread.getTaskExecutionContext().getTaskInstanceId());
+                taskExecuteThreadMap.remove(workerTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId());
             }
         };
         Futures.addCallback(future, futureCallback, this.listeningExecutorService);
@@ -93,6 +95,13 @@ public class WorkerExecService {
 
     public Map<Integer, WorkerTaskExecuteRunnable> getTaskExecuteThreadMap() {
         return taskExecuteThreadMap;
+    }
+
+    public List<WorkerTaskExecuteRunnable> getWaitingTask() {
+        List<WorkerTaskExecuteRunnable> waitingTasks =
+                Arrays.stream(taskExecuteThreadPool.getQueue().toArray(new WorkerTaskExecuteRunnable[0]))
+                        .collect(Collectors.toList());
+        return Collections.unmodifiableList(waitingTasks);
     }
 
 }

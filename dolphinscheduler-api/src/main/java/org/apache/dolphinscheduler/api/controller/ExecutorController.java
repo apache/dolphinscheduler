@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.dto.WorkflowInstanceExecuteDetailDto;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -375,8 +375,8 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
     @AccessLogAnnotation
-    public Result queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
-        WorkflowExecuteDto workflowExecuteDto = execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
-        return Result.success(workflowExecuteDto);
+    public Result<WorkflowInstanceExecuteDetailDto> queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
+        WorkflowInstanceExecuteDetailDto workflowInstanceExecuteDetailDto = execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
+        return Result.success(workflowInstanceExecuteDetailDto);
     }
 }

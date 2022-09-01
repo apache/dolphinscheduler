@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.dto.WorkflowInstanceExecuteDetailDto;
 
 import java.io.Serializable;
 
@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WorkflowExecutingDataResponseCommand implements Serializable {
 
-    private WorkflowExecuteDto workflowExecuteDto;
+    private WorkflowInstanceExecuteDetailDto workflowInstanceExecuteDetailDto;
 
     /**
      * package request command

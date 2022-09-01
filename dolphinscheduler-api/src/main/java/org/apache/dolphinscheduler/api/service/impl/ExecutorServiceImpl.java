@@ -69,7 +69,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.dto.WorkflowInstanceExecuteDetailDto;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
@@ -954,7 +954,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return
      */
     @Override
-    public WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
+    public WorkflowInstanceExecuteDetailDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
         if (processInstance == null) {
             return null;
@@ -967,6 +967,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return null;
         }
         WorkflowExecutingDataResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponseCommand.class);
-        return responseCommand.getWorkflowExecuteDto();
+        return responseCommand.getWorkflowInstanceExecuteDetailDto();
     }
 }

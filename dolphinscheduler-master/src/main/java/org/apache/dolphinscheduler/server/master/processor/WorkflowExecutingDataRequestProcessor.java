@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.dto.WorkflowInstanceExecuteDetailDto;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
@@ -56,10 +56,10 @@ public class WorkflowExecutingDataRequestProcessor implements NettyRequestProces
 
         logger.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
 
-        Optional<WorkflowExecuteDto> workflowExecuteDtoOptional = executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
+        Optional<WorkflowInstanceExecuteDetailDto> workflowExecuteDtoOptional = executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
 
         WorkflowExecutingDataResponseCommand responseCommand = new WorkflowExecutingDataResponseCommand();
-        workflowExecuteDtoOptional.ifPresent(responseCommand::setWorkflowExecuteDto);
+        workflowExecuteDtoOptional.ifPresent(responseCommand::setWorkflowInstanceExecuteDetailDto);
         channel.writeAndFlush(responseCommand.convert2Command(command.getOpaque()));
     }
 }

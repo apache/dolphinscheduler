@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
@@ -39,7 +40,7 @@ public class WorkerManagerThread implements Runnable {
 
     private final DelayQueue<WorkerDelayTaskExecuteRunnable> waitSubmitQueue;
 
-    private final WorkerExecService workerExecService;
+    private final TaskExecuteThreadPool taskExecuteThreadPool;
 
     /**
      * running task
@@ -48,7 +49,7 @@ public class WorkerManagerThread implements Runnable {
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
         this.waitSubmitQueue = new DelayQueue<>();
-        workerExecService = new WorkerExecService(
+        taskExecuteThreadPool = new TaskExecuteThreadPool(
                 ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
                 taskExecuteThreadMap);
     }
@@ -62,11 +63,11 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public int getThreadPoolWaitingTaskNum() {
-        return workerExecService.getThreadPoolWaitingTaskNum();
+        return taskExecuteThreadPool.getThreadPoolWaitingTaskNum();
     }
 
     public int getThreadPoolRunningTaskNum() {
-        return workerExecService.getThreadPoolRunningTaskNum();
+        return taskExecuteThreadPool.getThreadPoolRunningTaskNum();
     }
 
     /**
@@ -102,7 +103,7 @@ public class WorkerManagerThread implements Runnable {
                 }
                 final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
 
-                workerExecService.submit(workerDelayTaskExecuteRunnable);
+                taskExecuteThreadPool.submit(workerDelayTaskExecuteRunnable);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 logger.warn("Worker execute manager thread has been interrupted, will stop", ex);
@@ -121,9 +122,13 @@ public class WorkerManagerThread implements Runnable {
         }
     }
 
+    public List<WorkerTaskExecuteRunnable> getWaitingTask() {
+        return taskExecuteThreadPool.getWaitingTask();
+    }
+
     public void clearTask() {
         waitSubmitQueue.clear();
-        workerExecService.getTaskExecuteThreadMap().values().forEach(WorkerTaskExecuteRunnable::cancelTask);
-        workerExecService.getTaskExecuteThreadMap().clear();
+        taskExecuteThreadPool.getTaskExecuteThreadMap().values().forEach(WorkerTaskExecuteRunnable::cancelTask);
+        taskExecuteThreadPool.getTaskExecuteThreadMap().clear();
     }
 }

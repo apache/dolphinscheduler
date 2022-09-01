@@ -84,6 +84,8 @@ worker:
 
 server:
   port: 1235
+  servlet:
+    context-path: /dolphinscheduler/worker/
 
 management:
   endpoints:

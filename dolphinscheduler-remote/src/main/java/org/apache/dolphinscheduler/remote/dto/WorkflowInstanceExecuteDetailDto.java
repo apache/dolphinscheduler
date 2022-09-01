@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.dto;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -28,12 +29,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import java.util.Collection;
 import java.util.Date;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Setter
-@Getter
-public class WorkflowExecuteDto {
+@Data
+public class WorkflowInstanceExecuteDetailDto {
 
     private int id;
 
@@ -150,5 +147,5 @@ public class WorkflowExecuteDto {
 
     private boolean isBlocked;
 
-    private Collection<TaskInstanceExecuteDto> taskInstances;
+    private Collection<TaskInstanceExecuteDetailDto> taskInstances;
 }

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleException;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -122,6 +123,8 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
         logger.warn("Worker server clear the tasks due to lost connection from registry");
         messageRetryRunner.clearMessage();
         logger.warn("Worker server clear the retry message due to lost connection from registry");
+        TaskExecutionContextCacheManager.clearAllTaskExecutionContext();
+        logger.warn("Worker server clear the task execution context in cache");
 
     }
 

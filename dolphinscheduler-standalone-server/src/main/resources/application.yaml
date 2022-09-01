@@ -189,6 +189,11 @@ audit:
 metrics:
   enabled: true
 
+rpc:
+  rpc-prefix: http://
+  master-url-prefix: /dolphinscheduler/master
+  worker-url-prefix: /dolphinscheduler/worker
+
 # Override by profile
 ---
 spring:
