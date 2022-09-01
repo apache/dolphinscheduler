@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.dq.utils.spark;
+package org.apache.dolphinscheduler.spi.plugin;
 
-/**
- * support program types
- */
-public enum ProgramType {
+public interface PrioritySPI extends Comparable<Integer> {
 
     /**
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * The SPI identify, if the two plugin has the same name, will load the high priority.
+     * If the priority and name is all same, will throw <code>IllegalArgumentException</code>
+     * @return
      */
-    JAVA,
-    SCALA,
-    PYTHON
+    SPIIdentify getIdentify();
+
+    @Override
+    default int compareTo(Integer o) {
+        return Integer.compare(getIdentify().getPriority(), o);
+    }
+
 }

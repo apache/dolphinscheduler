@@ -173,7 +173,7 @@ The default configuration is as follows:
 |registry.zookeeper.session-timeout|30s|session timeout|
 |registry.zookeeper.connection-timeout|30s|connection timeout|
 |registry.zookeeper.block-until-connected|600ms|waiting time to block until the connection succeeds|
-|registry.zookeeper.digest|~|digest of zookeeper|
+|registry.zookeeper.digest|{username}:{password}|digest of zookeeper to access znode, works only when acl is enabled, for more details please check [https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper doc) |
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
 
@@ -209,6 +209,8 @@ The default configuration is as follows:
 |yarn.resourcemanager.ha.rm.ids | 192.168.xx.xx,192.168.xx.xx | specify the yarn resourcemanager url. if resourcemanager supports HA, input HA IP addresses (separated by comma), or input null for standalone|
 |yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode|
 |development.state | false | specify whether in development state|
+|dolphin.scheduler.network.interface.preferred | NONE | display name of the network card|
+|dolphin.scheduler.network.priority.strategy | default | IP acquisition strategy, give priority to finding the internal network or the external network|
 |resource.manager.httpaddress.port | 8088 | the port of resource manager|
 |yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | job history status url of yarn|
 |datasource.encryption.enable | false | whether to enable datasource encryption|
