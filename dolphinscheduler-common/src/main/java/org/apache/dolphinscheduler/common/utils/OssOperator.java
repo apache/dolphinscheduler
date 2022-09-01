@@ -88,9 +88,6 @@ public class OssOperator implements Closeable, StorageOperate {
         }
     }
 
-    /**
-     * S3Utils single
-     */
     private enum OssOperatorSingleton {
 
         INSTANCE;
@@ -240,8 +237,8 @@ public class OssOperator implements Closeable, StorageOperate {
             logger.error("file path:{} is blank", filePath);
             return Collections.emptyList();
         }
-        OSSObject s3Object = ossClient.getObject(BUCKET_NAME, filePath);
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
+        OSSObject ossObject = ossClient.getObject(BUCKET_NAME, filePath);
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ossObject.getObjectContent()))) {
             Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }
@@ -252,39 +249,18 @@ public class OssOperator implements Closeable, StorageOperate {
         deleteTenantCode(tenantCode);
     }
 
-    /**
-     * S3 resource dir
-     *
-     * @param tenantCode tenant code
-     * @return S3 resource dir
-     */
     public static String getOssResDir(String tenantCode) {
         return String.format("%s/" + RESOURCE_TYPE_FILE, getOssTenantDir(tenantCode));
     }
 
-    /**
-     * S3 udf dir
-     *
-     * @param tenantCode tenant code
-     * @return get udf dir on S3
-     */
     public static String getOssUdfDir(String tenantCode) {
         return String.format("%s/" + RESOURCE_TYPE_UDF, getOssTenantDir(tenantCode));
     }
 
-    /**
-     * @param tenantCode tenant code
-     * @return file directory of tenants on S3
-     */
     public static String getOssTenantDir(String tenantCode) {
         return String.format(FORMAT_S_S, getOssDataBasePath(), tenantCode);
     }
 
-    /**
-     * get data S3 path
-     *
-     * @return data S3 path
-     */
     public static String getOssDataBasePath() {
         if (FOLDER_SEPARATOR.equals(RESOURCE_UPLOAD_PATH)) {
             return "";
@@ -300,7 +276,7 @@ public class OssOperator implements Closeable, StorageOperate {
 
     public void checkBucketNameExists(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
-            throw new IllegalArgumentException("resource.aws.s3.bucket.name is blank");
+            throw new IllegalArgumentException("resource.alibaba.cloud.oss.bucket.name is blank");
         }
 
         Bucket existsBucket = ossClient.listBuckets()
