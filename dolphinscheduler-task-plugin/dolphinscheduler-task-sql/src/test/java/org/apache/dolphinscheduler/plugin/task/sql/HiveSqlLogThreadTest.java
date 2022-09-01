@@ -19,50 +19,49 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-import org.apache.hive.jdbc.HiveStatement;
+import org.apache.hive.jdbc.HivePreparedStatement;
+
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.*"})
 public class HiveSqlLogThreadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThreadTest.class);
 
-    private static volatile TaskExecutionContext taskExecutionContext;
+    private static TaskExecutionContext taskExecutionContext;
 
     @Test
-    public void testHiveSql() throws SQLException {
+    public void testHiveSql() throws InterruptedException, SQLException {
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskType("hive");
-
-        String sql = "select count(*) from test.table";
+        taskExecutionContext.setFirstSubmitTime(new Date());
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
+        taskExecutionContext.setProcessInstanceId(1);
+        taskExecutionContext.setTaskInstanceId(1);
 
         List<String> mockLog = new ArrayList<>();
         mockLog.add("1start hive sql log\napplication_1231_2323");
-        HiveStatement statement = PowerMockito.mock(HiveStatement.class);
-        PowerMockito.when(statement.isClosed()).thenReturn(false);
-        PowerMockito.when(statement.hasMoreLogs()).thenReturn(true);
-        PowerMockito.when(statement.getQueryLog(true, 500)).thenReturn(mockLog);
-        try {
-            HiveSqlLogThread queryThread = PowerMockito.spy(new HiveSqlLogThread(statement, LOGGER, taskExecutionContext));
-            queryThread.start();
+        PreparedStatement statement = PowerMockito.mock(PreparedStatement.class);
+        HivePreparedStatement hivePreparedStatement = PowerMockito.mock(HivePreparedStatement.class);
+        PowerMockito.when(statement.unwrap(HivePreparedStatement.class)).thenReturn(hivePreparedStatement);
+        PowerMockito.when(hivePreparedStatement.isClosed()).thenReturn(false);
+        PowerMockito.when(hivePreparedStatement.hasMoreLogs()).thenReturn(true);
+        PowerMockito.when(hivePreparedStatement.getQueryLog(true, 500)).thenReturn(mockLog);
 
-            Thread.sleep(5000);
-            Assert.assertEquals(taskExecutionContext.getAppIds(), "application_1231_2323");
+        HiveSqlLogThread queryThread = PowerMockito.spy(new HiveSqlLogThread(statement, LOGGER, taskExecutionContext));
+        queryThread.start();
 
-        } catch (Exception e) {
-            LOGGER.error("query failed,sql is [{}]" ,sql);
-        }
+        Thread.sleep(5000);
+        Assert.assertEquals(taskExecutionContext.getAppIds(), "application_1231_2323");
 
     }
 }
