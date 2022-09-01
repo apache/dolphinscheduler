@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import io.swagger.annotations.*;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceListPagingResponse;
@@ -30,14 +32,12 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 /**
  * task instance controller
@@ -45,7 +45,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 @Api(tags = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/v2/projects/{projectCode}/task-instances")
-public class TaskV2InstanceController extends BaseController {
+public class TaskInstanceV2Controller extends BaseController {
 
     @Autowired
     private TaskInstanceService taskInstanceService;
@@ -85,10 +85,14 @@ public class TaskV2InstanceController extends BaseController {
             return new TaskInstanceListPagingResponse(result);
         }
         String searchVal = ParameterUtils.handleEscapes(taskInstanceQueryReq.getSearchVal());
-        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
+        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode,
+                taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
                 taskInstanceQueryReq.getProcessDefinitionName(),
-                taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getExecutorName(), taskInstanceQueryReq.getStartTime(), taskInstanceQueryReq.getEndTime(), searchVal,
-                taskInstanceQueryReq.getStateType(), taskInstanceQueryReq.getHost(), taskInstanceQueryReq.getTaskExecuteType(), taskInstanceQueryReq.getPageNo(), taskInstanceQueryReq.getPageSize());
+                taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getExecutorName(),
+                taskInstanceQueryReq.getStartTime(), taskInstanceQueryReq.getEndTime(), searchVal,
+                taskInstanceQueryReq.getStateType(), taskInstanceQueryReq.getHost(),
+                taskInstanceQueryReq.getTaskExecuteType(), taskInstanceQueryReq.getPageNo(),
+                taskInstanceQueryReq.getPageSize());
         return new TaskInstanceListPagingResponse(result);
     }
 
@@ -104,7 +108,7 @@ public class TaskV2InstanceController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
     })
-    @PostMapping(value = "/{id}/force-success")
+    @PostMapping(value = "/{id}/force-success", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

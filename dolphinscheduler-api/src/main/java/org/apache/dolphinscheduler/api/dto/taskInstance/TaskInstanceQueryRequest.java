@@ -17,17 +17,17 @@
 
 package org.apache.dolphinscheduler.api.dto.taskInstance;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiParam;
-import lombok.Data;
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import lombok.Data;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * task instance request
@@ -38,8 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Data
 public class TaskInstanceQueryRequest extends PageQueryDto {
 
-    @ApiModelProperty(name = "processInstanceId", example = "PROCESS_INSTANCE_ID",value = "0")
-    Integer processInstanceId = 0;
+    @ApiModelProperty(name = "processInstanceId", example = "PROCESS_INSTANCE_ID", value = "0")
+    Integer processInstanceId;
 
     @ApiModelProperty(name = "processInstanceName", example = "PROCESS-INSTANCE-NAME")
     String processInstanceName;
@@ -68,6 +68,6 @@ public class TaskInstanceQueryRequest extends PageQueryDto {
     @ApiModelProperty(name = "endDate", example = "END-DATE")
     String endTime;
 
-    @ApiModelProperty(name = "taskExecuteType", example = "EXECUTE-TYPE" ,value = "BATCH")
-    TaskExecuteType taskExecuteType = TaskExecuteType.BATCH;
+    @ApiModelProperty(name = "taskExecuteType", example = "EXECUTE-TYPE", value = "BATCH")
+    TaskExecuteType taskExecuteType;
 }
