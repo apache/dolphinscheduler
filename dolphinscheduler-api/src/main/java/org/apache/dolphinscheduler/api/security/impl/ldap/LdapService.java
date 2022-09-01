@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.support.filter.EqualsFilter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -87,9 +88,9 @@ public class LdapService {
             SearchControls sc = new SearchControls();
             sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String searchFilter = String.format("(%s=%s)", ldapUserIdentifyingAttribute, userId);
+            EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
             //Search for the user you want to authenticate, search him with some attribute
-            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, searchFilter, sc);
+            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
             if (results.hasMore()) {
                 // get the users DN (distinguishedName) from the result
                 SearchResult result = results.next();

@@ -294,6 +294,11 @@
             <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-ldap</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

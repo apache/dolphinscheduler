@@ -215,6 +215,7 @@ spring-core-5.3.12.jar
 spring-expression-5.3.12.jar
 spring-jcl-5.3.12.jar
 spring-jdbc-5.3.12.jar
+spring-ldap-1.1.2.jar
 spring-plugin-core-1.2.0.RELEASE.jar
 spring-plugin-metadata-1.2.0.RELEASE.jar
 spring-tx-5.3.12.jar
