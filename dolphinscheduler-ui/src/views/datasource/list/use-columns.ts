@@ -28,13 +28,13 @@ import {
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
 import ButtonLink from '@/components/button-link'
-import { IDataSource, TableColumns } from './types'
+import type { IDataSource, TableColumns } from './types'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import { renderEnvironmentalDistinctionCell } from '@/common/common'
+import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()

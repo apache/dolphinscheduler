@@ -30,7 +30,6 @@ import {
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import {
-  renderEnvironmentalDistinctionCell,
   renderTableTime,
   runningType
 } from '@/common/common'
@@ -44,6 +43,7 @@ import type { Router } from 'vue-router'
 import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
+import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
 
 export function useTable() {
   const { t } = useI18n()

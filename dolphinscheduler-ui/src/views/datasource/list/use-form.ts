@@ -30,7 +30,7 @@ import type {
   IDataSource
 } from './types'
 import utils from '@/utils'
-import { TypeReq } from '@/service/modules/data-source/types'
+import type { TypeReq } from '@/service/modules/data-source/types'
 export function useForm(id?: number) {
   const { t } = useI18n()
 
@@ -49,7 +49,7 @@ export function useForm(id?: number) {
     database: '',
     connectType: '',
     other: '',
-    testFlag: undefined,
+    testFlag: -1,
     bindTestId: undefined
   } as IDataSourceDetail
 
@@ -128,7 +128,7 @@ export function useForm(id?: number) {
       testFlag: {
         trigger: ['input'],
         validator() {
-          if (undefined === state.detailForm.testFlag) {
+          if (-1 === state.detailForm.testFlag) {
             return new Error(t('datasource.datasource_test_flag_tips'))
           }
         }
@@ -136,7 +136,7 @@ export function useForm(id?: number) {
       bindTestId: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.bindTestId && !state.detailForm.testFlag) {
+          if (!state.detailForm.bindTestId && -1 == state.detailForm.testFlag) {
             return new Error(t('datasource.datasource_bind_test_id_tips'))
           }
         }

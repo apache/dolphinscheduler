@@ -41,7 +41,6 @@ import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
 import {
   parseTime,
-  renderEnvironmentalDistinctionCell,
   renderTableTime,
   tasksState
 } from '@/common/common'
@@ -51,6 +50,8 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
+import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+
 
 export function useTable() {
   const { t } = useI18n()

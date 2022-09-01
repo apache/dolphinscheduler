@@ -37,8 +37,6 @@ import {
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
 import { ITaskStateConfig } from './types'
-import { h } from 'vue'
-import { NTag } from 'naive-ui'
 /**
  * Intelligent display kb m
  */
@@ -48,31 +46,6 @@ export const bytesToSize = (bytes: number) => {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
-}
-
-export function renderEnvironmentalDistinctionCell(
-  testFlag: number | undefined,
-  t: Function
-) {
-  if (testFlag === 0) {
-    return h(
-      NTag,
-      { type: 'success', size: 'small' },
-      {
-        default: () => t('datasource.on_line')
-      }
-    )
-  } else if (testFlag === 1) {
-    return h(
-      NTag,
-      { type: 'warning', size: 'small' },
-      {
-        default: () => t('datasource.test')
-      }
-    )
-  } else {
-    return '-'
-  }
 }
 
 export const fileTypeArr = [

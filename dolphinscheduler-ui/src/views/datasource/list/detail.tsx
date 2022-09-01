@@ -93,7 +93,6 @@ const DetailModal = defineComponent({
     const onChangePort = changePort
     const onChangeTestFlag = changeTestFlag
 
-    const onGetSameTypeTestDataSource = getSameTypeTestDataSource
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(
@@ -116,7 +115,6 @@ const DetailModal = defineComponent({
       ...toRefs(status),
       onChangeType,
       onChangeTestFlag,
-      getSameTypeTestDataSource,
       onChangePort,
       onSubmit,
       onTest,
