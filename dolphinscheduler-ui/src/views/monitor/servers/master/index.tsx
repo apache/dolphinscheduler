@@ -129,11 +129,11 @@ const master = defineComponent({
                     <Card title={t('monitor.master.disk_available')}>
                       <div class={[styles.card, styles['load-average']]}>
                         {item && (
-                            <NNumberAnimation
-                                precision={2}
-                                from={0}
-                                to={JSON.parse(item.resInfo).diskAvailable}
-                            />
+                          <NNumberAnimation
+                            precision={2}
+                            from={0}
+                            to={JSON.parse(item.resInfo).diskAvailable}
+                          />
                         )}
                       </div>
                     </Card>

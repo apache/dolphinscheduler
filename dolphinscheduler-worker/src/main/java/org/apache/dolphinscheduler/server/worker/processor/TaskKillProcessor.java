@@ -22,8 +22,9 @@ import com.google.common.base.Strings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import lombok.NonNull;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -137,11 +138,6 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         });
     }
 
-    /**
-     * do kill
-     *
-     * @return kill result
-     */
     private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
         // kill system process
         boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
@@ -204,29 +200,33 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      * kill yarn job
      *
-     * @param host host
-     * @param logPath logPath
+     * @param host        host
+     * @param logPath     logPath
      * @param executePath executePath
-     * @param tenantCode tenantCode
+     * @param tenantCode  tenantCode
      * @return Pair<Boolean, List < String>> yarn kill result
      */
-    private Pair<Boolean, List<String>> killYarnJob(Host host, String logPath, String executePath, String tenantCode) {
-        try (LogClientService logClient = new LogClientService();) {
-            logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), logPath,
-                    host.getPort());
-            String log = logClient.viewLog(host.getIp(), host.getPort(), logPath);
-            List<String> appIds = Collections.emptyList();
-            if (!Strings.isNullOrEmpty(log)) {
-                appIds = LoggerUtils.getAppIds(log, logger);
-                if (Strings.isNullOrEmpty(executePath)) {
-                    logger.error("task instance execute path is empty");
-                    throw new RuntimeException("task instance execute path is empty");
-                }
-                if (appIds.size() > 0) {
-                    ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
-                }
+    private Pair<Boolean, List<String>> killYarnJob(@NonNull Host host,
+                                                    String logPath,
+                                                    String executePath,
+                                                    String tenantCode) {
+        if (logPath == null || executePath == null || tenantCode == null) {
+            logger.error("Kill yarn job error, the input params is illegal, host: {}, logPath: {}, executePath: {}, tenantCode: {}",
+                    host, logPath, executePath, tenantCode);
+            return Pair.of(false, Collections.emptyList());
+        }
+        try (LogClientService logClient = new LogClientService()) {
+            logger.info("Get appIds from worker {}:{} taskLogPath: {}", host.getIp(), host.getPort(), logPath);
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), logPath);
+            if (CollectionUtils.isEmpty(appIds)) {
+                return Pair.of(true, Collections.emptyList());
             }
+
+            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
             return Pair.of(true, appIds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("kill yarn job error, the current thread has been interrtpted", e);
         } catch (Exception e) {
             logger.error("kill yarn job error", e);
         }

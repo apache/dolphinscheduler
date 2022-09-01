@@ -16,14 +16,7 @@
  */
 
 import { SearchOutlined } from '@vicons/antd'
-import {
-  NInput,
-  NButton,
-  NDatePicker,
-  NSelect,
-  NIcon,
-  NSpace
-} from 'naive-ui'
+import { NInput, NButton, NDatePicker, NSelect, NIcon, NSpace } from 'naive-ui'
 import { defineComponent, getCurrentInstance, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
@@ -102,7 +95,7 @@ export default defineComponent({
         <NSelect
           options={options}
           size='small'
-          style={{width: '210px'}}
+          style={{ width: '210px' }}
           defaultValue={''}
           v-model:value={this.stateTypeRef}
         />

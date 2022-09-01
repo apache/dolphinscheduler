@@ -26,7 +26,13 @@ import {
   NTooltip,
   NPopconfirm
 } from 'naive-ui'
-import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import { useRouter, useRoute } from 'vue-router'
@@ -128,7 +134,12 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
-              <NButton strong secondary size='small' onClick={() => (this.showRef = true)}>
+              <NButton
+                strong
+                secondary
+                size='small'
+                onClick={() => (this.showRef = true)}
+              >
                 {t('project.workflow.import_workflow')}
               </NButton>
             </NSpace>
