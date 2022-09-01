@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.configuration.TaskTypeConfiguration;
 import org.apache.dolphinscheduler.api.dto.FavDto;
-import org.apache.dolphinscheduler.api.service.FavService;
-import org.apache.dolphinscheduler.dao.entity.Fav;
+import org.apache.dolphinscheduler.api.service.FavTaskService;
+import org.apache.dolphinscheduler.dao.entity.FavTask;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.FavMapper;
+import org.apache.dolphinscheduler.dao.mapper.FavTaskMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,12 +31,12 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class FaveServiceImpl extends BaseServiceImpl implements FavService {
+public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskService {
 
     @Resource
     private TaskTypeConfiguration taskTypeConfiguration;
     @Resource
-    private FavMapper favMapper;
+    private FavTaskMapper favMapper;
 
     @Override
     public List<FavDto> getFavTaskList(User loginUser) {
@@ -61,6 +61,6 @@ public class FaveServiceImpl extends BaseServiceImpl implements FavService {
     @Override
     public int addFavTask(User loginUser, String taskName) {
         favMapper.deleteUserFavTask(loginUser.getId(), taskName);
-        return favMapper.insert(new Fav(null, taskName, loginUser.getId()));
+        return favMapper.insert(new FavTask(null, taskName, loginUser.getId()));
     }
 }

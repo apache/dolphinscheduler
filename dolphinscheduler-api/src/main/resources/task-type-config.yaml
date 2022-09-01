@@ -17,12 +17,10 @@ task:
     - 'SWITCH'
     - 'NEXT_LOOP'
     - 'SURVEIL'
-  di:
+  dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'
     - 'SQOOP'
-  dq:
+  dataQuality:
     - 'DATA_QUALITY'
   other:
-    - 'PIGEON'
-    - 'INFA'

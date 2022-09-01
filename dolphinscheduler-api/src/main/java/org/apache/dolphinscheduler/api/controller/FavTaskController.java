@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.FavDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.FavService;
+import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -48,13 +48,13 @@ import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
 /**
  * fav controller
  */
-@Api(tags = "FAV")
+@Api(tags = "FAVOURITE")
 @RestController
-@RequestMapping("/fav")
-public class FavController extends BaseController {
+@RequestMapping("/favourite")
+public class FavTaskController extends BaseController {
 
     @Resource
-    private FavService favService;
+    private FavTaskService favTaskService;
 
     /**
      * get task type list
@@ -68,7 +68,7 @@ public class FavController extends BaseController {
     @ApiException(LIST_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listTaskType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<FavDto> favTaskList = favService.getFavTaskList(loginUser);
+        List<FavDto> favTaskList = favTaskService.getFavTaskList(loginUser);
         return success(Status.SUCCESS.getMsg(), favTaskList);
     }
 
@@ -85,7 +85,7 @@ public class FavController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteFavTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("taskName") String taskName) {
-        boolean b = favService.deleteFavTask(loginUser, taskName);
+        boolean b = favTaskService.deleteFavTask(loginUser, taskName);
         return success(b);
     }
 
@@ -102,7 +102,7 @@ public class FavController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result addFavTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @PathVariable("taskName") String taskName) {
-        int i = favService.addFavTask(loginUser, taskName);
+        int i = favTaskService.addFavTask(loginUser, taskName);
         return success(i > 0);
     }
 }

@@ -15,26 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.apache.dolphinscheduler.api.dto.FavDto;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@AllArgsConstructor
-@TableName("t_ds_fav")
-public class Fav {
+import java.util.List;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-    private String taskName;
-    private int userId;
+public interface FavTaskService {
 
+    List<FavDto> getFavTaskList(User loginUser);
+
+    boolean deleteFavTask(User loginUser, String taskName);
+
+    int addFavTask(User loginUser, String taskName);
 }

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.dolphinscheduler.dao.entity.Fav;
+import org.apache.dolphinscheduler.dao.entity.FavTask;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Set;
@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * fav mapper interface
  */
-public interface FavMapper extends BaseMapper<Fav> {
+public interface FavTaskMapper extends BaseMapper<FavTask> {
 
     Set<String> getUserFavTaskTypes(@Param("userId") int userId);
 

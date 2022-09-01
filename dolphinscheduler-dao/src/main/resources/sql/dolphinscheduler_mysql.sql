@@ -1970,14 +1970,14 @@ CREATE TABLE `t_ds_cluster`(
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for t_ds_fav
+-- Table structure for t_ds_fav_task
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_fav`;
-CREATE TABLE `t_ds_fav`
+DROP TABLE IF EXISTS `t_ds_fav_task`;
+CREATE TABLE `t_ds_fav_task`
 (
-    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'fav id',
-    `task_name` varchar(64) NOT NULL,
-    `user_id`   int         NOT NULL,
+    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'favorite task id',
+    `task_name` varchar(64) NOT NULL COMMENT 'favorite task name',
+    `user_id`   int         NOT NULL COMMENT 'user id',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1

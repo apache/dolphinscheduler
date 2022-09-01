@@ -849,10 +849,10 @@ public final class Constants {
      * Task Types
      */
     public static final String TYPE_UNIVERSAL = "universal";
-    public static final String TYPE_DI = "di";
+    public static final String TYPE_DATA_INTEGRATION = "dataIntegration";
     public static final String TYPE_CLOUD = "cloud";
     public static final String TYPE_LOGIC = "logic";
-    public static final String TYPE_DQ = "dq";
+    public static final String TYPE_DATA_QUALITY = "dataQuality";
     public static final String TYPE_OTHER = "other";
 
 }
