@@ -16,6 +16,8 @@
  */
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
