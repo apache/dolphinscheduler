@@ -169,6 +169,13 @@
         <if test="userId != 0">
             right join t_ds_relation_project_user rpu on p.id = rpu.project_id
             where rpu.user_id = #{userId}
+            union
+            select
+            <include refid="baseSqlV2">
+                <property name="alias" value="p2"/>
+            </include>
+            from t_ds_project p2
+            where p2.user_id = #{userId}
         </if>
     </select>
 
