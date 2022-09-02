@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.time.Duration;
 import java.util.regex.Pattern;
@@ -854,4 +853,15 @@ public final class Constants {
     public static final int DESC_LENGTH_GO_ONLINE = 255;
 
     public static final int NAME_LENGTH_GO_ONLINE = 100;
+
+    /**
+     * Task Types
+     */
+    public static final String TYPE_UNIVERSAL = "Universal";
+    public static final String TYPE_DATA_INTEGRATION = "DataIntegration";
+    public static final String TYPE_CLOUD = "Cloud";
+    public static final String TYPE_LOGIC = "Logic";
+    public static final String TYPE_DATA_QUALITY = "DataQuality";
+    public static final String TYPE_OTHER = "Other";
+    public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
 }

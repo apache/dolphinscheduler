@@ -1916,13 +1916,27 @@ CREATE TABLE `t_ds_k8s_namespace` (
 -- Table structure for t_ds_alert_send_status
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_alert_send_status;
-CREATE TABLE t_ds_alert_send_status (
-  `id`                            int(11) NOT NULL AUTO_INCREMENT,
-  `alert_id`                      int(11) NOT NULL,
-  `alert_plugin_instance_id`      int(11) NOT NULL,
-  `send_status`                   tinyint(4) DEFAULT '0',
-  `log`                           text,
-  `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
+CREATE TABLE t_ds_alert_send_status(
+   `id`                       int(11) NOT NULL AUTO_INCREMENT,
+   `alert_id`                 int(11) NOT NULL,
+   `alert_plugin_instance_id` int(11) NOT NULL,
+   `send_status`              tinyint(4) DEFAULT '0',
+   `log`                      text,
+   `create_time`              datetime DEFAULT NULL COMMENT 'create time',
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_fav_task
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_fav_task`;
+CREATE TABLE `t_ds_fav_task`
+(
+    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'favorite task id',
+    `task_name` varchar(64) NOT NULL COMMENT 'favorite task name',
+    `user_id`   int         NOT NULL COMMENT 'user id',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;

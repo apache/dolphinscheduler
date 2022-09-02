@@ -1914,13 +1914,26 @@ CREATE TABLE t_ds_k8s_namespace (
 -- Table structure for t_ds_alert_send_status
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_alert_send_status;
-CREATE TABLE t_ds_alert_send_status (
-    id                           serial NOT NULL,
-    alert_id                     int NOT NULL,
-    alert_plugin_instance_id     int NOT NULL,
-    send_status                  int DEFAULT '0',
-    log                          text,
-    create_time                  timestamp DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT alert_send_status_unique UNIQUE (alert_id,alert_plugin_instance_id)
+CREATE TABLE t_ds_alert_send_status(
+   id                       serial NOT NULL,
+   alert_id                 int    NOT NULL,
+   alert_plugin_instance_id int    NOT NULL,
+   send_status              int       DEFAULT '0',
+   log                      text,
+   create_time              timestamp DEFAULT NULL,
+   PRIMARY KEY (id),
+   CONSTRAINT alert_send_status_unique UNIQUE (alert_id, alert_plugin_instance_id)
+);
+
+--
+-- Table structure for t_ds_fav
+--
+
+DROP TABLE IF EXISTS t_ds_fav;
+CREATE TABLE t_ds_fav
+(
+    id        serial      NOT NULL,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
 );

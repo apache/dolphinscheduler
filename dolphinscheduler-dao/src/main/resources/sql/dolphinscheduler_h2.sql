@@ -1955,13 +1955,24 @@ CREATE TABLE t_ds_relation_namespace_user (
 DROP TABLE IF EXISTS t_ds_alert_send_status CASCADE;
 CREATE TABLE t_ds_alert_send_status
 (
-    id                            int NOT NULL AUTO_INCREMENT,
-    alert_id                      int NOT NULL,
-    alert_plugin_instance_id      int NOT NULL,
-    send_status                   tinyint(4) DEFAULT '0',
-    log                           text,
-    create_time                   timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    id                       int NOT NULL AUTO_INCREMENT,
+    alert_id                 int NOT NULL,
+    alert_plugin_instance_id int NOT NULL,
+    send_status              tinyint(4) DEFAULT '0',
+    log                      text,
+    create_time              timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY alert_send_status_unique (alert_id,alert_plugin_instance_id)
 );
 
+--
+-- Table structure for t_ds_fav
+--
+DROP TABLE IF EXISTS t_ds_fav CASCADE;
+CREATE TABLE t_ds_fav
+(
+    id        bigint(20) NOT NULL AUTO_INCREMENT,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
+);
