@@ -30,7 +30,7 @@ Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 ### Code Style
 
 DolphinScheduler uses `Spotless` for code style and formatting checks.
-You could run the following command and `Spotless` will automatically fix 
+You could run the following command and `Spotless` will automatically fix
 the code style and formatting errors for you:
 
 ```shell
@@ -53,7 +53,7 @@ cd dolphinscheduler
        -Dmaven.javadoc.skip \
        -Dmaven.checkstyle.skip \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release              
+       -Pdocker,release
 ```
 
 When the command is finished you could find them by command `docker imaegs`.
@@ -68,7 +68,7 @@ cd dolphinscheduler
        -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release           
+       -Pdocker,release
 ```
 
 * If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.
@@ -103,9 +103,9 @@ There are two ways to configure the DolphinScheduler development environment, st
 ## DolphinScheduler Standalone Quick Start
 
 > **_Note:_** Use standalone server only for development and debugging, because it uses H2 Database as default database and Zookeeper Testing Server which may not be stable in production.
-> 
+>
 > Standalone is only supported in DolphinScheduler 1.3.9 and later versions.
-> 
+>
 > Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/installation/standalone.html) for instructions.
 
 ### Git Branch Choose
@@ -206,7 +206,7 @@ There are three services that need to be started, including MasterServer, Worker
 
 * MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by Intellij IDEA, with the configuration *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
 * WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by Intellij IDEA, with the configuration *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-* ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by Intellij IDEA, with the configuration *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/doc.html
+* ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by Intellij IDEA, with the configuration *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > The `mysql` in the VM Options `-Dspring.profiles.active=mysql` means specified configuration file
 
