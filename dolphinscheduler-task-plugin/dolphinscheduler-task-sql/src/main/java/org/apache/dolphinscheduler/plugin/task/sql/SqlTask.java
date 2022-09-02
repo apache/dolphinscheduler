@@ -158,7 +158,7 @@ public class SqlTask extends AbstractTaskExecutor {
 
             // get appIds
             List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
-            logger.info("task log path:[{}],yarn appIds:[{}]",taskExecutionContext.getLogPath(), appIds);
+            logger.info("task log path:[{}],yarn appIds:[{}]", taskExecutionContext.getLogPath(), appIds);
             if (!appIds.isEmpty()) {
                 taskExecutionContext.setAppIds(String.join(",", appIds));
             }

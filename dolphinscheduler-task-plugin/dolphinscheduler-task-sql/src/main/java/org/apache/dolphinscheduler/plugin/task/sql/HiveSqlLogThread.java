@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
@@ -45,6 +46,16 @@ public class HiveSqlLogThread extends Thread {
 
     @Override
     public void run() {
+        String taskLogName = LoggerUtils.buildTaskId(taskExecutionContext.getFirstSubmitTime(),
+            taskExecutionContext.getProcessDefineCode(),
+            taskExecutionContext.getProcessDefineVersion(),
+            taskExecutionContext.getProcessInstanceId(),
+            taskExecutionContext.getTaskInstanceId());
+        taskExecutionContext.setTaskLogName(taskLogName);
+
+        // set the name of the current thread
+        Thread.currentThread().setName(taskLogName);
+
         if (statement == null) {
             hiveMapReduceLogger.info("hive statement is null, end this log query!");
             return;
@@ -56,9 +67,9 @@ public class HiveSqlLogThread extends Thread {
                     hiveMapReduceLogger.info(log);
 
                     List<String> appIds = LogUtils.getAppIds(log, hiveMapReduceLogger);
-                    //get sql task yarn's application_id
+                    // get sql task yarn's application_id
                     if (!appIds.isEmpty()) {
-                        hiveMapReduceLogger.info("yarn application_id is {}",appIds);
+                        hiveMapReduceLogger.info("yarn application_id is {}", appIds);
                         taskExecutionContext.setAppIds(String.join(",", appIds));
                     }
                 }
