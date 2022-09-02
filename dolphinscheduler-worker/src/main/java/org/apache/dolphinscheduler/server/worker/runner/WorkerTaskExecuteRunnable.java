@@ -223,6 +223,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void sendTaskResult() {
+
         taskExecutionContext.setCurrentExecutionStatus(task.getExitStatus());
         taskExecutionContext.setEndTime(new Date());
         taskExecutionContext.setProcessId(task.getProcessId());
