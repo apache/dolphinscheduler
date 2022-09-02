@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -29,9 +26,7 @@ import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Collections;
@@ -89,25 +84,18 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
     }
 
-    @Ignore
+
     @Test
-    public void testForceTaskSuccess() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("taskInstanceId", "104");
+    public void testForceTaskSuccess(){
 
         Result mockResult = new Result();
         putMsg(mockResult, Status.SUCCESS);
-        when(taskInstanceService.forceTaskSuccess(any(User.class), anyLong(), anyInt())).thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/v2/task-instance/force-success", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+        when(taskInstanceService.forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Result taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+
     }
 
 }
