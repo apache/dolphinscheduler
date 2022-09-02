@@ -162,6 +162,7 @@ public class SqlTask extends AbstractTask {
             logger.info("task log path:[{}],yarn appIds:[{}]",taskExecutionContext.getLogPath(), appIds);
             if (!appIds.isEmpty()) {
                 taskExecutionContext.setAppIds(String.join(",", appIds));
+                setAppIds(String.join(",", appIds));
             }
 
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
