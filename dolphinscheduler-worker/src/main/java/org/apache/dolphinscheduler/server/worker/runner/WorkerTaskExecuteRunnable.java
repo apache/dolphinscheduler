@@ -228,7 +228,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setCurrentExecutionStatus(task.getExitStatus());
         taskExecutionContext.setEndTime(new Date());
         taskExecutionContext.setProcessId(task.getProcessId());
-        taskExecutionContext.setAppIds(task.getAppIds());
+        taskExecutionContext.setAppIds(taskExecutionContext.getAppIds());
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
 
