@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -154,6 +155,13 @@ public class SqlTask extends AbstractTaskExecutor {
 
             // execute sql task
             executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+
+            // get appIds
+            List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+            logger.info("task log path:[{}],yarn appIds:[{}]",taskExecutionContext.getLogPath(), appIds);
+            if (!appIds.isEmpty()) {
+                taskExecutionContext.setAppIds(String.join(",", appIds));
+            }
 
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
 

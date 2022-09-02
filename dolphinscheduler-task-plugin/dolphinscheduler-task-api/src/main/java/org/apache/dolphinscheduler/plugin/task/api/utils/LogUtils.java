@@ -72,4 +72,29 @@ public class LogUtils {
             return Collections.emptyList();
         }
     }
+
+    /**
+     * processing log
+     * get yarn application id list
+     *
+     * @param log log content
+     * @param logger logger
+     * @return app id list
+     */
+    public static List<String> getAppIds(String log, Logger logger) {
+
+        List<String> appIds = new ArrayList<>();
+
+        Matcher matcher = APPLICATION_REGEX.matcher(log);
+
+        // analyse logs to get all submit yarn application id
+        while (matcher.find()) {
+            String appId = matcher.group();
+            if (!appIds.contains(appId)) {
+                logger.info("find app id: {}", appId);
+                appIds.add(appId);
+            }
+        }
+        return appIds;
+    }
 }

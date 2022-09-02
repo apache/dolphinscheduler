@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-import org.apache.hive.jdbc.HiveStatement;
+import org.apache.hive.jdbc.HivePreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class HiveSqlLogThreadTest {
 
         List<String> mockLog = new ArrayList<>();
         mockLog.add("1start hive sql log\napplication_1231_2323");
-        HiveStatement statement = PowerMockito.mock(HiveStatement.class);
+        HivePreparedStatement statement = PowerMockito.mock(HivePreparedStatement.class);
         PowerMockito.when(statement.isClosed()).thenReturn(false);
         PowerMockito.when(statement.hasMoreLogs()).thenReturn(true);
         PowerMockito.when(statement.getQueryLog(true, 500)).thenReturn(mockLog);
