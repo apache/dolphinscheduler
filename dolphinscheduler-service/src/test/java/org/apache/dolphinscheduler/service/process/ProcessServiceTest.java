@@ -52,6 +52,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
@@ -76,6 +77,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
+import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -145,6 +147,8 @@ public class ProcessServiceTest {
     private ResourceMapper resourceMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
+    @Mock
+    private DataSourceMapper dataSourceMapper;
     @Mock
     private TaskGroupQueueMapper taskGroupQueueMapper;
 
@@ -883,6 +887,37 @@ public class ProcessServiceTest {
         Assert.assertEquals(0, commandList.size());
     }
 
+    @Test
+    public void testFindLastManualProcessInterval() {
+        long definitionCode = 1L;
+        DateInterval dateInterval = new DateInterval(new Date(), new Date());
+        int testFlag = 1;
+
+        //find test lastManualProcessInterval
+        ProcessInstance lastManualProcessInterval = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+        Assert.assertEquals(null, lastManualProcessInterval);
+
+        //find online lastManualProcessInterval
+        testFlag = 0;
+        lastManualProcessInterval = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+        Assert.assertEquals(null, lastManualProcessInterval);
+    }
+
+    @Test
+    public void testQueryTestDataSourceId() {
+        Integer onlineDataSourceId = 1;
+
+        //unbound testDataSourceId
+        Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
+        Integer result = processService.queryTestDataSourceId(onlineDataSourceId);
+        Assert.assertNull(result);
+
+        //bound testDataSourceId
+        Integer testDataSourceId = 2;
+        Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(testDataSourceId);
+        result = processService.queryTestDataSourceId(onlineDataSourceId);
+        Assert.assertNotNull(result);
+    }
     private TaskGroupQueue getTaskGroupQueue() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task name");
