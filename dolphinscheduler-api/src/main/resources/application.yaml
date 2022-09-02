@@ -28,8 +28,6 @@ server:
     max-http-form-post-size: 5000000
 
 spring:
-  application:
-    name: api-server
   banner:
     charset: UTF-8
   jackson:

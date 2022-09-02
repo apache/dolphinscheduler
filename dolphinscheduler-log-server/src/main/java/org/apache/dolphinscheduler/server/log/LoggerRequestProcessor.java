@@ -59,8 +59,6 @@ import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 /**
  * logger request process logic
  */
@@ -80,7 +78,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         logger.info("received command : {}", command);
 
-        //request task log command type
+        // request task log command type
         final CommandType commandType = command.getType();
         switch (commandType) {
             case GET_LOG_BYTES_REQUEST:
@@ -120,7 +118,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 final int MaxResponseLogSize = 65535;
                 int totalLogByteSize = 0;
                 for (String line : lines) {
-                    //If a single line of log is exceed max response size, cut off the line
+                    // If a single line of log is exceed max response size, cut off the line
                     final int lineByteSize = line.getBytes(StandardCharsets.UTF_8).length;
                     if (lineByteSize >= MaxResponseLogSize) {
                         builder.append(line, 0, MaxResponseLogSize)
@@ -136,7 +134,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         break;
                     }
                 }
-                RollViewLogResponseCommand rollViewLogRequestResponse = new RollViewLogResponseCommand(builder.toString());
+                RollViewLogResponseCommand rollViewLogRequestResponse =
+                        new RollViewLogResponseCommand(builder.toString());
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
                 break;
             case REMOVE_TAK_LOG_REQUEST:
@@ -161,7 +160,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
                 break;
             case GET_APP_ID_REQUEST:
-                GetAppIdRequestCommand getAppIdRequestCommand = JSONUtils.parseObject(command.getBody(), GetAppIdRequestCommand.class);
+                GetAppIdRequestCommand getAppIdRequestCommand =
+                        JSONUtils.parseObject(command.getBody(), GetAppIdRequestCommand.class);
                 String logPath = getAppIdRequestCommand.getLogPath();
                 if (!checkPathSecurity(logPath)) {
                     throw new IllegalArgumentException("Illegal path");
@@ -203,8 +203,9 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return byte array of file
      */
     private byte[] getFileContentBytes(String filePath) {
-        try (InputStream in = new FileInputStream(filePath);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+        try (
+                InputStream in = new FileInputStream(filePath);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {

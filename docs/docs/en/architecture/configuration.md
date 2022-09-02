@@ -17,14 +17,14 @@ The directory structure of DolphinScheduler is as follows:
 │
 ├── licenses                                    directory of licenses
 │
-├── bin                                         directory of DolphinScheduler application commands, configrations scripts 
+├── bin                                         directory of DolphinScheduler application commands, configrations scripts
 │   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
 │   ├── env                                     directory of scripts to load environment variables
 │   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
 │   │   └── install_env.sh                      script to export environment variables for DolphinScheduler installation when you use scripts `install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`
 │   ├── install.sh                              script to auto-setup services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
-│   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches 
-│   ├── scp-hosts.sh                            script to copy installation files to target hosts 
+│   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches
+│   ├── scp-hosts.sh                            script to copy installation files to target hosts
 │   ├── start-all.sh                            script to start all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
@@ -34,7 +34,8 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── start.sh                            script to start DolphinScheduler alert-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of alert-server
-│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc. 
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
+│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for alert-server
 │   │   └── logback-spring.xml                  configurations of alert-service log
 │   └── libs                                    directory of alert-server libs
@@ -44,17 +45,19 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── start.sh                            script to start DolphinScheduler api-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of api-server
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for api-server
 │   │   └── logback-spring.xml                  configurations of api-service log
 │   ├── libs                                    directory of api-server libs
-│   └── ui                                      directory of api-server related front-end web resources 
+│   └── ui                                      directory of api-server related front-end web resources
 │
 ├── master-server                               directory of DolphinScheduler master-server commands, configrations scripts and libs
-│   ├── bin                                
+│   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler master-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of master-server
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for master-server
 │   │   └── logback-spring.xml                  configurations of master-service log
@@ -65,13 +68,14 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── start.sh                            script to start DolphinScheduler standalone-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of standalone-server
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for standalone-server
 │   │   ├── logback-spring.xml                  configurations of standalone-service log
 │   │   └── sql                                 .sql files to create or upgrade DolphinScheduler metadata
 │   ├── libs                                    directory of standalone-server libs
 │   └── ui                                      directory of standalone-server related front-end web resources
-│       
+│  
 ├── tools                                       directory of DolphinScheduler metadata tools commands, configrations scripts and libs
 │   ├── bin
 │   │   └── upgrade-schema.sh                   script to initialize or upgrade DolphinScheduler metadata
@@ -80,12 +84,13 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── common.properties                   configurations of common-service like storage, credentials, etc.
 │   ├── libs                                    directory of tool libs
 │   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
-│     
+│  
 ├── worker-server                               directory of DolphinScheduler worker-server commands, configrations scripts and libs
 │       ├── bin
 │       │   └── start.sh                        script to start DolphinScheduler worker-server
 │       ├── conf
 │       │   ├── application.yaml                configurations of worker-server
+│       │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │       │   ├── common.properties               configurations of common-service like storage, credentials, etc.
 │       │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
 │       │   └── logback-spring.xml              configurations of worker-service log
@@ -107,14 +112,14 @@ Currently, DolphinScheduler just makes a basic config, remember to config furthe
 Default simplified parameters are:
 ```bash
 export DOLPHINSCHEDULER_OPTS="
--server 
--Xmx16g 
--Xms1g 
--Xss512k 
--XX:+UseConcMarkSweepGC 
--XX:+CMSParallelRemarkEnabled 
--XX:+UseFastAccessorMethods 
--XX:+UseCMSInitiatingOccupancyOnly 
+-server
+-Xmx16g
+-Xms1g
+-Xss512k
+-XX:+UseConcMarkSweepGC
+-XX:+CMSParallelRemarkEnabled
+-XX:+UseFastAccessorMethods
+-XX:+UseCMSInitiatingOccupancyOnly
 -XX:CMSInitiatingOccupancyFraction=70
 "
 ```
