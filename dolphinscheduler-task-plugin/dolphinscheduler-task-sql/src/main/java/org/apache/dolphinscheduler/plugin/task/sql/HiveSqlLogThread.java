@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
-import org.apache.hive.jdbc.HiveStatement;
+import org.apache.hive.jdbc.HivePreparedStatement;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,14 +31,14 @@ import org.slf4j.Logger;
 
 public class HiveSqlLogThread extends Thread {
 
-    private final HiveStatement statement;
+    private final HivePreparedStatement statement;
 
     private final Logger hiveMapReduceLogger;
 
     private final TaskExecutionContext taskExecutionContext;
 
-    public HiveSqlLogThread(Statement statement, Logger logger, TaskExecutionContext taskExecutionContext) {
-        this.statement = (HiveStatement) statement;
+    public HiveSqlLogThread(PreparedStatement statement, Logger logger, TaskExecutionContext taskExecutionContext) throws SQLException {
+        this.statement = statement.unwrap(HivePreparedStatement.class);
         this.hiveMapReduceLogger = logger;
         this.taskExecutionContext = taskExecutionContext;
     }
@@ -55,7 +55,7 @@ public class HiveSqlLogThread extends Thread {
 
                     hiveMapReduceLogger.info(log);
 
-                    List<String> appIds = LoggerUtils.getAppIds(log, hiveMapReduceLogger);
+                    List<String> appIds = LogUtils.getAppIds(log, hiveMapReduceLogger);
                     //get sql task yarn's application_id
                     if (!appIds.isEmpty()) {
                         hiveMapReduceLogger.info("yarn application_id is {}",appIds);
