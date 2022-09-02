@@ -16,53 +16,14 @@
 # under the License.
 
 """DolphinScheduler gitlab resource plugin."""
-import re
-import sys
 from typing import Optional
 from urllib.parse import urljoin
 
-import bs4 as bs4
 import gitlab
 import requests
 
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyResPluginException
-
-URL = 'http://124.221.129.34:8088/'
-SIGN_IN_URL = 'http://124.221.129.34:8088//users/sign_in'
-LOGIN_URL = 'http://124.221.129.34:8088/users/sign_in'
-
-session = requests.Session()
-
-sign_in_page = session.get(SIGN_IN_URL).content
-for l in sign_in_page.decode().split('\n'):
-    m = re.search('name="authenticity_token" value="([^"]+)"', l)
-    if m:
-        break
-
-token = None
-if m:
-    token = m.group(1)
-
-if not token:
-    print('Unable to find the authenticity token')
-    sys.exit(1)
-
-# data = {'username': 'xdu.chenrj@gmail.com',
-#         'password': '429579723+wan',
-#         'authenticity_token': token}
-
-data = {'grant_type': 'password', 'username': "xdu.chenrj@gmail.com", 'password': "429579723+wan"}
-resp = requests.get("http://124.221.129.34:8088/oauth/token", data=data)
-# resp_data = resp.json()
-print(resp_data)
-# gitlab_oauth_token = resp_data["access_token"]
-#
-# gitlab_instance = gitlab.Gitlab(url="http://124.221.129.34:8088/",
-#                                             oauth_token=gitlab_oauth_token)
-#
-# gitlab_instance.auth()
-
 
 
 class GitLab(ResourcePlugin):
@@ -83,14 +44,16 @@ class GitLab(ResourcePlugin):
     def __init__(
         self,
         prefix: str,
-        access_token: Optional[str] = None,
+        private_token: Optional[str] = None,
+        oauth_token: Optional[str] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
         *args,
         **kwargs
     ):
         super().__init__(prefix, *args, **kwargs)
-        self.access_token = access_token
+        self.private_token = private_token
+        self.oauth_token = oauth_token
         self.username = username
         self.password = password
 
@@ -137,7 +100,7 @@ class GitLab(ResourcePlugin):
                 )
                 break
 
-        if project_name is None or branch is None or file_path is None or owner is None:
+        if project_name is None or branch is None or file_path is None or file_path == "" or owner is None:
             raise PyResPluginException("Incomplete path.")
 
         file_info = {
@@ -148,19 +111,44 @@ class GitLab(ResourcePlugin):
             "api_version": "v4",
             "owner": owner,
         }
-        return file_info
+        self._file_info = file_info
+
+    def authentication(self):
+        host = self._file_info["host"]
+        if self.private_token is not None:
+            return gitlab.Gitlab(host, private_token=self.private_token)
+        if self.oauth_token is not None:
+            return gitlab.Gitlab(host, oauth_token=self.oauth_token)
+        if self.username is not None and self.password is not None:
+            oauth_token = self.OAuth_token()
+            return gitlab.Gitlab(host, oauth_token=oauth_token)
+
+    def OAuth_token(self):
+        data = {
+            "grant_type": "password",
+            "username": self.username,
+            "password": self.password,
+        }
+        host = self._file_info["host"]
+        resp = requests.post("%s/oauth/token" % host, data=data)
+        oauth_token = resp.json()["access_token"]
+        return oauth_token
 
     # [start read_file_method]
     def read_file(self, suf: str):
-        """Get the content of the file.
+        """Get the content of the file.a
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
         path = self.url_join(self.prefix, suf)
-        file_info = self.get_file_info(path)
-        gl = gitlab.Gitlab(url=file_info["host"], private_token=self.access_token)
-        project = gl.projects.get(file_info["owner"] + "/" + file_info["project_name"])
-        f = project.files.get(file_path=file_info["file_path"], ref=file_info["branch"])
+        self.get_file_info(path)
+        gl = self.authentication()
+        project = gl.projects.get(
+            self._file_info["owner"] + "/" + self._file_info["project_name"]
+        )
+        f = project.files.get(
+            file_path=self._file_info["file_path"], ref=self._file_info["branch"]
+        )
         file_content = f.decode()
         return file_content.decode()
 

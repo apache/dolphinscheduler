@@ -19,6 +19,7 @@
 
 
 from abc import ABCMeta, abstractmethod
+from typing import Dict
 
 
 # [start resource_plugin_definition]
@@ -42,6 +43,9 @@ class ResourcePlugin(object, metaclass=ABCMeta):
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
+
+    """Some dictionary type information of the file, such as file path and warehouse."""
+    _file_info: Dict[str, str] = {}
 
     # [end abstractmethod read_file]
 
