@@ -20,10 +20,8 @@ package org.apache.dolphinscheduler.common.utils;
 import static org.apache.dolphinscheduler.common.Constants.ALIBABA_CLOUD_OSS_END_POINT;
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_OSS;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
@@ -63,29 +61,21 @@ public class OssOperator implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(OssOperator.class);
 
-    public static final String ACCESS_KEY_ID = PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
+    public static String ACCESS_KEY_ID;
 
-    public static final String ACCESS_KEY_SECRET =
-            PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
+    public static String ACCESS_KEY_SECRET;
 
-    public static final String REGION = PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_REGION);
+    public static String REGION;
 
-    public static final String BUCKET_NAME = PropertyUtils.getString(Constants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
+    public static String BUCKET_NAME;
 
-    private OSS ossClient = null;
+    public static String BASE_DIR = "";
+
+    private OSS ossClient;
+
+    private PropertyUtilsWrapper propertyUtilsWrapper;
 
     private OssOperator() {
-        if (PropertyUtils.getString(RESOURCE_STORAGE_TYPE).equals(STORAGE_OSS)) {
-
-            if (!StringUtils.isEmpty(PropertyUtils.getString(ALIBABA_CLOUD_OSS_END_POINT))) {
-                ossClient = new OSSClientBuilder().build(PropertyUtils.getString(ALIBABA_CLOUD_OSS_END_POINT),
-                        ACCESS_KEY_ID, ACCESS_KEY_SECRET);
-            } else {
-                ossClient = new OSSClientBuilder().build(PropertyUtils.getString(ALIBABA_CLOUD_OSS_END_POINT),
-                        ACCESS_KEY_ID, ACCESS_KEY_SECRET);
-            }
-            checkBucketNameExists(BUCKET_NAME);
-        }
     }
 
     private enum OssOperatorSingleton {
@@ -107,6 +97,17 @@ public class OssOperator implements Closeable, StorageOperate {
         return OssOperatorSingleton.INSTANCE.getInstance();
     }
 
+    public void init() {
+        propertyUtilsWrapper = createPropertyUtilsWrapper();
+        ACCESS_KEY_ID = propertyUtilsWrapper.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
+        ACCESS_KEY_SECRET = propertyUtilsWrapper.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
+        REGION = propertyUtilsWrapper.getString(TaskConstants.ALIBABA_CLOUD_REGION);
+        BUCKET_NAME = propertyUtilsWrapper.getString(Constants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
+
+        ossClient = buildOssClient();
+        ensureBucketSuccessfullyCreated(BUCKET_NAME);
+    }
+
     @Override
     public void close() throws IOException {
         ossClient.shutdown();
@@ -114,8 +115,8 @@ public class OssOperator implements Closeable, StorageOperate {
 
     @Override
     public void createTenantDirIfNotExists(String tenantCode) throws Exception {
-        getInstance().mkdir(tenantCode, getOssResDir(tenantCode));
-        getInstance().mkdir(tenantCode, getOssUdfDir(tenantCode));
+        mkdir(tenantCode, getOssResDir(tenantCode));
+        mkdir(tenantCode, getOssUdfDir(tenantCode));
     }
 
     @Override
@@ -130,15 +131,19 @@ public class OssOperator implements Closeable, StorageOperate {
 
     @Override
     public boolean mkdir(String tenantCode, String path) throws IOException {
-        String objectName = path + FOLDER_SEPARATOR;
-        if (!ossClient.doesObjectExist(BUCKET_NAME, objectName)) {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(0);
-            InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-            PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, objectName, emptyContent, metadata);
-            ossClient.putObject(putObjectRequest);
+        final String key = path + FOLDER_SEPARATOR;
+        if (!ossClient.doesObjectExist(BUCKET_NAME, key)) {
+            createOssPrefix(BUCKET_NAME, key);
         }
         return true;
+    }
+
+    protected void createOssPrefix(final String bucketName, final String key) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(0);
+        InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, emptyContent, metadata);
+        ossClient.putObject(putObjectRequest);
     }
 
     @Override
@@ -214,9 +219,8 @@ public class OssOperator implements Closeable, StorageOperate {
             case FILE:
                 return getResDir(tenantCode);
             default:
-                return "";
+                return BASE_DIR;
         }
-
     }
 
     @Override
@@ -245,23 +249,28 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
+    public ResUploadType returnStorageType() {
+        return ResUploadType.OSS;
+    }
+
+    @Override
     public void deleteTenant(String tenantCode) throws Exception {
         deleteTenantCode(tenantCode);
     }
 
-    public static String getOssResDir(String tenantCode) {
+    public String getOssResDir(String tenantCode) {
         return String.format("%s/" + RESOURCE_TYPE_FILE, getOssTenantDir(tenantCode));
     }
 
-    public static String getOssUdfDir(String tenantCode) {
+    public String getOssUdfDir(String tenantCode) {
         return String.format("%s/" + RESOURCE_TYPE_UDF, getOssTenantDir(tenantCode));
     }
 
-    public static String getOssTenantDir(String tenantCode) {
+    public String getOssTenantDir(String tenantCode) {
         return String.format(FORMAT_S_S, getOssDataBasePath(), tenantCode);
     }
 
-    public static String getOssDataBasePath() {
+    public String getOssDataBasePath() {
         if (FOLDER_SEPARATOR.equals(RESOURCE_UPLOAD_PATH)) {
             return "";
         } else {
@@ -269,12 +278,12 @@ public class OssOperator implements Closeable, StorageOperate {
         }
     }
 
-    private void deleteTenantCode(String tenantCode) {
-        deleteDirectory(getResDir(tenantCode));
-        deleteDirectory(getUdfDir(tenantCode));
+    protected void deleteTenantCode(String tenantCode) {
+        deleteDir(getResDir(tenantCode));
+        deleteDir(getUdfDir(tenantCode));
     }
 
-    public void checkBucketNameExists(String bucketName) {
+    public void ensureBucketSuccessfullyCreated(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException("resource.alibaba.cloud.oss.bucket.name is blank");
         }
@@ -292,14 +301,21 @@ public class OssOperator implements Closeable, StorageOperate {
         logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(), REGION);
     }
 
-    private void deleteDirectory(String directoryName) {
+    protected void deleteDir(String directoryName) {
         if (ossClient.doesObjectExist(BUCKET_NAME, directoryName)) {
             ossClient.deleteObject(BUCKET_NAME, directoryName);
         }
     }
 
-    @Override
-    public ResUploadType returnStorageType() {
-        return ResUploadType.OSS;
+    // Mockito.mackStatic could not mock PropertyUtils
+    // This method is to facilitate dependency injection in UT
+    protected PropertyUtilsWrapper createPropertyUtilsWrapper() {
+        return new PropertyUtilsWrapper();
     }
+
+    protected OSS buildOssClient() {
+        return new OSSClientBuilder().build(propertyUtilsWrapper.getString(ALIBABA_CLOUD_OSS_END_POINT),
+                ACCESS_KEY_ID, ACCESS_KEY_SECRET);
+    }
+
 }

@@ -44,7 +44,9 @@ public class StoreConfiguration {
     public StorageOperate storageOperate() {
         switch (PropertyUtils.getString(RESOURCE_STORAGE_TYPE)) {
             case STORAGE_OSS:
-                return OssOperator.getInstance();
+                OssOperator ossOperator = OssOperator.getInstance();
+                ossOperator.init();
+                return ossOperator;
             case STORAGE_S3:
                 return S3Utils.getInstance();
             case STORAGE_HDFS:
