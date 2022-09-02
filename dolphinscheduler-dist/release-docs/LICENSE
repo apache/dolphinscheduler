@@ -521,6 +521,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT
+    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on MIT
+    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on MIT
 
 ========================================================================
 MPL 1.1 licenses
