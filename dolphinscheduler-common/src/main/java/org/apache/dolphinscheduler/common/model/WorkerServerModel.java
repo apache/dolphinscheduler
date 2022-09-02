@@ -17,27 +17,18 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import lombok.Data;
+
 import java.util.Date;
 import java.util.Set;
 
-/**
- * server
- */
+@Data
 public class WorkerServerModel {
 
-    /**
-     * id
-     */
     private int id;
 
-    /**
-     * host
-     */
     private String host;
 
-    /**
-     * port
-     */
     private int port;
 
     /**
@@ -45,74 +36,10 @@ public class WorkerServerModel {
      */
     private Set<String> zkDirectories;
 
-    /**
-     * resource info about CPU and memory
-     */
     private String resInfo;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * last heart beat time
-     */
     private Date lastHeartbeatTime;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Set<String> getZkDirectories() {
-        return zkDirectories;
-    }
-
-    public void setZkDirectories(Set<String> zkDirectories) {
-        this.zkDirectories = zkDirectories;
-    }
-
-    public Date getLastHeartbeatTime() {
-        return lastHeartbeatTime;
-    }
-
-    public void setLastHeartbeatTime(Date lastHeartbeatTime) {
-        this.lastHeartbeatTime = lastHeartbeatTime;
-    }
-
-    public String getResInfo() {
-        return resInfo;
-    }
-
-    public void setResInfo(String resInfo) {
-        this.resInfo = resInfo;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
 }

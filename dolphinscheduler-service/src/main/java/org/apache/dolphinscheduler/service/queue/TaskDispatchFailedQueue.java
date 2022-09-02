@@ -19,11 +19,13 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
+import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 @Service(Constants.TASK_DISPATCH_FAILED_QUEUE)
 public class TaskDispatchFailedQueue implements TaskPriorityQueue<TaskPriority> {
@@ -51,6 +53,12 @@ public class TaskDispatchFailedQueue implements TaskPriorityQueue<TaskPriority> 
     @Override
     public int size() throws TaskPriorityQueueException {
         return taskDispatchFailedQueue.size();
+    }
+
+    @Override
+    public List<TaskPriority> getAll() {
+        TaskPriority[] taskPriorities = taskDispatchFailedQueue.toArray(new TaskPriority[0]);
+        return Arrays.stream(taskPriorities).collect(Collectors.toList());
     }
 
     @Override

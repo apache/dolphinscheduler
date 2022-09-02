@@ -226,6 +226,15 @@ public enum Status {
     DELETE_TASK_TYPE_ERROR(10200, "delete task type error", "删除任务类型错误"),
     ADD_TASK_TYPE_ERROR(10200, "add task type error", "添加任务类型错误"),
 
+    LIST_ALERT_SERVERS_ERROR(10198, "list AlertServer error", "查询AlertServer列表错误"),
+
+    LIST_API_SERVERS_ERROR(10199, "list ApiServer error", "查询ApiServer列表错误"),
+
+    LISTING_EXECUTING_WORKFLOWS_BY_MASTER_ERROR(10200, "listing executing workflows by master address error", "查询Master中运行的工作流实例信息错误"),
+    LISTING_DISPATCHING_TASK_INSTANCES_BY_MASTER_ERROR(10201, "listing dispatching TaskInstance by master address error", "查询Master中正在分发的任务实例信息错误"),
+    LISTING_EXECUTING_TASK_EXECUTION_CONTEXT_BY_WORKER_ERROR(10202, "listing executing TaskExecutionContext by master address error", "查询Worker中正在执行的任务上下文信息错误"),
+    LISTING_WAITING_TASK_INSTANCE_BY_WORKER_ERROR(10203, "listing waiting task by worker address error", "查询Worker中等待执行的任务信息错误"),
+
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),

@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.dto.WorkflowInstanceExecuteDetailDto;
 
 import java.util.Map;
 
@@ -118,5 +118,5 @@ public interface ExecutorService {
      * @param processInstanceId
      * @return
      */
-    WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
+    WorkflowInstanceExecuteDetailDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
 }

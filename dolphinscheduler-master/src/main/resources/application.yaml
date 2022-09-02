@@ -111,9 +111,16 @@ master:
   failover-interval: 10m
   # kill yarn jon when failover taskInstance, default true
   kill-yarn-job-when-task-failover: true
+  registry-disconnect-strategy:
+    # The disconnect strategy: stop, waiting
+    strategy: waiting
+    # The max waiting time to reconnect to registry if you set the strategy to waiting
+    max-waiting-time: 100s
 
 server:
   port: 5679
+  servlet:
+    context-path: /dolphinscheduler/master/
 
 management:
   endpoints:

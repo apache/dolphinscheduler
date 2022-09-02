@@ -17,15 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.http.HttpStatus;
-
-import java.io.IOException;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import lombok.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -33,10 +24,20 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.http.HttpStatus;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Map;
 
 public class OkHttpUtils {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
+
+    public static @NonNull String get(@NonNull String url) throws IOException {
+        return get(url, null, null);
+    }
 
     public static @NonNull String get(@NonNull String url,
                                       @Nullable Map<String, String> httpHeaders,
@@ -92,7 +93,7 @@ public class OkHttpUtils {
         if (response.code() != HttpStatus.SC_OK || response.body() == null) {
             throw new RuntimeException(String.format("Request execute failed, httpCode: %s, httpBody: %s",
                                                      response.code(),
-                                                     response.body()));
+                                                     response.body() == null ? null : response.body().string()));
         }
         return response.body().string();
     }

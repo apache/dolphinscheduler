@@ -122,7 +122,6 @@ public class FailoverServiceTest {
         given(registryClient.getStoppable()).willReturn(cause -> {
         });
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
-        doNothing().when(registryClient).handleDeadServer(Mockito.anySet(), Mockito.any(NodeType.class), Mockito.anyString());
 
         processInstance = new ProcessInstance();
         processInstance.setId(1);

@@ -18,13 +18,15 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import com.facebook.presto.jdbc.internal.javax.annotation.Nullable;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
@@ -38,9 +40,7 @@ public class WorkerManagerThread implements Runnable {
 
     private final DelayQueue<WorkerDelayTaskExecuteRunnable> waitSubmitQueue;
 
-    private final WorkerExecService workerExecService;
-
-    private final int workerExecThreads;
+    private final TaskExecuteThreadPool taskExecuteThreadPool;
 
     /**
      * running task
@@ -48,9 +48,8 @@ public class WorkerManagerThread implements Runnable {
     private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
-        workerExecThreads = workerConfig.getExecThreads();
         this.waitSubmitQueue = new DelayQueue<>();
-        workerExecService = new WorkerExecService(
+        taskExecuteThreadPool = new TaskExecuteThreadPool(
                 ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
                 taskExecuteThreadMap);
     }
@@ -59,22 +58,16 @@ public class WorkerManagerThread implements Runnable {
         return taskExecuteThreadMap.get(taskInstanceId);
     }
 
-    /**
-     * get wait submit queue size
-     *
-     * @return queue size
-     */
     public int getWaitSubmitQueueSize() {
         return waitSubmitQueue.size();
     }
 
-    /**
-     * get thread pool queue size
-     *
-     * @return queue size
-     */
-    public int getThreadPoolQueueSize() {
-        return workerExecService.getThreadPoolQueueSize();
+    public int getThreadPoolWaitingTaskNum() {
+        return taskExecuteThreadPool.getThreadPoolWaitingTaskNum();
+    }
+
+    public int getThreadPoolRunningTaskNum() {
+        return taskExecuteThreadPool.getThreadPoolRunningTaskNum();
     }
 
     /**
@@ -103,20 +96,39 @@ public class WorkerManagerThread implements Runnable {
     @Override
     public void run() {
         Thread.currentThread().setName("Worker-Execute-Manager-Thread");
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
+                if (!ServerLifeCycleManager.isRunning()) {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                }
                 final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
-                workerExecService.submit(workerDelayTaskExecuteRunnable);
+
+                taskExecuteThreadPool.submit(workerDelayTaskExecuteRunnable);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                logger.warn("Worker execute manager thread has been interrupted, will stop", ex);
+                break;
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "
                         + "the exception will be ignored and this thread will continue to run", e);
+                try {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    logger.warn("Worker execute manager thread has been interrupted, will stop", ex);
+                    break;
+                }
             }
         }
     }
 
+    public List<WorkerTaskExecuteRunnable> getWaitingTask() {
+        return taskExecuteThreadPool.getWaitingTask();
+    }
+
     public void clearTask() {
         waitSubmitQueue.clear();
-        workerExecService.getTaskExecuteThreadMap().values().forEach(WorkerTaskExecuteRunnable::cancelTask);
-        workerExecService.getTaskExecuteThreadMap().clear();
+        taskExecuteThreadPool.getTaskExecuteThreadMap().values().forEach(WorkerTaskExecuteRunnable::cancelTask);
+        taskExecuteThreadPool.getTaskExecuteThreadMap().clear();
     }
 }

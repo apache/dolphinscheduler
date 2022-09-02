@@ -166,8 +166,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
-        subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
-        processService.updateProcessInstance(subProcessInstance);
+        subProcessInstance.setStateWithDesc(ExecutionStatus.READY_PAUSE, "ready pause sub workflow");
+        processInstanceDao.updateProcessInstance(subProcessInstance);
         sendToSubProcess();
         return true;
     }
@@ -201,8 +201,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
-        subProcessInstance.setState(ExecutionStatus.READY_STOP);
-        processService.updateProcessInstance(subProcessInstance);
+        subProcessInstance.setStateWithDesc(ExecutionStatus.READY_STOP, "ready stop by kill task");
+        processInstanceDao.updateProcessInstance(subProcessInstance);
         sendToSubProcess();
         return true;
     }

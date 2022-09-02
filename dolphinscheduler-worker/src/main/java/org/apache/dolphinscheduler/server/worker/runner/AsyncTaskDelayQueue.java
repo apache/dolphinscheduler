@@ -19,14 +19,9 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskCallbackFunction;
-import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.async.AsyncTaskExecutionStatus;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.concurrent.DelayQueue;
 
 @UtilityClass
@@ -41,6 +36,10 @@ public class AsyncTaskDelayQueue {
 
     public @Nullable AsyncTaskExecutionContext pollAsyncTask() throws InterruptedException {
         return asyncTaskCheckDelayQueue.take();
+    }
+
+    public int getAsyncTaskRunningNum() {
+        return asyncTaskCheckDelayQueue.size();
     }
 
 }

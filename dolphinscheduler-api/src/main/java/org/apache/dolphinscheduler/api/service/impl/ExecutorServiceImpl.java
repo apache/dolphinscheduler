@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
@@ -62,12 +63,13 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.remote.dto.WorkflowInstanceExecuteDetailDto;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
@@ -122,6 +124,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private ProcessInstanceDao processInstanceDao;
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
@@ -261,7 +266,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     private boolean checkMasterExists(Map<String, Object> result) {
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(NodeType.MASTER);
 
         // no master
         if (masterServers.isEmpty()) {
@@ -507,8 +512,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         processInstance.setCommandType(commandType);
         processInstance.addHistoryCmd(commandType);
-        processInstance.setState(executionStatus);
-        int update = processService.updateProcessInstance(processInstance);
+        processInstance.setStateWithDesc(executionStatus, commandType.getDescp() + "by ui");
+        int update = processInstanceDao.updateProcessInstance(processInstance);
 
         // determine whether the process is normal
         if (update > 0) {
@@ -949,7 +954,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return
      */
     @Override
-    public WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
+    public WorkflowInstanceExecuteDetailDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
         if (processInstance == null) {
             return null;
@@ -962,6 +967,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return null;
         }
         WorkflowExecutingDataResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponseCommand.class);
-        return responseCommand.getWorkflowExecuteDto();
+        return responseCommand.getWorkflowInstanceExecuteDetailDto();
     }
 }

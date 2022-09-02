@@ -33,35 +33,16 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * executor dispatcher
- */
 @Service
 public class ExecutorDispatcher implements InitializingBean {
 
-    /**
-     * netty executor manager
-     */
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
 
-    /**
-     * round robin host manager
-     */
     @Autowired
     private HostManager hostManager;
 
-    /**
-     * executor manager
-     */
-    private final ConcurrentHashMap<ExecutorType, ExecutorManager<Boolean>> executorManagers;
-
-    /**
-     * constructor
-     */
-    public ExecutorDispatcher() {
-        this.executorManagers = new ConcurrentHashMap<>();
-    }
+    private final ConcurrentHashMap<ExecutorType, ExecutorManager<Boolean>> executorManagers = new ConcurrentHashMap<>();
 
     /**
      * task dispatch

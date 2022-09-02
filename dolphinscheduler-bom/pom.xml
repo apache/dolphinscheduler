@@ -15,18 +15,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>3.0.1-alpha-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-bom</artifactId>
-    <name>${project.artifactId}</name>
     <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
 
     <properties>
         <netty.version>4.1.53.Final</netty.version>
@@ -103,8 +102,8 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
                 <version>${netty.version}</version>
-                <scope>import</scope>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -203,8 +202,8 @@
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                     <exclusion>
-                        <artifactId>netty</artifactId>
                         <groupId>io.netty</groupId>
+                        <artifactId>netty</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>com.github.spotbugs</groupId>
@@ -404,12 +403,12 @@
                 <version>${hadoop.version}</version>
                 <exclusions>
                     <exclusion>
-                        <artifactId>slf4j-log4j12</artifactId>
                         <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                     <exclusion>
-                        <artifactId>com.sun.jersey</artifactId>
                         <groupId>jersey-json</groupId>
+                        <artifactId>com.sun.jersey</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>junit</groupId>

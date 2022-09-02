@@ -37,6 +37,7 @@ BEGIN
 --- add column
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS worker_group_extra_param int DEFAULT NULL  ';
 
+EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_isntance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL  ';
 
 
 return 'Success!';

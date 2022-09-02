@@ -17,47 +17,51 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-
-import java.io.Closeable;
-
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.event.EventListener;
 
+import javax.annotation.PreDestroy;
+import java.io.Closeable;
+
 @SpringBootApplication
-@ComponentScan("org.apache.dolphinscheduler")
+@ComponentScan(basePackages = "org.apache.dolphinscheduler", excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.service.process.*",
+                "org.apache.dolphinscheduler.service.queue.*",
+        })
+})
 public class AlertServer implements Closeable {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
-    private final PluginDao pluginDao;
-    private final AlertSenderService alertSenderService;
-    private final AlertRequestProcessor alertRequestProcessor;
-    private final AlertConfig alertConfig;
-    private NettyRemotingServer nettyRemotingServer;
+    @Autowired
+    private PluginDao pluginDao;
+    @Autowired
+    private AlertSenderService alertSenderService;
+    @Autowired
+    private AlertRequestProcessor alertRequestProcessor;
+    @Autowired
+    private AlertConfig alertConfig;
+    @Autowired
+    private AlertRegistryClient alertRegistryClient;
 
-    public AlertServer(PluginDao pluginDao,
-                       AlertSenderService alertSenderService,
-                       AlertRequestProcessor alertRequestProcessor,
-                       AlertConfig alertConfig) {
-        this.pluginDao = pluginDao;
-        this.alertSenderService = alertSenderService;
-        this.alertRequestProcessor = alertRequestProcessor;
-        this.alertConfig = alertConfig;
-    }
+    private NettyRemotingServer nettyRemotingServer;
 
     /**
      * alert server startup, not use web service
@@ -75,6 +79,7 @@ public class AlertServer implements Closeable {
 
         checkTable();
         startServer();
+        alertRegistryClient.start();
         alertSenderService.start();
         logger.info("Alert server is started ...");
     }
@@ -95,7 +100,7 @@ public class AlertServer implements Closeable {
         try {
             // set stop signal is true
             // execute only once
-            if (!Stopper.stop()) {
+            if (!ServerLifeCycleManager.toStopped()) {
                 logger.warn("AlterServer is already stopped");
                 return;
             }
@@ -122,7 +127,7 @@ public class AlertServer implements Closeable {
 
     private void startServer() {
         NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(alertConfig.getPort());
+        serverConfig.setListenPort(alertConfig.getListenPort());
 
         nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);

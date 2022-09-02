@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
 
 /**
  * shell command executor

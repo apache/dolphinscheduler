@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -28,29 +29,15 @@ import java.util.Map;
  */
 public interface MonitorService {
 
-    /**
-     * query database state
-     *
-     * @param loginUser login user
-     * @return data base state
-     */
-    Map<String,Object> queryDatabaseState(User loginUser);
+    Map<String,Object> queryDatabaseState();
     
-    /**
-     * query master list
-     *
-     * @param loginUser login user
-     * @return master information list
-     */
-    Map<String,Object> queryMaster(User loginUser);
-    
-    /**
-     * query worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
-    Map<String,Object> queryWorker(User loginUser);
-    
-    List<Server> getServerListFromRegistry(boolean isMaster);
+    Map<String, Object> queryMaster();
+
+    Map<String, Object> queryWorker();
+
+    Map<String, Object> queryAlertServer();
+
+    Map<String, Object> queryApiServer();
+
+    List<Server> getServerListFromRegistry(NodeType nodeType);
 }

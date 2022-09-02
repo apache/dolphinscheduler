@@ -22,10 +22,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.dto.WorkerGroupDto;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -53,78 +54,54 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
-/**
- * server node manager
- */
 @Service
 public class ServerNodeManager implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(ServerNodeManager.class);
 
-    /**
-     * master lock
-     */
     private final Lock masterLock = new ReentrantLock();
 
-    /**
-     * worker group lock
-     */
-    private final Lock workerGroupLock = new ReentrantLock();
+    private final ReentrantReadWriteLock workerGroupLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock workerGroupReadLock = workerGroupLock.readLock();
+    private final ReentrantReadWriteLock.WriteLock workerGroupWriteLock = workerGroupLock.writeLock();
+
+
+    private final ReentrantReadWriteLock workerNodeInfoLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock workerNodeInfoReadLock = workerNodeInfoLock.readLock();
+    private final ReentrantReadWriteLock.WriteLock workerNodeInfoWriteLock = workerNodeInfoLock.writeLock();
 
     /**
-     * worker node info lock
+     * worker group nodes, workerGroup -> ips
      */
-    private final Lock workerNodeInfoLock = new ReentrantLock();
-
-    /**
-     * worker group nodes
-     */
-    private final ConcurrentHashMap<String, Set<String>> workerGroupNodes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Set<String>> workerGroupToAddressMap = new ConcurrentHashMap<>();
 
     /**
      * master nodes
      */
     private final Set<String> masterNodes = new HashSet<>();
 
-    /**
-     * worker node info
-     */
-    private final Map<String, String> workerNodeInfo = new HashMap<>();
+    private final Map<String, WorkerHeartBeat> workerNodeInfo = new HashMap<>();
 
-    /**
-     * executor service
-     */
     private ScheduledExecutorService executorService;
 
     @Autowired
     private RegistryClient registryClient;
 
     /**
-     * eg : /node/worker/group/127.0.0.1:xxx
+     * eg : /dolphinscheduler/node/worker/group/127.0.0.1:xxx
      */
     private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
 
-    /**
-     * worker group mapper
-     */
     @Autowired
     private WorkerGroupDao workerGroupDao;
 
     private final MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
-    /**
-     * alert dao
-     */
     @Autowired
     private AlertDao alertDao;
 
-    /**
-     * master config
-     */
     @Autowired
     private MasterConfig masterConfig;
 
@@ -160,11 +137,11 @@ public class ServerNodeManager implements InitializingBean {
         /*
          * init MasterNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
+        registryClient.subscribe(NodeType.MASTER.getRegistryPath(), new MasterDataListener());
         /*
          * init WorkerNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
+        registryClient.subscribe(NodeType.WORKER.getRegistryPath(), new WorkerDataListener());
     }
 
     /**
@@ -181,7 +158,7 @@ public class ServerNodeManager implements InitializingBean {
          */
         Collection<String> workerGroups = registryClient.getWorkerGroupDirectly();
         for (String workerGroup : workerGroups) {
-            syncWorkerGroupNodes(workerGroup, registryClient.getWorkerGroupNodesDirectly(workerGroup));
+            syncWorkerGroupNodes(workerGroup, new HashSet<>(registryClient.getWorkerGroupNodesDirectly(workerGroup)));
         }
     }
 
@@ -198,14 +175,15 @@ public class ServerNodeManager implements InitializingBean {
                 syncAllWorkerNodeInfo(registryWorkerNodeMap);
                 // sync worker group nodes from database
                 List<WorkerGroupDto> workerGroupList = workerGroupDao.queryAllWorkerGroup();
-                if (CollectionUtils.isNotEmpty(workerGroupList)) {
-                    for (WorkerGroupDto wg : workerGroupList) {
-                        String workerGroupName = wg.getName();
-                        Set<String> workerAddress = getWorkerAddressByWorkerGroup(registryWorkerNodeMap, wg);
-                        if (!workerAddress.isEmpty()) {
-                            logger.info("WorkerGroup:{} sync after filter addrList: {}", workerGroupName, workerAddress.toString());
-                            syncWorkerGroupNodes(workerGroupName, workerAddress);
-                        }
+                if (CollectionUtils.isEmpty(workerGroupList)) {
+                    return;
+                }
+                for (WorkerGroupDto wg : workerGroupList) {
+                    String workerGroupName = wg.getName();
+                    Set<String> workerAddress = getWorkerAddressByWorkerGroup(workerNodeInfo, wg);
+                    if (!workerAddress.isEmpty()) {
+                        logger.info("WorkerGroup:{} sync after filter addrList: {}", workerGroupName, workerAddress);
+                        syncWorkerGroupNodes(workerGroupName, workerAddress);
                     }
                 }
             } catch (Exception e) {
@@ -215,7 +193,7 @@ public class ServerNodeManager implements InitializingBean {
     }
 
 
-    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroupDto wg) {
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, WorkerHeartBeat> newWorkerNodeInfo, WorkerGroupDto wg) {
         Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {
@@ -238,50 +216,36 @@ public class ServerNodeManager implements InitializingBean {
             final String data = event.data();
             if (registryClient.isWorkerPath(path)) {
                 try {
+                    String[] parts = path.split("/");
+                    if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
+                        logger.error("Worker group path is not valida, will ignore this event: {}", event);
+                        return;
+                    }
+                    final String workerGroupName = parts[parts.length - 2];
+                    final String workerAddress = parts[parts.length - 1];
+
                     if (type == Type.ADD) {
                         logger.info("worker group node : {} added.", path);
-                        String group = parseGroup(path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
                         logger.info("currentNodes : {}", currentNodes);
-                        syncWorkerGroupNodes(group, currentNodes);
+                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
                     } else if (type == Type.REMOVE) {
                         logger.info("worker group node : {} down.", path);
-                        String group = parseGroup(path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
-                        syncWorkerGroupNodes(group, currentNodes);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
+                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
-                        String group = parseGroup(path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
-                        syncWorkerGroupNodes(group, currentNodes);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
+                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
 
-                        String node = parseNode(path);
-                        syncSingleWorkerNodeInfo(node, data);
+                        syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
-                } catch (IllegalArgumentException ex) {
-                    logger.warn(ex.getMessage());
                 } catch (Exception ex) {
                     logger.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
 
             }
-        }
-
-        private String parseGroup(String path) {
-            String[] parts = path.split("/");
-            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
-            }
-            return parts[parts.length - 2];
-        }
-
-        private String parseNode(String path) {
-            String[] parts = path.split("/");
-            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
-            }
-            return parts[parts.length - 1];
         }
     }
 
@@ -327,20 +291,6 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     /**
-     * get master nodes
-     *
-     * @return master nodes
-     */
-    public Set<String> getMasterNodes() {
-        masterLock.lock();
-        try {
-            return Collections.unmodifiableSet(masterNodes);
-        } finally {
-            masterLock.unlock();
-        }
-    }
-
-    /**
      * sync master nodes
      *
      * @param nodes master nodes
@@ -348,18 +298,17 @@ public class ServerNodeManager implements InitializingBean {
     private void syncMasterNodes(Collection<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
-            String addr = NetUtils.getAddr(NetUtils.getHost(), masterConfig.getListenPort());
             this.masterNodes.addAll(nodes);
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
-            int index = masterPriorityQueue.getIndex(addr);
+            int index = masterPriorityQueue.getIndex(masterConfig.getMasterAddress());
             if (index >= 0) {
                 MASTER_SIZE = nodes.size();
                 MASTER_SLOT = index;
             } else {
-                logger.warn("current addr:{} is not in active master list", addr);
+                logger.warn("current addr:{} is not in active master list", masterConfig.getMasterAddress());
             }
-            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, addr);
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, masterConfig.getMasterAddress());
         } finally {
             masterLock.unlock();
         }
@@ -368,23 +317,28 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * sync worker group nodes
      *
-     * @param workerGroup worker group
-     * @param nodes worker nodes
+     * @param workerGroup     worker group
+     * @param workerAddresses worker nodes
      */
-    private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
-        workerGroupLock.lock();
+    private void syncWorkerGroupNodes(String workerGroup, Set<String> workerAddresses) {
+        workerGroupWriteLock.lock();
         try {
-            Set<String> workerNodes = workerGroupNodes.getOrDefault(workerGroup, new HashSet<>());
-            workerNodes.clear();
-            workerNodes.addAll(nodes);
-            workerGroupNodes.put(workerGroup, workerNodes);
+            workerGroupToAddressMap.put(workerGroup, workerAddresses);
         } finally {
-            workerGroupLock.unlock();
+            workerGroupWriteLock.unlock();
         }
     }
 
+    /**
+     * @return workerGroup -> workerAddresses
+     */
     public Map<String, Set<String>> getWorkerGroupNodes() {
-        return Collections.unmodifiableMap(workerGroupNodes);
+        workerGroupReadLock.lock();
+        try {
+            return Collections.unmodifiableMap(workerGroupToAddressMap);
+        } finally {
+            workerGroupReadLock.unlock();
+        }
     }
 
     /**
@@ -394,28 +348,16 @@ public class ServerNodeManager implements InitializingBean {
      * @return worker nodes
      */
     public Set<String> getWorkerGroupNodes(String workerGroup) {
-        workerGroupLock.lock();
+        workerGroupReadLock.lock();
         try {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
-            Set<String> nodes = workerGroupNodes.get(workerGroup);
-            if (CollectionUtils.isNotEmpty(nodes)) {
-                return Collections.unmodifiableSet(nodes);
-            }
-            return nodes;
+            Set<String> workerAddress = workerGroupToAddressMap.get(workerGroup);
+            return Collections.unmodifiableSet(workerAddress);
         } finally {
-            workerGroupLock.unlock();
+            workerGroupReadLock.unlock();
         }
-    }
-
-    /**
-     * get worker node info
-     *
-     * @return worker node info
-     */
-    public Map<String, String> getWorkerNodeInfo() {
-        return Collections.unmodifiableMap(workerNodeInfo);
     }
 
     /**
@@ -424,12 +366,12 @@ public class ServerNodeManager implements InitializingBean {
      * @param workerNode worker node
      * @return worker node info
      */
-    public String getWorkerNodeInfo(String workerNode) {
-        workerNodeInfoLock.lock();
+    public WorkerHeartBeat getWorkerNodeInfo(String workerNode) {
+        workerNodeInfoReadLock.lock();
         try {
             return workerNodeInfo.getOrDefault(workerNode, null);
         } finally {
-            workerNodeInfoLock.unlock();
+            workerNodeInfoReadLock.unlock();
         }
     }
 
@@ -439,30 +381,29 @@ public class ServerNodeManager implements InitializingBean {
      * @param newWorkerNodeInfo new worker node info
      */
     private void syncAllWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
-        workerNodeInfoLock.lock();
+        workerNodeInfoWriteLock.lock();
         try {
             workerNodeInfo.clear();
-            workerNodeInfo.putAll(newWorkerNodeInfo);
+            for (Map.Entry<String, String> entry : newWorkerNodeInfo.entrySet()) {
+                workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
+            }
         } finally {
-            workerNodeInfoLock.unlock();
+            workerNodeInfoWriteLock.unlock();
         }
     }
 
     /**
      * sync single worker node info
      */
-    private void syncSingleWorkerNodeInfo(String node, String info) {
-        workerNodeInfoLock.lock();
+    private void syncSingleWorkerNodeInfo(String node, WorkerHeartBeat info) {
+        workerNodeInfoWriteLock.lock();
         try {
             workerNodeInfo.put(node, info);
         } finally {
-            workerNodeInfoLock.unlock();
+            workerNodeInfoWriteLock.unlock();
         }
     }
 
-    /**
-     * destroy
-     */
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();

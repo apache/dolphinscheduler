@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -94,6 +95,9 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     ProcessService processService;
+
+    @Mock
+    ProcessInstanceDao processInstanceDao;
 
     @Mock
     ProcessInstanceMapper processInstanceMapper;
@@ -449,7 +453,7 @@ public class ProcessInstanceServiceTest {
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
-        when(processService.updateProcessInstance(processInstance)).thenReturn(1);
+        when(processInstanceDao.updateProcessInstance(processInstance)).thenReturn(1);
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.FALSE)).thenReturn(1);
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);

@@ -27,6 +27,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -79,6 +80,8 @@ public class WorkflowExecuteRunnableTest {
 
     private ProcessService processService;
 
+    private ProcessInstanceDao processInstanceDao;
+
     private final int processDefinitionId = 1;
 
     private MasterConfig config;
@@ -101,6 +104,8 @@ public class WorkflowExecuteRunnableTest {
         processService = mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        processInstanceDao = mock(ProcessInstanceDao.class);
+
         processInstance = mock(ProcessInstance.class);
         Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);
         Mockito.when(processInstance.getHistoryCmd()).thenReturn(CommandType.COMPLEMENT_DATA.toString());
@@ -120,7 +125,7 @@ public class WorkflowExecuteRunnableTest {
         NettyExecutorManager nettyExecutorManager = mock(NettyExecutorManager.class);
         ProcessAlertManager processAlertManager = mock(ProcessAlertManager.class);
         workflowExecuteThread =
-            PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, nettyExecutorManager, processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
+            PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao, nettyExecutorManager, processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
         // prepareProcess init dag
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);

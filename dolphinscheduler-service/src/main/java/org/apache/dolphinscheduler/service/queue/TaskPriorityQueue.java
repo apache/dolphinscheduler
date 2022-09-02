@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,6 +62,8 @@ public interface TaskPriorityQueue<T> {
      * @throws TaskPriorityQueueException
      */
     int size() throws TaskPriorityQueueException;
+
+    List<T> getAll();
 
     /**
      * clear queue

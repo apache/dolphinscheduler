@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.cache;
 
 import lombok.NonNull;
-
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.util.Collection;
@@ -65,4 +64,8 @@ public interface ProcessInstanceExecCacheManager {
      * @return all WorkflowExecuteThread in cache
      */
     Collection<WorkflowExecuteRunnable> getAll();
+
+    void clearCache();
+
+    int getSize();
 }

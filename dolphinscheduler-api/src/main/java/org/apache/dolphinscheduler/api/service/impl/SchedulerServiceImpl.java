@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.ScheduleVo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -337,7 +338,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(NodeType.MASTER);
 
         if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);

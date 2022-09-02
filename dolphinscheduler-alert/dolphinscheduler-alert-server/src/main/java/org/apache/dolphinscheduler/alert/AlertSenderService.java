@@ -17,16 +17,19 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -34,9 +37,12 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import org.apache.commons.collections.CollectionUtils;
-
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,27 +50,18 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Lists;
-
 @Service
 public final class AlertSenderService extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(AlertSenderService.class);
 
-    private final AlertDao alertDao;
-    private final AlertPluginManager alertPluginManager;
-    private final AlertConfig alertConfig;
-
-    public AlertSenderService(AlertDao alertDao, AlertPluginManager alertPluginManager, AlertConfig alertConfig) {
-        this.alertDao = alertDao;
-        this.alertPluginManager = alertPluginManager;
-        this.alertConfig = alertConfig;
-    }
+    @Autowired
+    private AlertDao alertDao;
+    @Autowired
+    private AlertPluginManager alertPluginManager;
+    @Autowired
+    private AlertConfig alertConfig;
+    @Autowired
+    private AlertRegistryClient alertRegistryClient;
 
     @Override
     public synchronized void start() {
@@ -76,13 +73,19 @@ public final class AlertSenderService extends Thread {
     @Override
     public void run() {
         logger.info("alert sender started");
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
+                if (!alertRegistryClient.getAlertLock()) {
+                    continue;
+                }
                 List<Alert> alerts = alertDao.listPendingAlerts();
+                AlertServerMetrics.registerPendingAlertGauge(alerts::size);
                 this.send(alerts);
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             } catch (Exception e) {
                 logger.error("alert sender thread error", e);
+            } finally {
+                alertRegistryClient.releaseAlertLock();
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             }
         }
     }
@@ -98,6 +101,7 @@ public final class AlertSenderService extends Thread {
                 List<AlertResult> alertResults = Lists.newArrayList(new AlertResult("false",
                                                                                     "no bind plugin instance"));
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, JSONUtils.toJsonString(alertResults), alertId);
+                AlertServerMetrics.incAlertFailCount();
                 continue;
             }
             AlertData alertData = AlertData.builder()
@@ -114,10 +118,16 @@ public final class AlertSenderService extends Thread {
             for (AlertPluginInstance instance : alertInstanceList) {
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
-                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.addAlertSendStatus(sendStatus, JSONUtils.toJsonString(alertResult), alertId, instance.getId());
+                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))
+                            ? AlertStatus.EXECUTION_SUCCESS
+                            : AlertStatus.EXECUTION_FAILURE;
+                    alertDao.addAlertSendStatus(sendStatus, JSONUtils.toJsonString(alertResult), alertId,
+                            instance.getId());
                     if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
                         sendSuccessCount++;
+                        AlertServerMetrics.incAlertSuccessCount();
+                    } else {
+                        AlertServerMetrics.incAlertFailCount();
                     }
                     alertResults.add(alertResult);
                 }
@@ -228,16 +238,17 @@ public final class AlertSenderService extends Thread {
         }
 
         if (!sendWarning) {
-            logger.info("Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}",
+            logger.info(
+                    "Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}",
                     pluginInstanceName, warningType.getCode(), alertData.getWarnType());
             return null;
         }
 
         AlertInfo alertInfo = AlertInfo.builder()
-            .alertData(alertData)
-            .alertParams(paramsMap)
-            .alertPluginInstanceId(instance.getId())
-            .build();
+                .alertData(alertData)
+                .alertParams(paramsMap)
+                .alertPluginInstanceId(instance.getId())
+                .build();
         int waitTimeout = alertConfig.getWaitTimeout();
         try {
             AlertResult alertResult;

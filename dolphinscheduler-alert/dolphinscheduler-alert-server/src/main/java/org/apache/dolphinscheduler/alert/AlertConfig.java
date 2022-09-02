@@ -17,30 +17,56 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
-@Component
+import java.time.Duration;
+
+@Slf4j
+@Data
+@Validated
+@Configuration
 @ConfigurationProperties("alert")
-public final class AlertConfig {
-    private int port;
+public class AlertConfig implements Validator {
+
+    private int listenPort;
 
     private int waitTimeout;
 
-    public int getPort() {
-        return port;
+    private Duration heartbeatInterval = Duration.ofSeconds(60);
+
+    private String alertServerAddress;
+    private String alertServerRegistryPath;
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return AlertConfig.class.isAssignableFrom(clazz);
     }
 
-    public void setPort(final int port) {
-        this.port = port;
+    @Override
+    public void validate(Object target, Errors errors) {
+        AlertConfig alertConfig = (AlertConfig) target;
+
+        if (heartbeatInterval.getSeconds() <= 0) {
+            errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
+        }
+
+        alertConfig.setAlertServerAddress(NetUtils.getAddr(listenPort));
+        alertConfig.setAlertServerRegistryPath(NodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.alertServerAddress);
+        printConfig();
     }
 
-    public int getWaitTimeout() {
-        return waitTimeout;
+    private void printConfig() {
+        log.info("Alert config: listenPort -> {}", listenPort);
+        log.info("Alert config: waitTimeout -> {}", waitTimeout);
+        log.info("Alert config: alertServerAddress -> {}", alertServerAddress);
+        log.info("Alert config: alertServerRegistryPath -> {}", alertServerRegistryPath);
     }
-
-    public void setWaitTimeout(final int waitTimeout) {
-        this.waitTimeout = waitTimeout;
-    }
-
 }

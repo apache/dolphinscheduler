@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -120,6 +121,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
 
     private final ProcessService processService;
+
+    private ProcessInstanceDao processInstanceDao;
 
     private final ProcessAlertManager processAlertManager;
 
@@ -218,6 +221,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * @param processInstance         processInstance
      * @param processService          processService
+     * @param processInstanceDao      processInstanceDao
      * @param nettyExecutorManager    nettyExecutorManager
      * @param processAlertManager     processAlertManager
      * @param masterConfig            masterConfig
@@ -226,12 +230,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     public WorkflowExecuteRunnable(
         @NonNull ProcessInstance processInstance,
         @NonNull ProcessService processService,
+        @NonNull ProcessInstanceDao processInstanceDao,
         @NonNull NettyExecutorManager nettyExecutorManager,
         @NonNull ProcessAlertManager processAlertManager,
         @NonNull MasterConfig masterConfig,
         @NonNull StateWheelExecuteThread stateWheelExecuteThread,
         @NonNull CuringParamsService curingParamsService) {
         this.processService = processService;
+        this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
@@ -371,7 +377,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 // todo: merge the last taskInstance
                 processInstance.setVarPool(taskInstance.getVarPool());
-                processService.saveProcessInstance(processInstance);
+                processInstanceDao.upsertProcessInstance(processInstance);
                 if (!processInstance.isBlocked()) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 }
@@ -889,7 +895,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                             processInstance.getScheduleTime(),
                             cmdParam.get(Constants.SCHEDULE_TIMEZONE));
                         processInstance.setGlobalParams(globalParams);
-                        processService.updateProcessInstance(processInstance);
+                        processInstanceDao.updateProcessInstance(processInstance);
                     }
                 }
             }
@@ -1675,15 +1681,15 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         originStates,
                         newStates);
 
-            processInstance.setState(newStates);
+            processInstance.setStateWithDesc(newStates, "update by workflow executor");
             if (newStates.typeIsFinished()) {
                 processInstance.setEndTime(new Date());
             }
             try {
-                processService.updateProcessInstance(processInstance);
+                processInstanceDao.updateProcessInstance(processInstance);
             } catch (Exception ex) {
                 // recover the status
-                processInstance.setState(originStates);
+                processInstance.setStateWithDesc(originStates, "recover state by DB error");
                 processInstance.setEndTime(null);
                 throw new StateEventHandleException("Update process instance status to DB error", ex);
             }

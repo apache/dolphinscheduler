@@ -174,27 +174,39 @@ security.authentication.type|PASSWORD|权限校验类型
 ## 6.master.properties [Master服务配置]
 |参数 |默认值| 描述| 
 |--|--|--|
-master.listen.port|5678|master监听端口
-master.exec.threads|100|master工作线程数量,用于限制并行的流程实例数量
-master.exec.task.num|20|master每个流程实例的并行任务数量
-master.dispatch.task.num|3|master每个批次的派发任务数量
-master.host.selector|LowerWeight|master host选择器,用于选择合适的worker执行任务,可选值: Random, RoundRobin, LowerWeight
-master.heartbeat.interval|10|master心跳间隔,单位为秒
-master.task.commit.retryTimes|5|任务重试次数
-master.task.commit.interval|1000|任务提交间隔,单位为毫秒
-master.max.cpuload.avg|-1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为-1: cpu cores * 2
-master.reserved.memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G
+|master.listen-port|5678|master监听端口|
+|master.fetch-command-num|10|master拉取command数量|
+|master.pre-exec-threads|10|master准备执行任务的数量，用于限制并行的command|
+|master.exec-threads|100|master工作线程数量,用于限制并行的流程实例数量|
+|master.dispatch-task-number|3|master每个批次的派发任务数量|
+|master.host-selector|lower_weight|master host选择器,用于选择合适的worker执行任务,可选值: random, round_robin, lower_weight|
+|master.heartbeat-interval|10|master心跳间隔,单位为秒|
+|master.task-commit-retry-times|5|任务重试次数|
+|master.task-commit-interval|1000|任务提交间隔,单位为毫秒|
+|master.state-wheel-interval|5|轮询检查状态时间|
+|master.max-cpu-load-avg|-1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为-1: cpu cores * 2|
+|master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G|
+|master.failover-interval|10|failover间隔，单位为分钟|
+|master.kill-yarn-job-when-task-failover|true|当任务实例failover时，是否kill掉yarn job|
+|master.registry-disconnect-strategy.strategy|stop|当Master与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
+|master.registry-disconnect-strategy.max-waiting-time|100s|当Master与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Master与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Master会丢弃目前正在执行的工作流，值为0表示会无限期等待 |
 
 
 ## 7.worker.properties [Worker服务配置]
 |参数 |默认值| 描述| 
 |--|--|--|
-worker.listen.port|1234|worker监听端口
-worker.exec.threads|100|worker工作线程数量,用于限制并行的任务实例数量
-worker.heartbeat.interval|10|worker心跳间隔,单位为秒
-worker.max.cpuload.avg|-1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为-1: cpu cores * 2
-worker.reserved.memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务,单位为G
-worker.groups|default|worker分组配置,逗号分隔,例如'worker.groups=default,test' <br> worker启动时会根据该配置自动加入对应的分组
+|worker.listen-port|1234|worker监听端口|
+|worker.exec-threads|100|worker工作线程数量,用于限制并行的任务实例数量|
+|worker.heartbeat-interval|10|worker心跳间隔,单位为秒|
+|worker.host-weight|100|派发任务时，worker主机的权重|
+|worker.tenant-auto-create|true|租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。|
+|worker.max-cpu-load-avg|-1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为-1: cpu cores * 2|
+|worker.reserved-memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务,单位为G|
+|worker.groups|default|worker分组配置,逗号分隔,例如'worker.groups=default,test' <br> worker启动时会根据该配置自动加入对应的分组|
+|worker.alert-listen-host|localhost|alert监听host|
+|worker.alert-listen-port|50052|alert监听端口|
+|worker.registry-disconnect-strategy.strategy|stop|当Worker与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
+|worker.registry-disconnect-strategy.max-waiting-time|100s|当Worker与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Worker与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Worker会丢弃kill正在执行的任务。值为0表示会无限期等待 |
 
 
 ## 8.alert.properties [Alert 告警服务配置]

@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-/**
- * Constants
- */
 public final class Constants {
 
     private Constants() {
@@ -38,17 +35,10 @@ public final class Constants {
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
-    /**
-     * registry properties
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
-    public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
     public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
     public static final String FORMAT_S_S_COLON = "%s:%s";
@@ -774,12 +764,14 @@ public final class Constants {
     /**
      * network interface preferred
      */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED = "dolphin.scheduler.network.interface.preferred";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
+            "dolphin.scheduler.network.interface.preferred";
 
     /**
      * network IP gets priority, default inner outer
      */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
+            "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -791,7 +783,8 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
+            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag

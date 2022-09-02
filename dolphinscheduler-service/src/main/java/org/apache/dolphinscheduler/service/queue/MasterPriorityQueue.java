@@ -20,12 +20,14 @@ package org.apache.dolphinscheduler.service.queue;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
 
@@ -60,6 +62,12 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
     @Override
     public int size() {
         return queue.size();
+    }
+
+    @Override
+    public List<Server> getAll() {
+        Server[] servers = queue.toArray(new Server[0]);
+        return Arrays.stream(servers).collect(Collectors.toList());
     }
 
     public void putList(List<Server> serverList) {

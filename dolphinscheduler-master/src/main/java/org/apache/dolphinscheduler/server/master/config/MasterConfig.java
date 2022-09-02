@@ -17,24 +17,31 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import lombok.Data;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
-
-import java.time.Duration;
-
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import lombok.Data;
+import java.time.Duration;
 
 @Data
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "master")
 public class MasterConfig implements Validator {
+
+    private Logger logger = LoggerFactory.getLogger(MasterConfig.class);
+
     /**
      * The master RPC server listen port.
      */
@@ -50,7 +57,7 @@ public class MasterConfig implements Validator {
     /**
      * todo: We may need to split the process/task into different thread size.
      * The thread number used to handle processInstance and task event.
-     * Will create two thread poll to execute {@link org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable} and {@link org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable}.
+     * Will create two thread poll to execute {@link WorkflowExecuteRunnable} and {@link TaskExecuteRunnable}.
      */
     private int execThreads = 10;
     /**
@@ -81,10 +88,12 @@ public class MasterConfig implements Validator {
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killYarnJobWhenTaskFailover = true;
-    /**
-     * ip:listenPort
-     */
+    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
+
+    // ip:listenPort
     private String masterAddress;
+
+    private String masterRegistryPath;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -128,5 +137,27 @@ public class MasterConfig implements Validator {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
+        masterConfig.setMasterRegistryPath(NodeType.MASTER.getRegistryPath() + "/" + masterConfig.getMasterAddress());
+        printConfig();
+    }
+
+    private void printConfig() {
+        logger.info("Master config: listenPort -> {} ", listenPort);
+        logger.info("Master config: fetchCommandNum -> {} ", fetchCommandNum);
+        logger.info("Master config: preExecThreads -> {} ", preExecThreads);
+        logger.info("Master config: execThreads -> {} ", execThreads);
+        logger.info("Master config: dispatchTaskNumber -> {} ", dispatchTaskNumber);
+        logger.info("Master config: hostSelector -> {} ", hostSelector);
+        logger.info("Master config: heartbeatInterval -> {} ", heartbeatInterval);
+        logger.info("Master config: taskCommitRetryTimes -> {} ", taskCommitRetryTimes);
+        logger.info("Master config: taskCommitInterval -> {} ", taskCommitInterval);
+        logger.info("Master config: stateWheelInterval -> {} ", stateWheelInterval);
+        logger.info("Master config: maxCpuLoadAvg -> {} ", maxCpuLoadAvg);
+        logger.info("Master config: reservedMemory -> {} ", reservedMemory);
+        logger.info("Master config: failoverInterval -> {} ", failoverInterval);
+        logger.info("Master config: killYarnJobWhenTaskFailover -> {} ", killYarnJobWhenTaskFailover);
+        logger.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
+        logger.info("Master config: masterAddress -> {} ", masterAddress);
+        logger.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
     }
 }

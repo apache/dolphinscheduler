@@ -27,7 +27,7 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-public class TaskInstanceExecuteDto {
+public class TaskInstanceExecuteDetailDto {
 
     private int id;
 

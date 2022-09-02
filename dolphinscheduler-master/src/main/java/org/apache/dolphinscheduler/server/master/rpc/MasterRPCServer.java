@@ -74,8 +74,8 @@ public class MasterRPCServer implements AutoCloseable {
     @Autowired
     private WorkflowExecutingDataRequestProcessor workflowExecutingDataRequestProcessor;
 
-    @PostConstruct
-    private void init() {
+    public void start() {
+        logger.info("Starting Master RPC Server...");
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
@@ -95,11 +95,6 @@ public class MasterRPCServer implements AutoCloseable {
         this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
 
-        this.nettyRemotingServer.start();
-    }
-
-    public void start() {
-        logger.info("Starting Master RPC Server...");
         this.nettyRemotingServer.start();
         logger.info("Started Master RPC Server...");
     }

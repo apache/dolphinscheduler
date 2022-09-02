@@ -42,14 +42,8 @@ public class TaskExecutionContext implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
-    /**
-     * task id
-     */
     private int taskInstanceId;
 
-    /**
-     * task name
-     */
     private String taskName;
 
     /**
