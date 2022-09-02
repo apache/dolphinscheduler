@@ -1992,5 +1992,17 @@ CREATE TABLE t_ds_cluster
 );
 
 INSERT INTO `t_ds_cluster`
-(`id`,`code`,`name`,`config`,`description`,`operator`,`create_time`,`update_time`)
+(`id`, `code`, `name`, `config`, `description`, `operator`, `create_time`, `update_time`)
 VALUES (100, 0, 'ds_null_k8s', '{"k8s":"ds_null_k8s"}', 'test', 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+
+--
+-- Table structure for t_ds_fav
+--
+DROP TABLE IF EXISTS t_ds_fav CASCADE;
+CREATE TABLE t_ds_fav
+(
+    id        bigint(20) NOT NULL AUTO_INCREMENT,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
+);
