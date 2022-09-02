@@ -52,7 +52,7 @@ cd dolphinscheduler
        -Dmaven.javadoc.skip \
        -Dmaven.checkstyle.skip \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release             
+       -Pdocker,release
 ```
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
 
@@ -66,7 +66,7 @@ cd dolphinscheduler
        -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release               
+       -Pdocker,release
 ```
 
 * 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件
@@ -100,7 +100,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 ## DolphinScheduler Standalone快速开发模式
 
 > **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database,Zookeeper Testing Server
-> 
+>
 > Standalone 仅在 DolphinScheduler 1.3.9 及以后的版本支持
 
 ### 分支选择
@@ -197,7 +197,7 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
 
 * MasterServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.server.master.MasterServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
 * WorkerServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.server.worker.WorkerServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-* ApiApplicationServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.api.ApiApplicationServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`。启动完成可以浏览 Open API 文档，地址为 http://localhost:12345/dolphinscheduler/doc.html
+* ApiApplicationServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.api.ApiApplicationServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`。启动完成可以浏览 Open API 文档，地址为 http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > VM Options `-Dspring.profiles.active=mysql` 中 `mysql` 表示指定的配置文件
 

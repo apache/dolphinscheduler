@@ -75,7 +75,7 @@ A：单独安装 **npm install node-sass --unsafe-perm**，之后再 **npm insta
 
 A：     1，如果是 node 启动的查看 dolphinscheduler-ui 下的 .env 文件里的 API_BASE 配置是否是 Api Server 服务地址
 
-​       2，如果是 nginx 启动的并且是通过 **install-dolphinscheduler-ui.sh** 安装的，查看             
+​       2，如果是 nginx 启动的并且是通过 **install-dolphinscheduler-ui.sh** 安装的，查看
 
 ​              **/etc/nginx/conf.d/dolphinscheduler.conf** 中的 proxy_pass 配置是否是 Api Server 服务地址
 
@@ -298,7 +298,7 @@ A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/do
 
 ---
 
-## Q：DolphinScheduler 什么时候发布新版本，同时新旧版本区别，以及如何升级，版本号规范 
+## Q：DolphinScheduler 什么时候发布新版本，同时新旧版本区别，以及如何升级，版本号规范
 A：1，Apache 项目的发版流程是通过邮件列表完成的。 你可以订阅 DolphinScheduler 的邮件列表，订阅之后如果有发版，你就可以收到邮件。请参照这篇[指引](https://github.com/apache/dolphinscheduler#get-help)来订阅 DolphinScheduler 的邮件列表。
 
    2，当项目发版的时候，会有发版说明告知具体的变更内容，同时也会有从旧版本升级到新版本的升级文档。
@@ -321,11 +321,11 @@ A：
    master.properties
    设置 master 节点并发执行的最大工作流数
    master.exec.threads=100
-   
+
    Control the number of parallel tasks in each workflow
    设置每个工作流可以并发执行的最大任务数
    master.exec.task.number=20
-   
+
    worker.properties
    设置 worker 节点并发执行的最大任务数
    worker.exec.threads=100
@@ -423,7 +423,7 @@ A：调度系统不支持秒级任务。
 ---
 
 ## Q：编译前后端代码 (dolphinscheduler-ui) 报错不能下载"https://github.com/sass/node-sass/releases/download/v4.13.1/darwin-x64-72_binding.node"
-A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录 
+A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录
 ```
 sudo rm -rf node_modules
 ```
@@ -488,7 +488,7 @@ A：1，我们可以成功创建调度任务，并且表 t_scheduler_schedules �
 ---
 
 ## Q：请问 swagger ui 的地址是什么
-A：1，1.2+ 版本地址是：http://apiServerIp:apiServerPort/dolphinscheduler/doc.html?language=zh_CN&lang=cn，其它版本是 http://apiServerIp:apiServerPort/escheduler/doc.html?language=zh_CN&lang=cn。
+A：1， 3.1.0+ 版本地址是 http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html, 1.2+ 版本地址是：http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=cn，其它版本是 http://apiServerIp:apiServerPort/escheduler/swagger-ui/index.html?language=zh_CN&lang=cn。
 
 ---
 
@@ -508,7 +508,7 @@ A： 1，用户修改了 api server 配置文件中的![apiServerContextPath](ht
    <img src="https://user-images.githubusercontent.com/21357069/58231400-805b0e80-7d69-11e9-8107-7f37b06a95df.png" width="60%" />
  </p>
 A：1，编辑 ngnix 配置文件 vi /etc/nginx/nginx.conf，更改上传大小 client_max_body_size 1024m。
-     
+
    ​	2，更新 google chrome 版本到最新版本。
 
 ---
@@ -529,7 +529,7 @@ A：1，目前是按照自然天来判断，上月末：判断时间是工作流
 ---
 
 ## Q：DS 后端接口文档
-A：1，http://106.75.43.194:8888/dolphinscheduler/doc.html?language=zh_CN&lang=zh。
+A：1，http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=zh。
 
 
 ## dolphinscheduler 在运行过程中，ip 地址获取错误的问题
@@ -585,9 +585,9 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EMR）：
 
    1. 将 Worker 节点部署至 EMR 集群的 Master 节点
-   
+
    2. 将 `conf/common.properties` 中的 `yarn.application.status.address` 修改为当前集群的 Yarn 的信息
-   
+
    3. 通过 `bin/dolphinscheduler-daemon.sh start worker-server` 启动 worker-server
 
 ---
@@ -695,6 +695,6 @@ A：在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server �
 如果您不想在 api server 启动的时候启动 Python gateway server，您可以修改 api server 中的配置文件 `api-server/conf/application.yaml`
 并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
 
---- 
+---
 
 我们会持续收集更多的 FAQ。
