@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APPLICATION_JSON;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -48,13 +47,12 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class HttpTask extends AbstractTaskExecutor {
+public class HttpTask extends AbstractTask {
 
     /**
      * output
@@ -111,6 +109,11 @@ public class HttpTask extends AbstractTaskExecutor {
             logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed：" + output, e);
             throw new TaskException("Execute http task failed", e);
         }
+
+    }
+
+    @Override
+    public void cancel() throws TaskException {
 
     }
 

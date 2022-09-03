@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.dvc;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -34,7 +34,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 /**
  * shell task
  */
-public class DvcTask extends AbstractTaskExecutor {
+public class DvcTask extends AbstractTask {
 
     /**
      * dvc parameters
@@ -81,7 +81,6 @@ public class DvcTask extends AbstractTaskExecutor {
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             parameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -97,9 +96,13 @@ public class DvcTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String buildCommand() {

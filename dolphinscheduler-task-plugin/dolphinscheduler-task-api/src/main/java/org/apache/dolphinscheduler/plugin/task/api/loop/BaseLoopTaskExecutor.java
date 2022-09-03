@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.loop;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -34,7 +35,12 @@ import lombok.NonNull;
  * <p>
  * The loop task type means, we will submit a task, and loop the task status until the task is finished.
  */
-public abstract class BaseLoopTaskExecutor extends AbstractTaskExecutor {
+public abstract class BaseLoopTaskExecutor extends AbstractRemoteTask {
+
+    /**
+     * cancel flag
+     */
+    protected volatile boolean cancel = false;
 
     /**
      * The task instance info will be set when task has submitted successful.
@@ -110,8 +116,8 @@ public abstract class BaseLoopTaskExecutor extends AbstractTaskExecutor {
     public abstract void cancelLoopTaskInstance(@Nullable LoopTaskInstanceInfo taskInstanceInfo) throws TaskException;
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
+    public void cancelApplication() throws TaskException {
+        this.cancel = true;
         cancelLoopTaskInstance(loopTaskInstanceInfo);
-        super.cancelApplication(status);
     }
 }

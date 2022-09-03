@@ -21,7 +21,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -40,12 +42,14 @@ import org.apache.http.util.EntityUtils;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
-public class DinkyTask extends AbstractTaskExecutor {
+public class DinkyTask extends AbstractRemoteTask {
 
     /**
      * taskExecutionContext
@@ -65,6 +69,11 @@ public class DinkyTask extends AbstractTaskExecutor {
     protected DinkyTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -166,8 +175,7 @@ public class DinkyTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        super.cancelApplication(status);
+    public void cancelApplication() throws TaskException {
         String address = this.dinkyParameters.getAddress();
         String taskId = this.dinkyParameters.getTaskId();
         logger.info("trying terminate dinky task, taskId: {}, address: {}, taskId: {}",

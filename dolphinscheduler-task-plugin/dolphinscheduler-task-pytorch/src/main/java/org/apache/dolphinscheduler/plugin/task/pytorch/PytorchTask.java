@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PytorchTask extends AbstractTaskExecutor {
+public class PytorchTask extends AbstractTask {
 
     private final ShellCommandExecutor shellCommandExecutor;
     protected PytorchParameters pytorchParameters;
@@ -70,7 +70,6 @@ public class PytorchTask extends AbstractTaskExecutor {
             String command = buildPythonExecuteCommand();
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
-            setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -82,6 +81,11 @@ public class PytorchTask extends AbstractTaskExecutor {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("Pytorch task execute failed", e);
         }
+    }
+
+    @Override
+    public void cancel() throws TaskException {
+
     }
 
 

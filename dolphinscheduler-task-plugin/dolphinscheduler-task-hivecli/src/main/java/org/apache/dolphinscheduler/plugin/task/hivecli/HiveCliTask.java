@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.hivecli;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -34,10 +35,12 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class HiveCliTask extends AbstractTaskExecutor {
+public class HiveCliTask extends AbstractRemoteTask {
 
     private HiveCliParameters hiveCliParameters;
 
@@ -52,6 +55,11 @@ public class HiveCliTask extends AbstractTaskExecutor {
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
                 logger);
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -126,8 +134,12 @@ public class HiveCliTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
-        shellCommandExecutor.cancelApplication();
+    public void cancelApplication() throws TaskException {
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
 }

@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.amazonaws.SdkBaseException;
@@ -53,6 +55,11 @@ public class EmrJobFlowTask extends AbstractEmrTask {
      */
     protected EmrJobFlowTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -148,8 +155,7 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     }
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        super.cancelApplication(status);
+    public void cancelApplication() throws TaskException {
         logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(), clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.mlflow;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -40,7 +40,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 /**
  * shell task
  */
-public class MlflowTask extends AbstractTaskExecutor {
+public class MlflowTask extends AbstractTask {
 
     /**
      * shell parameters
@@ -93,7 +93,6 @@ public class MlflowTask extends AbstractTaskExecutor {
                 exitCode = commandExecuteResult.getExitStatusCode();
             }
             setExitStatusCode(exitCode);
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -109,9 +108,13 @@ public class MlflowTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     public String buildCommand() {

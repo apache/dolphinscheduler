@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -36,8 +38,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
@@ -45,7 +49,7 @@ import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG
 /**
  * seatunnel task
  */
-public class SeatunnelTask extends AbstractTaskExecutor {
+public class SeatunnelTask extends AbstractRemoteTask {
 
     /**
      * seatunnel parameters
@@ -74,6 +78,11 @@ public class SeatunnelTask extends AbstractTaskExecutor {
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
                 logger);
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -107,9 +116,13 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     private String buildCommand() throws Exception {

@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
-public abstract class AbstractK8sTask extends AbstractTaskExecutor {
+public abstract class AbstractK8sTask extends AbstractRemoteTask {
     /**
      * process task
      */
@@ -53,12 +54,10 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
     /**
      * cancel application
      *
-     * @param status status
      * @throws Exception exception
      */
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        cancel = true;
+    public void cancelApplication() throws TaskException {
         // cancel process
         abstractK8sTaskExecutor.cancelApplication(buildCommand());
     }

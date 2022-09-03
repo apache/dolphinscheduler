@@ -33,7 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -75,7 +75,7 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
-public class DataxTask extends AbstractTaskExecutor {
+public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
@@ -158,7 +158,6 @@ public class DataxTask extends AbstractTaskExecutor {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -175,14 +174,16 @@ public class DataxTask extends AbstractTaskExecutor {
     /**
      * cancel DataX process
      *
-     * @param cancelApplication cancelApplication
-     * @throws Exception if error throws Exception
+     * @throws TaskException if error throws Exception
      */
     @Override
-    public void cancelApplication(boolean cancelApplication)
-            throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     /**

@@ -19,13 +19,24 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * abstract yarn task
  */
-public abstract class AbstractYarnTask extends AbstractTaskExecutor {
+public abstract class AbstractYarnTask extends AbstractRemoteTask {
     /**
      * process task
      */
@@ -72,14 +83,62 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     /**
      * cancel application
      *
-     * @param status status
      * @throws Exception exception
      */
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        cancel = true;
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
+    }
+
+    /**
+     * get application ids
+     * @return
+     * @throws TaskException
+     */
+    public Set<String> getApplicationIds() throws TaskException {
+        Set<String> appIds = new HashSet<>();
+
+        File file = new File(taskRequest.getLogPath());
+        if (!file.exists()) {
+            return appIds;
+        }
+
+        /*
+         * analysis log? get submitted yarn application id
+         */
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String appId = findAppId(line);
+                if (StringUtils.isNotEmpty(appId)) {
+                    appIds.add(appId);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new TaskException("get application id error, file not found, path:" + taskRequest.getLogPath());
+        } catch (IOException e) {
+            throw new TaskException("get application id error, path:" + taskRequest.getLogPath(), e);
+        }
+        return appIds;
+    }
+
+    /**
+     * find app id
+     *
+     * @param line line
+     * @return appid
+     */
+    protected String findAppId(String line) {
+        Matcher matcher = YARN_APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 
     /**

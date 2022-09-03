@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.plugin.task.shell;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -47,7 +48,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_
 /**
  * shell task
  */
-public class ShellTask extends AbstractTaskExecutor {
+public class ShellTask extends AbstractTask {
 
     /**
      * shell parameters
@@ -96,7 +97,6 @@ public class ShellTask extends AbstractTaskExecutor {
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -112,9 +112,13 @@ public class ShellTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     /**

@@ -22,7 +22,8 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -32,7 +33,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -46,7 +49,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 /**
  * SagemakerTask task, Used to start Sagemaker pipeline
  */
-public class SagemakerTask extends AbstractTaskExecutor {
+public class SagemakerTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
         new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false).configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
@@ -66,6 +69,11 @@ public class SagemakerTask extends AbstractTaskExecutor {
 
         this.taskExecutionContext = taskExecutionContext;
 
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -92,7 +100,7 @@ public class SagemakerTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) {
+    public void cancelApplication() {
         // stop pipeline
         utils.stopPipelineExecution();
     }

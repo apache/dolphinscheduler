@@ -118,7 +118,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         // cancel the task
         if (task != null) {
             try {
-                task.cancelApplication(true);
+                task.cancel();
                 ProcessUtils.killYarnJob(taskExecutionContext);
             } catch (Exception e) {
                 logger.error("Task execute failed and cancel the application failed, this will not affect the taskInstance status, but you need to check manual", e);
