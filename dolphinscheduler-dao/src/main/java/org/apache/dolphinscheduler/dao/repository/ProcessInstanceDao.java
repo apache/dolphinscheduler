@@ -13,10 +13,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
+
+package org.apache.dolphinscheduler.dao.repository;
+
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 
 
-ALTER TABLE `t_ds_worker_group` ADD COLUMN `other_params_json` text DEFAULT NULL COMMENT 'other params json';
+public interface ProcessInstanceDao {
 
-ALTER TABLE `t_ds_process_instance` ADD COLUMN `state_history` text DEFAULT NULL COMMENT 'state history desc' AFTER `state`;
+    public int insertProcessInstance(ProcessInstance processInstance);
 
+    public int updateProcessInstance(ProcessInstance processInstance);
+
+    /**
+     * insert or update work process instance to database
+     *
+     * @param processInstance processInstance
+     */
+    public int upsertProcessInstance(ProcessInstance processInstance);
+}
