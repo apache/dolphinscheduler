@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import com.facebook.presto.jdbc.internal.guava.base.Strings;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.NonNull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
-import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -317,7 +317,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroup.setName(workerGroupName);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                WorkerHeartBeat workerHeartBeat = JsonUtils.fromJson(registeredValue, WorkerHeartBeat.class);
+                WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(registeredValue, new TypeReference<WorkerHeartBeat>() {
+                });
                 workerGroup.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
                 workerGroup.setUpdateTime(new Date(workerHeartBeat.getReportTime()));
                 workerGroup.setSystemDefault(true);
