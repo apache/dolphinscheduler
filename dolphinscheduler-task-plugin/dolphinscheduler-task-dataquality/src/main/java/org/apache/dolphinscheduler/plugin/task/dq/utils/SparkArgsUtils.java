@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.dq.utils.spark;
+package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.ProgramType;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkConstants;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;

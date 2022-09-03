@@ -521,6 +521,7 @@ CREATE TABLE t_ds_process_instance (
   process_definition_code bigint DEFAULT NULL ,
   process_definition_version int DEFAULT NULL ,
   state int DEFAULT NULL ,
+  state_history text,
   recovery int DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   end_time timestamp DEFAULT NULL ,
@@ -1942,16 +1943,29 @@ CREATE TABLE t_ds_alert_send_status (
 --
 
 DROP TABLE IF EXISTS t_ds_cluster;
-CREATE TABLE t_ds_cluster (
-    id serial NOT NULL,
-    code bigint NOT NULL,
-    name varchar(100) DEFAULT NULL,
-    config text DEFAULT NULL,
-    description text,
-    operator int DEFAULT NULL,
-    create_time timestamp DEFAULT NULL,
-    update_time timestamp DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT cluster_name_unique UNIQUE (name),
-    CONSTRAINT cluster_code_unique UNIQUE (code)
+CREATE TABLE t_ds_cluster(
+                             id          serial NOT NULL,
+                             code        bigint NOT NULL,
+                             name        varchar(100) DEFAULT NULL,
+                             config      text         DEFAULT NULL,
+                             description text,
+                             operator    int          DEFAULT NULL,
+                             create_time timestamp    DEFAULT NULL,
+                             update_time timestamp    DEFAULT NULL,
+                             PRIMARY KEY (id),
+                             CONSTRAINT cluster_name_unique UNIQUE (name),
+                             CONSTRAINT cluster_code_unique UNIQUE (code)
+);
+
+--
+-- Table structure for t_ds_fav
+--
+
+DROP TABLE IF EXISTS t_ds_fav;
+CREATE TABLE t_ds_fav
+(
+    id        serial      NOT NULL,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
 );
