@@ -59,8 +59,9 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
             logger);
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
@@ -80,10 +81,22 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
         }
     }
 
+    // todo
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    // todo
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
+    }
+
     /**
      * cancel application
      *
-     * @throws Exception exception
+     * @throws TaskException exception
      */
     @Override
     public void cancelApplication() throws TaskException {

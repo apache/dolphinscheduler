@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -90,7 +91,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         logger.info("Set task logger name: {}", taskLogName);
     }
 
-    protected abstract void executeTask();
+    protected abstract void executeTask(TaskCallBack taskCallBack);
 
     protected void afterExecute() throws TaskException {
         if (task == null) {
@@ -148,7 +149,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             beforeExecute();
 
-            executeTask();
+            TaskCallBack taskCallBack = TaskCallbackImpl.builder().workerMessageSender(workerMessageSender).masterAddress(masterAddress).build();
+            executeTask(taskCallBack);
 
             afterExecute();
 

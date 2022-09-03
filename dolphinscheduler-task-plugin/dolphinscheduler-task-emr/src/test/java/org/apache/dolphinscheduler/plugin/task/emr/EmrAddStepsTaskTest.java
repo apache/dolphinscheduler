@@ -28,6 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -88,6 +89,9 @@ public class EmrAddStepsTaskTest {
     private EmrAddStepsTask emrAddStepsTask;
     private AmazonElasticMapReduce emrClient;
     private Step step;
+    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+
+    };
 
     @Before
     public void before() throws Exception {
@@ -120,7 +124,7 @@ public class EmrAddStepsTaskTest {
     public void testCanNotParseJson() throws Exception {
         mockStatic(JSONUtils.class);
         when(emrAddStepsTask, "createAddJobFlowStepsRequest").thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
-        emrAddStepsTask.handle();
+        emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
     }
 
@@ -134,7 +138,7 @@ public class EmrAddStepsTaskTest {
         emrAddStepsTask = spy(new EmrAddStepsTask(taskExecutionContext));
         doReturn(emrClient).when(emrAddStepsTask, "createEmrClient");
         emrAddStepsTask.init();
-        emrAddStepsTask.handle();
+        emrAddStepsTask.handle(taskCallBack);
 
         Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
     }
@@ -143,7 +147,7 @@ public class EmrAddStepsTaskTest {
     public void testHandle() throws Exception {
         when(step.getStatus()).thenReturn(pendingState, runningState, completedState);
 
-        emrAddStepsTask.handle();
+        emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_SUCCESS, emrAddStepsTask.getExitStatusCode());
     }
 
@@ -151,18 +155,18 @@ public class EmrAddStepsTaskTest {
     public void testHandleUserRequestTerminate() throws Exception {
         when(step.getStatus()).thenReturn(pendingState, runningState, cancelledState);
 
-        emrAddStepsTask.handle();
+        emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_KILL, emrAddStepsTask.getExitStatusCode());
     }
 
     @Test
     public void testHandleError() throws Exception {
         when(step.getStatus()).thenReturn(pendingState, runningState, failedState);
-        emrAddStepsTask.handle();
+        emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
 
         when(emrClient.addJobFlowSteps(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
-        emrAddStepsTask.handle();
+        emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
     }
 

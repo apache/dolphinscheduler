@@ -106,7 +106,7 @@ public abstract class AbstractTask {
         return null;
     }
 
-    public abstract void handle() throws TaskException;
+    public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
     public abstract void cancel() throws TaskException;
 

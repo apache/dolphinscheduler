@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -86,8 +87,9 @@ public class DinkyTask extends AbstractRemoteTask {
         }
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
 
             String address = this.dinkyParameters.getAddress();
@@ -137,6 +139,16 @@ public class DinkyTask extends AbstractRemoteTask {
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute dinkyTask failed", ex);
         }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     /**

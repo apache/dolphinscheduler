@@ -30,6 +30,8 @@ import com.amazonaws.services.elasticmapreduce.model.StepState;
 import com.amazonaws.services.elasticmapreduce.model.StepStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Sets;
+
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -69,7 +71,7 @@ public class EmrAddStepsTask extends AbstractEmrTask {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void submitApplication() throws TaskException {
         StepStatus stepStatus = null;
         try {
             AddJobFlowStepsRequest addJobFlowStepsRequest = createAddJobFlowStepsRequest();
@@ -84,13 +86,26 @@ public class EmrAddStepsTask extends AbstractEmrTask {
 
             stepStatus = getStepStatus();
 
+        } catch (EmrTaskException | SdkBaseException e) {
+            logger.error("emr task submit failed with error", e);
+        } finally {
+            final int exitStatusCode = calculateExitStatusCode(stepStatus);
+            setExitStatusCode(exitStatusCode);
+            logger.info("emr task finished with step status : {}", stepStatus);
+        }
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+        StepStatus stepStatus = getStepStatus();
+
+        try {
             while (waitingStateSet.contains(stepStatus.getState())) {
                 TimeUnit.SECONDS.sleep(10);
                 stepStatus = getStepStatus();
             }
-
         } catch (EmrTaskException | SdkBaseException e) {
-            logger.error("emr task submit failed with error", e);
+            logger.error("emr task failed with error", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new TaskException("Execute emr task failed", e);

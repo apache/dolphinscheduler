@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.emr;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -63,7 +64,7 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         ClusterStatus clusterStatus = null;
         try {
             RunJobFlowRequest runJobFlowRequest = createRunJobFlowRequest();
@@ -75,6 +76,8 @@ public class EmrJobFlowTask extends AbstractEmrTask {
             // Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
             setAppIds(clusterId);
 
+            taskCallBack.updateRemoteApplicationInfo(taskExecutionContext.getTaskInstanceId(), getAppIds());
+
             clusterStatus = getClusterStatus();
 
             while (waitingStateSet.contains(clusterStatus.getState())) {
@@ -84,6 +87,33 @@ public class EmrJobFlowTask extends AbstractEmrTask {
 
         } catch (EmrTaskException | SdkBaseException e) {
             logger.error("emr task submit failed with error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TaskException("Execute emr task failed", e);
+        } finally {
+            final int exitStatusCode = calculateExitStatusCode(clusterStatus);
+            setExitStatusCode(exitStatusCode);
+            logger.info("emr task finished with cluster status : {}", clusterStatus);
+        }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+        ClusterStatus clusterStatus = null;
+        try {
+            clusterStatus = getClusterStatus();
+
+            while (waitingStateSet.contains(clusterStatus.getState())) {
+                TimeUnit.SECONDS.sleep(10);
+                clusterStatus = getClusterStatus();
+            }
+        } catch (EmrTaskException | SdkBaseException e) {
+            logger.error("emr task failed with error", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new TaskException("Execute emr task failed", e);

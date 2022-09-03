@@ -21,6 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -83,8 +84,9 @@ public class PigeonTask extends AbstractRemoteTask {
         }
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         // Trigger PIGEON DataX pipeline
         logger.info("start execute PIGEON task");
         long startTime = System.currentTimeMillis();
@@ -162,6 +164,16 @@ public class PigeonTask extends AbstractRemoteTask {
             }
             throw new TaskException("Execute pigeon task failed", e);
         }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     private void addFormUrlencoded(HttpPost post) {

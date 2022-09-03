@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.loop;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -52,11 +53,13 @@ public abstract class BaseLoopTaskExecutor extends AbstractRemoteTask {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             final long loopInterval = getTaskInstanceStatusQueryInterval().toMillis();
             loopTaskInstanceInfo = submitLoopTask();
-            this.appIds = loopTaskInstanceInfo.getTaskInstanceId();
+            this.setAppIds(loopTaskInstanceInfo.getTaskInstanceId());
+            taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(), getAppIds());
+
             // loop the task status until the task is finished or task has been canceled.
             // we use retry utils here to avoid the task status query failure due to network failure.
             // the default retry policy is 3 times, and the interval is 1 second.

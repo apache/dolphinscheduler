@@ -23,7 +23,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -89,10 +89,19 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void submitApplication() throws TaskException {
         try {
-            int exitStatusCode = handleStartPipeline();
-            setExitStatusCode(exitStatusCode);
+            StartPipelineExecutionRequest request = createStartPipelineRequest();
+            try {
+                AmazonSageMaker client = createClient();
+                utils = new PipelineUtils(client);
+                setAppIds(utils.getPipelineExecutionArn());
+            } catch (Exception e) {
+                throw new SagemakerTaskException("can not connect aws ", e);
+            }
+
+            // Start pipeline
+            exitStatusCode = utils.startPipelineExecution(request);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("SageMaker task error", e);
@@ -105,25 +114,10 @@ public class SagemakerTask extends AbstractRemoteTask {
         utils.stopPipelineExecution();
     }
 
-    public int handleStartPipeline() {
-        int exitStatusCode;
-        StartPipelineExecutionRequest request = createStartPipelineRequest();
-
-        try {
-            AmazonSageMaker client = createClient();
-            utils = new PipelineUtils(client);
-            setAppIds(utils.getPipelineExecutionArn());
-        } catch (Exception e) {
-            throw new SagemakerTaskException("can not connect aws ", e);
-        }
-
-        // Start pipeline
-        exitStatusCode = utils.startPipelineExecution(request);
-        if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
-            // Keep checking the health status
-            exitStatusCode = utils.checkPipelineExecutionStatus();
-        }
-        return exitStatusCode;
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+        // Keep checking the health status
+        exitStatusCode = utils.checkPipelineExecutionStatus();
     }
 
     public StartPipelineExecutionRequest createStartPipelineRequest() throws SagemakerTaskException {

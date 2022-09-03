@@ -28,6 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -117,6 +118,9 @@ public class EmrJobFlowTaskTest {
     private EmrJobFlowTask emrJobFlowTask;
     private AmazonElasticMapReduce emrClient;
     private Cluster cluster;
+    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+
+    };
 
     @Before
     public void before() throws Exception {
@@ -146,7 +150,7 @@ public class EmrJobFlowTaskTest {
 
         when(cluster.getStatus()).thenReturn(startingStatus, softwareConfigStatus, runningStatus, terminatingStatus);
 
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_SUCCESS, emrJobFlowTask.getExitStatusCode());
 
     }
@@ -155,7 +159,7 @@ public class EmrJobFlowTaskTest {
     public void testHandleAliveWhenNoSteps() throws Exception {
         when(cluster.getStatus()).thenReturn(startingStatus, softwareConfigStatus, runningStatus, waitingStatus);
 
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_SUCCESS, emrJobFlowTask.getExitStatusCode());
     }
 
@@ -163,7 +167,7 @@ public class EmrJobFlowTaskTest {
     public void testHandleUserRequestTerminate() throws Exception {
         when(cluster.getStatus()).thenReturn(startingStatus, userRequestTerminateStatus);
 
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_KILL, emrJobFlowTask.getExitStatusCode());
     }
 
@@ -171,7 +175,7 @@ public class EmrJobFlowTaskTest {
     public void testHandleTerminatedWithError() throws Exception {
         when(cluster.getStatus()).thenReturn(startingStatus, softwareConfigStatus, runningStatus, terminatedWithErrorsStatus);
 
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
     }
 
@@ -179,7 +183,7 @@ public class EmrJobFlowTaskTest {
     public void testCanNotParseJson() throws Exception {
         mockStatic(JSONUtils.class);
         when(emrJobFlowTask, "createRunJobFlowRequest").thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
     }
 
@@ -188,7 +192,7 @@ public class EmrJobFlowTaskTest {
 
         when(emrClient.describeCluster(any())).thenReturn(null);
 
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
     }
 
@@ -196,9 +200,9 @@ public class EmrJobFlowTaskTest {
     public void testRunJobFlowError() throws Exception {
 
         when(emrClient.runJobFlow(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
-        emrJobFlowTask.handle();
+        emrJobFlowTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
 
     }
