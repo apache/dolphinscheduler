@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -83,6 +84,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    ProcessInstanceDao processInstanceDao;
 
     @Autowired
     ProcessDefinitionMapper processDefineMapper;
@@ -531,7 +535,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
         processInstance.setProcessDefinitionVersion(insertVersion);
-        int update = processService.updateProcessInstance(processInstance);
+        int update = processInstanceDao.updateProcessInstance(processInstance);
         if (update == 0) {
             putMsg(result, Status.UPDATE_PROCESS_INSTANCE_ERROR);
             throw new ServiceException(Status.UPDATE_PROCESS_INSTANCE_ERROR);
