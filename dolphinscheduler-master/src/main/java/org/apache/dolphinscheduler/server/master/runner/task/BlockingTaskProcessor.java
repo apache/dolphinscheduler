@@ -200,7 +200,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         logger.info("blocking opportunity: expected-->{}, actual-->{}", expected, this.conditionResult);
         processInstance.setBlocked(isBlocked);
         if (isBlocked) {
-            processInstance.setState(WorkflowExecutionStatus.READY_BLOCK);
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.READY_BLOCK, "ready block");
         }
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setEndTime(new Date());

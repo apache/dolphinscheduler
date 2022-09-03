@@ -127,8 +127,6 @@ public interface ProcessService {
 
     TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance);
 
-    void saveProcessInstance(ProcessInstance processInstance);
-
     int saveCommand(Command command);
 
     boolean saveTaskInstance(TaskInstance taskInstance);
@@ -163,8 +161,6 @@ public interface ProcessService {
 
     ProcessInstance findParentProcessInstance(Integer subProcessId);
 
-    int updateProcessInstance(ProcessInstance processInstance);
-
     void changeOutParam(TaskInstance taskInstance);
 
     Schedule querySchedule(int id);
@@ -185,8 +181,6 @@ public interface ProcessService {
     List<TaskInstance> queryNeedFailoverTaskInstances(String host);
 
     DataSource findDataSourceById(int id);
-
-    int updateProcessInstanceState(Integer processInstanceId, WorkflowExecutionStatus executionStatus);
 
     ProcessInstance findProcessInstanceByTaskId(int taskId);
 
