@@ -46,6 +46,7 @@ export function useTable() {
   const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
   const processInstanceId = Number(route.params.processInstanceId)
+  const taskName = route.params.taskName
 
   const variables = reactive({
     columns: [],
@@ -53,7 +54,7 @@ export function useTable() {
     tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
-    searchVal: ref(null),
+    searchVal: ref(taskName || null),
     processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
     stateType: ref(null),
