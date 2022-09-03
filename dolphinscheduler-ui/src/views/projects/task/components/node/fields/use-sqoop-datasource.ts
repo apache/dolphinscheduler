@@ -19,7 +19,7 @@ import { onMounted, ref, Ref } from 'vue'
 import { queryDataSourceList } from '@/service/modules/data-source'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem, IDataBase } from '../types'
-import { TypeReq } from '@/service/modules/data-source/types'
+import type { TypeReq } from '@/service/modules/data-source/types'
 export function useDatasource(
   model: { [field: string]: any },
   span: Ref,

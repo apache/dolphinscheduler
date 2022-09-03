@@ -183,22 +183,22 @@ export function useForm(id?: number) {
     const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
     const result = await queryDataSourceList(params)
     state.bindTestDataSourceExample = result
-      .map((TestDataSourceExample: { name: string; id: number }) => ({
+        .filter((value: { label: string; value: number }) => {
+          if (state.detailForm.id && state.detailForm.id === value.value)
+            return false
+          return true
+        })
+        .map((TestDataSourceExample: { name: string; id: number }) => ({
         label: TestDataSourceExample.name,
         value: TestDataSourceExample.id
       }))
-      .filter((value: { label: string; value: number }) => {
-        if (state.detailForm.id && state.detailForm.id === value.value)
-          return false
-        return true
-      })
   }
 
   const resetFieldsValue = () => {
     state.detailForm = { ...initialValues }
   }
 
-  const setFieldsValue = async (values: IDataSource) => {
+  const setFieldsValue = (values: IDataSource) => {
     state.detailForm = {
       ...state.detailForm,
       ...values,
