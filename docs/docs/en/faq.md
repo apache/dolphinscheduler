@@ -533,7 +533,8 @@ A: 1, We can successly create scheduled task and add one record into t_scheduler
 
 ## Q : What is the address of swagger ui
 
-A: 1, For version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
+A: 1, For version 3.1.0+ is http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html,
+for version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
 
 ---
 
@@ -582,7 +583,7 @@ A: 1, It is currently judged according to natural days, at the end of last month
 
 ## Q : DS Backend Inteface Document
 
-A: 1, http://106.75.43.194:8888/dolphinscheduler/doc.html?language=en.
+A: 1, http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=en.
 
 ## During the operation of dolphinscheduler, the ip address is obtained incorrectly
 
@@ -752,4 +753,3 @@ start API server. If you want disabled when Python gateway service you could cha
 ---
 
 We will collect more FAQ later
-

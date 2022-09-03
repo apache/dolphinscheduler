@@ -19,7 +19,6 @@ set -euox pipefail
 
 
 USER=root
-DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-*-SNAPSHOT-bin
 
 #Create database
 mysql -hmysql -P3306 -uroot -p123456 -e "CREATE DATABASE IF NOT EXISTS dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
