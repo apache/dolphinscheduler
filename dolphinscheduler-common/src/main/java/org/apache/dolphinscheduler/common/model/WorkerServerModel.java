@@ -36,7 +36,7 @@ public class WorkerServerModel {
      */
     private Set<String> zkDirectories;
 
-    private String resInfo;
+    private HeartBeat resInfo;
 
     private Date createTime;
 

@@ -95,30 +95,33 @@ public class RegistryClient {
                     server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
                     server.setId(masterHeartBeat.getProcessId());
+                    server.setResInfo(masterHeartBeat);
                     break;
                 case WORKER:
                     WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
                     server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
                     server.setId(workerHeartBeat.getProcessId());
+                    server.setResInfo(workerHeartBeat);
                     break;
                 case ALERT_SERVER:
                     AlertServerHeartBeat alertServerHeartBeat = JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
                     server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
                     server.setId(alertServerHeartBeat.getProcessId());
+                    server.setResInfo(alertServerHeartBeat);
                     break;
                 case API_SERVER:
                     ApiServerHeartBeat apiServerHeartBeat = JSONUtils.parseObject(heartBeatJson, ApiServerHeartBeat.class);
                     server.setCreateTime(new Date(apiServerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(apiServerHeartBeat.getReportTime()));
                     server.setId(apiServerHeartBeat.getProcessId());
+                    server.setResInfo(apiServerHeartBeat);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown nodeType: " + nodeType);
             }
 
-            server.setResInfo(heartBeatJson);
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
             server.setZkDirectory(parentPath + "/" + serverPath);
             // set host and port

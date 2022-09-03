@@ -75,7 +75,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     public Map<String, Object> queryWorker() {
 
         Map<String, Object> result = new HashMap<>();
-        List<WorkerServerModel> workerServers = getServerListFromRegistry(NodeType.MASTER)
+        List<WorkerServerModel> workerServers = getServerListFromRegistry(NodeType.WORKER)
                 .stream()
                 .map((Server server) -> {
                     WorkerServerModel model = new WorkerServerModel();

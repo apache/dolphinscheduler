@@ -32,10 +32,7 @@ public class Server {
 
     private String zkDirectory;
 
-    /**
-     * server heartbeatJson, see {@link  HeartBeat}
-     */
-    private String resInfo;
+    private HeartBeat resInfo;
 
     private Date createTime;
 

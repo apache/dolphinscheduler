@@ -107,7 +107,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -866,7 +865,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.warn("The process definition has not relation, it will be delete successfully");
         }
         deleteOtherRelation(project, result, processDefinition);
-        putMsg(result, Status.DELETE_PROCESS_DEFINITION_SUCCESS, processDefinition.getName());
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 

@@ -109,7 +109,7 @@ const worker = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).cpuUsage * 100
+                              item.resInfo.cpuUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -122,7 +122,7 @@ const worker = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).memoryUsage * 100
+                              item.resInfo.memoryUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -136,7 +136,7 @@ const worker = defineComponent({
                           <NNumberAnimation
                             precision={2}
                             from={0}
-                            to={JSON.parse(item.resInfo).loadAverage}
+                            to={item.resInfo.loadAverage}
                           />
                         )}
                       </div>
