@@ -99,6 +99,21 @@ public class NetUtilsTest {
         address = mock(InetAddress.class);
         when(address.getHostAddress()).thenReturn("1.2.3.4");
         assertTrue(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("1.2.3.4:80");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("256.0.0.1");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("127.1");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("127.0.0.0.1");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("-1.2.3.4");
+        assertFalse(NetUtils.isValidV4Address(address));
     }
 
 }
