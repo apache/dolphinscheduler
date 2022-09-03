@@ -136,7 +136,7 @@ export function useForm(id?: number) {
       bindTestId: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.bindTestId && -1 == state.detailForm.testFlag) {
+          if (!state.detailForm.bindTestId && -1 === state.detailForm.testFlag) {
             return new Error(t('datasource.datasource_bind_test_id_tips'))
           }
         }
