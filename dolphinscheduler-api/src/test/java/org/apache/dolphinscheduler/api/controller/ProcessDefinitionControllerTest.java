@@ -38,8 +38,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -421,4 +419,5 @@ public class ProcessDefinitionControllerTest {
                 user, projectCode, 1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
+
 }
