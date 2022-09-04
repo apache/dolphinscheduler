@@ -52,13 +52,13 @@ public class DataSourcePluginManager {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
 
-            loadDatasourceClient(factory);
+            loadDataSourceClient(factory);
 
             logger.info("Registered datasource plugin: {}", name);
         }
     }
 
-    private void loadDatasourceClient(DataSourceChannelFactory datasourceChannelFactory) {
+    private void loadDataSourceClient(DataSourceChannelFactory datasourceChannelFactory) {
         DataSourceChannel datasourceChannel = datasourceChannelFactory.create();
         datasourceClientMap.put(datasourceChannelFactory.getName(), datasourceChannel);
     }

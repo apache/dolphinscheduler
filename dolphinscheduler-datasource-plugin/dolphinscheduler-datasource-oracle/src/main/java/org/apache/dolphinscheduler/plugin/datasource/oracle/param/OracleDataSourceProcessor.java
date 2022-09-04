@@ -45,18 +45,18 @@ import com.google.auto.service.AutoService;
 public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, OracleDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         OracleConnectionParam connectionParams = (OracleConnectionParam) createConnectionParams(connectionJson);
-        OracleDataSourceParamDTO oracleDatasourceParamDTO = new OracleDataSourceParamDTO();
+        OracleDataSourceParamDTO oracleDataSourceParamDTO = new OracleDataSourceParamDTO();
 
-        oracleDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        oracleDatasourceParamDTO.setUserName(connectionParams.getUser());
-        oracleDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        oracleDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        oracleDataSourceParamDTO.setUserName(connectionParams.getUser());
+        oracleDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String hostSeperator = Constants.DOUBLE_SLASH;
         if (DbConnectType.ORACLE_SID.equals(connectionParams.connectType)) {
@@ -64,10 +64,10 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         }
         String[] hostPort = connectionParams.getAddress().split(hostSeperator);
         String[] hostPortArray = hostPort[hostPort.length - 1].split(Constants.COMMA);
-        oracleDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        oracleDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        oracleDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        oracleDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
 
-        return oracleDatasourceParamDTO;
+        return oracleDataSourceParamDTO;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         oracleConnectionParam.setJdbcUrl(jdbcUrl);
         oracleConnectionParam.setDatabase(oracleParam.getDatabase());
         oracleConnectionParam.setConnectType(oracleParam.getConnectType());
-        oracleConnectionParam.setDriverClassName(getDatasourceDriver());
+        oracleConnectionParam.setDriverClassName(getDataSourceDriver());
         oracleConnectionParam.setValidationQuery(getValidationQuery());
         oracleConnectionParam.setOther(transformOther(oracleParam.getOther()));
         oracleConnectionParam.setProps(oracleParam.getOther());
@@ -106,7 +106,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.COM_ORACLE_JDBC_DRIVER;
     }
 
@@ -127,7 +127,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         OracleConnectionParam oracleConnectionParam = (OracleConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
                 oracleConnectionParam.getUser(), PasswordUtils.decodePassword(oracleConnectionParam.getPassword()));
     }

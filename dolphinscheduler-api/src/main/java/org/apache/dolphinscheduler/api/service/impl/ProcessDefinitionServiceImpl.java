@@ -1161,7 +1161,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                     DataSource dataSource = dataSourceCache.get(datasourceName);
                     if (dataSource == null) {
-                        dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
+                        dataSource = queryDataSourceByNameAndUser(datasourceName, loginUser);
                     }
                     if (dataSource == null) {
                         putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
@@ -1223,7 +1223,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return processTaskRelation;
     }
 
-    private DataSource queryDatasourceByNameAndUser(String datasourceName, User loginUser) {
+    private DataSource queryDataSourceByNameAndUser(String datasourceName, User loginUser) {
         if (isAdmin(loginUser)) {
             List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(datasourceName);
             if (CollectionUtils.isNotEmpty(dataSources)) {
@@ -1242,7 +1242,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         taskDefinition.setFlag(Flag.YES);
         SqlParameters sqlParameters = new SqlParameters();
         sqlParameters.setType(dataSource.getType().name());
-        sqlParameters.setDatasource(dataSource.getId());
+        sqlParameters.setDataSource(dataSource.getId());
         sqlParameters.setSql(sql.substring(0, sql.length() - 1));
         // it may be a query type, but it can only be determined by parsing SQL
         sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());

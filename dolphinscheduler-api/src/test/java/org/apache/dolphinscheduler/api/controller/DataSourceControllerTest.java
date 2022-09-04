@@ -214,7 +214,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testAuthedDatasource() throws Exception {
+    public void testAuthedDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
@@ -229,7 +229,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testUnauthDatasource() throws Exception {
+    public void testUnauthDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","2");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")

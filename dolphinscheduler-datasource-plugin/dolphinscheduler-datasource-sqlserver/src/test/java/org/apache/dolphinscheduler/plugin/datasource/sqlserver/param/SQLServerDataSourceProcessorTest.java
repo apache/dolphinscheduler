@@ -41,23 +41,23 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class SQLServerDataSourceProcessorTest {
 
-    private SQLServerDataSourceProcessor sqlServerDatasourceProcessor = new SQLServerDataSourceProcessor();
+    private SQLServerDataSourceProcessor sqlServerDataSourceProcessor = new SQLServerDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        SQLServerDataSourceParamDTO sqlServerDatasourceParamDTO = new SQLServerDataSourceParamDTO();
-        sqlServerDatasourceParamDTO.setUserName("root");
-        sqlServerDatasourceParamDTO.setPassword("123456");
-        sqlServerDatasourceParamDTO.setDatabase("default");
-        sqlServerDatasourceParamDTO.setHost("localhost");
-        sqlServerDatasourceParamDTO.setPort(1234);
-        sqlServerDatasourceParamDTO.setOther(props);
+        SQLServerDataSourceParamDTO sqlServerDataSourceParamDTO = new SQLServerDataSourceParamDTO();
+        sqlServerDataSourceParamDTO.setUserName("root");
+        sqlServerDataSourceParamDTO.setPassword("123456");
+        sqlServerDataSourceParamDTO.setDatabase("default");
+        sqlServerDataSourceParamDTO.setHost("localhost");
+        sqlServerDataSourceParamDTO.setPort(1234);
+        sqlServerDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) sqlServerDatasourceProcessor
-                .createConnectionParams(sqlServerDatasourceParamDTO);
+        SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) sqlServerDataSourceProcessor
+                .createConnectionParams(sqlServerDataSourceParamDTO);
         Assert.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
         Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default", connectionParams.getJdbcUrl());
         Assert.assertEquals("root", connectionParams.getUser());
@@ -73,8 +73,8 @@ public class SQLServerDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_SQLSERVER_JDBC_DRIVER, sqlServerDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.COM_SQLSERVER_JDBC_DRIVER, sqlServerDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -83,16 +83,16 @@ public class SQLServerDataSourceProcessorTest {
         sqlServerConnectionParam.setJdbcUrl("jdbc:sqlserver://localhost:1234;databaseName=default");
         sqlServerConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default;other",
-                sqlServerDatasourceProcessor.getJdbcUrl(sqlServerConnectionParam));
+                sqlServerDataSourceProcessor.getJdbcUrl(sqlServerConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.SQLSERVER, sqlServerDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.SQLSERVER, sqlServerDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.SQLSERVER_VALIDATION_QUERY, sqlServerDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.SQLSERVER_VALIDATION_QUERY, sqlServerDataSourceProcessor.getValidationQuery());
     }
 }

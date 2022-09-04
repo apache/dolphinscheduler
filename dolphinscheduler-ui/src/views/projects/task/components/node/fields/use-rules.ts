@@ -19,11 +19,11 @@ import { useI18n } from 'vue-i18n'
 import {
   queryRuleList,
   getRuleFormCreateJson,
-  getDatasourceOptionsById
+  getDataSourceOptionsById
 } from '@/service/modules/data-quality'
 import {
-  getDatasourceTablesById,
-  getDatasourceTableColumnsById
+  getDataSourceTablesById,
+  getDataSourceTableColumnsById
 } from '@/service/modules/data-source'
 import type { IJsonItem, IResponseJsonItem, IJsonItemParams } from '../types'
 
@@ -34,13 +34,13 @@ export function useRules(
   const { t } = useI18n()
   const rules = ref([])
   const ruleLoading = ref(false)
-  const srcDatasourceOptions = ref([] as { label: string; value: number }[])
+  const srcDataSourceOptions = ref([] as { label: string; value: number }[])
   const srcTableOptions = ref([] as { label: string; value: number }[])
   const srcTableColumnOptions = ref([] as { label: string; value: number }[])
-  const targetDatasourceOptions = ref([] as { label: string; value: number }[])
+  const targetDataSourceOptions = ref([] as { label: string; value: number }[])
   const targetTableOptions = ref([] as { label: string; value: string }[])
   const targetTableColumnOptions = ref([] as { label: string; value: number }[])
-  const writerDatasourceOptions = ref([] as { label: string; value: number }[])
+  const writerDataSourceOptions = ref([] as { label: string; value: number }[])
 
   const fixValueSpan = computed(() => (model.comparison_type === 1 ? 24 : 0))
 
@@ -120,13 +120,13 @@ export function useRules(
       )
     }
     if (item.field === 'src_datasource_id') {
-      item.options = srcDatasourceOptions
+      item.options = srcDataSourceOptions
     }
     if (item.field === 'target_datasource_id') {
-      item.options = targetDatasourceOptions
+      item.options = targetDataSourceOptions
     }
     if (item.field === 'writer_datasource_id') {
-      item.options = writerDatasourceOptions
+      item.options = writerDataSourceOptions
     }
     if (item.field === 'src_table') {
       item.options = srcTableOptions
@@ -154,8 +154,8 @@ export function useRules(
     reset: boolean
   ) => {
     if (field === 'src_connector_type' && typeof value === 'number') {
-      const result = await getDatasourceOptionsById(value)
-      srcDatasourceOptions.value = result || []
+      const result = await getDataSourceOptionsById(value)
+      srcDataSourceOptions.value = result || []
       if (reset) {
         srcTableOptions.value = []
         model.src_datasource_id = null
@@ -165,8 +165,8 @@ export function useRules(
       return
     }
     if (field === 'target_connector_type' && typeof value === 'number') {
-      const result = await getDatasourceOptionsById(value)
-      targetDatasourceOptions.value = result || []
+      const result = await getDataSourceOptionsById(value)
+      targetDataSourceOptions.value = result || []
       if (reset) {
         targetTableOptions.value = []
         model.target_datasource_id = null
@@ -176,15 +176,15 @@ export function useRules(
       return
     }
     if (field === 'writer_connector_type' && typeof value === 'number') {
-      const result = await getDatasourceOptionsById(value)
-      writerDatasourceOptions.value = result || []
+      const result = await getDataSourceOptionsById(value)
+      writerDataSourceOptions.value = result || []
       if (reset) {
         model.writer_datasource_id = null
       }
       return
     }
     if (field === 'src_datasource_id' && typeof value === 'number') {
-      const result = await getDatasourceTablesById(value)
+      const result = await getDataSourceTablesById(value)
       srcTableOptions.value = result || []
       if (reset) {
         model.src_table = null
@@ -192,7 +192,7 @@ export function useRules(
       }
     }
     if (field === 'target_datasource_id' && typeof value === 'number') {
-      const result = await getDatasourceTablesById(value)
+      const result = await getDataSourceTablesById(value)
       targetTableOptions.value = result || []
       if (reset) {
         model.target_table = null
@@ -200,7 +200,7 @@ export function useRules(
       }
     }
     if (field === 'src_table' && typeof value === 'string') {
-      const result = await getDatasourceTableColumnsById(
+      const result = await getDataSourceTableColumnsById(
         model.src_datasource_id,
         value
       )
@@ -210,7 +210,7 @@ export function useRules(
       }
     }
     if (field === 'target_table' && typeof value === 'string') {
-      const result = await getDatasourceTableColumnsById(
+      const result = await getDataSourceTableColumnsById(
         model.target_datasource_id,
         value
       )

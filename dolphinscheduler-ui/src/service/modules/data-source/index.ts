@@ -45,7 +45,7 @@ export function createDataSource(data: IDataSource): any {
   })
 }
 
-export function authedDatasource(params: UserIdReq): any {
+export function authedDataSource(params: UserIdReq): any {
   return axios({
     url: '/datasources/authed-datasource',
     method: 'get',
@@ -80,7 +80,7 @@ export function queryDataSourceList(params: TypeReq): any {
   })
 }
 
-export function unAuthDatasource(params: UserIdReq): any {
+export function unAuthDataSource(params: UserIdReq): any {
   return axios({
     url: '/datasources/unauth-datasource',
     method: 'get',
@@ -129,7 +129,7 @@ export function connectionTest(id: IdReq): any {
   })
 }
 
-export function getDatasourceTablesById(datasourceId: number): any {
+export function getDataSourceTablesById(datasourceId: number): any {
   return axios({
     url: '/datasources/tables',
     method: 'get',
@@ -139,7 +139,7 @@ export function getDatasourceTablesById(datasourceId: number): any {
   })
 }
 
-export function getDatasourceTableColumnsById(
+export function getDataSourceTableColumnsById(
   datasourceId: number,
   tableName: string
 ): any {

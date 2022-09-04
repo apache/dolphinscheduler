@@ -68,7 +68,7 @@ export function useSql({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useDatasource(model),
+      ...Fields.useDataSource(model),
       ...Fields.useSqlType(model),
       ...Fields.useSql(model),
       Fields.usePreTasks()

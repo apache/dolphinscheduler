@@ -58,47 +58,47 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, MySQLDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         MySQLConnectionParam
                 connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
         MySQLDataSourceParamDTO
-                mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
+                mysqlDataSourceParamDTO = new MySQLDataSourceParamDTO();
 
-        mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
-        mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        mysqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        mysqlDataSourceParamDTO.setUserName(connectionParams.getUser());
+        mysqlDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        mysqlDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        mysqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        mysqlDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        mysqlDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        mysqlDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
 
-        return mysqlDatasourceParamDTO;
+        return mysqlDataSourceParamDTO;
     }
 
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
-        MySQLDataSourceParamDTO mysqlDatasourceParam = (MySQLDataSourceParamDTO) dataSourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
-        String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
+        MySQLDataSourceParamDTO mysqlDataSourceParam = (MySQLDataSourceParamDTO) dataSourceParam;
+        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDataSourceParam.getHost(), mysqlDataSourceParam.getPort());
+        String jdbcUrl = String.format("%s/%s", address, mysqlDataSourceParam.getDatabase());
 
         MySQLConnectionParam
                 mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl(jdbcUrl);
-        mysqlConnectionParam.setDatabase(mysqlDatasourceParam.getDatabase());
+        mysqlConnectionParam.setDatabase(mysqlDataSourceParam.getDatabase());
         mysqlConnectionParam.setAddress(address);
-        mysqlConnectionParam.setUser(mysqlDatasourceParam.getUserName());
-        mysqlConnectionParam.setPassword(PasswordUtils.encodePassword(mysqlDatasourceParam.getPassword()));
-        mysqlConnectionParam.setDriverClassName(getDatasourceDriver());
+        mysqlConnectionParam.setUser(mysqlDataSourceParam.getUserName());
+        mysqlConnectionParam.setPassword(PasswordUtils.encodePassword(mysqlDataSourceParam.getPassword()));
+        mysqlConnectionParam.setDriverClassName(getDataSourceDriver());
         mysqlConnectionParam.setValidationQuery(getValidationQuery());
-        mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
-        mysqlConnectionParam.setProps(mysqlDatasourceParam.getOther());
+        mysqlConnectionParam.setOther(transformOther(mysqlDataSourceParam.getOther()));
+        mysqlConnectionParam.setProps(mysqlDataSourceParam.getOther());
 
         return mysqlConnectionParam;
     }
@@ -109,7 +109,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.COM_MYSQL_CJ_JDBC_DRIVER;
     }
 
@@ -132,7 +132,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         String user = mysqlConnectionParam.getUser();
         if (user.contains(AUTO_DESERIALIZE)) {
             logger.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);

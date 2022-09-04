@@ -20,11 +20,11 @@ import { queryDataSourceList } from '@/service/modules/data-source'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem, IDataBase } from '../types'
 
-export function useDatasource(
+export function useDataSource(
   model: { [field: string]: any },
   span: Ref,
   fieldType: string,
-  fieldDatasource: string
+  fieldDataSource: string
 ): IJsonItem[] {
   const { t } = useI18n()
   const dataSourceList = ref([])
@@ -57,7 +57,7 @@ export function useDatasource(
     },
     {
       type: 'select',
-      field: fieldDatasource,
+      field: fieldDataSource,
       name: ' ',
       span: span,
       props: {

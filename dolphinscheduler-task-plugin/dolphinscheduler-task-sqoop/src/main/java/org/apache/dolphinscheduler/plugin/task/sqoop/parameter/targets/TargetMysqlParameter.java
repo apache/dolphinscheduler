@@ -25,7 +25,7 @@ public class TargetMysqlParameter {
     /**
      * target datasource
      */
-    private int targetDatasource;
+    private int targetDataSource;
     /**
      * target table
      */
@@ -59,12 +59,12 @@ public class TargetMysqlParameter {
      */
     private String targetUpdateMode;
 
-    public int getTargetDatasource() {
-        return targetDatasource;
+    public int getTargetDataSource() {
+        return targetDataSource;
     }
 
-    public void setTargetDatasource(int targetDatasource) {
-        this.targetDatasource = targetDatasource;
+    public void setTargetDataSource(int targetDataSource) {
+        this.targetDataSource = targetDataSource;
     }
 
     public String getTargetTable() {

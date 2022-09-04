@@ -40,23 +40,23 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class PrestoDataSourceProcessorTest {
 
-    private PrestoDataSourceProcessor prestoDatasourceProcessor = new PrestoDataSourceProcessor();
+    private PrestoDataSourceProcessor prestoDataSourceProcessor = new PrestoDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        PrestoDataSourceParamDTO prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
-        prestoDatasourceParamDTO.setHost("localhost");
-        prestoDatasourceParamDTO.setPort(1234);
-        prestoDatasourceParamDTO.setDatabase("default");
-        prestoDatasourceParamDTO.setUserName("root");
-        prestoDatasourceParamDTO.setPassword("123456");
-        prestoDatasourceParamDTO.setOther(props);
+        PrestoDataSourceParamDTO prestoDataSourceParamDTO = new PrestoDataSourceParamDTO();
+        prestoDataSourceParamDTO.setHost("localhost");
+        prestoDataSourceParamDTO.setPort(1234);
+        prestoDataSourceParamDTO.setDatabase("default");
+        prestoDataSourceParamDTO.setUserName("root");
+        prestoDataSourceParamDTO.setPassword("123456");
+        prestoDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(prestoDatasourceParamDTO);
+        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDataSourceProcessor
+                .createConnectionParams(prestoDataSourceParamDTO);
         Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
         Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
     }
@@ -65,15 +65,15 @@ public class PrestoDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
+        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDataSourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -82,17 +82,17 @@ public class PrestoDataSourceProcessorTest {
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
         prestoConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
-                prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
+                prestoDataSourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.PRESTO, prestoDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDataSourceProcessor.getValidationQuery());
     }
 }

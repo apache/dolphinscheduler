@@ -118,7 +118,7 @@ public class DqRuleServiceTest {
     }
 
     @Test
-    public void testGetDatasourceOptionsById() {
+    public void testGetDataSourceOptionsById() {
         when(dataSourceMapper.listAllDataSourceByType(DbType.MYSQL.getCode())).thenReturn(dataSourceList());
         Map<String, Object> result = dqRuleService.queryAllRuleList();
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

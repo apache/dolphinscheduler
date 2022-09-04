@@ -65,14 +65,14 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @param userId userId
      * @return datasource list
      */
-    List<DataSource> queryAuthedDatasource(@Param("userId") int userId);
+    List<DataSource> queryAuthedDataSource(@Param("userId") int userId);
 
     /**
      * query datasource except userId
      * @param userId userId
      * @return datasource list
      */
-    List<DataSource> queryDatasourceExceptUserId(@Param("userId") int userId);
+    List<DataSource> queryDataSourceExceptUserId(@Param("userId") int userId);
 
     /**
      * list all datasource by type

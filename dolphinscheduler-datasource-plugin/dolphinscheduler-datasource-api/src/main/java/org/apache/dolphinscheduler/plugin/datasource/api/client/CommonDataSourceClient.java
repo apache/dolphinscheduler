@@ -113,7 +113,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     @Override
     public void close() {
         logger.info("do close dataSource {}.", baseConnectionParam.getDatabase());
-        try (HikariDataSource closedDatasource = dataSource) {
+        try (HikariDataSource closedDataSource = dataSource) {
             // only close the resource
         }
         this.jdbcTemplate = null;

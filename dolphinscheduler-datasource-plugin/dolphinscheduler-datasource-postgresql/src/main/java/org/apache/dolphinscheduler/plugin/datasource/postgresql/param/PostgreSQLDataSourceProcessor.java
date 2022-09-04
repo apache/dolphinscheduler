@@ -42,26 +42,26 @@ import com.google.common.base.Strings;
 public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, PostgreSQLDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) createConnectionParams(connectionJson);
         PostgreSQLDataSourceParamDTO
-                postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
-        postgreSqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        postgreSqlDatasourceParamDTO.setUserName(connectionParams.getUser());
-        postgreSqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+                postgreSqlDataSourceParamDTO = new PostgreSQLDataSourceParamDTO();
+        postgreSqlDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        postgreSqlDataSourceParamDTO.setUserName(connectionParams.getUser());
+        postgreSqlDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        postgreSqlDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        postgreSqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        postgreSqlDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        postgreSqlDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
 
-        return postgreSqlDatasourceParamDTO;
+        return postgreSqlDataSourceParamDTO;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         postgreSqlConnectionParam.setDatabase(postgreSqlParam.getDatabase());
         postgreSqlConnectionParam.setUser(postgreSqlParam.getUserName());
         postgreSqlConnectionParam.setPassword(PasswordUtils.encodePassword(postgreSqlParam.getPassword()));
-        postgreSqlConnectionParam.setDriverClassName(getDatasourceDriver());
+        postgreSqlConnectionParam.setDriverClassName(getDataSourceDriver());
         postgreSqlConnectionParam.setValidationQuery(getValidationQuery());
         postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
         postgreSqlConnectionParam.setProps(postgreSqlParam.getOther());
@@ -90,7 +90,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.ORG_POSTGRESQL_DRIVER;
     }
 
@@ -111,7 +111,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         PostgreSQLConnectionParam postgreSqlConnectionParam = (PostgreSQLConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(postgreSqlConnectionParam),
                 postgreSqlConnectionParam.getUser(), PasswordUtils.decodePassword(postgreSqlConnectionParam.getPassword()));
     }

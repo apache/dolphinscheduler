@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.spi.datasource;
 import java.io.Serializable;
 
 /**
- * The model of Datasource Connection param
+ * The model of DataSource Connection param
  */
 public interface ConnectionParam extends Serializable {
 }

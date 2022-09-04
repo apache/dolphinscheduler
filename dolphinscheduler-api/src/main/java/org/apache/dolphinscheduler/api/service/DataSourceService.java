@@ -118,7 +118,7 @@ public interface DataSourceService {
      * @param userId    user id
      * @return unauthed data source result code
      */
-    Map<String, Object> unauthDatasource(User loginUser, Integer userId);
+    Map<String, Object> unauthDataSource(User loginUser, Integer userId);
 
     /**
      * authorized datasource
@@ -127,7 +127,7 @@ public interface DataSourceService {
      * @param userId    user id
      * @return authorized result code
      */
-    Map<String, Object> authedDatasource(User loginUser, Integer userId);
+    Map<String, Object> authedDataSource(User loginUser, Integer userId);
 
     /**
      * get tables

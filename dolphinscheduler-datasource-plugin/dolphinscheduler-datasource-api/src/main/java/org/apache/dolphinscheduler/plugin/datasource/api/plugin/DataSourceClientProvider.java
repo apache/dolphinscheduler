@@ -46,7 +46,7 @@ public class DataSourceClientProvider {
         .expireAfterWrite(duration, TimeUnit.HOURS)
         .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
             try (DataSourceClient closedClient = notification.getValue()) {
-                logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                logger.info("DataSource: {} is removed from cache due to expire", notification.getKey());
             }
         })
         .maximumSize(100)
@@ -67,7 +67,7 @@ public class DataSourceClientProvider {
 
     public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
-        String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
+        String datasourceUniqueId = DataSourceUtils.getDataSourceUniqueId(baseConnectionParam, dbType);
         logger.info("Get connection from datasource {}", datasourceUniqueId);
 
         DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {

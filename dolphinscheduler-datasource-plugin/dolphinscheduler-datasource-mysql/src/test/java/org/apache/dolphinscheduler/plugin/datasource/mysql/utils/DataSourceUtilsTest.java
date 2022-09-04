@@ -50,44 +50,44 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class DataSourceUtilsTest {
 
     @Test
-    public void testCheckDatasourceParam() {
-        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setDatabase("default");
+    public void testCheckDataSourceParam() {
+        MySQLDataSourceParamDTO mysqlDataSourceParamDTO = new MySQLDataSourceParamDTO();
+        mysqlDataSourceParamDTO.setHost("localhost");
+        mysqlDataSourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
         other.put("queryTimeout", "-1");
         other.put("characterEncoding", "utf8");
-        mysqlDatasourceParamDTO.setOther(other);
-        DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
+        mysqlDataSourceParamDTO.setOther(other);
+        DataSourceUtils.checkDataSourceParam(mysqlDataSourceParamDTO);
         Assert.assertTrue(true);
     }
 
     @Test
     public void testBuildConnectionParams() {
-        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setUserName("root");
-        mysqlDatasourceParamDTO.setPort(3306);
-        mysqlDatasourceParamDTO.setPassword("123456");
+        MySQLDataSourceParamDTO mysqlDataSourceParamDTO = new MySQLDataSourceParamDTO();
+        mysqlDataSourceParamDTO.setHost("localhost");
+        mysqlDataSourceParamDTO.setDatabase("default");
+        mysqlDataSourceParamDTO.setUserName("root");
+        mysqlDataSourceParamDTO.setPort(3306);
+        mysqlDataSourceParamDTO.setPassword("123456");
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDataSourceParamDTO);
         Assert.assertNotNull(connectionParam);
     }
 
     @Test
     public void testBuildConnectionParams2() {
-        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setUserName("root");
-        mysqlDatasourceParamDTO.setPort(3306);
-        mysqlDatasourceParamDTO.setPassword("123456");
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.MYSQL, JSONUtils.toJsonString(mysqlDatasourceParamDTO));
+        MySQLDataSourceParamDTO mysqlDataSourceParamDTO = new MySQLDataSourceParamDTO();
+        mysqlDataSourceParamDTO.setHost("localhost");
+        mysqlDataSourceParamDTO.setDatabase("default");
+        mysqlDataSourceParamDTO.setUserName("root");
+        mysqlDataSourceParamDTO.setPort(3306);
+        mysqlDataSourceParamDTO.setPassword("123456");
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.MYSQL, JSONUtils.toJsonString(mysqlDataSourceParamDTO));
         Assert.assertNotNull(connectionParam);
     }
 
@@ -121,24 +121,24 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testBuildDatasourceParamDTO() {
+    public void testBuildDataSourceParamDTO() {
         MySQLConnectionParam connectionParam = new MySQLConnectionParam();
         connectionParam.setJdbcUrl("jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false");
         connectionParam.setAddress("jdbc:mysql://localhost:3308");
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
 
-        Assert.assertNotNull(DataSourceUtils.buildDatasourceParamDTO(DbType.MYSQL, JSONUtils.toJsonString(connectionParam)));
+        Assert.assertNotNull(DataSourceUtils.buildDataSourceParamDTO(DbType.MYSQL, JSONUtils.toJsonString(connectionParam)));
 
     }
 
     @Test
-    public void testGetDatasourceProcessor() {
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.MYSQL));
+    public void testGetDataSourceProcessor() {
+        Assert.assertNotNull(DataSourceUtils.getDataSourceProcessor(DbType.MYSQL));
     }
 
     @Test(expected = Exception.class)
-    public void testGetDatasourceProcessorError() {
-        DataSourceUtils.getDatasourceProcessor(null);
+    public void testGetDataSourceProcessorError() {
+        DataSourceUtils.getDataSourceProcessor(null);
     }
 }

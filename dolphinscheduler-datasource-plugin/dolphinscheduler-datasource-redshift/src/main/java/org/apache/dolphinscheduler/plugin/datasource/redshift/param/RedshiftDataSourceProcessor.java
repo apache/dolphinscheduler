@@ -44,12 +44,12 @@ import com.google.auto.service.AutoService;
 public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, RedshiftDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         RedshiftConnectionParam
                 connectionParams = (RedshiftConnectionParam) createConnectionParams(connectionJson);
 
@@ -57,14 +57,14 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
         RedshiftDataSourceParamDTO
-                redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
-        redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        redshiftDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        redshiftDatasourceParamDTO.setUserName(connectionParams.getUser());
-        redshiftDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+                redshiftDataSourceParamDTO = new RedshiftDataSourceParamDTO();
+        redshiftDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        redshiftDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        redshiftDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        redshiftDataSourceParamDTO.setUserName(connectionParams.getUser());
+        redshiftDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
-        return redshiftDatasourceParamDTO;
+        return redshiftDataSourceParamDTO;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         redshiftConnectionParam.setAddress(address);
         redshiftConnectionParam.setJdbcUrl(jdbcUrl);
         redshiftConnectionParam.setDatabase(redshiftParam.getDatabase());
-        redshiftConnectionParam.setDriverClassName(getDatasourceDriver());
+        redshiftConnectionParam.setDriverClassName(getDataSourceDriver());
         redshiftConnectionParam.setValidationQuery(getValidationQuery());
         redshiftConnectionParam.setProps(redshiftParam.getOther());
 
@@ -94,7 +94,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.COM_REDSHIFT_JDBC_DRIVER;
     }
 
@@ -116,7 +116,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         RedshiftConnectionParam redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
                 redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
     }

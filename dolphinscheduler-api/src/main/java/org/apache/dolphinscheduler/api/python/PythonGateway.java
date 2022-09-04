@@ -459,7 +459,7 @@ public class PythonGateway {
      *
      * @param datasourceName user who create or update schedule
      */
-    public Map<String, Object> getDatasourceInfo(String datasourceName) {
+    public Map<String, Object> getDataSourceInfo(String datasourceName) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
         if (dataSourceList == null || dataSourceList.isEmpty()) {

@@ -223,13 +223,13 @@ public class SqoopParameters extends AbstractParameters {
         }
 
         SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
-        if (sourceMysqlParameter.getSrcDatasource() != 0) {
-            resources.put(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
+        if (sourceMysqlParameter.getSrcDataSource() != 0) {
+            resources.put(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDataSource());
         }
 
         TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
-        if (targetMysqlParameter.getTargetDatasource() != 0) {
-            resources.put(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+        if (targetMysqlParameter.getTargetDataSource() != 0) {
+            resources.put(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDataSource());
         }
 
         return resources;
@@ -245,17 +245,17 @@ public class SqoopParameters extends AbstractParameters {
         SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
         TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
 
-        DataSourceParameters dataSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
-        DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+        DataSourceParameters dataSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDataSource());
+        DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDataSource());
 
         if (Objects.nonNull(dataSource)) {
-            sqoopTaskExecutionContext.setDataSourceId(sourceMysqlParameter.getSrcDatasource());
+            sqoopTaskExecutionContext.setDataSourceId(sourceMysqlParameter.getSrcDataSource());
             sqoopTaskExecutionContext.setSourcetype(dataSource.getType());
             sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
         }
 
         if (Objects.nonNull(dataTarget)) {
-            sqoopTaskExecutionContext.setDataTargetId(targetMysqlParameter.getTargetDatasource());
+            sqoopTaskExecutionContext.setDataTargetId(targetMysqlParameter.getTargetDataSource());
             sqoopTaskExecutionContext.setTargetType(dataTarget.getType());
             sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
         }

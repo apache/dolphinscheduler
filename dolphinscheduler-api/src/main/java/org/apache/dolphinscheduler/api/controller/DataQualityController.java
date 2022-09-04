@@ -180,15 +180,15 @@ public class DataQualityController extends BaseController {
      * @param datasourceId datasourceId
      * @return result
      */
-    @ApiOperation(value = "getDatasourceOptionsById", notes = "GET_DATASOURCE_OPTIONS_NOTES")
+    @ApiOperation(value = "getDataSourceOptionsById", notes = "GET_DATASOURCE_OPTIONS_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", dataTypeClass = int.class, example = "1")
     })
-    @GetMapping(value = "/getDatasourceOptionsById")
+    @GetMapping(value = "/getDataSourceOptionsById")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_OPTIONS_ERROR)
-    public Result getDatasourceOptionsById(@RequestParam(value = "datasourceId") int datasourceId) {
-        Map<String, Object> result = dqRuleService.getDatasourceOptionsById(datasourceId);
+    public Result getDataSourceOptionsById(@RequestParam(value = "datasourceId") int datasourceId) {
+        Map<String, Object> result = dqRuleService.getDataSourceOptionsById(datasourceId);
         return returnDataList(result);
     }
 }

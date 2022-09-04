@@ -130,7 +130,7 @@ public class TaskPriorityQueueConsumerTest {
 
         DataSource dataSource = new DataSource();
         dataSource.setId(1);
-        dataSource.setName("sqlDatasource");
+        dataSource.setName("sqlDataSource");
         dataSource.setType(DbType.MYSQL);
         dataSource.setUserId(2);
         dataSource.setConnectionParams("{\"address\":\"jdbc:mysql://192.168.221.185:3306\","

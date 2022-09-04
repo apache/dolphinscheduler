@@ -47,14 +47,14 @@ public class DataSourceProcessorManager {
             if (dataSourceProcessorMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
-            loadDatasourceClient(factory);
+            loadDataSourceClient(factory);
 
             logger.info("done register processor: {}", name);
 
         });
     }
 
-    private void loadDatasourceClient(DataSourceProcessor processor) {
+    private void loadDataSourceClient(DataSourceProcessor processor) {
         DataSourceProcessor instance = processor.create();
         dataSourceProcessorMap.put(processor.getDbType().name(), instance);
     }

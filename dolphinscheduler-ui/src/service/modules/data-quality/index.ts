@@ -51,9 +51,9 @@ export function getRuleFormCreateJson(ruleId: number): any {
   })
 }
 
-export function getDatasourceOptionsById(datasourceId: number): any {
+export function getDataSourceOptionsById(datasourceId: number): any {
   return axios({
-    url: '/data-quality/getDatasourceOptionsById',
+    url: '/data-quality/getDataSourceOptionsById',
     method: 'get',
     params: {
       datasourceId

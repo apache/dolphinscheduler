@@ -318,7 +318,7 @@ public class MysqlOperator implements AutoCloseable {
     @Override
     public void close() throws Exception {
         if (!dataSource.isClosed()) {
-            try (HikariDataSource closedDatasource = this.dataSource) {
+            try (HikariDataSource closedDataSource = this.dataSource) {
 
             }
         }

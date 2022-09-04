@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.DataSourceUser;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -26,7 +26,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 /**
  * datasource user realtion mapper interface
  */
-public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
+public interface DataSourceUserMapper extends BaseMapper<DataSourceUser> {
 
 
     /**
@@ -41,6 +41,6 @@ public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
      * @param datasourceId datasourceId
      * @return delete result
      */
-    int deleteByDatasourceId(@Param("datasourceId") int datasourceId);
+    int deleteByDataSourceId(@Param("datasourceId") int datasourceId);
 
 }

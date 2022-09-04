@@ -42,26 +42,26 @@ import com.google.auto.service.AutoService;
 public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, Db2DataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) createConnectionParams(connectionJson);
 
         Db2DataSourceParamDTO
-                db2DatasourceParamDTO = new Db2DataSourceParamDTO();
-        db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
-        db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
+                db2DataSourceParamDTO = new Db2DataSourceParamDTO();
+        db2DataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        db2DataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        db2DataSourceParamDTO.setUserName(db2DataSourceParamDTO.getUserName());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        db2DatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        db2DatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        db2DataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        db2DataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
 
-        return db2DatasourceParamDTO;
+        return db2DataSourceParamDTO;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         db2ConnectionParam.setJdbcUrl(jdbcUrl);
         db2ConnectionParam.setUser(db2Param.getUserName());
         db2ConnectionParam.setPassword(PasswordUtils.encodePassword(db2Param.getPassword()));
-        db2ConnectionParam.setDriverClassName(getDatasourceDriver());
+        db2ConnectionParam.setDriverClassName(getDataSourceDriver());
         db2ConnectionParam.setValidationQuery(getValidationQuery());
         db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
         db2ConnectionParam.setProps(db2Param.getOther());
@@ -90,7 +90,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.COM_DB2_JDBC_DRIVER;
     }
 
@@ -106,7 +106,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(db2ConnectionParam),
                 db2ConnectionParam.getUser(), PasswordUtils.decodePassword(db2ConnectionParam.getPassword()));
     }

@@ -40,23 +40,23 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class PostgreSQLDataSourceProcessorTest {
 
-    private PostgreSQLDataSourceProcessor postgreSqlDatasourceProcessor = new PostgreSQLDataSourceProcessor();
+    private PostgreSQLDataSourceProcessor postgreSqlDataSourceProcessor = new PostgreSQLDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
-        postgreSqlDatasourceParamDTO.setUserName("root");
-        postgreSqlDatasourceParamDTO.setPassword("123456");
-        postgreSqlDatasourceParamDTO.setHost("localhost");
-        postgreSqlDatasourceParamDTO.setPort(3308);
-        postgreSqlDatasourceParamDTO.setDatabase("default");
-        postgreSqlDatasourceParamDTO.setOther(props);
+        PostgreSQLDataSourceParamDTO postgreSqlDataSourceParamDTO = new PostgreSQLDataSourceParamDTO();
+        postgreSqlDataSourceParamDTO.setUserName("root");
+        postgreSqlDataSourceParamDTO.setPassword("123456");
+        postgreSqlDataSourceParamDTO.setHost("localhost");
+        postgreSqlDataSourceParamDTO.setPort(3308);
+        postgreSqlDataSourceParamDTO.setDatabase("default");
+        postgreSqlDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
-                .createConnectionParams(postgreSqlDatasourceParamDTO);
+        PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDataSourceProcessor
+                .createConnectionParams(postgreSqlDataSourceParamDTO);
         Assert.assertEquals("jdbc:postgresql://localhost:3308", connectionParams.getAddress());
         Assert.assertEquals("jdbc:postgresql://localhost:3308/default", connectionParams.getJdbcUrl());
         Assert.assertEquals("root", connectionParams.getUser());
@@ -66,15 +66,15 @@ public class PostgreSQLDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:postgresql://localhost:3308\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:postgresql://localhost:3308/default\"}";
-        PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
+        PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDataSourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.ORG_POSTGRESQL_DRIVER, postgreSqlDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -83,18 +83,18 @@ public class PostgreSQLDataSourceProcessorTest {
         postgreSqlConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:3308/default");
         postgreSqlConnectionParam.setOther("other");
 
-        String jdbcUrl = postgreSqlDatasourceProcessor.getJdbcUrl(postgreSqlConnectionParam);
+        String jdbcUrl = postgreSqlDataSourceProcessor.getJdbcUrl(postgreSqlConnectionParam);
         Assert.assertEquals("jdbc:postgresql://localhost:3308/default?other", jdbcUrl);
 
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.POSTGRESQL, postgreSqlDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.POSTGRESQL, postgreSqlDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.POSTGRESQL_VALIDATION_QUERY, postgreSqlDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.POSTGRESQL_VALIDATION_QUERY, postgreSqlDataSourceProcessor.getValidationQuery());
     }
 }

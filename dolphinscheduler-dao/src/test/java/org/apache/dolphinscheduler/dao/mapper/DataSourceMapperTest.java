@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.DataSourceUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -189,13 +189,13 @@ public class DataSourceMapperTest extends BaseDaoTest {
      * test query authed datasource
      */
     @Test
-    public void testQueryAuthedDatasource() {
+    public void testQueryAuthedDataSource() {
         String name = "test";
         Integer userId = 1;
 
         Map<Integer, DataSource> expectedDataSourceMap = createDataSourceMap(userId, name);
 
-        List<DataSource> actualDataSources = dataSourceMapper.queryAuthedDatasource(userId);
+        List<DataSource> actualDataSources = dataSourceMapper.queryAuthedDataSource(userId);
 
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
@@ -210,13 +210,13 @@ public class DataSourceMapperTest extends BaseDaoTest {
      * test query datasource except userId
      */
     @Test
-    public void testQueryDatasourceExceptUserId() {
+    public void testQueryDataSourceExceptUserId() {
         String name = "test";
         Integer userId = 1;
 
         Map<Integer, DataSource> expectedDataSourceMap = createDataSourceMap(userId, name);
 
-        List<DataSource> actualDataSources = dataSourceMapper.queryDatasourceExceptUserId(userId);
+        List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceExceptUserId(userId);
 
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
@@ -290,9 +290,9 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
         DataSource otherDataSource = createDataSource(userId + 1, name + "1");
 
-        DatasourceUser datasourceUser = new DatasourceUser();
+        DataSourceUser datasourceUser = new DataSourceUser();
 
-        datasourceUser.setDatasourceId(otherDataSource.getId());
+        datasourceUser.setDataSourceId(otherDataSource.getId());
         datasourceUser.setUserId(userId);
         datasourceUser.setPerm(7);
         datasourceUser.setCreateTime(DateUtils.getCurrentDate());
@@ -382,12 +382,12 @@ public class DataSourceMapperTest extends BaseDaoTest {
      *
      * @param user user
      * @param dataSource data source
-     * @return DatasourceUser
+     * @return DataSourceUser
      */
-    private DatasourceUser createUserDataSource(User user, DataSource dataSource) {
-        DatasourceUser datasourceUser = new DatasourceUser();
+    private DataSourceUser createUserDataSource(User user, DataSource dataSource) {
+        DataSourceUser datasourceUser = new DataSourceUser();
 
-        datasourceUser.setDatasourceId(dataSource.getId());
+        datasourceUser.setDataSourceId(dataSource.getId());
         datasourceUser.setUserId(user.getId());
         datasourceUser.setPerm(7);
         datasourceUser.setCreateTime(DateUtils.getCurrentDate());

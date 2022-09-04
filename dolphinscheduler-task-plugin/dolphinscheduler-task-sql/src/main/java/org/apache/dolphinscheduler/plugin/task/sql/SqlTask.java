@@ -119,7 +119,7 @@ public class SqlTask extends AbstractTask {
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
-                sqlParameters.getDatasource(),
+                sqlParameters.getDataSource(),
                 sqlParameters.getSql(),
                 sqlParameters.getLocalParams(),
                 sqlParameters.getUdfs(),

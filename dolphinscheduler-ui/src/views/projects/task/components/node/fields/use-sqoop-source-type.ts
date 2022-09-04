@@ -17,7 +17,7 @@
 
 import { ref, h, watch, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDatasource } from './use-sqoop-datasource'
+import { useDataSource } from './use-sqoop-datasource'
 import { useCustomParams } from '.'
 import styles from '../index.module.scss'
 import type { IJsonItem, IOption, ModelType } from '../types'
@@ -129,11 +129,11 @@ export function useSourceType(
       span: unCustomSpan,
       options: sourceTypes
     },
-    ...useDatasource(
+    ...useDataSource(
       model,
       datasourceSpan,
       'sourceMysqlType',
-      'sourceMysqlDatasource'
+      'sourceMysqlDataSource'
     ),
     {
       type: 'radio',

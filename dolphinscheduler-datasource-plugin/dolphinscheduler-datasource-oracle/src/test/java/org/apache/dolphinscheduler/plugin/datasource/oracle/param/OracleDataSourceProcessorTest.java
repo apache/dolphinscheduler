@@ -41,24 +41,24 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class OracleDataSourceProcessorTest {
 
-    private OracleDataSourceProcessor oracleDatasourceProcessor = new OracleDataSourceProcessor();
+    private OracleDataSourceProcessor oracleDataSourceProcessor = new OracleDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        OracleDataSourceParamDTO oracleDatasourceParamDTO = new OracleDataSourceParamDTO();
-        oracleDatasourceParamDTO.setConnectType(DbConnectType.ORACLE_SID);
-        oracleDatasourceParamDTO.setHost("localhost");
-        oracleDatasourceParamDTO.setPort(3308);
-        oracleDatasourceParamDTO.setUserName("root");
-        oracleDatasourceParamDTO.setPassword("123456");
-        oracleDatasourceParamDTO.setDatabase("default");
-        oracleDatasourceParamDTO.setOther(props);
+        OracleDataSourceParamDTO oracleDataSourceParamDTO = new OracleDataSourceParamDTO();
+        oracleDataSourceParamDTO.setConnectType(DbConnectType.ORACLE_SID);
+        oracleDataSourceParamDTO.setHost("localhost");
+        oracleDataSourceParamDTO.setPort(3308);
+        oracleDataSourceParamDTO.setUserName("root");
+        oracleDataSourceParamDTO.setPassword("123456");
+        oracleDataSourceParamDTO.setDatabase("default");
+        oracleDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
-                .createConnectionParams(oracleDatasourceParamDTO);
+        OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDataSourceProcessor
+                .createConnectionParams(oracleDataSourceParamDTO);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
         Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
@@ -68,15 +68,15 @@ public class OracleDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:oracle:thin:@localhost:3308\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:oracle:thin:@localhost:3308:default\",\"connectType\":\"ORACLE_SID\"}";
-        OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
+        OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDataSourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -85,16 +85,16 @@ public class OracleDataSourceProcessorTest {
         oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308:default");
         oracleConnectionParam.setOther("other=other");
         Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
-                oracleDatasourceProcessor.getJdbcUrl(oracleConnectionParam));
+                oracleDataSourceProcessor.getJdbcUrl(oracleConnectionParam));
     }
 
     @Test
     public void getDbType() {
-        Assert.assertEquals(DbType.ORACLE, oracleDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.ORACLE, oracleDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.ORACLE_VALIDATION_QUERY, oracleDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.ORACLE_VALIDATION_QUERY, oracleDataSourceProcessor.getValidationQuery());
     }
 }

@@ -94,7 +94,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true) @RequestBody String jsonStr) {
-        BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
+        BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDataSourceParam(jsonStr);
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
 
@@ -119,7 +119,7 @@ public class DataSourceController extends BaseController {
     public Result updateDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @PathVariable(value = "id") Integer id,
                                    @RequestBody String jsonStr) {
-        BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
+        BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDataSourceParam(jsonStr);
         dataSourceParam.setId(id);
         return dataSourceService.updateDataSource(dataSourceParam.getId(), loginUser, dataSourceParam);
     }
@@ -214,8 +214,8 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result connectDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
-        BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
-        DataSourceUtils.checkDatasourceParam(dataSourceParam);
+        BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDataSourceParam(jsonStr);
+        DataSourceUtils.checkDataSourceParam(dataSourceParam);
         ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
         return dataSourceService.checkConnection(dataSourceParam.getType(), connectionParams);
     }
@@ -287,7 +287,7 @@ public class DataSourceController extends BaseController {
      * @param userId user id
      * @return unauthed data source result code
      */
-    @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "unauthDataSource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
     })
@@ -295,10 +295,10 @@ public class DataSourceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UNAUTHORIZED_DATASOURCE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result unauthDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result unauthDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
+        Map<String, Object> result = dataSourceService.unauthDataSource(loginUser, userId);
         return returnDataList(result);
     }
 
@@ -309,7 +309,7 @@ public class DataSourceController extends BaseController {
      * @param userId user id
      * @return authorized result code
      */
-    @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "authedDataSource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
     })
@@ -317,10 +317,10 @@ public class DataSourceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(AUTHORIZED_DATA_SOURCE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result authedDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authedDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
+        Map<String, Object> result = dataSourceService.authedDataSource(loginUser, userId);
         return returnDataList(result);
     }
 

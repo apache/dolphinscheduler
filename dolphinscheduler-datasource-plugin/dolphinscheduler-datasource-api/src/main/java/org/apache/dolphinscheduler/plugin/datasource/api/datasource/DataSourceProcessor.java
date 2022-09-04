@@ -32,28 +32,28 @@ public interface DataSourceProcessor {
      * @param paramJson
      * @return {@link BaseDataSourceParamDTO}
      */
-    BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson);
+    BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson);
 
 
     /**
      * check datasource param is valid
      */
-    void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam);
+    void checkDataSourceParam(BaseDataSourceParamDTO datasourceParam);
 
     /**
-     * get Datasource Client UniqueId
+     * get DataSource Client UniqueId
      *
      * @return UniqueId
      */
-    String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType);
+    String getDataSourceUniqueId(ConnectionParam connectionParam, DbType dbType);
 
     /**
      * create BaseDataSourceParamDTO by connectionJson
      *
-     * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.Datasource}
+     * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.DataSource}
      * @return {@link BaseDataSourceParamDTO}
      */
-    BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson);
+    BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson);
 
     /**
      * create datasource connection parameter which will be stored at DataSource
@@ -73,7 +73,7 @@ public interface DataSourceProcessor {
     /**
      * get datasource Driver
      */
-    String getDatasourceDriver();
+    String getDataSourceDriver();
 
     /**
      * get validation Query

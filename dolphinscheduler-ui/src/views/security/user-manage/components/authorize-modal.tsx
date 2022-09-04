@@ -100,9 +100,9 @@ export const AuthorizeModal = defineComponent({
         {type === 'authorize_datasource' && (
           <NTransfer
             virtualScroll
-            options={this.unauthorizedDatasources}
+            options={this.unauthorizedDataSources}
             filterable
-            v-model:value={this.authorizedDatasources}
+            v-model:value={this.authorizedDataSources}
             class={styles.transfer}
           />
         )}

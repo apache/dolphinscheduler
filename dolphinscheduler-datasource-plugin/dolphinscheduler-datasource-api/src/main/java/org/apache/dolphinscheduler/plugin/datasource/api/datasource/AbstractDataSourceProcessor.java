@@ -39,9 +39,9 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.]+$");
 
     @Override
-    public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
+    public void checkDataSourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         checkHost(baseDataSourceParamDTO.getHost());
-        checkDatasourcePatter(baseDataSourceParamDTO.getDatabase());
+        checkDataSourcePatter(baseDataSourceParamDTO.getDatabase());
         checkOther(baseDataSourceParamDTO.getOther());
     }
 
@@ -61,7 +61,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      *
      * @param database database name
      */
-    protected void checkDatasourcePatter(String database) {
+    protected void checkDataSourcePatter(String database) {
         if (!DATABASE_PATTER.matcher(database).matches()) {
             throw new IllegalArgumentException("datasource name illegal");
         }
@@ -83,7 +83,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     }
 
     @Override
-    public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
+    public String getDataSourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getUser(), PasswordUtils.encodePassword(baseConnectionParam.getPassword()), baseConnectionParam.getJdbcUrl());
     }

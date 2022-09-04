@@ -40,25 +40,25 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class SparkDataSourceProcessorTest {
 
-    private SparkDataSourceProcessor sparkDatasourceProcessor = new SparkDataSourceProcessor();
+    private SparkDataSourceProcessor sparkDataSourceProcessor = new SparkDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        SparkDataSourceParamDTO sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
-        sparkDatasourceParamDTO.setUserName("root");
-        sparkDatasourceParamDTO.setPassword("12345");
-        sparkDatasourceParamDTO.setHost("localhost1,localhost2");
-        sparkDatasourceParamDTO.setPort(1234);
-        sparkDatasourceParamDTO.setDatabase("default");
-        sparkDatasourceParamDTO.setOther(props);
+        SparkDataSourceParamDTO sparkDataSourceParamDTO = new SparkDataSourceParamDTO();
+        sparkDataSourceParamDTO.setUserName("root");
+        sparkDataSourceParamDTO.setPassword("12345");
+        sparkDataSourceParamDTO.setHost("localhost1,localhost2");
+        sparkDataSourceParamDTO.setPort(1234);
+        sparkDataSourceParamDTO.setDatabase("default");
+        sparkDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
-                .createConnectionParams(sparkDatasourceParamDTO);
+        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDataSourceProcessor
+                .createConnectionParams(sparkDataSourceParamDTO);
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default", connectionParams.getJdbcUrl());
     }
@@ -67,15 +67,15 @@ public class SparkDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"12345\",\"address\":\"jdbc:hive2://localhost1:1234,localhost2:1234\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
-        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
+        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDataSourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, sparkDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, sparkDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -84,16 +84,16 @@ public class SparkDataSourceProcessorTest {
         sparkConnectionParam.setJdbcUrl("jdbc:hive2://localhost1:1234,localhost2:1234/default");
         sparkConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default;other",
-                sparkDatasourceProcessor.getJdbcUrl(sparkConnectionParam));
+                sparkDataSourceProcessor.getJdbcUrl(sparkConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.SPARK, sparkDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.SPARK, sparkDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.HIVE_VALIDATION_QUERY, sparkDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.HIVE_VALIDATION_QUERY, sparkDataSourceProcessor.getValidationQuery());
     }
 }

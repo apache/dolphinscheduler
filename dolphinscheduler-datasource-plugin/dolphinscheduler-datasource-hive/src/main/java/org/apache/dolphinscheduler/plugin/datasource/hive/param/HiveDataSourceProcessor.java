@@ -44,12 +44,12 @@ import com.google.auto.service.AutoService;
 public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, HiveDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         HiveDataSourceParamDTO
                 hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) createConnectionParams(connectionJson);
@@ -91,7 +91,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         hiveConnectionParam.setJdbcUrl(jdbcUrl);
         hiveConnectionParam.setUser(hiveParam.getUserName());
         hiveConnectionParam.setPassword(PasswordUtils.encodePassword(hiveParam.getPassword()));
-        hiveConnectionParam.setDriverClassName(getDatasourceDriver());
+        hiveConnectionParam.setDriverClassName(getDataSourceDriver());
         hiveConnectionParam.setValidationQuery(getValidationQuery());
 
         if (CommonUtils.getKerberosStartupState()) {
@@ -111,7 +111,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
@@ -136,7 +136,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         CommonUtils.loadKerberosConf(hiveConnectionParam.getJavaSecurityKrb5Conf(),
                 hiveConnectionParam.getLoginUserKeytabUsername(), hiveConnectionParam.getLoginUserKeytabPath());
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
                 hiveConnectionParam.getUser(), PasswordUtils.decodePassword(hiveConnectionParam.getPassword()));
     }

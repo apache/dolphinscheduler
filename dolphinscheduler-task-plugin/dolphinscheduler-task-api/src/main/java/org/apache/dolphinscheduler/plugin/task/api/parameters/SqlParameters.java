@@ -139,11 +139,11 @@ public class SqlParameters extends AbstractParameters {
         this.type = type;
     }
 
-    public int getDatasource() {
+    public int getDataSource() {
         return datasource;
     }
 
-    public void setDatasource(int datasource) {
+    public void setDataSource(int datasource) {
         this.datasource = datasource;
     }
 

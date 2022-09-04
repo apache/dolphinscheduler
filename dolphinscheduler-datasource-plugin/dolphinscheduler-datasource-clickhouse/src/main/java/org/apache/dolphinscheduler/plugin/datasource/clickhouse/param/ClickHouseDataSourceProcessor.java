@@ -41,26 +41,26 @@ import com.google.auto.service.AutoService;
 public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, ClickHouseDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         ClickHouseConnectionParam connectionParams = (ClickHouseConnectionParam) createConnectionParams(connectionJson);
 
         ClickHouseDataSourceParamDTO
-                clickHouseDatasourceParamDTO = new ClickHouseDataSourceParamDTO();
-        clickHouseDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        clickHouseDatasourceParamDTO.setUserName(connectionParams.getUser());
-        clickHouseDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+                clickHouseDataSourceParamDTO = new ClickHouseDataSourceParamDTO();
+        clickHouseDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        clickHouseDataSourceParamDTO.setUserName(connectionParams.getUser());
+        clickHouseDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        clickHouseDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        clickHouseDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        clickHouseDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        clickHouseDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
 
-        return clickHouseDatasourceParamDTO;
+        return clickHouseDataSourceParamDTO;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         clickhouseConnectionParam.setJdbcUrl(jdbcUrl);
         clickhouseConnectionParam.setUser(clickHouseParam.getUserName());
         clickhouseConnectionParam.setPassword(PasswordUtils.encodePassword(clickHouseParam.getPassword()));
-        clickhouseConnectionParam.setDriverClassName(getDatasourceDriver());
+        clickhouseConnectionParam.setDriverClassName(getDataSourceDriver());
         clickhouseConnectionParam.setValidationQuery(getValidationQuery());
         clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
         clickhouseConnectionParam.setProps(clickHouseParam.getOther());
@@ -88,7 +88,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.COM_CLICKHOUSE_JDBC_DRIVER;
     }
 
@@ -110,7 +110,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         ClickHouseConnectionParam clickhouseConnectionParam = (ClickHouseConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(clickhouseConnectionParam),
                 clickhouseConnectionParam.getUser(), PasswordUtils.decodePassword(clickhouseConnectionParam.getPassword()));
     }

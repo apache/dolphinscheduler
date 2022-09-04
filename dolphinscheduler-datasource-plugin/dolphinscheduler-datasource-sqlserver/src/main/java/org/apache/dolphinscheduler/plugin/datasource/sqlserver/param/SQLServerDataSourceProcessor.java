@@ -42,23 +42,23 @@ import com.google.auto.service.AutoService;
 public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, SQLServerDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) createConnectionParams(connectionJson);
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
-        SQLServerDataSourceParamDTO sqlServerDatasourceParamDTO = new SQLServerDataSourceParamDTO();
-        sqlServerDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        sqlServerDatasourceParamDTO.setUserName(connectionParams.getUser());
-        sqlServerDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
-        sqlServerDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        sqlServerDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        return sqlServerDatasourceParamDTO;
+        SQLServerDataSourceParamDTO sqlServerDataSourceParamDTO = new SQLServerDataSourceParamDTO();
+        sqlServerDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        sqlServerDataSourceParamDTO.setUserName(connectionParams.getUser());
+        sqlServerDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        sqlServerDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        sqlServerDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        return sqlServerDataSourceParamDTO;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
         sqlServerConnectionParam.setOther(transformOther(sqlServerParam.getOther()));
         sqlServerConnectionParam.setUser(sqlServerParam.getUserName());
         sqlServerConnectionParam.setPassword(PasswordUtils.encodePassword(sqlServerParam.getPassword()));
-        sqlServerConnectionParam.setDriverClassName(getDatasourceDriver());
+        sqlServerConnectionParam.setDriverClassName(getDataSourceDriver());
         sqlServerConnectionParam.setValidationQuery(getValidationQuery());
         sqlServerConnectionParam.setProps(sqlServerParam.getOther());
         return sqlServerConnectionParam;
@@ -86,7 +86,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.COM_SQLSERVER_JDBC_DRIVER;
     }
 
@@ -108,7 +108,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         SQLServerConnectionParam sqlServerConnectionParam = (SQLServerConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam), sqlServerConnectionParam.getUser(),
                 PasswordUtils.decodePassword(sqlServerConnectionParam.getPassword()));
     }

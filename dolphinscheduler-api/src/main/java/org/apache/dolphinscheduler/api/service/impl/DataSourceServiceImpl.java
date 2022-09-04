@@ -103,7 +103,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     @Transactional
     public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
-        DataSourceUtils.checkDatasourceParam(datasourceParam);
+        DataSourceUtils.checkDataSourceParam(datasourceParam);
         Result<Object> result = new Result<>();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.DATASOURCE, ApiFuncIdentificationConstant.DATASOURCE_CREATE_DATASOURCE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -159,7 +159,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      */
     @Override
     public Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam) {
-        DataSourceUtils.checkDatasourceParam(dataSourceParam);
+        DataSourceUtils.checkDataSourceParam(dataSourceParam);
         Result<Object> result = new Result<>();
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
@@ -235,7 +235,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         // type
-        BaseDataSourceParamDTO baseDataSourceParamDTO = DataSourceUtils.buildDatasourceParamDTO(
+        BaseDataSourceParamDTO baseDataSourceParamDTO = DataSourceUtils.buildDataSourceParamDTO(
                 dataSource.getType(), dataSource.getConnectionParams());
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
@@ -418,7 +418,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 return result;
             }
             dataSourceMapper.deleteById(datasourceId);
-            datasourceUserMapper.deleteByDatasourceId(datasourceId);
+            datasourceUserMapper.deleteByDataSourceId(datasourceId);
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
             logger.error("delete datasource error", e);
@@ -435,12 +435,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return unauthed data source result code
      */
     @Override
-    public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
+    public Map<String, Object> unauthDataSource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> datasourceList;
         if (canOperatorPermissions(loginUser,null,AuthorizationType.DATASOURCE,null)) {
             // admin gets all data sources except userId
-            datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
+            datasourceList = dataSourceMapper.queryDataSourceExceptUserId(userId);
         } else {
             // non-admins users get their own data sources
             datasourceList = dataSourceMapper.selectByMap(Collections.singletonMap("user_id", loginUser.getId()));
@@ -450,7 +450,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         if (datasourceList != null && !datasourceList.isEmpty()) {
             datasourceSet = new HashSet<>(datasourceList);
 
-            List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
+            List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDataSource(userId);
 
             Set<DataSource> authedDataSourceSet;
             if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
@@ -472,11 +472,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return authorized result code
      */
     @Override
-    public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
+    public Map<String, Object> authedDataSource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
-        result.put(Constants.DATA_LIST, authedDatasourceList);
+        List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDataSource(userId);
+        result.put(Constants.DATA_LIST, authedDataSourceList);
         putMsg(result, Status.SUCCESS);
         return result;
     }

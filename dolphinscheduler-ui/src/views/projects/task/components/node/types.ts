@@ -114,7 +114,7 @@ interface ISqoopTargetData {
   targetHdfsFieldsTerminated?: string
   targetHdfsLinesTerminated?: string
   targetMysqlType?: string
-  targetMysqlDatasource?: string
+  targetMysqlDataSource?: string
   targetMysqlTable?: string
   targetMysqlColumns?: string
   targetMysqlFieldsTerminated?: string
@@ -131,7 +131,7 @@ interface ISqoopSourceData {
   srcColumns?: string
   sourceMysqlSrcQuerySql?: string
   sourceMysqlType?: string
-  sourceMysqlDatasource?: string
+  sourceMysqlDataSource?: string
   mapColumnHive?: ILocalParam[]
   mapColumnJava?: ILocalParam[]
   sourceHdfsExportDir?: string
@@ -158,7 +158,7 @@ interface ISqoopTargetParams {
   fieldsTerminated?: string
   linesTerminated?: string
   targetType?: string
-  targetDatasource?: string
+  targetDataSource?: string
   targetTable?: string
   targetColumns?: string
   isUpdate?: string
@@ -172,7 +172,7 @@ interface ISqoopSourceParams {
   srcQuerySql?: string
   srcQueryType?: '1' | '0'
   srcType?: string
-  srcDatasource?: string
+  srcDataSource?: string
   mapColumnHive?: ILocalParam[]
   mapColumnJava?: ILocalParam[]
   exportDir?: string

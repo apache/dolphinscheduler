@@ -40,23 +40,23 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class RedshiftDataSourceProcessorTest {
 
-    private RedshiftDataSourceProcessor redshiftDatasourceProcessor = new RedshiftDataSourceProcessor();
+    private RedshiftDataSourceProcessor redshiftDataSourceProcessor = new RedshiftDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        RedshiftDataSourceParamDTO redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
-        redshiftDatasourceParamDTO.setHost("localhost");
-        redshiftDatasourceParamDTO.setPort(5439);
-        redshiftDatasourceParamDTO.setDatabase("dev");
-        redshiftDatasourceParamDTO.setUserName("awsuser");
-        redshiftDatasourceParamDTO.setPassword("123456");
-        redshiftDatasourceParamDTO.setOther(props);
+        RedshiftDataSourceParamDTO redshiftDataSourceParamDTO = new RedshiftDataSourceParamDTO();
+        redshiftDataSourceParamDTO.setHost("localhost");
+        redshiftDataSourceParamDTO.setPort(5439);
+        redshiftDataSourceParamDTO.setDatabase("dev");
+        redshiftDataSourceParamDTO.setUserName("awsuser");
+        redshiftDataSourceParamDTO.setPassword("123456");
+        redshiftDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
-                .createConnectionParams(redshiftDatasourceParamDTO);
+        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDataSourceProcessor
+                .createConnectionParams(redshiftDataSourceParamDTO);
         Assert.assertEquals("jdbc:redshift://localhost:5439", connectionParams.getAddress());
         Assert.assertEquals("jdbc:redshift://localhost:5439/dev", connectionParams.getJdbcUrl());
     }
@@ -65,15 +65,15 @@ public class RedshiftDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"awsuser\",\"password\":\"123456\",\"address\":\"jdbc:redshift://localhost:5439\""
                 + ",\"database\":\"dev\",\"jdbcUrl\":\"jdbc:redshift://localhost:5439/dev\"}";
-        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
+        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDataSourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("awsuser", connectionParams.getUser());
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_REDSHIFT_JDBC_DRIVER, redshiftDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.COM_REDSHIFT_JDBC_DRIVER, redshiftDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -82,17 +82,17 @@ public class RedshiftDataSourceProcessorTest {
         redshiftConnectionParam.setJdbcUrl("jdbc:redshift://localhost:5439/default");
         redshiftConnectionParam.setOther("DSILogLevel=6;defaultRowFetchSize=100");
         Assert.assertEquals("jdbc:redshift://localhost:5439/default?DSILogLevel=6;defaultRowFetchSize=100",
-                redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
+                redshiftDataSourceProcessor.getJdbcUrl(redshiftConnectionParam));
 
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.REDSHIFT, redshiftDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.REDSHIFT, redshiftDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.REDHIFT_VALIDATION_QUERY, redshiftDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.REDHIFT_VALIDATION_QUERY, redshiftDataSourceProcessor.getValidationQuery());
     }
 }

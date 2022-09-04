@@ -122,18 +122,18 @@ public class DataQualityTaskTest {
         srcConnectorType.setCreateTime(new Date());
         srcConnectorType.setUpdateTime(new Date());
 
-        DqRuleInputEntry srcDatasourceId = new DqRuleInputEntry();
-        srcDatasourceId.setTitle("源数据源");
-        srcDatasourceId.setField("src_datasource_id");
-        srcDatasourceId.setType(FormType.CASCADER.getFormType());
-        srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setIsShow(true);
-        srcDatasourceId.setValue(null);
-        srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
-        srcDatasourceId.setInputType(InputType.DEFAULT.getCode());
-        srcDatasourceId.setValueType(ValueType.NUMBER.getCode());
-        srcDatasourceId.setCreateTime(new Date());
-        srcDatasourceId.setUpdateTime(new Date());
+        DqRuleInputEntry srcDataSourceId = new DqRuleInputEntry();
+        srcDataSourceId.setTitle("源数据源");
+        srcDataSourceId.setField("src_datasource_id");
+        srcDataSourceId.setType(FormType.CASCADER.getFormType());
+        srcDataSourceId.setCanEdit(true);
+        srcDataSourceId.setIsShow(true);
+        srcDataSourceId.setValue(null);
+        srcDataSourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
+        srcDataSourceId.setInputType(InputType.DEFAULT.getCode());
+        srcDataSourceId.setValueType(ValueType.NUMBER.getCode());
+        srcDataSourceId.setCreateTime(new Date());
+        srcDataSourceId.setUpdateTime(new Date());
 
         DqRuleInputEntry srcTable = new DqRuleInputEntry();
         srcTable.setTitle("源数据表");
@@ -257,7 +257,7 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(afterFailure);
 
         defaultInputEntryList.add(srcConnectorType);
-        defaultInputEntryList.add(srcDatasourceId);
+        defaultInputEntryList.add(srcDataSourceId);
         defaultInputEntryList.add(srcTable);
         defaultInputEntryList.add(srcFilter);
         defaultInputEntryList.add(srcField);
@@ -330,17 +330,17 @@ public class DataQualityTaskTest {
         srcConnectorType.setCreateTime(new Date());
         srcConnectorType.setUpdateTime(new Date());
 
-        DqRuleInputEntry srcDatasourceId = new DqRuleInputEntry();
-        srcDatasourceId.setTitle("源数据源");
-        srcDatasourceId.setField("src_datasource_id");
-        srcDatasourceId.setType(FormType.CASCADER.getFormType());
-        srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setIsShow(true);
-        srcDatasourceId.setValue(null);
-        srcDatasourceId.setPlaceholder("${comparison_value}");
-        srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
-        srcDatasourceId.setInputType(InputType.DEFAULT.getCode());
-        srcDatasourceId.setValueType(ValueType.NUMBER.getCode());
+        DqRuleInputEntry srcDataSourceId = new DqRuleInputEntry();
+        srcDataSourceId.setTitle("源数据源");
+        srcDataSourceId.setField("src_datasource_id");
+        srcDataSourceId.setType(FormType.CASCADER.getFormType());
+        srcDataSourceId.setCanEdit(true);
+        srcDataSourceId.setIsShow(true);
+        srcDataSourceId.setValue(null);
+        srcDataSourceId.setPlaceholder("${comparison_value}");
+        srcDataSourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
+        srcDataSourceId.setInputType(InputType.DEFAULT.getCode());
+        srcDataSourceId.setValueType(ValueType.NUMBER.getCode());
         srcConnectorType.setCreateTime(new Date());
         srcConnectorType.setUpdateTime(new Date());
 
@@ -447,7 +447,7 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(threshold);
         defaultInputEntryList.add(afterFailure);
         defaultInputEntryList.add(srcConnectorType);
-        defaultInputEntryList.add(srcDatasourceId);
+        defaultInputEntryList.add(srcDataSourceId);
         defaultInputEntryList.add(srcTable);
         defaultInputEntryList.add(statisticsName);
         defaultInputEntryList.add(statisticsExecuteSql);
@@ -566,17 +566,17 @@ public class DataQualityTaskTest {
         srcConnectorType.setCreateTime(new Date());
         srcConnectorType.setUpdateTime(new Date());
 
-        DqRuleInputEntry srcDatasourceId = new DqRuleInputEntry();
-        srcDatasourceId.setTitle("源数据源");
-        srcDatasourceId.setField("src_datasource_id");
-        srcDatasourceId.setType(FormType.CASCADER.getFormType());
-        srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setIsShow(true);
-        srcDatasourceId.setValue(null);
-        srcDatasourceId.setPlaceholder("${comparison_value}");
-        srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
-        srcDatasourceId.setInputType(InputType.DEFAULT.getCode());
-        srcDatasourceId.setValueType(ValueType.NUMBER.getCode());
+        DqRuleInputEntry srcDataSourceId = new DqRuleInputEntry();
+        srcDataSourceId.setTitle("源数据源");
+        srcDataSourceId.setField("src_datasource_id");
+        srcDataSourceId.setType(FormType.CASCADER.getFormType());
+        srcDataSourceId.setCanEdit(true);
+        srcDataSourceId.setIsShow(true);
+        srcDataSourceId.setValue(null);
+        srcDataSourceId.setPlaceholder("${comparison_value}");
+        srcDataSourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
+        srcDataSourceId.setInputType(InputType.DEFAULT.getCode());
+        srcDataSourceId.setValueType(ValueType.NUMBER.getCode());
         srcConnectorType.setCreateTime(new Date());
         srcConnectorType.setUpdateTime(new Date());
 
@@ -627,16 +627,16 @@ public class DataQualityTaskTest {
         targetConnectorType.setOptions(null);
         targetConnectorType.setInputType(InputType.DEFAULT.getCode());
 
-        DqRuleInputEntry targetDatasourceId = new DqRuleInputEntry();
-        targetDatasourceId.setTitle("目标数据源");
-        targetDatasourceId.setField("target_datasource_id");
-        targetDatasourceId.setType(FormType.SELECT.getFormType());
-        targetDatasourceId.setCanEdit(true);
-        targetDatasourceId.setIsShow(true);
-        targetDatasourceId.setValue("1");
-        targetDatasourceId.setPlaceholder("Please select target datasource");
-        targetDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
-        targetDatasourceId.setInputType(InputType.DEFAULT.getCode());
+        DqRuleInputEntry targetDataSourceId = new DqRuleInputEntry();
+        targetDataSourceId.setTitle("目标数据源");
+        targetDataSourceId.setField("target_datasource_id");
+        targetDataSourceId.setType(FormType.SELECT.getFormType());
+        targetDataSourceId.setCanEdit(true);
+        targetDataSourceId.setIsShow(true);
+        targetDataSourceId.setValue("1");
+        targetDataSourceId.setPlaceholder("Please select target datasource");
+        targetDataSourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
+        targetDataSourceId.setInputType(InputType.DEFAULT.getCode());
 
         DqRuleInputEntry targetTable = new DqRuleInputEntry();
         targetTable.setTitle("目标数据表");
@@ -730,13 +730,13 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(afterFailure);
 
         defaultInputEntryList.add(srcConnectorType);
-        defaultInputEntryList.add(srcDatasourceId);
+        defaultInputEntryList.add(srcDataSourceId);
         defaultInputEntryList.add(srcTable);
         defaultInputEntryList.add(statisticsName);
         defaultInputEntryList.add(statisticsExecuteSql);
 
         defaultInputEntryList.add(targetConnectorType);
-        defaultInputEntryList.add(targetDatasourceId);
+        defaultInputEntryList.add(targetDataSourceId);
         defaultInputEntryList.add(targetTable);
         defaultInputEntryList.add(comparisonName);
         defaultInputEntryList.add(comparisonExecuteSql);
@@ -842,17 +842,17 @@ public class DataQualityTaskTest {
         srcConnectorType.setInputType(InputType.DEFAULT.getCode());
         srcConnectorType.setValueType(ValueType.NUMBER.getCode());
 
-        DqRuleInputEntry srcDatasourceId = new DqRuleInputEntry();
-        srcDatasourceId.setTitle("源数据源");
-        srcDatasourceId.setField("src_datasource_id");
-        srcDatasourceId.setType(FormType.SELECT.getFormType());
-        srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setIsShow(true);
-        srcDatasourceId.setValue("1");
-        srcDatasourceId.setPlaceholder("Please select source datasource");
-        srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
-        srcDatasourceId.setInputType(InputType.DEFAULT.getCode());
-        srcDatasourceId.setValueType(ValueType.NUMBER.getCode());
+        DqRuleInputEntry srcDataSourceId = new DqRuleInputEntry();
+        srcDataSourceId.setTitle("源数据源");
+        srcDataSourceId.setField("src_datasource_id");
+        srcDataSourceId.setType(FormType.SELECT.getFormType());
+        srcDataSourceId.setCanEdit(true);
+        srcDataSourceId.setIsShow(true);
+        srcDataSourceId.setValue("1");
+        srcDataSourceId.setPlaceholder("Please select source datasource");
+        srcDataSourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
+        srcDataSourceId.setInputType(InputType.DEFAULT.getCode());
+        srcDataSourceId.setValueType(ValueType.NUMBER.getCode());
 
         DqRuleInputEntry srcTable = new DqRuleInputEntry();
         srcTable.setTitle("源数据表");
@@ -889,17 +889,17 @@ public class DataQualityTaskTest {
         targetConnectorType.setInputType(InputType.DEFAULT.getCode());
         targetConnectorType.setValueType(ValueType.STRING.getCode());
 
-        DqRuleInputEntry targetDatasourceId = new DqRuleInputEntry();
-        targetDatasourceId.setTitle("目标数据源");
-        targetDatasourceId.setField("target_datasource_id");
-        targetDatasourceId.setType(FormType.CASCADER.getFormType());
-        targetDatasourceId.setCanEdit(true);
-        targetDatasourceId.setIsShow(true);
-        targetDatasourceId.setValue("1");
-        targetDatasourceId.setPlaceholder("Please select target datasource");
-        targetDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
-        targetDatasourceId.setInputType(InputType.DEFAULT.getCode());
-        targetDatasourceId.setValueType(ValueType.NUMBER.getCode());
+        DqRuleInputEntry targetDataSourceId = new DqRuleInputEntry();
+        targetDataSourceId.setTitle("目标数据源");
+        targetDataSourceId.setField("target_datasource_id");
+        targetDataSourceId.setType(FormType.CASCADER.getFormType());
+        targetDataSourceId.setCanEdit(true);
+        targetDataSourceId.setIsShow(true);
+        targetDataSourceId.setValue("1");
+        targetDataSourceId.setPlaceholder("Please select target datasource");
+        targetDataSourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
+        targetDataSourceId.setInputType(InputType.DEFAULT.getCode());
+        targetDataSourceId.setValueType(ValueType.NUMBER.getCode());
 
         DqRuleInputEntry targetTable = new DqRuleInputEntry();
         targetTable.setTitle("目标数据表");
@@ -947,11 +947,11 @@ public class DataQualityTaskTest {
         statisticsName.setValueType(ValueType.STRING.getCode());
 
         defaultInputEntryList.add(srcConnectorType);
-        defaultInputEntryList.add(srcDatasourceId);
+        defaultInputEntryList.add(srcDataSourceId);
         defaultInputEntryList.add(srcTable);
         defaultInputEntryList.add(srcFilter);
         defaultInputEntryList.add(targetConnectorType);
-        defaultInputEntryList.add(targetDatasourceId);
+        defaultInputEntryList.add(targetDataSourceId);
         defaultInputEntryList.add(targetTable);
         defaultInputEntryList.add(targetFilter);
         defaultInputEntryList.add(mappingColumns);

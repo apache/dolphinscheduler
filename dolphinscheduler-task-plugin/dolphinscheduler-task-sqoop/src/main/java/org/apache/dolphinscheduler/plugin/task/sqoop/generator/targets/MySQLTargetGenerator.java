@@ -60,7 +60,7 @@ public class MySQLTargetGenerator implements ITargetGenerator {
             TargetMysqlParameter targetMysqlParameter =
                 JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
 
-            if (null != targetMysqlParameter && targetMysqlParameter.getTargetDatasource() != 0) {
+            if (null != targetMysqlParameter && targetMysqlParameter.getTargetDataSource() != 0) {
 
                 // get datasource
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(

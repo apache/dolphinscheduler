@@ -130,7 +130,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
     }
 
     @Override
-    public Map<String, Object> getDatasourceOptionsById(int datasourceId) {
+    public Map<String, Object> getDataSourceOptionsById(int datasourceId) {
         Map<String, Object> result = new HashMap<>();
 
         List<DataSource> dataSourceList = dataSourceMapper.listAllDataSourceByType(datasourceId);

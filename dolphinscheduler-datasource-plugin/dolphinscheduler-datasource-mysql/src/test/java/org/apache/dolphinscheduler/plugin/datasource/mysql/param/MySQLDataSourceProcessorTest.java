@@ -40,23 +40,23 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class MySQLDataSourceProcessorTest {
 
-    private MySQLDataSourceProcessor mysqlDatasourceProcessor = new MySQLDataSourceProcessor();
+    private MySQLDataSourceProcessor mysqlDataSourceProcessor = new MySQLDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setUserName("root");
-        mysqlDatasourceParamDTO.setPassword("123456");
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setPort(3306);
-        mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setOther(props);
+        MySQLDataSourceParamDTO mysqlDataSourceParamDTO = new MySQLDataSourceParamDTO();
+        mysqlDataSourceParamDTO.setUserName("root");
+        mysqlDataSourceParamDTO.setPassword("123456");
+        mysqlDataSourceParamDTO.setHost("localhost");
+        mysqlDataSourceParamDTO.setPort(3306);
+        mysqlDataSourceParamDTO.setDatabase("default");
+        mysqlDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
-                .createConnectionParams(mysqlDatasourceParamDTO);
+        MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDataSourceProcessor
+                .createConnectionParams(mysqlDataSourceParamDTO);
         Assert.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
         Assert.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
     }
@@ -65,15 +65,15 @@ public class MySQLDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://localhost:3306\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/default\"}";
-        MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
+        MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDataSourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionJson);
         Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_MYSQL_CJ_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
+    public void testGetDataSourceDriver() {
+        Assert.assertEquals(Constants.COM_MYSQL_CJ_JDBC_DRIVER, mysqlDataSourceProcessor.getDataSourceDriver());
     }
 
     @Test
@@ -81,27 +81,27 @@ public class MySQLDataSourceProcessorTest {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
-                mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
+                mysqlDataSourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.MYSQL, mysqlDataSourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.MYSQL_VALIDATION_QUERY, mysqlDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.MYSQL_VALIDATION_QUERY, mysqlDataSourceProcessor.getValidationQuery());
     }
 
     @Test
-    public void testGetDatasourceUniqueId() {
+    public void testGetDataSourceUniqueId() {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         mysqlConnectionParam.setUser("root");
         mysqlConnectionParam.setPassword("123456");
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-        Assert.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default", mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
+        Assert.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default", mysqlDataSourceProcessor.getDataSourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
     }
 }

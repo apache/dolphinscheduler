@@ -16,7 +16,7 @@
  */
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCustomParams, useDatasource, useResources } from '.'
+import { useCustomParams, useDataSource, useResources } from '.'
 import type { IJsonItem } from '../types'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
@@ -99,7 +99,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const sqlEditorSpan = ref(24)
   const jsonEditorSpan = ref(0)
   const datasourceSpan = ref(12)
-  const destinationDatasourceSpan = ref(8)
+  const destinationDataSourceSpan = ref(8)
   const otherStatementSpan = ref(22)
   const jobSpeedSpan = ref(12)
   const customParameterSpan = ref(0)
@@ -110,7 +110,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       sqlEditorSpan.value = 0
       jsonEditorSpan.value = 24
       datasourceSpan.value = 0
-      destinationDatasourceSpan.value = 0
+      destinationDataSourceSpan.value = 0
       otherStatementSpan.value = 0
       jobSpeedSpan.value = 0
       customParameterSpan.value = 24
@@ -119,7 +119,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       sqlEditorSpan.value = 24
       jsonEditorSpan.value = 0
       datasourceSpan.value = 12
-      destinationDatasourceSpan.value = 8
+      destinationDataSourceSpan.value = 8
       otherStatementSpan.value = 22
       jobSpeedSpan.value = 12
       customParameterSpan.value = 0
@@ -150,7 +150,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       field: 'customConfig',
       name: t('project.node.datax_custom_template')
     },
-    ...useDatasource(model, {
+    ...useDataSource(model, {
       typeField: 'dsType',
       sourceField: 'dataSource',
       span: datasourceSpan,
@@ -179,17 +179,17 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useResources(useResourcesSpan),
-    ...useDatasource(model, {
+    ...useDataSource(model, {
       typeField: 'dtType',
       sourceField: 'dataTarget',
-      span: destinationDatasourceSpan,
+      span: destinationDataSourceSpan,
       supportedDatasourceType
     }),
     {
       type: 'input',
       field: 'targetTable',
       name: t('project.node.datax_target_table'),
-      span: destinationDatasourceSpan,
+      span: destinationDataSourceSpan,
       props: {
         placeholder: t('project.node.datax_target_table_tips')
       },

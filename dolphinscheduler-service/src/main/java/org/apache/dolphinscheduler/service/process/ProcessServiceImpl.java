@@ -2318,9 +2318,9 @@ public class ProcessServiceImpl implements ProcessService {
                     originResSet.removeAll(authorizedResources);
                     break;
                 case DATASOURCE:
-                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks)
+                    Set<Integer> authorizedDataSources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks)
                             .stream().map(DataSource::getId).collect(toSet());
-                    originResSet.removeAll(authorizedDatasources);
+                    originResSet.removeAll(authorizedDataSources);
                     break;
                 case UDF:
                     Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream()

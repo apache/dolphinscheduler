@@ -27,7 +27,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
 @TableName("t_ds_relation_datasource_user")
-public class DatasourceUser {
+public class DataSourceUser {
 
     /**
      * id
@@ -58,4 +58,64 @@ public class DatasourceUser {
      * update time
      */
     private Date updateTime;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getDataSourceId() {
+        return datasourceId;
+    }
+
+    public void setDataSourceId(int datasourceId) {
+        this.datasourceId = datasourceId;
+    }
+
+    public int getPerm() {
+        return perm;
+    }
+
+    public void setPerm(int perm) {
+        this.perm = perm;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "DataSourceUser{"
+                + "id=" + id
+                + ", userId=" + userId
+                + ", datasourceId=" + datasourceId
+                + ", perm=" + perm
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
+    }
 }

@@ -47,23 +47,23 @@ import com.google.auto.service.AutoService;
 public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
-    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+    public BaseDataSourceParamDTO castDataSourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, SparkDataSourceParamDTO.class);
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDataSourceParamDTO(String connectionJson) {
         SparkConnectionParam
                 connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
 
         SparkDataSourceParamDTO
-                sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
-        sparkDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        sparkDatasourceParamDTO.setUserName(connectionParams.getUser());
-        sparkDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
-        sparkDatasourceParamDTO.setJavaSecurityKrb5Conf(connectionParams.getJavaSecurityKrb5Conf());
-        sparkDatasourceParamDTO.setLoginUserKeytabPath(connectionParams.getLoginUserKeytabPath());
-        sparkDatasourceParamDTO.setLoginUserKeytabUsername(connectionParams.getLoginUserKeytabUsername());
+                sparkDataSourceParamDTO = new SparkDataSourceParamDTO();
+        sparkDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        sparkDataSourceParamDTO.setUserName(connectionParams.getUser());
+        sparkDataSourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        sparkDataSourceParamDTO.setJavaSecurityKrb5Conf(connectionParams.getJavaSecurityKrb5Conf());
+        sparkDataSourceParamDTO.setLoginUserKeytabPath(connectionParams.getLoginUserKeytabPath());
+        sparkDataSourceParamDTO.setLoginUserKeytabUsername(connectionParams.getLoginUserKeytabUsername());
 
         StringBuilder hosts = new StringBuilder();
         String[] tmpArray = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
@@ -71,41 +71,41 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         Arrays.stream(hostPortArray).forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
         hosts.deleteCharAt(hosts.length() - 1);
 
-        sparkDatasourceParamDTO.setHost(hosts.toString());
-        sparkDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        sparkDataSourceParamDTO.setHost(hosts.toString());
+        sparkDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
 
-        return sparkDatasourceParamDTO;
+        return sparkDataSourceParamDTO;
     }
 
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         StringBuilder address = new StringBuilder();
-        SparkDataSourceParamDTO sparkDatasourceParam = (SparkDataSourceParamDTO) dataSourceParam;
+        SparkDataSourceParamDTO sparkDataSourceParam = (SparkDataSourceParamDTO) dataSourceParam;
         address.append(Constants.JDBC_HIVE_2);
-        for (String zkHost : sparkDatasourceParam.getHost().split(",")) {
-            address.append(String.format("%s:%s,", zkHost, sparkDatasourceParam.getPort()));
+        for (String zkHost : sparkDataSourceParam.getHost().split(",")) {
+            address.append(String.format("%s:%s,", zkHost, sparkDataSourceParam.getPort()));
         }
         address.deleteCharAt(address.length() - 1);
 
-        String jdbcUrl = address + "/" + sparkDatasourceParam.getDatabase();
+        String jdbcUrl = address + "/" + sparkDataSourceParam.getDatabase();
 
         SparkConnectionParam
                 sparkConnectionParam = new SparkConnectionParam();
-        sparkConnectionParam.setPassword(PasswordUtils.encodePassword(sparkDatasourceParam.getPassword()));
-        sparkConnectionParam.setUser(sparkDatasourceParam.getUserName());
-        sparkConnectionParam.setOther(transformOther(sparkDatasourceParam.getOther()));
-        sparkConnectionParam.setDatabase(sparkDatasourceParam.getDatabase());
+        sparkConnectionParam.setPassword(PasswordUtils.encodePassword(sparkDataSourceParam.getPassword()));
+        sparkConnectionParam.setUser(sparkDataSourceParam.getUserName());
+        sparkConnectionParam.setOther(transformOther(sparkDataSourceParam.getOther()));
+        sparkConnectionParam.setDatabase(sparkDataSourceParam.getDatabase());
         sparkConnectionParam.setAddress(address.toString());
         sparkConnectionParam.setJdbcUrl(jdbcUrl);
-        sparkConnectionParam.setDriverClassName(getDatasourceDriver());
+        sparkConnectionParam.setDriverClassName(getDataSourceDriver());
         sparkConnectionParam.setValidationQuery(getValidationQuery());
-        sparkConnectionParam.setProps(sparkDatasourceParam.getOther());
+        sparkConnectionParam.setProps(sparkDataSourceParam.getOther());
 
         if (CommonUtils.getKerberosStartupState()) {
-            sparkConnectionParam.setPrincipal(sparkDatasourceParam.getPrincipal());
-            sparkConnectionParam.setJavaSecurityKrb5Conf(sparkDatasourceParam.getJavaSecurityKrb5Conf());
-            sparkConnectionParam.setLoginUserKeytabPath(sparkDatasourceParam.getLoginUserKeytabPath());
-            sparkConnectionParam.setLoginUserKeytabUsername(sparkDatasourceParam.getLoginUserKeytabUsername());
+            sparkConnectionParam.setPrincipal(sparkDataSourceParam.getPrincipal());
+            sparkConnectionParam.setJavaSecurityKrb5Conf(sparkDataSourceParam.getJavaSecurityKrb5Conf());
+            sparkConnectionParam.setLoginUserKeytabPath(sparkDataSourceParam.getLoginUserKeytabPath());
+            sparkConnectionParam.setLoginUserKeytabUsername(sparkDataSourceParam.getLoginUserKeytabUsername());
         }
 
         return sparkConnectionParam;
@@ -117,7 +117,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public String getDatasourceDriver() {
+    public String getDataSourceDriver() {
         return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
@@ -141,7 +141,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
         CommonUtils.loadKerberosConf(sparkConnectionParam.getJavaSecurityKrb5Conf(),
                 sparkConnectionParam.getLoginUserKeytabUsername(), sparkConnectionParam.getLoginUserKeytabPath());
-        Class.forName(getDatasourceDriver());
+        Class.forName(getDataSourceDriver());
         return DriverManager.getConnection(getJdbcUrl(sparkConnectionParam),
                 sparkConnectionParam.getUser(), PasswordUtils.decodePassword(sparkConnectionParam.getPassword()));
     }

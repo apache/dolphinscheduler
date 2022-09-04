@@ -131,7 +131,7 @@ export function formatParams(data: INodeData): {
         case 'MYSQL':
           targetParams = {
             targetType: data.targetMysqlType,
-            targetDatasource: data.targetMysqlDatasource,
+            targetDataSource: data.targetMysqlDataSource,
             targetTable: data.targetMysqlTable,
             targetColumns: data.targetMysqlColumns,
             fieldsTerminated: data.targetMysqlFieldsTerminated,
@@ -157,7 +157,7 @@ export function formatParams(data: INodeData): {
               data.srcQueryType === '0' ? '' : data.sourceMysqlSrcQuerySql,
             srcQueryType: data.srcQueryType,
             srcType: data.sourceMysqlType,
-            srcDatasource: data.sourceMysqlDatasource,
+            srcDataSource: data.sourceMysqlDataSource,
             mapColumnHive: data.mapColumnHive,
             mapColumnJava: data.mapColumnJava
           }
@@ -561,7 +561,7 @@ export function formatModel(data: ITaskData) {
     params.targetHdfsFieldsTerminated = targetParams.fieldsTerminated
     params.targetHdfsLinesTerminated = targetParams.linesTerminated
     params.targetMysqlType = targetParams.targetType
-    params.targetMysqlDatasource = targetParams.targetDatasource
+    params.targetMysqlDataSource = targetParams.targetDataSource
     params.targetMysqlTable = targetParams.targetTable
     params.targetMysqlColumns = targetParams.targetColumns
     params.targetMysqlFieldsTerminated = targetParams.fieldsTerminated
@@ -583,7 +583,7 @@ export function formatModel(data: ITaskData) {
     params.sourceMysqlSrcQuerySql = sourceParams.srcQuerySql
     params.srcQueryType = sourceParams.srcQueryType
     params.sourceMysqlType = sourceParams.srcType
-    params.sourceMysqlDatasource = sourceParams.srcDatasource
+    params.sourceMysqlDataSource = sourceParams.srcDataSource
     params.mapColumnHive = sourceParams.mapColumnHive || []
     params.mapColumnJava = sourceParams.mapColumnJava || []
     params.sourceHdfsExportDir = sourceParams.exportDir

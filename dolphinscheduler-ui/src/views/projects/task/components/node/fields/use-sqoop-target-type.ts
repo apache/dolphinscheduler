@@ -17,7 +17,7 @@
 
 import { ref, h, watch, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDatasource } from './use-sqoop-datasource'
+import { useDataSource } from './use-sqoop-datasource'
 import styles from '../index.module.scss'
 import type { IJsonItem, IOption, SourceType } from '../types'
 
@@ -280,11 +280,11 @@ export function useTargetType(
         placeholder: t('project.node.lines_terminated_tips')
       }
     },
-    ...useDatasource(
+    ...useDataSource(
       model,
       dataSourceSpan,
       'targetMysqlType',
-      'targetMysqlDatasource'
+      'targetMysqlDataSource'
     ),
     {
       type: 'input',

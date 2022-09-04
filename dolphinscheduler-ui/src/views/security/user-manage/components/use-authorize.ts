@@ -20,8 +20,8 @@ import {
   queryUnauthorizedProject
 } from '@/service/modules/projects'
 import {
-  authedDatasource,
-  unAuthDatasource
+  authedDataSource,
+  unAuthDataSource
 } from '@/service/modules/data-source'
 import {
   authorizedFile,
@@ -49,8 +49,8 @@ export function useAuthorize() {
     loading: false,
     authorizedProjects: [] as number[],
     unauthorizedProjects: [] as IOption[],
-    authorizedDatasources: [] as number[],
-    unauthorizedDatasources: [] as IOption[],
+    authorizedDataSources: [] as number[],
+    unauthorizedDataSources: [] as IOption[],
     authorizedUdfs: [] as number[],
     unauthorizedUdfs: [] as IOption[],
     authorizedNamespaces: [] as number[],
@@ -81,18 +81,18 @@ export function useAuthorize() {
     )
   }
 
-  const getDatasources = async (userId: number) => {
+  const getDataSources = async (userId: number) => {
     if (state.loading) return
     state.loading = true
     const datasources = await Promise.all([
-      authedDatasource({ userId }),
-      unAuthDatasource({ userId })
+      authedDataSource({ userId }),
+      unAuthDataSource({ userId })
     ])
     state.loading = false
-    state.authorizedDatasources = datasources[0].map(
+    state.authorizedDataSources = datasources[0].map(
       (item: { name: string; id: number }) => item.id
     )
-    state.unauthorizedDatasources = [...datasources[0], ...datasources[1]].map(
+    state.unauthorizedDataSources = [...datasources[0], ...datasources[1]].map(
       (item: { name: string; id: number }) => ({
         label: item.name,
         value: item.id
@@ -170,7 +170,7 @@ export function useAuthorize() {
       getProjects(userId)
     }
     if (type === 'authorize_datasource') {
-      getDatasources(userId)
+      getDataSources(userId)
     }
     if (type === 'authorize_udf') {
       getUdfs(userId)
@@ -225,7 +225,7 @@ export function useAuthorize() {
     if (type === 'authorize_datasource') {
       await grantDataSource({
         userId,
-        datasourceIds: state.authorizedDatasources.join(',')
+        datasourceIds: state.authorizedDataSources.join(',')
       })
     }
     if (type === 'authorize_udf') {

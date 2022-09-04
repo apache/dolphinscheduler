@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.DataSourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -878,9 +878,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         for (String datasourceId : datasourceIdArr) {
             Date now = new Date();
 
-            DatasourceUser datasourceUser = new DatasourceUser();
+            DataSourceUser datasourceUser = new DataSourceUser();
             datasourceUser.setUserId(userId);
-            datasourceUser.setDatasourceId(Integer.parseInt(datasourceId));
+            datasourceUser.setDataSourceId(Integer.parseInt(datasourceId));
             datasourceUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             datasourceUser.setCreateTime(now);
             datasourceUser.setUpdateTime(now);

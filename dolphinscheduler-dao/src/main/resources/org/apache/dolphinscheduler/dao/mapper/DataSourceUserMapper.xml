@@ -22,7 +22,7 @@
         delete from t_ds_relation_datasource_user
         where user_id = #{userId}
     </delete>
-    <delete id="deleteByDatasourceId">
+    <delete id="deleteByDataSourceId">
         delete from t_ds_relation_datasource_user
         where datasource_id = #{datasourceId}
     </delete>

@@ -551,7 +551,7 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/contribute/backend/spi/task.html',
                             },
                             {
-                                title: 'Datasource SPI',
+                                title: 'DataSource SPI',
                                 link: '/en-us/docs/dev/user_doc/contribute/backend/spi/datasource.html',
                             },
                             {
@@ -625,7 +625,7 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
                     },
                     {
-                        title: 'Datasource Setting',
+                        title: 'DataSource Setting',
                         link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
                     },
                     {
@@ -1155,7 +1155,7 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/task.html',
                             },
                             {
-                                title: 'Datasource SPI',
+                                title: 'DataSource SPI',
                                 link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/datasource.html',
                             },
                             {

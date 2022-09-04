@@ -120,7 +120,7 @@ public class RuleParserUtils {
                 config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),sourceDataSource));
                 config.put(USER,sourceDataSource.getUser());
                 config.put(PASSWORD,sourceDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
+                config.put(DRIVER, DataSourceUtils.getDataSourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
                 String outputTable = sourceDataSource.getDatabase() + "_" + inputParameterValue.get(SRC_TABLE);
                 config.put(OUTPUT_TABLE,outputTable);
                 inputParameterValue.put(SRC_TABLE,outputTable);
@@ -145,7 +145,7 @@ public class RuleParserUtils {
                 config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getTargetType()),targetDataSource));
                 config.put(USER,targetDataSource.getUser());
                 config.put(PASSWORD,targetDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
+                config.put(DRIVER, DataSourceUtils.getDataSourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
                 String outputTable = targetDataSource.getDatabase() + "_" + inputParameterValue.get(TARGET_TABLE);
                 config.put(OUTPUT_TABLE,outputTable);
                 inputParameterValue.put(TARGET_TABLE,outputTable);
@@ -271,7 +271,7 @@ public class RuleParserUtils {
                 config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getWriterType()),writerDataSource));
                 config.put(USER,writerDataSource.getUser());
                 config.put(PASSWORD,writerDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
+                config.put(DRIVER, DataSourceUtils.getDataSourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
                 config.put(SQL,sql);
             }
             writerConfig.setConfig(config);
@@ -337,7 +337,7 @@ public class RuleParserUtils {
                 config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getStatisticsValueType()),writerDataSource));
                 config.put(USER,writerDataSource.getUser());
                 config.put(PASSWORD,writerDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
+                config.put(DRIVER, DataSourceUtils.getDataSourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
             }
 
             baseConfig.setConfig(config);

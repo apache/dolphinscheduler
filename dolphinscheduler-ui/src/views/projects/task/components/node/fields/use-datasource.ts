@@ -22,10 +22,10 @@ import { indexOf, find } from 'lodash'
 import type { IJsonItem } from '../types'
 import type { TypeReq } from '@/service/modules/data-source/types'
 
-export function useDatasource(
+export function useDataSource(
   model: { [field: string]: any },
   params: {
-    supportedDatasourceType?: string[]
+    supportedDataSourceType?: string[]
     typeField?: string
     sourceField?: string
     span?: Ref | number
@@ -89,14 +89,14 @@ export function useDatasource(
     }
   ]
 
-  const getDatasourceTypes = async () => {
+  const getDataSourceTypes = async () => {
     options.value = datasourceTypes
       .filter((item) => {
         if (item.disabled) {
           return false
         }
-        if (params.supportedDatasourceType) {
-          return indexOf(params.supportedDatasourceType, item.code) !== -1
+        if (params.supportedDataSourceType) {
+          return indexOf(params.supportedDataSourceType, item.code) !== -1
         }
         return true
       })
@@ -125,7 +125,7 @@ export function useDatasource(
   }
 
   onMounted(async () => {
-    getDatasourceTypes()
+    getDataSourceTypes()
     await nextTick()
     refreshOptions()
   })

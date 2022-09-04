@@ -42,8 +42,8 @@ public class DataSourceUtils {
      *
      * @param baseDataSourceParamDTO datasource param
      */
-    public static void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        getDatasourceProcessor(baseDataSourceParamDTO.getType()).checkDatasourceParam(baseDataSourceParamDTO);
+    public static void checkDataSourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
+        getDataSourceProcessor(baseDataSourceParamDTO.getType()).checkDataSourceParam(baseDataSourceParamDTO);
     }
 
     /**
@@ -52,37 +52,37 @@ public class DataSourceUtils {
      * @param baseDataSourceParamDTO datasourceParam
      */
     public static ConnectionParam buildConnectionParams(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        ConnectionParam connectionParams = getDatasourceProcessor(baseDataSourceParamDTO.getType())
+        ConnectionParam connectionParams = getDataSourceProcessor(baseDataSourceParamDTO.getType())
                 .createConnectionParams(baseDataSourceParamDTO);
         logger.info("parameters map:{}", connectionParams);
         return connectionParams;
     }
 
     public static ConnectionParam buildConnectionParams(DbType dbType, String connectionJson) {
-        return getDatasourceProcessor(dbType).createConnectionParams(connectionJson);
+        return getDataSourceProcessor(dbType).createConnectionParams(connectionJson);
     }
 
     public static String getJdbcUrl(DbType dbType, ConnectionParam baseConnectionParam) {
-        return getDatasourceProcessor(dbType).getJdbcUrl(baseConnectionParam);
+        return getDataSourceProcessor(dbType).getJdbcUrl(baseConnectionParam);
     }
 
     public static Connection getConnection(DbType dbType, ConnectionParam connectionParam) {
         try {
-            return getDatasourceProcessor(dbType).getConnection(connectionParam);
+            return getDataSourceProcessor(dbType).getConnection(connectionParam);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String getDatasourceDriver(DbType dbType) {
-        return getDatasourceProcessor(dbType).getDatasourceDriver();
+    public static String getDataSourceDriver(DbType dbType) {
+        return getDataSourceProcessor(dbType).getDataSourceDriver();
     }
 
-    public static BaseDataSourceParamDTO buildDatasourceParamDTO(DbType dbType, String connectionParams) {
-        return getDatasourceProcessor(dbType).createDatasourceParamDTO(connectionParams);
+    public static BaseDataSourceParamDTO buildDataSourceParamDTO(DbType dbType, String connectionParams) {
+        return getDataSourceProcessor(dbType).createDataSourceParamDTO(connectionParams);
     }
 
-    public static DataSourceProcessor getDatasourceProcessor(DbType dbType) {
+    public static DataSourceProcessor getDataSourceProcessor(DbType dbType) {
         Map<String, DataSourceProcessor> dataSourceProcessorMap = DataSourceProcessorProvider.getInstance().getDataSourceProcessorMap();
         if (!dataSourceProcessorMap.containsKey(dbType.name())) {
             throw new IllegalArgumentException("illegal datasource type");
@@ -93,17 +93,17 @@ public class DataSourceUtils {
     /**
      * get datasource UniqueId
      */
-    public static String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
-        return getDatasourceProcessor(dbType).getDatasourceUniqueId(connectionParam, dbType);
+    public static String getDataSourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
+        return getDataSourceProcessor(dbType).getDataSourceUniqueId(connectionParam, dbType);
     }
 
     /**
      * build connection url
      */
-    public static BaseDataSourceParamDTO buildDatasourceParam(String param) {
+    public static BaseDataSourceParamDTO buildDataSourceParam(String param) {
         JsonNode jsonNodes = JSONUtils.parseObject(param);
 
-        return getDatasourceProcessor(DbType.ofName(jsonNodes.get("type").asText().toUpperCase()))
-                .castDatasourceParamDTO(param);
+        return getDataSourceProcessor(DbType.ofName(jsonNodes.get("type").asText().toUpperCase()))
+                .castDataSourceParamDTO(param);
     }
 }
