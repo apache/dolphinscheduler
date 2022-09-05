@@ -1072,7 +1072,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 childList = new ArrayList<>(childDependentList);
             }
         }
-        log.info("processDefinitionCode={}, size={}, dependentProcessDefinitionList={}", processDefinitionCode, dependentProcessDefinitionList.size(), dependentProcessDefinitionList);
         return dependentProcessDefinitionList;
     }
 
