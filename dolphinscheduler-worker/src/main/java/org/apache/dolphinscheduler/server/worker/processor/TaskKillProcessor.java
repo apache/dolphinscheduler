@@ -83,7 +83,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
         if (killCommand == null) {
             logger.error("task kill request command is null");
@@ -93,21 +93,15 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
         int taskInstanceId = killCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext =
-                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+            TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
             logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
             return;
         }
 
         int processId = taskExecutionContext.getProcessId();
-
-        this.cancelApplication(taskInstanceId);
-
-        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
-
-        // if processId = 0 and yarn application_id list is empty, the task has not been executed and has been cancelled.
-
-        if (processId == 0 && result.getRight().isEmpty()) {
+        if (processId == 0) {
+            this.cancelApplication(taskInstanceId);
             workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
             taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
@@ -116,8 +110,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             return;
         }
 
+        // if processId > 0, it should call cancelApplication to cancel remote application too.
+        this.cancelApplication(taskInstanceId);
+        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
+
         taskExecutionContext.setCurrentExecutionStatus(
-                result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
+            result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
         sendTaskKillResponseCommand(channel, taskExecutionContext);
 
@@ -158,9 +156,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
         // find log and kill yarn job
         Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
+            taskExecutionContext.getLogPath(),
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTenantCode());
         return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
     }
 
@@ -227,7 +225,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                                                     String tenantCode) {
         if (logPath == null || executePath == null || tenantCode == null) {
             logger.error("Kill yarn job error, the input params is illegal, host: {}, logPath: {}, executePath: {}, tenantCode: {}",
-                    host, logPath, executePath, tenantCode);
+                host, logPath, executePath, tenantCode);
             return Pair.of(false, Collections.emptyList());
         }
         try (LogClientService logClient = new LogClientService()) {
