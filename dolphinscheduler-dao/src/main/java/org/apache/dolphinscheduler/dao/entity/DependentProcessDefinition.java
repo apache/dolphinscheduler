@@ -42,6 +42,11 @@ public class DependentProcessDefinition {
     private String processDefinitionName;
 
     /**
+     * process definition version
+     **/
+    private int processDefinitionVersion;
+
+    /**
      * task definition name
      */
     private long taskDefinitionCode;
@@ -120,6 +125,14 @@ public class DependentProcessDefinition {
 
     public void setProcessDefinitionCode(long code) {
         this.processDefinitionCode = code;
+    }
+
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
+    }
+
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
     }
 
     public long getTaskDefinitionCode() {

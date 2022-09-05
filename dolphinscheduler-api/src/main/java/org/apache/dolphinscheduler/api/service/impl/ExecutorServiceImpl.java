@@ -891,13 +891,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
-            long processDefinitionCode = dependentProcessDefinition.getProcessDefinitionCode();
-
-            // get dependent downstream version
-            ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-            dependentCommand.setProcessDefinitionVersion(processDefinition.getVersion());
-
-            dependentCommand.setProcessDefinitionCode(processDefinitionCode);
+            dependentCommand.setProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode());
+            dependentCommand.setProcessDefinitionVersion(dependentProcessDefinition.getProcessDefinitionVersion());
             dependentCommand.setWorkerGroup(dependentProcessDefinition.getWorkerGroup());
             Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
             cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentProcessDefinition.getTaskDefinitionCode()));
