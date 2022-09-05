@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.api.dto.dataAnalysis.TaskStateCountRequest;
 import org.apache.dolphinscheduler.api.dto.dataAnalysis.TaskStateCountResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -83,7 +82,8 @@ public class DataAnalysisV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_INSTANCE_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countTaskState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+
+    public TaskStateCountResponse countTaskState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestBody TaskStateCountRequest taskStateCountReq) {
 
         Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, taskStateCountReq.getProjectCode(), taskStateCountReq.getStartDate(), taskStateCountReq.getEndDate());
@@ -107,7 +107,7 @@ public class DataAnalysisV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_INSTANCE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countProcessInstanceState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProcessInstanceStateCountResponse countProcessInstanceState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestBody ProcessInstanceStateCountRequest processInstanceStateCountReq) {
 
         Map<String, Object> result =
@@ -130,7 +130,7 @@ public class DataAnalysisV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProcessDefinitionStateCountResponse countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestBody ProcessDefinitionStateCountRequest processDefinitionStateCountReq) {
 
         Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, processDefinitionStateCountReq.getProjectCode());
@@ -148,7 +148,7 @@ public class DataAnalysisV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COMMAND_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public CommandStateCountResponse countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         Map<String, Object> result = dataAnalysisService.countCommandState(loginUser);
         return new CommandStateCountResponse(result);
@@ -165,7 +165,7 @@ public class DataAnalysisV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUEUE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public QueueStateCountResponse countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         Map<String, Object> result = dataAnalysisService.countQueueState(loginUser);
         return new QueueStateCountResponse(result);
