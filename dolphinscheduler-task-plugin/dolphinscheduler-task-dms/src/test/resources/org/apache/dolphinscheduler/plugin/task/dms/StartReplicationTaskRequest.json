@@ -1,0 +1,7 @@
+{
+  "ReplicationTaskArn":"arn:aws:dms:us-east-1:123456789012:task:RALPZGYI3IUSJCBKKIRBEURKDY",
+  "StartReplicationTaskType":"reload-target",
+  "CdcStartPosition":"mysql-bin-changelog.000024:373",
+  "CdcStartTime": "2018-03-08T12:12:12",
+  "CdcStopPosition": "server_time:2018-02-09T12:12:12"
+}
