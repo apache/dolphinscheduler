@@ -52,27 +52,38 @@ public class TaskTypeConfiguration {
     private List<String> other;
     private List<String> machineLearning;
 
+    private static final List<FavTaskDto> defaultTaskTypes = new ArrayList<>();
+
     public List<FavTaskDto> getDefaultTaskTypes() {
-        List<FavTaskDto> defaultTaskTypes = new ArrayList<>();
+        if (defaultTaskTypes.size() <= 0) {
+            printDefaultTypes();
+            universal.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_UNIVERSAL)));
+            cloud.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_CLOUD)));
+            logic.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_LOGIC)));
+            dataIntegration.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
+            dataQuality.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_QUALITY)));
+            machineLearning.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
+            other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
 
-        universal.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_UNIVERSAL)));
-        cloud.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_CLOUD)));
-        logic.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_LOGIC)));
-        dataIntegration.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
-        dataQuality.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_QUALITY)));
-        machineLearning.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
-        other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
-
-        return defaultTaskTypes;
+        }
+        List<FavTaskDto> result = new ArrayList<>();
+        defaultTaskTypes.forEach(e -> {
+            try {
+                result.add((FavTaskDto) e.clone());
+            } catch (CloneNotSupportedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return result;
     }
 
-    public void printDefaultTypes(){
-        logger.debug("support default universal task types: {}", universal);
-        logger.debug("support default cloud task types: {}", cloud);
-        logger.debug("support default logic task types: {}", logic);
-        logger.debug("support default dataIntegration task types: {}", dataIntegration);
-        logger.debug("support default dataQuality task types: {}", dataQuality);
-        logger.debug("support default machineLearning task types: {}", machineLearning);
-        logger.debug("support default other task types: {}", other);
+    public void printDefaultTypes() {
+        logger.info("support default universal task types: {}", universal);
+        logger.info("support default cloud task types: {}", cloud);
+        logger.info("support default logic task types: {}", logic);
+        logger.info("support default dataIntegration task types: {}", dataIntegration);
+        logger.info("support default dataQuality task types: {}", dataQuality);
+        logger.info("support default machineLearning task types: {}", machineLearning);
+        logger.info("support default other task types: {}", other);
     }
 }
