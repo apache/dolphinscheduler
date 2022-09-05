@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
@@ -40,13 +42,14 @@ import lombok.Setter;
 @Setter
 public class TaskTypeConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(TaskTypeConfiguration.class);
+
     private List<String> universal;
     private List<String> cloud;
     private List<String> logic;
     private List<String> dataIntegration;
     private List<String> dataQuality;
     private List<String> other;
-
     private List<String> machineLearning;
 
     public List<FavTaskDto> getDefaultTaskTypes() {
@@ -61,5 +64,15 @@ public class TaskTypeConfiguration {
         other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
 
         return defaultTaskTypes;
+    }
+
+    public void printDefaultTypes(){
+        logger.debug("support default universal task types: {}", universal);
+        logger.debug("support default cloud task types: {}", cloud);
+        logger.debug("support default logic task types: {}", logic);
+        logger.debug("support default dataIntegration task types: {}", dataIntegration);
+        logger.debug("support default dataQuality task types: {}", dataQuality);
+        logger.debug("support default machineLearning task types: {}", machineLearning);
+        logger.debug("support default other task types: {}", other);
     }
 }
