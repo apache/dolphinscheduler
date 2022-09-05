@@ -609,7 +609,7 @@
                 <artifactId>lz4-java</artifactId>
                 <version>${lz4-java.version}</version>
             </dependency>
-            
+
         </dependencies>
 
     </dependencyManagement>
