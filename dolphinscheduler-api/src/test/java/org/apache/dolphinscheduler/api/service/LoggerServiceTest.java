@@ -73,11 +73,6 @@ public class LoggerServiceTest {
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
-    @Before
-    public void init() {
-        this.loggerService.init();
-    }
-
     @Test
     public void testQueryDataSourceList() {
 
@@ -187,11 +182,6 @@ public class LoggerServiceTest {
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         loggerService.getLogBytes(loginUser, projectCode, 1);
-    }
-
-    @After
-    public void close() {
-        this.loggerService.close();
     }
 
     /**
