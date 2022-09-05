@@ -75,6 +75,6 @@ public class MasterRestfulServiceImpl implements MasterRestfulService {
     }
 
     private String getUrl(String masterAddress, String uri) {
-        return rpcConfiguration.getRpcPrefix() + masterAddress + uri;
+        return rpcConfiguration.getRpcPrefix() + masterAddress + rpcConfiguration.getMasterUrlPrefix() + uri;
     }
 }
