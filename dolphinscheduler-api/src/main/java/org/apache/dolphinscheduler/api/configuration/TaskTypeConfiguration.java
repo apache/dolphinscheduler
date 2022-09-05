@@ -17,19 +17,22 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 @EnableConfigurationProperties
@@ -39,18 +42,21 @@ import java.util.Set;
 @Setter
 public class TaskTypeConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(TaskTypeConfiguration.class);
+
     private List<String> universal;
     private List<String> cloud;
     private List<String> logic;
     private List<String> dataIntegration;
     private List<String> dataQuality;
     private List<String> other;
-
     private List<String> machineLearning;
 
-    public Set<FavTaskDto> getDefaultTaskTypes() {
-        Set<FavTaskDto> defaultTaskTypes = new HashSet<>();
+    private static final List<FavTaskDto> defaultTaskTypes = new ArrayList<>();
+
+    public List<FavTaskDto> getDefaultTaskTypes() {
         if (defaultTaskTypes.size() <= 0) {
+            printDefaultTypes();
             universal.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_UNIVERSAL)));
             cloud.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_CLOUD)));
             logic.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_LOGIC)));
@@ -60,7 +66,24 @@ public class TaskTypeConfiguration {
             other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
 
         }
+        List<FavTaskDto> result = new ArrayList<>();
+        defaultTaskTypes.forEach(e -> {
+            try {
+                result.add((FavTaskDto) e.clone());
+            } catch (CloneNotSupportedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return result;
+    }
 
-        return defaultTaskTypes;
+    public void printDefaultTypes() {
+        logger.info("support default universal task types: {}", universal);
+        logger.info("support default cloud task types: {}", cloud);
+        logger.info("support default logic task types: {}", logic);
+        logger.info("support default dataIntegration task types: {}", dataIntegration);
+        logger.info("support default dataQuality task types: {}", dataQuality);
+        logger.info("support default machineLearning task types: {}", machineLearning);
+        logger.info("support default other task types: {}", other);
     }
 }

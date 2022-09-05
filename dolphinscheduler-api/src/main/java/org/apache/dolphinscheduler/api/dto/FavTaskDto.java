@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FavTaskDto {
+public class FavTaskDto implements Cloneable {
 
     private String taskName;
     private boolean isCollection;
@@ -45,5 +45,10 @@ public class FavTaskDto {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
