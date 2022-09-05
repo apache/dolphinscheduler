@@ -84,7 +84,7 @@ public class MonitorController extends BaseController {
     }
 
     @ApiOperation(value = "listApiServers", notes = "ALERT_SERVER_LIST_NOTES")
-    @GetMapping(value = "/alertApiServers")
+    @GetMapping(value = "/apiServers")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_API_SERVERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

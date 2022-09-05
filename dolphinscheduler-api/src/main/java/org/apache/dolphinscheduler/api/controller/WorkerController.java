@@ -30,11 +30,11 @@ public class WorkerController {
     private WorkerRestfulService workerRestfulService;
 
 
-    @ApiOperation(value = "queryExecutingTaskExecutionContext", notes = "QUERY_EXECUTING_TASK_EXECUTION_CONTEXT")
+    @ApiOperation(value = "listingExecutingTaskExecutionContext", notes = "QUERY_EXECUTING_TASK_EXECUTION_CONTEXT")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "workerAddress", value = "WORKER_ADDRESS", required = true, dataTypeClass = String.class, example = "127.0.0.1:5679")
     })
-    @GetMapping(value = "/{workerAddress}/queryExecutingTaskExecutionContext")
+    @GetMapping(value = "/{workerAddress}/listingExecutingTaskExecutionContexts")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LISTING_EXECUTING_TASK_EXECUTION_CONTEXT_BY_WORKER_ERROR)
     public Result<List<TaskExecutionContext>> listingExecutingTaskExecutionContext(@PathVariable("workerAddress") String workerAddress) {
@@ -42,11 +42,11 @@ public class WorkerController {
         return Result.success(taskExecutionContexts);
     }
 
-    @ApiOperation(value = "queryWaitingTask", notes = "QUERY_WAITING_TASK")
+    @ApiOperation(value = "listingWaitingTask", notes = "QUERY_WAITING_TASK")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "workerAddress", value = "WORKER_ADDRESS", required = true, dataTypeClass = String.class, example = "127.0.0.1:5679")
     })
-    @GetMapping(value = "/{workerAddress}/queryWaitingTask")
+    @GetMapping(value = "/{workerAddress}/listingWaitingTasks")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LISTING_EXECUTING_TASK_EXECUTION_CONTEXT_BY_WORKER_ERROR)
     public Result<List<WorkerTaskInstanceWaitingDto>> listingWaitingTask(@PathVariable("workerAddress") String workerAddress) {
