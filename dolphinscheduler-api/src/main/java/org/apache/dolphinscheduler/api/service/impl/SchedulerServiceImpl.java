@@ -78,9 +78,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cronutils.model.Cron;
 
-/**
- * scheduler service impl
- */
 @Service
 public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerService {
 
@@ -382,9 +379,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     return result;
             }
         } catch (Exception e) {
-            result.put(Constants.MSG,
-                    scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
-            throw new ServiceException(result.get(Constants.MSG).toString(), e);
+            Status status = scheduleStatus == ReleaseState.ONLINE ? Status.PUBLISH_SCHEDULE_ONLINE_ERROR
+                    : Status.OFFLINE_SCHEDULE_ERROR;
+            result.put(Constants.STATUS, status);
+            throw new ServiceException(status, e);
         }
 
         putMsg(result, Status.SUCCESS);

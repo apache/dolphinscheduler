@@ -17,6 +17,17 @@
 
 package org.apache.dolphinscheduler.remote;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -35,6 +46,8 @@ import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,112 +56,48 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
-
-/**
- * remoting netty client
- */
-public class NettyRemotingClient {
+public class NettyRemotingClient implements AutoCloseable {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingClient.class);
 
-    /**
-     * client bootstrap
-     */
     private final Bootstrap bootstrap = new Bootstrap();
 
-    /**
-     * encoder
-     */
     private final NettyEncoder encoder = new NettyEncoder();
 
-    /**
-     * channels
-     */
     private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
-    /**
-     * started flag
-     */
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    /**
-     * worker group
-     */
     private final EventLoopGroup workerGroup;
 
-    /**
-     * client config
-     */
     private final NettyClientConfig clientConfig;
 
-    /**
-     * saync semaphore
-     */
     private final Semaphore asyncSemaphore = new Semaphore(200, true);
 
-    /**
-     * callback thread executor
-     */
     private final ExecutorService callbackExecutor;
 
-    /**
-     * client handler
-     */
     private final NettyClientHandler clientHandler;
 
-    /**
-     * response future executor
-     */
     private final ScheduledExecutorService responseFutureExecutor;
 
-    /**
-     * client init
-     *
-     * @param clientConfig client config
-     */
     public NettyRemotingClient(final NettyClientConfig clientConfig) {
         this.clientConfig = clientConfig;
         if (Epoll.isAvailable()) {
-            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private final AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
         } else {
-            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private final AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
         }
-        this.callbackExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
+        this.callbackExecutor = new ThreadPoolExecutor(
+                Constants.CPUS,
+                Constants.CPUS,
+                1,
+                TimeUnit.MINUTES,
+                new LinkedBlockingQueue<>(1000),
+                new NamedThreadFactory("CallbackExecutor"),
                 new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
 
@@ -157,9 +106,6 @@ public class NettyRemotingClient {
         this.start();
     }
 
-    /**
-     * start
-     */
     private void start() {
 
         this.bootstrap
@@ -371,9 +317,7 @@ public class NettyRemotingClient {
         return null;
     }
 
-    /**
-     * close
-     */
+    @Override
     public void close() {
         if (isStarted.compareAndSet(true, false)) {
             try {
