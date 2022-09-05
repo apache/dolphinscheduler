@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,17 +181,15 @@ public class ProcessUtils {
      * @param taskExecutionContext taskExecutionContext
      * @return yarn application ids
      */
-    public static @Nullable List<String> killYarnJob(@NonNull TaskExecutionContext taskExecutionContext) {
+    public static @Nullable List<String> killYarnJob(@NonNull LogClient logClient,
+                                                     @NonNull TaskExecutionContext taskExecutionContext) {
         if (taskExecutionContext.getLogPath() == null) {
             return Collections.emptyList();
         }
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            List<String> appIds;
-            try (LogClientService logClient = new LogClientService()) {
-                Host host = Host.of(taskExecutionContext.getHost());
-                appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
-            }
+            Host host = Host.of(taskExecutionContext.getHost());
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext.setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),

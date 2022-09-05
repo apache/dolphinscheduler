@@ -32,18 +32,15 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
@@ -61,7 +58,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @Autowired
     private ProcessService processService;
 
-    private LogClientService logClient;
+    @Autowired
+    private LogClient logClient;
 
     @Autowired
     ProjectMapper projectMapper;
@@ -71,20 +69,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
     @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @PostConstruct
-    public void init() {
-        if (Objects.isNull(this.logClient)) {
-            this.logClient = new LogClientService();
-        }
-    }
-
-    @PreDestroy
-    public void close() {
-        if (Objects.nonNull(this.logClient) && this.logClient.isRunning()) {
-            logClient.close();
-        }
-    }
 
     /**
      * view log

@@ -58,10 +58,10 @@ public class MasterHeartBeat implements HeartBeat {
         private int totalMasterCount;
         private int workflowEventQueueWaitingEventNum;
         private int runningWorkflowNum;
-        private int workflowExecuteThreadPoolRunningTaskNum;
-        private long workflowExecuteThreadPoolWaitingTaskNum;
-        private int taskExecuteThreadPoolRunningTaskNum;
-        private long taskExecuteThreadPoolWaitingTaskNum;
+        private int workflowExecuteThreadPoolRunningThreadNum;
+        private long workflowExecuteThreadPoolWaitingJobNum;
+        private int taskExecuteThreadPoolRunningThreadNum;
+        private long taskExecuteThreadPoolWaitingJobNum;
 
     }
 }

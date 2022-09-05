@@ -120,7 +120,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.corn.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
-import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -141,6 +141,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -272,6 +273,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private LogClient logClient;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -448,8 +452,8 @@ public class ProcessServiceImpl implements ProcessService {
      * @return process instance
      */
     @Override
-    public ProcessInstance findProcessInstanceDetailById(int processId) {
-        return processInstanceMapper.queryDetailById(processId);
+    public Optional<ProcessInstance> findProcessInstanceDetailById(int processId) {
+        return Optional.ofNullable(processInstanceMapper.queryDetailById(processId));
     }
 
     /**
@@ -569,16 +573,14 @@ public class ProcessServiceImpl implements ProcessService {
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
-        try (LogClientService logClient = new LogClientService()) {
-            for (TaskInstance taskInstance : taskInstanceList) {
-                String taskLogPath = taskInstance.getLogPath();
-                if (StringUtils.isEmpty(taskInstance.getHost())) {
-                    continue;
-                }
-                Host host = Host.of(taskInstance.getHost());
-                // remove task log from loggerserver
-                logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
+        for (TaskInstance taskInstance : taskInstanceList) {
+            String taskLogPath = taskInstance.getLogPath();
+            if (StringUtils.isEmpty(taskInstance.getHost())) {
+                continue;
             }
+            Host host = Host.of(taskInstance.getHost());
+            // remove task log from loggerserver
+            logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
         }
     }
 
@@ -883,7 +885,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param host    host
      * @return process instance
      */
-    protected ProcessInstance constructProcessInstance(Command command, String host) {
+    protected @Nullable ProcessInstance constructProcessInstance(Command command, String host) {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
@@ -899,7 +901,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (processInstanceId == 0) {
             processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
         } else {
-            processInstance = this.findProcessInstanceDetailById(processInstanceId);
+            processInstance = this.findProcessInstanceDetailById(processInstanceId).orElse(null);
             if (processInstance == null) {
                 return null;
             }
@@ -1036,7 +1038,7 @@ public class ProcessServiceImpl implements ProcessService {
      *
      * @return ProcessDefinition
      */
-    private ProcessDefinition getProcessDefinitionByCommand(long processDefinitionCode, Map<String, String> cmdParam) {
+    private @Nullable ProcessDefinition getProcessDefinitionByCommand(long processDefinitionCode, Map<String, String> cmdParam) {
         if (cmdParam != null) {
             int processInstanceId = 0;
             if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING)) {
@@ -1048,7 +1050,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
 
             if (processInstanceId != 0) {
-                ProcessInstance processInstance = this.findProcessInstanceDetailById(processInstanceId);
+                ProcessInstance processInstance = this.findProcessInstanceDetailById(processInstanceId).orElse(null);
                 if (processInstance == null) {
                     return null;
                 }
@@ -1142,7 +1144,7 @@ public class ProcessServiceImpl implements ProcessService {
         // copy parent instance user def params to sub process..
         String parentInstanceId = paramMap.get(CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID);
         if (StringUtils.isNotEmpty(parentInstanceId)) {
-            ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId));
+            ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId)).orElse(null);
             if (parentInstance != null) {
                 subProcessInstance.setGlobalParams(joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
                 subProcessInstance.setVarPool(joinVarPool(parentInstance.getVarPool(), subProcessInstance.getVarPool()));

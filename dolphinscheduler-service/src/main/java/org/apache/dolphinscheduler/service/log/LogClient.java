@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.log;
 
 import lombok.NonNull;
+import org.apache.commons.compress.utils.ByteUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -39,46 +40,24 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-/**
- * log client
- */
-public class LogClientService implements AutoCloseable {
+@Service
+public class LogClient implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
-
-    private final NettyClientConfig clientConfig;
+    private static final Logger logger = LoggerFactory.getLogger(LogClient.class);
 
     private final NettyRemotingClient client;
 
-    private volatile boolean isRunning;
-
-    /**
-     * request time out
-     */
     private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
 
-    /**
-     * construct client
-     */
-    public LogClientService() {
-        this.clientConfig = new NettyClientConfig();
-        this.clientConfig.setWorkerThreads(4);
-        this.client = new NettyRemotingClient(clientConfig);
-        this.isRunning = true;
-    }
-
-    /**
-     * close
-     */
-    @Override
-    public void close() {
-        this.client.close();
-        this.isRunning = false;
-        logger.info("logger client closed");
+    public LogClient() {
+        NettyClientConfig nettyClientConfig = new NettyClientConfig();
+        this.client = new NettyRemotingClient(nettyClientConfig);
+        logger.info("Initialized LogClientService with config: {}", nettyClientConfig);
     }
 
     /**
@@ -92,24 +71,21 @@ public class LogClientService implements AutoCloseable {
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
+        logger.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
-        String result = "";
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Command response = client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(
-                        response.getBody(), RollViewLogResponseCommand.class);
+                RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
+            return "Roll view log response is null";
         } catch (Exception e) {
-            logger.error("roll view log error", e);
-        } finally {
-            this.client.closeChannel(address);
+            logger.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port, path, skipLineNum, limit, e);
+            return "Roll view log error: " + e.getMessage();
         }
-        return result;
     }
 
     /**
@@ -121,28 +97,25 @@ public class LogClientService implements AutoCloseable {
      * @return log content
      */
     public String viewLog(String host, int port, String path) {
-        logger.info("view log path {}", path);
+        logger.info("View log from host: {}, port: {}, logPath: {}", host, port, path);
         ViewLogRequestCommand request = new ViewLogRequestCommand(path);
-        String result = "";
         final Host address = new Host(host, port);
         try {
             if (NetUtils.getHost().equals(host)) {
-                result = LoggerUtils.readWholeFileContent(request.getPath());
+                return LoggerUtils.readWholeFileContent(request.getPath());
             } else {
                 Command command = request.convert2Command();
                 Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
-                    ViewLogResponseCommand viewLog = JSONUtils.parseObject(
-                            response.getBody(), ViewLogResponseCommand.class);
-                    result = viewLog.getMsg();
+                    ViewLogResponseCommand viewLog = JSONUtils.parseObject(response.getBody(), ViewLogResponseCommand.class);
+                    return viewLog.getMsg();
                 }
+                return "View log response is null";
             }
         } catch (Exception e) {
-            logger.error("view log error", e);
-        } finally {
-            this.client.closeChannel(address);
+            logger.error("View log from host: {}, port: {}, logPath: {} error", host, port, path, e);
+            return "View log error: " + e.getMessage();
         }
-        return result;
     }
 
     /**
@@ -154,23 +127,21 @@ public class LogClientService implements AutoCloseable {
      * @return log content bytes
      */
     public byte[] getLogBytes(String host, int port, String path) {
-        logger.info("log path {}", path);
+        logger.info("Get log bytes from host: {}, port: {}, logPath {}", host, port, path);
         GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
-                        response.getBody(), GetLogBytesResponseCommand.class);
-                return getLog.getData() == null ? new byte[0] : getLog.getData();
+                GetLogBytesResponseCommand getLog = JSONUtils.parseObject(response.getBody(), GetLogBytesResponseCommand.class);
+                return getLog.getData() == null ? ByteUtils.EMPTY_BYTE_ARRAY : getLog.getData();
             }
+            return ByteUtils.EMPTY_BYTE_ARRAY;
         } catch (Exception e) {
-            logger.error("get log size error", e);
-        } finally {
-            this.client.closeChannel(address);
+            logger.error("Get logSize from host: {}, port: {}, logPath: {} error", host, port, path, e);
+            return ByteUtils.EMPTY_BYTE_ARRAY;
         }
-        return new byte[0];
     }
 
     /**
@@ -182,49 +153,45 @@ public class LogClientService implements AutoCloseable {
      * @return remove task status
      */
     public Boolean removeTaskLog(String host, int port, String path) {
-        logger.info("log path {}", path);
+        logger.info("Remove task log from host: {}, port: {}, logPath {}", host, port, path);
         RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
-        Boolean result = false;
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(
-                        response.getBody(), RemoveTaskLogResponseCommand.class);
+                RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }
+            return false;
         } catch (Exception e) {
-            logger.error("remove task log error", e);
-        } finally {
-            this.client.closeChannel(address);
+            logger.error("Remove task log from host: {}, port: {} logPath: {} error", host, port, path, e);
+            return false;
         }
-        return result;
     }
 
     public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
         logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}", host, port, taskLogFilePath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
-        try {
-            if (NetUtils.getHost().equals(host)) {
-                appIds = LogUtils.getAppIdsFromLogFile(taskLogFilePath);
-            } else {
-                final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
-                Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
-                if (response != null) {
-                    GetAppIdResponseCommand responseCommand = JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
-                    appIds = responseCommand.getAppIds();
-                }
+        if (NetUtils.getHost().equals(host)) {
+            appIds = LogUtils.getAppIdsFromLogFile(taskLogFilePath);
+        } else {
+            final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
+            Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
+            if (response != null) {
+                GetAppIdResponseCommand responseCommand = JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
+                appIds = responseCommand.getAppIds();
             }
-        } finally {
-            client.closeChannel(workerAddress);
         }
         logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}", appIds, host, port, taskLogFilePath);
         return appIds;
     }
 
-    public boolean isRunning() {
-        return isRunning;
+    @Override
+    public void close() {
+        this.client.close();
+        logger.info("LogClientService closed");
     }
+
 }

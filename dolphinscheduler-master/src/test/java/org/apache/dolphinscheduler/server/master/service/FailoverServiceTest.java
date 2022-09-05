@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-
+import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -37,13 +32,9 @@ import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,9 +45,16 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
+
+import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 
 /**
  * MasterRegistryClientTest
@@ -82,6 +80,9 @@ public class FailoverServiceTest {
     @Mock
     private ProcessInstanceExecCacheManager cacheManager;
 
+    @Mock
+    private LogClient logClient;
+
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -100,12 +101,13 @@ public class FailoverServiceTest {
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
         MasterFailoverService masterFailoverService =
-            new MasterFailoverService(registryClient, masterConfig, processService, cacheManager);
+                new MasterFailoverService(registryClient, masterConfig, processService, cacheManager);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
-            masterConfig,
-            processService,
-            workflowExecuteThreadPool,
-            cacheManager);
+                masterConfig,
+                processService,
+                workflowExecuteThreadPool,
+                cacheManager,
+                logClient);
 
         failoverService = new FailoverService(masterFailoverService, workerFailoverService);
 
@@ -148,7 +150,7 @@ public class FailoverServiceTest {
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString())).willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
         given(processService.findValidTaskListByProcessId(Mockito.anyInt())).willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(processInstance);
+        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(Optional.ofNullable(processInstance));
 
         Thread.sleep(1000);
         Server masterServer = new Server();

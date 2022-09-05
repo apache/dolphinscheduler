@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +78,7 @@ public interface ProcessService {
 
     boolean verifyIsNeedCreateCommand(Command command);
 
-    ProcessInstance findProcessInstanceDetailById(int processId);
+    Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
     List<TaskDefinition> getTaskNodeListByDefinition(long defineCode);
 

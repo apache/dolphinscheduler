@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.CheckComplementDto;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -79,6 +80,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -351,11 +353,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
-        if (processInstance == null) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
-            return result;
-        }
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
         ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
@@ -954,8 +953,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return
      */
     @Override
-    public WorkflowInstanceExecuteDetailDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
+    public @Nullable WorkflowInstanceExecuteDetailDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId).orElse(null);
         if (processInstance == null) {
             return null;
         }
