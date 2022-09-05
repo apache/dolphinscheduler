@@ -95,6 +95,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         if (StringUtils.isEmpty(name)) {
+            logger.warn("Parameter name can ot be null.");
             putMsg(result, Status.NAME_NULL);
             return result;
         }
@@ -117,15 +118,18 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroup.setDescription(description);
 
         if (checkWorkerGroupNameExists(workerGroup)) {
+            logger.warn("Worker group with the same name already exists, name:{}.", workerGroup.getName());
             putMsg(result, Status.NAME_EXIST, workerGroup.getName());
             return result;
         }
         String invalidAddr = checkWorkerGroupAddrList(workerGroup);
         if (invalidAddr != null) {
+            logger.warn("Worker group address is invalid, invalidAddr:{}.", invalidAddr);
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
         handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
+        logger.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -295,7 +299,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         try {
             workerGroupList = registryClient.getChildrenKeys(workerPath);
         } catch (Exception e) {
-            logger.error("getWorkerGroups exception, workerPath: {}, isPaging: {}", workerPath, isPaging, e);
+            logger.error("Get worker groups exception, workerPath:{}, isPaging:{}", workerPath, isPaging, e);
         }
 
         if (CollectionUtils.isEmpty(workerGroupList)) {
@@ -317,7 +321,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             try {
                 childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
             } catch (Exception e) {
-                logger.error("getChildrenNodes exception: {}, workerGroupPath: {}", e.getMessage(), workerGroupPath);
+                logger.error("Get children nodes exception, workerGroupPath:{}.", workerGroupPath, e);
             }
             if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
@@ -362,17 +366,22 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);
         if (workerGroup == null) {
+            logger.error("Worker group does not exist, workerGroupId:{}.", id);
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
         List<ProcessInstance> processInstances = processInstanceMapper
                 .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
+        List<Integer> processInstanceIds = processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(processInstances)) {
+            logger.warn("Delete worker group failed because there are {} processInstances are uising it, processInstanceIds:{}.",
+                    processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
         workerGroupMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
+        logger.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
         return result;
     }
