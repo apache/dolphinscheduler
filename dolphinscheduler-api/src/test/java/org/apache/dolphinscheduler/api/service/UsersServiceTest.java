@@ -175,49 +175,65 @@ public class UsersServiceTest {
 
             //userName null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(null, finalUserPassword, finalEmail, tenantId, finalPhone, queueName, state));
-            Assertions.assertEquals(Status.NAME_NULL.getMsg(), exception.getMessage());
+            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "userName"), exception.getMessage());
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
             //password error
-            Map<String, Object> result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            String finalUserName2 = userName;
+            String finalUserPassword2 = userPassword;
+            String finalEmail2 = email;
+            String finalPhone2 = phone;
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(user, finalUserName2, finalUserPassword2, finalEmail2, tenantId, finalPhone2, queueName, state));
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "password"), exception.getMessage());
 
             //userPassword null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, null, finalEmail, tenantId, finalPhone, queueName, state));
-            Assertions.assertEquals(Status.DATA_IS_NULL.getMsg(), exception.getMessage());
+            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "password"), exception.getMessage());
 
             userPassword = "userTest0001";
             email = "1q.com";
-            // email error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //email error
+            String finalUserName6 = userName;
+            String finalUserPassword6 = userPassword;
+            String finalEmail6 = email;
+            String finalPhone6 = phone;
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(user, finalUserName6, finalUserPassword6, finalEmail6, tenantId, finalPhone6, queueName, state));
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "email"), exception.getMessage());
 
             //email null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, finalUserPassword, null, tenantId, finalPhone, queueName, state));
-            Assertions.assertEquals(Status.DATA_IS_NULL.getMsg(), exception.getMessage());
+            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "email"), exception.getMessage());
 
             email = "122222@qq.com";
             phone = "2233";
-            // phone error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //phone error
+            String finalUserName3 = userName;
+            String finalUserPassword3 = userPassword;
+            String finalEmail3 = email;
+            String finalPhone3 = phone;
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(user, finalUserName3, finalUserPassword3, finalEmail3, tenantId, finalPhone3, queueName, state));
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "phone"), exception.getMessage());
 
             //phone null
             exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(finalUserName, finalUserPassword, finalEmail, tenantId, null, queueName, state));
-            Assertions.assertEquals(Status.DATA_IS_NULL.getMsg(), exception.getMessage());
+            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "phone"), exception.getMessage());
 
             phone = "13456432345";
-            // tenantId not exists
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
-            // success
+
+            //tenantId not exists
+            String finalUserName4 = userName;
+            String finalUserPassword4 = userPassword;
+            String finalEmail4 = email;
+            String finalPhone4 = phone;
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(user, finalUserName4, finalUserPassword4, finalEmail4, tenantId, finalPhone4, queueName, state));
+            Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
+
+            //success
             Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-            result = usersService.createUser(user, userName, userPassword, email, 1, phone, queueName, state);
+            Map<String, Object> result = usersService.createUser(user, userName, userPassword, email, 1, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
