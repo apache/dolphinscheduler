@@ -92,19 +92,15 @@ public class SagemakerTask extends AbstractRemoteTask {
     public void submitApplication() throws TaskException {
         try {
             StartPipelineExecutionRequest request = createStartPipelineRequest();
-            try {
-                AmazonSageMaker client = createClient();
-                utils = new PipelineUtils(client);
-                setAppIds(utils.getPipelineExecutionArn());
-            } catch (Exception e) {
-                throw new SagemakerTaskException("can not connect aws ", e);
-            }
+            AmazonSageMaker client = createClient();
+            utils = new PipelineUtils(client);
+            setAppIds(utils.getPipelineExecutionArn());
 
             // Start pipeline
             exitStatusCode = utils.startPipelineExecution(request);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("SageMaker task error", e);
+            throw new TaskException("SageMaker task submit error", e);
         }
     }
 

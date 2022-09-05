@@ -29,6 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -179,32 +180,24 @@ public class EmrJobFlowTaskTest {
         Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testCanNotParseJson() throws Exception {
         mockStatic(JSONUtils.class);
         when(emrJobFlowTask, "createRunJobFlowRequest").thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
         emrJobFlowTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testClusterStatusNull() throws Exception {
 
         when(emrClient.describeCluster(any())).thenReturn(null);
-
         emrJobFlowTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testRunJobFlowError() throws Exception {
-
         when(emrClient.runJobFlow(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
         emrJobFlowTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
-        emrJobFlowTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrJobFlowTask.getExitStatusCode());
-
     }
 
     private String buildEmrTaskParameters() {

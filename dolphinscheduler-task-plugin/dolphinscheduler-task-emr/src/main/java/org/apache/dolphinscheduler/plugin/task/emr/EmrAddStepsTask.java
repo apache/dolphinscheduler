@@ -88,6 +88,7 @@ public class EmrAddStepsTask extends AbstractEmrTask {
 
         } catch (EmrTaskException | SdkBaseException e) {
             logger.error("emr task submit failed with error", e);
+            throw new TaskException("emr task submit fail", e);
         } finally {
             final int exitStatusCode = calculateExitStatusCode(stepStatus);
             setExitStatusCode(exitStatusCode);

@@ -29,6 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -120,15 +121,14 @@ public class EmrAddStepsTaskTest {
         emrAddStepsTask.init();
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testCanNotParseJson() throws Exception {
         mockStatic(JSONUtils.class);
         when(emrAddStepsTask, "createAddJobFlowStepsRequest").thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
         emrAddStepsTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testDefineJsonStepNotOne() throws Exception {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildErrorEmrTaskParameters();
@@ -139,8 +139,6 @@ public class EmrAddStepsTaskTest {
         doReturn(emrClient).when(emrAddStepsTask, "createEmrClient");
         emrAddStepsTask.init();
         emrAddStepsTask.handle(taskCallBack);
-
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
     }
 
     @Test
@@ -159,7 +157,7 @@ public class EmrAddStepsTaskTest {
         Assert.assertEquals(EXIT_CODE_KILL, emrAddStepsTask.getExitStatusCode());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testHandleError() throws Exception {
         when(step.getStatus()).thenReturn(pendingState, runningState, failedState);
         emrAddStepsTask.handle(taskCallBack);
@@ -167,7 +165,6 @@ public class EmrAddStepsTaskTest {
 
         when(emrClient.addJobFlowSteps(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
         emrAddStepsTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
     }
 
     private EmrParameters buildEmrTaskParameters() {

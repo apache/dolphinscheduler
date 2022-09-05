@@ -58,10 +58,6 @@ public abstract class AbstractRemoteTask extends AbstractTask {
         // submit a remote application
         submitApplication();
 
-        if (exitStatusCode != TaskConstants.EXIT_CODE_SUCCESS) {
-            return;
-        }
-
         if (StringUtils.isNotEmpty(taskRequest.getAppIds())) {
             // callback to update remote application info
             taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(), taskRequest.getAppIds());
