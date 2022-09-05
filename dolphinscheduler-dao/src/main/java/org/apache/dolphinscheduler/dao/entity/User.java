@@ -134,6 +134,7 @@ public class User {
     public User() {
     }
 
+    // for new user
     public User(String userName, String userPassword, String email, String phone, Integer tenantId, Integer state) {
         Date now = new Date();
         this.userName = userName;

@@ -154,9 +154,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           String queue,
                                           int state) throws Exception {
         Map<String, Object> result = new HashMap<>();
-
+        if (StringUtils.isEmpty(userName) || !CheckUtils.checkUserName(userName)) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "userName");
+        }
         //check all user params
-        checkUserParams(userName, userPassword, email, phone);
+        checkUserParams(userPassword, email, phone);
         if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
@@ -198,7 +200,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            String queue,
                            int state) {
         Date now = new Date();
-        checkUserParams(userName, userPassword, email, phone);
+        if (StringUtils.isEmpty(userName) || !CheckUtils.checkUserName(userName)) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "userName");
+        }
+        checkUserParams(userPassword, email, phone);
 
         User tempUser = userMapper.queryByUserNameAccurately(userName);
         if (tempUser != null) {
@@ -382,20 +387,20 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            throw new ServiceException(Status.FUNCTION_DISABLED.getMsg());
+            throw new ServiceException(Status.FUNCTION_DISABLED);
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM.getMsg());
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new ServiceException(Status.USER_NOT_EXIST.getMsg());
+            throw new ServiceException(Status.USER_NOT_EXIST);
         }
 
-        checkUserParams(userName, userPassword, email, phone);
+        checkUserParams(userPassword, email, phone);
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                throw new ServiceException(MessageFormat.format(Status.TIME_ZONE_ILLEGAL.getMsg(), timeZone));
+                throw new ServiceException(Status.TIME_ZONE_ILLEGAL, timeZone);
             }
             user.setTimeZone(timeZone);
         }
@@ -1074,11 +1079,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * @return if check failed throw error, otherwise return null
      */
-    private void checkUserParams(String userName, String userPassword, String email) {
-        if (StringUtils.isEmpty(userName) || !CheckUtils.checkUserName(userName)) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "userName");
-        }
-
+    private void checkUserParams(String userPassword, String email) {
         if (StringUtils.isEmpty(userPassword) || !CheckUtils.checkPassword(userPassword) || !CheckUtils.checkPasswordLength(userPassword)) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "password");
         }
@@ -1091,8 +1092,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * @return if check failed throw error, otherwise return null
      */
-    private void checkUserParams(String userName, String userPassword, String email, String phone) {
-        checkUserParams(userName, userPassword, email);
+    private void checkUserParams(String userPassword, String email, String phone) {
+        checkUserParams(userPassword, email);
         if (StringUtils.isEmpty(phone) || !CheckUtils.checkPhone(phone)) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "phone");
         }
@@ -1162,7 +1163,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
 
         //check user params with dummy phone because we are not required phone when register
-        checkUserParams(userName, userPassword, email);
+        checkUserParams(userPassword, email);
         if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;

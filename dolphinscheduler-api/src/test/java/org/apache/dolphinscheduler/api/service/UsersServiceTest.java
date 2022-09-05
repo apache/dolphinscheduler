@@ -165,18 +165,22 @@ public class UsersServiceTest {
             String finalPhone = phone;
 
             //userName error
-            Map<String, Object> result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            String finalUserName1 = userName;
+            String finalUserPassword1 = userPassword;
+            String finalEmail1 = email;
+            String finalPhone1 = phone;
+            Throwable exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(user, finalUserName1, finalUserPassword1, finalEmail1, tenantId, finalPhone1, queueName, state));
+            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg().replace("{0}", "userName"), exception.getMessage());
+
 
             //userName null
-            Throwable exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(null, finalUserPassword, finalEmail, tenantId, finalPhone, queueName, state));
+            exception = Assertions.assertThrows(ServiceException.class, () -> usersService.createUser(null, finalUserPassword, finalEmail, tenantId, finalPhone, queueName, state));
             Assertions.assertEquals(Status.NAME_NULL.getMsg(), exception.getMessage());
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
-            // password error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            //password error
+            Map<String, Object> result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
