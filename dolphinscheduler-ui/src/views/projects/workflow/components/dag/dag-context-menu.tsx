@@ -26,15 +26,11 @@ import { IWorkflowTaskInstance } from './types'
 import { NButton } from 'naive-ui'
 
 const props = {
-  startButtonDisplay: {
-    type: Boolean as PropType<boolean>,
-    default: true
-  },
-  startReadonly: {
+  startDisplay: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  menuReadonly: {
+  menuDisplay: {
     type: Boolean as PropType<boolean>,
     default: false
   },
@@ -131,36 +127,36 @@ export default defineComponent({
           class={styles['dag-context-menu']}
           style={{ left: `${this.left}px`, top: `${this.top}px` }}
         >
-          {this.startButtonDisplay && (
+          {this.startDisplay && (
             <NButton
               class={`${styles['menu-item']}`}
-              disabled={this.startReadonly}
               onClick={this.startRunning}
             >
               {t('project.node.start')}
-            </NButton>)
-          }
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.menuReadonly}
-            onClick={this.handleEdit}
-          >
-            {t('project.node.edit')}
-          </NButton>
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.menuReadonly}
-            onClick={this.handleCopy}
-          >
-            {t('project.node.copy')}
-          </NButton>
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.menuReadonly}
-            onClick={this.handleDelete}
-          >
-            {t('project.node.delete')}
-          </NButton>
+            </NButton>
+          )}
+          {this.menuDisplay && (
+            <>
+              <NButton
+                class={`${styles['menu-item']}`}
+                onClick={this.handleEdit}
+              >
+                {t('project.node.edit')}
+              </NButton>
+              <NButton
+                class={`${styles['menu-item']}`}
+                onClick={this.handleCopy}
+              >
+                {t('project.node.copy')}
+              </NButton>
+              <NButton
+                class={`${styles['menu-item']}`}
+                onClick={this.handleDelete}
+              >
+                {t('project.node.delete')}
+              </NButton>
+            </>
+          )}
           {this.taskInstance && (
             <NButton
               class={`${styles['menu-item']}`}

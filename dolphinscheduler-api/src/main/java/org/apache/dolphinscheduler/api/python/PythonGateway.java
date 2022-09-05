@@ -206,7 +206,6 @@ public class PythonGateway {
      * and if would always fresh exists schedule if not null
      * @param warningType warning type
      * @param warningGroupId warning group id
-     * @param locations locations json object about all tasks
      * @param timeout timeout for process definition working, if running time longer than timeout,
      * task will mark as fail
      * @param workerGroup run task in which worker group
@@ -224,7 +223,6 @@ public class PythonGateway {
                                                 String schedule,
                                                 String warningType,
                                                 int warningGroupId,
-                                                String locations,
                                                 int timeout,
                                                 String workerGroup,
                                                 String tenantCode,
@@ -245,10 +243,10 @@ public class PythonGateway {
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
@@ -269,7 +267,7 @@ public class PythonGateway {
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
+        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName, 0);
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         ProcessDefinition processDefinition = null;

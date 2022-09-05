@@ -51,9 +51,11 @@
         <if test="userId != 0">
             and user_id = #{userId}
         </if>
-        and resources_id in
-        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <if test="resIds != null and resIds.length != 0">
+            and resources_id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
     </delete>
 </mapper>

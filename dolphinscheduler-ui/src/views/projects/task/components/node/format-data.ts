@@ -386,6 +386,16 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SAGEMAKER') {
     taskParams.sagemakerRequestJson = data.sagemakerRequestJson
   }
+  if (data.taskType === 'PYTORCH') {
+    taskParams.script = data.script
+    taskParams.scriptParams = data.scriptParams
+    taskParams.pythonPath = data.pythonPath
+    taskParams.isCreateEnvironment = data.isCreateEnvironment
+    taskParams.pythonCommand = data.pythonCommand
+    taskParams.pythonEnvTool = data.pythonEnvTool
+    taskParams.requirements = data.requirements
+    taskParams.condaPythonVersion = data.condaPythonVersion
+  }
 
   if (data.taskType === 'DINKY') {
     taskParams.address = data.address
@@ -409,6 +419,12 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
+  }
+
+  if (data.taskType === 'HIVECLI') {
+    taskParams.hiveCliTaskExecutionType = data.hiveCliTaskExecutionType
+    taskParams.hiveSqlScript = data.hiveSqlScript
+    taskParams.hiveCliOptions = data.hiveCliOptions
   }
 
   let timeoutNotifyStrategy = ''
@@ -648,5 +664,6 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
+
   return params
 }

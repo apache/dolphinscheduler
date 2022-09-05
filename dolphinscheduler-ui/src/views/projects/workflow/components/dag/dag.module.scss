@@ -159,6 +159,9 @@ $bgLight: #ffffff;
     &.icon-zeppelin {
       background-image: url('/images/task-icons/zeppelin.png');
     }
+    &.icon-hivecli {
+      background-image: url('/images/task-icons/hivecli.png');
+    }
     &.icon-k8s {
       background-image: url('/images/task-icons/k8s.png');
     }
@@ -182,6 +185,9 @@ $bgLight: #ffffff;
     }
     &.icon-chunjun {
       background-image: url('/images/task-icons/chunjun.png');
+    }
+    &.icon-pytorch {
+      background-image: url('/images/task-icons/pytorch.png');
     }
   }
 
@@ -245,6 +251,9 @@ $bgLight: #ffffff;
       &.icon-zeppelin {
         background-image: url('/images/task-icons/zeppelin_hover.png');
       }
+      &.icon-hivecli {
+        background-image: url('/images/task-icons/hivecli_hover.png');
+      }
       &.icon-k8s {
         background-image: url('/images/task-icons/k8s_hover.png');
       }
@@ -268,6 +277,9 @@ $bgLight: #ffffff;
       }
       &.icon-chunjun {
         background-image: url('/images/task-icons/chunjun_hover.png');
+      }
+      &.icon-pytorch {
+        background-image: url('/images/task-icons/pytorch_hover.png');
       }
     }
   }

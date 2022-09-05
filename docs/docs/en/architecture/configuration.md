@@ -17,14 +17,14 @@ The directory structure of DolphinScheduler is as follows:
 │
 ├── licenses                                    directory of licenses
 │
-├── bin                                         directory of DolphinScheduler application commands, configrations scripts 
+├── bin                                         directory of DolphinScheduler application commands, configrations scripts
 │   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
 │   ├── env                                     directory of scripts to load environment variables
 │   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
 │   │   └── install_env.sh                      script to export environment variables for DolphinScheduler installation when you use scripts `install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`
 │   ├── install.sh                              script to auto-setup services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
-│   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches 
-│   ├── scp-hosts.sh                            script to copy installation files to target hosts 
+│   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches
+│   ├── scp-hosts.sh                            script to copy installation files to target hosts
 │   ├── start-all.sh                            script to start all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
@@ -34,7 +34,8 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── start.sh                            script to start DolphinScheduler alert-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of alert-server
-│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc. 
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
+│   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for alert-server
 │   │   └── logback-spring.xml                  configurations of alert-service log
 │   └── libs                                    directory of alert-server libs
@@ -44,17 +45,19 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── start.sh                            script to start DolphinScheduler api-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of api-server
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for api-server
 │   │   └── logback-spring.xml                  configurations of api-service log
 │   ├── libs                                    directory of api-server libs
-│   └── ui                                      directory of api-server related front-end web resources 
+│   └── ui                                      directory of api-server related front-end web resources
 │
 ├── master-server                               directory of DolphinScheduler master-server commands, configrations scripts and libs
-│   ├── bin                                
+│   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler master-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of master-server
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for master-server
 │   │   └── logback-spring.xml                  configurations of master-service log
@@ -65,13 +68,14 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── start.sh                            script to start DolphinScheduler standalone-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of standalone-server
+│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for standalone-server
 │   │   ├── logback-spring.xml                  configurations of standalone-service log
 │   │   └── sql                                 .sql files to create or upgrade DolphinScheduler metadata
 │   ├── libs                                    directory of standalone-server libs
 │   └── ui                                      directory of standalone-server related front-end web resources
-│       
+│  
 ├── tools                                       directory of DolphinScheduler metadata tools commands, configrations scripts and libs
 │   ├── bin
 │   │   └── upgrade-schema.sh                   script to initialize or upgrade DolphinScheduler metadata
@@ -80,12 +84,13 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── common.properties                   configurations of common-service like storage, credentials, etc.
 │   ├── libs                                    directory of tool libs
 │   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
-│     
+│  
 ├── worker-server                               directory of DolphinScheduler worker-server commands, configrations scripts and libs
 │       ├── bin
 │       │   └── start.sh                        script to start DolphinScheduler worker-server
 │       ├── conf
 │       │   ├── application.yaml                configurations of worker-server
+│       │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │       │   ├── common.properties               configurations of common-service like storage, credentials, etc.
 │       │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
 │       │   └── logback-spring.xml              configurations of worker-service log
@@ -107,14 +112,14 @@ Currently, DolphinScheduler just makes a basic config, remember to config furthe
 Default simplified parameters are:
 ```bash
 export DOLPHINSCHEDULER_OPTS="
--server 
--Xmx16g 
--Xms1g 
--Xss512k 
--XX:+UseConcMarkSweepGC 
--XX:+CMSParallelRemarkEnabled 
--XX:+UseFastAccessorMethods 
--XX:+UseCMSInitiatingOccupancyOnly 
+-server
+-Xmx16g
+-Xms1g
+-Xss512k
+-XX:+UseConcMarkSweepGC
+-XX:+CMSParallelRemarkEnabled
+-XX:+UseFastAccessorMethods
+-XX:+UseCMSInitiatingOccupancyOnly
 -XX:CMSInitiatingOccupancyFraction=70
 "
 ```
@@ -173,7 +178,7 @@ The default configuration is as follows:
 |registry.zookeeper.session-timeout|30s|session timeout|
 |registry.zookeeper.connection-timeout|30s|connection timeout|
 |registry.zookeeper.block-until-connected|600ms|waiting time to block until the connection succeeds|
-|registry.zookeeper.digest|~|digest of zookeeper|
+|registry.zookeeper.digest|{username}:{password}|digest of zookeeper to access znode, works only when acl is enabled, for more details please check [https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper doc) |
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
 
@@ -209,6 +214,8 @@ The default configuration is as follows:
 |yarn.resourcemanager.ha.rm.ids | 192.168.xx.xx,192.168.xx.xx | specify the yarn resourcemanager url. if resourcemanager supports HA, input HA IP addresses (separated by comma), or input null for standalone|
 |yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | keep default if ResourceManager supports HA or not use ResourceManager, or replace ds1 with corresponding hostname if ResourceManager in standalone mode|
 |development.state | false | specify whether in development state|
+|dolphin.scheduler.network.interface.preferred | NONE | display name of the network card|
+|dolphin.scheduler.network.priority.strategy | default | IP acquisition strategy, give priority to finding the internal network or the external network|
 |resource.manager.httpaddress.port | 8088 | the port of resource manager|
 |yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | job history status url of yarn|
 |datasource.encryption.enable | false | whether to enable datasource encryption|
@@ -268,6 +275,8 @@ Location: `master-server/conf/application.yaml`
 |master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G|
 |master.failover-interval|10|failover interval, the unit is minute|
 |master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
+|master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
+|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
 
 
 ### Worker Server related configuration
@@ -285,6 +294,8 @@ Location: `worker-server/conf/application.yaml`
 |worker.groups|default|worker groups separated by comma, e.g., 'worker.groups=default,test' <br> worker will join corresponding group according to this config when startup|
 |worker.alert-listen-host|localhost|the alert listen host of worker|
 |worker.alert-listen-port|50052|the alert listen port of worker|
+|worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
+|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
 
 ### Alert Server related configuration
 Location: `alert-server/conf/application.yaml`

@@ -89,6 +89,7 @@ export default defineComponent({
 
     const graph = ref<Graph>()
     provide('graph', graph)
+    context.expose(graph)
 
     // Auto layout modal
     const {
@@ -119,11 +120,11 @@ export default defineComponent({
     })
 
     // start button in the dag node menu
-    const startReadonly = computed(() => {
+    const startDisplay = computed(() => {
       if (props.definition) {
         return (
           route.name === 'workflow-definition-detail' &&
-          props.definition!.processDefinition.releaseState === 'NOT_RELEASE'
+          props.definition!.processDefinition.releaseState === 'ONLINE'
         )
       } else {
         return false
@@ -131,17 +132,17 @@ export default defineComponent({
     })
 
     // other button in the dag node menu
-    const menuReadonly = computed(() => {
+    const menuDisplay = computed(() => {
       if (props.instance) {
         return (
-          props.instance.state !== 'WAITING_THREAD' &&
-          props.instance.state !== 'SUCCESS' &&
-          props.instance.state !== 'PAUSE' &&
-          props.instance.state !== 'FAILURE' &&
-          props.instance.state !== 'STOP'
+          props.instance.state === 'WAITING_THREAD' ||
+          props.instance.state === 'SUCCESS' ||
+          props.instance.state === 'PAUSE' ||
+          props.instance.state === 'FAILURE' ||
+          props.instance.state === 'STOP'
         )
       } else if (props.definition) {
-        return props.definition!.processDefinition.releaseState === 'ONLINE'
+        return props.definition!.processDefinition.releaseState === 'OFFLINE'
       } else {
         return false
       }
@@ -337,7 +338,7 @@ export default defineComponent({
         />
         {!!props.definition && (
           <VersionModal
-            isInstance={props.instance ? true : false}
+            isInstance={!!props.instance}
             v-model:row={props.definition.processDefinition}
             v-model:show={versionModalShow.value}
             onUpdateList={refreshDetail}
@@ -362,9 +363,8 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
-          startButtonDisplay={!props.instance}
-          startReadonly={startReadonly.value}
-          menuReadonly={menuReadonly.value}
+          startDisplay={startDisplay.value}
+          menuDisplay={menuDisplay.value}
           taskInstance={taskInstance.value}
           cell={nodeVariables.menuCell as Cell}
           visible={nodeVariables.menuVisible}

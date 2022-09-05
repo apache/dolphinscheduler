@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Stopper.class})
+@PrepareForTest({ServerLifeCycleManager.class})
 public class SubProcessTaskTest {
 
     /**
@@ -73,8 +73,8 @@ public class SubProcessTaskTest {
         config.setTaskCommitRetryTimes(3);
         config.setTaskCommitInterval(Duration.ofSeconds(1));
 
-        PowerMockito.mockStatic(Stopper.class);
-        PowerMockito.when(Stopper.isRunning()).thenReturn(true);
+        PowerMockito.mockStatic(ServerLifeCycleManager.class);
+        PowerMockito.when(ServerLifeCycleManager.isStopped()).thenReturn(false);
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);

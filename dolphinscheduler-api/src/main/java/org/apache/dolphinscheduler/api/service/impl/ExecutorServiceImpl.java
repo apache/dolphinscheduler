@@ -56,6 +56,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
@@ -116,6 +117,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private ProcessInstanceDao processInstanceDao;
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
@@ -324,7 +328,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
+     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
+
+
      *
      * @param loginUser         login user
      * @param projectCode       project code
@@ -358,6 +364,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
             result =
                     checkProcessDefinitionValid(projectCode, processDefinition,
@@ -475,8 +482,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         boolean checkResult = false;
         switch (executeType) {
             case PAUSE:
-            case STOP:
                 if (executionStatus.isRunning()) {
+                    checkResult = true;
+                }
+                break;
+            case STOP:
+                if (executionStatus.canStop()) {
                     checkResult = true;
                 }
                 break;
@@ -521,8 +532,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         processInstance.setCommandType(commandType);
         processInstance.addHistoryCmd(commandType);
-        processInstance.setState(executionStatus);
-        int update = processService.updateProcessInstance(processInstance);
+        processInstance.setStateWithDesc(executionStatus, commandType.getDescp() + "by ui");
+        int update = processInstanceDao.updateProcessInstance(processInstance);
 
         // determine whether the process is normal
         if (update > 0) {

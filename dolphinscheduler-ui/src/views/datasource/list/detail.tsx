@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
   NSpin,
@@ -89,13 +95,13 @@ const DetailModal = defineComponent({
     watch(
       () => props.show,
       async () => {
-        props.show && props.id && setFieldsValue(await queryById(props.id))
         props.show &&
           state.detailForm.type &&
-          changeType(
+          (await changeType(
             state.detailForm.type,
             datasourceType[state.detailForm.type]
-          )
+          ))
+        props.show && props.id && setFieldsValue(await queryById(props.id))
       }
     )
 
@@ -171,7 +177,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-data-source-name'
                     v-model={[detailForm.name, 'value']}
                     maxlength={60}
@@ -180,7 +186,7 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 <NFormItem label={t('datasource.description')} path='note'>
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-data-source-description'
                     v-model={[detailForm.note, 'value']}
                     type='textarea'
@@ -193,7 +199,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-ip'
                     v-model={[detailForm.host, 'value']}
                     type='text'
@@ -222,7 +228,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.principal, 'value']}
                     type='text'
                     placeholder={t('datasource.principal_tips')}
@@ -234,7 +240,7 @@ const DetailModal = defineComponent({
                   path='javaSecurityKrb5Conf'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.javaSecurityKrb5Conf, 'value']}
                     type='text'
                     placeholder={t('datasource.krb5_conf_tips')}
@@ -246,7 +252,7 @@ const DetailModal = defineComponent({
                   path='loginUserKeytabUsername'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.loginUserKeytabUsername, 'value']}
                     type='text'
                     placeholder={t('datasource.keytab_username_tips')}
@@ -258,7 +264,7 @@ const DetailModal = defineComponent({
                   path='loginUserKeytabPath'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.loginUserKeytabPath, 'value']}
                     type='text'
                     placeholder={t('datasource.keytab_path_tips')}
@@ -270,7 +276,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-username'
                     v-model={[detailForm.userName, 'value']}
                     type='text'
@@ -283,7 +289,7 @@ const DetailModal = defineComponent({
                   path='password'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-password'
                     v-model={[detailForm.password, 'value']}
                     type='password'
@@ -296,7 +302,7 @@ const DetailModal = defineComponent({
                   show-require-mark={requiredDataBase}
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-data-base'
                     v-model={[detailForm.database, 'value']}
                     type='text'
@@ -326,7 +332,7 @@ const DetailModal = defineComponent({
                   path='other'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-jdbc-params'
                     v-model={[detailForm.other, 'value']}
                     type='textarea'

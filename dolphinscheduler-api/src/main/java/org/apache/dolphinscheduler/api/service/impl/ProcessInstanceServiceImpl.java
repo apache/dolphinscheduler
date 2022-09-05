@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -83,6 +84,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    ProcessInstanceDao processInstanceDao;
 
     @Autowired
     ProcessDefinitionMapper processDefineMapper;
@@ -531,7 +535,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
         processInstance.setProcessDefinitionVersion(insertVersion);
-        int update = processService.updateProcessInstance(processInstance);
+        int update = processInstanceDao.updateProcessInstance(processInstance);
         if (update == 0) {
             putMsg(result, Status.UPDATE_PROCESS_INSTANCE_ERROR);
             throw new ServiceException(Status.UPDATE_PROCESS_INSTANCE_ERROR);
@@ -780,24 +784,36 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
-        for (String node : nodeList) {
-            TaskInstance taskInstance =
-                    taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, Long.parseLong(node));
-            if (taskInstance == null) {
-                continue;
+        if (!nodeList.isEmpty()) {
+            List<Long> taskCodes = nodeList.stream().map(Long::parseLong).collect(Collectors.toList());
+            List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
+                    Collections.singletonList(processInstanceId), taskCodes
+            );
+            for (String node : nodeList) {
+                TaskInstance taskInstance = null;
+                for (TaskInstance instance : taskInstances) {
+                    if (instance.getProcessInstanceId() == processInstanceId
+                            && instance.getTaskCode() == Long.parseLong(node)) {
+                        taskInstance = instance;
+                        break;
+                    }
+                }
+                if (taskInstance == null) {
+                    continue;
+                }
+                Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
+                Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
+                Task task = new Task();
+                task.setTaskName(taskInstance.getName());
+                task.getStartDate().add(startTime.getTime());
+                task.getEndDate().add(endTime.getTime());
+                task.setIsoStart(startTime);
+                task.setIsoEnd(endTime);
+                task.setStatus(taskInstance.getState().toString());
+                task.setExecutionDate(taskInstance.getStartTime());
+                task.setDuration(DateUtils.format2Readable(endTime.getTime() - startTime.getTime()));
+                taskList.add(task);
             }
-            Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
-            Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
-            Task task = new Task();
-            task.setTaskName(taskInstance.getName());
-            task.getStartDate().add(startTime.getTime());
-            task.getEndDate().add(endTime.getTime());
-            task.setIsoStart(startTime);
-            task.setIsoEnd(endTime);
-            task.setStatus(taskInstance.getState().toString());
-            task.setExecutionDate(taskInstance.getStartTime());
-            task.setDuration(DateUtils.format2Readable(endTime.getTime() - startTime.getTime()));
-            taskList.add(task);
         }
         ganttDto.setTasks(taskList);
 
