@@ -22,6 +22,7 @@ import org.apache.commons.lang.SystemUtils;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -42,6 +43,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,7 +107,7 @@ public class ChunJunTask extends AbstractTask {
      * @throws TaskException exception
      */
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
@@ -114,7 +116,9 @@ public class ChunJunTask extends AbstractTask {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
+
+            // todo get applicationId
+            setAppIds(String.join(TaskConstants.COMMA, Collections.emptySet()));
             setProcessId(commandExecuteResult.getProcessId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -252,13 +256,16 @@ public class ChunJunTask extends AbstractTask {
     /**
      * cancel ChunJun process
      *
-     * @param cancelApplication cancelApplication
      * @throws Exception if error throws Exception
      */
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
 }
