@@ -15,36 +15,21 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
-import { useAsyncState } from '@vueuse/core'
-import { viewGanttTree } from '@/service/modules/process-instances'
-import { IGanttRes } from './type'
+package org.apache.dolphinscheduler.dao.repository;
 
-export function useGantt() {
-  const variables = reactive({
-    seriesData: [],
-    taskList: [] as Array<string>
-  })
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 
-  const formatGantt = (obj: IGanttRes) => {
-    variables.seriesData = []
-    variables.taskList = []
 
-    variables.seriesData = obj.tasks.map((item) => {
-      variables.taskList.push(item.taskName)
-      return item
-    }) as any
-  }
+public interface ProcessInstanceDao {
 
-  const getGantt = (id: number, code: number) => {
-    const { state } = useAsyncState(
-      viewGanttTree(id, code).then((res: IGanttRes) => {
-        formatGantt(res)
-      }),
-      {}
-    )
-    return state
-  }
+    public int insertProcessInstance(ProcessInstance processInstance);
 
-  return { variables, getGantt }
+    public int updateProcessInstance(ProcessInstance processInstance);
+
+    /**
+     * insert or update work process instance to database
+     *
+     * @param processInstance processInstance
+     */
+    public int upsertProcessInstance(ProcessInstance processInstance);
 }
