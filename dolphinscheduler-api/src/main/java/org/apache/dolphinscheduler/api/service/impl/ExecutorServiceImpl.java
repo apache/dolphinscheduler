@@ -222,7 +222,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
                                                    int dryRun, int testFlag,
-                                                   ComplementDependentMode complementDependentMode, Integer version) {
+                                                   ComplementDependentMode complementDependentMode, Integer version,
+                                                   boolean allLevelDependent) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -264,7 +265,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup, tenantCode,
                         environmentCode, startParams, expectedParallelismNumber, dryRun, testFlag,
-                        complementDependentMode);
+                        complementDependentMode, allLevelDependent);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -740,6 +741,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param workerGroup             workerGroup
      * @param testFlag                testFlag
      * @param environmentCode         environmentCode
+     * @param allLevelDependent       allLevelDependent
      * @return command id
      */
     private int createCommand(Long triggerCode, CommandType commandType, long processDefineCode, TaskDependType nodeDep,
@@ -748,7 +750,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               Priority processInstancePriority, String workerGroup, String tenantCode,
                               Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
-                              int testFlag, ComplementDependentMode complementDependentMode) {
+                              int testFlag, ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
 
         /**
          * instantiate command schedule instance
@@ -807,7 +809,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 log.info("Start to create {} command, processDefinitionCode:{}.",
                         command.getCommandType().getDescp(), processDefineCode);
                 return createComplementCommandList(triggerCode, schedule, runMode, command, expectedParallelismNumber,
-                        complementDependentMode);
+                        complementDependentMode, allLevelDependent);
             } catch (CronParseException cronParseException) {
                 // We catch the exception here just to make compiler happy, since we have already validated the schedule
                 // cron expression before
@@ -834,7 +836,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     protected int createComplementCommandList(Long triggerCode, String scheduleTimeParam, RunMode runMode,
                                               Command command,
                                               Integer expectedParallelismNumber,
-                                              ComplementDependentMode complementDependentMode) throws CronParseException {
+                                              ComplementDependentMode complementDependentMode,
+                                              boolean allLevelDependent) throws CronParseException {
         int createCount = 0;
         String startDate = null;
         String endDate = null;
@@ -894,7 +897,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         log.info(
                                 "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, processDefinitionCode:{}.",
                                 command.getProcessDefinitionCode());
-                        dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command);
+                        dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command, allLevelDependent);
                     }
                 }
                 if (createCount > 0) {
@@ -963,7 +966,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                         "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, processDefinitionCode:{}.",
                                         command.getProcessDefinitionCode());
                                 dependentProcessDefinitionCreateCount +=
-                                        createComplementDependentCommand(schedules, command);
+                                        createComplementDependentCommand(schedules, command, allLevelDependent);
                             }
                         }
                     }
@@ -1004,7 +1007,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * create complement dependent command
      */
-    public int createComplementDependentCommand(List<Schedule> schedules, Command command) {
+    public int createComplementDependentCommand(List<Schedule> schedules, Command command, boolean allLevelDependent) {
         int dependentProcessDefinitionCreateCount = 0;
         Command dependentCommand;
 
@@ -1017,7 +1020,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 getComplementDependentDefinitionList(dependentCommand.getProcessDefinitionCode(),
-                        CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup());
+                        CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup(), allLevelDependent);
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
             // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
@@ -1041,12 +1044,36 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     private List<DependentProcessDefinition> getComplementDependentDefinitionList(long processDefinitionCode,
                                                                                   CycleEnum processDefinitionCycle,
-                                                                                  String workerGroup) {
+                                                                                  String workerGroup,
+                                                                                  boolean allLevelDependent) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
-                processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
+            checkDependentProcessDefinitionValid(processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode), processDefinitionCycle, workerGroup,
+                processDefinitionCode);
 
-        return checkDependentProcessDefinitionValid(dependentProcessDefinitionList, processDefinitionCycle,
-                workerGroup, processDefinitionCode);
+        if (dependentProcessDefinitionList.isEmpty()) {
+            return dependentProcessDefinitionList;
+        }
+
+        if (allLevelDependent) {
+            List<DependentProcessDefinition> childList = new ArrayList<>(dependentProcessDefinitionList);
+            while (true) {
+                List<DependentProcessDefinition> childDependentList = childList
+                    .stream()
+                    .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
+                        processService.queryDependentProcessDefinitionByProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode()),
+                        processDefinitionCycle,
+                        workerGroup,
+                        dependentProcessDefinition.getProcessDefinitionCode()).stream())
+                    .collect(Collectors.toList());
+                if (childDependentList.isEmpty()) {
+                    break;
+                }
+                dependentProcessDefinitionList.addAll(childDependentList);
+                childList = new ArrayList<>(childDependentList);
+            }
+        }
+        log.info("processDefinitionCode={}, size={}, dependentProcessDefinitionList={}", processDefinitionCode, dependentProcessDefinitionList.size(), dependentProcessDefinitionList);
+        return dependentProcessDefinitionList;
     }
 
     /**
