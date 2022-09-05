@@ -20,8 +20,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Dependent
-    name: dependent
+  - name: dependent
+    task_type: Dependent
     denpendence:
     op: and
     groups:
@@ -47,8 +47,8 @@ tasks:
             dependent_task_name: task_2
             dependent_date: last24Hours 
 
-  - task_type: Dependent
-    name: dependent_var
+  - name: dependent_var
+    task_type: Dependent
     denpendence:
     op: and
     groups:

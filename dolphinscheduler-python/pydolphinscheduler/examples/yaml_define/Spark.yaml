@@ -21,8 +21,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Spark
-    name: task
+  - name: task
+    task_type: Spark
     main_class: org.apache.spark.examples.SparkPi
     main_package: test_java.jar
     program_type: SCALA

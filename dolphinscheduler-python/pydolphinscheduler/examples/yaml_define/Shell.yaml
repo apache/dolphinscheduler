@@ -23,18 +23,18 @@ workflow:
 
 # Define the tasks under the process
 tasks:
-  - task_type: Shell
-    name: task_parent
+  - name: task_parent
+    task_type: Shell
     command: |
       echo hello pydolphinscheduler 
       echo run task parent
 
-  - task_type: Shell
+  - name: task_child_one
+    task_type: Shell
     deps: [task_parent]
-    name: task_child_one
     command: echo "child one"
 
-  - task_type: Shell
+  - name: task_child_two
+    task_type: Shell
     deps: [task_parent]
-    name: task_child_two
     command: echo "child two"

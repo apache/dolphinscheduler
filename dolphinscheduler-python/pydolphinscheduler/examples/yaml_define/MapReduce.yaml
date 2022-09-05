@@ -21,8 +21,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: MR
-    name: task
+  - name: task
+    task_type: MR
     main_class: wordcount
     main_package: test_java.jar
     program_type: SCALA

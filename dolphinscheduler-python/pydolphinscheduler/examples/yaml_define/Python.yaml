@@ -21,8 +21,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Python
-    name: python
+  - name: python
+    task_type: Python
     definition: |
       import os
       print(os)

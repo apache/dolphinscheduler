@@ -21,7 +21,7 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Procedure
-    name: task
+  - name: task
+    task_type: Procedure
     datasource_name: db
     method: show tables;

@@ -20,8 +20,8 @@ workflow:
   name: "SubWorkflow"
 
 tasks:
-  - task_type: SubProcess
-    name: example_workflow
+  - name: example_workflow
+    task_type: SubProcess
     process_definition_name: $WORKFLOW{"example_sub_workflow.yaml"}
 
   - { "task_type": "Shell", "deps": [example_workflow], "name": "task_3", "command": "echo task 3" }

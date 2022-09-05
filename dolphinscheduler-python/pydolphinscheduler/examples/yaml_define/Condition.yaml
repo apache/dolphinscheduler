@@ -27,8 +27,8 @@ tasks:
   - { "task_type": "Shell", "name": "success_branch", "command": "echo success_branch" }
   - { "task_type": "Shell", "name": "fail_branch", "command": "echo fail_branch" }
 
-  - task_type: Condition
-    name: condition
+  - name: condition
+    task_type: Condition
     success_task: success_branch
     failed_task: fail_branch
     op: AND

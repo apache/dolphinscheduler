@@ -21,8 +21,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Flink
-    name: task
+  - name: task
+    task_type: Flink
     main_class: org.apache.flink.streaming.examples.wordcount.WordCount
     main_package: test_java.jar
     program_type: JAVA

@@ -23,8 +23,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Shell
-    name: shell_0
+  - name: shell_0
+    task_type: Shell
     description: "yaml define task"
     flag: "YES"
     command: |

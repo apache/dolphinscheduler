@@ -21,8 +21,8 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Http
-    name: task
+  - name: task
+    task_type: Http
     url: "https://httpbin.org/get"
     http_method: "GET"
     http_params:

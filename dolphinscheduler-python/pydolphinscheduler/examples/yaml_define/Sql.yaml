@@ -21,20 +21,20 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: Sql
-    name: task_base
+  - name: task_base
+    task_type: Sql
     datasource_name: "db"
     sql: show tables;
 
-  - task_type: Sql
-    name: task_multi_line
+  - name: task_multi_line
+    task_type: Sql
     datasource_name: "db"
     sql: |
       show tables;
       select id from version where id=1;
 
-  - task_type: Sql
-    name: task_file
+  - name: task_file
+    task_type: Sql
     datasource_name: "db"
     sql: $FILE{"example_sql.sql"}
 

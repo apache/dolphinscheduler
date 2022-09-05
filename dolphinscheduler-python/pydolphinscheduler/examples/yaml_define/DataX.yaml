@@ -21,13 +21,13 @@ workflow:
 
 # Define the tasks under the workflow
 tasks:
-  - task_type: DataX
-    name: task
+  - name: task
+    task_type: DataX
     datasource_name: db
     datatarget_name: db
     sql: show tables;
     target_table: table_test
 
-  - task_type: CustomDataX
-    name: task_custon_config
+  - name: task_custon_config
+    task_type: CustomDataX
     json: $FILE{"example_datax.json"}
