@@ -22,8 +22,6 @@ The MLflow plugin currently supports and will support the following:
     - Docker: Run the container after packaging the docker image
     - Docker Compose: Use docker compose to run the container, it will replace the docker run above
 
-
-
 ## Create Task
 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
@@ -31,21 +29,12 @@ The MLflow plugin currently supports and will support the following:
 
 ## Task Parameters and Example
 
-| **Parameter** | **Description** |
-| ------- | ---------- |
-| Node Name | Set the name of the task. Node names within a workflow definition are unique. |
-| Run flag | Indicates whether the node can be scheduled normally. If it is not necessary to execute, you can turn on the prohibiting execution switch. |
-| Description | Describes the function of this node. |
-| Task priority | When the number of worker threads is insufficient, they are executed in order from high to low according to the priority, and they are executed according to the first-in, first-out principle when the priority is the same. |
-| Worker group | The task is assigned to the machines in the worker group for execution. If Default is selected, a worker machine will be randomly selected for execution. |
-| Task group name | The group in Resources, if not configured, it will not be used. | 
-| Environment Name | Configure the environment in which to run the script. |
-| Number of failed retries | The number of times the task is resubmitted after failure. It supports drop-down and manual filling. | 
-| Failure Retry Interval | The time interval for resubmitting the task if the task fails. It supports drop-down and manual filling. | 
-| Timeout alarm | Check Timeout Alarm and Timeout Failure. When the task exceeds the "timeout duration", an alarm email will be sent and the task execution will fail. |
-| Predecessor task | Selecting the predecessor task of the current task will set the selected predecessor task as the upstream of the current task. |
-| MLflow Tracking Server URI | MLflow Tracking Server URI, default http://localhost:5000. |
-| Experiment Name | Create the experiment where the task is running, if the experiment does not exist. If the name is empty, it is set to ` Default `, the same as MLflow. |
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+
+|       **Parameter**        |                                                                    **Description**                                                                     |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| MLflow Tracking Server URI | MLflow Tracking Server URI, default http://localhost:5000.                                                                                             |
+| Experiment Name            | Create the experiment where the task is running, if the experiment does not exist. If the name is empty, it is set to ` Default `, the same as MLflow. |
 
 ### MLflow Projects
 
@@ -89,16 +78,14 @@ The MLflow plugin currently supports and will support the following:
 
 You can now use this feature to run all MLFlow projects on Github (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) ). You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
 
-
 ### MLflow Models
 
 **General Parameters**
 
-| **Parameter** | **Description** |
-| ------- | ---------- |
-| Model-URI | Model-URI of MLflow , support `models:/<model_name>/suffix` format and `runs:/` format. See https://mlflow.org/docs/latest/tracking.html#artifact-stores |
-| Port | The port to listen on. |
-
+| **Parameter** |                                                                     **Description**                                                                      |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Model-URI     | Model-URI of MLflow , support `models:/<model_name>/suffix` format and `runs:/` format. See https://mlflow.org/docs/latest/tracking.html#artifact-stores |
+| Port          | The port to listen on.                                                                                                                                   |
 
 #### MLflow
 
@@ -112,10 +99,10 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 ![mlflow-models-docker-compose](../../../../img/tasks/demo/mlflow-models-docker-compose.png)
 
-| **Parameter** | **Description** |
-| ------- | ---------- |
-| Max Cpu Limit | For example, `1.0` or `0.5`, the same as docker compose. |
-| Max Memory Limit | For example `1G` or `500M`, the same as docker compose. |
+|  **Parameter**   |                     **Description**                      |
+|------------------|----------------------------------------------------------|
+| Max Cpu Limit    | For example, `1.0` or `0.5`, the same as docker compose. |
+| Max Memory Limit | For example `1G` or `500M`, the same as docker compose.  |
 
 ## Environment to Prepare
 
@@ -123,7 +110,7 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 You need to enter the admin account to configure a conda environment variable（Please
 install [anaconda](https://docs.continuum.io/anaconda/install/)
-or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing ) in advance).
+or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance).
 
 ![mlflow-conda-env](../../../../img/tasks/demo/mlflow-conda-env.png)
 
