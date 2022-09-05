@@ -19,12 +19,13 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
+import io.micrometer.core.lang.NonNull;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import lombok.NonNull;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -43,6 +44,9 @@ import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 import org.apache.dolphinscheduler.service.log.LogClientService;
+
+import org.apache.commons.collections.CollectionUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,14 +99,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         }
 
         int processId = taskExecutionContext.getProcessId();
-
-        this.cancelApplication(taskInstanceId);
-
-        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
-
-        // if processId = 0 and yarn application_id list is empty, the task has not been executed and has been cancelled.
-
-        if (processId == 0 && result.getRight().isEmpty()) {
+        if (processId == 0) {
+            this.cancelApplication(taskInstanceId);
             workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
             taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
@@ -110,6 +108,10 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
             return;
         }
+
+        // if processId > 0, it should call cancelApplication to cancel remote application too.
+        this.cancelApplication(taskInstanceId);
+        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
 
         taskExecutionContext.setCurrentExecutionStatus(
                 result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
@@ -142,10 +144,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         });
     }
 
+    /**
+     * do kill
+     *
+     * @return kill result
+     */
     private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
         // kill system process
         boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
-
         // find log and kill yarn job
         Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
                 taskExecutionContext.getLogPath(),
@@ -205,8 +211,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      * kill yarn job
      *
-     * @param host        host
-     * @param logPath     logPath
+     * @param host host
+     * @param logPath logPath
      * @param executePath executePath
      * @param tenantCode  tenantCode
      * @return Pair<Boolean, List < String>> yarn kill result
