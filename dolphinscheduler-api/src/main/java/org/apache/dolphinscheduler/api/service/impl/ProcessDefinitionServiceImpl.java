@@ -856,7 +856,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
+        if(ReleaseState.ONLINE == processDefinition.getReleaseState()){
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
+            return result;
+        }
         processDefinitionUsedInOtherTaskValid(processDefinition);
 
         // get the timing according to the process definition
