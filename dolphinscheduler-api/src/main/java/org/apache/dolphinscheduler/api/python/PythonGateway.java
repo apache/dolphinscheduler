@@ -90,6 +90,8 @@ public class PythonGateway {
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
     private static final int DEFAULT_DRY_RUN = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
+    // We use admin user's user_id to skip some permission issue from python gateway service
+    private static final int ADMIN_USER_ID = 1;
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -142,7 +144,7 @@ public class PythonGateway {
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
         {
-            setId(Integer.MAX_VALUE);
+            setId(ADMIN_USER_ID);
             setUserName("dummyUser");
             setUserType(UserType.ADMIN_USER);
         }
