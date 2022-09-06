@@ -392,11 +392,11 @@ public class ProcessDefinition {
         this.projectCode = projectCode;
     }
 
-    public int getWarningGroupId() {
+    public Integer getWarningGroupId() {
         return warningGroupId;
     }
 
-    public void setWarningGroupId(int warningGroupId) {
+    public void setWarningGroupId(Integer warningGroupId) {
         this.warningGroupId = warningGroupId;
     }
 
