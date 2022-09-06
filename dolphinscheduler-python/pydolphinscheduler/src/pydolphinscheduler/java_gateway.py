@@ -98,6 +98,10 @@ class JavaGate:
         """Get resources file info through java gateway."""
         return self.java_gateway.entry_point.queryResourcesFileInfo(user_name, name)
 
+    def query_environment_info(self, name: str):
+        """Get environment info through java gateway."""
+        return self.java_gateway.entry_point.getEnvironmentInfo(name)
+
     def get_code_and_version(
         self, project_name: str, process_definition_name: str, task_name: str
     ):
