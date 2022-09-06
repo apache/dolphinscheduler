@@ -19,3 +19,11 @@ Python
 ======
 
 .. automodule:: pydolphinscheduler.tasks.python
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Python.yaml
+   :start-after: # under the License.
+   :language: yaml

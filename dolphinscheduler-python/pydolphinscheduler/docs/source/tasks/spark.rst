@@ -31,3 +31,11 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.spark
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Spark.yaml
+   :start-after: # under the License.
+   :language: yaml
