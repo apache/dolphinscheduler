@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.dvc;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -29,8 +30,6 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
 /**
  * shell task
@@ -102,7 +101,7 @@ public class DvcTask extends AbstractTask {
         try {
             shellCommandExecutor.cancelApplication();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TaskException("cancel application error", e);
         }
     }
 
@@ -111,9 +110,9 @@ public class DvcTask extends AbstractTask {
         TaskTypeEnum taskType = parameters.getDvcTaskType();
         if (taskType == TaskTypeEnum.UPLOAD) {
             command = buildUploadCommond();
-        }else if (taskType == TaskTypeEnum.DOWNLOAD){
+        } else if (taskType == TaskTypeEnum.DOWNLOAD) {
             command = buildDownCommond();
-        }else if (taskType == TaskTypeEnum.INIT){
+        } else if (taskType == TaskTypeEnum.INIT) {
             command = buildInitDvcCommond();
         }
         logger.info("Run DVC task with command: \n{}", command);
@@ -163,12 +162,9 @@ public class DvcTask extends AbstractTask {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return parameters;
     }
 
-
 }
-
