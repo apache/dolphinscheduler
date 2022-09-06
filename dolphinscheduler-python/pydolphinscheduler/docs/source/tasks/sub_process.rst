@@ -19,3 +19,20 @@ Sub Process
 ===========
 
 .. automodule:: pydolphinscheduler.tasks.sub_process
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/SubProcess.yaml
+   :start-after: # under the License.
+   :language: yaml
+
+
+
+example_subprocess.yaml:
+
+.. literalinclude:: ../../../examples/yaml_define/example_sub_workflow.yaml
+   :start-after: # under the License.
+   :language: yaml
+

@@ -21,13 +21,13 @@
 
     <select id="getUserFavTaskTypes" resultType="string">
         select task_name
-        from t_ds_fav
+        from t_ds_fav_task
         where user_id = #{userId}
     </select>
 
     <delete id="deleteUserFavTask">
         delete
-        from t_ds_fav
+        from t_ds_fav_task
         where user_id = #{userId}
           and task_name = #{taskName}
     </delete>
