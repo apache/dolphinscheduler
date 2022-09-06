@@ -37,7 +37,7 @@ public class AlertRegistryClient implements AutoCloseable {
 
     public boolean getAlertLock() {
         try {
-            return registryClient.getLock(NodeType.API_SERVER.getRegistryPath());
+            return registryClient.getLock(NodeType.ALERT_LOCK.getRegistryPath());
         } catch (RegistryException ex) {
             log.error("Get alert lock from registry error", ex);
             return false;
@@ -46,7 +46,7 @@ public class AlertRegistryClient implements AutoCloseable {
 
     public boolean releaseAlertLock() {
         try {
-            return registryClient.getLock(NodeType.API_SERVER.getRegistryPath());
+            return registryClient.getLock(NodeType.ALERT_LOCK.getRegistryPath());
         } catch (RegistryException ex) {
             log.info("Release alert lock from registry error", ex);
             return false;

@@ -40,6 +40,20 @@ spring:
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
 
+registry:
+  type: zookeeper
+  zookeeper:
+    namespace: dolphinscheduler
+    connect-string: localhost:2181
+    retry-policy:
+      base-sleep-time: 60ms
+      max-sleep: 300ms
+      max-retries: 5
+    session-timeout: 30s
+    connection-timeout: 9s
+    block-until-connected: 600ms
+    digest: ~
+
 server:
   port: 50053
 

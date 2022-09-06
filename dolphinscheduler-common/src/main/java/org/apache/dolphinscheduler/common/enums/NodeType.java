@@ -23,6 +23,7 @@ public enum NodeType {
     WORKER("worker", "/nodes/worker"),
     API_SERVER("apiServer", "/nodes/apiServer"),
     ALERT_SERVER("alertServer", "/nodes/alertServer"),
+    ALERT_LOCK("lock", "/lock/alert"),
     ;
 
     private final String name;
