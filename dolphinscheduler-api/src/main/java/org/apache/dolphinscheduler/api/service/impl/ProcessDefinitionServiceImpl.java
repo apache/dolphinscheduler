@@ -809,10 +809,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         for (ProcessDefinition process : processDefinitionList) {
             long code = process.getCode();
             try {
-                Map<String, Object> deleteResult =
-                        this.deleteProcessDefinitionByCode(loginUser, projectCode, code);
+                Map<String, Object> deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, code);
                 if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
-                    throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), deleteResult.get(Constants.MSG));
+                    throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR,
+                            process.getName(), deleteResult.get(Constants.MSG));
                 }
             } catch (Exception e){
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
