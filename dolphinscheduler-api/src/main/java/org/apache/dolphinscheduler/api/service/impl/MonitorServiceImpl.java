@@ -96,9 +96,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
                         (WorkerServerModel worker) -> {
                             String[] s = worker.getZkDirectories().iterator().next().split("/");
                             return s[s.length - 1];
-                        }
-                        , Function.identity()
-                        , (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
+                        }, Function.identity(), (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
                             oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
                             return oldOne;
                         }));

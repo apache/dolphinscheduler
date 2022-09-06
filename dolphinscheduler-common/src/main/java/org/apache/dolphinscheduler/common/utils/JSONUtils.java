@@ -17,28 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
-import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TimeZone;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,16 +33,35 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import lombok.experimental.UtilityClass;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * json utils
- */
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TimeZone;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+@UtilityClass
 public class JSONUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
 
     static {
-        logger.info("init timezone: {}",TimeZone.getDefault());
+        logger.info("init timezone: {}", TimeZone.getDefault());
     }
 
     /**
@@ -77,10 +74,6 @@ public class JSONUtils {
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .setTimeZone(TimeZone.getDefault())
             .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
-
-    private JSONUtils() {
-        throw new UnsupportedOperationException("Construct JSONUtils");
-    }
 
     public static ArrayNode createArrayNode() {
         return objectMapper.createArrayNode();
@@ -97,16 +90,16 @@ public class JSONUtils {
     /**
      * json representation of object
      *
-     * @param object object
+     * @param object  object
      * @param feature feature
      * @return object to json string
      */
-    public static String toJsonString(Object object, SerializationFeature feature) {
+    public static @Nullable String toJsonString(Object object, SerializationFeature feature) {
         try {
             ObjectWriter writer = objectMapper.writer(feature);
             return writer.writeValueAsString(object);
         } catch (Exception e) {
-            logger.error("object to json exception!", e);
+            logger.error("object to json exception!, obj: {}", object, e);
         }
 
         return null;
@@ -126,7 +119,7 @@ public class JSONUtils {
      * @return an object of type T from the string
      * classOfT
      */
-    public static <T> T parseObject(String json, Class<T> clazz) {
+    public static @Nullable <T> T parseObject(String json, Class<T> clazz) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
@@ -134,20 +127,20 @@ public class JSONUtils {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
-            logger.error("parse object exception!", e);
+            logger.error("parse object exception! json: {}", json, e);
         }
         return null;
     }
 
     /**
-     *  deserialize
+     * deserialize
      *
-     * @param src byte array
+     * @param src   byte array
      * @param clazz class
-     * @param <T> deserialize type
+     * @param <T>   deserialize type
      * @return deserialize type
      */
-    public static <T> T parseObject(byte[] src, Class<T> clazz) {
+    public static @Nullable <T> T parseObject(byte[] src, Class<T> clazz) {
         if (src == null) {
             return null;
         }
@@ -172,7 +165,7 @@ public class JSONUtils {
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {
-            logger.error("parse list exception!", e);
+            logger.error("parse list exception! json: {}", json, e);
         }
 
         return Collections.emptyList();
@@ -194,7 +187,7 @@ public class JSONUtils {
             objectMapper.readTree(json);
             return true;
         } catch (IOException e) {
-            logger.error("check json object valid exception!", e);
+            logger.error("check json object valid exception! json: {}", json, e);
         }
 
         return false;
@@ -227,7 +220,8 @@ public class JSONUtils {
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {});
+        return parseObject(json, new TypeReference<Map<String, String>>() {
+        });
     }
 
     /**
@@ -249,7 +243,7 @@ public class JSONUtils {
             return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
             });
         } catch (Exception e) {
-            logger.error("json to map exception!", e);
+            logger.error("json to map exception! json: {}", json, e);
         }
 
         return Collections.emptyMap();
@@ -270,6 +264,7 @@ public class JSONUtils {
             }
             return jsonNode.isTextual() ? jsonNode.asText() : jsonNode.toString();
         } catch (JsonProcessingException e) {
+            logger.info("Json deserialize error, json: {}", json, e);
             return "";
         }
     }
@@ -282,7 +277,7 @@ public class JSONUtils {
      * @param <T>
      * @return return parse object
      */
-    public static <T> T parseObject(String json, TypeReference<T> type) {
+    public static @Nullable <T> T parseObject(String json, TypeReference<T> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
@@ -290,7 +285,7 @@ public class JSONUtils {
         try {
             return objectMapper.readValue(json, type);
         } catch (Exception e) {
-            logger.error("json to map exception!", e);
+            logger.error("json to map exception!, json: {}", json, e);
         }
 
         return null;
@@ -306,7 +301,7 @@ public class JSONUtils {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
-            throw new RuntimeException("Object json deserialization exception.", e);
+            throw new RuntimeException("Object json deserialization exception. obj: " + object, e);
         }
     }
 
@@ -317,7 +312,7 @@ public class JSONUtils {
      * @param <T> object type
      * @return byte array
      */
-    public static <T> byte[] toJsonByteArray(T obj)  {
+    public static @Nullable <T> byte[] toJsonByteArray(T obj) {
         if (obj == null) {
             return null;
         }
@@ -325,7 +320,7 @@ public class JSONUtils {
         try {
             json = toJsonString(obj);
         } catch (Exception e) {
-            logger.error("json serialize exception.", e);
+            logger.error("json serialize exception. obj: {}", obj, e);
         }
 
         return json.getBytes(UTF_8);
@@ -339,7 +334,7 @@ public class JSONUtils {
                 return (ObjectNode) objectMapper.readTree(text);
             }
         } catch (Exception e) {
-            throw new RuntimeException("String json deserialization exception.", e);
+            throw new RuntimeException("String json deserialization exception. text: " + text, e);
         }
     }
 
@@ -347,7 +342,7 @@ public class JSONUtils {
         try {
             return (ArrayNode) objectMapper.readTree(text);
         } catch (Exception e) {
-            throw new RuntimeException("Json deserialization exception.", e);
+            throw new RuntimeException("Json deserialization exception. text: " + text, e);
         }
     }
 
