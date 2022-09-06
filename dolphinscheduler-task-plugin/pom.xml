@@ -61,6 +61,7 @@
         <module>dolphinscheduler-task-flink-stream</module>
         <module>dolphinscheduler-task-pytorch</module>
         <module>dolphinscheduler-task-hivecli</module>
+        <module>dolphinscheduler-task-datasync</module>
     </modules>
 
     <dependencyManagement>
