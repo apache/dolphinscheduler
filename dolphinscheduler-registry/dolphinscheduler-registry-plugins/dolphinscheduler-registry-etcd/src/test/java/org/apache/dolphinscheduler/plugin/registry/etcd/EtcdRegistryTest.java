@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.zookeeper;
+package org.apache.dolphinscheduler.plugin.registry.etcd;
 
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
-
-import org.apache.curator.test.TestingServer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,44 +27,49 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ZookeeperRegistryTest {
+import io.etcd.jetcd.test.EtcdClusterExtension;
 
-    private static final Logger logger = LoggerFactory.getLogger(ZookeeperRegistryTest.class);
+public class EtcdRegistryTest {
+    private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
-    TestingServer server;
+    @RegisterExtension
+    public static final EtcdClusterExtension server = EtcdClusterExtension.builder()
+            .withNodes(1)
+            .withImage("ibmcom/etcd:3.2.24")
+            .build();
+    public static EtcdRegistry registry;
 
-    ZookeeperRegistry registry;
-
-    @Before
-    public void before() throws Exception {
-        server = new TestingServer(true);
-
-        ZookeeperRegistryProperties p = new ZookeeperRegistryProperties();
-        p.getZookeeper().setConnectString(server.getConnectString());
-        registry = new ZookeeperRegistry(p);
-        registry.start();
-        registry.put("/sub", "", false);
+    @BeforeClass
+    public static void before() throws Exception {
+        EtcdRegistryProperties properties = new EtcdRegistryProperties();
+        server.restart();
+        properties.setEndpoints(String.valueOf(server.clientEndpoints().get(0)));
+        registry = new EtcdRegistry(properties);
+        registry.put("/sub", "sub", false);
     }
 
     @Test
     public void persistTest() {
         registry.put("/nodes/m1", "", false);
         registry.put("/nodes/m2", "", false);
-        Assert.assertEquals(Arrays.asList("m2", "m1"), registry.children("/nodes"));
+        Assert.assertEquals(Arrays.asList("m1", "m2"), registry.children("/nodes"));
         Assert.assertTrue(registry.exists("/nodes/m1"));
         registry.delete("/nodes/m2");
         Assert.assertFalse(registry.exists("/nodes/m2"));
+        registry.delete("/nodes");
+        Assert.assertFalse(registry.exists("/nodes/m1"));
     }
 
     @Test
-    public void lockTest() throws InterruptedException {
+    public void lockTest() {
         CountDownLatch preCountDownLatch = new CountDownLatch(1);
         CountDownLatch allCountDownLatch = new CountDownLatch(2);
         List<String> testData = new ArrayList<>();
@@ -87,7 +90,11 @@ public class ZookeeperRegistryTest {
                 allCountDownLatch.countDown();
             }
         }).start();
-        preCountDownLatch.await(5, TimeUnit.SECONDS);
+        try {
+            preCountDownLatch.await(5,TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         new Thread(() -> {
             try {
                 logger.info(Thread.currentThread().getName() + " :I am trying to acquire the lock");
@@ -101,14 +108,22 @@ public class ZookeeperRegistryTest {
             }
 
         }).start();
-        allCountDownLatch.await(5, TimeUnit.SECONDS);
+        try {
+            allCountDownLatch.await(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
-
     }
 
     @Test
     public void subscribeTest() {
         boolean status = registry.subscribe("/sub", new TestListener());
+        // The following add and delete operations are used for debugging
+        registry.put("/sub/m1", "tt", false);
+        registry.put("/sub/m2", "tt", false);
+        registry.delete("/sub/m2");
+        registry.delete("/sub");
         Assert.assertTrue(status);
 
     }
@@ -120,10 +135,8 @@ public class ZookeeperRegistryTest {
         }
     }
 
-    @After
-    public void after() throws IOException {
+    @AfterClass
+    public static void after() throws IOException {
         registry.close();
-        server.close();
     }
-
 }
