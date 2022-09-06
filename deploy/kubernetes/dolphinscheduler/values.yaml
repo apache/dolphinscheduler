@@ -148,6 +148,8 @@ common:
   ## Configmap
   configmap:
     DOLPHINSCHEDULER_OPTS: ""
+    DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
     # dolphinscheduler env
     HADOOP_HOME: "/opt/soft/hadoop"
     HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
