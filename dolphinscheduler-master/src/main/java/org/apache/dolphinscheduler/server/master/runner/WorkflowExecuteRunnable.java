@@ -1812,8 +1812,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 getPreVarPool(task, preTask);
             }
             DependResult dependResult = getDependResultForTask(task);
-            if (DependResult.SUCCESS == dependResult
-                    || processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
+            if (DependResult.SUCCESS == dependResult || ((DependResult.WAITING != dependResult)
+                    && (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE))) {
                 Optional<TaskInstance> taskInstanceOptional = submitTaskExec(task);
                 if (!taskInstanceOptional.isPresent()) {
                     this.taskFailedSubmit = true;
