@@ -205,7 +205,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.START_PROCESS,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
@@ -227,7 +227,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.START_PROCESS,
                 null, "n1,n2",
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
@@ -249,7 +249,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2022-01-07 12:12:12\",\"complementEndDate\":\"2022-01-06 12:12:12\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
@@ -270,7 +270,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
@@ -291,7 +291,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
@@ -313,7 +313,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
@@ -331,7 +331,7 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
