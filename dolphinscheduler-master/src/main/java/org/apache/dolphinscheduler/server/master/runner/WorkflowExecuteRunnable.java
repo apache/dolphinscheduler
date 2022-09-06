@@ -473,7 +473,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             stateWheelExecuteThread.addTask4RetryCheck(processInstance, newTaskInstance);
         } else {
             addTaskToStandByList(newTaskInstance);
-            submitStandByTask();
+            handleStandByTask();
             waitToRetryTaskInstanceMap.remove(newTaskInstance.getTaskCode());
         }
     }
@@ -1346,7 +1346,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
             addTaskToStandByList(task);
         }
-        submitStandByTask();
+        handleStandByTask();
         updateProcessInstanceState();
     }
 
@@ -1784,7 +1784,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * handling the list of tasks to be submitted
      */
-    public void submitStandByTask() throws StateEventHandleException {
+    public void handleStandByTask() throws StateEventHandleException {
         int length = readyToSubmitTaskQueue.size();
         for (int i = 0; i < length; i++) {
             TaskInstance task = readyToSubmitTaskQueue.peek();
@@ -1812,42 +1812,59 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 getPreVarPool(task, preTask);
             }
             DependResult dependResult = getDependResultForTask(task);
-            if (DependResult.SUCCESS == dependResult || ((DependResult.WAITING != dependResult)
-                    && (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE))) {
-                Optional<TaskInstance> taskInstanceOptional = submitTaskExec(task);
-                if (!taskInstanceOptional.isPresent()) {
-                    this.taskFailedSubmit = true;
-                    // Remove and add to complete map and error map
-                    if (!removeTaskFromStandbyList(task)) {
-                        logger.error(
-                                "Task submit failed, remove from standby list failed, workflowInstanceId: {}, taskCode: {}",
-                                processInstance.getId(),
-                                task.getTaskCode());
-                    }
-                    completeTaskMap.put(task.getTaskCode(), task.getId());
-                    taskInstanceMap.put(task.getId(), task);
-                    errorTaskMap.put(task.getTaskCode(), task.getId());
-                    activeTaskProcessorMaps.remove(task.getTaskCode());
-                    logger.error("Task submitted failed, workflowInstanceId: {}, taskInstanceId: {}, taskCode: {}",
-                            task.getProcessInstanceId(),
-                            task.getId(),
-                            task.getTaskCode());
-                } else {
-                    removeTaskFromStandbyList(task);
-                }
-            } else if (DependResult.FAILED == dependResult) {
-                // if the dependency fails, the current node is not submitted and the state changes to failure.
-                dependFailedTaskMap.put(task.getTaskCode(), task.getId());
-                removeTaskFromStandbyList(task);
-                logger.info("Dependent task failed, taskInstanceId:{} depend result: {}", task.getId(),
-                        dependResult);
-            } else if (DependResult.NON_EXEC == dependResult) {
-                // for some reasons(depend task pause/stop) this task would not be submit
-                removeTaskFromStandbyList(task);
-                logger.info("Remove task due to depend result not executed, taskInstanceId:{} depend result : {}",
-                        task.getId(), dependResult);
-            }
+            handleStandByTaskBasedOnDependResultAndFailureStrategy(task, dependResult);
         }
+    }
+
+    protected void handleStandByTaskBasedOnDependResultAndFailureStrategy(final TaskInstance task,
+                                                                          final DependResult dependResult) {
+        if (DependResult.SUCCESS == dependResult || ((DependResult.WAITING != dependResult)
+                && (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE))) {
+            trySubmittingStandByTask(task);
+        } else if (DependResult.FAILED == dependResult) {
+            handleStandByTaskWithDependentResultFailedAndEndStrategy(task);
+        } else if (DependResult.NON_EXEC == dependResult) {
+            handleStandByTaskWithDependentResultNoExecAndEndStrategy(task);
+        }
+    }
+
+    protected void trySubmittingStandByTask(final TaskInstance task) {
+        Optional<TaskInstance> taskInstanceOptional = submitTaskExec(task);
+        if (!taskInstanceOptional.isPresent()) {
+            this.taskFailedSubmit = true;
+            // Remove and add to complete map and error map
+            if (!removeTaskFromStandbyList(task)) {
+                logger.error(
+                        "Task submit failed, remove from standby list failed, workflowInstanceId: {}, taskCode: {}",
+                        processInstance.getId(),
+                        task.getTaskCode());
+            }
+            completeTaskMap.put(task.getTaskCode(), task.getId());
+            taskInstanceMap.put(task.getId(), task);
+            errorTaskMap.put(task.getTaskCode(), task.getId());
+            activeTaskProcessorMaps.remove(task.getTaskCode());
+            logger.error("Task submitted failed, workflowInstanceId: {}, taskInstanceId: {}, taskCode: {}",
+                    task.getProcessInstanceId(),
+                    task.getId(),
+                    task.getTaskCode());
+        } else {
+            removeTaskFromStandbyList(task);
+        }
+    }
+
+    protected void handleStandByTaskWithDependentResultFailedAndEndStrategy(final TaskInstance task) {
+        // if the dependency fails, the current node is not submitted and the state changes to failure.
+        dependFailedTaskMap.put(task.getTaskCode(), task.getId());
+        removeTaskFromStandbyList(task);
+        logger.info("Dependent task failed, taskInstanceId:{} depend result: {}", task.getId(),
+                DependResult.FAILED);
+    }
+
+    protected void handleStandByTaskWithDependentResultNoExecAndEndStrategy(final TaskInstance task) {
+        // for some reasons(depend task pause/stop) this task would not be submit
+        removeTaskFromStandbyList(task);
+        logger.info("Remove task due to depend result not executed, taskInstanceId:{} depend result : {}",
+                task.getId(), DependResult.NON_EXEC);
     }
 
     /**

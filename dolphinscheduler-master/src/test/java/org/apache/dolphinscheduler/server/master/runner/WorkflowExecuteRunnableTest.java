@@ -21,15 +21,15 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -37,10 +37,13 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
@@ -123,7 +126,8 @@ public class WorkflowExecuteRunnableTest {
         NettyExecutorManager nettyExecutorManager = mock(NettyExecutorManager.class);
         ProcessAlertManager processAlertManager = mock(ProcessAlertManager.class);
         workflowExecuteThread = PowerMockito.spy(
-            new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao, nettyExecutorManager, processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
+                new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao, nettyExecutorManager,
+                        processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
         // prepareProcess init dag
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
@@ -141,7 +145,7 @@ public class WorkflowExecuteRunnableTest {
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
             method.setAccessible(true);
             List<String> nodeNames =
-                (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
+                    (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(3, nodeNames.size());
         } catch (Exception e) {
             Assert.fail();
@@ -163,18 +167,18 @@ public class WorkflowExecuteRunnableTest {
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1,2,3,4");
             Mockito.when(processService.findTaskInstanceByIdList(
                     Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(),
-                        taskInstance4.getId())))
-                .thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
+                            taskInstance4.getId())))
+                    .thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
             Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getRecoverTaskInstanceList", String.class);
             method.setAccessible(true);
             List<TaskInstance> taskInstances =
-                workflowExecuteThread.getRecoverTaskInstanceList(JSONUtils.toJsonString(cmdParam));
+                    workflowExecuteThread.getRecoverTaskInstanceList(JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
 
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1");
             List<TaskInstance> taskInstanceEmpty =
-                (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
+                    (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertTrue(taskInstanceEmpty.isEmpty());
 
         } catch (Exception e) {
@@ -264,6 +268,94 @@ public class WorkflowExecuteRunnableTest {
             Mockito.when(processService.findProcessInstanceById(225)).thenReturn(processInstance);
             Mockito.when(processService.findProcessInstanceById(222)).thenReturn(processInstance9);
             workflowExecuteThread.checkSerialProcess(processDefinition1);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testWorkflowExecutionWithDependResultSuccessAndContinueStrategy() {
+        try {
+            TaskInstance taskInstanceMock = Mockito.mock(TaskInstance.class);
+            Mockito.when(processInstance.getFailureStrategy()).thenReturn(FailureStrategy.CONTINUE);
+            doNothing().when(workflowExecuteThread).trySubmittingStandByTask(taskInstanceMock);
+            workflowExecuteThread.handleStandByTaskBasedOnDependResultAndFailureStrategy(taskInstanceMock,
+                    DependResult.SUCCESS);
+            Mockito.verify(workflowExecuteThread, times(1)).trySubmittingStandByTask(taskInstanceMock);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testWorkflowExecutionWithDependResultSuccessAndEndStrategy() {
+        try {
+            TaskInstance taskInstanceMock = Mockito.mock(TaskInstance.class);
+            Mockito.when(processInstance.getFailureStrategy()).thenReturn(FailureStrategy.END);
+            doNothing().when(workflowExecuteThread).trySubmittingStandByTask(taskInstanceMock);
+            workflowExecuteThread.handleStandByTaskBasedOnDependResultAndFailureStrategy(taskInstanceMock,
+                    DependResult.SUCCESS);
+            Mockito.verify(workflowExecuteThread, times(1)).trySubmittingStandByTask(taskInstanceMock);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testWorkflowExecutionWithDependResultFailedAndContinueStrategy() {
+        try {
+            TaskInstance taskInstanceMock = Mockito.mock(TaskInstance.class);
+            Mockito.when(processInstance.getFailureStrategy()).thenReturn(FailureStrategy.CONTINUE);
+            doNothing().when(workflowExecuteThread).trySubmittingStandByTask(taskInstanceMock);
+            workflowExecuteThread.handleStandByTaskBasedOnDependResultAndFailureStrategy(taskInstanceMock,
+                    DependResult.FAILED);
+            Mockito.verify(workflowExecuteThread, times(1)).trySubmittingStandByTask(taskInstanceMock);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testWorkflowExecutionWithDependResultFailedAndEndStrategy() {
+        try {
+            TaskInstance taskInstanceMock = Mockito.mock(TaskInstance.class);
+            Mockito.when(processInstance.getFailureStrategy()).thenReturn(FailureStrategy.END);
+            doNothing().when(workflowExecuteThread)
+                    .handleStandByTaskWithDependentResultFailedAndEndStrategy(taskInstanceMock);
+            workflowExecuteThread.handleStandByTaskBasedOnDependResultAndFailureStrategy(taskInstanceMock,
+                    DependResult.FAILED);
+            Mockito.verify(workflowExecuteThread, times(1))
+                    .handleStandByTaskWithDependentResultFailedAndEndStrategy(taskInstanceMock);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testWorkflowExecutionWithDependResultNoExecAndContinueStrategy() {
+        try {
+            TaskInstance taskInstanceMock = Mockito.mock(TaskInstance.class);
+            Mockito.when(processInstance.getFailureStrategy()).thenReturn(FailureStrategy.CONTINUE);
+            doNothing().when(workflowExecuteThread).trySubmittingStandByTask(taskInstanceMock);
+            workflowExecuteThread.handleStandByTaskBasedOnDependResultAndFailureStrategy(taskInstanceMock,
+                    DependResult.NON_EXEC);
+            Mockito.verify(workflowExecuteThread, times(1)).trySubmittingStandByTask(taskInstanceMock);
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testWorkflowExecutionWithDependResultNoExecAndEndStrategy() {
+        try {
+            TaskInstance taskInstanceMock = Mockito.mock(TaskInstance.class);
+            Mockito.when(processInstance.getFailureStrategy()).thenReturn(FailureStrategy.END);
+            doNothing().when(workflowExecuteThread)
+                    .handleStandByTaskWithDependentResultNoExecAndEndStrategy(taskInstanceMock);
+            workflowExecuteThread.handleStandByTaskBasedOnDependResultAndFailureStrategy(taskInstanceMock,
+                    DependResult.NON_EXEC);
+            Mockito.verify(workflowExecuteThread, times(1))
+                    .handleStandByTaskWithDependentResultNoExecAndEndStrategy(taskInstanceMock);
         } catch (Exception e) {
             Assert.fail();
         }
