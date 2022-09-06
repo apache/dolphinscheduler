@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -47,6 +48,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -58,6 +61,11 @@ import com.google.common.collect.Lists;
 
 @Component
 public class AlertDao {
+
+    /**
+     * logger of AlertDao
+     */
+    private static final Logger logger = LoggerFactory.getLogger(AlertDao.class);
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
@@ -81,9 +89,15 @@ public class AlertDao {
      * @return add alert result
      */
     public int addAlert(Alert alert) {
+        if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
+            return 0;
+        }
+
         String sign = generateSign(alert);
         alert.setSign(sign);
-        return alertMapper.insert(alert);
+        int count = alertMapper.insert(alert);
+        logger.info("add alert to db , alert: {}", alert);
+        return count;
     }
 
     /**

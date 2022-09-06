@@ -201,7 +201,6 @@ public class ProcessAlertManager {
                     processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
             alertDao.addAlert(alert);
-            logger.info("add alert to db , alert : {}", alert);
 
         } catch (Exception e) {
             logger.error("send alert failed:{} ", e.getMessage());
@@ -218,13 +217,7 @@ public class ProcessAlertManager {
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances,
                                          ProjectUser projectUser) {
-
-        if (null == processInstance.getWarningGroupId() || NumberUtils.INTEGER_ZERO.equals(processInstance.getWarningGroupId())) {
-            return;
-        }
-
         Alert alert = new Alert();
-
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().isSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
@@ -239,7 +232,6 @@ public class ProcessAlertManager {
         alert.setAlertType(processInstance.getState().isSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
                 : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**
@@ -326,7 +318,6 @@ public class ProcessAlertManager {
         alert.setAlertType(processInstance.getState().isSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
                 : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**
@@ -343,7 +334,6 @@ public class ProcessAlertManager {
         alert.setProcessInstanceId(processInstance.getId());
         alert.setAlertType(AlertType.TASK_FAILURE);
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**
@@ -441,6 +431,5 @@ public class ProcessAlertManager {
         alert.setProcessInstanceId(processInstance.getId());
         alert.setAlertType(AlertType.PROCESS_INSTANCE_BLOCKED);
         alertDao.addAlert(alert);
-        logger.info("add alert to db, alert: {}", alert);
     }
 }
