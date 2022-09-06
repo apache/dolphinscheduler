@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NInput,
@@ -60,6 +66,8 @@ export const UserModal = defineComponent({
       ctx.emit('update')
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.show,
       () => {
@@ -75,7 +83,8 @@ export const UserModal = defineComponent({
       IS_ADMIN,
       formRules,
       onCancel,
-      onConfirm
+      onConfirm,
+      trim
     }
   },
   render(props: { currentRecord: IRecord }) {
@@ -105,6 +114,7 @@ export const UserModal = defineComponent({
         >
           <NFormItem label={t('security.user.username')} path='userName'>
             <NInput
+              allowInput={this.trim}
               class='input-username'
               v-model:value={this.formData.userName}
               minlength={3}
@@ -118,6 +128,7 @@ export const UserModal = defineComponent({
               path='userPassword'
             >
               <NInput
+                allowInput={this.trim}
                 class='input-password'
                 type='password'
                 v-model:value={this.formData.userPassword}
@@ -146,6 +157,7 @@ export const UserModal = defineComponent({
           )}
           <NFormItem label={t('security.user.email')} path='email'>
             <NInput
+              allowInput={this.trim}
               class='input-email'
               v-model:value={this.formData.email}
               placeholder={t('security.user.email_empty_tips')}
@@ -153,6 +165,7 @@ export const UserModal = defineComponent({
           </NFormItem>
           <NFormItem label={t('security.user.phone')} path='phone'>
             <NInput
+              allowInput={this.trim}
               class='input-phone'
               v-model:value={this.formData.phone}
               placeholder={t('security.user.phone_empty_tips')}

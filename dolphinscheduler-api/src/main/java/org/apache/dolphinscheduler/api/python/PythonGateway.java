@@ -17,25 +17,26 @@
 
 package org.apache.dolphinscheduler.api.python;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
+import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
@@ -100,6 +101,9 @@ public class PythonGateway {
     private TenantService tenantService;
 
     @Autowired
+    private EnvironmentService environmentService;
+
+    @Autowired
     private ExecutorService executorService;
 
     @Autowired
@@ -110,9 +114,6 @@ public class PythonGateway {
 
     @Autowired
     private UsersService usersService;
-
-    @Autowired
-    private QueueService queueService;
 
     @Autowired
     private ResourcesService resourceService;
@@ -175,10 +176,11 @@ public class PythonGateway {
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        // In the case project exists, but current process definition still not created, we should also return the init version of it
         if (processDefinition == null) {
-            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("version", 0L);
+            return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
@@ -206,7 +208,6 @@ public class PythonGateway {
      * and if would always fresh exists schedule if not null
      * @param warningType warning type
      * @param warningGroupId warning group id
-     * @param locations locations json object about all tasks
      * @param timeout timeout for process definition working, if running time longer than timeout,
      * task will mark as fail
      * @param workerGroup run task in which worker group
@@ -224,7 +225,6 @@ public class PythonGateway {
                                                 String schedule,
                                                 String warningType,
                                                 int warningGroupId,
-                                                String locations,
                                                 int timeout,
                                                 String workerGroup,
                                                 String tenantCode,
@@ -245,10 +245,10 @@ public class PythonGateway {
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
@@ -269,7 +269,7 @@ public class PythonGateway {
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
+        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName, 0);
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         ProcessDefinition processDefinition = null;
@@ -394,37 +394,38 @@ public class PythonGateway {
         }
     }
 
-    public Map<String, Object> createQueue(String name, String queueName) {
-        Result<Object> verifyQueueExists = queueService.verifyQueue(name, queueName);
-        if (verifyQueueExists.getCode() == 0) {
-            return queueService.createQueue(dummyAdminUser, name, queueName);
-        } else {
-            Map<String, Object> result = new HashMap<>();
-            // TODO function putMsg do not work here
-            result.put(Constants.STATUS, Status.SUCCESS);
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            return result;
-        }
+    public Project queryProjectByName(String userName, String projectName) {
+        User user = usersService.queryUser(userName);
+        return (Project) projectService.queryByName(user, projectName);
     }
 
-    public Map<String, Object> createTenant(String tenantCode, String desc, String queueName) throws Exception {
-        if (tenantService.checkTenantExists(tenantCode)) {
-            Map<String, Object> result = new HashMap<>();
-            // TODO function putMsg do not work here
-            result.put(Constants.STATUS, Status.SUCCESS);
-            result.put(Constants.MSG, Status.SUCCESS.getMsg());
-            return result;
-        } else {
-            Result<Object> verifyQueueExists = queueService.verifyQueue(queueName, queueName);
-            if (verifyQueueExists.getCode() == 0) {
-                // TODO why create do not return id?
-                queueService.createQueue(dummyAdminUser, queueName, queueName);
-            }
-            Map<String, Object> result = queueService.queryQueueName(queueName);
-            List<Queue> queueList = (List<Queue>) result.get(Constants.DATA_LIST);
-            Queue queue = queueList.get(0);
-            return tenantService.createTenant(dummyAdminUser, tenantCode, queue.getId(), desc);
-        }
+    public void updateProject(String userName, Long projectCode, String projectName, String desc) {
+        User user = usersService.queryUser(userName);
+        projectService.update(user, projectCode, projectName, desc, userName);
+    }
+
+    public void deleteProject(String userName, Long projectCode) {
+        User user = usersService.queryUser(userName);
+        projectService.deleteProject(user, projectCode);
+    }
+
+    public Tenant createTenant(String tenantCode, String desc, String queueName) {
+        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
+    }
+
+    public Result queryTenantList(String userName, String searchVal, Integer pageNo, Integer pageSize) {
+        User user = usersService.queryUser(userName);
+        return tenantService.queryTenantList(user, searchVal, pageNo, pageSize);
+    }
+
+    public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
+        User user = usersService.queryUser(userName);
+        tenantService.updateTenant(user, id, tenantCode, queueId, desc);
+    }
+
+    public void deleteTenantById(String userName, Integer tenantId) throws Exception {
+        User user = usersService.queryUser(userName);
+        tenantService.deleteTenantById(user, tenantId);
     }
 
     public void createUser(String userName,
@@ -433,13 +434,21 @@ public class PythonGateway {
                            String phone,
                            String tenantCode,
                            String queue,
-                           int state) {
+                           int state) throws IOException {
+        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
+    }
+
+    public User queryUser(int id) {
+        return usersService.queryUser(id);
+    }
+
+    public void updateUser(String userName, String userPassword, String email, String phone, String tenantCode, String queue, int state) throws Exception {
+        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
+    }
+
+    public void deleteUser(String userName, int id) throws Exception {
         User user = usersService.queryUser(userName);
-        if (Objects.isNull(user)) {
-            Map<String, Object> tenantResult = tenantService.queryByTenantCode(tenantCode);
-            Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
-            usersService.createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
-        }
+        usersService.deleteUserById(user, id);
     }
 
     /**
@@ -559,25 +568,48 @@ public class PythonGateway {
     }
 
     /**
+     * Get environment info by given environment name. It return environment code.
+     * Useful in Python API create task which need environment information.
+     *
+     * @param environmentName name of the environment
+     */
+    public Long getEnvironmentInfo(String environmentName) {
+        Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
+
+        if (result.get("data") == null) {
+            String msg = String.format("Can not find valid environment by name %s", environmentName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        EnvironmentDto environmentDto = EnvironmentDto.class.cast(result.get("data"));
+        return environmentDto.getCode();
+    }
+
+
+    /**
      * Get resource by given resource type and full name. It return map contain resource id, name.
      * Useful in Python API create task which need processDefinition information.
      *
      * @param userName user who query resource
      * @param fullName full name of the resource
      */
-    public Map<String, Object> queryResourcesFileInfo(String userName, String fullName) {
-        Map<String, Object> result = new HashMap<>();
-        User user = usersService.queryUser(userName);
-        Result<Object> resourceResponse = resourceService.queryResource(user, fullName, null, ResourceType.FILE);
-        if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
-            String msg = String.format("Can not find valid resource by name %s", fullName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        Resource resource = (Resource) resourceResponse.getData();
-        result.put("id", resource.getId());
-        result.put("name", resource.getFullName());
-        return result;
+    public Resource queryResourcesFileInfo(String userName, String fullName) {
+        return resourceService.queryResourcesFileInfo(userName, fullName);
+    }
+
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    public Integer createOrUpdateResource(
+            String userName, String fullName, String description, String resourceContent) {
+        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
     }
 
     @PostConstruct

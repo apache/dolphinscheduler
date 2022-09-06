@@ -112,22 +112,27 @@
 
 ## Worker 分组
 
-每个 worker 节点都会归属于自己的 worker 分组,默认分组为 default。
+每个 worker 节点都会归属于自己的 worker 分组，默认分组为 `default`。
 
 在任务执行时,可以将任务分配给指定 worker 分组，最终由该组中的 worker 节点执行该任务。
 
-> 新增/更新 worker 分组
+### 新增 / 更新 worker 分组
 
-- 打开要设置分组的 worker 节点上的 `conf/worker.properties` 配置文件. 修改 worker.groups 参数. 
-- worker.groups 参数后面对应的为该 worker 节点对应的分组名称,默认为 default。
-- 如果该 worker 节点对应多个分组,则以逗号隔开。
+- 打开要设置分组的 worker 节点上的 `worker-server/conf/application.yaml` 配置文件. 修改 `worker` 配置下的 `groups` 参数. 
+- `groups` 参数的值为 worker 节点对应的分组名称，默认为 `default`。
+- 如果该 worker 节点对应多个分组，则用连字符列出，示范如下：
 
 ```conf
-示例: 
-worker.groups=default,test
+worker:
+......
+  groups:
+    - default
+    - group1
+    - group2
+......
 ```
 
-- 也可以在运行中修改 worker 所属的 worker 分组，如果修改成功，worker 就会使用这个新建的分组，忽略 `worker.properties` 中的配置。修改步骤为"安全中心 -> worker分组管理 -> 点击 '新建worker分组' -> 输入'组名称' -> 选择已有worker -> 点击'提交'"
+- 也可以在运行中添加 worker 所属的 worker 分组而忽略 `application.yaml` 中的配置。修改步骤为 `安全中心` -> `worker分组管理` -> 点击 `创建worker分组` -> 输入`分组名称`和`worker地址` -> 点击`确定`
 
 ## 环境管理
 
@@ -149,6 +154,8 @@ worker.groups=default,test
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
+> 注意: 当无法在任务定义或工作流运行对话框中使用你想要使用的环境时，请检查您已经选择worker，并且您要使用的环境已经关联到您选择的worker中
+
 ## 集群管理
 
 > 创建/更新 集群
@@ -165,7 +172,7 @@ worker.groups=default,test
 
 > 创建/更新 k8s集群
 
-- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`，后续会通过页面配置.
+- 先把k8s集群连接的配置录入 database 的表 `t_ds_k8s`给批次使用后续移除，namespace的创建现在通过下拉选择集群.
 
 > 创建/更新 namespace
 

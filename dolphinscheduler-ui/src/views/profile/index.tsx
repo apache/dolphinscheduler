@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs
+} from 'vue'
 import { useForm } from './use-form'
 import { NButton, NForm, NFormItem, NInput } from 'naive-ui'
 import { useUserinfo } from './use-userinfo'
@@ -53,7 +59,9 @@ const profile = defineComponent({
       await getUserInfo()
     }
 
-    return { ...toRefs(state), showModalRef, t, onCancel, onConfirm }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
+    return { ...toRefs(state), showModalRef, t, onCancel, onConfirm, trim }
   },
   render() {
     const { t, onCancel, onConfirm } = this
@@ -91,18 +99,21 @@ const profile = defineComponent({
               <NForm rules={this.rules} ref='profileFormRef'>
                 <NFormItem label={t('profile.username')} path='username'>
                   <NInput
+                    allowInput={this.trim}
                     v-model={[this.profileForm.username, 'value']}
                     placeholder={t('profile.username_tips')}
                   />
                 </NFormItem>
                 <NFormItem label={t('profile.email')} path='email'>
                   <NInput
+                    allowInput={this.trim}
                     v-model={[this.profileForm.email, 'value']}
                     placeholder={t('profile.email_tips')}
                   />
                 </NFormItem>
                 <NFormItem label={t('profile.phone')} path='phone'>
                   <NInput
+                    allowInput={this.trim}
                     v-model={[this.profileForm.phone, 'value']}
                     placeholder={t('profile.phone_tips')}
                   />

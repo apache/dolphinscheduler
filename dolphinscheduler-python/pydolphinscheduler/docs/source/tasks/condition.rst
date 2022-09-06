@@ -31,3 +31,10 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.condition
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Condition.yaml
+   :start-after: # under the License.
+   :language: yaml

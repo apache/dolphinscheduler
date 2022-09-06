@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, watch, onMounted, ref } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  watch,
+  onMounted,
+  ref,
+  getCurrentInstance
+} from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -80,6 +87,8 @@ const DetailModal = defineComponent({
     }
     const onChangePlugin = changePlugin
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.show,
       async () => {
@@ -116,7 +125,8 @@ const DetailModal = defineComponent({
       elements,
       onChangePlugin,
       onSubmit,
-      onCancel
+      onCancel,
+      trim
     }
   },
   render(props: { currentRecord: IRecord }) {
@@ -165,6 +175,7 @@ const DetailModal = defineComponent({
                     label: t('security.alarm_instance.alarm_instance_name'),
                     widget: (
                       <NInput
+                        allowInput={this.trim}
                         v-model={[detailForm.instanceName, 'value']}
                         placeholder={t(
                           'security.alarm_instance.alarm_instance_name_tips'

@@ -15,29 +15,31 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs
+} from 'vue'
 import {
   NSpace,
   NInput,
   NButton,
   NIcon,
   NDataTable,
-  NPagination,
-  NCard
+  NPagination
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import Card from '@/components/card'
-import styles from './index.module.scss'
 import RuleModal from './components/rule-modal'
 
 const TaskResult = defineComponent({
   name: 'rule',
   setup() {
     const { t, variables, getTableData } = useTable()
-
     const showModalRef = ref(false)
-
     const ruleEntryData = ref('')
 
     const requestTableData = () => {
@@ -73,6 +75,8 @@ const TaskResult = defineComponent({
       ruleEntryData.value = ruleJson
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       requestTableData()
     })
@@ -87,7 +91,8 @@ const TaskResult = defineComponent({
       onConfirm,
       onSearch,
       ruleEntryData,
-      viewRuleEntry
+      viewRuleEntry,
+      trim
     }
   },
   render() {
@@ -107,44 +112,43 @@ const TaskResult = defineComponent({
     const { columns } = useTable(viewRuleEntry)
 
     return (
-      <div>
-        <NCard>
+      <NSpace vertical>
+        <Card>
           <NSpace justify='end'>
             <NInput
+              allowInput={this.trim}
               v-model={[this.searchVal, 'value']}
               size='small'
               placeholder={t('data_quality.rule.name')}
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>
-              {{
-                icon: () => (
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                )
-              }}
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
             </NButton>
           </NSpace>
-        </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            columns={columns}
-            data={this.tableData}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestTableData}
-              onUpdatePageSize={onUpdatePageSize}
+        </Card>
+        <Card title={t('menu.rule')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={columns}
+              data={this.tableData}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestTableData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         {showModalRef && (
           <RuleModal
@@ -154,7 +158,7 @@ const TaskResult = defineComponent({
             data={ruleEntryData}
           />
         )}
-      </div>
+      </NSpace>
     )
   }
 })

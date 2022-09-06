@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType } from 'vue'
+import { defineComponent, toRefs, PropType, getCurrentInstance } from 'vue'
 import { NForm, NFormItem, NInput, NUpload, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -52,13 +52,23 @@ export default defineComponent({
     const customRequest = ({ file }: any) => {
       state.uploadForm.name = file.name
       state.uploadForm.file = file.file
+      state.uploadFormRef.validate()
     }
+
+    const removeFile = () => {
+      state.uploadForm.name = ''
+      state.uploadForm.file = ''
+    }
+
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
       hideModal,
       handleFolder,
       customRequest,
-      ...toRefs(state)
+      removeFile,
+      ...toRefs(state),
+      trim
     }
   },
   render() {
@@ -76,6 +86,7 @@ export default defineComponent({
         <NForm rules={this.rules} ref='uploadFormRef'>
           <NFormItem label={t('resource.udf.file_name')} path='name'>
             <NInput
+              allowInput={this.trim}
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.udf.enter_name_tips')}
               class='input-file-name'
@@ -83,6 +94,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
             <NInput
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}
@@ -93,7 +105,9 @@ export default defineComponent({
             <NUpload
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
+              max={1}
               class='btn-upload'
+              onRemove={this.removeFile}
             >
               <NButton>
                 {t('resource.udf.upload')}

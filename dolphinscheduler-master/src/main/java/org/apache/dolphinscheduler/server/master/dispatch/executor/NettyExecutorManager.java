@@ -62,13 +62,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     private ServerNodeManager serverNodeManager;
 
     @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-
-    @Autowired
     private TaskKillResponseProcessor taskKillResponseProcessor;
-
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
 
     @Autowired
     private TaskRecallProcessor taskRecallProcessor;
@@ -88,10 +82,8 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     @PostConstruct
     public void init() {
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_RECALL, taskRecallProcessor);
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_REJECT, taskRecallProcessor);
     }
 
     /**
@@ -117,6 +109,10 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 doExecute(host, command);
                 success = true;
                 context.setHost(host);
+                // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be
+                // failovered, due to the taskInstance's host
+                // is not belongs to the down worker ISSUE-10842.
+                context.getTaskInstance().setHost(host.getAddress());
             } catch (ExecuteException ex) {
                 logger.error(String.format("execute command : %s error", command), ex);
                 try {
@@ -196,7 +192,4 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         return nodes;
     }
 
-    public NettyRemotingClient getNettyRemotingClient() {
-        return nettyRemotingClient;
-    }
 }

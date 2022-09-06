@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef, watch } from 'vue'
+import {
+  defineComponent,
+  Ref,
+  toRefs,
+  onMounted,
+  toRef,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import {
   NIcon,
   NSpace,
@@ -26,9 +34,9 @@ import {
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
+import { useTable } from './use-table'
 import Card from '@/components/card'
 import FolderModal from './components/function-modal'
-import { useTable } from './use-table'
 import styles from './index.module.scss'
 
 export default defineComponent({
@@ -68,6 +76,8 @@ export default defineComponent({
       handleShowModal(toRef(variables, 'showRef'))
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(useI18n().locale, () => {
       createColumns(variables)
     })
@@ -83,7 +93,8 @@ export default defineComponent({
       handleUpdateList,
       handleCreateFolder,
       handleChangePageSize,
-      ...toRefs(variables)
+      ...toRefs(variables),
+      trim
     }
   },
   render() {
@@ -91,67 +102,64 @@ export default defineComponent({
     const { loadingRef } = this
 
     return (
-      <div class={styles.content}>
-        <Card class={styles.card}>
-          <div class={styles.header}>
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButton
+              type='primary'
+              size='small'
+              onClick={this.handleCreateFolder}
+              class='btn-create-udf-function'
+            >
+              {t('resource.function.create_udf_function')}
+            </NButton>
             <NSpace>
-              <NButton
-                type='primary'
-                onClick={this.handleCreateFolder}
-                class='btn-create-udf-function'
-              >
-                {t('resource.function.create_udf_function')}
+              <NInput
+                allowInput={this.trim}
+                size='small'
+                placeholder={t('resource.function.enter_keyword_tips')}
+                v-model={[this.searchVal, 'value']}
+              />
+              <NButton type='primary' size='small' onClick={this.handleSearch}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
-            <div class={styles.right}>
-              <div class={styles.search}>
-                <div class={styles.list}>
-                  <NButton type='primary' onClick={this.handleSearch}>
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  </NButton>
-                </div>
-                <div class={styles.list}>
-                  <NInput
-                    placeholder={t('resource.function.enter_keyword_tips')}
-                    v-model={[this.searchVal, 'value']}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          </NSpace>
         </Card>
         <Card title={t('resource.function.udf_function')}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            striped
-            size={'small'}
-            class={styles.table}
-            row-class-name='items'
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              striped
+              size={'small'}
+              class={styles.table}
+              row-class-name='items'
+              scrollX={this.tableWidth}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <FolderModal
           v-model:row={this.row}
           v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}
         />
-      </div>
+      </NSpace>
     )
   }
 })

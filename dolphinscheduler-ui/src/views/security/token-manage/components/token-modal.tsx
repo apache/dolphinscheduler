@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import {
   NForm,
@@ -85,6 +91,8 @@ const TokenModal = defineComponent({
       }
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.showModalRef,
       () => {
@@ -130,7 +138,8 @@ const TokenModal = defineComponent({
       confirmModal,
       getToken,
       changeUser,
-      userStore
+      userStore,
+      trim
     }
   },
   render() {
@@ -189,6 +198,7 @@ const TokenModal = defineComponent({
                 <NFormItem label={t('security.token.token')} path='token'>
                   <NSpace>
                     <NInput
+                      allowInput={this.trim}
                       class='input-token'
                       style={{ width: '504px' }}
                       disabled

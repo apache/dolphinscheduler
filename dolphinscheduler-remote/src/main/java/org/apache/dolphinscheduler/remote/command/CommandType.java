@@ -19,44 +19,23 @@ package org.apache.dolphinscheduler.remote.command;
 
 public enum CommandType {
 
-    /**
-     * remove task log request,
-     */
+    GET_APP_ID_REQUEST,
+    GET_APP_ID_RESPONSE,
+
     REMOVE_TAK_LOG_REQUEST,
 
-    /**
-     * remove task log response
-     */
     REMOVE_TAK_LOG_RESPONSE,
 
-    /**
-     * roll view log request
-     */
     ROLL_VIEW_LOG_REQUEST,
 
-    /**
-     * roll view log response
-     */
     ROLL_VIEW_LOG_RESPONSE,
 
-    /**
-     * view whole log request
-     */
     VIEW_WHOLE_LOG_REQUEST,
 
-    /**
-     * view whole log response
-     */
     VIEW_WHOLE_LOG_RESPONSE,
 
-    /**
-     * get log bytes request
-     */
     GET_LOG_BYTES_REQUEST,
 
-    /**
-     * get log bytes response
-     */
     GET_LOG_BYTES_RESPONSE,
 
 
@@ -64,9 +43,14 @@ public enum CommandType {
     MASTER_RESPONSE,
 
     /**
-     * execute task request
+     * task execute start, from api to master
      */
-    TASK_EXECUTE_REQUEST,
+    TASK_EXECUTE_START,
+
+    /**
+     * dispatch task request
+     */
+    TASK_DISPATCH_REQUEST,
 
     /**
      * task execute running, from worker to master
@@ -81,56 +65,39 @@ public enum CommandType {
     /**
      * task execute response, from worker to master
      */
-    TASK_EXECUTE_RESPONSE,
+    TASK_EXECUTE_RESULT,
 
     /**
      * task execute response ack, from master to worker
      */
-    TASK_EXECUTE_RESPONSE_ACK,
+    TASK_EXECUTE_RESULT_ACK,
 
-    /**
-     * kill task
-     */
     TASK_KILL_REQUEST,
 
-    /**
-     * kill task response
-     */
     TASK_KILL_RESPONSE,
 
-    /**
-     * task recall
-     */
-    TASK_RECALL,
+    TASK_REJECT,
+
+    TASK_REJECT_ACK,
 
     /**
-     * task recall ack
+     * task savepoint, for stream task
      */
-    TASK_RECALL_ACK,
+    TASK_SAVEPOINT_REQUEST,
 
     /**
-     * HEART_BEAT
+     * task savepoint ack, for stream task
      */
+    TASK_SAVEPOINT_RESPONSE,
+
     HEART_BEAT,
 
-    /**
-     * ping
-     */
     PING,
 
-    /**
-     * pong
-     */
     PONG,
 
-    /**
-     * alert send request
-     */
     ALERT_SEND_REQUEST,
 
-    /**
-     * alert send response
-     */
     ALERT_SEND_RESPONSE,
 
     /**
@@ -158,5 +125,15 @@ public enum CommandType {
     /**
      * task state event request
      */
-    TASK_WAKEUP_EVENT_REQUEST;
+    TASK_WAKEUP_EVENT_REQUEST,
+
+    /**
+     * workflow executing data request, from api to master
+     */
+    WORKFLOW_EXECUTING_DATA_REQUEST,
+
+    /**
+     * workflow executing data response, from master to api
+     */
+    WORKFLOW_EXECUTING_DATA_RESPONSE;
 }

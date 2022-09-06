@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, getCurrentInstance, toRefs } from 'vue'
 import { NForm, NFormItem, NButton, NInput } from 'naive-ui'
 import { useForm } from './use-form'
 import { useUpdate } from './use-update'
@@ -26,8 +26,9 @@ const password = defineComponent({
   setup() {
     const { state, rules, t } = useForm()
     const { handleUpdate } = useUpdate(state)
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
-    return { ...toRefs(state), t, handleUpdate, rules }
+    return { ...toRefs(state), t, handleUpdate, rules, trim }
   },
   render() {
     const { t } = this
@@ -44,6 +45,7 @@ const password = defineComponent({
               >
                 <NFormItem label={t('password.password')} path='password'>
                   <NInput
+                    allowInput={this.trim}
                     type='password'
                     placeholder={t('password.password_tips')}
                     v-model={[this.passwordForm.password, 'value']}
@@ -61,6 +63,7 @@ const password = defineComponent({
                   first
                 >
                   <NInput
+                    allowInput={this.trim}
                     type='password'
                     placeholder={t('password.confirm_password_tips')}
                     v-model={[this.passwordForm.confirmPassword, 'value']}

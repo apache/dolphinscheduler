@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_K8S_NAMESPACE_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CAN_USE_K8S_CLUSTER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CAN_USE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_K8S_NAMESPACE_ERROR;
@@ -34,6 +34,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * k8s namespace controller
@@ -78,19 +79,18 @@ public class K8sNamespaceController extends BaseController {
      */
     @ApiOperation(value = "queryNamespaceListPaging", notes = "QUERY_NAMESPACE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "10"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "searchVal", required = false) String searchVal,
-                                         @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
-    ) {
+    public Result queryNamespaceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @RequestParam(value = "searchVal", required = false) String searchVal,
+                                           @RequestParam("pageSize") Integer pageSize,
+                                           @RequestParam("pageNo") Integer pageNo) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -101,23 +101,22 @@ public class K8sNamespaceController extends BaseController {
         return result;
     }
 
-
     /**
      * create namespace,if not exist on k8s,will create,if exist only register in db
      *
      * @param loginUser
      * @param namespace    k8s namespace
-     * @param k8s          k8s name
+     * @param clusterCode  clusterCode
      * @param limitsCpu    max cpu
      * @param limitsMemory max memory
      * @return
      */
     @ApiOperation(value = "createK8sNamespace", notes = "CREATE_NAMESPACE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "namespace", value = "NAMESPACE", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "k8s", value = "K8S", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "limits_cpu", value = "LIMITS_CPU", required = false, dataType = "Double"),
-            @ApiImplicitParam(name = "limits_memory", value = "LIMITS_MEMORY", required = false, dataType = "Integer")
+            @ApiImplicitParam(name = "namespace", value = "NAMESPACE", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "clusterCode", value = "CLUSTER_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "limits_cpu", value = "LIMITS_CPU", required = false, dataTypeClass = double.class),
+            @ApiImplicitParam(name = "limits_memory", value = "LIMITS_MEMORY", required = false, dataTypeClass = int.class)
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -125,11 +124,11 @@ public class K8sNamespaceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createNamespace(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
-                                  @RequestParam(value = "k8s") String k8s,
+                                  @RequestParam(value = "clusterCode") Long clusterCode,
                                   @RequestParam(value = "limitsCpu", required = false) Double limitsCpu,
-                                  @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory
-    ) {
-        Map<String, Object> result =  k8sNamespaceService.createK8sNamespace(loginUser, namespace, k8s, limitsCpu, limitsMemory);
+                                  @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory) {
+        Map<String, Object> result =
+                k8sNamespaceService.createK8sNamespace(loginUser, namespace, clusterCode, limitsCpu, limitsMemory);
         return returnDataList(result);
     }
 
@@ -137,17 +136,17 @@ public class K8sNamespaceController extends BaseController {
      * update namespace,namespace and k8s not allowed update, because may create on k8s,can delete and create new instead
      *
      * @param loginUser
-     * @param userName        owner
+     * @param userName     owner
      * @param limitsCpu    max cpu
      * @param limitsMemory max memory
      * @return
      */
     @ApiOperation(value = "updateK8sNamespace", notes = "UPDATE_NAMESPACE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "K8S_NAMESPACE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "userName", value = "OWNER", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "limitsCpu", value = "LIMITS_CPU", required = false, dataType = "Double"),
-            @ApiImplicitParam(name = "limitsMemory", value = "LIMITS_MEMORY", required = false, dataType = "Integer")})
+            @ApiImplicitParam(name = "id", value = "K8S_NAMESPACE_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "userName", value = "OWNER", required = false, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "limitsCpu", value = "LIMITS_CPU", required = false, dataTypeClass = double.class),
+            @ApiImplicitParam(name = "limitsMemory", value = "LIMITS_MEMORY", required = false, dataTypeClass = int.class)})
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_K8S_NAMESPACE_ERROR)
@@ -158,22 +157,23 @@ public class K8sNamespaceController extends BaseController {
                                   @RequestParam(value = "tag", required = false) String tag,
                                   @RequestParam(value = "limitsCpu", required = false) Double limitsCpu,
                                   @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory) {
-        Map<String, Object> result = k8sNamespaceService.updateK8sNamespace(loginUser, id, userName, limitsCpu, limitsMemory);
+        Map<String, Object> result =
+                k8sNamespaceService.updateK8sNamespace(loginUser, id, userName, limitsCpu, limitsMemory);
         return returnDataList(result);
     }
 
     /**
      * verify namespace and k8s,one k8s namespace is unique
      *
-     * @param loginUser login user
-     * @param namespace namespace
-     * @param k8s       k8s
+     * @param loginUser   login user
+     * @param namespace   namespace
+     * @param clusterCode cluster code
      * @return true if the k8s and namespace not exists, otherwise return false
      */
     @ApiOperation(value = "verifyNamespaceK8s", notes = "VERIFY_NAMESPACE_K8S_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "namespace", value = "NAMESPACE", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "k8s", value = "K8S", required = true, dataType = "String")
+            @ApiImplicitParam(name = "namespace", value = "NAMESPACE", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "clusterCode", value = "CLUSTER_CODE", required = true, dataTypeClass = long.class),
     })
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
@@ -181,12 +181,10 @@ public class K8sNamespaceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyNamespace(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
-                                  @RequestParam(value = "k8s") String k8s
-    ) {
+                                  @RequestParam(value = "clusterCode") Long clusterCode) {
 
-        return k8sNamespaceService.verifyNamespaceK8s(namespace, k8s);
+        return k8sNamespaceService.verifyNamespaceK8s(namespace, clusterCode);
     }
-
 
     /**
      * delete namespace by id
@@ -197,7 +195,7 @@ public class K8sNamespaceController extends BaseController {
      */
     @ApiOperation(value = "delNamespaceById", notes = "DELETE_NAMESPACE_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "NAMESPACE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "NAMESPACE_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -213,12 +211,12 @@ public class K8sNamespaceController extends BaseController {
      * query unauthorized namespace
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the namespaces which user have not permission to see
      */
     @ApiOperation(value = "queryUnauthorizedNamespace", notes = "QUERY_UNAUTHORIZED_NAMESPACE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/unauth-namespace")
     @ResponseStatus(HttpStatus.OK)
@@ -234,12 +232,12 @@ public class K8sNamespaceController extends BaseController {
      * query unauthorized namespace
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return namespaces which the user have permission to see
      */
     @ApiOperation(value = "queryAuthorizedNamespace", notes = "QUERY_AUTHORIZED_NAMESPACE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/authed-namespace")
     @ResponseStatus(HttpStatus.OK)
@@ -260,7 +258,7 @@ public class K8sNamespaceController extends BaseController {
     @ApiOperation(value = "queryAvailableNamespaceList", notes = "QUERY_AVAILABLE_NAMESPACE_LIST_NOTES")
     @GetMapping(value = "/available-list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_CAN_USE_K8S_CLUSTER_ERROR)
+    @ApiException(QUERY_CAN_USE_K8S_NAMESPACE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAvailableNamespaceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(loginUser);

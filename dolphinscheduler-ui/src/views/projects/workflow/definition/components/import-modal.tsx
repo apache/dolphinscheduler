@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs } from 'vue'
+import { defineComponent, getCurrentInstance, PropType, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
@@ -49,12 +49,14 @@ export default defineComponent({
       importState.importForm.name = file.name
       importState.importForm.file = file.file
     }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
       hideModal,
       handleImport,
       customRequest,
-      ...toRefs(importState)
+      ...toRefs(importState),
+      trim
     }
   },
 
@@ -88,6 +90,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('project.workflow.file_name')} path='name'>
             <NInput
+              allowInput={this.trim}
               v-model={[this.importForm.name, 'value']}
               placeholder={''}
               disabled

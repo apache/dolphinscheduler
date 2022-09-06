@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +27,9 @@ public class TaskConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
+    public static final String YARN_APPLICATION_REGEX = "application_\\d+_\\d+";
+
+    public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
 
     public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\(([^)]*)\\)}";
 
@@ -395,6 +398,8 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
+    public static final String TASK_TYPE_STREAM = "STREAM";
+
     public static final List<String> COMPLEX_TASK_TYPES = Arrays.asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
 
     /**
@@ -421,14 +426,13 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
-    /**
-     * zeppelin config
-     */
-    public static final String ZEPPELIN_REST_URL = "zeppelin.rest.url";
 
     /**
      * conda config used by jupyter task plugin
      */
     public static final String CONDA_PATH = "conda.path";
+
+    // Loop task constants
+    public static final Duration DEFAULT_LOOP_STATUS_INTERVAL = Duration.ofSeconds(5L);
 
 }

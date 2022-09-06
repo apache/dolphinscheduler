@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
@@ -65,6 +66,13 @@ public class K8sTaskTest {
         Map<String, Property> paramsMap = new HashMap<>();
         paramsMap.put(DAY,property);
         taskRequest.setParamsMap(paramsMap);
+
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        Property property1 = new Property();
+        property1.setProp("day");
+        property1.setValue("20220507");
+        prepareParamsMap.put("day", property1);
+        taskRequest.setPrepareParamsMap(prepareParamsMap);
         k8sTask = new K8sTask(taskRequest);
     }
 

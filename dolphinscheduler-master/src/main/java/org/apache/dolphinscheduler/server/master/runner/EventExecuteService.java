@@ -18,10 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -38,11 +39,14 @@ public class EventExecuteService extends BaseDaemonThread {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    /**
-     * workflow exec service
-     */
+    @Autowired
+    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
+
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+
+    @Autowired
+    private StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
 
     protected EventExecuteService() {
         super("EventServiceStarted");
@@ -57,9 +61,10 @@ public class EventExecuteService extends BaseDaemonThread {
 
     @Override
     public void run() {
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
-                eventHandler();
+                workflowEventHandler();
+                streamTaskEventHandler();
                 TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS_SHORT);
             } catch (InterruptedException interruptedException) {
                 logger.warn("Master event service interrupted, will exit this loop", interruptedException);
@@ -71,11 +76,23 @@ public class EventExecuteService extends BaseDaemonThread {
         }
     }
 
-    private void eventHandler() {
+    private void workflowEventHandler() {
         for (WorkflowExecuteRunnable workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
             try {
                 LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                 workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
+
+            } finally {
+                LoggerUtils.removeWorkflowInstanceIdMDC();
+            }
+        }
+    }
+
+    private void streamTaskEventHandler() {
+        for (StreamTaskExecuteRunnable streamTaskExecuteRunnable : streamTaskInstanceExecCacheManager.getAll()) {
+            try {
+                LoggerUtils.setTaskInstanceIdMDC(streamTaskExecuteRunnable.getTaskInstance().getId());
+                streamTaskExecuteThreadPool.executeEvent(streamTaskExecuteRunnable);
 
             } finally {
                 LoggerUtils.removeWorkflowInstanceIdMDC();

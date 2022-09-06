@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -54,6 +60,8 @@ const WorkerGroupModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.showModalRef,
       () => {
@@ -84,7 +92,7 @@ const WorkerGroupModal = defineComponent({
       }
     )
 
-    return { t, ...toRefs(variables), cancelModal, confirmModal }
+    return { t, ...toRefs(variables), cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -116,6 +124,7 @@ const WorkerGroupModal = defineComponent({
                   path='name'
                 >
                   <NInput
+                    allowInput={this.trim}
                     class='input-worker-group-name'
                     placeholder={t('security.worker_group.group_name_tips')}
                     v-model={[this.model.name, 'value']}

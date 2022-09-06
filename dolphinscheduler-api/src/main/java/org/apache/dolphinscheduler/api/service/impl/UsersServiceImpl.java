@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -59,28 +56,33 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
-import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
 
 /**
  * users service impl
@@ -129,8 +131,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
-    @Autowired
-    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     /**
      * create user, only system admin have permission
@@ -146,7 +146,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public Map<String, Object> createUser(User loginUser,
                                           String userName,
                                           String userPassword,
@@ -159,7 +159,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         //check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED, msg);
             return result;
         }
@@ -185,7 +185,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
-//
         }
 
         result.put(Constants.DATA_LIST, user);
@@ -195,7 +194,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public User createUser(String userName,
                            String userPassword,
                            String email,
@@ -230,7 +229,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * create User for ldap login
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public User createUser(UserType userType, String userId, String email) {
         User user = new User();
         Date now = new Date();
@@ -337,7 +336,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -387,7 +386,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -453,62 +452,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         Date now = new Date();
         user.setUpdateTime(now);
-
-        //if user switches the tenant, the user's resources need to be copied to the new tenant
-//        if (user.getTenantId() != tenantId) {
-//            Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
-//            //query tenant
-//            Tenant newTenant = tenantMapper.queryById(tenantId);
-//            // if hdfs startup
-//            if (null != newTenant && PropertyUtils.getResUploadStartupState() && oldTenant != null) {
-//                String newTenantCode = newTenant.getTenantCode();
-//                String oldResourcePath = storageOperate.getResDir(oldTenant.getTenantCode());
-//                String oldUdfsPath = storageOperate.getUdfDir(oldTenant.getTenantCode());
-//
-//                try {// if old tenant dir exists
-//                    if (storageOperate.exists(oldTenant.getTenantCode(), oldResourcePath)) {
-//                        String newResourcePath = storageOperate.getResDir(newTenantCode);
-//                        String newUdfsPath = storageOperate.getUdfDir(newTenantCode);
-//
-//                        //file resources list
-//                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-//                                null, userId, ResourceType.FILE.ordinal());
-//                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-//                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-//                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-//                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldResourcePath, newResourcePath);
-//                        }
-//
-//                        //udf resources
-//                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-//                                null, userId, ResourceType.UDF.ordinal());
-//                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-//                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-//                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-//                            copyResourceFiles(oldTenant.getTenantCode(), newTenantCode, resourceComponent, oldUdfsPath, newUdfsPath);
-//                        }
-//
-//                    } else {
-//                        // if old tenant dir not exists , create
-//                        storageOperate.createTenantDirIfNotExists(oldTenant.getTenantCode());
-//
-//                        if (!storageOperate.exists(newTenant.getTenantCode(), storageOperate.getDir(null,newTenant.getTenantCode()))) {
-//                            storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
-//                        }
-//                    }
-//                } catch (Exception e) {
-//                    logger.error("create tenant {} failed ,the reason is {}", oldTenant, e.getMessage());
-//                }
-//
-//
-//            try {
-//                storageOperate.createTenantDirIfNotExists(newTenant.getTenantCode());
-//            } catch (Exception e) {
-//                logger.error("create tenant {} failed ,the reason is {}", newTenant, e.getMessage());
-//            }
-//            }
-//            user.setTenantId(tenantId);
-//        }
         user.setTenantId(tenantId);
         // updateProcessInstance user
         userMapper.updateById(user);
@@ -525,10 +468,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception when operate hdfs
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -552,8 +495,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         // delete user
         userMapper.queryTenantCodeByUserId(id);
-
-
+        
         accessTokenMapper.deleteAccessTokenByUserId(id);
 
         userMapper.deleteById(id);
@@ -572,12 +514,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -621,7 +563,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -676,7 +618,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -714,11 +656,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -812,11 +754,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -860,11 +802,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -910,12 +852,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -961,7 +903,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Map<String, Object> result = new HashMap<>();
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1004,7 +946,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1034,13 +976,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.ge("id", 0);
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
-            queryWrapper.eq("id", loginUser.getId());
-        }
-        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userMapper.queryEnabledUsers();
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
@@ -1078,7 +1014,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
         Map<String, Object> result = new HashMap<>();
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1118,7 +1054,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId) {
         Map<String, Object> result = new HashMap<>();
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1140,8 +1076,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private boolean checkTenantExists(int tenantId) {
         return tenantMapper.queryById(tenantId) != null;
     }
-
-
+    
     /**
      * @return if check failed return the field, otherwise return null
      */
@@ -1219,13 +1154,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
         Map<String, Object> result = new HashMap<>();
 
         //check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1255,7 +1190,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> activateUser(User loginUser, String userName) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1303,7 +1238,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
         Map<String, Object> result = new HashMap<>();
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1343,5 +1278,35 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, res);
         return result;
+    }
+
+    /**
+     * Make sure user with given name exists, and create the user if not exists
+     * <p>
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param userName     user name
+     * @param userPassword user password
+     * @param email        user email
+     * @param phone        user phone
+     * @param tenantCode   tenant code
+     * @param queue        queue
+     * @param state        state
+     * @return create result code
+     */
+    @Override
+    @Transactional
+    public User createUserIfNotExists(String userName, String userPassword, String email, String phone, String tenantCode,
+                                      String queue,
+                                      int state) throws IOException {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        if (Objects.isNull(user)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
+            return user;
+        }
+
+        updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
+        return user;
     }
 }

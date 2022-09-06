@@ -16,7 +16,7 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { reactive, ref } from 'vue'
+import { h, reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryExecuteResultListPaging } from '@/service/modules/data-quality'
 import { format } from 'date-fns'
@@ -30,9 +30,13 @@ import type {
   ResultListRes
 } from '@/service/modules/data-quality/types'
 import { parseTime } from '@/common/common'
+import ButtonLink from '@/components/button-link'
+import { NEllipsis, NTag } from 'naive-ui'
+import { useRouter } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
+  const router = useRouter()
 
   const variables = reactive({
     columns: [],
@@ -58,13 +62,36 @@ export function useTable() {
       },
       {
         title: t('data_quality.task_result.task_name'),
-        key: 'userName',
+        key: 'taskName',
         ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('data_quality.task_result.workflow_instance'),
         key: 'processInstanceName',
-        ...COLUMN_WIDTH_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: ResultItem) =>
+          h(
+            ButtonLink,
+            {
+              onClick: () =>
+                void router.push({
+                  name: 'workflow-instance-detail',
+                  params: {
+                    projectCode: row.projectCode,
+                    id: row.processInstanceId
+                  },
+                  query: { code: row.processDefinitionCode }
+                })
+            },
+            {
+              default: () =>
+                h(
+                  NEllipsis,
+                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                  () => row.processInstanceName
+                )
+            }
+          )
       },
       {
         title: t('data_quality.task_result.rule_type'),
@@ -92,11 +119,31 @@ export function useTable() {
         key: 'state',
         render: (row: ResultItem) => {
           if (row.state === 0) {
-            return t('data_quality.task_result.undone')
+            return h(
+              NTag,
+              { type: 'info', size: 'small' },
+              {
+                default: () => t('data_quality.task_result.undone')
+              }
+            )
           } else if (row.state === 1) {
-            return t('data_quality.task_result.success')
+            return h(
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('data_quality.task_result.success')
+              }
+            )
           } else if (row.state === 2) {
-            return t('data_quality.task_result.failure')
+            return h(
+              NTag,
+              { type: 'error', size: 'small' },
+              {
+                default: () => t('data_quality.task_result.failure')
+              }
+            )
+          } else {
+            return '-'
           }
         },
         ...COLUMN_WIDTH_CONFIG['state']
@@ -155,7 +202,16 @@ export function useTable() {
       {
         title: t('data_quality.task_result.failure_strategy'),
         key: 'failureStrategy',
-        width: 150
+        width: 150,
+        render: (row: ResultItem) => {
+          if (row.failureStrategy === 0) {
+            return 'Alert'
+          }
+          if (row.failureStrategy === 1) {
+            return 'Block'
+          }
+          return ''
+        }
       },
       {
         title: t('data_quality.task_result.excepted_value_type'),

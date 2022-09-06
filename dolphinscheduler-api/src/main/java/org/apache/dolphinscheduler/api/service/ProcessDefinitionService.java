@@ -158,7 +158,7 @@ public interface ProcessDefinitionService {
                                                    long targetProjectCode);
 
     /**
-     * update  process definition
+     * update process definition, with whole process definition object including task definition, task relation and location.
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -194,11 +194,13 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param name name
+     * @param processDefinitionCode processDefinitionCode
      * @return true if process definition name not exists, otherwise false
      */
     Map<String, Object> verifyProcessDefinitionName(User loginUser,
                                                     long projectCode,
-                                                    String name);
+                                                    String name,
+                                                    long processDefinitionCode);
 
     /**
      * batch delete process definition by code
@@ -410,7 +412,7 @@ public interface ProcessDefinitionService {
                                                      ProcessExecutionTypeEnum executionType);
 
     /**
-     * update process definition basic info
+     * update process definition basic info, not including task definition, task relation and location.
      *
      * @param loginUser login user
      * @param projectCode project code
