@@ -52,7 +52,7 @@ public class JDBCDataSourceProvider {
         dataSource.setUsername(properties.getUser());
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
-        dataSource.setMinimumIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMinimumIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 1));
         dataSource.setMaximumPoolSize(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
