@@ -80,7 +80,11 @@ const UsersManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
-                  allowInput={this.trim} v-model:value={this.searchVal} size='small' clearable />
+                allowInput={this.trim}
+                v-model:value={this.searchVal}
+                size='small'
+                clearable
+              />
               <NButton type='primary' size='small' onClick={this.onUpdatedList}>
                 <NIcon>
                   <SearchOutlined />

@@ -31,3 +31,11 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.shell
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Shell.yaml
+   :start-after: # under the License.
+   :language: yaml

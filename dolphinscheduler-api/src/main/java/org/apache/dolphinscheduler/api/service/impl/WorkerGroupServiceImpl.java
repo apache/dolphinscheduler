@@ -28,7 +28,9 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.model.HeartBeat;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -318,9 +320,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                HeartBeat heartBeat = HeartBeat.decodeHeartBeat(registeredValue);
-                wg.setCreateTime(new Date(heartBeat.getStartupTime()));
-                wg.setUpdateTime(new Date(heartBeat.getReportTime()));
+                WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(registeredValue, WorkerHeartBeat.class);
+                wg.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
+                wg.setUpdateTime(new Date(workerHeartBeat.getReportTime()));
                 wg.setSystemDefault(true);
                 if (workerGroupsMap != null && workerGroupsMap.containsKey(workerGroup)) {
                     wg.setDescription(workerGroupsMap.get(workerGroup).getDescription());
