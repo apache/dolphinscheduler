@@ -311,7 +311,7 @@ public enum Status {
     NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
     BATCH_EXECUTE_PROCESS_INSTANCE_ERROR(50058, "change process instance status error: {0}", "修改工作实例状态错误: {0}"),
     START_TASK_INSTANCE_ERROR(50059, "start task instance error", "运行任务流实例错误"),
-    DELETE_PROCESS_DEFINE_BY_CODES_ERROR(50060, "delete process definition by codes [{0}] error: {1}", "删除工作流定义[{0}]错误: {1}"),
+    DELETE_PROCESS_DEFINE_ERROR(50060, "delete process definition [{0}] error: {1}", "删除工作流定义[{0}]错误: {1}"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),

@@ -107,7 +107,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -146,24 +145,8 @@ import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 
 /**
  * process definition service impl
@@ -797,39 +780,45 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     @Override
+    @Transactional
     public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser,
                                                                    long projectCode,
-                                                                   String codes){
+                                                                   String codes) {
         Map<String, Object> result = new HashMap<>();
-        Set<String> deleteFailedCodeSet = new HashSet<>();
-        if (!StringUtils.isEmpty(codes)) {
-            String[] processDefinitionCodeArray = codes.split(",");
-            for (String strProcessDefinitionCode : processDefinitionCodeArray) {
-                long code = Long.parseLong(strProcessDefinitionCode);
-                ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
-                // check workflow exists, avoid null exception
-                if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-                    deleteFailedCodeSet.add(MessageFormat.format(Status.PROCESS_DEFINE_NOT_EXIST.getMsg(), String.valueOf(code)));
-                    continue;
-                }
-                try {
-                    Map<String, Object> deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, code);
-                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        String errorMsg = MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), processDefinition.getName(), deleteResult.get(Constants.MSG));
-                        deleteFailedCodeSet.add(errorMsg);
-                        logger.error(errorMsg);
-                    }
-                } catch (Exception e) {
-                    deleteFailedCodeSet.add(MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(), processDefinition.getName(), e.getMessage()));
-                }
-            }
+        if (StringUtils.isEmpty(codes)) {
+            putMsg(result, Status.SUCCESS);
+            return result;
         }
 
-        if (!deleteFailedCodeSet.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, "\n " + String.join("\n ", deleteFailedCodeSet));
-        } else {
-            putMsg(result, Status.SUCCESS);
+        Set<Long> definitionCodes = Arrays.stream(codes.split(Constants.COMMA)).map(Long::parseLong)
+                .collect(Collectors.toSet());
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
+        Set<Long> queryCodes =
+                processDefinitionList.stream().map(ProcessDefinition::getCode).collect(Collectors.toSet());
+        // definitionCodes - queryCodes
+        Set<Long> diffCode =
+                definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
+
+        Set<String> deleteFailedSet = new HashSet<>();
+        diffCode.forEach(code -> deleteFailedSet.add(code + "[null]"));
+        if (!deleteFailedSet.isEmpty()) {
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join(",", deleteFailedSet));
+            return result;
         }
+
+        for (ProcessDefinition process : processDefinitionList) {
+            long code = process.getCode();
+            try {
+                Map<String, Object> deleteResult =
+                        this.deleteProcessDefinitionByCode(loginUser, projectCode, code);
+                if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
+                    throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), deleteResult.get(Constants.MSG));
+                }
+            } catch (Exception e){
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
+            }
+        }
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
