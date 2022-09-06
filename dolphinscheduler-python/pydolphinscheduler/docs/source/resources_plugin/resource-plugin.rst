@@ -31,9 +31,9 @@ Dive Into
 ---------
 It has the following key functions.
 
-- Method `__init__`: The `__init__` function has STR type parameter `prefix`, which means the plugin type of the resource.
+- Method `__init__`: The `__init__` function has STR type parameter `prefix`, which means the prefix of the resource.
 
-You can rewrite it if necessary.
+You can rewrite this function if necessary.
 
 .. literalinclude:: ../../../src/pydolphinscheduler/core/resource_plugin.py
     :start-after: [start init_method]
