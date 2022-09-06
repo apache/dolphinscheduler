@@ -28,6 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -127,10 +128,10 @@ public class ZeppelinTaskTest {
         Assert.assertEquals(EXIT_CODE_FAILURE, this.zeppelinTask.getExitStatusCode());
     }
 
-    @Test
+    @Test(expected = TaskException.class)
     public void testHandleWithParagraphExecutionException() throws Exception {
         when(this.zClient.executeParagraph(any(), any(), any(Map.class))).
-                thenThrow(new Exception("Something wrong happens from zeppelin side"));
+                thenThrow(new TaskException("Something wrong happens from zeppelin side"));
 //        when(this.paragraphResult.getStatus()).thenReturn(Status.ERROR);
         this.zeppelinTask.handle();
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,

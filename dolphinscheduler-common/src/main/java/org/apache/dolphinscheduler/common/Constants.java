@@ -17,17 +17,14 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-/**
- * Constants
- */
 public final class Constants {
 
     private Constants() {
@@ -44,12 +41,9 @@ public final class Constants {
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
     public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
     public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
@@ -71,7 +65,6 @@ public final class Constants {
      */
     public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
-
     /**
      * hadoop configuration
      */
@@ -83,7 +76,6 @@ public final class Constants {
      * yarn.resourcemanager.ha.rm.ids
      */
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
-
 
     /**
      * yarn.application.status.address
@@ -127,7 +119,8 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXES = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
+    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE =
+            "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -224,7 +217,6 @@ public final class Constants {
      */
     public static final int HTTP_CONNECT_TIMEOUT = 60 * 1000;
 
-
     /**
      * http connect request time out
      */
@@ -270,12 +262,10 @@ public final class Constants {
      */
     public static final int READ_PERMISSION = 2;
 
-
     /**
      * write permission
      */
     public static final int WRITE_PERMISSION = 2 * 2;
-
 
     /**
      * execute permission
@@ -291,7 +281,6 @@ public final class Constants {
      * default hash map size
      */
     public static final int DEFAULT_HASH_MAP_SIZE = 16;
-
 
     /**
      * all permissions
@@ -583,7 +572,6 @@ public final class Constants {
     public static final String DEPENDENT_SPLIT = ":||";
     public static final long DEPENDENT_ALL_TASK_CODE = 0;
 
-
     /**
      * preview schedule execute count
      */
@@ -617,7 +605,8 @@ public final class Constants {
     /**
      * hadoop.security.authentication
      */
-    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+            "hadoop.security.authentication.startup.state";
 
     /**
      * com.amazonaws.services.s3.enableV4
@@ -642,23 +631,21 @@ public final class Constants {
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[] {
-        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.DISPATCH.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal(),
-        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-        ExecutionStatus.WAITING_THREAD.ordinal(),
-        ExecutionStatus.WAITING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[]{
+            WorkflowExecutionStatus.SUBMITTED_SUCCESS.getCode(),
+            TaskExecutionStatus.DISPATCH.getCode(),
+            WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
+            WorkflowExecutionStatus.DELAY_EXECUTION.getCode(),
+            WorkflowExecutionStatus.READY_PAUSE.getCode(),
+            WorkflowExecutionStatus.READY_STOP.getCode(),
+            TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),
     };
 
-    public static final int[] RUNNING_PROCESS_STATE = new int[] {
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.DISPATCH.ordinal(),
-        ExecutionStatus.SERIAL_WAIT.ordinal()
+    public static final int[] RUNNING_PROCESS_STATE = new int[]{
+            TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
+            TaskExecutionStatus.SUBMITTED_SUCCESS.getCode(),
+            TaskExecutionStatus.DISPATCH.getCode(),
+            WorkflowExecutionStatus.SERIAL_WAIT.getCode()
     };
 
     /**
@@ -685,7 +672,6 @@ public final class Constants {
      * current page no
      */
     public static final String PAGE_NUMBER = "pageNo";
-
 
     /**
      *
@@ -741,7 +727,8 @@ public final class Constants {
     /**
      * dataSource sensitive param
      */
-    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
+    public static final String DATASOURCE_PASSWORD_REGEX =
+            "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
 
     /**
      * default worker group
@@ -779,12 +766,14 @@ public final class Constants {
     /**
      * network interface preferred
      */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED = "dolphin.scheduler.network.interface.preferred";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
+            "dolphin.scheduler.network.interface.preferred";
 
     /**
      * network IP gets priority, default inner outer
      */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
+            "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -796,7 +785,8 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
+            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag
@@ -855,4 +845,14 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+    /**
+     * Task Types
+     */
+    public static final String TYPE_UNIVERSAL = "Universal";
+    public static final String TYPE_DATA_INTEGRATION = "DataIntegration";
+    public static final String TYPE_CLOUD = "Cloud";
+    public static final String TYPE_LOGIC = "Logic";
+    public static final String TYPE_DATA_QUALITY = "DataQuality";
+    public static final String TYPE_OTHER = "Other";
+    public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
 }

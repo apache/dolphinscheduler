@@ -43,6 +43,7 @@ export default {
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
     workflow_name: 'Workflow Name',
+    workflow_instance_name: 'Workflow Instance Name',
     current_selection: 'Current Selection',
     online: 'Online',
     offline: 'Offline',
@@ -240,7 +241,27 @@ export default {
     forced_success: 'Forced Success',
     view_log: 'View Log',
     download_log: 'Download Log',
-    refresh: 'Refresh'
+    refresh: 'Refresh',
+    app_id: 'Application ID',
+    execute: 'Execute',
+    stop: 'Stop',
+    batch_task: 'Batch Task',
+    stream_task: 'Stream Task',
+    jump_tip: 'Jump, not open yet!',
+    savepoint: 'Savepoint',
+    success: 'Success',
+    none_send: 'None',
+    success_send: 'Success',
+    failure_send: 'Failure',
+    all_send: 'All',
+    set_parameters_before_starting: 'Please set the parameters before starting',
+    notification_strategy: 'Notification Strategy',
+    worker_group: 'Worker group',
+    environment_name: 'Environment Name',
+    alarm_group: 'Alarm group',
+    startup_parameter: 'Startup Parameter',
+    whether_dry_run: 'Whether Dry-Run',
+    please_choose: 'Please Choose'
   },
   dag: {
     create: 'Create Workflow',
@@ -625,11 +646,20 @@ export default {
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
     zeppelin_parameters: 'parameters',
-    zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
+    zeppelin_parameters_tips:
+      'Please enter the parameters for zeppelin dynamic form',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
-    zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
-    zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
-    zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
+    zeppelin_rest_endpoint_tips:
+      'Please enter the rest endpoint of your Zeppelin server',
+    zeppelin_production_note_directory:
+      'Directory for cloned zeppelin note in production mode',
+    zeppelin_production_note_directory_tips:
+      'Please enter the production note directory to enable production mode',
+    hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
+    hive_sql_script: 'Hive SQL Script',
+    hive_cli_options: 'Hive Cli Options',
+    hive_cli_options_tips:
+      'Please enter the options for hive cli, e.g. --verbose',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',
@@ -732,6 +762,18 @@ export default {
     dinky_address_tips: 'Please enter the url of your dinky',
     dinky_task_id: 'Dinky task id',
     dinky_task_id_tips: 'Please enter the task id of your dinky',
-    dinky_online: 'Online task'
+    dinky_online: 'Online task',
+    pytorch_script: 'Python Script',
+    pytorch_script_params: 'Script Input Parameters',
+    pytorch_other_params: 'Show More Configurations',
+    pytorch_python_path: 'Project Path',
+    pytorch_is_create_environment: 'Create An Environment Or Not',
+    pytorch_python_command: 'Python Command Path',
+    pytorch_python_command_tips: 'If empty，will be set $PYTHON_HOME',
+    pytorch_python_env_tool: 'Python Environment Manager Tool',
+    pytorch_requirements: 'Requirement File',
+    pytorch_conda_python_version: 'Python Version',
+    pytorch_conda_python_version_tips:
+      'Please enter the version number, such as 3.6, 3.7, 3.x'
   }
 }

@@ -100,7 +100,7 @@ public class PythonTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() throws TaskException {
         try {
             // generate the content of this python script
             String pythonScriptContent = buildPythonScriptContent();
@@ -113,7 +113,7 @@ public class PythonTask extends AbstractTaskExecutor {
 
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
-            setAppIds(taskResponse.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {

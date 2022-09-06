@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
@@ -33,13 +35,6 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,16 +44,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler",
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                        "org.apache.dolphinscheduler.service.process.*",
-                        "org.apache.dolphinscheduler.service.queue.*",
-                })
-        }
-)
+@ComponentScan(basePackages = "org.apache.dolphinscheduler", excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.service.process.*",
+                "org.apache.dolphinscheduler.service.queue.*",
+        })
+})
 public class WorkerServer implements IStoppable {
 
     /**
@@ -100,6 +96,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    @Autowired
+    private WorkerConfig workerConfig;
+
     /**
      * worker server startup, not use web service
      *
@@ -116,9 +115,8 @@ public class WorkerServer implements IStoppable {
         this.workerRpcClient.start();
         this.taskPluginManager.loadPlugin();
 
-        this.workerRegistryClient.registry();
         this.workerRegistryClient.setRegistryStoppable(this);
-        this.workerRegistryClient.handleDeadServer();
+        this.workerRegistryClient.start();
 
         this.workerManagerThread.start();
 
@@ -128,23 +126,24 @@ public class WorkerServer implements IStoppable {
          * registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (Stopper.isRunning()) {
+            if (!ServerLifeCycleManager.isStopped()) {
                 close("WorkerServer shutdown hook");
             }
         }));
     }
 
     public void close(String cause) {
-        if (!Stopper.stop()) {
+        if (!ServerLifeCycleManager.toStopped()) {
             logger.warn("WorkerServer is already stopped, current cause: {}", cause);
             return;
         }
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
-        try (WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
-             WorkerRegistryClient closedRegistryClient = workerRegistryClient;
-             AlertClientService closedAlertClientService = alertClientService;
-             SpringApplicationContext closedSpringContext = springApplicationContext;) {
+        try (
+                WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
+                WorkerRegistryClient closedRegistryClient = workerRegistryClient;
+                AlertClientService closedAlertClientService = alertClientService;
+                SpringApplicationContext closedSpringContext = springApplicationContext;) {
             logger.info("Worker server is stopping, current cause : {}", cause);
             // kill running tasks
             this.killAllRunningTasks();
@@ -173,7 +172,8 @@ public class WorkerServer implements IStoppable {
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
             try {
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(), taskRequest.getTaskInstanceId());
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                        taskRequest.getTaskInstanceId());
                 if (ProcessUtils.kill(taskRequest)) {
                     killNumber++;
                 }
@@ -181,6 +181,7 @@ public class WorkerServer implements IStoppable {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
-        logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(), killNumber);
+        logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
+                killNumber);
     }
 }

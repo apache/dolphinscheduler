@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -euox pipefail
 
 #Start base service containers
 docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-base.yaml up -d
