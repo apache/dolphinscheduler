@@ -782,6 +782,7 @@ def test_dependent_get_define(mock_code_version, mock_dep_code):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",

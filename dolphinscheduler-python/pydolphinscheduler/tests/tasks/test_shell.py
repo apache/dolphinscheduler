@@ -62,6 +62,7 @@ def test_shell_get_define():
         "name": name,
         "version": 1,
         "description": None,
+        "environmentCode": None,
         "delayTime": 0,
         "taskType": "SHELL",
         "taskParams": {
@@ -75,6 +76,7 @@ def test_shell_get_define():
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
@@ -86,4 +88,5 @@ def test_shell_get_define():
         return_value=(code, version),
     ):
         shell = Shell(name, command)
+        print(shell.get_define())
         assert shell.get_define() == expect

@@ -124,6 +124,7 @@ def test_property_task_params(mock_resource, mock_code_version, attr, expect):
                 "flag": "YES",
                 "taskPriority": "MEDIUM",
                 "workerGroup": "default",
+                "environmentCode": None,
                 "failRetryTimes": 0,
                 "failRetryInterval": 1,
                 "timeoutFlag": "CLOSE",
