@@ -925,7 +925,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   List<DependentProcessDefinition> dependentProcessDefinitionList,
                                                                                   CycleEnum processDefinitionCycle,
                                                                                   String workerGroup,
-                                                                                  long processDefinitionCode) {
+                                                                                  long upstreamProcessDefinitionCode) {
         List<DependentProcessDefinition> validDependentProcessDefinitionList = new ArrayList<>();
 
         List<Long> processDefinitionCodeList =
@@ -936,7 +936,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 processService.queryWorkerGroupByProcessDefinitionCodes(processDefinitionCodeList);
 
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
-            if (dependentProcessDefinition.getDependentCycle(processDefinitionCode) == processDefinitionCycle) {
+            if (dependentProcessDefinition.getDependentCycle(upstreamProcessDefinitionCode) == processDefinitionCycle) {
                 if (processDefinitionWorkerGroupMap
                         .get(dependentProcessDefinition.getProcessDefinitionCode()) == null) {
                     dependentProcessDefinition.setWorkerGroup(workerGroup);

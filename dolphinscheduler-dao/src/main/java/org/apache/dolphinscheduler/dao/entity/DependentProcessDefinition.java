@@ -65,14 +65,14 @@ public class DependentProcessDefinition {
      * get dependent cycle
      * @return CycleEnum
      */
-    public CycleEnum getDependentCycle(long processDefinitionCode) {
+    public CycleEnum getDependentCycle(long upstreamProcessDefinitionCode) {
         DependentParameters dependentParameters = this.getDependentParameters();
         List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependTaskList();
 
         for (DependentTaskModel dependentTaskModel : dependentTaskModelList) {
             List<DependentItem> dependentItemList = dependentTaskModel.getDependItemList();
             for (DependentItem dependentItem : dependentItemList) {
-                if (processDefinitionCode == dependentItem.getDefinitionCode()) {
+                if (upstreamProcessDefinitionCode == dependentItem.getDefinitionCode()) {
                     return cycle2CycleEnum(dependentItem.getCycle());
                 }
             }
