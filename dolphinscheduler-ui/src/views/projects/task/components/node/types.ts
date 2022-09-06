@@ -299,6 +299,7 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   noteId?: string
   paragraphId?: string
+  engine?: string
   processDefinitionCode?: number
   conditionResult?: {
     successNode?: number[]
