@@ -22,7 +22,7 @@ When you want to create a new resource plugin, you need to add a new class in th
 
 The resource plug-in class needs to inherit the abstract class `ResourcePlugin` and implement its abstract method `read_file` function.
 
-The parameter of the `__init__` function of `ResourcePlugin` is the prefix of STR type. You can override it when necessary.
+The parameter of the `__init__` function of `ResourcePlugin` is the prefix of STR type. You can override this function when necessary.
 
 The `read_file` function parameter of `ResourcePlugin` is the file suffix of STR type, and its return value is the file content, if it exists and is readable.
 

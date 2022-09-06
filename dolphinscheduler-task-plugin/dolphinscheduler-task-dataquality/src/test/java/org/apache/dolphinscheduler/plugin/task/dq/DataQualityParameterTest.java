@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq;
 
-import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.TriggerType;

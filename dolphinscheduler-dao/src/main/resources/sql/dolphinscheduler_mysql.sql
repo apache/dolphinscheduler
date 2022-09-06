@@ -592,6 +592,7 @@ CREATE TABLE `t_ds_process_instance` (
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `process_definition_version` int(11) DEFAULT '0' COMMENT 'process definition version',
   `state` tinyint(4) DEFAULT NULL COMMENT 'process instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
+  `state_history` text DEFAULT NULL COMMENT 'state history desc',
   `recovery` tinyint(4) DEFAULT NULL COMMENT 'process instance failover flag：0:normal,1:failover instance',
   `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
   `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',
@@ -1955,16 +1956,30 @@ CREATE TABLE t_ds_alert_send_status (
 -- Table structure for t_ds_cluster
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_cluster`;
-CREATE TABLE `t_ds_cluster` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
-  `name` varchar(100) NOT NULL COMMENT 'cluster name',
-  `config` text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
-  `description` text NULL DEFAULT NULL COMMENT 'the details',
-  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `cluster_name_unique` (`name`),
-  UNIQUE KEY `cluster_code_unique` (`code`)
+CREATE TABLE `t_ds_cluster`(
+                               `id`          bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+                               `code`        bigint(20) DEFAULT NULL COMMENT 'encoding',
+                               `name`        varchar(100) NOT NULL COMMENT 'cluster name',
+                               `config`      text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
+                               `description` text NULL DEFAULT NULL COMMENT 'the details',
+                               `operator`    int(11) DEFAULT NULL COMMENT 'operator user id',
+                               `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                               `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                               PRIMARY KEY (`id`),
+                               UNIQUE KEY `cluster_name_unique` (`name`),
+                               UNIQUE KEY `cluster_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_fav_task
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_fav_task`;
+CREATE TABLE `t_ds_fav_task`
+(
+    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'favorite task id',
+    `task_name` varchar(64) NOT NULL COMMENT 'favorite task name',
+    `user_id`   int         NOT NULL COMMENT 'user id',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;
