@@ -43,16 +43,18 @@ import java.util.Objects;
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
+
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Override
-    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
-        try{
+    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids,
+                                     Logger logger) {
+        try {
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("post handle error", e);
             throw new RuntimeException("resource association user error", e);
         }
@@ -78,7 +80,7 @@ public class BaseServiceImpl implements BaseService {
      */
     @Override
     public boolean isNotAdmin(User loginUser, Map<String, Object> result) {
-        //only admin can operate
+        // only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return true;
@@ -145,14 +147,14 @@ public class BaseServiceImpl implements BaseService {
      * @param tenantCode tenant code
      * @throws IOException if hdfs operation exception
      */
-//    @Override
-//    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-//        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-//        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-//        // init resource path and udf path
-//        HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
-//        HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
-//    }
+    // @Override
+    // public void createTenantDirIfNotExists(String tenantCode) throws IOException {
+    // String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
+    // String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
+    // // init resource path and udf path
+    // HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
+    // HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
+    // }
 
     /**
      * Verify that the operator has permissions
@@ -173,9 +175,11 @@ public class BaseServiceImpl implements BaseService {
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, type.equals(AuthorizationType.PROJECTS) ? ids : null, user.getId(), permissionKey, logger);
-        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+    public boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String permissionKey) {
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type,
+                type.equals(AuthorizationType.PROJECTS) ? ids : null, user.getId(), permissionKey, logger);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids,
+                user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
     }
 
@@ -215,6 +219,6 @@ public class BaseServiceImpl implements BaseService {
 
     @Override
     public boolean checkLengthIllegal(String input, int length) {
-        return input!=null && input.codePointCount(0, input.length()) > length;
+        return input != null && input.codePointCount(0, input.length()) > length;
     }
 }

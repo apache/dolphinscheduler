@@ -15,63 +15,67 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-
+    
     <artifactId>dolphinscheduler-dist</artifactId>
     <name>${project.artifactId}</name>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-server</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-standalone-server</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-server</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-data-quality</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-ui-next</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-tools</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-python</artifactId>
         </dependency>
     </dependencies>
-
+    
+    <build>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
+    </build>
+    
     <profiles>
         <profile>
             <id>release</id>
@@ -82,11 +86,11 @@
                         <executions>
                             <execution>
                                 <id>dolphinscheduler-bin</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
-
+                                <phase>package</phase>
+                                
                                 <configuration>
                                     <descriptors>
                                         <descriptor>src/main/assembly/dolphinscheduler-bin.xml</descriptor>
@@ -94,13 +98,13 @@
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
                             </execution>
-
+                            
                             <execution>
                                 <id>src</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <phase>package</phase>
                                 <configuration>
                                     <descriptors>
                                         <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
@@ -108,13 +112,13 @@
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
                             </execution>
-
+                            
                         </executions>
                     </plugin>
                 </plugins>
             </build>
         </profile>
-
+        
         <profile>
             <id>python</id>
             <build>
@@ -122,13 +126,13 @@
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
-
+                            
                             <execution>
                                 <id>python</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <phase>package</phase>
                                 <configuration>
                                     <!-- Make final directory with simple name `python`, and without any addtion information -->
                                     <finalName>python</finalName>
@@ -138,15 +142,11 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
-
+                            
                         </executions>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
-
-    <build>
-        <finalName>apache-dolphinscheduler-${project.version}</finalName>
-    </build>
 </project>

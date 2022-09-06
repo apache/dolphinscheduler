@@ -170,7 +170,8 @@ public class ProcessDefinition {
      */
     private ProcessExecutionTypeEnum executionType;
 
-    public ProcessDefinition() { }
+    public ProcessDefinition() {
+    }
 
     public ProcessDefinition(long projectCode,
                              String name,
@@ -417,44 +418,44 @@ public class ProcessDefinition {
         }
         ProcessDefinition that = (ProcessDefinition) o;
         return projectCode == that.projectCode
-            && userId == that.userId
-            && timeout == that.timeout
-            && tenantId == that.tenantId
-            && Objects.equals(name, that.name)
-            && releaseState == that.releaseState
-            && Objects.equals(description, that.description)
-            && Objects.equals(globalParams, that.globalParams)
-            && flag == that.flag
-            && executionType == that.executionType
-            && Objects.equals(locations, that.locations);
+                && userId == that.userId
+                && timeout == that.timeout
+                && tenantId == that.tenantId
+                && Objects.equals(name, that.name)
+                && releaseState == that.releaseState
+                && Objects.equals(description, that.description)
+                && Objects.equals(globalParams, that.globalParams)
+                && flag == that.flag
+                && executionType == that.executionType
+                && Objects.equals(locations, that.locations);
     }
 
     @Override
     public String toString() {
         return "ProcessDefinition{"
-            + "id=" + id
-            + ", code=" + code
-            + ", name='" + name + '\''
-            + ", version=" + version
-            + ", releaseState=" + releaseState
-            + ", projectCode=" + projectCode
-            + ", description='" + description + '\''
-            + ", globalParams='" + globalParams + '\''
-            + ", globalParamList=" + globalParamList
-            + ", globalParamMap=" + globalParamMap
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + ", flag=" + flag
-            + ", userId=" + userId
-            + ", userName='" + userName + '\''
-            + ", projectName='" + projectName + '\''
-            + ", locations='" + locations + '\''
-            + ", scheduleReleaseState=" + scheduleReleaseState
-            + ", timeout=" + timeout
-            + ", tenantId=" + tenantId
-            + ", tenantCode='" + tenantCode + '\''
-            + ", modifyBy='" + modifyBy + '\''
-            + ", warningGroupId=" + warningGroupId
-            + '}';
+                + "id=" + id
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", version=" + version
+                + ", releaseState=" + releaseState
+                + ", projectCode=" + projectCode
+                + ", description='" + description + '\''
+                + ", globalParams='" + globalParams + '\''
+                + ", globalParamList=" + globalParamList
+                + ", globalParamMap=" + globalParamMap
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", flag=" + flag
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", projectName='" + projectName + '\''
+                + ", locations='" + locations + '\''
+                + ", scheduleReleaseState=" + scheduleReleaseState
+                + ", timeout=" + timeout
+                + ", tenantId=" + tenantId
+                + ", tenantCode='" + tenantCode + '\''
+                + ", modifyBy='" + modifyBy + '\''
+                + ", warningGroupId=" + warningGroupId
+                + '}';
     }
 }

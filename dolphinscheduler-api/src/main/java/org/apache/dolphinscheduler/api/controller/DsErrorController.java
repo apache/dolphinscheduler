@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class DsErrorController implements ErrorController {
+
     @RequestMapping("/error")
     public ModelAndView handleError(HttpServletRequest request) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);

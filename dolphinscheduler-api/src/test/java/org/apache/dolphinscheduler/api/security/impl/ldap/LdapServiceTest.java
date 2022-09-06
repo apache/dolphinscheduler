@@ -37,18 +37,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles(ProfileType.H2)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-@TestPropertySource(
-        properties = {
-                "security.authentication.type=LDAP",
-                "security.authentication.ldap.user.admin=read-only-admin",
-                "ldap.urls=ldap://ldap.forumsys.com:389/",
-                "ldap.base.dn=dc=example,dc=com",
-                "ldap.username=cn=read-only-admin,dc=example,dc=com",
-                "ldap.password=password",
-                "ldap.user.identity.attribute=uid",
-                "ldap.user.email.attribute=mail",
-        })
+@TestPropertySource(properties = {
+        "security.authentication.type=LDAP",
+        "security.authentication.ldap.user.admin=read-only-admin",
+        "ldap.urls=ldap://ldap.forumsys.com:389/",
+        "ldap.base.dn=dc=example,dc=com",
+        "ldap.username=cn=read-only-admin,dc=example,dc=com",
+        "ldap.password=password",
+        "ldap.user.identity.attribute=uid",
+        "ldap.user.email.attribute=mail",
+})
 public class LdapServiceTest {
+
     @Autowired
     protected AutowireCapableBeanFactory beanFactory;
 

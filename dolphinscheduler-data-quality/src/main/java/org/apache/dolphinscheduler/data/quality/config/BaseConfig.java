@@ -32,12 +32,12 @@ public class BaseConfig implements IConfig {
     private String type;
 
     @JsonProperty("config")
-    private Map<String,Object> config;
+    private Map<String, Object> config;
 
     public BaseConfig() {
     }
 
-    public BaseConfig(String type, Map<String,Object> config) {
+    public BaseConfig(String type, Map<String, Object> config) {
         this.type = type;
         this.config = config;
     }

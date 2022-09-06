@@ -67,16 +67,21 @@ public class AsyncTaskLooper extends BaseDaemonThread {
                 }
 
                 final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
-                if (TaskExecutionContextCacheManager.getByTaskInstanceId(taskExecutionContext.getTaskInstanceId()) == null) {
-                    logger.warn("Cannot find the taskInstance from TaskExecutionContextCacheManager, the task may already been killed");
+                if (TaskExecutionContextCacheManager
+                        .getByTaskInstanceId(taskExecutionContext.getTaskInstanceId()) == null) {
+                    logger.warn(
+                            "Cannot find the taskInstance from TaskExecutionContextCacheManager, the task may already been killed");
                     continue;
                 }
                 asyncCheckThreadPool.submit(() -> {
                     Thread.currentThread().setName(taskExecutionContext.getTaskLogName());
-                    final AsyncTaskExecuteFunction asyncTaskExecuteFunction = asyncTaskExecutionContext.getAsyncTaskExecuteFunction();
-                    final AsyncTaskCallbackFunction asyncTaskCallbackFunction = asyncTaskExecutionContext.getAsyncTaskCallbackFunction();
+                    final AsyncTaskExecuteFunction asyncTaskExecuteFunction =
+                            asyncTaskExecutionContext.getAsyncTaskExecuteFunction();
+                    final AsyncTaskCallbackFunction asyncTaskCallbackFunction =
+                            asyncTaskExecutionContext.getAsyncTaskCallbackFunction();
                     try {
-                        AsyncTaskExecutionStatus asyncTaskExecutionStatus = asyncTaskExecuteFunction.getTaskExecuteStatus();
+                        AsyncTaskExecutionStatus asyncTaskExecutionStatus =
+                                asyncTaskExecuteFunction.getTaskExecuteStatus();
                         switch (asyncTaskExecutionStatus) {
                             case RUNNING:
                                 asyncTaskCallbackFunction.executeRunning();

@@ -53,16 +53,16 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
     public void handleWorkflowEvent(WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
         logger.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
         WorkflowExecuteRunnable workflowExecuteRunnable =
-            processInstanceExecCacheManager.getByProcessInstanceId(workflowEvent.getWorkflowInstanceId());
+                processInstanceExecCacheManager.getByProcessInstanceId(workflowEvent.getWorkflowInstanceId());
         if (workflowExecuteRunnable == null) {
             throw new WorkflowEventHandleError(
-                "The workflow start event is invalid, cannot find the workflow instance from cache");
+                    "The workflow start event is invalid, cannot find the workflow instance from cache");
         }
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
 
         ProcessInstanceMetrics.incProcessInstanceSubmit();
         CompletableFuture<WorkflowSubmitStatue> workflowSubmitFuture =
-            CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool);
+                CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool);
         workflowSubmitFuture.thenAccept(workflowSubmitStatue -> {
             if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
                 // submit failed will resend the event to workflow event queue
@@ -72,9 +72,9 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                 }
             } else {
                 logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
-                             workflowEvent);
+                        workflowEvent);
                 workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
-                                                              processInstance.getId()));
+                        processInstance.getId()));
             }
         });
     }

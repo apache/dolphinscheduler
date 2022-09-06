@@ -105,9 +105,10 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * @return
      */
     @Override
-    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, Double limitsCpu, Integer limitsMemory) {
+    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, String k8s, Double limitsCpu,
+                                                  Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.K8S_NAMESPACE, null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -179,9 +180,10 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * @return
      */
     @Override
-    public Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu, Integer limitsMemory) {
+    public Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu,
+                                                  Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.K8S_NAMESPACE, null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -263,7 +265,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Map<String, Object> deleteNamespaceById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.K8S_NAMESPACE, null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -298,7 +300,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * @return yaml file
      */
     private String genDefaultResourceYaml(K8sNameSpace k8sNamespace) {
-        //resource use same name with namespace
+        // resource use same name with namespace
         String name = k8sNamespace.getNamespace();
         String namespace = k8sNamespace.getNamespace();
         String cpuStr = null;
@@ -327,7 +329,6 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
         return result;
     }
 
-
     /**
      * query unauthorized namespace
      *
@@ -338,7 +339,8 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     @Override
     public Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (loginUser.getId() != userId && !canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+        if (loginUser.getId() != userId
+                && !canOperatorPermissions(loginUser, null, AuthorizationType.K8S_NAMESPACE, null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -367,7 +369,8 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
     public Map<String, Object> queryAuthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (loginUser.getId() != userId && !canOperatorPermissions(loginUser, null,AuthorizationType.K8S_NAMESPACE,null)) {
+        if (loginUser.getId() != userId
+                && !canOperatorPermissions(loginUser, null, AuthorizationType.K8S_NAMESPACE, null)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -387,7 +390,7 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      */
     @Override
     public List<K8sNameSpace> queryNamespaceAvailable(User loginUser) {
-        if (canOperatorPermissions(loginUser,null,AuthorizationType.K8S_NAMESPACE,null)) {
+        if (canOperatorPermissions(loginUser, null, AuthorizationType.K8S_NAMESPACE, null)) {
             return k8sNamespaceMapper.selectList(null);
         } else {
             return k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
@@ -401,7 +404,8 @@ public class K8sNameSpaceServiceImpl extends BaseServiceImpl implements K8sNameS
      * @param authedNamespaceList authed namespace list
      * @return namespace list that authorization
      */
-    private List<K8sNameSpace> getUnauthorizedNamespaces(Set<K8sNameSpace> namespaceSet, List<K8sNameSpace> authedNamespaceList) {
+    private List<K8sNameSpace> getUnauthorizedNamespaces(Set<K8sNameSpace> namespaceSet,
+                                                         List<K8sNameSpace> authedNamespaceList) {
         List<K8sNameSpace> resultList = new ArrayList<>();
         for (K8sNameSpace k8sNamespace : namespaceSet) {
             boolean existAuth = false;

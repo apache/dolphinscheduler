@@ -32,7 +32,7 @@ public class PropertyUtilsTest {
     }
 
     @Test
-    public void getResUploadStartupState(){
+    public void getResUploadStartupState() {
         Assert.assertFalse(PropertyUtils.getResUploadStartupState());
     }
 }

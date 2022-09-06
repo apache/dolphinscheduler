@@ -136,9 +136,9 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         if (CollectionUtils.isNotEmpty(dataSourceList)) {
             options = new ArrayList<>();
 
-            for (DataSource dataSource: dataSourceList) {
+            for (DataSource dataSource : dataSourceList) {
                 ParamsOptions childrenOption =
-                        new ParamsOptions(dataSource.getName(),dataSource.getId(),false);
+                        new ParamsOptions(dataSource.getName(), dataSource.getId(), false);
                 options.add(childrenOption);
             }
         }
@@ -158,7 +158,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                                       Integer pageNo,
                                       Integer pageSize) {
         Result result = new Result();
-        
+
         Date start = null;
         Date end = null;
         try {
@@ -194,7 +194,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                         DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(dqRule.getId()));
                 List<DqRuleExecuteSql> ruleExecuteSqlList = dqRuleExecuteSqlMapper.getExecuteSqlList(dqRule.getId());
 
-                RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList,ruleExecuteSqlList);
+                RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList, ruleExecuteSqlList);
                 dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
             });
 
@@ -254,7 +254,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         paramProps.setRows(1);
 
         return InputParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
                         .setRequired(inputEntry.getValidate())
                         .build())
@@ -278,18 +278,19 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
             case DATASOURCE_TYPE:
                 options = new ArrayList<>();
                 ParamsOptions paramsOptions = null;
-                for (DbType dbtype: DbType.values()) {
-                    paramsOptions = new ParamsOptions(dbtype.name(),dbtype.getCode(),false);
+                for (DbType dbtype : DbType.values()) {
+                    paramsOptions = new ParamsOptions(dbtype.name(), dbtype.getCode(), false);
                     options.add(paramsOptions);
                 }
                 break;
             case COMPARISON_TYPE:
                 options = new ArrayList<>();
                 ParamsOptions comparisonOptions = null;
-                List<DqComparisonType> list = dqComparisonTypeMapper.selectList(new QueryWrapper<DqComparisonType>().orderByAsc("id"));
+                List<DqComparisonType> list =
+                        dqComparisonTypeMapper.selectList(new QueryWrapper<DqComparisonType>().orderByAsc("id"));
 
-                for (DqComparisonType type: list) {
-                    comparisonOptions = new ParamsOptions(type.getType(), type.getId(),false);
+                for (DqComparisonType type : list) {
+                    comparisonOptions = new ParamsOptions(type.getType(), type.getId(), false);
                     options.add(comparisonOptions);
                 }
                 break;
@@ -298,7 +299,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         }
 
         return SelectParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .setOptions(options)
                 .setValue(inputEntry.getValue())
                 .setSize(SMALL)
@@ -315,10 +316,10 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         paramProps.setRows(2);
 
         return InputParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
-                                     .setRequired(inputEntry.getValidate())
-                                     .build())
+                        .setRequired(inputEntry.getValidate())
+                        .build())
                 .setProps(paramProps)
                 .setValue(inputEntry.getValue())
                 .setPlaceholder(inputEntry.getPlaceholder())
@@ -328,11 +329,12 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
 
     private GroupParam getGroupParam(DqRuleInputEntry inputEntry) {
         return GroupParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
                         .setRequired(inputEntry.getValidate())
                         .build())
-                .setProps(new GroupParamsProps().setRules(JSONUtils.toList(inputEntry.getOptions(),PluginParams.class)).setFontSize(20))
+                .setProps(new GroupParamsProps().setRules(JSONUtils.toList(inputEntry.getOptions(), PluginParams.class))
+                        .setFontSize(20))
                 .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }

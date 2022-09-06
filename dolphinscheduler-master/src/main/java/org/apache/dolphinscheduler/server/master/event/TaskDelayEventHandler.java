@@ -56,7 +56,7 @@ public class TaskDelayEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable =
-            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError("Cannot find related workflow instance from cache");
@@ -69,9 +69,9 @@ public class TaskDelayEventHandler implements TaskEventHandler {
         TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState().typeIsFinished()) {
             logger.warn(
-                "The current task status is: {}, will not handle the running event, this event is delay, will discard this event: {}",
-                taskInstance.getState(),
-                taskEvent);
+                    "The current task status is: {}, will not handle the running event, this event is delay, will discard this event: {}",
+                    taskInstance.getState(),
+                    taskEvent);
             sendAckToWorker(taskEvent);
             return;
         }
@@ -109,7 +109,7 @@ public class TaskDelayEventHandler implements TaskEventHandler {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-            new TaskExecuteRunningAckMessage(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
+                new TaskExecuteRunningAckMessage(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
         taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
     }
 

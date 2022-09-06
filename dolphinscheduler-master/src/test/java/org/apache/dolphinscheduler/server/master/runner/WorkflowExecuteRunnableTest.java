@@ -125,7 +125,9 @@ public class WorkflowExecuteRunnableTest {
         NettyExecutorManager nettyExecutorManager = mock(NettyExecutorManager.class);
         ProcessAlertManager processAlertManager = mock(ProcessAlertManager.class);
         workflowExecuteThread =
-            PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao, nettyExecutorManager, processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
+                PowerMockito.spy(new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao,
+                        nettyExecutorManager, processAlertManager, config, stateWheelExecuteThread,
+                        curingGlobalParamsService));
         // prepareProcess init dag
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
@@ -142,7 +144,8 @@ public class WorkflowExecuteRunnableTest {
             Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
             method.setAccessible(true);
-            List<String> nodeNames = (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
+            List<String> nodeNames =
+                    (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(3, nodeNames.size());
         } catch (Exception e) {
             Assert.fail();
@@ -163,16 +166,19 @@ public class WorkflowExecuteRunnableTest {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1,2,3,4");
             Mockito.when(processService.findTaskInstanceByIdList(
-                    Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(), taskInstance4.getId()))
-            ).thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
+                    Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(),
+                            taskInstance4.getId())))
+                    .thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
             Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getRecoverTaskInstanceList", String.class);
             method.setAccessible(true);
-            List<TaskInstance> taskInstances = workflowExecuteThread.getRecoverTaskInstanceList(JSONUtils.toJsonString(cmdParam));
+            List<TaskInstance> taskInstances =
+                    workflowExecuteThread.getRecoverTaskInstanceList(JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
 
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1");
-            List<TaskInstance> taskInstanceEmpty = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
+            List<TaskInstance> taskInstanceEmpty =
+                    (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertTrue(taskInstanceEmpty.isEmpty());
 
         } catch (Exception e) {

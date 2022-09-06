@@ -30,8 +30,10 @@ public class AccessLogAspectTest {
 
     @Test
     public void testHandleSensitiveData() {
-        String data = "userPassword='7ad2410b2f4c074479a8937a28a22b8f', email='xxx@qq.com', database='null', userName='root', password='root', other='null'";
-        String expected = "userPassword='********************************', email='xxx@qq.com', database='null', userName='root', password='****', other='null'";
+        String data =
+                "userPassword='7ad2410b2f4c074479a8937a28a22b8f', email='xxx@qq.com', database='null', userName='root', password='root', other='null'";
+        String expected =
+                "userPassword='********************************', email='xxx@qq.com', database='null', userName='root', password='****', other='null'";
 
         String actual = accessLogAspect.handleSensitiveData(data);
 

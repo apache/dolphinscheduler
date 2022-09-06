@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import java.util.List;
 
 public class PermissionCheck<T> {
+
     /**
      * logger
      */
@@ -72,7 +73,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.needChecks = needChecks;
@@ -82,7 +84,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId, Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.needChecks = needChecks;
@@ -93,7 +96,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId, Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService,
+                           List<ResourceInfo> resourceList, int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.resourceList = resourceList;
@@ -173,8 +177,10 @@ public class PermissionCheck<T> {
                 List<T> unauthorizedList = processService.listUnauthorized(userId, needChecks, authorizationType);
                 // if exist unauthorized resource
                 if (CollectionUtils.isNotEmpty(unauthorizedList)) {
-                    logger.error("user {} doesn't have permission of {}: {}", user.getUserName(), authorizationType.getDescp(), unauthorizedList);
-                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
+                    logger.error("user {} doesn't have permission of {}: {}", user.getUserName(),
+                            authorizationType.getDescp(), unauthorizedList);
+                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s",
+                            user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }
         }

@@ -59,7 +59,8 @@ public class AlertConfig implements Validator {
         }
 
         alertConfig.setAlertServerAddress(NetUtils.getAddr(listenPort));
-        alertConfig.setAlertServerRegistryPath(NodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.alertServerAddress);
+        alertConfig.setAlertServerRegistryPath(
+                NodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.alertServerAddress);
         printConfig();
     }
 

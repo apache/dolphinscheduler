@@ -63,9 +63,9 @@ public class BaseServiceTest {
 
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
-        //ADMIN_USER
+        // ADMIN_USER
         Assert.assertTrue(baseService.isAdmin(user));
-        //GENERAL_USER
+        // GENERAL_USER
         user.setUserType(UserType.GENERAL_USER);
         Assert.assertFalse(baseService.isAdmin(user));
 
@@ -76,9 +76,9 @@ public class BaseServiceTest {
 
         Map<String, Object> result = new HashMap<>();
         baseService.putMsg(result, Status.SUCCESS);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-        //has params
-        baseService.putMsg(result, Status.PROJECT_NOT_FOUND,"test");
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        // has params
+        baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
 
     }
 
@@ -87,39 +87,39 @@ public class BaseServiceTest {
 
         Result result = new Result();
         baseService.putMsg(result, Status.SUCCESS);
-        Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
-        //has params
-        baseService.putMsg(result,Status.PROJECT_NOT_FOUND,"test");
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        // has params
+        baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
     }
 
-//    @Test
-//    public void testCreateTenantDirIfNotExists() {
-//
-//        PowerMockito.mockStatic(HadoopUtils.class);
-//        PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
-//
-//        try {
-//            baseService.createTenantDirIfNotExists("test");
-//        } catch (Exception e) {
-//            Assert.fail();
-//            logger.error("CreateTenantDirIfNotExists error ",e);
-//            e.printStackTrace();
-//        }
-//
-//    }
+    // @Test
+    // public void testCreateTenantDirIfNotExists() {
+    //
+    // PowerMockito.mockStatic(HadoopUtils.class);
+    // PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
+    //
+    // try {
+    // baseService.createTenantDirIfNotExists("test");
+    // } catch (Exception e) {
+    // Assert.fail();
+    // logger.error("CreateTenantDirIfNotExists error ",e);
+    // e.printStackTrace();
+    // }
+    //
+    // }
 
     @Test
     public void testHasPerm() {
 
         User user = new User();
         user.setId(1);
-        //create user
-        Assert.assertTrue(baseService.canOperator(user,1));
+        // create user
+        Assert.assertTrue(baseService.canOperator(user, 1));
 
-        //admin
+        // admin
         user.setId(2);
         user.setUserType(UserType.ADMIN_USER);
-        Assert.assertTrue(baseService.canOperator(user,1));
+        Assert.assertTrue(baseService.canOperator(user, 1));
 
     }
 

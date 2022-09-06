@@ -138,7 +138,6 @@ public class TaskNode {
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String dependence;
 
-
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String conditionResult;
@@ -382,7 +381,8 @@ public class TaskNode {
      */
     public TaskTimeoutParameter getTaskTimeoutParameter() {
         if (!StringUtils.isEmpty(this.getTimeout())) {
-            String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
+            String formatStr =
+                    String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
             String taskTimeout = this.getTimeout().replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
             return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
         }
@@ -410,7 +410,8 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {
+        });
 
         if (taskParams == null) {
             taskParams = new HashMap<>();
@@ -423,7 +424,8 @@ public class TaskNode {
     }
 
     public Map<String, Object> taskParamsToJsonObj(String taskParams) {
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {
+        });
         if (taskParamsMap == null) {
             taskParamsMap = new HashMap<>();
         }

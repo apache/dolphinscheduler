@@ -53,7 +53,8 @@ public class WorkerRegistryClient implements AutoCloseable {
     public synchronized void start() {
         try {
             registry();
-            registryClient.addConnectionStateListener(new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
+            registryClient.addConnectionStateListener(
+                    new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
         } catch (Exception ex) {
             throw new RegistryException("WorkerRegistryClient start up error", ex);
         }

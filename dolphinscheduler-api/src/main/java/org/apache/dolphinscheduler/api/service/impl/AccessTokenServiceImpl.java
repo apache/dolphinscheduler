@@ -75,10 +75,12 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     public Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), logger);
         if (!ids.isEmpty()) {
             Page<AccessToken> page = new Page<>(pageNo, pageSize);
-            IPage<AccessToken> accessTokenList = accessTokenMapper.selectAccessTokenPage(page, new ArrayList<>(ids), searchVal);
+            IPage<AccessToken> accessTokenList =
+                    accessTokenMapper.selectAccessTokenPage(page, new ArrayList<>(ids), searchVal);
             pageInfo.setTotal((int) accessTokenList.getTotal());
             pageInfo.setTotalList(accessTokenList.getRecords());
         }
@@ -99,7 +101,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         List<AccessToken> accessTokenList = Collections.EMPTY_LIST;
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), logger);
         if (!ids.isEmpty()) {
             accessTokenList = this.accessTokenMapper.selectBatchIds(ids);
         }
@@ -123,7 +126,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
 
         // 1. check permission
-        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
+        if (!(canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE)
+                || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -154,7 +158,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         if (insert > 0) {
             result.setData(accessToken);
             putMsg(result, Status.SUCCESS);
-            resourcePermissionCheckService.postHandle(AuthorizationType.ACCESS_TOKEN, loginUser.getId(), Collections.singletonList(accessToken.getId()), logger);
+            resourcePermissionCheckService.postHandle(AuthorizationType.ACCESS_TOKEN, loginUser.getId(),
+                    Collections.singletonList(accessToken.getId()), logger);
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
@@ -189,7 +194,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -221,7 +226,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperatorPermissions(loginUser,new Object[]{id},AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

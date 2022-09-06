@@ -38,8 +38,7 @@ public class TaskEventChangeCommand implements Serializable {
 
     public TaskEventChangeCommand(
                                   int processInstanceId,
-                                  int taskInstanceId
-    ) {
+                                  int taskInstanceId) {
         this.key = String.format("%d-%d",
                 processInstanceId,
                 taskInstanceId);

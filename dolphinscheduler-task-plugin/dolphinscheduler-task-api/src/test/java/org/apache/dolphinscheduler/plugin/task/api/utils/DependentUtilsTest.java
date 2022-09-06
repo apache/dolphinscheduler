@@ -34,11 +34,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 public class DependentUtilsTest {
+
     private static final Logger logger = LoggerFactory.getLogger(DependentUtilsTest.class);
 
     @Test
     public void getDependResultForRelation() {
-        //failed
+        // failed
         DependentRelation dependentRelation = DependentRelation.AND;
         List<DependResult> dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.FAILED);
@@ -46,33 +47,33 @@ public class DependentUtilsTest {
         DependResult result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.FAILED);
 
-        //waiting
+        // waiting
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.WAITING);
         dependResultList.add(DependResult.SUCCESS);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.WAITING);
 
-        //success
+        // success
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.SUCCESS);
         dependResultList.add(DependResult.SUCCESS);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.SUCCESS);
 
-        //one success
+        // one success
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.SUCCESS);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.SUCCESS);
 
-        //one failed
+        // one failed
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.FAILED);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.FAILED);
 
-        //or success
+        // or success
         dependentRelation = DependentRelation.OR;
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.FAILED);
@@ -80,27 +81,27 @@ public class DependentUtilsTest {
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.SUCCESS);
 
-        //waiting
+        // waiting
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.WAITING);
         dependResultList.add(DependResult.FAILED);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.WAITING);
 
-        //success
+        // success
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.SUCCESS);
         dependResultList.add(DependResult.SUCCESS);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.SUCCESS);
 
-        //one success
+        // one success
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.SUCCESS);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.SUCCESS);
 
-        //one failed
+        // one failed
         dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.FAILED);
         result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
@@ -142,7 +143,8 @@ public class DependentUtilsTest {
         Date firstWeekDay = DateUtils.getMonday(curDay);
         dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
 
-        DateInterval weekHead = new DateInterval(DateUtils.getStartOfDay(firstWeekDay), DateUtils.getEndOfDay(firstWeekDay));
+        DateInterval weekHead =
+                new DateInterval(DateUtils.getStartOfDay(firstWeekDay), DateUtils.getEndOfDay(firstWeekDay));
         DateInterval weekThis = new DateInterval(DateUtils.getStartOfDay(curDay), DateUtils.getEndOfDay(curDay));
 
         Assert.assertEquals(dateIntervals.get(0), weekHead);
@@ -152,7 +154,8 @@ public class DependentUtilsTest {
         Date firstMonthDay = DateUtils.getFirstDayOfMonth(curDay);
         dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
 
-        DateInterval monthHead = new DateInterval(DateUtils.getStartOfDay(firstMonthDay), DateUtils.getEndOfDay(firstMonthDay));
+        DateInterval monthHead =
+                new DateInterval(DateUtils.getStartOfDay(firstMonthDay), DateUtils.getEndOfDay(firstMonthDay));
         DateInterval monthThis = new DateInterval(DateUtils.getStartOfDay(curDay), DateUtils.getEndOfDay(curDay));
 
         Assert.assertEquals(dateIntervals.get(0), monthHead);
@@ -295,7 +298,7 @@ public class DependentUtilsTest {
         Date day7 = DateUtils.stringToDate("2019-02-03 00:00:00");
         DateInterval di7 = new DateInterval(DateUtils.getStartOfDay(day7),
                 DateUtils.getEndOfDay(day7));
-        List<DateInterval> dateIntervals  = DependentDateUtils.getLastWeekInterval(curDay);
+        List<DateInterval> dateIntervals = DependentDateUtils.getLastWeekInterval(curDay);
         Assert.assertEquals(dateIntervals.size(), 7);
         Assert.assertEquals(dateIntervals.get(0), di1);
         Assert.assertEquals(dateIntervals.get(1), di2);
@@ -350,9 +353,10 @@ public class DependentUtilsTest {
 
         Date curDay = DateUtils.stringToDate("2020-05-15 12:10:00");
 
-        List<DateInterval> dateIntervals  = DependentUtils.getDateIntervalList(curDay, dateValue);
+        List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
 
-        DateInterval expect = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 12:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 12:59:59")));
+        DateInterval expect = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 12:00:00")),
+                DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 12:59:59")));
 
         Assert.assertEquals(expect, dateIntervals.get(0));
         Assert.assertEquals(1, dateIntervals.size());
@@ -371,11 +375,14 @@ public class DependentUtilsTest {
             if (a < 10) {
                 i = "0" + i;
             }
-            DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":00:00")),
-                    DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":59:59")));
+            DateInterval dateInterval =
+                    new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":00:00")),
+                            DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":59:59")));
             expect.add(dateInterval);
         }
-        DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 00:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 00:59:59")));
+        DateInterval dateInterval =
+                new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 00:00:00")),
+                        DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 00:59:59")));
         expect.add(dateInterval);
 
         Assert.assertEquals(24, dateIntervals.size());

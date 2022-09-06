@@ -28,6 +28,7 @@ import java.util.Date;
  * auditlog mapper interface
  */
 public interface AuditLogMapper extends BaseMapper<AuditLog> {
+
     IPage<AuditLog> queryAuditLog(IPage<AuditLog> page,
                                   @Param("resourceType") int[] resourceArray,
                                   @Param("operationType") int[] operationType,

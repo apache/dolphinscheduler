@@ -72,7 +72,8 @@ public class ResponseFuture {
 
     private Throwable cause;
 
-    public ResponseFuture(long opaque, long timeoutMillis, InvokeCallback invokeCallback, ReleaseSemaphore releaseSemaphore) {
+    public ResponseFuture(long opaque, long timeoutMillis, InvokeCallback invokeCallback,
+                          ReleaseSemaphore releaseSemaphore) {
         this.opaque = opaque;
         this.timeoutMillis = timeoutMillis;
         this.invokeCallback = invokeCallback;

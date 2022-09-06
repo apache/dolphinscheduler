@@ -64,9 +64,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 
 public interface ProcessService {
+
     @Transactional
-    ProcessInstance handleCommand(String host, Command command)
-        throws CodeGenerateUtils.CodeGenerateException;
+    ProcessInstance handleCommand(String host, Command command) throws CodeGenerateUtils.CodeGenerateException;
 
     void moveToErrorCommand(Command command, String message);
 
@@ -108,7 +108,9 @@ public interface ProcessService {
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    @Nullable TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, long commitInterval);
+    @Nullable
+    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
+                                     long commitInterval);
 
     @Transactional
     TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
@@ -223,7 +225,8 @@ public interface ProcessService {
 
     int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine);
 
-    int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean syncDefine, Boolean isFromProcessDefine);
+    int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean syncDefine,
+                          Boolean isFromProcessDefine);
 
     int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                          List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,
@@ -243,7 +246,8 @@ public interface ProcessService {
 
     List<ProcessTaskRelation> findRelationByCode(long processDefinitionCode, int processDefinitionVersion);
 
-    List<TaskNode> transformTask(List<ProcessTaskRelation> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs);
+    List<TaskNode> transformTask(List<ProcessTaskRelation> taskRelationList,
+                                 List<TaskDefinitionLog> taskDefinitionLogs);
 
     Map<ProcessInstance, TaskInstance> notifyProcessList(int processId);
 

@@ -120,7 +120,8 @@ public class ErrorCommand {
      */
     private int dryRun;
 
-    public ErrorCommand() {}
+    public ErrorCommand() {
+    }
 
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();

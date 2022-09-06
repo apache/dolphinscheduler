@@ -77,7 +77,9 @@ public class CuringGlobalParams implements CuringParamsService {
      * @return
      */
     @Override
-    public String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap, List<Property> globalParamList, CommandType commandType, Date scheduleTime, String timezone) {
+    public String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap,
+                                     List<Property> globalParamList, CommandType commandType, Date scheduleTime,
+                                     String timezone) {
         if (globalParamList == null || globalParamList.isEmpty()) {
             return null;
         }
@@ -86,9 +88,8 @@ public class CuringGlobalParams implements CuringParamsService {
             globalMap.putAll(globalParamMap);
         }
         Map<String, String> allParamMap = new HashMap<>();
-        //If it is a complement, a complement time needs to be passed in, according to the task type
-        Map<String, String> timeParams = BusinessTimeUtils.
-                getBusinessTime(commandType, scheduleTime, timezone);
+        // If it is a complement, a complement time needs to be passed in, according to the task type
+        Map<String, String> timeParams = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timezone);
 
         if (timeParams != null) {
             allParamMap.putAll(timeParams);
@@ -128,9 +129,11 @@ public class CuringGlobalParams implements CuringParamsService {
      * @return
      */
     @Override
-    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters, @NonNull ProcessInstance processInstance) {
+    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
+                                                         @NonNull AbstractParameters parameters,
+                                                         @NonNull ProcessInstance processInstance) {
         // assign value to definedParams here
-        Map<String,String> globalParamsMap = setGlobalParamsMap(processInstance);
+        Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
         Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
         CommandType commandType = processInstance.getCmdTypeIfComplement();
         Date scheduleTime = processInstance.getScheduleTime();
@@ -138,7 +141,7 @@ public class CuringGlobalParams implements CuringParamsService {
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
 
-        //stream pass params
+        // stream pass params
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
         if (globalParams.isEmpty() && localParams.isEmpty() && varParams.isEmpty()) {
@@ -149,7 +152,7 @@ public class CuringGlobalParams implements CuringParamsService {
         // of the process instance complement
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
-        Map<String,String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
+        Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
         if (globalParamsMap != null) {
             params.putAll(globalParamsMap);
@@ -172,7 +175,8 @@ public class CuringGlobalParams implements CuringParamsService {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
 
-            if (StringUtils.isNotEmpty(property.getValue()) && property.getValue().startsWith(Constants.FUNCTION_START_WITH)) {
+            if (StringUtils.isNotEmpty(property.getValue())
+                    && property.getValue().startsWith(Constants.FUNCTION_START_WITH)) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
@@ -183,7 +187,7 @@ public class CuringGlobalParams implements CuringParamsService {
                 if (timeFunctionNeedExpand(val)) {
                     val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
                 } else {
-                    val  = convertParameterPlaceholders(val, params);
+                    val = convertParameterPlaceholders(val, params);
                 }
                 property.setValue(val);
             }
@@ -206,7 +210,8 @@ public class CuringGlobalParams implements CuringParamsService {
         String globalParamsStr = processInstance.getGlobalParams();
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
-            globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
+            globalParamsMap
+                    .putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;
     }

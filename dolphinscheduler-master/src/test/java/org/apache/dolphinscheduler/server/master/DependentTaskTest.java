@@ -56,7 +56,6 @@ public class DependentTaskTest {
      */
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
-
     public static final Long TASK_CODE = 1111L;
     public static final Long DEPEND_TASK_CODE_A = 110L;
     public static final Long DEPEND_TASK_CODE_B = 111L;
@@ -128,8 +127,7 @@ public class DependentTaskTest {
         DependentTaskModel dependentTaskModel = new DependentTaskModel();
         dependentTaskModel.setRelation(DependentRelation.AND);
         dependentTaskModel.setDependItemList(Stream.of(
-                getDependentItemFromTaskNode(2L, DEPEND_TASK_CODE_A, "today", "day")
-        ).collect(Collectors.toList()));
+                getDependentItemFromTaskNode(2L, DEPEND_TASK_CODE_A, "today", "day")).collect(Collectors.toList()));
 
         DependentParameters dependentParameters = new DependentParameters();
         dependentParameters.setRelation(DependentRelation.AND);
@@ -155,9 +153,11 @@ public class DependentTaskTest {
         Mockito.when(processService
                 .findValidTaskListByProcessId(200))
                 .thenReturn(Stream.of(
-                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_A, dependentProcessInstance),
-                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, DEPEND_TASK_CODE_B, dependentProcessInstance)
-                ).collect(Collectors.toList()));
+                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_A,
+                                dependentProcessInstance),
+                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, DEPEND_TASK_CODE_B,
+                                dependentProcessInstance))
+                        .collect(Collectors.toList()));
 
     }
 
@@ -175,9 +175,11 @@ public class DependentTaskTest {
         Mockito.when(processService
                 .findValidTaskListByProcessId(200))
                 .thenReturn(Stream.of(
-                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, DEPEND_TASK_CODE_A, dependentProcessInstance),
-                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_B, dependentProcessInstance)
-                ).collect(Collectors.toList()));
+                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, DEPEND_TASK_CODE_A,
+                                dependentProcessInstance),
+                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_B,
+                                dependentProcessInstance))
+                        .collect(Collectors.toList()));
     }
 
     @Test
@@ -186,26 +188,22 @@ public class DependentTaskTest {
         dependentTaskModel1.setRelation(DependentRelation.AND);
         dependentTaskModel1.setDependItemList(Stream.of(
                 getDependentItemFromTaskNode(2L, DEPEND_TASK_CODE_A, "today", "day"),
-                getDependentItemFromTaskNode(3L, DEPEND_TASK_CODE_B, "today", "day")
-        ).collect(Collectors.toList()));
+                getDependentItemFromTaskNode(3L, DEPEND_TASK_CODE_B, "today", "day")).collect(Collectors.toList()));
 
         DependentTaskModel dependentTaskModel2 = new DependentTaskModel();
         dependentTaskModel2.setRelation(DependentRelation.OR);
         dependentTaskModel2.setDependItemList(Stream.of(
                 getDependentItemFromTaskNode(2L, DEPEND_TASK_CODE_A, "today", "day"),
-                getDependentItemFromTaskNode(3L, DEPEND_TASK_CODE_C, "today", "day")
-        ).collect(Collectors.toList()));
+                getDependentItemFromTaskNode(3L, DEPEND_TASK_CODE_C, "today", "day")).collect(Collectors.toList()));
 
         /*
-         * OR   AND 2-A-day-today 3-B-day-today
-         *      OR  2-A-day-today 3-C-day-today
+         * OR AND 2-A-day-today 3-B-day-today OR 2-A-day-today 3-C-day-today
          */
         DependentParameters dependentParameters = new DependentParameters();
         dependentParameters.setRelation(DependentRelation.OR);
         dependentParameters.setDependTaskList(Stream.of(
                 dependentTaskModel1,
-                dependentTaskModel2
-        ).collect(Collectors.toList()));
+                dependentTaskModel2).collect(Collectors.toList()));
 
         TaskNode taskNode = getDependantTaskNode();
         taskNode.setDependence(JSONUtils.toJsonString(dependentParameters));
@@ -228,18 +226,21 @@ public class DependentTaskTest {
         Mockito.when(processService
                 .findValidTaskListByProcessId(200))
                 .thenReturn(Stream.of(
-                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, DEPEND_TASK_CODE_A, processInstance200)
-                ).collect(Collectors.toList()));
+                        getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, DEPEND_TASK_CODE_A,
+                                processInstance200))
+                        .collect(Collectors.toList()));
         Mockito.when(processService
                 .findValidTaskListByProcessId(300))
                 .thenReturn(Stream.of(
-                        getTaskInstanceForValidTaskList(3000, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_B, processInstance300),
-                        getTaskInstanceForValidTaskList(3001, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_C, processInstance300)
-                ).collect(Collectors.toList()));
+                        getTaskInstanceForValidTaskList(3000, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_B,
+                                processInstance300),
+                        getTaskInstanceForValidTaskList(3001, ExecutionStatus.SUCCESS, DEPEND_TASK_CODE_C,
+                                processInstance300))
+                        .collect(Collectors.toList()));
 
-        //DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        // DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
+        // taskExecThread.call();
+        // Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     /**
@@ -250,8 +251,8 @@ public class DependentTaskTest {
         DependentTaskModel dependentTaskModel = new DependentTaskModel();
         dependentTaskModel.setRelation(DependentRelation.AND);
         dependentTaskModel.setDependItemList(Stream.of(
-                getDependentItemFromTaskNode(2L, Constants.DEPENDENT_ALL_TASK_CODE, "today", "day")
-        ).collect(Collectors.toList()));
+                getDependentItemFromTaskNode(2L, Constants.DEPENDENT_ALL_TASK_CODE, "today", "day"))
+                .collect(Collectors.toList()));
 
         DependentParameters dependentParameters = new DependentParameters();
         dependentParameters.setRelation(DependentRelation.AND);
@@ -271,9 +272,9 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.SUCCESS));
 
-        //DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        // DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
+        // taskExecThread.call();
+        // Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
@@ -284,9 +285,9 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.FAILURE));
 
-        //DependentTaskExecThread dependentTask = new DependentTaskExecThread(taskInstance);
-        //dependentTask.call();
-        //Assert.assertEquals(ExecutionStatus.FAILURE, dependentTask.getTaskInstance().getState());
+        // DependentTaskExecThread dependentTask = new DependentTaskExecThread(taskInstance);
+        // dependentTask.call();
+        // Assert.assertEquals(ExecutionStatus.FAILURE, dependentTask.getTaskInstance().getState());
     }
 
     /**
@@ -303,8 +304,7 @@ public class DependentTaskTest {
         DependentTaskModel dependentTaskModel = new DependentTaskModel();
         dependentTaskModel.setRelation(DependentRelation.AND);
         dependentTaskModel.setDependItemList(Stream.of(
-                getDependentItemFromTaskNode(2L, DEPEND_TASK_CODE_A, "today", "day")
-        ).collect(Collectors.toList()));
+                getDependentItemFromTaskNode(2L, DEPEND_TASK_CODE_A, "today", "day")).collect(Collectors.toList()));
 
         DependentParameters dependentParameters = new DependentParameters();
         dependentParameters.setRelation(DependentRelation.AND);
@@ -322,7 +322,7 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(dependentProcessInstance);
 
-        //DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
+        // DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
 
         // for DependentExecute.getDependTaskResult
         Mockito.when(processService
@@ -330,13 +330,14 @@ public class DependentTaskTest {
                 .thenAnswer(i -> {
                     processInstance.setState(ExecutionStatus.READY_STOP);
                     return Stream.of(
-                            getTaskInstanceForValidTaskList(2000, ExecutionStatus.RUNNING_EXECUTION, DEPEND_TASK_CODE_A, dependentProcessInstance)
-                    ).collect(Collectors.toList());
+                            getTaskInstanceForValidTaskList(2000, ExecutionStatus.RUNNING_EXECUTION, DEPEND_TASK_CODE_A,
+                                    dependentProcessInstance))
+                            .collect(Collectors.toList());
                 })
                 .thenThrow(new IllegalStateException("have not been stopped as expected"));
 
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.KILL, taskExecThread.getTaskInstance().getState());
+        // taskExecThread.call();
+        // Assert.assertEquals(ExecutionStatus.KILL, taskExecThread.getTaskInstance().getState());
     }
 
     private ProcessInstance getProcessInstance() {
@@ -390,7 +391,8 @@ public class DependentTaskTest {
     /**
      * DependentItem defines the condition for the dependent
      */
-    private DependentItem getDependentItemFromTaskNode(Long processDefinitionCode, long taskCode, String date, String cycle) {
+    private DependentItem getDependentItemFromTaskNode(Long processDefinitionCode, long taskCode, String date,
+                                                       String cycle) {
         DependentItem dependentItem = new DependentItem();
         dependentItem.setDefinitionCode(processDefinitionCode);
         dependentItem.setDepTaskCode(taskCode);
@@ -410,9 +412,8 @@ public class DependentTaskTest {
     }
 
     private TaskInstance getTaskInstanceForValidTaskList(
-            int taskInstanceId, ExecutionStatus state,
-            long taskCode, ProcessInstance processInstance
-    ) {
+                                                         int taskInstanceId, ExecutionStatus state,
+                                                         long taskCode, ProcessInstance processInstance) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("DEPENDENT");
         taskInstance.setId(taskInstanceId);

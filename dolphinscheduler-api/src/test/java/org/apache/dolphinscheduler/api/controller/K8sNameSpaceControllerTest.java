@@ -54,8 +54,8 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "20");
 
         MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -71,14 +71,16 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         paramsMap.add("k8s", "k8s");
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
-                .andExpect(status().isCreated()) //it can
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isCreated()) // it can
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.K8S_CLIENT_OPS_ERROR.getCode(), result.getCode().intValue());//because we not have a k8s cluster in test env
+        Assert.assertEquals(Status.K8S_CLIENT_OPS_ERROR.getCode(), result.getCode().intValue());// because we not have a
+                                                                                                // k8s cluster in test
+                                                                                                // env
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -90,8 +92,8 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         paramsMap.add("tag", "flink");
 
         MvcResult mvcResult = mockMvc.perform(put("/k8s-namespace/{id}", 1)
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -110,8 +112,8 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         // success
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -120,13 +122,13 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify namespace return result:{}", mvcResult.getResponse().getContentAsString());
 
-        //error
+        // error
         paramsMap.clear();
         paramsMap.add("namespace", null);
         paramsMap.add("k8s", "default");
         mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -142,14 +144,15 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "1");
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/delete")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());//there is no k8s cluster in test env
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());// there is no k8s cluster in test
+                                                                                   // env
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -160,8 +163,8 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         paramsMap.add("userId", "1");
 
         MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace/unauth-namespace")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -177,8 +180,8 @@ public class K8sNameSpaceControllerTest extends AbstractControllerTest {
         paramsMap.add("userId", "1");
 
         MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace/authed-namespace")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

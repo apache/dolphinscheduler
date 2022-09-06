@@ -45,18 +45,18 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
-@TestPropertySource(
-        properties = {
-                "security.authentication.type=LDAP",
-                "security.authentication.ldap.user.admin=read-only-admin",
-                "ldap.urls=ldap://ldap.forumsys.com:389/",
-                "ldap.base.dn=dc=example,dc=com",
-                "ldap.username=cn=read-only-admin,dc=example,dc=com",
-                "ldap.password=password",
-                "ldap.user.identity.attribute=uid",
-                "ldap.user.email.attribute=mail",
-        })
+@TestPropertySource(properties = {
+        "security.authentication.type=LDAP",
+        "security.authentication.ldap.user.admin=read-only-admin",
+        "ldap.urls=ldap://ldap.forumsys.com:389/",
+        "ldap.base.dn=dc=example,dc=com",
+        "ldap.username=cn=read-only-admin,dc=example,dc=com",
+        "ldap.password=password",
+        "ldap.user.identity.attribute=uid",
+        "ldap.user.email.attribute=mail",
+})
 public class LdapAuthenticatorTest extends AbstractControllerTest {
+
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
     @Autowired
     protected AutowireCapableBeanFactory beanFactory;
@@ -69,7 +69,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     private LdapAuthenticator ldapAuthenticator;
 
-    //test param
+    // test param
     private User mockUser;
     private Session mockSession;
 

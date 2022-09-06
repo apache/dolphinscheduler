@@ -45,7 +45,7 @@ public class QueueMapperTest extends BaseDaoTest {
      * @return Queue
      */
     private Queue insertOne() {
-        //insertOne
+        // insertOne
         Queue queue = new Queue();
         queue.setQueueName("queue");
         queue.setQueue("queue");
@@ -60,10 +60,10 @@ public class QueueMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Queue queue = insertOne();
         queue.setCreateTime(new Date());
-        //update
+        // update
         int update = queueMapper.updateById(queue);
         Assert.assertEquals(1, update);
     }
@@ -84,7 +84,7 @@ public class QueueMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Queue queue = insertOne();
-        //query
+        // query
         List<Queue> queues = queueMapper.selectList(null);
         Assert.assertNotEquals(queues.size(), 0);
     }
@@ -96,12 +96,12 @@ public class QueueMapperTest extends BaseDaoTest {
     public void testQueryQueuePaging() {
 
         Queue queue = insertOne();
-        Page<Queue> page = new Page(1,3);
+        Page<Queue> page = new Page(1, 3);
 
-        IPage<Queue> queueIPage= queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), null);
+        IPage<Queue> queueIPage = queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), null);
         Assert.assertNotEquals(queueIPage.getTotal(), 0);
 
-        queueIPage= queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), queue.getQueueName());
+        queueIPage = queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), queue.getQueueName());
         Assert.assertNotEquals(queueIPage.getTotal(), 0);
     }
 

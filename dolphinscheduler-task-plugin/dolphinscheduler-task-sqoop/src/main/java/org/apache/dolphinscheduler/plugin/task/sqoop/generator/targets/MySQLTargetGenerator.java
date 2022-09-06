@@ -58,7 +58,7 @@ public class MySQLTargetGenerator implements ITargetGenerator {
 
         try {
             TargetMysqlParameter targetMysqlParameter =
-                JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
+                    JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
 
             if (null != targetMysqlParameter && targetMysqlParameter.getTargetDatasource() != 0) {
 
@@ -77,12 +77,12 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                             .append(SPACE).append(DB_PWD)
                             .append(SPACE).append(DOUBLE_QUOTES)
                             .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
-                        .append(SPACE).append(TABLE)
-                        .append(SPACE).append(targetMysqlParameter.getTargetTable());
+                            .append(SPACE).append(TABLE)
+                            .append(SPACE).append(targetMysqlParameter.getTargetTable());
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getTargetColumns())) {
                         mysqlTargetSb.append(SPACE).append(COLUMNS)
-                            .append(SPACE).append(targetMysqlParameter.getTargetColumns());
+                                .append(SPACE).append(targetMysqlParameter.getTargetColumns());
                     }
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getFieldsTerminated())) {
@@ -91,7 +91,8 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                             mysqlTargetSb.append(SPACE).append(targetMysqlParameter.getFieldsTerminated());
 
                         } else {
-                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES).append(targetMysqlParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
+                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                                    .append(targetMysqlParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
                         }
                     }
 
@@ -100,17 +101,18 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                         if (targetMysqlParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
                             mysqlTargetSb.append(SPACE).append(targetMysqlParameter.getLinesTerminated());
                         } else {
-                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES).append(targetMysqlParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                                    .append(targetMysqlParameter.getLinesTerminated()).append(SINGLE_QUOTES);
                         }
                     }
 
                     if (targetMysqlParameter.getIsUpdate()
-                        && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
-                        && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())) {
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())) {
                         mysqlTargetSb.append(SPACE).append(UPDATE_KEY)
-                            .append(SPACE).append(targetMysqlParameter.getTargetUpdateKey())
-                            .append(SPACE).append(UPDATE_MODE)
-                            .append(SPACE).append(targetMysqlParameter.getTargetUpdateMode());
+                                .append(SPACE).append(targetMysqlParameter.getTargetUpdateKey())
+                                .append(SPACE).append(UPDATE_MODE)
+                                .append(SPACE).append(targetMysqlParameter.getTargetUpdateMode());
                     }
                 }
             }

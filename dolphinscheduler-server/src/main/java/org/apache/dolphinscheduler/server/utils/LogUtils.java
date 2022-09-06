@@ -44,39 +44,40 @@ public class LogUtils {
     /**
      * get task log path
      */
-    public static String getTaskLogPath(Date firstSubmitTime, Long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
+    public static String getTaskLogPath(Date firstSubmitTime, Long processDefineCode, int processDefineVersion,
+                                        int processInstanceId, int taskInstanceId) {
         // format /logs/YYYYMMDD/defintion-code_defintion_version-processInstanceId-taskInstanceId.log
         final String taskLogFileName = new StringBuilder(String.valueOf(processDefineCode))
-            .append(Constants.UNDERLINE)
-            .append(processDefineVersion)
-            .append(Constants.SUBTRACT_CHAR)
-            .append(processInstanceId)
-            .append(Constants.SUBTRACT_CHAR)
-            .append(taskInstanceId)
-            .append(LOG_TAILFIX)
-            .toString();
+                .append(Constants.UNDERLINE)
+                .append(processDefineVersion)
+                .append(Constants.SUBTRACT_CHAR)
+                .append(processInstanceId)
+                .append(Constants.SUBTRACT_CHAR)
+                .append(taskInstanceId)
+                .append(LOG_TAILFIX)
+                .toString();
         // Optional.map will be skipped if null
         return Optional.of(LoggerFactory.getILoggerFactory())
-            .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
-            .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
-            .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
-            .map(TaskLogDiscriminator::getLogBase)
-            .map(e -> Paths.get(e)
-                .toAbsolutePath()
-                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD, null))
-                .resolve(taskLogFileName))
-            .map(Path::toString)
-            .orElse("");
+                .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
+                .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
+                .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
+                .map(TaskLogDiscriminator::getLogBase)
+                .map(e -> Paths.get(e)
+                        .toAbsolutePath()
+                        .resolve(DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null))
+                        .resolve(taskLogFileName))
+                .map(Path::toString)
+                .orElse("");
     }
 
     /**
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(),taskExecutionContext.getProcessDefineCode(),
-            taskExecutionContext.getProcessDefineVersion(),
-            taskExecutionContext.getProcessInstanceId(),
-            taskExecutionContext.getTaskInstanceId());
+        return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId());
     }
 
 }

@@ -29,12 +29,12 @@ import java.util.Date;
  * user
  */
 @TableName("t_ds_user")
-public class  User {
+public class User {
 
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -174,7 +174,6 @@ public class  User {
         this.updateTime = updateTime;
     }
 
-
     public String getPhone() {
         return phone;
     }
@@ -270,7 +269,7 @@ public class  User {
                 ", tenantCode='" + tenantCode + '\'' +
                 ", queueName='" + queueName + '\'' +
                 ", alertGroup='" + alertGroup + '\'' +
-                ", queue='" + queue + '\''  +
+                ", queue='" + queue + '\'' +
                 ", timeZone='" + timeZone + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +

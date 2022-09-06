@@ -118,7 +118,7 @@ public class ExecutorController extends BaseController {
             @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
             @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
             @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int" , example = "8"),
+            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8"),
             @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
             @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataType = "complementDependentMode")
     })
@@ -161,7 +161,8 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, complementDependentMode);
+                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                complementDependentMode);
         return returnDataList(result);
     }
 
@@ -251,7 +252,8 @@ public class ExecutorController extends BaseController {
 
         for (String strProcessDefinitionCode : processDefinitionCodeArray) {
             long processDefinitionCode = Long.parseLong(strProcessDefinitionCode);
-            result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
+            result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime,
+                    execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                     workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
                     complementDependentMode);
@@ -262,7 +264,8 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
+            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR,
+                    String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
         return returnDataList(result);
@@ -289,8 +292,7 @@ public class ExecutorController extends BaseController {
     public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
-                          @RequestParam("executeType") ExecuteType executeType
-    ) {
+                          @RequestParam("executeType") ExecuteType executeType) {
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -306,9 +308,9 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "batchExecute", notes = "BATCH_EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
-        @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "processInstanceIds", value = "PROCESS_INSTANCE_IDS", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
     })
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
@@ -317,8 +319,7 @@ public class ExecutorController extends BaseController {
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
-                               @RequestParam("executeType") ExecuteType executeType
-    ) {
+                               @RequestParam("executeType") ExecuteType executeType) {
         Map<String, Object> result = new HashMap<>();
         List<String> executeFailedIdList = new ArrayList<>();
         if (!StringUtils.isEmpty(processInstanceIds)) {
@@ -327,13 +328,15 @@ public class ExecutorController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> singleResult = execService.execute(loginUser, projectCode, processInstanceId, executeType);
+                    Map<String, Object> singleResult =
+                            execService.execute(loginUser, projectCode, processInstanceId, executeType);
                     if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
                         logger.error((String) singleResult.get(Constants.MSG));
                     }
                 } catch (Exception e) {
-                    executeFailedIdList.add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                    executeFailedIdList
+                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
             }
         }
@@ -369,14 +372,15 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "queryExecutingWorkflow", notes = "QUERY_WORKFLOW_EXECUTE_DATA")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/query-executing-workflow")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
     @AccessLogAnnotation
     public Result<WorkflowInstanceExecuteDetailDto> queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
-        WorkflowInstanceExecuteDetailDto workflowInstanceExecuteDetailDto = execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
+        WorkflowInstanceExecuteDetailDto workflowInstanceExecuteDetailDto =
+                execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
         return Result.success(workflowInstanceExecuteDetailDto);
     }
 }

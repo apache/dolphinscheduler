@@ -23,8 +23,10 @@ import java.time.Duration;
 
 public interface AsyncTaskExecuteFunction {
 
-    @NonNull AsyncTaskExecutionStatus getTaskExecuteStatus();
+    @NonNull
+    AsyncTaskExecutionStatus getTaskExecuteStatus();
 
-    @NonNull Duration getTaskExecuteInterval();
+    @NonNull
+    Duration getTaskExecuteInterval();
 
 }

@@ -53,11 +53,11 @@ public class RadioParam extends PluginParams {
         public Builder(String name, String title) {
             super(name, RADIO, title);
         }
-        
+
         private List<ParamsOptions> options;
 
         private RadioParamProps props;
-        
+
         public Builder setOptions(List<ParamsOptions> options) {
             this.options = options;
             return this;

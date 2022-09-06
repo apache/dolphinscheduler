@@ -70,22 +70,23 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "createEnvironment", notes = "CREATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
-        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataType = "String")
+            @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("name") String name,
-                                @RequestParam("config") String config,
-                                @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "workerGroups", required = false) String workerGroups) {
+                                    @RequestParam("name") String name,
+                                    @RequestParam("config") String config,
+                                    @RequestParam(value = "description", required = false) String description,
+                                    @RequestParam(value = "workerGroups", required = false) String workerGroups) {
 
-        Map<String, Object> result = environmentService.createEnvironment(loginUser, name, config, description, workerGroups);
+        Map<String, Object> result =
+                environmentService.createEnvironment(loginUser, name, config, description, workerGroups);
         return returnDataList(result);
     }
 
@@ -101,11 +102,11 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "updateEnvironment", notes = "UPDATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
-        @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
-        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataType = "String")
+            @ApiImplicitParam(name = "code", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
+            @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -117,7 +118,8 @@ public class EnvironmentController extends BaseController {
                                     @RequestParam("config") String config,
                                     @RequestParam(value = "description", required = false) String description,
                                     @RequestParam(value = "workerGroups", required = false) String workerGroups) {
-        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, code, name, config, description, workerGroups);
+        Map<String, Object> result =
+                environmentService.updateEnvironmentByCode(loginUser, code, name, config, description, workerGroups);
         return returnDataList(result);
     }
 
@@ -129,14 +131,14 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "queryEnvironmentByCode", notes = "QUERY_ENVIRONMENT_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
     })
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryEnvironmentByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam("environmentCode") Long environmentCode) {
+                                         @RequestParam("environmentCode") Long environmentCode) {
 
         Map<String, Object> result = environmentService.queryEnvironmentByCode(environmentCode);
         return returnDataList(result);
@@ -152,19 +154,18 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "queryEnvironmentListPaging", notes = "QUERY_ENVIRONMENT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryEnvironmentListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "searchVal", required = false) String searchVal,
-                                         @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
-    ) {
+                                             @RequestParam(value = "searchVal", required = false) String searchVal,
+                                             @RequestParam("pageSize") Integer pageSize,
+                                             @RequestParam("pageNo") Integer pageNo) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -184,15 +185,14 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "deleteEnvironmentByCode", notes = "DELETE_ENVIRONMENT_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("environmentCode") Long environmentCode
-    ) {
+                                    @RequestParam("environmentCode") Long environmentCode) {
 
         Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, environmentCode);
         return returnDataList(result);
@@ -223,15 +223,14 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "verifyEnvironment", notes = "VERIFY_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/verify-environment")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "environmentName") String environmentName
-    ) {
+                                    @RequestParam(value = "environmentName") String environmentName) {
         Map<String, Object> result = environmentService.verifyEnvironment(environmentName);
         return returnDataList(result);
     }

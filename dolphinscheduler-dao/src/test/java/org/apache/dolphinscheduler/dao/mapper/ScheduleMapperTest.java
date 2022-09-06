@@ -53,7 +53,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
      * @return Schedule
      */
     private Schedule insertOne() {
-        //insertOne
+        // insertOne
         Schedule schedule = new Schedule();
         schedule.setStartTime(new Date());
         schedule.setEndTime(new Date());
@@ -72,10 +72,10 @@ public class ScheduleMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Schedule schedule = insertOne();
         schedule.setCreateTime(new Date());
-        //update
+        // update
         int update = scheduleMapper.updateById(schedule);
         Assert.assertEquals(update, 1);
     }
@@ -96,7 +96,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Schedule schedule = insertOne();
-        //query
+        // query
         List<Schedule> schedules = scheduleMapper.selectList(null);
         Assert.assertNotEquals(schedules.size(), 0);
     }
@@ -133,7 +133,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         schedule.setProcessDefinitionCode(processDefinition.getCode());
         scheduleMapper.insert(schedule);
 
-        Page<Schedule> page = new Page(1,3);
+        Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
                 processDefinition.getCode(), "");
         Assert.assertNotEquals(scheduleIPage.getSize(), 0);
@@ -171,10 +171,9 @@ public class ScheduleMapperTest extends BaseDaoTest {
         schedule.setProcessDefinitionCode(processDefinition.getCode());
         scheduleMapper.insert(schedule);
 
-        Page<Schedule> page = new Page(1,3);
+        Page<Schedule> page = new Page(1, 3);
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
-                project.getName()
-        );
+                project.getName());
 
         Assert.assertNotEquals(schedules.size(), 0);
     }
@@ -190,7 +189,8 @@ public class ScheduleMapperTest extends BaseDaoTest {
         schedule.setReleaseState(ReleaseState.ONLINE);
         scheduleMapper.updateById(schedule);
 
-        List<Schedule> schedules = scheduleMapper.selectAllByProcessDefineArray(new long[] {schedule.getProcessDefinitionCode()});
+        List<Schedule> schedules =
+                scheduleMapper.selectAllByProcessDefineArray(new long[]{schedule.getProcessDefinitionCode()});
         Assert.assertNotEquals(schedules.size(), 0);
     }
 

@@ -38,7 +38,8 @@ public class OracleDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         OracleDataSourceChannel sourceChannel = PowerMockito.mock(OracleDataSourceChannel.class);
         OracleDataSourceClient dataSourceClient = PowerMockito.mock(OracleDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
     }
 }

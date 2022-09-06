@@ -56,7 +56,7 @@ public class JSONUtils {
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
 
     static {
-        logger.info("init timezone: {}",TimeZone.getDefault());
+        logger.info("init timezone: {}", TimeZone.getDefault());
     }
 
     /**
@@ -179,7 +179,8 @@ public class JSONUtils {
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {});
+        return parseObject(json, new TypeReference<Map<String, String>>() {
+        });
     }
 
     /**
@@ -193,7 +194,8 @@ public class JSONUtils {
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
+        return parseObject(json, new TypeReference<Map<K, V>>() {
+        });
     }
 
     /**
@@ -239,7 +241,7 @@ public class JSONUtils {
      * @param <T> object type
      * @return byte array
      */
-    public static <T> byte[] toJsonByteArray(T obj)  {
+    public static <T> byte[] toJsonByteArray(T obj) {
         if (obj == null) {
             return null;
         }

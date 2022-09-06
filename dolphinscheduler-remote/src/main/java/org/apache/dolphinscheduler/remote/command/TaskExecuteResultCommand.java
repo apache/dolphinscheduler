@@ -74,12 +74,10 @@ public class TaskExecuteResultCommand extends BaseCommand {
      */
     private String executePath;
 
-
     /**
      * end time
      */
     private Date endTime;
-
 
     /**
      * processId

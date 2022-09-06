@@ -30,9 +30,11 @@ public class AbstractResourceParametersTest {
     @Test
     public void testDataSource() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        String taskParam = "{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":\"1\",\"sql\":\"select now();\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}";
+        String taskParam =
+                "{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":\"1\",\"sql\":\"select now();\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}";
 
-        ResourceParametersHelper resourceParametersHelper = JSONUtils.parseObject(taskParam, SqlParameters.class).getResources();
+        ResourceParametersHelper resourceParametersHelper =
+                JSONUtils.parseObject(taskParam, SqlParameters.class).getResources();
 
         resourceParametersHelper.getResourceMap().forEach((type, map) -> {
             map.forEach((code, parameters) -> {
@@ -52,5 +54,3 @@ public class AbstractResourceParametersTest {
         Assert.assertNotNull(taskExecutionContext);
     }
 }
-
-

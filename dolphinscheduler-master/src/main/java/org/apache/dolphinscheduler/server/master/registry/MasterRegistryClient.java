@@ -62,7 +62,8 @@ public class MasterRegistryClient implements AutoCloseable {
     public synchronized void start() {
         try {
             registry();
-            registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
+            registryClient.addConnectionStateListener(
+                    new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -164,7 +165,8 @@ public class MasterRegistryClient implements AutoCloseable {
         ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
         masterHeartBeatTask.start();
-        logger.info("Master node : {} registered to registry center: {} successfully", masterAddress, masterRegistryPath);
+        logger.info("Master node : {} registered to registry center: {} successfully", masterAddress,
+                masterRegistryPath);
 
     }
 

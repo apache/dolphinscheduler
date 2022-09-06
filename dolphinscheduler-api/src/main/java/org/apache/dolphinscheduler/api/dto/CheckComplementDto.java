@@ -143,7 +143,8 @@ public class CheckComplementDto {
         if (StringUtils.isEmpty(selectStartDate) || StringUtils.isEmpty(selectEndDate)) {
             return false;
         }
-        return ChronoUnit.DAYS.between(LocalDate.parse(selectStartDate, FORMATTER), LocalDate.parse(selectEndDate, FORMATTER)) + 1 > Constants.SCHEDULE_TIME_MAX_LENGTH;
+        return ChronoUnit.DAYS.between(LocalDate.parse(selectStartDate, FORMATTER),
+                LocalDate.parse(selectEndDate, FORMATTER)) + 1 > Constants.SCHEDULE_TIME_MAX_LENGTH;
     }
 
     public boolean checkFilter() {

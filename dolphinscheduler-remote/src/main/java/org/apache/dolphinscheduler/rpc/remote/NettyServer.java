@@ -85,6 +85,7 @@ public class NettyServer {
         this.serverConfig = serverConfig;
         if (NettyUtils.useEpoll()) {
             this.bossGroup = new EpollEventLoopGroup(1, new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -94,15 +95,18 @@ public class NettyServer {
             });
 
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
+                    return new Thread(r,
+                            String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
                 }
             });
         } else {
             this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -112,11 +116,13 @@ public class NettyServer {
             });
 
             this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
+                    return new Thread(r,
+                            String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
                 }
             });
         }
@@ -151,14 +157,18 @@ public class NettyServer {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
                 logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
-                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
+                throw new RuntimeException(
+                        String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
             }
             if (future.isSuccess()) {
                 logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
             } else if (future.cause() != null) {
-                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()), future.cause());
+                throw new RuntimeException(
+                        String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()),
+                        future.cause());
             } else {
-                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
+                throw new RuntimeException(
+                        String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
             }
         }
     }
@@ -172,7 +182,8 @@ public class NettyServer {
         ch.pipeline()
                 .addLast(new NettyDecoder(RpcRequest.class))
                 .addLast(new NettyEncoder())
-                .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
+                .addLast("server-idle-handle",
+                        new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
                 .addLast("handler", new NettyServerHandler());
     }
 

@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
  * abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractTaskExecutor {
+
     /**
      * process task
      */

@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class ExcelUtils {
+
     private static final int XLSX_WINDOW_ROW = 10000;
     private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
@@ -74,32 +75,33 @@ public final class ExcelUtils {
         for (Map.Entry<String, Object> en : headerMap.entrySet()) {
             headerList.add(en.getKey());
         }
-        try (SXSSFWorkbook wb = new SXSSFWorkbook(XLSX_WINDOW_ROW);
-             FileOutputStream fos = new FileOutputStream(String.format("%s/%s.xlsx", xlsFilePath, title))) {
+        try (
+                SXSSFWorkbook wb = new SXSSFWorkbook(XLSX_WINDOW_ROW);
+                FileOutputStream fos = new FileOutputStream(String.format("%s/%s.xlsx", xlsFilePath, title))) {
             // declare a workbook
             // generate a table
             Sheet sheet = wb.createSheet();
             Row row = sheet.createRow(0);
-            //set the height of the first line
+            // set the height of the first line
             row.setHeight((short) 500);
 
-            //set Horizontal right
+            // set Horizontal right
             CellStyle cellStyle = wb.createCellStyle();
             cellStyle.setAlignment(HorizontalAlignment.RIGHT);
 
-            //setting excel headers
+            // setting excel headers
             for (int i = 0; i < headerList.size(); i++) {
                 Cell cell = row.createCell(i);
                 cell.setCellStyle(cellStyle);
                 cell.setCellValue(headerList.get(i));
             }
 
-            //setting excel body
+            // setting excel body
             int rowIndex = 1;
             for (LinkedHashMap<String, Object> itemsMap : itemsList) {
                 Object[] values = itemsMap.values().toArray();
                 row = sheet.createRow(rowIndex);
-                //setting excel body height
+                // setting excel body height
                 row.setHeight((short) 500);
                 rowIndex++;
                 for (int j = 0; j < values.length; j++) {
@@ -117,7 +119,7 @@ public final class ExcelUtils {
                 sheet.setColumnWidth(i, headerList.get(i).length() * 800);
             }
 
-            //setting file output
+            // setting file output
             wb.write(fos);
             wb.dispose();
         } catch (Exception e) {

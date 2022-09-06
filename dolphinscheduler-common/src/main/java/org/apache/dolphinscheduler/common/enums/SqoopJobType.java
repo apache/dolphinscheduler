@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-public enum  SqoopJobType {
+public enum SqoopJobType {
+
     CUSTOM(0, "CUSTOM"),
     TEMPLATE(1, "TEMPLATE");
 

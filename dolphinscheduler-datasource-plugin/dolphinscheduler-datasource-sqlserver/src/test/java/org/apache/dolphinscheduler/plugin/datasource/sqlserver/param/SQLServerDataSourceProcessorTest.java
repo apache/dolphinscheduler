@@ -38,7 +38,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class,
+        DataSourceClientProvider.class, PasswordUtils.class})
 public class SQLServerDataSourceProcessorTest {
 
     private SQLServerDataSourceProcessor sqlServerDatasourceProcessor = new SQLServerDataSourceProcessor();
@@ -65,9 +66,11 @@ public class SQLServerDataSourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
-        SQLServerConnectionParam sqlServerConnectionParam = JSONUtils.parseObject(connectionJson, SQLServerConnectionParam.class);
+        String connectionJson =
+                "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\""
+                        + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
+        SQLServerConnectionParam sqlServerConnectionParam =
+                JSONUtils.parseObject(connectionJson, SQLServerConnectionParam.class);
         Assert.assertNotNull(sqlServerConnectionParam);
         Assert.assertEquals("root", sqlServerConnectionParam.getUser());
     }

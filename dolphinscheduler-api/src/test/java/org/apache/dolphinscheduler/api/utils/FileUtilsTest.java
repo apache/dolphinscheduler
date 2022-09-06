@@ -62,23 +62,23 @@ public class FileUtilsTest {
     @Test
     public void testCopyFile() throws IOException {
 
-        //Define dest file path
+        // Define dest file path
         String src = rootPath + System.getProperty("file.separator") + "src.txt";
         String destFilename = rootPath + System.getProperty("file.separator") + "data.txt";
-        logger.info("destFilename: "+destFilename);
+        logger.info("destFilename: " + destFilename);
 
-        //Define InputStream for MultipartFile
+        // Define InputStream for MultipartFile
         String data = "data text";
         org.apache.commons.io.FileUtils.writeStringToFile(new File(src), data);
 
-        //Use Mockito to mock MultipartFile
+        // Use Mockito to mock MultipartFile
         MultipartFile file = Mockito.mock(MultipartFile.class, Mockito.RETURNS_DEEP_STUBS);
         Mockito.when(file.getInputStream()).thenReturn(new FileInputStream(src));
 
-        //Invoke copyFile
-        FileUtils.copyInputStreamToFile(file,destFilename);
+        // Invoke copyFile
+        FileUtils.copyInputStreamToFile(file, destFilename);
 
-        //Test file exists
+        // Test file exists
         File destFile = new File(destFilename);
         assertTrue(destFile.exists());
 
@@ -87,19 +87,19 @@ public class FileUtilsTest {
     @Test
     public void testFile2Resource() throws IOException {
 
-        //Define dest file path
+        // Define dest file path
         String destFilename = rootPath + System.getProperty("file.separator") + "data.txt";
-        logger.info("destFilename: "+destFilename);
+        logger.info("destFilename: " + destFilename);
 
-        //Define test resource
+        // Define test resource
         File file = folder.newFile("resource.txt");
 
-        //Invoke file2Resource and test not null
+        // Invoke file2Resource and test not null
         Resource resource = FileUtils.file2Resource(file.getAbsolutePath());
         assertNotNull(resource);
 
-        //Invoke file2Resource and test null
-        Resource resource1 = FileUtils.file2Resource(file.getAbsolutePath()+"abc");
+        // Invoke file2Resource and test null
+        Resource resource1 = FileUtils.file2Resource(file.getAbsolutePath() + "abc");
         assertNull(resource1);
 
     }
@@ -107,7 +107,7 @@ public class FileUtilsTest {
     @Test
     public void testFile2String() throws IOException {
         String content = "123";
-        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/task.json"),content);
+        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/task.json"), content);
 
         File file = new File("/tmp/task.json");
         FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");

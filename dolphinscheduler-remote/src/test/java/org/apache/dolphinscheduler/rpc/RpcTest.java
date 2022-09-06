@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RpcTest {
+
     private NettyServer nettyServer;
 
     private IUserService userService;

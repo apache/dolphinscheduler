@@ -59,7 +59,7 @@ public class UiPluginController extends BaseController {
 
     @ApiOperation(value = "queryUiPluginsByType", notes = "QUERY_UI_PLUGINS_BY_TYPE")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "pluginType", value = "pluginType", required = true, dataType = "PluginType"),
+            @ApiImplicitParam(name = "pluginType", value = "pluginType", required = true, dataType = "PluginType"),
     })
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.CREATED)
@@ -74,7 +74,7 @@ public class UiPluginController extends BaseController {
 
     @ApiOperation(value = "queryUiPluginDetailById", notes = "QUERY_UI_PLUGIN_DETAIL_BY_ID")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "PLUGIN_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "id", value = "PLUGIN_ID", required = true, dataType = "Int", example = "100"),
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)

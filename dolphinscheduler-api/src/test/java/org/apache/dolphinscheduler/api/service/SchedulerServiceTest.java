@@ -109,19 +109,19 @@ public class SchedulerServiceTest {
 
         Mockito.when(processDefinitionMapper.queryByCode(1)).thenReturn(processDefinition);
 
-        //hash no auth
+        // hash no auth
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
 
-        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result,null)).thenReturn(true);
-        //schedule not exists
+        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result, null)).thenReturn(true);
+        // schedule not exists
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 2, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));
 
-        //SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
+        // SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
 
-        //PROCESS_DEFINE_NOT_EXIST
+        // PROCESS_DEFINE_NOT_EXIST
         schedule.setProcessDefinitionCode(2);
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
@@ -136,10 +136,10 @@ public class SchedulerServiceTest {
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
 
-        //set master
+        // set master
         Mockito.when(monitorService.getServerListFromRegistry(NodeType.MASTER)).thenReturn(masterServers);
 
-        //SUCCESS
+        // SUCCESS
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
     }

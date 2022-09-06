@@ -55,7 +55,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private EnvironmentWorkerGroupRelation insertOne() {
-        //insertOne
+        // insertOne
         EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
         relation.setEnvironmentCode(1L);
         relation.setWorkerGroup("default");
@@ -72,7 +72,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         insertOne();
-        //query
+        // query
         List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
         Assert.assertEquals(relations.size(), 1);
     }
@@ -80,14 +80,16 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByEnvironmentCode() {
         EnvironmentWorkerGroupRelation relation = insertOne();
-        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations = environmentWorkerGroupRelationMapper.queryByEnvironmentCode(1L);
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
+                environmentWorkerGroupRelationMapper.queryByEnvironmentCode(1L);
         Assert.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
     }
 
     @Test
     public void testQueryByWorkerGroupName() {
         EnvironmentWorkerGroupRelation relation = insertOne();
-        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations = environmentWorkerGroupRelationMapper.queryByWorkerGroupName("default");
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
+                environmentWorkerGroupRelationMapper.queryByWorkerGroupName("default");
         Assert.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
     }
 

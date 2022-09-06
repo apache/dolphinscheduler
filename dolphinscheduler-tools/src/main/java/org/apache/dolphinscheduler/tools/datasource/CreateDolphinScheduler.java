@@ -26,12 +26,14 @@ import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 public class CreateDolphinScheduler {
+
     public static void main(String[] args) {
         SpringApplication.run(CreateDolphinScheduler.class, args);
     }
 
     @Component
     static class CreateRunner implements CommandLineRunner {
+
         private static final Logger logger = LoggerFactory.getLogger(CreateRunner.class);
 
         private final DolphinSchedulerManager dolphinSchedulerManager;

@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,6 +60,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DqExecuteResultServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(DqExecuteResultServiceTest.class);
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
@@ -84,17 +84,20 @@ public class DqExecuteResultServiceTest {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, null, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, null,
+                loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0,
+                baseServiceLogger)).thenReturn(true);
         Page<DqExecuteResult> page = new Page<>(1, 10);
         page.setTotal(1);
         page.setRecords(getExecuteResultList());
         when(dqExecuteResultMapper.queryResultListPaging(
-                any(IPage.class), eq(""), eq(loginUser.getId()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
+                any(IPage.class), eq(""), eq(loginUser.getId()), any(), eq(ruleType), eq(start), eq(end)))
+                        .thenReturn(page);
 
         Result result = dqExecuteResultService.queryResultListPaging(
-                loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
-        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()),result.getCode());
+                loginUser, searchVal, 1, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
     }
 
     public List<DqExecuteResult> getExecuteResultList() {

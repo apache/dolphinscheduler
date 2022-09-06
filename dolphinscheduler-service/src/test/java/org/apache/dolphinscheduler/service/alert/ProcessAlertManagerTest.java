@@ -70,7 +70,6 @@ public class ProcessAlertManagerTest {
         processAlertManager.sendAlertWorkerToleranceFault(processInstance, taskInstanceList);
     }
 
-
     /**
      * send worker alert fault tolerance
      */
@@ -110,6 +109,6 @@ public class ProcessAlertManagerTest {
 
         ProjectUser projectUser = new ProjectUser();
 
-        processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+        processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
     }
 }

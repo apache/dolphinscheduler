@@ -33,8 +33,10 @@ public class ResponseFutureTest {
 
     @Test
     public void testScanFutureTable() {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
+        ScheduledExecutorService executorService =
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
         executorService.scheduleAtFixedRate(new Runnable() {
+
             @Override
             public void run() {
                 ResponseFuture.scanFutureTable();
@@ -43,6 +45,7 @@ public class ResponseFutureTest {
 
         CountDownLatch latch = new CountDownLatch(1);
         InvokeCallback invokeCallback = new InvokeCallback() {
+
             @Override
             public void operationComplete(ResponseFuture responseFuture) {
                 latch.countDown();

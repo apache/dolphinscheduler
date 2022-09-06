@@ -56,11 +56,13 @@ public class SubTaskProcessor extends BaseTaskProcessor {
      */
     private final Lock runLock = new ReentrantLock();
 
-    private StateEventCallbackService stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
+    private StateEventCallbackService stateEventCallbackService =
+            SpringApplicationContext.getBean(StateEventCallbackService.class);
 
     @Override
     public boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
@@ -135,20 +137,23 @@ public class SubTaskProcessor extends BaseTaskProcessor {
             String subProcessInstanceVarPool = subProcessInstance.getVarPool();
             if (StringUtils.isNotEmpty(subProcessInstanceVarPool)) {
                 List<Property> varPoolProperties = JSONUtils.toList(thisTaskInstanceVarPool, Property.class);
-                Map<String, Object> taskParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                });
+                Map<String, Object> taskParams =
+                        JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                        });
                 Object localParams = taskParams.get(LOCAL_PARAMS);
                 if (localParams != null) {
                     List<Property> properties = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
-                    Map<String, String> subProcessParam = JSONUtils.toList(subProcessInstanceVarPool, Property.class).stream()
-                            .collect(Collectors.toMap(Property::getProp, Property::getValue));
-                    List<Property> outProperties = properties.stream().filter(r -> Direct.OUT == r.getDirect()).collect(Collectors.toList());
+                    Map<String, String> subProcessParam =
+                            JSONUtils.toList(subProcessInstanceVarPool, Property.class).stream()
+                                    .collect(Collectors.toMap(Property::getProp, Property::getValue));
+                    List<Property> outProperties =
+                            properties.stream().filter(r -> Direct.OUT == r.getDirect()).collect(Collectors.toList());
                     for (Property info : outProperties) {
                         info.setValue(subProcessParam.get(info.getProp()));
                         varPoolProperties.add(info);
                     }
                     taskInstance.setVarPool(JSONUtils.toJsonString(varPoolProperties));
-                    //deal with localParam for show in the page
+                    // deal with localParam for show in the page
                     processService.changeOutParam(taskInstance);
                 }
             }
@@ -162,7 +167,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     private boolean pauseSubWorkFlow() {
-        ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+        ProcessInstance subProcessInstance =
+                processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
@@ -197,7 +203,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean killTask() {
-        ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+        ProcessInstance subProcessInstance =
+                processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
@@ -209,8 +216,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     private void sendToSubProcess() {
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(), subProcessInstance.getId(), 0
-        );
+                processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(),
+                subProcessInstance.getId(), 0);
         Host host = new Host(subProcessInstance.getHost());
         this.stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
     }

@@ -28,15 +28,14 @@ import org.slf4j.Marker;
 
 import java.util.Map;
 
-
 public class WorkerLogFilterTest {
 
     @Test
     public void decide() {
         WorkerLogFilter workerLogFilter = new WorkerLogFilter();
 
-
         FilterReply filterReply = workerLogFilter.decide(new ILoggingEvent() {
+
             @Override
             public String getThreadName() {
                 return Constants.THREAD_NAME_WORKER_SERVER;

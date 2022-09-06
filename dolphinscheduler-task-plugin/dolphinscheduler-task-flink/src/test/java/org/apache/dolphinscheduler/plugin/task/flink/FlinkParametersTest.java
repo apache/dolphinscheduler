@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class FlinkParametersTest {
+
     @Test
     public void getResourceFilesList() {
         FlinkParameters flinkParameters = new FlinkParameters();

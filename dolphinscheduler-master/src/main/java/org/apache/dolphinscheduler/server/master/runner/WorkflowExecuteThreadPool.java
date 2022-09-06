@@ -91,9 +91,11 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * submit state event
      */
     public void submitStateEvent(StateEvent stateEvent) {
-        WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+        WorkflowExecuteRunnable workflowExecuteThread =
+                processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}", stateEvent);
+            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
+                    stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
@@ -115,6 +117,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
         ListenableFuture<?> future = this.submitListenable(workflowExecuteThread::handleEvents);
         future.addCallback(new ListenableFutureCallback() {
+
             @Override
             public void onFailure(Throwable ex) {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
@@ -129,11 +132,13 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onSuccess(Object result) {
                 // if an exception occurs, first, the error message cannot be printed in the log;
-                // secondly, the `multiThreadFilterMap` cannot remove the `workflowExecuteThread`, resulting in the state of process instance cannot be changed and memory leak
+                // secondly, the `multiThreadFilterMap` cannot remove the `workflowExecuteThread`, resulting in the
+                // state of process instance cannot be changed and memory leak
                 try {
                     LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish()) {
-                        stateWheelExecuteThread.removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
+                        stateWheelExecuteThread
+                                .removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                         logger.info("Workflow instance is finished.");
@@ -188,15 +193,17 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * notify process's master
      */
-    private void notifyProcess(ProcessInstance finishProcessInstance, ProcessInstance processInstance, TaskInstance taskInstance) {
+    private void notifyProcess(ProcessInstance finishProcessInstance, ProcessInstance processInstance,
+                               TaskInstance taskInstance) {
         String processInstanceHost = processInstance.getHost();
         if (Strings.isNullOrEmpty(processInstanceHost)) {
-            logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(), taskInstance.getId());
+            logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(),
+                    taskInstance.getId());
             return;
         }
         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(), taskInstance.getId()
-        );
+                finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(),
+                taskInstance.getId());
         Host host = new Host(processInstanceHost);
         stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
     }

@@ -58,7 +58,8 @@ public class TaskExecuteThreadPool {
     }
 
     public void submit(@NonNull final WorkerTaskExecuteRunnable workerTaskExecuteRunnable) {
-        taskExecuteThreadMap.put(workerTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId(), workerTaskExecuteRunnable);
+        taskExecuteThreadMap.put(workerTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId(),
+                workerTaskExecuteRunnable);
         ListenableFuture future = this.listeningExecutorService.submit(workerTaskExecuteRunnable);
         FutureCallback futureCallback = new FutureCallback() {
 

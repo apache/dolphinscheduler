@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class PasswordAuthenticator extends AbstractAuthenticator {
+
     @Autowired
     private UsersService userService;
 

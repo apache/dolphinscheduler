@@ -52,7 +52,6 @@ public interface EnvironmentService {
      */
     Map<String, Object> queryEnvironmentByCode(Long code);
 
-
     /**
      * delete environment
      *
@@ -71,7 +70,8 @@ public interface EnvironmentService {
      * @param desc environment desc
      * @param workerGroups worker groups
      */
-    Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups);
+    Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc,
+                                                String workerGroups);
 
     /**
      * query environment paging
@@ -100,4 +100,3 @@ public interface EnvironmentService {
     Map<String, Object> verifyEnvironment(String environmentName);
 
 }
-

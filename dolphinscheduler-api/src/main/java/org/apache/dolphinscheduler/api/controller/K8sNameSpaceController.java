@@ -89,8 +89,7 @@ public class K8sNameSpaceController extends BaseController {
     public Result queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
-    ) {
+                                         @RequestParam("pageNo") Integer pageNo) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -100,7 +99,6 @@ public class K8sNameSpaceController extends BaseController {
         result = k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
         return result;
     }
-
 
     /**
      * create namespace,if not exist on k8s,will create,if exist only register in db
@@ -127,9 +125,9 @@ public class K8sNameSpaceController extends BaseController {
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "k8s") String k8s,
                                   @RequestParam(value = "limitsCpu", required = false) Double limitsCpu,
-                                  @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory
-    ) {
-        Map<String, Object> result =  k8sNamespaceService.createK8sNamespace(loginUser, namespace, k8s, limitsCpu, limitsMemory);
+                                  @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory) {
+        Map<String, Object> result =
+                k8sNamespaceService.createK8sNamespace(loginUser, namespace, k8s, limitsCpu, limitsMemory);
         return returnDataList(result);
     }
 
@@ -158,7 +156,8 @@ public class K8sNameSpaceController extends BaseController {
                                   @RequestParam(value = "tag", required = false) String tag,
                                   @RequestParam(value = "limitsCpu", required = false) Double limitsCpu,
                                   @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory) {
-        Map<String, Object> result = k8sNamespaceService.updateK8sNamespace(loginUser, id, userName, limitsCpu, limitsMemory);
+        Map<String, Object> result =
+                k8sNamespaceService.updateK8sNamespace(loginUser, id, userName, limitsCpu, limitsMemory);
         return returnDataList(result);
     }
 
@@ -181,12 +180,10 @@ public class K8sNameSpaceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyNamespace(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
-                                  @RequestParam(value = "k8s") String k8s
-    ) {
+                                  @RequestParam(value = "k8s") String k8s) {
 
         return k8sNamespaceService.verifyNamespaceK8s(namespace, k8s);
     }
-
 
     /**
      * delete namespace by id

@@ -70,7 +70,7 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      * @param searchVal searchVal
      * @return tenant IPage
      */
-    IPage<Tenant> queryTenantPaging(IPage<Tenant> page,@Param("ids") List<Integer> ids,
+    IPage<Tenant> queryTenantPaging(IPage<Tenant> page, @Param("ids") List<Integer> ids,
                                     @Param("searchVal") String searchVal);
 
     /**
@@ -88,7 +88,8 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      * @param searchVal
      * @return
      */
-    IPage<Tenant> queryTenantPagingByIds(Page<Tenant> page, @Param("ids")List<Integer> ids, @Param("searchVal")String searchVal);
+    IPage<Tenant> queryTenantPagingByIds(Page<Tenant> page, @Param("ids") List<Integer> ids,
+                                         @Param("searchVal") String searchVal);
 
     /**
      * queryAll

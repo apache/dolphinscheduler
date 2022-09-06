@@ -86,7 +86,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
         Status resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
-            putMsg(result,resultEnum);
+            putMsg(result, resultEnum);
             return result;
         }
 

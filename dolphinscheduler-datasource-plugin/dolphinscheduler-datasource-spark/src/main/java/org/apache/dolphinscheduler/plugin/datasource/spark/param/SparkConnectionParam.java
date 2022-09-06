@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSConnectionParam;
 
 public class SparkConnectionParam extends BaseHDFSConnectionParam {
+
     @Override
     public String toString() {
         return "SparkConnectionParam{"

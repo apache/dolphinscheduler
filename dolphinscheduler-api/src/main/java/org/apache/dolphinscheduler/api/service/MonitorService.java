@@ -29,8 +29,8 @@ import java.util.Map;
  */
 public interface MonitorService {
 
-    Map<String,Object> queryDatabaseState();
-    
+    Map<String, Object> queryDatabaseState();
+
     Map<String, Object> queryMaster();
 
     Map<String, Object> queryWorker();

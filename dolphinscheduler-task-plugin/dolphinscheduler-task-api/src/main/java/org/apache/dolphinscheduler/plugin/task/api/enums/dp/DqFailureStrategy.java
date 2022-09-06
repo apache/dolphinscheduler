@@ -24,6 +24,7 @@ import java.util.Map;
  * failure policy when dqs task node failed.
  */
 public enum DqFailureStrategy {
+
     /**
      * 0-alert and continue when dqc tasks failed.
      * 1-alert and block when dqc tasks failed.
@@ -51,7 +52,7 @@ public enum DqFailureStrategy {
 
     static {
         for (DqFailureStrategy type : DqFailureStrategy.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

@@ -29,6 +29,7 @@ import java.util.Date;
  */
 @TableName("t_ds_task_group")
 public class TaskGroup implements Serializable {
+
     /**
      * key
      */
@@ -69,7 +70,7 @@ public class TaskGroup implements Serializable {
      */
     private long projectCode;
 
-    public TaskGroup(String name,long projectCode, String description, int groupSize, int userId,int status) {
+    public TaskGroup(String name, long projectCode, String description, int groupSize, int userId, int status) {
         this.name = name;
         this.projectCode = projectCode;
         this.description = description;

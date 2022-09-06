@@ -67,7 +67,6 @@ public class ServerNodeManager implements InitializingBean {
     private final ReentrantReadWriteLock.ReadLock workerGroupReadLock = workerGroupLock.readLock();
     private final ReentrantReadWriteLock.WriteLock workerGroupWriteLock = workerGroupLock.writeLock();
 
-
     private final ReentrantReadWriteLock workerNodeInfoLock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock workerNodeInfoReadLock = workerNodeInfoLock.readLock();
     private final ReentrantReadWriteLock.WriteLock workerNodeInfoWriteLock = workerNodeInfoLock.writeLock();
@@ -117,7 +116,6 @@ public class ServerNodeManager implements InitializingBean {
         return MASTER_SIZE;
     }
 
-
     /**
      * init listener
      *
@@ -132,7 +130,8 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init executor service
          */
-        executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
+        executorService =
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
         executorService.scheduleWithFixedDelay(new WorkerNodeInfoAndGroupDbSyncTask(), 0, 10, TimeUnit.SECONDS);
         /*
          * init MasterNodeListener listener
@@ -192,8 +191,8 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
-
-    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, WorkerHeartBeat> newWorkerNodeInfo, WorkerGroupDto wg) {
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, WorkerHeartBeat> newWorkerNodeInfo,
+                                                        WorkerGroupDto wg) {
         Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {
@@ -250,6 +249,7 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     class MasterDataListener implements SubscribeListener {
+
         @Override
         public void notify(Event event) {
             final String path = event.path();
@@ -308,7 +308,8 @@ public class ServerNodeManager implements InitializingBean {
             } else {
                 logger.warn("current addr:{} is not in active master list", masterConfig.getMasterAddress());
             }
-            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, masterConfig.getMasterAddress());
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT,
+                    masterConfig.getMasterAddress());
         } finally {
             masterLock.unlock();
         }

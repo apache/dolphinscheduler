@@ -127,7 +127,7 @@ public class DataQualityControllerTest {
         String start = "2020-01-01 00:00:00";
         String end = "2020-01-02 00:00:00";
 
-        PageInfo<DqRule> pageInfo = new PageInfo<>(1,10);
+        PageInfo<DqRule> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotal(10);
         pageInfo.setTotalList(getRuleList());
 
@@ -136,9 +136,9 @@ public class DataQualityControllerTest {
         putMsg(result, Status.SUCCESS);
 
         when(dqRuleService.queryRuleListPaging(
-                user, searchVal, ruleType, start, end,1, 10)).thenReturn(result);
+                user, searchVal, ruleType, start, end, 1, 10)).thenReturn(result);
 
-        Result response = dataQualityController.queryRuleListPaging(user, searchVal, ruleType,start,end,1,10);
+        Result response = dataQualityController.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -163,7 +163,7 @@ public class DataQualityControllerTest {
         String start = "2020-01-01 00:00:00";
         String end = "2020-01-02 00:00:00";
 
-        PageInfo<DqRule> pageInfo = new PageInfo<>(1,10);
+        PageInfo<DqRule> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotal(10);
 
         Result result = new Result();
@@ -171,9 +171,10 @@ public class DataQualityControllerTest {
         putMsg(result, Status.SUCCESS);
 
         when(dqExecuteResultService.queryResultListPaging(
-                user, searchVal, 0,ruleType, start, end,1, 10)).thenReturn(result);
+                user, searchVal, 0, ruleType, start, end, 1, 10)).thenReturn(result);
 
-        Result response = dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType,0,start,end,1,10);
+        Result response =
+                dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType, 0, start, end, 1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 }

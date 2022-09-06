@@ -45,7 +45,6 @@ public class PropertyPlaceholderHelper {
         wellKnownSimplePrefixes.put(")", "(");
     }
 
-
     private final String placeholderPrefix;
 
     private final String placeholderSuffix;
@@ -55,7 +54,6 @@ public class PropertyPlaceholderHelper {
     private final String valueSeparator;
 
     private final boolean ignoreUnresolvablePlaceholders;
-
 
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
@@ -84,7 +82,6 @@ public class PropertyPlaceholderHelper {
         this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
     }
 
-
     /**
      * Replaces all placeholders of format {@code ${name}} with the value returned
      * from the supplied {@link PlaceholderResolver}.
@@ -99,7 +96,8 @@ public class PropertyPlaceholderHelper {
     }
 
     protected String parseStringValue(
-        String value, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
+                                      String value, PlaceholderResolver placeholderResolver,
+                                      Set<String> visitedPlaceholders) {
 
         StringBuilder result = new StringBuilder(value);
 
@@ -111,7 +109,7 @@ public class PropertyPlaceholderHelper {
                 String originalPlaceholder = placeholder;
                 if (!visitedPlaceholders.add(originalPlaceholder)) {
                     throw new IllegalArgumentException(
-                        "Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
+                            "Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
                 }
                 // Recursive invocation, parsing placeholders contained in the placeholder key.
                 placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
@@ -142,7 +140,7 @@ public class PropertyPlaceholderHelper {
                     startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
                 } else {
                     throw new IllegalArgumentException("Could not resolve placeholder '" +
-                        placeholder + "'" + " in value \"" + value + "\"");
+                            placeholder + "'" + " in value \"" + value + "\"");
                 }
                 visitedPlaceholders.remove(originalPlaceholder);
             } else {
@@ -173,7 +171,6 @@ public class PropertyPlaceholderHelper {
         }
         return -1;
     }
-
 
     /**
      * Strategy interface used to resolve replacement values for placeholders contained in Strings.
@@ -208,4 +205,3 @@ public class PropertyPlaceholderHelper {
         return true;
     }
 }
-

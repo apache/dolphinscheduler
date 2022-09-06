@@ -26,16 +26,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * rule input entry value type
  */
 public enum ValueType {
+
     /**
      * 0-string
      * 1-list
      * 2-number
      * 3-sql
      */
-    STRING(0,"string"),
-    LIST(1,"list"),
-    NUMBER(2,"number"),
-    LIKE_SQL(3,"sql");
+    STRING(0, "string"),
+    LIST(1, "list"),
+    NUMBER(2, "number"),
+    LIKE_SQL(3, "sql");
 
     ValueType(int code, String description) {
         this.code = code;
@@ -58,7 +59,7 @@ public enum ValueType {
 
     static {
         for (ValueType type : ValueType.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

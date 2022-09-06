@@ -67,7 +67,7 @@ public class DataQualityController extends BaseController {
      */
     @ApiOperation(value = "getRuleFormCreateJson", notes = "GET_RULE_FORM_CREATE_JSON_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "ruleId", value = "RULE_ID", dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "ruleId", value = "RULE_ID", dataType = "Int", example = "1")
     })
     @GetMapping(value = "/getRuleFormCreateJson")
     @ResponseStatus(HttpStatus.OK)
@@ -88,12 +88,12 @@ public class DataQualityController extends BaseController {
      */
     @ApiOperation(value = "queryRuleListPaging", notes = "QUERY_RULE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "ruleType", value = "RULE_TYPE", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+            @ApiImplicitParam(name = "ruleType", value = "RULE_TYPE", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10")
     })
     @GetMapping(value = "/rule/page")
     @ResponseStatus(HttpStatus.OK)
@@ -142,25 +142,25 @@ public class DataQualityController extends BaseController {
      */
     @ApiOperation(value = "queryExecuteResultListPaging", notes = "QUERY_EXECUTE_RESULT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "ruleType", value = "RULE_TYPE", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+            @ApiImplicitParam(name = "ruleType", value = "RULE_TYPE", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10")
     })
     @GetMapping(value = "/result/page")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR)
     public Result queryExecuteResultListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "searchVal", required = false) String searchVal,
-                                       @RequestParam(value = "ruleType", required = false) Integer ruleType,
-                                       @RequestParam(value = "state", required = false) Integer state,
-                                       @RequestParam(value = "startDate", required = false) String startTime,
-                                       @RequestParam(value = "endDate", required = false) String endTime,
-                                       @RequestParam("pageNo") Integer pageNo,
-                                       @RequestParam("pageSize") Integer pageSize) {
+                                               @RequestParam(value = "searchVal", required = false) String searchVal,
+                                               @RequestParam(value = "ruleType", required = false) Integer ruleType,
+                                               @RequestParam(value = "state", required = false) Integer state,
+                                               @RequestParam(value = "startDate", required = false) String startTime,
+                                               @RequestParam(value = "endDate", required = false) String endTime,
+                                               @RequestParam("pageNo") Integer pageNo,
+                                               @RequestParam("pageSize") Integer pageSize) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -168,7 +168,8 @@ public class DataQualityController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
 
-        return dqExecuteResultService.queryResultListPaging(loginUser, searchVal, state, ruleType, startTime, endTime, pageNo, pageSize);
+        return dqExecuteResultService.queryResultListPaging(loginUser, searchVal, state, ruleType, startTime, endTime,
+                pageNo, pageSize);
     }
 
     /**
@@ -178,7 +179,7 @@ public class DataQualityController extends BaseController {
      */
     @ApiOperation(value = "getDatasourceOptionsById", notes = "GET_DATASOURCE_OPTIONS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", dataType = "Int", example = "1")
     })
     @GetMapping(value = "/getDatasourceOptionsById")
     @ResponseStatus(HttpStatus.OK)

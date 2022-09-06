@@ -33,7 +33,8 @@ public enum ThreadPoolManager {
     private static final long KEEP_ALIVE_TIME = 60;
 
     ThreadPoolManager() {
-        executorService = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+        executorService = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2,
+                Runtime.getRuntime().availableProcessors() * 4, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(WORK_QUEUE_SIZE),
                 new DiscardPolicy());
     }

@@ -27,18 +27,19 @@ public class PrioritySPIFactoryTest {
 
     @Test
     public void loadHighPriority() {
-        PrioritySPIFactory<LoadHighPriorityConflictTestSPI> factory = new PrioritySPIFactory<>(LoadHighPriorityConflictTestSPI.class);
+        PrioritySPIFactory<LoadHighPriorityConflictTestSPI> factory =
+                new PrioritySPIFactory<>(LoadHighPriorityConflictTestSPI.class);
         Map<String, LoadHighPriorityConflictTestSPI> spiMap = factory.getSPIMap();
         Assert.assertEquals(1, spiMap.get("A").getIdentify().getPriority());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void throwExceptionWhenPriorityIsSame() {
-        PrioritySPIFactory<ThrowExceptionConflictTestSPI> factory = new PrioritySPIFactory<>(ThrowExceptionConflictTestSPI.class);
+        PrioritySPIFactory<ThrowExceptionConflictTestSPI> factory =
+                new PrioritySPIFactory<>(ThrowExceptionConflictTestSPI.class);
         Map<String, ThrowExceptionConflictTestSPI> spiMap = factory.getSPIMap();
         Assert.assertEquals(0, spiMap.get("B").getIdentify().getPriority());
     }
-
 
     public interface LoadHighPriorityConflictTestSPI extends PrioritySPI {
 
@@ -83,6 +84,5 @@ public class PrioritySPIFactoryTest {
             return SPIIdentify.create("B", 0);
         }
     }
-
 
 }

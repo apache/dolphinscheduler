@@ -123,8 +123,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     private boolean setSwitchResult() {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId()
-        );
+                taskInstance.getProcessInstanceId());
         Map<String, ExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());

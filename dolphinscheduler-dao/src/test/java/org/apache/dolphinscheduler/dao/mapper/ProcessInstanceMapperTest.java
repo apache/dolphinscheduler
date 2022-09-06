@@ -67,7 +67,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
      * @return ProcessInstance
      */
     private ProcessInstance insertOne() {
-        //insertOne
+        // insertOne
         ProcessInstance processInstance = new ProcessInstance();
         Date start = new Date(2019 - 1900, 1 - 1, 1, 0, 10, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 1, 1, 0, 0);
@@ -85,9 +85,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         ProcessInstance processInstanceMap = insertOne();
-        //update
+        // update
         int update = processInstanceMapper.updateById(processInstanceMap);
         Assert.assertEquals(1, update);
         processInstanceMapper.deleteById(processInstanceMap.getId());
@@ -109,7 +109,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         ProcessInstance processInstance = insertOne();
-        //query
+        // query
         List<ProcessInstance> dataSources = processInstanceMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
         processInstanceMapper.deleteById(processInstance.getId());
@@ -185,8 +185,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 stateArray,
                 processInstance.getHost(),
                 null,
-                null
-        );
+                null);
         Assert.assertNotEquals(processInstanceIPage.getTotal(), 0);
 
         processDefinitionMapper.deleteById(processDefinition.getId());
@@ -262,7 +261,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
 
         Long[] projectCodes = new Long[]{processDefinition.getProjectCode()};
 
-        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByProjectCodes(null, null, projectCodes);
+        List<ExecuteStatusCount> executeStatusCounts =
+                processInstanceMapper.countInstanceStateByProjectCodes(null, null, projectCodes);
 
         Assert.assertNotEquals(executeStatusCounts.size(), 0);
 
@@ -279,10 +279,12 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         ProcessInstance processInstance = insertOne();
         ProcessInstance processInstance1 = insertOne();
 
-        List<ProcessInstance> processInstances = processInstanceMapper.queryByProcessDefineCode(processInstance.getProcessDefinitionCode(), 1);
+        List<ProcessInstance> processInstances =
+                processInstanceMapper.queryByProcessDefineCode(processInstance.getProcessDefinitionCode(), 1);
         Assert.assertEquals(1, processInstances.size());
 
-        processInstances = processInstanceMapper.queryByProcessDefineCode(processInstance.getProcessDefinitionCode(), 2);
+        processInstances =
+                processInstanceMapper.queryByProcessDefineCode(processInstance.getProcessDefinitionCode(), 2);
         Assert.assertEquals(2, processInstances.size());
 
         processInstanceMapper.deleteById(processInstance.getId());
@@ -298,7 +300,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstance.setScheduleTime(new Date());
         processInstanceMapper.updateById(processInstance);
 
-        ProcessInstance processInstance1 = processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null);
+        ProcessInstance processInstance1 =
+                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null);
         Assert.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
     }
@@ -316,7 +319,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
 
-        ProcessInstance processInstance1 = processInstanceMapper.queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null, stateArray);
+        ProcessInstance processInstance1 = processInstanceMapper
+                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null, stateArray);
 
         Assert.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
@@ -332,13 +336,13 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
 
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
-        ProcessInstance processInstance1 = processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end
-        );
+        ProcessInstance processInstance1 =
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end);
         Assert.assertEquals(processInstance1.getId(), processInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
-        processInstance1 = processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end
-        );
+        processInstance1 =
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end);
         Assert.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());
@@ -351,7 +355,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     private boolean isSortedByDuration(List<ProcessInstance> processInstances) {
         for (int i = 1; i < processInstances.size(); i++) {
             long d1 = processInstances.get(i).getEndTime().getTime() - processInstances.get(i).getStartTime().getTime();
-            long d2 = processInstances.get(i - 1).getEndTime().getTime() - processInstances.get(i - 1).getStartTime().getTime();
+            long d2 = processInstances.get(i - 1).getEndTime().getTime()
+                    - processInstances.get(i - 1).getStartTime().getTime();
             if (d1 > d2) {
                 return false;
             }
@@ -375,7 +380,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         ProcessInstance processInstance3 = insertOne(startTime3, endTime3);
         Date start = new Date(2020, 1, 1, 1, 1, 1);
         Date end = new Date(2021, 1, 1, 1, 1, 1);
-        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end, ExecutionStatus.SUCCESS,0L);
+        List<ProcessInstance> processInstances =
+                processInstanceMapper.queryTopNProcessInstance(2, start, end, ExecutionStatus.SUCCESS, 0L);
         Assert.assertEquals(2, processInstances.size());
         Assert.assertTrue(isSortedByDuration(processInstances));
         for (ProcessInstance processInstance : processInstances) {

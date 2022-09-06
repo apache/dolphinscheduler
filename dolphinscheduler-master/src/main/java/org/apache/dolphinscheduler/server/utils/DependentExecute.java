@@ -59,7 +59,6 @@ public class DependentExecute {
      */
     protected DependentRelation relation;
 
-
     /**
      * depend result
      */
@@ -109,7 +108,7 @@ public class DependentExecute {
      * @return dateIntervals
      */
     public DependResult calculateResultForTasks(DependentItem dependentItem,
-                                                 List<DateInterval> dateIntervals) {
+                                                List<DateInterval> dateIntervals) {
 
         DependResult result = DependResult.FAILED;
         for (DateInterval dateInterval : dateIntervals) {
@@ -215,7 +214,8 @@ public class DependentExecute {
         }
 
         if (lastManualProcess.getEndTime() == null && lastSchedulerProcess.getEndTime() == null) {
-            return lastManualProcess.getStartTime().after(lastSchedulerProcess.getStartTime()) ? lastManualProcess : lastSchedulerProcess;
+            return lastManualProcess.getStartTime().after(lastSchedulerProcess.getStartTime()) ? lastManualProcess
+                    : lastSchedulerProcess;
         }
 
         if (lastSchedulerProcess.getEndTime() == null) {

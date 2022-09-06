@@ -145,22 +145,21 @@ public class Command {
     }
 
     public Command(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            long processDefinitionCode,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            String workerGroup,
-            Long environmentCode,
-            Priority processInstancePriority,
-            int dryRun,
-            int processInstanceId,
-            int processDefinitionVersion
-    ) {
+                   CommandType commandType,
+                   TaskDependType taskDependType,
+                   FailureStrategy failureStrategy,
+                   int executorId,
+                   long processDefinitionCode,
+                   String commandParam,
+                   WarningType warningType,
+                   int warningGroupId,
+                   Date scheduleTime,
+                   String workerGroup,
+                   Long environmentCode,
+                   Priority processInstancePriority,
+                   int dryRun,
+                   int processInstanceId,
+                   int processDefinitionVersion) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -348,7 +347,8 @@ public class Command {
             return false;
         }
 
-        if (environmentCode != null ? environmentCode.equals(command.environmentCode) : command.environmentCode == null) {
+        if (environmentCode != null ? environmentCode.equals(command.environmentCode)
+                : command.environmentCode == null) {
             return false;
         }
 
@@ -436,4 +436,3 @@ public class Command {
     }
 
 }
-

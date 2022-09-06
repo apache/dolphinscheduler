@@ -47,6 +47,7 @@ import static java.lang.String.format;
 // todo: make this class to be utils
 @Component
 public class TaskPluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(TaskPluginManager.class);
 
     private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();

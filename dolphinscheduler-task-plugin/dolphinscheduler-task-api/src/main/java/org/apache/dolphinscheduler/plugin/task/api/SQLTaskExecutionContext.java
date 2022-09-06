@@ -27,7 +27,6 @@ import java.util.List;
  */
 public class SQLTaskExecutionContext implements Serializable {
 
-
     /**
      * warningGroupId
      */

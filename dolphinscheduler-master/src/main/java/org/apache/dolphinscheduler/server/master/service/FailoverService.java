@@ -30,6 +30,7 @@ import lombok.NonNull;
  */
 @Component
 public class FailoverService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FailoverService.class);
 
     private final MasterFailoverService masterFailoverService;

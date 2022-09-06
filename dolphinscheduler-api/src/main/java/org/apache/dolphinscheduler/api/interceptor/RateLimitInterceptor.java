@@ -52,13 +52,15 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             .maximumSize(100)
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .build(new CacheLoader<String, RateLimiter>() {
+
                 @Override
                 public RateLimiter load(String token) {
                     // use tenant customize rate limit
                     Map<String, Integer> customizeTenantQpsRate = trafficConfiguration.getCustomizeTenantQpsRate();
                     int tenantQuota = trafficConfiguration.getDefaultTenantQpsRate();
                     if (MapUtils.isNotEmpty(customizeTenantQpsRate)) {
-                        tenantQuota = customizeTenantQpsRate.getOrDefault(token, trafficConfiguration.getDefaultTenantQpsRate());
+                        tenantQuota = customizeTenantQpsRate.getOrDefault(token,
+                                trafficConfiguration.getDefaultTenantQpsRate());
                     }
                     // use tenant default rate limit
                     return RateLimiter.create(tenantQuota, 1, TimeUnit.SECONDS);
@@ -66,7 +68,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             });
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ExecutionException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+                             Object handler) throws ExecutionException {
         // tenant-level rate limit
         if (trafficConfiguration.isTrafficTenantControlSwitch()) {
             String token = request.getHeader("token");
@@ -74,7 +77,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 RateLimiter tenantRateLimiter = tenantRateLimiterCache.get(token);
                 if (!tenantRateLimiter.tryAcquire()) {
                     response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                    logger.warn("Too many request, reach tenant rate limit, current tenant:{} qps is {}", token, tenantRateLimiter.getRate());
+                    logger.warn("Too many request, reach tenant rate limit, current tenant:{} qps is {}", token,
+                            tenantRateLimiter.getRate());
                     return false;
                 }
             }
@@ -83,7 +87,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (trafficConfiguration.isTrafficGlobalControlSwitch()) {
             if (!globalRateLimiter.tryAcquire()) {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                logger.warn("Too many request, reach global rate limit, current qps is {}", globalRateLimiter.getRate());
+                logger.warn("Too many request, reach global rate limit, current qps is {}",
+                        globalRateLimiter.getRate());
                 return false;
             }
         }
@@ -93,7 +98,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     public RateLimitInterceptor(TrafficConfiguration trafficConfiguration) {
         this.trafficConfiguration = trafficConfiguration;
         if (trafficConfiguration.isTrafficGlobalControlSwitch()) {
-            this.globalRateLimiter = RateLimiter.create(trafficConfiguration.getMaxGlobalQpsRate(), 1, TimeUnit.SECONDS);
+            this.globalRateLimiter =
+                    RateLimiter.create(trafficConfiguration.getMaxGlobalQpsRate(), 1, TimeUnit.SECONDS);
         }
     }
 

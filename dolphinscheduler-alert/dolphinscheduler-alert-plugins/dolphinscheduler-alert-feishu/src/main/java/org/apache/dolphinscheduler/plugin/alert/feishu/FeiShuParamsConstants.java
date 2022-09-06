@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
 public final class FeiShuParamsConstants {
+
     public static final String FEI_SHU_PROXY_ENABLE = "$t('isEnableProxy')";
     static final String WEB_HOOK = "$t('webhook')";
     static final String NAME_WEB_HOOK = "WebHook";

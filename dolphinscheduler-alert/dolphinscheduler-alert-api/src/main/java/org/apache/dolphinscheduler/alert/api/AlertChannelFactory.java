@@ -29,6 +29,7 @@ import java.util.List;
  * alert channel factory
  */
 public interface AlertChannelFactory extends PrioritySPI {
+
     /**
      * Returns the name of the alert channel
      *

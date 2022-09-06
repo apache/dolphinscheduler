@@ -42,7 +42,7 @@ public @interface Rpc {
 
     boolean callBack() default false;
 
-    //todo It is better to set the timeout period for synchronous calls
+    // todo It is better to set the timeout period for synchronous calls
 
     /**
      * When it is asynchronous transmission, callback must be set
@@ -50,8 +50,5 @@ public @interface Rpc {
     Class<? extends AbstractRpcCallBack> serviceCallback() default AbstractRpcCallBack.class;
 
     Class<? extends AbstractRpcCallBack> ackCallback() default AbstractRpcCallBack.class;
-
-
-
 
 }

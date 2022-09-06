@@ -216,27 +216,27 @@ public class StringUtils {
                 out.write("\\u00" + hex(ch));
             } else if (ch < 32) {
                 switch (ch) {
-                    case '\b' :
+                    case '\b':
                         out.write('\\');
                         out.write('b');
                         break;
-                    case '\n' :
+                    case '\n':
                         out.write('\\');
                         out.write('n');
                         break;
-                    case '\t' :
+                    case '\t':
                         out.write('\\');
                         out.write('t');
                         break;
-                    case '\f' :
+                    case '\f':
                         out.write('\\');
                         out.write('f');
                         break;
-                    case '\r' :
+                    case '\r':
                         out.write('\\');
                         out.write('r');
                         break;
-                    default :
+                    default:
                         if (ch > 0xf) {
                             out.write("\\u00" + hex(ch));
                         } else {
@@ -246,27 +246,27 @@ public class StringUtils {
                 }
             } else {
                 switch (ch) {
-                    case '\'' :
+                    case '\'':
                         if (escapeSingleQuote) {
                             out.write('\\');
                         }
                         out.write('\'');
                         break;
-                    case '"' :
+                    case '"':
                         out.write('\\');
                         out.write('"');
                         break;
-                    case '\\' :
+                    case '\\':
                         out.write('\\');
                         out.write('\\');
                         break;
-                    case '/' :
+                    case '/':
                         if (escapeForwardSlash) {
                             out.write('\\');
                         }
                         out.write('/');
                         break;
-                    default :
+                    default:
                         out.write(ch);
                         break;
                 }
@@ -282,10 +282,11 @@ public class StringUtils {
         mainParameter = mainParameter
                 .replace(Constants.DOUBLE_BRACKETS_LEFT, Constants.DOUBLE_BRACKETS_LEFT_SPACE)
                 .replace(Constants.DOUBLE_BRACKETS_RIGHT, Constants.DOUBLE_BRACKETS_RIGHT_SPACE);
-        if (mainParameter.contains(Constants.DOUBLE_BRACKETS_LEFT) || mainParameter.contains(Constants.DOUBLE_BRACKETS_RIGHT)) {
+        if (mainParameter.contains(Constants.DOUBLE_BRACKETS_LEFT)
+                || mainParameter.contains(Constants.DOUBLE_BRACKETS_RIGHT)) {
             return replaceDoubleBrackets(mainParameter);
         } else {
-            return  mainParameter;
+            return mainParameter;
         }
     }
 }

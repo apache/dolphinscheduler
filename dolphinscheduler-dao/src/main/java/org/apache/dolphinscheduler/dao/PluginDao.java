@@ -54,21 +54,27 @@ public class PluginDao {
         requireNonNull(pluginDefine.getPluginName(), "pluginName is null");
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
-        PluginDefine currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+        PluginDefine currPluginDefine =
+                pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (currPluginDefine == null) {
             try {
                 if (pluginDefineMapper.insert(pluginDefine) == 1) {
                     return pluginDefine.getId();
                 } else {
-                    throw new TaskPluginException(String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s", pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                    throw new TaskPluginException(
+                            String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
+                                    pluginDefine.getPluginName(), pluginDefine.getPluginType()));
                 }
             } catch (TaskPluginException ex) {
                 throw ex;
             } catch (Exception ex) {
                 logger.info("Insert plugin definition error, there may already exist a plugin");
-                currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+                currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(),
+                        pluginDefine.getPluginType());
                 if (currPluginDefine == null) {
-                    throw new TaskPluginException(String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s", pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                    throw new TaskPluginException(
+                            String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
+                                    pluginDefine.getPluginName(), pluginDefine.getPluginType()));
                 }
             }
         }

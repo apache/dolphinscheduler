@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.plugin.task.api.loop;
  * The return result of {@link LoopTaskQueryStatusMethodDefinition#queryTaskInstanceStatus(LoopTaskInstanceInfo)}.
  */
 public interface LoopTaskInstanceStatus {
+
     /**
      * Judge if the task instance is finished.
      *

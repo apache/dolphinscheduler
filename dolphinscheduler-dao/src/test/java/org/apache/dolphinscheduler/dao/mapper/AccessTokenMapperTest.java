@@ -84,7 +84,6 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Assert.assertEquals(insertCount, deleteCount);
     }
 
-
     /**
      * test select by id
      *
@@ -150,7 +149,6 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         }
     }
 
-
     /**
      * test update
      */
@@ -158,7 +156,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
     public void testUpdate() throws Exception {
         Integer userId = 1;
         AccessToken accessToken = createAccessToken(userId);
-        //update
+        // update
         accessToken.setToken("56789");
         accessToken.setExpireTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
@@ -197,7 +195,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
      * @throws Exception
      */
     private Map<Integer, AccessToken> createAccessTokens(
-            Integer count, String userName) throws Exception {
+                                                         Integer count, String userName) throws Exception {
 
         User user = createUser(userName);
 
@@ -246,7 +244,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
      * @return accessToken
      */
     private AccessToken createAccessToken(Integer userId, String userName) {
-        //insertOne
+        // insertOne
         AccessToken accessToken = new AccessToken();
         accessToken.setUserName(userName);
         accessToken.setUserId(userId);

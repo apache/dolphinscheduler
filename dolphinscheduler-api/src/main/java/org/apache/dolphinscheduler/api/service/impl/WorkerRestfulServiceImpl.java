@@ -37,7 +37,9 @@ public class WorkerRestfulServiceImpl implements WorkerRestfulService {
         try {
             String response = OkHttpUtils.get(getUrl(workerAddress, LISTING_EXECUTING_TASK_EXECUTION_CONTEXT));
             if (StringUtils.isEmpty(response)) {
-                log.error("Query TaskExecutionContext by worker address error, the response is empty, url: {}, workerAddress: {}", url, workerAddress);
+                log.error(
+                        "Query TaskExecutionContext by worker address error, the response is empty, url: {}, workerAddress: {}",
+                        url, workerAddress);
                 throw new ServiceException(LISTING_EXECUTING_TASK_EXECUTION_CONTEXT_BY_WORKER_ERROR);
             }
             return JSONUtils.parseObject(response, new TypeReference<List<TaskExecutionContext>>() {
@@ -45,7 +47,8 @@ public class WorkerRestfulServiceImpl implements WorkerRestfulService {
         } catch (ServiceException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error("Query TaskExecutionContext by worker address error, url: {}, workerAddress: {}", url, workerAddress, ex);
+            log.error("Query TaskExecutionContext by worker address error, url: {}, workerAddress: {}", url,
+                    workerAddress, ex);
             throw new ServiceException(LISTING_EXECUTING_TASK_EXECUTION_CONTEXT_BY_WORKER_ERROR);
         }
     }
@@ -59,7 +62,9 @@ public class WorkerRestfulServiceImpl implements WorkerRestfulService {
         try {
             String response = OkHttpUtils.get(url);
             if (StringUtils.isEmpty(response)) {
-                log.error("Query TaskExecutionContext by worker address error the response data from worker is empty, url: {}, workerAddress: {}", url, workerAddress);
+                log.error(
+                        "Query TaskExecutionContext by worker address error the response data from worker is empty, url: {}, workerAddress: {}",
+                        url, workerAddress);
                 throw new ServiceException(LISTING_WAITING_TASK_INSTANCE_BY_WORKER_ERROR);
             }
             return JSONUtils.parseObject(response, new TypeReference<List<WorkerTaskInstanceWaitingDto>>() {
@@ -67,7 +72,9 @@ public class WorkerRestfulServiceImpl implements WorkerRestfulService {
         } catch (ServiceException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error("Query TaskExecutionContext by worker address error, get an unknown exception, url: {}, workerAddress: {}", url, workerAddress, ex);
+            log.error(
+                    "Query TaskExecutionContext by worker address error, get an unknown exception, url: {}, workerAddress: {}",
+                    url, workerAddress, ex);
             throw new ServiceException(LISTING_WAITING_TASK_INSTANCE_BY_WORKER_ERROR);
         }
     }

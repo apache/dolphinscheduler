@@ -53,7 +53,7 @@ public class WorkerRpcClient implements AutoCloseable {
         this.nettyRemotingClient = new NettyRemotingClient(nettyClientConfig);
         // we only use the client to handle the ack message, we can optimize this, send ack to the nettyServer.
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK,
-                                                   taskExecuteRunningAckProcessor);
+                taskExecuteRunningAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
         logger.info("Worker rpc client started");
     }

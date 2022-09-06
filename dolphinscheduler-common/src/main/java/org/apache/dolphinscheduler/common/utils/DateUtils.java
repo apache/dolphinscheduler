@@ -45,7 +45,8 @@ public final class DateUtils {
     static final long C6 = C5 * 24L;
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
-    private static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS = DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS);
+    private static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS =
+            DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
@@ -119,7 +120,8 @@ public final class DateUtils {
     }
 
     public static String format(Date date, DateTimeFormatter dateTimeFormatter, String timezone) {
-        LocalDateTime localDateTime = StringUtils.isEmpty(timezone) ? date2LocalDateTime(date) : date2LocalDateTime(date, ZoneId.of(timezone));
+        LocalDateTime localDateTime = StringUtils.isEmpty(timezone) ? date2LocalDateTime(date)
+                : date2LocalDateTime(date, ZoneId.of(timezone));
         return format(localDateTime, dateTimeFormatter);
     }
 
@@ -554,8 +556,10 @@ public final class DateUtils {
             return date;
         }
         String dateToString = dateToString(date, sourceTimezoneId);
-        LocalDateTime localDateTime = LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
+        LocalDateTime localDateTime =
+                LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
+        ZonedDateTime zonedDateTime =
+                ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
         return Date.from(zonedDateTime.toInstant());
     }
 
@@ -573,6 +577,7 @@ public final class DateUtils {
      * Time unit representing one thousandth of a second
      */
     public static class MILLISECONDS {
+
         public static long toDays(long d) {
             return d / (C6 / C2);
         }

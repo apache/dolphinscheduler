@@ -96,25 +96,26 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      */
     @Override
     public Result queryTaskListPaging(User loginUser,
-                                                   long projectCode,
-                                                   Integer processInstanceId,
-                                                   String processInstanceName,
-                                                   String taskName,
-                                                   String executorName,
-                                                   String startDate,
-                                                   String endDate,
-                                                   String searchVal,
-                                                   ExecutionStatus stateType,
-                                                   String host,
-                                                   Integer pageNo,
-                                                   Integer pageSize) {
+                                      long projectCode,
+                                      Integer processInstanceId,
+                                      String processInstanceName,
+                                      String taskName,
+                                      String executorName,
+                                      String startDate,
+                                      String endDate,
+                                      String searchVal,
+                                      ExecutionStatus stateType,
+                                      String host,
+                                      Integer pageNo,
+                                      Integer pageSize) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE);
+        // check user access for project
+        Map<String, Object> checkResult =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            putMsg(result,status);
+            putMsg(result, status);
             return result;
         }
         int[] statusArray = null;
@@ -124,7 +125,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
         status = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            putMsg(result,status);
+            putMsg(result, status);
             return result;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
@@ -133,13 +134,14 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-            page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
-        );
+                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId,
+                statusArray, host, start, end);
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
-        List<Integer> executorIds = taskInstanceList.stream().map(TaskInstance::getExecutorId).distinct().collect(Collectors.toList());
+        List<Integer> executorIds =
+                taskInstanceList.stream().map(TaskInstance::getExecutorId).distinct().collect(Collectors.toList());
         List<User> users = usersService.queryUser(executorIds);
         Map<Integer, User> userMap = users.stream().collect(Collectors.toMap(User::getId, v -> v));
         for (TaskInstance taskInstance : taskInstanceList) {
@@ -167,8 +169,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Override
     public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

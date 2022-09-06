@@ -76,8 +76,8 @@ public class TaskResponseServiceTest {
         taskEventService.start();
 
         TaskExecuteRunningCommand taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
-                                                                                            "127.0.0.1:1234",
-                                                                                            System.currentTimeMillis());
+                "127.0.0.1:1234",
+                System.currentTimeMillis());
         taskExecuteRunningMessage.setProcessId(1);
         taskExecuteRunningMessage.setTaskInstanceId(22);
         taskExecuteRunningMessage.setStatus(ExecutionStatus.RUNNING_EXECUTION.getCode());
@@ -87,12 +87,12 @@ public class TaskResponseServiceTest {
         taskExecuteRunningMessage.setStartTime(new Date());
 
         ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
-                                             channel,
-                                             taskExecuteRunningMessage.getMessageSenderAddress());
+                channel,
+                taskExecuteRunningMessage.getMessageSenderAddress());
 
         TaskExecuteResultCommand taskExecuteResultMessage = new TaskExecuteResultCommand(NetUtils.getAddr(1234),
-                                                                                         NetUtils.getAddr(5678),
-                                                                                         System.currentTimeMillis());
+                NetUtils.getAddr(5678),
+                System.currentTimeMillis());
         taskExecuteResultMessage.setProcessInstanceId(1);
         taskExecuteResultMessage.setTaskInstanceId(22);
         taskExecuteResultMessage.setStatus(ExecutionStatus.SUCCESS.getCode());
@@ -101,8 +101,8 @@ public class TaskResponseServiceTest {
         taskExecuteResultMessage.setAppIds("ids");
         taskExecuteResultMessage.setProcessId(1);
         resultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
-                                               channel,
-                                               taskExecuteResultMessage.getMessageSenderAddress());
+                channel,
+                taskExecuteResultMessage.getMessageSenderAddress());
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);

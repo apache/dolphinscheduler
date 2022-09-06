@@ -75,5 +75,6 @@ public interface EnvironmentMapper extends BaseMapper<Environment> {
      * @param searchVal
      * @return
      */
-    IPage<Environment> queryEnvironmentListPagingByIds(Page<Environment> page, @Param("ids")List<Integer> ids, @Param("searchName")String searchVal);
+    IPage<Environment> queryEnvironmentListPagingByIds(Page<Environment> page, @Param("ids") List<Integer> ids,
+                                                       @Param("searchName") String searchVal);
 }

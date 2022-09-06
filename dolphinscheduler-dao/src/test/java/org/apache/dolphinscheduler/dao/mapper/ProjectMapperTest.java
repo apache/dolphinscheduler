@@ -44,7 +44,7 @@ public class ProjectMapperTest extends BaseDaoTest {
      * @return Project
      */
     private Project insertOne() {
-        //insertOne
+        // insertOne
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(111);
@@ -60,10 +60,10 @@ public class ProjectMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Project project = insertOne();
         project.setCreateTime(new Date());
-        //update
+        // update
         int update = projectMapper.updateById(project);
         Assert.assertEquals(update, 1);
     }
@@ -84,7 +84,7 @@ public class ProjectMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Project project = insertOne();
-        //query
+        // query
         List<Project> projects = projectMapper.selectList(null);
         Assert.assertNotEquals(projects.size(), 0);
     }
@@ -142,13 +142,11 @@ public class ProjectMapperTest extends BaseDaoTest {
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(
                 page,
                 null,
-                null
-        );
+                null);
         IPage<Project> projectIPage1 = projectMapper.queryProjectListPaging(
                 page,
                 null,
-                project.getName()
-        );
+                project.getName());
         Assert.assertEquals(projectIPage.getTotal(), 1);
         Assert.assertEquals(projectIPage1.getTotal(), 1);
     }
@@ -186,8 +184,7 @@ public class ProjectMapperTest extends BaseDaoTest {
         Project project = insertOne();
 
         List<Project> projects = projectMapper.queryProjectExceptUserId(
-                100000
-        );
+                100000);
 
         Assert.assertNotEquals(projects.size(), 0);
     }
@@ -196,10 +193,10 @@ public class ProjectMapperTest extends BaseDaoTest {
      * test query project permission
      */
     @Test
-    public void testListAuthorizedProjects(){
+    public void testListAuthorizedProjects() {
         Project project = insertOne();
-        List<Project> projects  = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
-        Assert.assertEquals(projects.size(),0);
+        List<Project> projects = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
+        Assert.assertEquals(projects.size(), 0);
     }
 
 }

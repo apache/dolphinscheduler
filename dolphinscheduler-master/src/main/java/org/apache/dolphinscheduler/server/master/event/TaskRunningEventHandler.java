@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TaskRunningEventHandler implements TaskEventHandler {
+
     private final Logger logger = LoggerFactory.getLogger(TaskRunningEventHandler.class);
 
     @Autowired
@@ -55,23 +56,23 @@ public class TaskRunningEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable =
-            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle task running event error, cannot find related workflow instance from cache, will discard this event");
+                    "Handle task running event error, cannot find related workflow instance from cache, will discard this event");
         }
         Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
         if (!taskInstanceOptional.isPresent()) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle running event error, cannot find the taskInstance from cache, will discord this event");
+                    "Handle running event error, cannot find the taskInstance from cache, will discord this event");
         }
         TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState().typeIsFinished()) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle task running event error, this task instance is already finished, this event is delay, will discard this event");
+                    "Handle task running event error, this task instance is already finished, this event is delay, will discard this event");
         }
 
         TaskInstance oldTaskInstance = new TaskInstance();
@@ -107,7 +108,7 @@ public class TaskRunningEventHandler implements TaskEventHandler {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-            new TaskExecuteRunningAckMessage(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
+                new TaskExecuteRunningAckMessage(ExecutionStatus.SUCCESS.getCode(), taskEvent.getTaskInstanceId());
         taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
     }
 

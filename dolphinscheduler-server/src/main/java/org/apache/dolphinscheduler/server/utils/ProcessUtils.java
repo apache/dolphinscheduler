@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
  * mainly used to get the start command line of a process.
  */
 public class ProcessUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     /**
@@ -94,12 +95,15 @@ public class ProcessUtils {
     static String getKerberosInitCommand() {
         logger.info("get kerberos init command");
         StringBuilder kerberosCommandBuilder = new StringBuilder();
-        boolean hadoopKerberosState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+        boolean hadoopKerberosState =
+                PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
         if (hadoopKerberosState) {
             kerberosCommandBuilder.append("export KRB5_CONFIG=")
                     .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
                     .append("\n\n")
-                    .append(String.format("kinit -k -t %s %s || true", PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
+                    .append(String.format("kinit -k -t %s %s || true",
+                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
+                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
                     .append("\n\n");
             logger.info("kerberos init command: {}", kerberosCommandBuilder);
         }
@@ -115,7 +119,8 @@ public class ProcessUtils {
      * @param commandFile command file
      * @param cmd cmd
      */
-    private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile, String cmd) {
+    private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile,
+                                            String cmd) {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("#!/bin/sh\n");
@@ -130,7 +135,8 @@ public class ProcessUtils {
             File f = new File(commandFile);
 
             if (!f.exists()) {
-                org.apache.commons.io.FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+                org.apache.commons.io.FileUtils.writeStringToFile(new File(commandFile), sb.toString(),
+                        StandardCharsets.UTF_8);
             }
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
@@ -192,17 +198,20 @@ public class ProcessUtils {
             List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
-                    taskExecutionContext.setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-                            taskExecutionContext.getProcessDefineCode(),
-                            taskExecutionContext.getProcessDefineVersion(),
-                            taskExecutionContext.getProcessInstanceId(),
-                            taskExecutionContext.getTaskInstanceId()));
+                    taskExecutionContext
+                            .setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                                    taskExecutionContext.getProcessDefineCode(),
+                                    taskExecutionContext.getProcessDefineVersion(),
+                                    taskExecutionContext.getProcessInstanceId(),
+                                    taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                        taskExecutionContext.getExecutePath());
                 return appIds;
             } else {
-                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId());
+                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
+                        taskExecutionContext.getTaskInstanceId());
             }
         } catch (Exception e) {
             logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);

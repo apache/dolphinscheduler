@@ -42,7 +42,8 @@ public class ExecutorDispatcher implements InitializingBean {
     @Autowired
     private HostManager hostManager;
 
-    private final ConcurrentHashMap<ExecutorType, ExecutorManager<Boolean>> executorManagers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<ExecutorType, ExecutorManager<Boolean>> executorManagers =
+            new ConcurrentHashMap<>();
 
     /**
      * task dispatch
@@ -67,8 +68,8 @@ public class ExecutorDispatcher implements InitializingBean {
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
             throw new ExecuteException(String.format("fail to execute : %s due to no suitable worker, "
-                            + "current task needs worker group %s to execute",
-                    context.getCommand(),context.getWorkerGroup()));
+                    + "current task needs worker group %s to execute",
+                    context.getCommand(), context.getWorkerGroup()));
         }
         context.setHost(host);
         executorManager.beforeExecute(context);

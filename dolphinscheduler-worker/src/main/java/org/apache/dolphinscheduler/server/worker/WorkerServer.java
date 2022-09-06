@@ -85,7 +85,7 @@ public class WorkerServer implements IStoppable {
     private WorkerRegistryClient workerRegistryClient;
 
     // todo: Can we just load the task spi, and don't install into mysql?
-    //  we don't need to rely the dao module in worker.
+    // we don't need to rely the dao module in worker.
     @Autowired
     private TaskPluginManager taskPluginManager;
 

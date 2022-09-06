@@ -75,8 +75,8 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "create", notes = "CREATE_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -100,10 +100,10 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "update", notes = "UPDATE_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456"),
-        @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String"),
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", dataType = "String"),
+            @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456"),
+            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", dataType = "String"),
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -127,7 +127,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryProjectByCode", notes = "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+            @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -150,9 +150,9 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -161,8 +161,7 @@ public class ProjectController extends BaseController {
     public Result queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
-    ) {
+                                         @RequestParam("pageNo") Integer pageNo) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -182,7 +181,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "delete", notes = "DELETE_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+            @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -203,7 +202,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
@@ -224,7 +223,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedProject", notes = "QUERY_AUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
@@ -245,14 +244,14 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedUser", notes = "QUERY_AUTHORIZED_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
     })
     @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_USER)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAuthorizedUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam("projectCode") Long projectCode) {
+                                      @RequestParam("projectCode") Long projectCode) {
         Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, projectCode);
         return this.returnDataList(result);
     }

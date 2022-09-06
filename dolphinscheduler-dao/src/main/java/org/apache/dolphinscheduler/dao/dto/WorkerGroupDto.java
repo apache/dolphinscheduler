@@ -43,7 +43,8 @@ public class WorkerGroupDto {
                 .createTime(workerGroup.getCreateTime())
                 .updateTime(workerGroup.getUpdateTime())
                 .description(workerGroup.getDescription())
-                .workerGroupExtraParam(JSONUtils.parseObject(workerGroup.getWorkerGroupExtraParam(), WorkerGroupExtraParam.class))
+                .workerGroupExtraParam(
+                        JSONUtils.parseObject(workerGroup.getWorkerGroupExtraParam(), WorkerGroupExtraParam.class))
                 .build();
     }
 
@@ -63,6 +64,7 @@ public class WorkerGroupDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WorkerGroupExtraParam {
+
         private String filterList;
         private Map<String, String> extraParams;
     }

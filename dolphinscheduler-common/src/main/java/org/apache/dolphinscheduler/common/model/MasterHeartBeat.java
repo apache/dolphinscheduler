@@ -30,6 +30,7 @@ public class MasterHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MasterConfigProperty {
+
         private String databaseUrl;
         private int fetchCommandNum;
         private int preExecThreads;
@@ -54,6 +55,7 @@ public class MasterHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MasterMetricsProperty {
+
         private int slot;
         private int totalMasterCount;
         private int workflowEventQueueWaitingEventNum;

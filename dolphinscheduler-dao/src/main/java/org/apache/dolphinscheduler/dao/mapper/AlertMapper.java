@@ -34,6 +34,7 @@ public interface AlertMapper extends BaseMapper<Alert> {
      * Insert server crash alert
      * <p>This method will ensure that there is at most one unsent alert which has the same content in the database.
      */
-    void insertAlertWhenServerCrash(@Param("alert") Alert alert, @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
+    void insertAlertWhenServerCrash(@Param("alert") Alert alert,
+                                    @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
 
 }

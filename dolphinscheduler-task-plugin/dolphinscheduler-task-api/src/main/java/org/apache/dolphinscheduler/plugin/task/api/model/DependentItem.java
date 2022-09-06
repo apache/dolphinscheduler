@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 @Data
 public class DependentItem {
+
     private long projectCode;
     private long definitionCode;
     private long depTaskCode;

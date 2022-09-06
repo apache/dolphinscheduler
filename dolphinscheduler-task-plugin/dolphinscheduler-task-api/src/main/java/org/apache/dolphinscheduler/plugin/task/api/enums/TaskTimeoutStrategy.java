@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * task timeout strategy
  */
 public enum TaskTimeoutStrategy {
+
     /**
      * 0 warn
      * 1 failed

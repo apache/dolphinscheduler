@@ -42,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * data analysis controller test
  */
 public class DataAnalysisControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
     @Autowired
@@ -62,9 +63,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         int projectId = createProject();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-12-01 00:00:00");
-        paramsMap.add("endDate","2019-12-28 00:00:00");
-        paramsMap.add("projectCode","16");
+        paramsMap.add("startDate", "2019-12-01 00:00:00");
+        paramsMap.add("endDate", "2019-12-28 00:00:00");
+        paramsMap.add("projectCode", "16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/task-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -83,9 +84,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         int projectId = createProject();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-12-01 00:00:00");
-        paramsMap.add("endDate","2019-12-28 00:00:00");
-        paramsMap.add("projectCode","16");
+        paramsMap.add("startDate", "2019-12-01 00:00:00");
+        paramsMap.add("endDate", "2019-12-28 00:00:00");
+        paramsMap.add("projectCode", "16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
                 .header("sessionId", sessionId)
@@ -104,7 +105,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     public void testCountDefinitionByUser() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId","16");
+        paramsMap.add("projectId", "16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/define-user-count")
                 .header("sessionId", sessionId)

@@ -48,16 +48,16 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable =
-            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             throw new TaskEventHandleError("Cannot find related workflow instance from cache");
         }
         TaskInstance taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId)
-            .orElseThrow(() -> new TaskEventHandleError("Cannot find related taskInstance from cache"));
+                .orElseThrow(() -> new TaskEventHandleError("Cannot find related taskInstance from cache"));
         if (taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
             logger.warn(
-                "The current taskInstance status is not SUBMITTED_SUCCESS, so the dispatch event will be discarded, the current is a delay event, event: {}",
-                taskEvent);
+                    "The current taskInstance status is not SUBMITTED_SUCCESS, so the dispatch event will be discarded, the current is a delay event, event: {}",
+                    taskEvent);
             return;
         }
 

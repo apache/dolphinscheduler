@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  */
 @TableName("t_ds_k8s")
 public class K8s {
+
     /**
      * id
      */

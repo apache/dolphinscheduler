@@ -61,7 +61,6 @@ public class TaskInstance implements Serializable {
      */
     private String name;
 
-
     /**
      * task type
      */
@@ -224,7 +223,6 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private String dependentResult;
 
-
     /**
      * workerGroup
      */
@@ -256,7 +254,6 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private String executorName;
 
-
     @TableField(exist = false)
     private Map<String, String> resources;
 
@@ -264,7 +261,6 @@ public class TaskInstance implements Serializable {
      * delay execution time.
      */
     private int delayTime;
-
 
     /**
      * task params
@@ -476,10 +472,12 @@ public class TaskInstance implements Serializable {
 
     public DependentParameters getDependency() {
         if (this.dependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
-            if (taskParamsMap.get(Constants.OTHER_PARAMS) != null){
+            Map<String, Object> taskParamsMap =
+                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            this.dependency =
+                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
+            if (taskParamsMap.get(Constants.OTHER_PARAMS) != null) {
                 this.dependency.setOtherParams((Map<String, Object>) taskParamsMap.get(Constants.OTHER_PARAMS));
             }
         }
@@ -492,16 +490,19 @@ public class TaskInstance implements Serializable {
 
     public SwitchParameters getSwitchDependency() {
         if (this.switchDependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
+            Map<String, Object> taskParamsMap =
+                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            this.switchDependency =
+                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
         }
         return this.switchDependency;
     }
 
     public void setSwitchDependency(SwitchParameters switchDependency) {
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-        });
+        Map<String, Object> taskParamsMap =
+                JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                });
         taskParamsMap.put(Constants.SWITCH_RESULT, JSONUtils.toJsonString(switchDependency));
         this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }

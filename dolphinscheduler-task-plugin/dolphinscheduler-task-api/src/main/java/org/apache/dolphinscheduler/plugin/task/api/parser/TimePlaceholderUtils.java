@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
  * time place holder utils
  */
 public class TimePlaceholderUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(TimePlaceholderUtils.class);
 
     /**
@@ -95,7 +96,8 @@ public class TimePlaceholderUtils {
      *                                       be ignored ({@code true}) or cause an exception ({@code false})
      */
     private static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
-        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
+        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null,
+                ignoreUnresolvablePlaceholders);
     }
 
     /**
@@ -129,7 +131,8 @@ public class TimePlaceholderUtils {
                     arr[i] = N;
                 } else {
                     char c = arr[i - 1];
-                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR || c == LEFT_BRACE_CHAR) {
+                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR
+                            || c == LEFT_BRACE_CHAR) {
                         arr[i] = N;
                     }
                 }
@@ -138,7 +141,8 @@ public class TimePlaceholderUtils {
                     arr[i] = P;
                 } else {
                     char c = arr[i - 1];
-                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR || c == LEFT_BRACE_CHAR) {
+                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR
+                            || c == LEFT_BRACE_CHAR) {
                         arr[i] = P;
                     }
                 }
@@ -275,9 +279,11 @@ public class TimePlaceholderUtils {
      * @return true or false
      */
     private static boolean compare(String peek, String cur) {
-        if (MULTIPLY_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur) || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
+        if (MULTIPLY_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur)
+                || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
             return true;
-        } else if (DIVISION_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur) || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
+        } else if (DIVISION_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur)
+                || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
             return true;
         } else if (ADD_STRING.equals(peek) && (ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
             return true;
@@ -290,8 +296,9 @@ public class TimePlaceholderUtils {
     /**
      * Placeholder replacement resolver
      */
-    private static class TimePlaceholderResolver implements
-        PropertyPlaceholderHelper.PlaceholderResolver {
+    private static class TimePlaceholderResolver
+            implements
+                PropertyPlaceholderHelper.PlaceholderResolver {
 
         private final String value;
 
@@ -561,7 +568,7 @@ public class TimePlaceholderUtils {
         } else {
 
             calcExpression = String.format("60*24*(%s)%s", minuteExpression.substring(0, index),
-                minuteExpression.substring(index));
+                    minuteExpression.substring(index));
         }
 
         return calculate(calcExpression);

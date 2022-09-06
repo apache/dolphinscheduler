@@ -47,7 +47,12 @@ public class TaskKillResponseProcessorTest {
         channel = PowerMockito.mock(Channel.class);
         taskKillResponseCommand = new TaskKillResponseCommand();
         taskKillResponseCommand.setAppIds(
-                new ArrayList<String>() {{ add("task_1"); }});
+                new ArrayList<String>() {
+
+                    {
+                        add("task_1");
+                    }
+                });
         taskKillResponseCommand.setHost("localhost");
         taskKillResponseCommand.setProcessId(1);
         taskKillResponseCommand.setStatus(1);
@@ -58,7 +63,7 @@ public class TaskKillResponseProcessorTest {
     @Test
     public void testProcess() {
         Command command = taskKillResponseCommand.convert2Command();
-        Assert.assertEquals(CommandType.TASK_KILL_RESPONSE,command.getType());
-        taskKillResponseProcessor.process(channel,command);
+        Assert.assertEquals(CommandType.TASK_KILL_RESPONSE, command.getType());
+        taskKillResponseProcessor.process(channel, command);
     }
 }

@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 public final class SlackSender {
+
     private static final Logger logger = LoggerFactory.getLogger(SlackSender.class);
 
     private final String webHookUrl;
@@ -53,7 +54,8 @@ public final class SlackSender {
         webHookUrl = slackAlertParam.get(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME);
         botName = slackAlertParam.get(SlackParamsConstants.SLACK_BOT_NAME);
         Preconditions.checkArgument(!Objects.isNull(webHookUrl), "SlackWebHookURL can not be null");
-        Preconditions.checkArgument(webHookUrl.startsWith("https://hooks.slack.com/services/"), "SlackWebHookURL invalidate");
+        Preconditions.checkArgument(webHookUrl.startsWith("https://hooks.slack.com/services/"),
+                "SlackWebHookURL invalidate");
         Preconditions.checkArgument(!Objects.isNull(botName), "slack bot name can not be null");
     }
 
@@ -120,17 +122,17 @@ public final class SlackSender {
         final int elementLen = maxLen;
         StringBuilder stringBuilder = new StringBuilder(200);
         stringBuilder.append(headers.stream()
-                                    .map(header -> generateString(header, elementLen, " "))
-                                    .collect(Collectors.joining("|")));
+                .map(header -> generateString(header, elementLen, " "))
+                .collect(Collectors.joining("|")));
         stringBuilder.append("\n");
         for (List<String> element : elements) {
             stringBuilder.append(element.stream()
-                                        .map(lement -> generateString("", elementLen, "-"))
-                                        .collect(Collectors.joining("|")));
+                    .map(lement -> generateString("", elementLen, "-"))
+                    .collect(Collectors.joining("|")));
             stringBuilder.append("\n");
             stringBuilder.append(element.stream()
-                                        .map(e -> generateString(e, elementLen, " "))
-                                        .collect(Collectors.joining("|")));
+                    .map(e -> generateString(e, elementLen, " "))
+                    .collect(Collectors.joining("|")));
             stringBuilder.append("\n");
         }
         return String.format("```%s```", stringBuilder);

@@ -357,84 +357,84 @@ public class ProcessInstance {
     @Override
     public String toString() {
         return "ProcessInstance{"
-            + "id=" + id
-            + ", state=" + state
-            + ", recovery=" + recovery
-            + ", startTime=" + startTime
-            + ", endTime=" + endTime
-            + ", runTimes=" + runTimes
-            + ", name='" + name + '\''
-            + ", host='" + host + '\''
-            + ", processDefinition="
-            + processDefinition
-            + ", commandType="
-            + commandType
-            + ", commandParam='"
-            + commandParam
-            + '\''
-            + ", taskDependType="
-            + taskDependType
-            + ", maxTryTimes="
-            + maxTryTimes
-            + ", failureStrategy="
-            + failureStrategy
-            + ", warningType="
-            + warningType
-            + ", warningGroupId="
-            + warningGroupId
-            + ", scheduleTime="
-            + scheduleTime
-            + ", commandStartTime="
-            + commandStartTime
-            + ", globalParams='"
-            + globalParams
-            + '\''
-            + ", executorId="
-            + executorId
-            + ", tenantCode='"
-            + tenantCode
-            + '\''
-            + ", queue='"
-            + queue
-            + '\''
-            + ", isSubProcess="
-            + isSubProcess
-            + ", locations='"
-            + locations
-            + '\''
-            + ", historyCmd='"
-            + historyCmd
-            + '\''
-            + ", dependenceScheduleTimes='"
-            + dependenceScheduleTimes
-            + '\''
-            + ", duration="
-            + duration
-            + ", processInstancePriority="
-            + processInstancePriority
-            + ", workerGroup='"
-            + workerGroup
-            + '\''
-            + ", timeout="
-            + timeout
-            + ", tenantId="
-            + tenantId
-            + ", processDefinitionCode='"
-            + processDefinitionCode
-            + '\''
-            + ", processDefinitionVersion='"
-            + processDefinitionVersion
-            + '\''
-            + ", dryRun='"
-            + dryRun
-            + '\''
-            + '}'
-            + ", restartTime='"
-            + restartTime
-            + '\''
-            + ", isBlocked="
-            + isBlocked
-            + '}';
+                + "id=" + id
+                + ", state=" + state
+                + ", recovery=" + recovery
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", runTimes=" + runTimes
+                + ", name='" + name + '\''
+                + ", host='" + host + '\''
+                + ", processDefinition="
+                + processDefinition
+                + ", commandType="
+                + commandType
+                + ", commandParam='"
+                + commandParam
+                + '\''
+                + ", taskDependType="
+                + taskDependType
+                + ", maxTryTimes="
+                + maxTryTimes
+                + ", failureStrategy="
+                + failureStrategy
+                + ", warningType="
+                + warningType
+                + ", warningGroupId="
+                + warningGroupId
+                + ", scheduleTime="
+                + scheduleTime
+                + ", commandStartTime="
+                + commandStartTime
+                + ", globalParams='"
+                + globalParams
+                + '\''
+                + ", executorId="
+                + executorId
+                + ", tenantCode='"
+                + tenantCode
+                + '\''
+                + ", queue='"
+                + queue
+                + '\''
+                + ", isSubProcess="
+                + isSubProcess
+                + ", locations='"
+                + locations
+                + '\''
+                + ", historyCmd='"
+                + historyCmd
+                + '\''
+                + ", dependenceScheduleTimes='"
+                + dependenceScheduleTimes
+                + '\''
+                + ", duration="
+                + duration
+                + ", processInstancePriority="
+                + processInstancePriority
+                + ", workerGroup='"
+                + workerGroup
+                + '\''
+                + ", timeout="
+                + timeout
+                + ", tenantId="
+                + tenantId
+                + ", processDefinitionCode='"
+                + processDefinitionCode
+                + '\''
+                + ", processDefinitionVersion='"
+                + processDefinitionVersion
+                + '\''
+                + ", dryRun='"
+                + dryRun
+                + '\''
+                + '}'
+                + ", restartTime='"
+                + restartTime
+                + '\''
+                + ", isBlocked="
+                + isBlocked
+                + '}';
     }
 
     @Override
@@ -460,6 +460,7 @@ public class ProcessInstance {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StateDesc {
+
         Date time;
         ExecutionStatus state;
         String desc;

@@ -69,6 +69,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @RunWith(MockitoJUnitRunner.class)
 @PrepareForTest({PropertyUtils.class})
 public class TenantServiceTest {
+
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
     private static final Logger tenantServiceImplLogger = LoggerFactory.getLogger(TenantServiceImpl.class);
@@ -101,16 +102,18 @@ public class TenantServiceTest {
 
         User loginUser = getLoginUser();
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null,
+                loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
+                baseServiceLogger)).thenReturn(true);
         try {
-            //check tenantCode
+            // check tenantCode
             Map<String, Object> result =
                     tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
-            //check exist
+            // check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.OS_TENANT_CODE_EXIST, result.get(Constants.STATUS));
@@ -135,9 +138,11 @@ public class TenantServiceTest {
         page.setTotal(1L);
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
-        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq("TenantServiceTest")))
-        .thenReturn(page);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT,
+                getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
+        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(),
+                Mockito.eq("TenantServiceTest")))
+                .thenReturn(page);
         Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
@@ -149,8 +154,10 @@ public class TenantServiceTest {
     public void testUpdateTenant() {
 
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null,
+                getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
+                baseServiceLogger)).thenReturn(true);
         try {
             // id not exist
             Map<String, Object> result =
@@ -170,8 +177,10 @@ public class TenantServiceTest {
 
     @Test
     public void testDeleteTenantById() throws Exception {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null,
+                getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
+                baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES))
                 .thenReturn(getInstanceList());
@@ -179,23 +188,23 @@ public class TenantServiceTest {
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
         try {
-            //TENANT_NOT_EXIST
+            // TENANT_NOT_EXIST
             Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(), 12);
             logger.info(result.toString());
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
 
-            //DELETE_TENANT_BY_ID_FAIL
+            // DELETE_TENANT_BY_ID_FAIL
             result = tenantService.deleteTenantById(getLoginUser(), 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.DELETE_TENANT_BY_ID_FAIL, result.get(Constants.STATUS));
 
-            //DELETE_TENANT_BY_ID_FAIL_DEFINES
+            // DELETE_TENANT_BY_ID_FAIL_DEFINES
             Mockito.when(tenantMapper.queryById(2)).thenReturn(getTenant(2));
             result = tenantService.deleteTenantById(getLoginUser(), 2);
             logger.info(result.toString());
             Assert.assertEquals(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, result.get(Constants.STATUS));
 
-            //DELETE_TENANT_BY_ID_FAIL_USERS
+            // DELETE_TENANT_BY_ID_FAIL_USERS
             Mockito.when(tenantMapper.queryById(3)).thenReturn(getTenant(3));
             result = tenantService.deleteTenantById(getLoginUser(), 3);
             logger.info(result.toString());
@@ -220,7 +229,7 @@ public class TenantServiceTest {
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
-        // tenantCode  exist
+        // tenantCode exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
         Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
     }

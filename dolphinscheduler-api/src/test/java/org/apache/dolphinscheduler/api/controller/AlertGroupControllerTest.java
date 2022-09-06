@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * alert group controller test
  */
 public class AlertGroupControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     private static final String defaultTestAlertGroupName = "cxc test group name";
@@ -65,7 +66,8 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
 
     @After
     public void clear() {
-        alertGroupMapper.delete(new QueryWrapper<AlertGroup>().lambda().eq(AlertGroup::getGroupName, defaultTestAlertGroupName));
+        alertGroupMapper.delete(
+                new QueryWrapper<AlertGroup>().lambda().eq(AlertGroup::getGroupName, defaultTestAlertGroupName));
     }
 
     @Test
@@ -204,11 +206,11 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     public void test090DelAlertGroupById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
-            .header("sessionId", sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());

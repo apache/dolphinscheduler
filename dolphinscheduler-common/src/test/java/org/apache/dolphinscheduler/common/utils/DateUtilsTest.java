@@ -221,7 +221,8 @@ public class DateUtilsTest {
         Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(defaultTimeZoneDate));
 
         Date targetTimeZoneDate = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID(), "Asia/Shanghai");
-        Assert.assertEquals(DateUtils.dateToString(date, TimeZone.getDefault().getID()), DateUtils.dateToString(targetTimeZoneDate, "Asia/Shanghai"));
+        Assert.assertEquals(DateUtils.dateToString(date, TimeZone.getDefault().getID()),
+                DateUtils.dateToString(targetTimeZoneDate, "Asia/Shanghai"));
     }
 
     @Test

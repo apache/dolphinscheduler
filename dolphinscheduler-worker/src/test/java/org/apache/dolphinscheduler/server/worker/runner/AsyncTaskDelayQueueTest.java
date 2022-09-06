@@ -54,6 +54,7 @@ public class AsyncTaskDelayQueueTest {
     private AsyncTaskExecutionContext createAsyncTaskExecutionContext() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         AsyncTaskExecuteFunction asyncTaskExecuteFunction = new AsyncTaskExecuteFunction() {
+
             @Override
             public @NonNull AsyncTaskExecutionStatus getTaskExecuteStatus() {
                 return AsyncTaskExecutionStatus.SUCCESS;
@@ -85,7 +86,6 @@ public class AsyncTaskDelayQueueTest {
         return new AsyncTaskExecutionContext(
                 taskExecutionContext,
                 asyncTaskExecuteFunction,
-                asyncTaskCallbackFunction
-        );
+                asyncTaskCallbackFunction);
     }
 }

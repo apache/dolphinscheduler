@@ -37,7 +37,7 @@ public class HdfsFileWriter extends BaseFileWriter {
 
     @Override
     public void write(Dataset<Row> data, SparkRuntimeEnvironment environment) {
-        outputImpl(data,"hdfs://");
+        outputImpl(data, "hdfs://");
     }
 
     @Override

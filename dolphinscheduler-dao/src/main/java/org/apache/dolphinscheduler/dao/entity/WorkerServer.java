@@ -36,7 +36,6 @@ public class WorkerServer {
      */
     private int port;
 
-
     /**
      * zookeeper directory
      */

@@ -122,4 +122,3 @@ public class PluginDefine {
         this.updateTime = updateTime;
     }
 }
-

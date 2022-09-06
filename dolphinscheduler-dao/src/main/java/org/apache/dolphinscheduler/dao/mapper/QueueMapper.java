@@ -34,7 +34,7 @@ public interface QueueMapper extends BaseMapper<Queue> {
      * @param searchVal searchVal
      * @return queue IPage
      */
-    IPage<Queue> queryQueuePaging(IPage<Queue> page, @Param("ids")List<Integer> ids,
+    IPage<Queue> queryQueuePaging(IPage<Queue> page, @Param("ids") List<Integer> ids,
                                   @Param("searchVal") String searchVal);
 
     /**
@@ -44,7 +44,7 @@ public interface QueueMapper extends BaseMapper<Queue> {
      * @return queue list
      */
     List<Queue> queryAllQueueList(@Param("queue") String queue,
-                             @Param("queueName") String queueName);
+                                  @Param("queueName") String queueName);
 
     /**
      * check the target queue exist

@@ -36,13 +36,13 @@ public class WorkflowBlockStateEventHandler implements StateEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowBlockStateEventHandler.class);
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleError {
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleError {
         Optional<TaskInstance> taskInstanceOptional =
-            workflowExecuteRunnable.getTaskInstance(stateEvent.getTaskInstanceId());
+                workflowExecuteRunnable.getTaskInstance(stateEvent.getTaskInstanceId());
         if (!taskInstanceOptional.isPresent()) {
             throw new StateEventHandleError("Cannot find taskInstance from taskMap by taskInstanceId: "
-                + stateEvent.getTaskInstanceId());
+                    + stateEvent.getTaskInstanceId());
         }
         TaskInstance task = taskInstanceOptional.get();
 

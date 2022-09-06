@@ -24,6 +24,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
 public class TaskWaitTaskGroupStateHandler implements StateEventHandler {
+
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent) {
         return workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent);

@@ -35,7 +35,8 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
                     T heartBeat = getHeartBeat();
                     writeHeartBeat(heartBeat);
                 } else {
-                    log.info("The current server status is {}, will not write heart beat", ServerLifeCycleManager.getServerStatus());
+                    log.info("The current server status is {}, will not write heart beat",
+                            ServerLifeCycleManager.getServerStatus());
                 }
             } catch (Exception ex) {
                 log.error("{} task execute failed", threadName, ex);

@@ -65,7 +65,9 @@ public interface CuringParamsService {
      * @param timezone
      * @return
      */
-    String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap, List<Property> globalParamList, CommandType commandType, Date scheduleTime, String timezone);
+    String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap,
+                              List<Property> globalParamList, CommandType commandType, Date scheduleTime,
+                              String timezone);
 
     /**
      * param parsing preparation
@@ -74,7 +76,9 @@ public interface CuringParamsService {
      * @param processInstance
      * @return
      */
-    Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters, @NonNull ProcessInstance processInstance);
+    Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
+                                                  @NonNull AbstractParameters parameters,
+                                                  @NonNull ProcessInstance processInstance);
 
     /**
      * preBuildBusinessParams

@@ -135,4 +135,3 @@ public class AlertPluginInstance {
         this.instanceName = instanceName;
     }
 }
-

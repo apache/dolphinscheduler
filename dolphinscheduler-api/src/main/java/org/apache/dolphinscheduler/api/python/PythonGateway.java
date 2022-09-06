@@ -77,6 +77,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class PythonGateway {
+
     private static final Logger logger = LoggerFactory.getLogger(PythonGateway.class);
 
     private static final FailureStrategy DEFAULT_FAILURE_STRATEGY = FailureStrategy.CONTINUE;
@@ -138,6 +139,7 @@ public class PythonGateway {
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
+
         {
             setId(Integer.MAX_VALUE);
             setUserName("dummyUser");
@@ -146,6 +148,7 @@ public class PythonGateway {
     };
 
     private final Queue queuePythonGateway = new Queue() {
+
         {
             setId(Integer.MAX_VALUE);
             setQueueName("queuePythonGateway");
@@ -162,7 +165,8 @@ public class PythonGateway {
         return taskDefinitionService.genTaskCodeList(genNum);
     }
 
-    public Map<String, Long> getCodeAndVersion(String projectName, String taskName) throws CodeGenerateUtils.CodeGenerateException {
+    public Map<String, Long> getCodeAndVersion(String projectName,
+                                               String taskName) throws CodeGenerateUtils.CodeGenerateException {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
@@ -233,21 +237,28 @@ public class PythonGateway {
         if (processDefinition != null) {
             processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
-            Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
+                    ReleaseState.OFFLINE);
+            Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name,
+                    processDefinitionCode, description, globalParams,
+                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    executionType);
         } else {
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+            Map<String, Object> result =
+                    processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
+                            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                            executionType);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
 
-        // Fresh process definition schedule 
+        // Fresh process definition schedule
         if (schedule != null) {
-            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
+            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType,
+                    warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.getEnum(releaseState));
+        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
+                ReleaseState.getEnum(releaseState));
         return processDefinitionCode;
     }
 
@@ -259,14 +270,16 @@ public class PythonGateway {
      * @param processDefinitionName process definition name
      */
     private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName, 0);
+        Map<String, Object> verifyProcessDefinitionExists =
+                processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName, 0);
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         ProcessDefinition processDefinition = null;
         if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
             processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         } else if (verifyStatus != Status.SUCCESS) {
-            String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
+            String msg =
+                    "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
             logger.error(msg);
             throw new RuntimeException(msg);
         }
@@ -298,13 +311,16 @@ public class PythonGateway {
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
-            Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, WarningType.valueOf(warningType),
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
+                    ReleaseState.ONLINE);
+            Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode,
+                    schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
+                    ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
@@ -318,14 +334,15 @@ public class PythonGateway {
                                     String workerGroup,
                                     String warningType,
                                     int warningGroupId,
-                                    Integer timeout
-    ) {
+                                    Integer timeout) {
         User user = usersService.queryUser(userName);
         Project project = projectMapper.queryByName(projectName);
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        ProcessDefinition processDefinition =
+                processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
 
         // make sure process definition online
-        processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(), ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(),
+                ReleaseState.ONLINE);
 
         executorService.execProcessInstance(user,
                 project.getCode(),
@@ -345,14 +362,13 @@ public class PythonGateway {
                 null,
                 null,
                 DEFAULT_DRY_RUN,
-                COMPLEMENT_DEPENDENT_MODE
-        );
+                COMPLEMENT_DEPENDENT_MODE);
     }
 
     // side object
     /*
-      Grant project's permission to user. Use when project's created user not current but
-      Python API use it to change process definition.
+     * Grant project's permission to user. Use when project's created user not current but Python API use it to change
+     * process definition.
      */
     private Integer grantProjectToUser(Project project, User user) {
         Date now = new Date();
@@ -366,8 +382,8 @@ public class PythonGateway {
     }
 
     /*
-      Grant or create project. Create a new project if project do not exists, and grant the project
-      permission to user if project exists but without permission to this user.
+     * Grant or create project. Create a new project if project do not exists, and grant the project permission to user
+     * if project exists but without permission to this user.
      */
     public void createOrGrantProject(String userName, String name, String desc) {
         User user = usersService.queryUser(userName);
@@ -466,7 +482,8 @@ public class PythonGateway {
      * @param projectName project name which process definition belongs to
      * @param processDefinitionName process definition name
      */
-    public Map<String, Object> getProcessDefinitionInfo(String userName, String projectName, String processDefinitionName) {
+    public Map<String, Object> getProcessDefinitionInfo(String userName, String projectName,
+                                                        String processDefinitionName) {
         Map<String, Object> result = new HashMap<>();
 
         User user = usersService.queryUser(userName);
@@ -476,7 +493,8 @@ public class PythonGateway {
         // get process definition info
         if (processDefinition != null) {
             // make sure process definition online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(), ReleaseState.ONLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(),
+                    ReleaseState.ONLINE);
             result.put("id", processDefinition.getId());
             result.put("name", processDefinition.getName());
             result.put("code", processDefinition.getCode());
@@ -509,7 +527,8 @@ public class PythonGateway {
         long projectCode = project.getCode();
         result.put("projectCode", projectCode);
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
+        ProcessDefinition processDefinition =
+                processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         if (processDefinition == null) {
             String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
             logger.error(msg);
@@ -534,11 +553,14 @@ public class PythonGateway {
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE, ProgramType.valueOf(programType));
+        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE,
+                ProgramType.valueOf(programType));
         List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.getData();
-        List<ResourceComponent> namedResources = resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
+        List<ResourceComponent> namedResources =
+                resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(namedResources)) {
-            String msg = String.format("Can not find valid resource by program type %s and name %s", programType, fullName);
+            String msg =
+                    String.format("Can not find valid resource by program type %s and name %s", programType, fullName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -561,15 +583,14 @@ public class PythonGateway {
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
             InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfiguration.getPythonAddress());
             server = new GatewayServer(
-                this,
-                pythonGatewayConfiguration.getGatewayServerPort(),
-                pythonGatewayConfiguration.getPythonPort(),
-                gatewayHost,
-                pythonHost,
-                pythonGatewayConfiguration.getConnectTimeout(),
-                pythonGatewayConfiguration.getReadTimeout(),
-                null
-            );
+                    this,
+                    pythonGatewayConfiguration.getGatewayServerPort(),
+                    pythonGatewayConfiguration.getPythonPort(),
+                    gatewayHost,
+                    pythonHost,
+                    pythonGatewayConfiguration.getConnectTimeout(),
+                    pythonGatewayConfiguration.getReadTimeout(),
+                    null);
             GatewayServer.turnLoggingOn();
             logger.info("PythonGatewayService started on: " + gatewayHost.toString());
             server.start();

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PostgreSQLPerformance extends BaseDBPerformance {
+
     private static final Logger logger = LoggerFactory.getLogger(PostgreSQLPerformance.class);
 
     /**
@@ -61,7 +62,9 @@ public class PostgreSQLPerformance extends BaseDBPerformance {
                 }
             }
 
-            try (ResultSet rs3 = pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
+            try (
+                    ResultSet rs3 =
+                            pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
                 if (rs3.next()) {
                     monitorRecord.setThreadsRunningConnections(rs3.getInt("count"));
                 }

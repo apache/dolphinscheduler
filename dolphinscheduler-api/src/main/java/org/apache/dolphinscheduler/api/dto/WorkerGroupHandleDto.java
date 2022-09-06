@@ -13,6 +13,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class WorkerGroupHandleDto {
+
     private WorkerGroupDto workerGroup;
     private String workerGroupName;
     private Map<String, WorkerGroupDto> workerGroupsMap;

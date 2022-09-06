@@ -26,6 +26,7 @@ import java.util.Date;
 
 @TableName("t_ds_access_token")
 public class AccessToken {
+
     /**
      * primary key
      */

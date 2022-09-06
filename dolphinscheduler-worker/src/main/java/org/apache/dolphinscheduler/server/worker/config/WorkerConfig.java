@@ -88,7 +88,8 @@ public class WorkerConfig implements Validator {
 
         Set<String> workerRegistryPaths = workerConfig.getGroups()
                 .stream()
-                .map(workerGroup -> NodeType.WORKER.getRegistryPath() + "/" + workerGroup + "/" + workerConfig.getWorkerAddress())
+                .map(workerGroup -> NodeType.WORKER.getRegistryPath() + "/" + workerGroup + "/"
+                        + workerConfig.getWorkerAddress())
                 .collect(Collectors.toSet());
 
         workerConfig.setWorkerGroupRegistryPaths(workerRegistryPaths);

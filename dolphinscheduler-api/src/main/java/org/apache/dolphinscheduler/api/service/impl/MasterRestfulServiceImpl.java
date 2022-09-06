@@ -26,8 +26,10 @@ public class MasterRestfulServiceImpl implements MasterRestfulService {
     @Autowired
     private RpcConfiguration rpcConfiguration;
 
-    private static final String LISTING_EXECUTING_WORKFLOWS_BY_MASTER_ADDRESS_URI = "/workflow/listingExecutingWorkflows";
-    private static final String LISTING_DISPATCHING_TASKINSTANCES_BY_MASTER_ADDRESS_URI = "/task/listingDispatchingTaskInstances";
+    private static final String LISTING_EXECUTING_WORKFLOWS_BY_MASTER_ADDRESS_URI =
+            "/workflow/listingExecutingWorkflows";
+    private static final String LISTING_DISPATCHING_TASKINSTANCES_BY_MASTER_ADDRESS_URI =
+            "/task/listingDispatchingTaskInstances";
 
     @Override
     public List<MasterWorkflowInstanceExecutingListingDto> listingExecutingWorkflowsByMasterAddress(String masterAddress) {
@@ -39,15 +41,19 @@ public class MasterRestfulServiceImpl implements MasterRestfulService {
             // todo: add sdk
             String response = OkHttpUtils.get(url);
             if (StringUtils.isEmpty(response)) {
-                log.error("Query executing workflows by master address error, the response is empty, url: {}, masterAddress: {}", url, masterAddress);
+                log.error(
+                        "Query executing workflows by master address error, the response is empty, url: {}, masterAddress: {}",
+                        url, masterAddress);
                 throw new ServiceException(LISTING_EXECUTING_WORKFLOWS_BY_MASTER_ERROR);
             }
-            return JSONUtils.parseObject(response, new TypeReference<List<MasterWorkflowInstanceExecutingListingDto>>() {
-            });
+            return JSONUtils.parseObject(response,
+                    new TypeReference<List<MasterWorkflowInstanceExecutingListingDto>>() {
+                    });
         } catch (ServiceException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error("Query executing workflows by master address error, url: {}, masterAddress: {}", url, masterAddress, ex);
+            log.error("Query executing workflows by master address error, url: {}, masterAddress: {}", url,
+                    masterAddress, ex);
             throw new ServiceException(LISTING_EXECUTING_WORKFLOWS_BY_MASTER_ERROR);
         }
     }
@@ -61,7 +67,9 @@ public class MasterRestfulServiceImpl implements MasterRestfulService {
         try {
             String response = OkHttpUtils.get(url);
             if (StringUtils.isEmpty(response)) {
-                log.error("Query executing task instances by master address error, the response is empty, url: {}, masterAddress: {}", url, masterAddress);
+                log.error(
+                        "Query executing task instances by master address error, the response is empty, url: {}, masterAddress: {}",
+                        url, masterAddress);
                 throw new ServiceException(LISTING_DISPATCHING_TASK_INSTANCES_BY_MASTER_ERROR);
             }
             return JSONUtils.parseObject(response, new TypeReference<List<MasterTaskInstanceDispatchingDto>>() {
@@ -69,7 +77,8 @@ public class MasterRestfulServiceImpl implements MasterRestfulService {
         } catch (ServiceException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error("Query executing task instances by master address error, url: {}, masterAddress: {}", url, masterAddress, ex);
+            log.error("Query executing task instances by master address error, url: {}, masterAddress: {}", url,
+                    masterAddress, ex);
             throw new ServiceException(LISTING_DISPATCHING_TASK_INSTANCES_BY_MASTER_ERROR);
         }
     }

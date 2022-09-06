@@ -25,10 +25,10 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.io.IOException;
 import java.util.List;
 
-
 public interface StorageOperate {
 
-    public static final String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+    public static final String RESOURCE_UPLOAD_PATH =
+            PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
 
     /**
      * if the resource of tenant 's exist, the resource of folder will be created
@@ -59,7 +59,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean mkdir(String tenantCode,String path) throws IOException;
+    public boolean mkdir(String tenantCode, String path) throws IOException;
 
     /**
      * get the path of the resource file
@@ -85,7 +85,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public  boolean exists(String tenantCode,String fileName) throws IOException;
+    public boolean exists(String tenantCode, String fileName) throws IOException;
 
     /**
      * delete the resource of  filePath
@@ -96,7 +96,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean delete(String tenantCode,String filePath, boolean recursive) throws IOException;
+    public boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException;
 
     /**
      * copy the file from srcPath to dstPath
@@ -115,7 +115,7 @@ public interface StorageOperate {
      * @param tenantCode
      * @return
      */
-    public  String getDir(ResourceType resourceType, String tenantCode);
+    public String getDir(ResourceType resourceType, String tenantCode);
 
     /**
      * upload the local srcFile to dstPath
@@ -127,7 +127,8 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    public boolean upload(String tenantCode,String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
+    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
+                          boolean overwrite) throws IOException;
 
     /**
      * download the srcPath to local
@@ -138,7 +139,8 @@ public interface StorageOperate {
      * @param overwrite
      * @throws IOException
      */
-    public void download(String tenantCode,String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite)throws IOException;
+    public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource,
+                         boolean overwrite) throws IOException;
 
     /**
      * vim the context of filePath

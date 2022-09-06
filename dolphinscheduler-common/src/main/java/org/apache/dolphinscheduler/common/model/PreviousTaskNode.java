@@ -37,7 +37,7 @@ public class PreviousTaskNode {
     public PreviousTaskNode() {
 
     }
-    
+
     public PreviousTaskNode(long code, String name, int version) {
         this.code = code;
         this.name = name;

@@ -90,8 +90,7 @@ public class DataSourceController extends BaseController {
     @ApiException(CREATE_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true)
-                                   @RequestBody String jsonStr) {
+                                   @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true) @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
@@ -131,7 +130,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSource", notes = "QUERY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
 
     })
     @GetMapping(value = "/{id}")
@@ -154,7 +153,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
@@ -177,9 +176,9 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -230,7 +229,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "connectionTest", notes = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
@@ -250,14 +249,14 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "deleteDataSource", notes = "DELETE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                         @PathVariable("id") int id) {
+                                   @PathVariable("id") int id) {
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -270,15 +269,14 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "verifyDataSourceName", notes = "VERIFY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_DATASOURCE_NAME_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyDataSourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "name") String name
-    ) {
+                                       @RequestParam(value = "name") String name) {
         return dataSourceService.verifyDataSourceName(name);
     }
 
@@ -291,7 +289,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -313,7 +311,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -344,7 +342,7 @@ public class DataSourceController extends BaseController {
 
     @ApiOperation(value = "tables", notes = "GET_DATASOURCE_TABLES_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
     })
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
@@ -356,15 +354,15 @@ public class DataSourceController extends BaseController {
 
     @ApiOperation(value = "tableColumns", notes = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
     public Result getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
                                   @RequestParam("tableName") String tableName) {
-        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId,tableName);
+        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId, tableName);
         return returnDataList(result);
     }
 }

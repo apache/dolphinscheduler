@@ -98,7 +98,8 @@ public class MasterRegistryClientTest {
         taskInstance.setHost("127.0.0.1:8080");
         given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(taskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(Optional.ofNullable(processInstance));
+        given(processService.findProcessInstanceDetailById(Mockito.anyInt()))
+                .willReturn(Optional.ofNullable(processInstance));
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
         Server server = new Server();
         server.setHost("127.0.0.1");

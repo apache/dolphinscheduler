@@ -49,7 +49,8 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             case TEXT:
                 return getTextTypeMessage(content);
             default:
-                throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate", showType));
+                throw new IllegalArgumentException(
+                        String.format("not support showType: %s in DefaultHTMLTemplate", showType));
         }
     }
 

@@ -61,33 +61,33 @@ public class ExcelUtilsTest {
     @Test
     public void testGenExcelFile() {
 
-        //Define dest file path
+        // Define dest file path
         String xlsFilePath = rootPath + System.getProperty("file.separator");
         logger.info("xlsFilePath: " + xlsFilePath);
 
-        //Define correctContent
+        // Define correctContent
         String correctContent = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";
 
-        //Define incorrectContent
+        // Define incorrectContent
         String incorrectContent1 = "{\"name\":\"ds name\",\"value\":\"ds value\"}";
 
-        //Define title
+        // Define title
         String title = "test report";
 
-        //Invoke genExcelFile with correctContent
+        // Invoke genExcelFile with correctContent
         ExcelUtils.genExcelFile(correctContent, title, xlsFilePath);
 
-        //Test file exists
+        // Test file exists
         File xlsFile = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLSX);
         assertTrue(xlsFile.exists());
 
-        //Expected RuntimeException
+        // Expected RuntimeException
         expectedException.expect(RuntimeException.class);
 
-        //Expected error message
+        // Expected error message
         expectedException.expectMessage("itemsList is null");
 
-        //Invoke genExcelFile with incorrectContent, will cause RuntimeException
+        // Invoke genExcelFile with incorrectContent, will cause RuntimeException
         ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
 
     }

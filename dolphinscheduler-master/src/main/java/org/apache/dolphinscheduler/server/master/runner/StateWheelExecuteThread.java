@@ -335,7 +335,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 if (taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE
                         && taskInstance.retryTaskIntervalOverTime()) {
                     // reset taskInstance endTime and state
-                    // todo relative funtion: TaskInstance.retryTaskIntervalOverTime, WorkflowExecuteThread.cloneRetryTaskInstance
+                    // todo relative funtion: TaskInstance.retryTaskIntervalOverTime,
+                    // WorkflowExecuteThread.cloneRetryTaskInstance
                     logger.info("[TaskInstance-{}]The task instance can retry, will retry this task instance",
                             taskInstance.getId());
                     taskInstance.setEndTime(null);

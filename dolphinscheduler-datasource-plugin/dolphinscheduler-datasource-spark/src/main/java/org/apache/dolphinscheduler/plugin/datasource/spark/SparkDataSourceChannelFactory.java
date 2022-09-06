@@ -24,6 +24,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceChannelFactory.class)
 public class SparkDataSourceChannelFactory implements DataSourceChannelFactory {
+
     @Override
     public String getName() {
         return "spark";

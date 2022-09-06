@@ -27,6 +27,7 @@ import java.util.Date;
 
 @JsonInclude(Include.NON_NULL)
 public class TaskAlertContent implements Serializable {
+
     @JsonProperty("taskInstanceId")
     private int taskInstanceId;
     @JsonProperty("taskName")
@@ -72,6 +73,7 @@ public class TaskAlertContent implements Serializable {
     }
 
     public static class Builder {
+
         private int taskInstanceId;
         private String taskName;
         private String taskType;

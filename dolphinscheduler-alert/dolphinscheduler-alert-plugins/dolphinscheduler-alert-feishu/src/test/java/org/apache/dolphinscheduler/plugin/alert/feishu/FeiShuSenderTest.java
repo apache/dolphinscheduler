@@ -29,7 +29,6 @@ import org.junit.Test;
 
 public class FeiShuSenderTest {
 
-
     private static Map<String, String> feiShuConfig = new HashMap<>();
 
     @Before
@@ -50,23 +49,23 @@ public class FeiShuSenderTest {
     @Test
     public void testFormatContent() {
         String alertMsg = "[\n"
-            + "  {\n"
-            + "    \"owner\": \"dolphinscheduler\",\n"
-            + "    \"processEndTime\": \"2021-01-29 19:01:11\",\n"
-            + "    \"processHost\": \"10.81.129.4:5678\",\n"
-            + "    \"processId\": 2926,\n"
-            + "    \"processName\": \"3-20210129190038108\",\n"
-            + "    \"processStartTime\": \"2021-01-29 19:00:38\",\n"
-            + "    \"processState\": \"SUCCESS\",\n"
-            + "    \"processType\": \"START_PROCESS\",\n"
-            + "    \"projectId\": 2,\n"
-            + "    \"projectName\": \"testdelproject\",\n"
-            + "    \"recovery\": \"NO\",\n"
-            + "    \"retryTimes\": 0,\n"
-            + "    \"runTimes\": 1,\n"
-            + "    \"taskId\": 0\n"
-            + "  }\n"
-            + "]";
+                + "  {\n"
+                + "    \"owner\": \"dolphinscheduler\",\n"
+                + "    \"processEndTime\": \"2021-01-29 19:01:11\",\n"
+                + "    \"processHost\": \"10.81.129.4:5678\",\n"
+                + "    \"processId\": 2926,\n"
+                + "    \"processName\": \"3-20210129190038108\",\n"
+                + "    \"processStartTime\": \"2021-01-29 19:00:38\",\n"
+                + "    \"processState\": \"SUCCESS\",\n"
+                + "    \"processType\": \"START_PROCESS\",\n"
+                + "    \"projectId\": 2,\n"
+                + "    \"projectName\": \"testdelproject\",\n"
+                + "    \"recovery\": \"NO\",\n"
+                + "    \"retryTimes\": 0,\n"
+                + "    \"runTimes\": 1,\n"
+                + "    \"taskId\": 0\n"
+                + "  }\n"
+                + "]";
         AlertData alertData = new AlertData();
         alertData.setTitle("");
         alertData.setContent(alertMsg);

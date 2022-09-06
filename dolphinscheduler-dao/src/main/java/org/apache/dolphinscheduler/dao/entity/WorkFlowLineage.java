@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 public class WorkFlowLineage {
+
     private long workFlowCode;
     private String workFlowName;
     private String workFlowPublishStatus;

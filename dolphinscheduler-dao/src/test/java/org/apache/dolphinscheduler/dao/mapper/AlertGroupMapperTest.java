@@ -56,19 +56,17 @@ public class AlertGroupMapperTest extends BaseDaoTest {
 
     }
 
-
     /**
      * test selectById
      */
     @Test
     public void testSelectById() {
         AlertGroup alertGroup = createAlertGroup();
-        //query
+        // query
         AlertGroup targetAlert = alertGroupMapper.selectById(alertGroup.getId());
 
         assertEquals(alertGroup, targetAlert);
     }
-
 
     /**
      * test page
@@ -120,7 +118,6 @@ public class AlertGroupMapperTest extends BaseDaoTest {
         assertEquals(alertGroup, resultAlertGroup);
     }
 
-
     /**
      * test delete
      */
@@ -135,7 +132,6 @@ public class AlertGroupMapperTest extends BaseDaoTest {
 
         assertNull(resultAlertGroup);
     }
-
 
     /**
      * test query by groupname
@@ -237,7 +233,7 @@ public class AlertGroupMapperTest extends BaseDaoTest {
      * @return AlertGroup map
      */
     private Map<Integer, AlertGroup> createAlertGroups(
-        Integer count, String groupName) {
+                                                       Integer count, String groupName) {
         Map<Integer, AlertGroup> alertGroupMap = new HashMap<>();
 
         AlertGroup alertGroup = null;
@@ -256,7 +252,7 @@ public class AlertGroupMapperTest extends BaseDaoTest {
      * @return AlertGroup map
      */
     private Map<Integer, AlertGroup> createAlertGroups(
-        Integer count) {
+                                                       Integer count) {
         Map<Integer, AlertGroup> alertGroupMap = new HashMap<>();
 
         AlertGroup alertGroup = null;

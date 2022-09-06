@@ -31,6 +31,7 @@ import java.util.Date;
  */
 @TableName("t_ds_task_group_queue")
 public class TaskGroupQueue implements Serializable {
+
     /**
      * key
      */
@@ -98,7 +99,8 @@ public class TaskGroupQueue implements Serializable {
 
     }
 
-    public TaskGroupQueue(int taskId, String taskName, int groupId, int processId, int priority, TaskGroupQueueStatus status) {
+    public TaskGroupQueue(int taskId, String taskName, int groupId, int processId, int priority,
+                          TaskGroupQueueStatus status) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.groupId = groupId;
@@ -174,16 +176,16 @@ public class TaskGroupQueue implements Serializable {
     @Override
     public String toString() {
         return "TaskGroupQueue{"
-            + "id=" + id
-            + ", taskId=" + taskId
-            + ", taskName='" + taskName + '\''
-            + ", groupId=" + groupId
-            + ", processId=" + processId
-            + ", priority=" + priority
-            + ", status=" + status
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + '}';
+                + "id=" + id
+                + ", taskId=" + taskId
+                + ", taskName='" + taskName + '\''
+                + ", groupId=" + groupId
+                + ", processId=" + processId
+                + ", priority=" + priority
+                + ", status=" + status
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 
     public TaskGroupQueueStatus getStatus() {

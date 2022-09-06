@@ -68,7 +68,8 @@ public class MapReduceTask extends AbstractYarnTask {
 
         logger.info("mapreduce task params {}", taskExecutionContext.getTaskParams());
 
-        this.mapreduceParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MapReduceParameters.class);
+        this.mapreduceParameters =
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MapReduceParameters.class);
 
         // check parameters
         if (mapreduceParameters == null || !mapreduceParameters.checkParameters()) {
@@ -81,10 +82,13 @@ public class MapReduceTask extends AbstractYarnTask {
         // replace placeholder,and combine local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-        String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));
+        String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),
+                ParamUtils.convert(paramsMap));
         mapreduceParameters.setMainArgs(args);
-        if (mapreduceParameters.getProgramType() != null && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
-            String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),  ParamUtils.convert(paramsMap));
+        if (mapreduceParameters.getProgramType() != null
+                && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
+            String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),
+                    ParamUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
     }

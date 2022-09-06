@@ -40,11 +40,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 import static java.util.Objects.requireNonNull;
 import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.*;
 
 public final class WeChatSender {
+
     private static final Logger logger = LoggerFactory.getLogger(WeChatSender.class);
     private static final String MUST_NOT_NULL = " must not null";
     private static final String ALERT_STATUS = "false";
@@ -210,11 +210,15 @@ public final class WeChatSender {
         String msgJson = "";
         if (sendType.equals(WeChatType.APP.getDescp())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
-            WechatAppMessage wechatAppMessage = new WechatAppMessage(weChatUsers, showType, Integer.valueOf(weChatAgentIdChatId), contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY, WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
+            WechatAppMessage wechatAppMessage = new WechatAppMessage(weChatUsers, showType,
+                    Integer.valueOf(weChatAgentIdChatId), contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY,
+                    WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
             msgJson = JSONUtils.toJsonString(wechatAppMessage);
         } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
-            enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
-            WechatAppChatMessage wechatAppChatMessage = new WechatAppChatMessage(weChatAgentIdChatId, showType, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
+            enterpriseWeChatPushUrlReplace =
+                    WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+            WechatAppChatMessage wechatAppChatMessage =
+                    new WechatAppChatMessage(weChatAgentIdChatId, showType, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
             msgJson = JSONUtils.toJsonString(wechatAppChatMessage);
         }
 
@@ -248,6 +252,7 @@ public final class WeChatSender {
     }
 
     static final class WeChatSendMsgResponse {
+
         private Integer errcode;
         private String errmsg;
 
@@ -302,7 +307,8 @@ public final class WeChatSender {
         }
 
         public String toString() {
-            return "WeChatSender.WeChatSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg() + ")";
+            return "WeChatSender.WeChatSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg()
+                    + ")";
         }
     }
 }

@@ -31,7 +31,7 @@ public class Queue {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
     /**
      * queue name

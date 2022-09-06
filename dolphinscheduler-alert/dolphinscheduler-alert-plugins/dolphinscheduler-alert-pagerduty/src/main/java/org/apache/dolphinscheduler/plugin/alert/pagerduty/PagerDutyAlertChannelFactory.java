@@ -28,6 +28,7 @@ import java.util.List;
 
 @AutoService(AlertChannelFactory.class)
 public final class PagerDutyAlertChannelFactory implements AlertChannelFactory {
+
     @Override
     public String name() {
         return "PagerDuty";
@@ -35,7 +36,9 @@ public final class PagerDutyAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> params() {
-        InputParam integrationKey = InputParam.newBuilder(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME, PagerDutyParamsConstants.PAGER_DUTY_INTEGRATION_KEY)
+        InputParam integrationKey = InputParam
+                .newBuilder(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME,
+                        PagerDutyParamsConstants.PAGER_DUTY_INTEGRATION_KEY)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())

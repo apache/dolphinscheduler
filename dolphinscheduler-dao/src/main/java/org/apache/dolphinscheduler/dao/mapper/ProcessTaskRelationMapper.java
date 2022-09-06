@@ -100,7 +100,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+    List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode,
+                                                  @Param("taskCode") long taskCode);
 
     /**
      * query downstream process task relation by taskCode
@@ -109,7 +110,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+    List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode,
+                                                    @Param("taskCode") long taskCode);
 
     /**
      * query task relation by codes
@@ -119,7 +121,9 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param preTaskCodes preTaskCode list
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode, @Param("preTaskCodes") Long[] preTaskCodes);
+    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode,
+                                                   @Param("taskCode") long taskCode,
+                                                   @Param("preTaskCodes") Long[] preTaskCodes);
 
     /**
      * query process task relation by process definition code
@@ -193,6 +197,5 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
-
 
 }

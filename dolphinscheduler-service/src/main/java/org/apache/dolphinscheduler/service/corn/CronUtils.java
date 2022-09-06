@@ -50,20 +50,20 @@ import static org.apache.dolphinscheduler.service.corn.CycleFactory.month;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.week;
 import static org.apache.dolphinscheduler.service.corn.CycleFactory.year;
 
-
 /**
  * // todo: this utils is heavy, it rely on quartz and corn-utils.
  * cron utils
  */
 public class CronUtils {
+
     private CronUtils() {
         throw new IllegalStateException("CronUtils class");
     }
 
     private static final Logger logger = LoggerFactory.getLogger(CronUtils.class);
 
-
-    private static final CronParser QUARTZ_CRON_PARSER = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
+    private static final CronParser QUARTZ_CRON_PARSER =
+            new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
 
     /**
      * parse to cron
@@ -93,7 +93,8 @@ public class CronUtils {
      * @return CycleEnum
      */
     public static CycleEnum getMaxCycle(Cron cron) {
-        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).addCycle(year(cron)).getCycle();
+        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron))
+                .addCycle(year(cron)).getCycle();
     }
 
     /**
@@ -103,7 +104,8 @@ public class CronUtils {
      * @return CycleEnum
      */
     public static CycleEnum getMiniCycle(Cron cron) {
-        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).addCycle(year(cron)).getMiniCycle();
+        return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron))
+                .addCycle(year(cron)).getMiniCycle();
     }
 
     /**
@@ -147,7 +149,8 @@ public class CronUtils {
      * @param fireTimes fireTimes
      * @return date list
      */
-    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression, int fireTimes) {
+    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression,
+                                                 int fireTimes) {
         List<Date> dateList = new ArrayList<>();
         while (fireTimes > 0) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
@@ -187,7 +190,8 @@ public class CronUtils {
      * gets all scheduled times for a period of time based on self dependency
      * if schedulers is empty then default scheduler = 1 day
      */
-    public static List<Date> getSelfFireDateList(final Date startTime, final Date endTime, final List<Schedule> schedules) {
+    public static List<Date> getSelfFireDateList(final Date startTime, final Date endTime,
+                                                 final List<Schedule> schedules) {
         List<Date> result = new ArrayList<>();
         if (startTime.equals(endTime)) {
             result.add(startTime);
@@ -289,10 +293,10 @@ public class CronUtils {
      * @param param
      * @return  date list
      */
-    public static List<Date> getSelfScheduleDateList(Map<String, String> param){
+    public static List<Date> getSelfScheduleDateList(Map<String, String> param) {
         List<Date> result = new ArrayList<>();
         String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-        if(StringUtils.isNotEmpty(scheduleDates)){
+        if (StringUtils.isNotEmpty(scheduleDates)) {
             for (String stringDate : scheduleDates.split(COMMA)) {
                 result.add(DateUtils.stringToDate(stringDate.trim()));
             }

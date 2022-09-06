@@ -74,7 +74,6 @@ public class S3Utils implements Closeable, StorageOperate {
 
     public static final String REGION = PropertyUtils.getString(Constants.AWS_REGION);
 
-
     private AmazonS3 s3Client = null;
 
     private S3Utils() {
@@ -84,13 +83,16 @@ public class S3Utils implements Closeable, StorageOperate {
                 s3Client = AmazonS3ClientBuilder
                         .standard()
                         .withPathStyleAccessEnabled(true)
-                        .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(PropertyUtils.getString(AWS_END_POINT), Regions.fromName(REGION).getName()))
-                        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
+                        .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
+                                PropertyUtils.getString(AWS_END_POINT), Regions.fromName(REGION).getName()))
+                        .withCredentials(
+                                new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
                         .build();
             } else {
                 s3Client = AmazonS3ClientBuilder
                         .standard()
-                        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
+                        .withCredentials(
+                                new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
                         .withRegion(Regions.fromName(REGION))
                         .build();
             }
@@ -102,6 +104,7 @@ public class S3Utils implements Closeable, StorageOperate {
      * S3Utils single
      */
     private enum S3Singleton {
+
         INSTANCE;
 
         private final S3Utils instance;
@@ -126,24 +129,24 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public void createTenantDirIfNotExists(String tenantCode) throws ServiceException {
-        createFolder(tenantCode+ FOLDER_SEPARATOR +RESOURCE_TYPE_UDF);
-        createFolder(tenantCode+ FOLDER_SEPARATOR +RESOURCE_TYPE_FILE);
+        createFolder(tenantCode + FOLDER_SEPARATOR + RESOURCE_TYPE_UDF);
+        createFolder(tenantCode + FOLDER_SEPARATOR + RESOURCE_TYPE_FILE);
     }
 
     @Override
     public String getResDir(String tenantCode) {
-        return tenantCode+ FOLDER_SEPARATOR +RESOURCE_TYPE_FILE+FOLDER_SEPARATOR;
+        return tenantCode + FOLDER_SEPARATOR + RESOURCE_TYPE_FILE + FOLDER_SEPARATOR;
     }
 
     @Override
     public String getUdfDir(String tenantCode) {
-        return tenantCode+ FOLDER_SEPARATOR +RESOURCE_TYPE_UDF+FOLDER_SEPARATOR;
+        return tenantCode + FOLDER_SEPARATOR + RESOURCE_TYPE_UDF + FOLDER_SEPARATOR;
     }
 
     @Override
     public boolean mkdir(String tenantCode, String path) throws IOException {
-         createFolder(path);
-         return true;
+        createFolder(path);
+        return true;
     }
 
     @Override
@@ -151,28 +154,31 @@ public class S3Utils implements Closeable, StorageOperate {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
-        return String.format(FORMAT_S_S, tenantCode+FOLDER_SEPARATOR+RESOURCE_TYPE_FILE, fileName);
+        return String.format(FORMAT_S_S, tenantCode + FOLDER_SEPARATOR + RESOURCE_TYPE_FILE, fileName);
     }
     @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
-        return getDir(resourceType, tenantCode)+fileName;
+        return getDir(resourceType, tenantCode) + fileName;
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
+    public void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource,
+                         boolean overwrite) throws IOException {
         S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
-        try (S3ObjectInputStream s3is = o.getObjectContent();
-             FileOutputStream fos = new FileOutputStream(new File(dstFile))) {
+        try (
+                S3ObjectInputStream s3is = o.getObjectContent();
+                FileOutputStream fos = new FileOutputStream(new File(dstFile))) {
             byte[] readBuf = new byte[1024];
             int readLen = 0;
             while ((readLen = s3is.read(readBuf)) > 0) {
                 fos.write(readBuf, 0, readLen);
             }
         } catch (AmazonServiceException e) {
-            logger.error("the resource can`t be downloaded,the bucket is {},and the src is {}", tenantCode, srcFilePath);
+            logger.error("the resource can`t be downloaded,the bucket is {},and the src is {}", tenantCode,
+                    srcFilePath);
             throw new IOException(e.getMessage());
         } catch (FileNotFoundException e) {
             logger.error("the file isn`t exists");
@@ -211,43 +217,44 @@ public class S3Utils implements Closeable, StorageOperate {
             case FILE:
                 return getResDir(tenantCode);
             default:
-                return tenantCode+ FOLDER_SEPARATOR ;
+                return tenantCode + FOLDER_SEPARATOR;
         }
 
     }
 
     @Override
-    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
+                          boolean overwrite) throws IOException {
         try {
             s3Client.putObject(BUCKET_NAME, dstPath, new File(srcFile));
             return true;
         } catch (AmazonServiceException e) {
-            logger.error("upload failed,the bucketName is {},the dstPath is {}", BUCKET_NAME, tenantCode+ FOLDER_SEPARATOR +dstPath);
+            logger.error("upload failed,the bucketName is {},the dstPath is {}", BUCKET_NAME,
+                    tenantCode + FOLDER_SEPARATOR + dstPath);
             return false;
         }
     }
 
-
     @Override
-    public List<String> vimFile(String tenantCode,String filePath, int skipLineNums, int limit) throws IOException {
+    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
         if (StringUtils.isBlank(filePath)) {
             logger.error("file path:{} is blank", filePath);
             return Collections.emptyList();
         }
-            S3Object s3Object=s3Client.getObject(BUCKET_NAME,filePath);
-            try(BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))){
-                Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
-                return stream.collect(Collectors.toList());
-            }
+        S3Object s3Object = s3Client.getObject(BUCKET_NAME, filePath);
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
+            Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
+            return stream.collect(Collectors.toList());
+        }
     }
 
-    private void
-    createFolder( String folderName) {
+    private void createFolder(String folderName) {
         if (!s3Client.doesObjectExist(BUCKET_NAME, folderName + FOLDER_SEPARATOR)) {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(0);
             InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-            PutObjectRequest putObjectRequest = new PutObjectRequest(BUCKET_NAME, folderName + FOLDER_SEPARATOR, emptyContent, metadata);
+            PutObjectRequest putObjectRequest =
+                    new PutObjectRequest(BUCKET_NAME, folderName + FOLDER_SEPARATOR, emptyContent, metadata);
             s3Client.putObject(putObjectRequest);
         }
     }
@@ -270,9 +277,8 @@ public class S3Utils implements Closeable, StorageOperate {
      * @param strPath
      */
     private void uploadDirectory(String tenantCode, String keyPrefix, String strPath) {
-        s3Client.putObject(BUCKET_NAME, tenantCode+ FOLDER_SEPARATOR +keyPrefix, new File(strPath));
+        s3Client.putObject(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(strPath));
     }
-
 
     /**
      * xxx untest
@@ -281,13 +287,15 @@ public class S3Utils implements Closeable, StorageOperate {
      * @param keyPrefix the name of directory
      * @param srcPath
      */
-    private void downloadDirectory(String  tenantCode, String keyPrefix, String srcPath){
-        TransferManager  tm= TransferManagerBuilder.standard().withS3Client(s3Client).build();
-        try{
-            MultipleFileDownload download = tm.downloadDirectory(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(srcPath));
+    private void downloadDirectory(String tenantCode, String keyPrefix, String srcPath) {
+        TransferManager tm = TransferManagerBuilder.standard().withS3Client(s3Client).build();
+        try {
+            MultipleFileDownload download =
+                    tm.downloadDirectory(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(srcPath));
             download.waitForCompletion();
         } catch (AmazonS3Exception | InterruptedException e) {
-            logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix);
+            logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME,
+                    tenantCode + FOLDER_SEPARATOR + keyPrefix);
             Thread.currentThread().interrupt();
         } finally {
             tm.shutdownNow();
@@ -302,7 +310,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     /*
-    only delete the object of directory ,it`s better to delete the files in it -r
+     * only delete the object of directory ,it`s better to delete the files in it -r
      */
     private void deleteDirectory(String directoryName) {
         if (s3Client.doesObjectExist(BUCKET_NAME, directoryName)) {

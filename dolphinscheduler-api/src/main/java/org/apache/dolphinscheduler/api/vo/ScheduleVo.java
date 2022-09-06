@@ -112,7 +112,6 @@ public class ScheduleVo {
      */
     private int warningGroupId;
 
-
     /**
      * process instance priority
      */
@@ -304,27 +303,27 @@ public class ScheduleVo {
     @Override
     public String toString() {
         return "Schedule{"
-            + "id=" + id
-            + ", processDefinitionCode=" + processDefinitionCode
-            + ", processDefinitionName='" + processDefinitionName + '\''
-            + ", projectName='" + projectName + '\''
-            + ", description='" + definitionDescription + '\''
-            + ", startTime=" + startTime
-            + ", endTime=" + endTime
-            + ", timezoneId='" + timezoneId + +'\''
-            + ", crontab='" + crontab + '\''
-            + ", failureStrategy=" + failureStrategy
-            + ", warningType=" + warningType
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + ", userId=" + userId
-            + ", userName='" + userName + '\''
-            + ", releaseState=" + releaseState
-            + ", warningGroupId=" + warningGroupId
-            + ", processInstancePriority=" + processInstancePriority
-            + ", workerGroup='" + workerGroup + '\''
-            + ", environmentCode='" + environmentCode + '\''
-            + '}';
+                + "id=" + id
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", processDefinitionName='" + processDefinitionName + '\''
+                + ", projectName='" + projectName + '\''
+                + ", description='" + definitionDescription + '\''
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", timezoneId='" + timezoneId + +'\''
+                + ", crontab='" + crontab + '\''
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", releaseState=" + releaseState
+                + ", warningGroupId=" + warningGroupId
+                + ", processInstancePriority=" + processInstancePriority
+                + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
+                + '}';
     }
 
     public String getDefinitionDescription() {

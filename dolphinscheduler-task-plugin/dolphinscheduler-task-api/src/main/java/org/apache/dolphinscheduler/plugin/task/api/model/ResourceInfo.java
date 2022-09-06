@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.plugin.task.api.model;
  * resource info
  */
 public class ResourceInfo {
+
     /**
      * res the name of the resource that was uploaded
      */

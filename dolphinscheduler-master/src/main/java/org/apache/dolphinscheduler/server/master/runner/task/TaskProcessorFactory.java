@@ -47,10 +47,12 @@ public final class TaskProcessorFactory {
         for (Map.Entry<String, ITaskProcessor> entry : prioritySPIFactory.getSPIMap().entrySet()) {
             try {
                 logger.info("Registering task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
-                PROCESS_MAP.put(entry.getKey(), (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
+                PROCESS_MAP.put(entry.getKey(),
+                        (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
                 logger.info("Registered task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
             } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException(String.format("The task processor: %s should has a no args constructor", entry.getKey()));
+                throw new IllegalArgumentException(
+                        String.format("The task processor: %s should has a no args constructor", entry.getKey()));
             }
         }
     }

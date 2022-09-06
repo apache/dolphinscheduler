@@ -28,6 +28,7 @@ import java.util.Date;
  * RuleInputEntry
  */
 public class DqRuleInputEntry implements Serializable {
+
     /**
      * primary key
      */

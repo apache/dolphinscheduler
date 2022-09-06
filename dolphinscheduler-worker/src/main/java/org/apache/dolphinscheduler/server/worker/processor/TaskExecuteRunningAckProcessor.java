@@ -49,10 +49,10 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING_ACK == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteRunningAckMessage runningAckCommand = JSONUtils.parseObject(command.getBody(),
-                                                                               TaskExecuteRunningAckMessage.class);
+                TaskExecuteRunningAckMessage.class);
         if (runningAckCommand == null) {
             logger.error("task execute running ack command is null");
             return;
@@ -63,7 +63,7 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
 
             if (runningAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
                 messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),
-                                                      CommandType.TASK_EXECUTE_RUNNING);
+                        CommandType.TASK_EXECUTE_RUNNING);
             }
         } finally {
             LoggerUtils.removeTaskInstanceIdMDC();

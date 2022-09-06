@@ -73,7 +73,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
+                loginUser.getId(), logger);
         if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
             ids = ids.isEmpty() ? new HashSet<>() : ids;
             ids.add(Constants.DEFAULT_QUEUE_ID);
@@ -97,7 +98,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
+                loginUser.getId(), logger);
         if (ids.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -126,7 +128,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Transactional
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.QUEUE, YARN_QUEUE_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -162,7 +164,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.insert(queueObj);
         result.put(Constants.DATA_LIST, queueObj);
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
+        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()),
+                logger);
         return result;
     }
 
@@ -178,7 +181,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.QUEUE, YARN_QUEUE_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -220,7 +223,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         // check old queue using by any user
         if (checkIfQueueIsInUsing(queueObj.getQueueName(), queueName)) {
-            //update user related old queue
+            // update user related old queue
             Integer relatedUserNums = userMapper.updateUserQueue(queueObj.getQueueName(), queueName);
             logger.info("old queue have related {} user, exec update user success.", relatedUserNums);
         }

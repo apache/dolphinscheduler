@@ -84,13 +84,13 @@ public class DependentProcessDefinition {
                 cycleEnum = CycleEnum.DAY;
                 break;
             case "hour":
-                cycleEnum =  CycleEnum.HOUR;
+                cycleEnum = CycleEnum.HOUR;
                 break;
             case "week":
-                cycleEnum =  CycleEnum.WEEK;
+                cycleEnum = CycleEnum.WEEK;
                 break;
             case "month":
-                cycleEnum =  CycleEnum.MONTH;
+                cycleEnum = CycleEnum.MONTH;
                 break;
             default:
                 break;

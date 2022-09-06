@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 public final class WeChatAlertParamsConstants {
+
     static final String ENTERPRISE_WE_CHAT_CORP_ID = "$t('corpId')";
     static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "corpId";
     static final String ENTERPRISE_WE_CHAT_SECRET = "$t('secret')";

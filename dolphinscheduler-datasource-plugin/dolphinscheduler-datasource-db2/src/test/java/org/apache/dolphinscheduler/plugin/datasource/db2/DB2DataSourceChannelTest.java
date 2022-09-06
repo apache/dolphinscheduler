@@ -38,7 +38,8 @@ public class DB2DataSourceChannelTest {
     public void testCreateDataSourceClient() {
         DB2DataSourceChannel sourceChannel = PowerMockito.mock(DB2DataSourceChannel.class);
         DB2DataSourceClient dataSourceClient = PowerMockito.mock(DB2DataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
     }
 }

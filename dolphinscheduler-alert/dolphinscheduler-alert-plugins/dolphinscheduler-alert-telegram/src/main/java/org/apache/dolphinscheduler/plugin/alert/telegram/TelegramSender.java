@@ -69,7 +69,6 @@ public final class TelegramSender {
 
     private String password;
 
-
     TelegramSender(Map<String, String> config) {
         url = config.get(TelegramParamsConstants.NAME_TELEGRAM_WEB_HOOK);
         botToken = config.get(TelegramParamsConstants.NAME_TELEGRAM_BOT_TOKEN);
@@ -132,14 +131,13 @@ public final class TelegramSender {
         return result;
     }
 
-
     private String sendInvoke(String title, String content) throws IOException {
         HttpPost httpPost = buildHttpPost(url, buildMsgJsonStr(content));
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
             if (StringUtils.isNotEmpty(user) && StringUtils.isNotEmpty(password)) {
                 httpClient = getProxyClient(proxy, port, user, password);
-            }else {
+            } else {
                 httpClient = getDefaultClient();
             }
             RequestConfig rcf = getProxyConfig(proxy, port);
@@ -180,6 +178,7 @@ public final class TelegramSender {
     }
 
     static class TelegramSendMsgResponse {
+
         @JsonProperty("ok")
         private Boolean ok;
         @JsonProperty("error_code")

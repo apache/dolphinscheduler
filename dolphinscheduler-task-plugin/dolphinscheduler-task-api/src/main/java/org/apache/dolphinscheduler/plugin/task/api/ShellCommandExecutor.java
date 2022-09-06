@@ -65,10 +65,8 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.%s"
-                , taskRequest.getExecutePath()
-                , taskRequest.getTaskAppId()
-                , OSUtils.isWindows() ? "bat" : "command");
+        return String.format("%s/%s.%s", taskRequest.getExecutePath(), taskRequest.getTaskAppId(),
+                OSUtils.isWindows() ? "bat" : "command");
     }
 
     /**

@@ -50,25 +50,28 @@ public class StateEventProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.STATE_EVENT_REQUEST == command.getType(), String.format("invalid command type: %s", command.getType()));
+        Preconditions.checkArgument(CommandType.STATE_EVENT_REQUEST == command.getType(),
+                String.format("invalid command type: %s", command.getType()));
 
-        StateEventChangeCommand stateEventChangeCommand = JSONUtils.parseObject(command.getBody(), StateEventChangeCommand.class);
+        StateEventChangeCommand stateEventChangeCommand =
+                JSONUtils.parseObject(command.getBody(), StateEventChangeCommand.class);
         StateEvent stateEvent = new StateEvent();
         stateEvent.setKey(stateEventChangeCommand.getKey());
-        if (stateEventChangeCommand.getSourceProcessInstanceId() != stateEventChangeCommand.getDestProcessInstanceId()) {
+        if (stateEventChangeCommand.getSourceProcessInstanceId() != stateEventChangeCommand
+                .getDestProcessInstanceId()) {
             stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         } else {
             stateEvent.setExecutionStatus(stateEventChangeCommand.getSourceStatus());
         }
         stateEvent.setProcessInstanceId(stateEventChangeCommand.getDestProcessInstanceId());
         stateEvent.setTaskInstanceId(stateEventChangeCommand.getDestTaskInstanceId());
-        StateEventType
-            type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
+        StateEventType type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE
+                : StateEventType.TASK_STATE_CHANGE;
         stateEvent.setType(type);
 
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                stateEvent.getTaskInstanceId());
+                    stateEvent.getTaskInstanceId());
 
             logger.info("Received state change command, event: {}", stateEvent);
             stateEventResponseService.addStateChangeEvent(stateEvent);

@@ -48,6 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Ignore
 public class NettyExecutorManagerTest {
+
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
     @Test
@@ -55,8 +56,9 @@ public class NettyExecutorManagerTest {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(org.apache.dolphinscheduler.remote.command.CommandType.TASK_DISPATCH_REQUEST,
-                                              new TaskDispatchProcessor());
+        nettyRemotingServer.registerProcessor(
+                org.apache.dolphinscheduler.remote.command.CommandType.TASK_DISPATCH_REQUEST,
+                new TaskDispatchProcessor());
         nettyRemotingServer.start();
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
@@ -64,10 +66,10 @@ public class NettyExecutorManagerTest {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                                                                  .buildTaskInstanceRelatedInfo(taskInstance)
-                                                                  .buildProcessInstanceRelatedInfo(processInstance)
-                                                                  .buildProcessDefinitionRelatedInfo(processDefinition)
-                                                                  .create();
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processDefinition)
+                .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(serverConfig.getListenPort())));
         Boolean execute = nettyExecutorManager.execute(executionContext);
@@ -94,9 +96,9 @@ public class NettyExecutorManagerTest {
     }
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
-                                                                     "127.0.0.1:5678",
-                                                                     "127.0.0.1:1234",
-                                                                     System.currentTimeMillis());
+                "127.0.0.1:5678",
+                "127.0.0.1:1234",
+                System.currentTimeMillis());
         return requestCommand.convert2Command();
     }
 }

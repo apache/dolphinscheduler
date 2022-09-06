@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.alert.api;
 
 public enum ShowType {
+
     /**
      * 0 TABLE;
      * 1 TEXT;

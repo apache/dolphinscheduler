@@ -19,9 +19,8 @@ package org.apache.dolphinscheduler.rpc.common;
 
 public enum RequestEventType {
 
-    HEARTBEAT((byte)1,"heartbeat"),
-    BUSINESS((byte)2,"business request");
-
+    HEARTBEAT((byte) 1, "heartbeat"),
+    BUSINESS((byte) 2, "business request");
 
     private Byte type;
 

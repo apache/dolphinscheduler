@@ -38,6 +38,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootApplication(scanBasePackageClasses = DaoConfiguration.class)
 public class WorkerGroupDaoTest {
+
     @Autowired
     protected DataSource dataSource;
 

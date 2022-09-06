@@ -67,7 +67,6 @@ public class AlertGroupController extends BaseController {
     @Autowired
     private AlertGroupService alertGroupService;
 
-
     /**
      * create alert group
      *
@@ -78,9 +77,9 @@ public class AlertGroupController extends BaseController {
      */
     @ApiOperation(value = "createAlertgroup", notes = "CREATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
+            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -90,7 +89,8 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
+        Map<String, Object> result =
+                alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -122,9 +122,9 @@ public class AlertGroupController extends BaseController {
      */
     @ApiOperation(value = "queryAlertGroupListPaging", notes = "QUERY_ALERT_GROUP_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -163,8 +163,6 @@ public class AlertGroupController extends BaseController {
         return returnDataList(result);
     }
 
-
-
     /**
      * updateProcessInstance alert group
      *
@@ -176,10 +174,10 @@ public class AlertGroupController extends BaseController {
      */
     @ApiOperation(value = "updateAlertgroup", notes = "UPDATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
+            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -191,7 +189,8 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
 
-        Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
+        Map<String, Object> result =
+                alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -204,7 +203,7 @@ public class AlertGroupController extends BaseController {
      */
     @ApiOperation(value = "delAlertgroupById", notes = "DELETE_ALERT_GROUP_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -216,7 +215,6 @@ public class AlertGroupController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * check alert group exist
      *
@@ -226,7 +224,7 @@ public class AlertGroupController extends BaseController {
      */
     @ApiOperation(value = "verifyGroupName", notes = "VERIFY_ALERT_GROUP_NAME_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)

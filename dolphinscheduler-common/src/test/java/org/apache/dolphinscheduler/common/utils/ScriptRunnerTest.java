@@ -22,9 +22,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ScriptRunnerTest {
+
     @Test
     public void testRunScript() {
-        //connection is null
+        // connection is null
         Exception exception = null;
         ScriptRunner s = new ScriptRunner(null, true, true);
         try {

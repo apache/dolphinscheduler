@@ -94,8 +94,7 @@ public abstract class BaseLoopTaskExecutor extends AbstractTaskExecutor {
     /**
      * Query the loop task status, if query failed, directly throw exception
      */
-    public abstract @NonNull LoopTaskInstanceStatus queryTaskInstanceStatus(@NonNull LoopTaskInstanceInfo taskInstanceInfo)
-        throws TaskException;
+    public abstract @NonNull LoopTaskInstanceStatus queryTaskInstanceStatus(@NonNull LoopTaskInstanceInfo taskInstanceInfo) throws TaskException;
 
     /**
      * Get the interval time to query the loop task status

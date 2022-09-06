@@ -35,8 +35,8 @@ public class ResourceUserMapperTest extends BaseDaoTest {
      * insert
      * @return ResourcesUser
      */
-    private ResourcesUser insertOne(){
-        //insertOne
+    private ResourcesUser insertOne() {
+        // insertOne
         ResourcesUser resourcesUser = new ResourcesUser();
         resourcesUser.setCreateTime(new Date());
         resourcesUser.setUpdateTime(new Date());
@@ -51,11 +51,11 @@ public class ResourceUserMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         ResourcesUser queue = insertOne();
         queue.setCreateTime(new Date());
-        //update
+        // update
         int update = resourceUserMapper.updateById(queue);
         Assert.assertEquals(1, update);
     }
@@ -64,7 +64,7 @@ public class ResourceUserMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         ResourcesUser queue = insertOne();
         int delete = resourceUserMapper.deleteById(queue.getId());
         Assert.assertEquals(1, delete);
@@ -76,7 +76,7 @@ public class ResourceUserMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         ResourcesUser queue = insertOne();
-        //query
+        // query
         List<ResourcesUser> queues = resourceUserMapper.selectList(null);
         Assert.assertNotEquals(queues.size(), 0);
     }

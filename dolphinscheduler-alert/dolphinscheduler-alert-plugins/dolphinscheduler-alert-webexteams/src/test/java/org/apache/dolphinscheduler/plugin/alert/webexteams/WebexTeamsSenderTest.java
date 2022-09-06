@@ -28,25 +28,26 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class WebexTeamsSenderTest {
+
     private static final Map<String, String> webexTeamsConfig = new HashMap<>();
 
     private AlertData alertData;
 
     private String content = "[{" +
-        "\"projectId\":90001," +
-        "\"projectName\":\"test-k8s\"," +
-        "\"owner\":\"test@cisco.com\"," +
-        "\"processId\":90019," +
-        "\"processDefinitionCode\":1111111," +
-        "\"processName\":\"test-name\"," +
-        "\"taskCode\":2222222," +
-        "\"taskName\":\"test\"," +
-        "\"taskType\":\"SQL\"," +
-        "\"taskState\":\"FAILURE\"," +
-        "\"taskStartTime\":\"2022-01-12 11:05:27\"," +
-        "\"taskEndTime\":\"2022-01-12 11:05:28\"," +
-        "\"taskHost\":\"dolphinscheduler-test\"," +
-        "\"logPath\":\"test.log\"}]";
+            "\"projectId\":90001," +
+            "\"projectName\":\"test-k8s\"," +
+            "\"owner\":\"test@cisco.com\"," +
+            "\"processId\":90019," +
+            "\"processDefinitionCode\":1111111," +
+            "\"processName\":\"test-name\"," +
+            "\"taskCode\":2222222," +
+            "\"taskName\":\"test\"," +
+            "\"taskType\":\"SQL\"," +
+            "\"taskState\":\"FAILURE\"," +
+            "\"taskStartTime\":\"2022-01-12 11:05:27\"," +
+            "\"taskEndTime\":\"2022-01-12 11:05:28\"," +
+            "\"taskHost\":\"dolphinscheduler-test\"," +
+            "\"logPath\":\"test.log\"}]";
 
     @Before
     public void initDingTalkConfig() {
@@ -62,23 +63,26 @@ public class WebexTeamsSenderTest {
 
     @Test
     public void testSendToRoomId() {
-        webexTeamsConfig.put(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION, WebexTeamsDestination.ROOM_ID.getDescp());
+        webexTeamsConfig.put(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION,
+                WebexTeamsDestination.ROOM_ID.getDescp());
         testSend();
     }
 
     @Test
     public void testSendToPersonEmail() {
-        webexTeamsConfig.put(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION, WebexTeamsDestination.PERSON_EMAIL.getDescp());
+        webexTeamsConfig.put(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION,
+                WebexTeamsDestination.PERSON_EMAIL.getDescp());
         testSend();
     }
 
     @Test
     public void testSendToPersonId() {
-        webexTeamsConfig.put(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION, WebexTeamsDestination.PERSON_ID.getDescp());
+        webexTeamsConfig.put(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION,
+                WebexTeamsDestination.PERSON_ID.getDescp());
         testSend();
     }
 
-    public void testSend(){
+    public void testSend() {
         WebexTeamsSender webexTeamsSender = new WebexTeamsSender(webexTeamsConfig);
         AlertResult alertResult = webexTeamsSender.sendWebexTeamsAlter(alertData);
         Assert.assertEquals("false", alertResult.getStatus());

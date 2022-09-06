@@ -25,6 +25,7 @@ import java.util.Map;
 import com.google.common.base.Functions;
 
 public enum WebexTeamsDestination {
+
     /**
      * 0 ROOM_ID;
      * 1 PERSON_EMAIL;
@@ -51,7 +52,8 @@ public enum WebexTeamsDestination {
     }
 
     private static final Map<String, WebexTeamsDestination> WEBEX_TEAMS_DESTINATION_MAP =
-        Arrays.stream(WebexTeamsDestination.values()).collect(toMap(WebexTeamsDestination::getDescp, Functions.identity()));
+            Arrays.stream(WebexTeamsDestination.values())
+                    .collect(toMap(WebexTeamsDestination::getDescp, Functions.identity()));
 
     public static WebexTeamsDestination of(String descp) {
         if (WEBEX_TEAMS_DESTINATION_MAP.containsKey(descp)) {

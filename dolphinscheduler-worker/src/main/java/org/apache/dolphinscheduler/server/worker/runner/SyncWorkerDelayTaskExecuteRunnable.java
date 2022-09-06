@@ -37,7 +37,8 @@ public class SyncWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecuteRu
                                               @NonNull AlertClientService alertClientService,
                                               @NonNull TaskPluginManager taskPluginManager,
                                               @Nullable StorageOperate storageOperate) {
-        super(taskExecutionContext, workerConfig, workflowMaster, workerMessageSender, alertClientService, taskPluginManager, storageOperate);
+        super(taskExecutionContext, workerConfig, workflowMaster, workerMessageSender, alertClientService,
+                taskPluginManager, storageOperate);
     }
 
     @Override

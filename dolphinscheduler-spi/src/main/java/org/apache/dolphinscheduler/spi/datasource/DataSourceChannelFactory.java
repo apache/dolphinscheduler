@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.spi.datasource;
 
 public interface DataSourceChannelFactory {
+
     /**
      * get datasource client
      */

@@ -50,18 +50,18 @@ public class HdfsTargetGenerator implements ITargetGenerator {
 
         try {
             TargetHdfsParameter targetHdfsParameter =
-                JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHdfsParameter.class);
+                    JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHdfsParameter.class);
 
             if (null != targetHdfsParameter) {
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getTargetPath())) {
                     hdfsTargetSb.append(SPACE).append(TARGET_DIR)
-                        .append(SPACE).append(targetHdfsParameter.getTargetPath());
+                            .append(SPACE).append(targetHdfsParameter.getTargetPath());
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getCompressionCodec())) {
                     hdfsTargetSb.append(SPACE).append(COMPRESSION_CODEC)
-                        .append(SPACE).append(targetHdfsParameter.getCompressionCodec());
+                            .append(SPACE).append(targetHdfsParameter.getCompressionCodec());
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getFileType())) {
@@ -74,12 +74,14 @@ public class HdfsTargetGenerator implements ITargetGenerator {
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getFieldsTerminated())) {
                     hdfsTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY)
-                        .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
+                            .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getFieldsTerminated())
+                            .append(SINGLE_QUOTES);
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getLinesTerminated())) {
                     hdfsTargetSb.append(SPACE).append(LINES_TERMINATED_BY)
-                        .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                            .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getLinesTerminated())
+                            .append(SINGLE_QUOTES);
                 }
 
                 hdfsTargetSb.append(SPACE).append(FIELD_NULL_PLACEHOLDER);

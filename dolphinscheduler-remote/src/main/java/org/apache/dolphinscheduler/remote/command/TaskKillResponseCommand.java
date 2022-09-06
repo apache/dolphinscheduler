@@ -42,7 +42,6 @@ public class TaskKillResponseCommand implements Serializable {
      */
     private int status;
 
-
     /**
      * processId
      */

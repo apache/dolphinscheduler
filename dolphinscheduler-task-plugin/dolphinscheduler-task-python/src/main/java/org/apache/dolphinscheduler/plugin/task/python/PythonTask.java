@@ -106,7 +106,7 @@ public class PythonTask extends AbstractTaskExecutor {
             String pythonScriptFile = buildPythonCommandFilePath();
 
             // create this file
-            createPythonCommandFileIfNotExists(pythonScriptContent,pythonScriptFile);
+            createPythonCommandFileIfNotExists(pythonScriptContent, pythonScriptFile);
             String command = buildPythonExecuteCommand(pythonScriptFile);
 
             TaskResponse taskResponse = shellCommandExecutor.run(command);

@@ -56,16 +56,16 @@ public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteResultCommand taskExecuteResultMessage = JSONUtils.parseObject(command.getBody(),
-                                                                                  TaskExecuteResultCommand.class);
+                TaskExecuteResultCommand.class);
         TaskEvent taskResultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
-                                                             channel,
-                                                             taskExecuteResultMessage.getMessageSenderAddress());
+                channel,
+                taskExecuteResultMessage.getMessageSenderAddress());
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),
-                                                        taskResultEvent.getTaskInstanceId());
+                    taskResultEvent.getTaskInstanceId());
             logger.info("Received task execute result, event: {}", taskResultEvent);
 
             taskEventService.addEvent(taskResultEvent);

@@ -36,37 +36,36 @@ import org.powermock.reflect.Whitebox;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class AlertServerTest extends TestCase {
-    
+
     @InjectMocks
     private AlertServer alertServer;
-    
+
     @Mock
     private PluginDao pluginDao;
-    
+
     @Mock
     private AlertConfig alertConfig;
 
     @Mock
     private AlertSenderService alertSenderService;
-    
+
     @Test
     public void testStart() {
 
         Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
-        
+
         Mockito.when(alertConfig.getListenPort()).thenReturn(50053);
 
         Mockito.doNothing().when(alertSenderService).start();
 
         alertServer.run(null);
-    
+
         NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "nettyRemotingServer");
-    
+
         NettyServerConfig nettyServerConfig = Whitebox.getInternalState(nettyRemotingServer, "serverConfig");
-        
+
         Assert.assertEquals(50053, nettyServerConfig.getListenPort());
 
     }

@@ -42,7 +42,6 @@ public class TelegramSenderTest {
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_TXT);
     }
 
-
     @Test
     public void testSendMessageFailByParamToken() {
         AlertData alertData = new AlertData();
@@ -68,8 +67,6 @@ public class TelegramSenderTest {
         Assert.assertEquals("false", result.getStatus());
     }
 
-
-
     @Test
     public void testSendMessage() {
         AlertData alertData = new AlertData();
@@ -85,7 +82,8 @@ public class TelegramSenderTest {
     public void testSendMessageByMarkdown() {
         AlertData alertData = new AlertData();
         alertData.setTitle("[telegram alert]test markdown");
-        alertData.setContent("```python \npre-formatted fixed-width code block written in the Python programming language```");
+        alertData.setContent(
+                "```python \npre-formatted fixed-width code block written in the Python programming language```");
         telegramConfig.put(
                 TelegramParamsConstants.NAME_TELEGRAM_PARSE_MODE, TelegramAlertConstants.PARSE_MODE_MARKDOWN);
         TelegramSender telegramSender = new TelegramSender(telegramConfig);
@@ -106,6 +104,5 @@ public class TelegramSenderTest {
         Assert.assertEquals("false", result.getStatus());
 
     }
-
 
 }

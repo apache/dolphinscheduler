@@ -77,7 +77,6 @@ public interface UserMapper extends BaseMapper<User> {
      */
     User queryUserByNamePassword(@Param("userName") String userName, @Param("password") String password);
 
-
     /**
      * user page
      *

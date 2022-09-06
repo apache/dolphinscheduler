@@ -64,16 +64,21 @@ public class ProcessScheduleTask extends QuartzJobBean {
         // query schedule
         Schedule schedule = processService.querySchedule(scheduleId);
         if (schedule == null || ReleaseState.OFFLINE == schedule.getReleaseState()) {
-            logger.warn("process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}", projectId, scheduleId);
+            logger.warn(
+                    "process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}",
+                    projectId, scheduleId);
             deleteJob(context, projectId, scheduleId);
             return;
         }
 
-        ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
+        ProcessDefinition processDefinition =
+                processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
         // release state : online/offline
         ReleaseState releaseState = processDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
-            logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processId:{}", projectId, processDefinition.getId());
+            logger.warn(
+                    "process definition does not exist in db or offline，need not to create command, projectId:{}, processId:{}",
+                    projectId, processDefinition.getId());
             return;
         }
 
@@ -85,7 +90,8 @@ public class ProcessScheduleTask extends QuartzJobBean {
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
-        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : schedule.getWorkerGroup();
+        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP
+                : schedule.getWorkerGroup();
         command.setWorkerGroup(workerGroup);
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());

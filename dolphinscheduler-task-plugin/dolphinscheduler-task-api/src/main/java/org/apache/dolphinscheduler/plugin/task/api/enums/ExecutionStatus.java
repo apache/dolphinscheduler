@@ -78,13 +78,13 @@ public enum ExecutionStatus {
 
     private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP = new HashMap<>();
 
-    private static final int[] NEED_FAILOVER_STATES = new int[] {
-        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.DISPATCH.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal()
+    private static final int[] NEED_FAILOVER_STATES = new int[]{
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.DISPATCH.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.DELAY_EXECUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal()
     };
 
     static {
@@ -191,8 +191,7 @@ public enum ExecutionStatus {
     }
 
     public static boolean isNeedFailoverWorkflowInstanceState(ExecutionStatus executionStatus) {
-        return
-            ExecutionStatus.SUBMITTED_SUCCESS == executionStatus
+        return ExecutionStatus.SUBMITTED_SUCCESS == executionStatus
                 || ExecutionStatus.DISPATCH == executionStatus
                 || ExecutionStatus.RUNNING_EXECUTION == executionStatus
                 || ExecutionStatus.DELAY_EXECUTION == executionStatus

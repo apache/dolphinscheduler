@@ -34,7 +34,8 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
 
     public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
     /**
@@ -73,7 +74,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
      * @param paramsPropsMap params props map
      */
     public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
-                                Map<String, Property> paramsPropsMap,int taskInstanceId) {
+                                Map<String, Property> paramsPropsMap, int taskInstanceId) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         int index = 1;
@@ -83,12 +84,16 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {
-                logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
-                    + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskInstanceId);
+                logger.error(
+                        "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
+                                + " with id: {}. So couldn't put Property in sqlParamsMap.",
+                        paramName, taskInstanceId);
             } else {
                 sqlParamsMap.put(index, prop);
                 index++;
-                logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
+                logger.info(
+                        "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",
+                        paramName, content);
             }
 
         }

@@ -37,7 +37,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class,
+        DataSourceClientProvider.class, PasswordUtils.class})
 public class Db2DataSourceProcessorTest {
 
     private Db2DataSourceProcessor db2DatasourceProcessor = new Db2DataSourceProcessor();

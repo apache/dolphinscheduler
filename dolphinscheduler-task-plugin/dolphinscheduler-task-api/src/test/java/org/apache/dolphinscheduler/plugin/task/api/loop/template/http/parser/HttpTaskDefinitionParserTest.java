@@ -27,7 +27,7 @@ import org.junit.Test;
 public class HttpTaskDefinitionParserTest {
 
     private static final String yamlFile = HttpTaskDefinitionParserTest.class.getResource("/mock_loop_task.yaml")
-        .getFile();
+            .getFile();
 
     @Test
     public void parseYamlConfigFile() throws IOException {

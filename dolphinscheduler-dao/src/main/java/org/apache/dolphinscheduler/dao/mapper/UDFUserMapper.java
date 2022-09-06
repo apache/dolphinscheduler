@@ -40,4 +40,3 @@ public interface UDFUserMapper extends BaseMapper<UDFUser> {
     int deleteByUdfFuncId(@Param("udfFuncId") int udfFuncId);
 
 }
-

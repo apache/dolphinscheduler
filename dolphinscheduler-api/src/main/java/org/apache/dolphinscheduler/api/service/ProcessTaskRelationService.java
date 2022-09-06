@@ -118,5 +118,6 @@ public interface ProcessTaskRelationService {
      * @param postTaskCode post task code
      * @return delete result code
      */
-    Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode);
+    Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode,
+                                   long postTaskCode);
 }

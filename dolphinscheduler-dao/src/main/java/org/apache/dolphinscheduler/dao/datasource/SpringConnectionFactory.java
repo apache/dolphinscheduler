@@ -81,7 +81,8 @@ public class SpringConnectionFactory {
         sqlSessionFactoryBean.setGlobalConfig(globalConfig);
         sqlSessionFactoryBean.setTypeAliasesPackage("org.apache.dolphinscheduler.dao.entity");
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        sqlSessionFactoryBean.setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
+        sqlSessionFactoryBean
+                .setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.**.enums");
         sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         return sqlSessionFactoryBean.getObject();

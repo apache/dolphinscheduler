@@ -39,7 +39,6 @@ public interface BaseService {
      */
     boolean isAdmin(User user);
 
-
     /**
      * isNotAdmin
      *
@@ -86,7 +85,6 @@ public interface BaseService {
      */
     boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm);
 
-
     /**
      * Verify that the operator has permissions
      *
@@ -125,4 +123,3 @@ public interface BaseService {
     boolean checkLengthIllegal(String input, int length);
 
 }
-

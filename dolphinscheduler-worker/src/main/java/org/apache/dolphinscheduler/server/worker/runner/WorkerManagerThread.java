@@ -45,7 +45,8 @@ public class WorkerManagerThread implements Runnable {
     /**
      * running task
      */
-    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap =
+            new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
         this.waitSubmitQueue = new DelayQueue<>();

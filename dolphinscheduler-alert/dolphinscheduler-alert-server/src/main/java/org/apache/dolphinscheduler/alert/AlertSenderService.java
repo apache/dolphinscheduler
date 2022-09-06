@@ -52,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public final class AlertSenderService extends Thread {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertSenderService.class);
 
     @Autowired
@@ -92,26 +93,26 @@ public final class AlertSenderService extends Thread {
 
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
-            //get alert group from alert
+            // get alert group from alert
             int alertId = Optional.ofNullable(alert.getId()).orElse(0);
             int alertGroupId = Optional.ofNullable(alert.getAlertGroupId()).orElse(0);
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
                 logger.error("send alert msg fail,no bind plugin instance.");
                 List<AlertResult> alertResults = Lists.newArrayList(new AlertResult("false",
-                                                                                    "no bind plugin instance"));
+                        "no bind plugin instance"));
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, JSONUtils.toJsonString(alertResults), alertId);
                 AlertServerMetrics.incAlertFailCount();
                 continue;
             }
             AlertData alertData = AlertData.builder()
-                .id(alertId)
-                .content(alert.getContent())
-                .log(alert.getLog())
-                .title(alert.getTitle())
-                .warnType(alert.getWarningType().getCode())
-                .alertType(alert.getAlertType().getCode())
-                .build();
+                    .id(alertId)
+                    .content(alert.getContent())
+                    .log(alert.getLog())
+                    .title(alert.getTitle())
+                    .warnType(alert.getWarningType().getCode())
+                    .alertType(alert.getAlertType().getCode())
+                    .build();
 
             int sendSuccessCount = 0;
             List<AlertResult> alertResults = new ArrayList<>();
@@ -197,8 +198,8 @@ public final class AlertSenderService extends Thread {
         Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(instance.getPluginDefineId());
         if (!alertChannelOptional.isPresent()) {
             String message = String.format("Alert Plugin %s send error: the channel doesn't exist, pluginDefineId: %s",
-                                           pluginInstanceName,
-                                           pluginDefineId);
+                    pluginInstanceName,
+                    pluginDefineId);
             logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginDefineId);
             return new AlertResult("false", message);
         }

@@ -52,18 +52,18 @@ public class FlinkArgsUtils {
         }
         String others = param.getOthers();
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
-            args.add(FlinkConstants.FLINK_RUN_MODE);  //-m
+            args.add(FlinkConstants.FLINK_RUN_MODE); // -m
 
-            args.add(FlinkConstants.FLINK_YARN_CLUSTER);   //yarn-cluster
+            args.add(FlinkConstants.FLINK_YARN_CLUSTER); // yarn-cluster
 
             int slot = param.getSlot();
             if (slot > 0) {
                 args.add(FlinkConstants.FLINK_YARN_SLOT);
-                args.add(String.format("%d", slot));   //-ys
+                args.add(String.format("%d", slot)); // -ys
             }
 
             String appName = param.getAppName();
-            if (StringUtils.isNotEmpty(appName)) { //-ynm
+            if (StringUtils.isNotEmpty(appName)) { // -ynm
                 args.add(FlinkConstants.FLINK_APP_NAME);
                 args.add(ArgsUtils.escape(appName));
             }
@@ -72,7 +72,7 @@ public class FlinkArgsUtils {
             String flinkVersion = param.getFlinkVersion();
             if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
                 int taskManager = param.getTaskManager();
-                if (taskManager > 0) {                        //-yn
+                if (taskManager > 0) { // -yn
                     args.add(FlinkConstants.FLINK_TASK_MANAGE);
                     args.add(String.format("%d", taskManager));
                 }
@@ -80,7 +80,7 @@ public class FlinkArgsUtils {
             String jobManagerMemory = param.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
                 args.add(FlinkConstants.FLINK_JOB_MANAGE_MEM);
-                args.add(jobManagerMemory); //-yjm
+                args.add(jobManagerMemory); // -yjm
             }
 
             String taskManagerMemory = param.getTaskManagerMemory();
@@ -101,10 +101,11 @@ public class FlinkArgsUtils {
         int parallelism = param.getParallelism();
         if (parallelism > 0) {
             args.add(FlinkConstants.FLINK_PARALLELISM);
-            args.add(String.format("%d", parallelism));   // -p
+            args.add(String.format("%d", parallelism)); // -p
         }
 
-        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated abruptly
+        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated
+        // abruptly
         // The task status will be synchronized with the cluster job status
         args.add(FlinkConstants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
 
@@ -116,8 +117,8 @@ public class FlinkArgsUtils {
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
         if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
-            args.add(FlinkConstants.FLINK_MAIN_CLASS);    //-c
-            args.add(param.getMainClass());          //main class
+            args.add(FlinkConstants.FLINK_MAIN_CLASS); // -c
+            args.add(param.getMainClass()); // main class
         }
 
         ResourceInfo mainJar = param.getMainJar();

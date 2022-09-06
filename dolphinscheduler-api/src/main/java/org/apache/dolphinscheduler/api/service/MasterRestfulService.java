@@ -6,6 +6,7 @@ import org.apache.dolphinscheduler.remote.dto.MasterWorkflowInstanceExecutingLis
 import java.util.List;
 
 public interface MasterRestfulService {
+
     List<MasterWorkflowInstanceExecutingListingDto> listingExecutingWorkflowsByMasterAddress(String masterAddress);
 
     List<MasterTaskInstanceDispatchingDto> listingDispatchingTaskInstanceByMasterAddress(String masterAddress);

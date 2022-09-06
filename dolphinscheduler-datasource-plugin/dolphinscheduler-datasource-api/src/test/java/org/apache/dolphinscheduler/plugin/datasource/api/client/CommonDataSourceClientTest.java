@@ -39,7 +39,8 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest(value = {HikariDataSource.class, CommonDataSourceClient.class, JDBCDataSourceProvider.class, JdbcTemplate.class, Connection.class})
+@PrepareForTest(value = {HikariDataSource.class, CommonDataSourceClient.class, JDBCDataSourceProvider.class,
+        JdbcTemplate.class, Connection.class})
 public class CommonDataSourceClientTest {
 
     @Mock
@@ -59,7 +60,8 @@ public class CommonDataSourceClientTest {
         commonDataSourceClient.checkEnv(baseConnectionParam);
         Mockito.verify(commonDataSourceClient).checkEnv(Mockito.any(BaseConnectionParam.class));
 
-        PowerMockito.doNothing().when(commonDataSourceClient).checkValidationQuery(Mockito.any(BaseConnectionParam.class));
+        PowerMockito.doNothing().when(commonDataSourceClient)
+                .checkValidationQuery(Mockito.any(BaseConnectionParam.class));
         commonDataSourceClient.checkValidationQuery(baseConnectionParam);
         Mockito.verify(commonDataSourceClient).checkValidationQuery(Mockito.any(BaseConnectionParam.class));
 
@@ -67,7 +69,8 @@ public class CommonDataSourceClientTest {
         commonDataSourceClient.checkUser(baseConnectionParam);
         Mockito.verify(commonDataSourceClient).checkUser(Mockito.any(BaseConnectionParam.class));
 
-        PowerMockito.doNothing().when(commonDataSourceClient).setDefaultUsername(Mockito.any(BaseConnectionParam.class));
+        PowerMockito.doNothing().when(commonDataSourceClient)
+                .setDefaultUsername(Mockito.any(BaseConnectionParam.class));
         commonDataSourceClient.setDefaultUsername(baseConnectionParam);
         Mockito.verify(commonDataSourceClient).setDefaultUsername(Mockito.any(BaseConnectionParam.class));
     }
@@ -75,7 +78,8 @@ public class CommonDataSourceClientTest {
     @Test
     public void testInitClient() {
         BaseConnectionParam baseConnectionParam = new MySQLConnectionParam();
-        PowerMockito.doNothing().when(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), Mockito.any());
+        PowerMockito.doNothing().when(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class),
+                Mockito.any());
         commonDataSourceClient.initClient(baseConnectionParam, DbType.MYSQL);
         Mockito.verify(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), Mockito.any());
     }

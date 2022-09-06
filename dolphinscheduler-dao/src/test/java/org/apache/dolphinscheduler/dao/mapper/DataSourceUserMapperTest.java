@@ -37,7 +37,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
      * @return DatasourceUser
      */
     private DatasourceUser insertOne() {
-        //insertOne
+        // insertOne
         DatasourceUser dataSourceUser = new DatasourceUser();
         dataSourceUser.setUserId(4);
         dataSourceUser.setDatasourceId(1010);
@@ -53,9 +53,9 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         DatasourceUser dataSourceUser = insertOne();
-        //update
+        // update
         dataSourceUser.setUpdateTime(new Date());
         int update = dataSourceUserMapper.updateById(dataSourceUser);
         Assert.assertEquals(update, 1);
@@ -78,7 +78,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         DatasourceUser dataSourceUser = insertOne();
-        //query
+        // query
         List<DatasourceUser> dataSources = dataSourceUserMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
     }

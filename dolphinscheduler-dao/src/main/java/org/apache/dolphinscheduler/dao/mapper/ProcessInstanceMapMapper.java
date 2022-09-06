@@ -37,7 +37,6 @@ public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap>
     ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId,
                                        @Param("parentTaskId") int parentTaskId);
 
-
     /**
      * query by sub process id
      * @param subProcessId subProcessId

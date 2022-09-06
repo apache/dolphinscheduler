@@ -67,7 +67,8 @@ public class LoggerUtils {
         // like TaskAppId=TASK-20211107-798_1-4084-15210
         String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null);
         return String.format("%s=%s-%s-%s_%s-%s-%s",
-                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
+                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr,
+                processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**
@@ -103,10 +104,9 @@ public class LoggerUtils {
         Set<String> appIds = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
             stream.filter(line -> {
-                        Matcher matcher = APPLICATION_REGEX.matcher(line);
-                        return matcher.find();
-                    }
-            ).forEach(line -> {
+                Matcher matcher = APPLICATION_REGEX.matcher(line);
+                return matcher.find();
+            }).forEach(line -> {
                 Matcher matcher = APPLICATION_REGEX.matcher(line);
                 if (matcher.find()) {
                     String appId = matcher.group();

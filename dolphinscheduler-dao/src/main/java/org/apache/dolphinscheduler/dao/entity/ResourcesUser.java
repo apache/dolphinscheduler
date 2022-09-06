@@ -28,94 +28,94 @@ import java.util.Date;
 @TableName("t_ds_relation_resources_user")
 public class ResourcesUser {
 
-  /**
-   * id
-   */
-  @TableId(value="id", type=IdType.AUTO)
-  private int id;
+    /**
+     * id
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private int id;
 
-  /**
-   * user id
-   */
-  private int userId;
+    /**
+     * user id
+     */
+    private int userId;
 
-  /**
-   * resource id
-   */
-  private int resourcesId;
+    /**
+     * resource id
+     */
+    private int resourcesId;
 
-  /**
-   * permission
-   */
-  private int perm;
+    /**
+     * permission
+     */
+    private int perm;
 
-  /**
-   * create time
-   */
-  private Date createTime;
+    /**
+     * create time
+     */
+    private Date createTime;
 
-  /**
-   * update time
-   */
-  private Date updateTime;
+    /**
+     * update time
+     */
+    private Date updateTime;
 
-  public int getId() {
-    return id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public int getUserId() {
-    return userId;
-  }
+    public int getUserId() {
+        return userId;
+    }
 
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-  public int getResourcesId() {
-    return resourcesId;
-  }
+    public int getResourcesId() {
+        return resourcesId;
+    }
 
-  public void setResourcesId(int resourcesId) {
-    this.resourcesId = resourcesId;
-  }
+    public void setResourcesId(int resourcesId) {
+        this.resourcesId = resourcesId;
+    }
 
-  public int getPerm() {
-    return perm;
-  }
+    public int getPerm() {
+        return perm;
+    }
 
-  public void setPerm(int perm) {
-    this.perm = perm;
-  }
+    public void setPerm(int perm) {
+        this.perm = perm;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-  @Override
-  public String toString() {
-    return "ResourcesUser{" +
-            "id=" + id +
-            ", userId=" + userId +
-            ", resourcesId=" + resourcesId +
-            ", perm=" + perm +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "ResourcesUser{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", resourcesId=" + resourcesId +
+                ", perm=" + perm +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }

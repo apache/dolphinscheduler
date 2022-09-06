@@ -28,9 +28,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
 public class TaskRetryStateEventHandler implements StateEventHandler {
+
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException {
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleException {
         TaskMetrics.incTaskRetry();
         Map<Long, TaskInstance> waitToRetryTaskInstanceMap = workflowExecuteRunnable.getWaitToRetryTaskInstanceMap();
         TaskInstance taskInstance = waitToRetryTaskInstanceMap.get(stateEvent.getTaskCode());

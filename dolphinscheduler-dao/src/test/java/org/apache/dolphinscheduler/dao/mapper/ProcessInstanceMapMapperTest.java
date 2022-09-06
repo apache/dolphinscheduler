@@ -36,7 +36,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
      * @return ProcessInstanceMap
      */
     private ProcessInstanceMap insertOne() {
-        //insertOne
+        // insertOne
         ProcessInstanceMap processInstanceMap = new ProcessInstanceMap();
         processInstanceMap.setProcessInstanceId(0);
         processInstanceMap.setParentTaskInstanceId(0);
@@ -50,9 +50,9 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         ProcessInstanceMap processInstanceMap = insertOne();
-        //update
+        // update
         processInstanceMap.setParentProcessInstanceId(1);
         int update = processInstanceMapMapper.updateById(processInstanceMap);
         Assert.assertEquals(1, update);
@@ -74,7 +74,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         ProcessInstanceMap processInstanceMap = insertOne();
-        //query
+        // query
         List<ProcessInstanceMap> dataSources = processInstanceMapMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
     }
@@ -101,8 +101,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         processInstanceMap.setParentProcessInstanceId(100);
         processInstanceMapMapper.updateById(processInstanceMap);
         int delete = processInstanceMapMapper.deleteByParentProcessId(
-                processInstanceMap.getParentProcessInstanceId()
-        );
+                processInstanceMap.getParentProcessInstanceId());
         Assert.assertEquals(1, delete);
     }
 
@@ -118,10 +117,10 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
 
         processInstanceMapMapper.updateById(processInstanceMap);
 
-        List<Integer> subIds = processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
+        List<Integer> subIds =
+                processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
 
         Assert.assertNotEquals(subIds.size(), 0);
-
 
     }
 }

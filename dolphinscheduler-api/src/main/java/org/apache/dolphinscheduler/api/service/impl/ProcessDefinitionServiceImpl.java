@@ -246,7 +246,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
+        if (checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -597,7 +597,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
+        if (checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -755,7 +755,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return true if process definition name not exists, otherwise false
      */
     @Override
-    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name, long processDefinitionCode) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name,
+                                                           long processDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -794,7 +795,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessInstance> processInstances = processInstanceService
                 .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processDefinition.getName(), processInstances.size());
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processDefinition.getName(),
+                    processInstances.size());
         }
 
         // check process used by other task, including subprocess and dependent task type
@@ -805,7 +807,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(),
                             task.getTaskName()))
                     .collect(Collectors.joining(Constants.COMMA));
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, processDefinition.getName(), taskDepDetail);
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, processDefinition.getName(),
+                    taskDepDetail);
         }
     }
 
@@ -847,7 +850,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
                 int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
-                    throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_SCHEDULE_CRON_ERROR, processDefinition.getName());
+                    throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_SCHEDULE_CRON_ERROR,
+                            processDefinition.getName());
                 }
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
@@ -858,7 +862,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR.getCode(), Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR.getMsg() + " : " + processDefinition.getName());
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR.getCode(),
+                    Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR.getMsg() + " : " + processDefinition.getName());
         }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (deleteRelation == 0) {
@@ -1271,8 +1276,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
         String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
 
-        //unique check
-        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
+        // unique check
+        Map<String, Object> checkResult =
+                verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -2160,7 +2166,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
+        if (checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -2300,7 +2306,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        if(checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)){
+        if (checkLengthIllegal(description, Constants.DESC_LENGTH_GO_ONLINE)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

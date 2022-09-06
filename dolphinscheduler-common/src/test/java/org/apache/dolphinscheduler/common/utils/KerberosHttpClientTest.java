@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * KerberosHttpClient  test
  */
 public class KerberosHttpClientTest {
+
     public static final Logger logger = LoggerFactory.getLogger(KerberosHttpClientTest.class);
     private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
 
@@ -36,8 +37,10 @@ public class KerberosHttpClientTest {
         try {
             String applicationUrl = hadoopUtils.getApplicationUrl("application_1542010131334_0029");
             String responseContent;
-            KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                    PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
+            KerberosHttpClient kerberosHttpClient =
+                    new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
+                            PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
             responseContent = kerberosHttpClient.get(applicationUrl,
                     PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
             Assert.assertNull(responseContent);

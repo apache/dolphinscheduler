@@ -25,6 +25,7 @@ public class AlertServerHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AlertConfigProperty {
+
         private String databaseUrl;
         private int listenPort;
         private int waitTimeout;
@@ -38,6 +39,7 @@ public class AlertServerHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AlertMetricsProperty {
+
         private double sendSuccessNum;
         private double sendFailedNum;
     }

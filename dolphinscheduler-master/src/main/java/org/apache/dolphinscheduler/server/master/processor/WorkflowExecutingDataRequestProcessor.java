@@ -50,13 +50,16 @@ public class WorkflowExecutingDataRequestProcessor implements NettyRequestProces
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST == command.getType(), String.format("invalid command type: %s", command.getType()));
+        Preconditions.checkArgument(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST == command.getType(),
+                String.format("invalid command type: %s", command.getType()));
 
-        WorkflowExecutingDataRequestCommand requestCommand = JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataRequestCommand.class);
+        WorkflowExecutingDataRequestCommand requestCommand =
+                JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataRequestCommand.class);
 
         logger.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
 
-        Optional<WorkflowInstanceExecuteDetailDto> workflowExecuteDtoOptional = executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
+        Optional<WorkflowInstanceExecuteDetailDto> workflowExecuteDtoOptional =
+                executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
 
         WorkflowExecutingDataResponseCommand responseCommand = new WorkflowExecutingDataResponseCommand();
         workflowExecuteDtoOptional.ifPresent(responseCommand::setWorkflowInstanceExecuteDetailDto);

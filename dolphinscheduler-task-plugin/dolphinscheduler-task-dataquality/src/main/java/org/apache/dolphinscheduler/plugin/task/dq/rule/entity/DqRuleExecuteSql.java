@@ -26,6 +26,7 @@ import java.util.Date;
  * RuleExecuteSql
  */
 public class DqRuleExecuteSql implements Serializable {
+
     /**
      * primary key
      */

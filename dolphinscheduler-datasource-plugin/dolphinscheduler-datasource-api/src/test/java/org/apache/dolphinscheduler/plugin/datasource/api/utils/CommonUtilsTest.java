@@ -47,7 +47,8 @@ public class CommonUtilsTest {
 
         PowerMockito.mockStatic(PropertyUtils.class);
         PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true)).thenReturn(Boolean.TRUE);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true))
+                .thenReturn(Boolean.TRUE);
         kerberosStartupState = CommonUtils.getKerberosStartupState();
         Assert.assertFalse(kerberosStartupState);
     }
@@ -57,10 +58,14 @@ public class CommonUtilsTest {
         try {
             PowerMockito.mockStatic(PropertyUtils.class);
             PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
-            PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(Boolean.TRUE);
-            PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/opt/krb5.conf");
-            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("hdfs-mycluster@ESZ.COM");
-            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/opt/hdfs.headless.keytab");
+            PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                    .thenReturn(Boolean.TRUE);
+            PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                    .thenReturn("/opt/krb5.conf");
+            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME))
+                    .thenReturn("hdfs-mycluster@ESZ.COM");
+            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH))
+                    .thenReturn("/opt/hdfs.headless.keytab");
 
             PowerMockito.mockStatic(UserGroupInformation.class);
             boolean result = CommonUtils.loadKerberosConf(new Configuration());

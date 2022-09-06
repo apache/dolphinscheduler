@@ -27,6 +27,7 @@ import java.util.Date;
 
 @TableName("t_ds_dq_comparison_type")
 public class DqComparisonType implements Serializable {
+
     /**
      * primary key
      */

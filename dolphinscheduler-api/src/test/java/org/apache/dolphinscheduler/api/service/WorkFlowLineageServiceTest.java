@@ -80,7 +80,8 @@ public class WorkFlowLineageServiceTest {
         Project project = getProject("test");
         String name = "test";
         when(projectMapper.queryByCode(1L)).thenReturn(project);
-        when(workFlowLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any())).thenReturn(getWorkFlowLineages());
+        when(workFlowLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
+                .thenReturn(getWorkFlowLineages());
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(1L, name);
         List<WorkFlowLineage> workFlowLineageList = (List<WorkFlowLineage>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(workFlowLineageList.size() > 0);
@@ -113,8 +114,10 @@ public class WorkFlowLineageServiceTest {
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(1L);
 
         Map<String, Object> workFlowLists = (Map<String, Object>) result.get(Constants.DATA_LIST);
-        Collection<WorkFlowLineage> workFlowLineageList = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
-        Set<WorkFlowRelation> workFlowRelations = (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
+        Collection<WorkFlowLineage> workFlowLineageList =
+                (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
+        Set<WorkFlowRelation> workFlowRelations =
+                (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
         Assert.assertTrue(workFlowLineageList.size() > 0);
         Assert.assertTrue(workFlowRelations.size() > 0);
     }

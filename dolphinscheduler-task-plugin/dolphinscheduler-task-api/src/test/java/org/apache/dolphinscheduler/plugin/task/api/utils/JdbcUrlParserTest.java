@@ -38,7 +38,7 @@ public class JdbcUrlParserTest {
                     + "driverName='mysql', database='dolphinscheduler', "
                     + "params='useUnicode=true&characterEncoding=UTF-8', "
                     + "address='jdbc:mysql://localhost:3306'}";
-            Assert.assertEquals(expected,jdbcInfoStr);
+            Assert.assertEquals(expected, jdbcInfoStr);
         }
     }
 }

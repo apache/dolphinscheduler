@@ -48,6 +48,3 @@ public class LowerWeightRoundRobin extends AbstractSelector<HostWeight> {
 
     }
 }
-
-
-

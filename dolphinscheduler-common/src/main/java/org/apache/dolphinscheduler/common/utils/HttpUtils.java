@@ -66,9 +66,10 @@ public class HttpUtils {
     }
 
     private static class HttpClientInstance {
-        private static final CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(requestConfig).build();
-    }
 
+        private static final CloseableHttpClient httpClient =
+                HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(requestConfig).build();
+    }
 
     private static PoolingHttpClientConnectionManager cm;
 
@@ -81,6 +82,7 @@ public class HttpUtils {
     private static Registry<ConnectionSocketFactory> socketFactoryRegistry;
 
     private static X509TrustManager xtm = new X509TrustManager() {
+
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
         }

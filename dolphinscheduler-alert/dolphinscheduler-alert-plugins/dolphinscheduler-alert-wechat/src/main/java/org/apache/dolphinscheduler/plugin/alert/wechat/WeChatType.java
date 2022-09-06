@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 public enum WeChatType {
+
     APP(1, "应用"),
     APPCHAT(2, "群聊"),
     ;

@@ -29,6 +29,7 @@ import java.util.Date;
  */
 @TableName("t_ds_relation_namespace_user")
 public class K8sNamespaceUser {
+
     /**
      * id
      */
@@ -151,14 +152,14 @@ public class K8sNamespaceUser {
     @Override
     public String toString() {
         return "K8sNamespaceUser{" +
-            "id=" + id +
-            ", userId=" + userId +
-            ", namespaceId=" + namespaceId +
-            ", k8s=" + k8s +
-            ", namespaceName=" + namespaceName +
-            ", perm=" + perm +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
+                "id=" + id +
+                ", userId=" + userId +
+                ", namespaceId=" + namespaceId +
+                ", k8s=" + k8s +
+                ", namespaceName=" + namespaceName +
+                ", perm=" + perm +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

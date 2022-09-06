@@ -37,7 +37,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class,
+        DataSourceClientProvider.class, PasswordUtils.class})
 public class SparkDataSourceProcessorTest {
 
     private SparkDataSourceProcessor sparkDatasourceProcessor = new SparkDataSourceProcessor();
@@ -65,8 +66,9 @@ public class SparkDataSourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"12345\",\"address\":\"jdbc:hive2://localhost1:1234,localhost2:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
+        String connectionJson =
+                "{\"user\":\"root\",\"password\":\"12345\",\"address\":\"jdbc:hive2://localhost1:1234,localhost2:1234\""
+                        + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);

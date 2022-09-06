@@ -20,7 +20,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 
 import java.text.MessageFormat;
 
-
 /**
  * service exception
  */
@@ -44,7 +43,7 @@ public class ServiceException extends RuntimeException {
         this.code = status.getCode();
     }
 
-    public ServiceException(Integer code,String message) {
+    public ServiceException(Integer code, String message) {
         super(message);
         this.code = code;
     }

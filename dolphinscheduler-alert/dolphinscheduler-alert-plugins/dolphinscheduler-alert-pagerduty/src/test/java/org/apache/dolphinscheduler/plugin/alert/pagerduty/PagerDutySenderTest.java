@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PagerDutySenderTest {
+
     private static final Map<String, String> pagerDutyConfig = new HashMap<>();
 
     @Before

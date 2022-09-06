@@ -36,6 +36,7 @@ import org.mockito.Mockito;
  * for test use only
  */
 public class ExecutionContextTestUtils {
+
     public static ExecutionContext getExecutionContext(int port) {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
@@ -43,15 +44,15 @@ public class ExecutionContextTestUtils {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                                                                  .buildTaskInstanceRelatedInfo(taskInstance)
-                                                                  .buildProcessInstanceRelatedInfo(processInstance)
-                                                                  .buildProcessDefinitionRelatedInfo(processDefinition)
-                                                                  .create();
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processDefinition)
+                .create();
 
         TaskDispatchCommand requestCommand = new TaskDispatchCommand(context,
-                                                                     "127.0.0.1:5678",
-                                                                     "127.0.0.1:5678",
-                                                                     System.currentTimeMillis());
+                "127.0.0.1:5678",
+                "127.0.0.1:5678",
+                System.currentTimeMillis());
         Command command = requestCommand.convert2Command();
 
         ExecutionContext executionContext = new ExecutionContext(command, ExecutorType.WORKER, taskInstance);

@@ -117,6 +117,7 @@ public class ProcessAlertContent implements Serializable {
     }
 
     public static class Builder {
+
         private Integer projectId;
         private Long projectCode;
         private String projectName;

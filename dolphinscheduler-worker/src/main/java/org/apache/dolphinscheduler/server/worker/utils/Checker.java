@@ -59,12 +59,14 @@ public class Checker {
                 osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
             }
             if (!osUserExistFlag) {
-                throw new TaskException(String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+                throw new TaskException(
+                        String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
             }
         } catch (TaskException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new TaskException(String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+            throw new TaskException(
+                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
         }
     }
 
@@ -84,7 +86,8 @@ public class Checker {
         }
     }
 
-    public static void downloadResourcesIfNeeded(StorageOperate storageOperate, TaskExecutionContext taskExecutionContext, Logger logger) {
+    public static void downloadResourcesIfNeeded(StorageOperate storageOperate,
+                                                 TaskExecutionContext taskExecutionContext, Logger logger) {
         String execLocalPath = taskExecutionContext.getExecutePath();
         Map<String, String> projectRes = taskExecutionContext.getResources();
         if (MapUtils.isEmpty(projectRes)) {
@@ -113,7 +116,8 @@ public class Checker {
                     String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
                     logger.info("get resource file from path:{}", resPath);
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false, true);
+                    storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false,
+                            true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(

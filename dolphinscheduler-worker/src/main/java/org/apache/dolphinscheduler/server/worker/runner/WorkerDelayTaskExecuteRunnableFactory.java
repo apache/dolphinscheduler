@@ -27,7 +27,9 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.Nullable;
 
-public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDelayTaskExecuteRunnable> implements WorkerTaskExecuteRunnableFactory<T> {
+public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDelayTaskExecuteRunnable>
+        implements
+            WorkerTaskExecuteRunnableFactory<T> {
 
     protected final @NonNull TaskExecutionContext taskExecutionContext;
     protected final @NonNull WorkerConfig workerConfig;
@@ -38,13 +40,13 @@ public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDela
     protected final @Nullable StorageOperate storageOperate;
 
     protected WorkerDelayTaskExecuteRunnableFactory(
-            @NonNull TaskExecutionContext taskExecutionContext,
-            @NonNull WorkerConfig workerConfig,
-            @NonNull String workflowMasterAddress,
-            @NonNull WorkerMessageSender workerMessageSender,
-            @NonNull AlertClientService alertClientService,
-            @NonNull TaskPluginManager taskPluginManager,
-            @Nullable StorageOperate storageOperate) {
+                                                    @NonNull TaskExecutionContext taskExecutionContext,
+                                                    @NonNull WorkerConfig workerConfig,
+                                                    @NonNull String workflowMasterAddress,
+                                                    @NonNull WorkerMessageSender workerMessageSender,
+                                                    @NonNull AlertClientService alertClientService,
+                                                    @NonNull TaskPluginManager taskPluginManager,
+                                                    @Nullable StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workflowMasterAddress = workflowMasterAddress;
@@ -53,7 +55,6 @@ public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDela
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
     }
-
 
     public abstract T createWorkerTaskExecuteRunnable();
 }

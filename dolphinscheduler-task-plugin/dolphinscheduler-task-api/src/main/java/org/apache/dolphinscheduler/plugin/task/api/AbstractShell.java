@@ -148,7 +148,7 @@ public abstract class AbstractShell {
             timeOutTimer = new Timer();
             timeoutTimerTask = new ShellTimeoutTimerTask(
                     this);
-            //One time scheduling.
+            // One time scheduling.
             timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);
         }
         final BufferedReader errReader =
@@ -162,6 +162,7 @@ public abstract class AbstractShell {
         // read error and input streams as this would free up the buffers
         // free the error stream buffer
         Thread errThread = new Thread() {
+
             @Override
             public void run() {
                 try {
@@ -177,6 +178,7 @@ public abstract class AbstractShell {
             }
         };
         Thread inThread = new Thread() {
+
             @Override
             public void run() {
                 try {
@@ -204,8 +206,8 @@ public abstract class AbstractShell {
                 logger.warn("Interrupted while reading the error and in stream", ie);
             }
             completed.compareAndSet(false, true);
-            //the timeout thread handling
-            //taken care in finally block
+            // the timeout thread handling
+            // taken care in finally block
             if (exitCode != 0 || errMsg.length() > 0) {
                 throw new ExitCodeException(exitCode, errMsg.toString());
             }
@@ -246,8 +248,7 @@ public abstract class AbstractShell {
      * @param lines lines
      * @throws IOException errors
      */
-    protected abstract void parseExecResult(BufferedReader lines)
-            throws IOException;
+    protected abstract void parseExecResult(BufferedReader lines) throws IOException;
 
     /**
      * get the current sub-process executing the given command
@@ -291,9 +292,9 @@ public abstract class AbstractShell {
             try {
                 p.exitValue();
             } catch (Exception e) {
-                //Process has not terminated.
-                //So check if it has completed
-                //if not just destroy it.
+                // Process has not terminated.
+                // So check if it has completed
+                // if not just destroy it.
                 if (p != null && !shell.completed.get()) {
                     shell.setTimedOut();
                     p.destroy();
@@ -306,6 +307,7 @@ public abstract class AbstractShell {
      * This is an IOException with exit code added.
      */
     public static class ExitCodeException extends IOException {
+
         private final int exitCode;
 
         public ExitCodeException(int exitCode, String message) {
@@ -322,6 +324,7 @@ public abstract class AbstractShell {
      * process manage container
      */
     public static class ProcessContainer extends ConcurrentHashMap<Integer, Process> {
+
         private static final ProcessContainer container = new ProcessContainer();
 
         private ProcessContainer() {

@@ -27,6 +27,7 @@ import java.util.Date;
 
 @TableName("t_ds_dq_execute_result")
 public class DqExecuteResult implements Serializable {
+
     /**
      * primary key
      */
@@ -41,7 +42,7 @@ public class DqExecuteResult implements Serializable {
      * process definition name
      */
     @TableField(exist = false)
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * process definition code
      */
@@ -355,7 +356,7 @@ public class DqExecuteResult implements Serializable {
 
     @Override
     public String toString() {
-        return "DqExecuteResult{" 
+        return "DqExecuteResult{"
                 + "id=" + id
                 + ", processDefinitionId=" + processDefinitionId
                 + ", processDefinitionName='" + processDefinitionName + '\''

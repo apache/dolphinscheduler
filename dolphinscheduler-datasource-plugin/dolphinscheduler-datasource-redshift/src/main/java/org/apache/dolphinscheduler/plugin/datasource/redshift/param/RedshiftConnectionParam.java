@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 public class RedshiftConnectionParam extends BaseConnectionParam {
+
     @Override
     public String toString() {
         return "RedshiftConnectionParam{"

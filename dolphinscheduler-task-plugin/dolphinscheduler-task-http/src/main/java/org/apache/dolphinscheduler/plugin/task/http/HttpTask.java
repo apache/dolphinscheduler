@@ -96,13 +96,15 @@ public class HttpTask extends AbstractTaskExecutor {
         String statusCode = null;
         String body = null;
 
-        try (CloseableHttpClient client = createHttpClient();
-             CloseableHttpResponse response = sendRequest(client)) {
+        try (
+                CloseableHttpClient client = createHttpClient();
+                CloseableHttpResponse response = sendRequest(client)) {
             statusCode = String.valueOf(getStatusCode(response));
             body = getResponseBody(response);
             exitStatusCode = validResponse(body, statusCode);
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
+            logger.info(
+                    "startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
                     formatTimeStamp, httpParameters.getUrl(),
                     httpParameters.getHttpMethod(), costTime, statusCode, body, output);
         } catch (Exception e) {
@@ -137,7 +139,8 @@ public class HttpTask extends AbstractTaskExecutor {
             }
         }
         addRequestParams(builder, httpPropertyList);
-        String requestUrl = ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
+        String requestUrl =
+                ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
         HttpUriRequest request = builder.setUri(requestUrl).build();
         setHeaders(request, httpPropertyList);
         return client.execute(request);
@@ -198,7 +201,8 @@ public class HttpTask extends AbstractTaskExecutor {
                 break;
             case STATUS_CODE_CUSTOM:
                 if (!statusCode.equals(httpParameters.getCondition())) {
-                    appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: " + httpParameters.getCondition());
+                    appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: "
+                            + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
@@ -289,7 +293,8 @@ public class HttpTask extends AbstractTaskExecutor {
      * @return RequestConfig
      */
     private RequestConfig requestConfig() {
-        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout()).setConnectTimeout(httpParameters.getConnectTimeout()).build();
+        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout())
+                .setConnectTimeout(httpParameters.getConnectTimeout()).build();
     }
 
     /**
