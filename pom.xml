@@ -598,7 +598,6 @@
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
-
                 <configuration>
                     <!-- optional: limit format enforcement to just the files changed by this feature branch -->
                     <ratchetFrom>HEAD</ratchetFrom>

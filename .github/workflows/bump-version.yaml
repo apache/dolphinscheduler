@@ -37,5 +37,5 @@ jobs:
                 -Dmaven.javadoc.skip \
                 -Dmaven.site.skip=true \
                 -Djacoco.skip=true \
-                -Dcheckstyle.skip \
+                -Dspotless.apply.skip \
                 -DretryFailedDeploymentCount=5
